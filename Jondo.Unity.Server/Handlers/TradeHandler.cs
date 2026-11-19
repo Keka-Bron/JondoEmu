@@ -28,6 +28,16 @@ namespace Jondo.Unity.Server.Handlers
 
         public bool Ended { get; set; }
 
+        /// <summary>
+        /// The side nobody plays, or zero: a hero of the one who asked (Managers.Heroes), who has no
+        /// client to accept, lay or be ready with. He takes what is laid down, ready whenever his
+        /// master is.
+        /// </summary>
+        public long Hero { get; init; }
+
+        /// <summary>Whether this side is ready: it said so, or it is the hero who always is.</summary>
+        public bool IsReady(long who) => who == Hero || Ready.Contains(who);
+
         /// <summary>One of the two at a time: both write here, each from their own connection.</summary>
         public SemaphoreSlim Gate { get; } = new SemaphoreSlim(1, 1);
 
@@ -91,6 +101,10 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static long Carried(GameSession session) => ConnectionProtocol.Carried(session.State);
 
+        /// <summary>One side of a trade: a player's session, or a hero's, which is in no registry.</summary>
+        private static GameSession? SessionOf(long characterId)
+            => SessionRegistry.FindByCharacter(characterId) ?? Heroes.SessionOf(characterId);
+
         // ─── Asking ─────────────────────────────────────────────────────────────────────────
 
         /// <summary>keu: asking someone on the map to trade.</summary>
@@ -101,8 +115,19 @@ namespace Jondo.Unity.Server.Handlers
             long target = VarOf(keu, 2);
 
             var me = SessionContext.Current;
-            var other = SessionRegistry.FindByCharacter(target);
-            if (other == null || !other.IsInWorld || target == me.CharacterId || other.MapId != me.MapId)
+            // Another player's hero is played from his master's client alone, which is his master's
+            // character: nobody could accept, and the request went nowhere without a word. It goes
+            // to the character that player is playing, who can.
+            var hero = Heroes.AsHero(target);
+            if (hero != null && hero.MasterId != me.CharacterId)
+            {
+                Console.WriteLine($"[Trade] {me.CharacterId} asks {target}, a hero of {hero.MasterId}: asked of him instead.");
+                target = hero.MasterId;
+                hero = null;
+            }
+
+            var other = hero?.Session ?? SessionRegistry.FindByCharacter(target);
+            if (other == null || (hero == null && !other.IsInWorld) || target == me.CharacterId || other.MapId != me.MapId)
             {
                 Console.WriteLine($"[Trade] {me.CharacterId} asks {target}, who is not on this map.");
                 return;
@@ -113,13 +138,22 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            var trade = new Trade { SourceId = me.CharacterId, TargetId = target };
+            var trade = new Trade { SourceId = me.CharacterId, TargetId = target, Hero = hero != null ? target : 0 };
             me.State.Trade = trade;
             other.State.Trade = trade;
 
             byte[] kfz = TradeProtocol.BuildRequested(me.CharacterId, target);
             await SendBothAsync(me, other, Op.Kfz, kfz);
             Console.WriteLine($"[Trade] {me.CharacterId} asks {target} to trade.");
+
+            // One of his own heroes has no client to accept with: the window opens at once.
+            if (hero != null)
+            {
+                trade.Accepted = true;
+                await SendAsync(me, Op.Kbg, TradeProtocol.BuildStarted(me.CharacterId, Capacity(me), Carried(me),
+                                                                     target, Capacity(other), Carried(other)));
+                Console.WriteLine($"[Trade] {me.CharacterId} trades with {target}, a hero of his.");
+            }
         }
 
         private static bool Busy(GameSession session)
@@ -135,7 +169,7 @@ namespace Jondo.Unity.Server.Handlers
             if (trade == null) return false;
             if (trade.Accepted || trade.TargetId != me.CharacterId) return true;
 
-            var source = SessionRegistry.FindByCharacter(trade.SourceId);
+            var source = SessionOf(trade.SourceId);
             if (source == null || source.MapId != me.MapId)
             {
                 await EndAsync(trade, done: false);
@@ -168,7 +202,7 @@ namespace Jondo.Unity.Server.Handlers
             try
             {
                 if (trade.Ended) return true;
-                var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+                var other = SessionOf(trade.Other(me.CharacterId));
                 int had = trade.OfferOf(me.CharacterId).Find(o => o.Uid == uid).Quantity;
                 if (await LayAsync(trade, me, other, uid, had + delta))
                     await NobodyReadyAsync(trade, me, other);
@@ -264,7 +298,7 @@ namespace Jondo.Unity.Server.Handlers
                         return false;
                 }
 
-                var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+                var other = SessionOf(trade.Other(me.CharacterId));
                 int changed = 0;
                 foreach (var (uid, quantity) in moves)
                     if (await LayAsync(trade, me, other, uid, quantity)) changed++;
@@ -291,7 +325,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (trade.Ended) return true;
                 long kamas = Math.Clamp(VarOf(kee, 1), 0, me.State.Kamas);
                 trade.Kamas[me.CharacterId] = kamas;
-                var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+                var other = SessionOf(trade.Other(me.CharacterId));
                 await SendAsync(me, Op.Ket, TradeProtocol.BuildKamas(kamas, remote: false));
                 await SendAsync(other, Op.Ket, TradeProtocol.BuildKamas(kamas, remote: true));
                 await NobodyReadyAsync(trade, me, other);
@@ -326,11 +360,11 @@ namespace Jondo.Unity.Server.Handlers
             try
             {
                 if (trade.Ended) return true;
-                var other = SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+                var other = SessionOf(trade.Other(me.CharacterId));
                 if (ready) trade.Ready.Add(me.CharacterId);
                 else trade.Ready.Remove(me.CharacterId);
 
-                both = trade.Ready.Contains(trade.SourceId) && trade.Ready.Contains(trade.TargetId);
+                both = trade.IsReady(trade.SourceId) && trade.IsReady(trade.TargetId);
                 if (!both)
                 {
                     await SendBothAsync(me, other, Op.Kgt, WorkshopProtocol.BuildReady(ready, me.CharacterId));
@@ -357,7 +391,7 @@ namespace Jondo.Unity.Server.Handlers
             // same stack. Asked for before the gate and with a deadline: two «ready» crossing would
             // each wait for the other's turn for ever, and then the trade is called off instead.
             var me = SessionContext.Actual;
-            var partner = me == null ? null : SessionRegistry.FindByCharacter(trade.Other(me.CharacterId));
+            var partner = me == null ? null : SessionOf(trade.Other(me.CharacterId));
             bool held = partner != null && !ReferenceEquals(partner, me) && await partner.UnoCadaVez.WaitAsync(PartnerTurnWait);
             try
             {
@@ -385,9 +419,9 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 }
                 // The table may have changed between the second «ready» and here, and took both back.
-                if (!trade.Ready.Contains(trade.SourceId) || !trade.Ready.Contains(trade.TargetId)) return;
-                var source = SessionRegistry.FindByCharacter(trade.SourceId);
-                var target = SessionRegistry.FindByCharacter(trade.TargetId);
+                if (!trade.IsReady(trade.SourceId) || !trade.IsReady(trade.TargetId)) return;
+                var source = SessionOf(trade.SourceId);
+                var target = SessionOf(trade.TargetId);
                 if (source == null || target == null || !StillThere(trade, source) || !StillThere(trade, target))
                 {
                     await EndHeldAsync(trade, done: false);
@@ -546,8 +580,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (trade.Ended) return;
             trade.Ended = true;
-            var source = SessionRegistry.FindByCharacter(trade.SourceId);
-            var target = SessionRegistry.FindByCharacter(trade.TargetId);
+            var source = SessionOf(trade.SourceId);
+            var target = SessionOf(trade.TargetId);
             foreach (var session in new[] { source, target })
                 if (session?.State.Trade == trade) session.State.Trade = null;
             await SendBothAsync(source, target, Op.Khd, TradeProtocol.BuildClosed(done));
