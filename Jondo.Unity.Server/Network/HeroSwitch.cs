@@ -106,6 +106,14 @@ namespace Jondo.Unity.Server.Network
             // His look told as a change of gear tells it: an inventory left open kept drawing the
             // one played before over the new one's bag.
             await session.SendAsync(ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
+            // His journal, the quests he follows and the NPCs' marks his quests put on this map: the
+            // map's block sends them, and with no map loaded again the client kept showing the
+            // journal of the one played before until the next login.
+            if (!reload)
+            {
+                await Quests.SendJournalAsync(session, box: true);
+                await Quests.SendMarksAsync(session, map);
+            }
 
             // The one played before back as a hero, where he was in the group's round: the others
             // are in it from the one after the hero taken (Heroes.HandOver). Taking the first hero
