@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-  Packages a release of the emulator for one platform: the full zip, the executables as assets
-  of their own, the setup, and the manifest the launcher updates from.
+  Packages a release of the emulator for one platform: the setup players download, the full zip,
+  the server and Studio as assets of their own, and the manifest the launcher updates from.
 
 .DESCRIPTION
   The folder a player installs is what git versions of datos/, content/, launcher_assets/, the
@@ -11,7 +11,8 @@
     - the versioned ones as "raw": the launcher fetches them one by one from the repository at
       the release's tag. They are taken with LF line endings, which is how the repository stores
       them, so their hashes are the raw files' hashes;
-    - the executables as "asset": uploaded beside the zip under names without spaces.
+    - the executables as "asset": uploaded beside the zip under names without spaces. The
+      launcher's asset is the setup itself (the same file), so it is uploaded once.
 
   An update fetches only the files whose hash changed, or the full zip when most did. Runs on
   Windows PowerShell 5.1 and on PowerShell 7, on Windows and on Linux.
@@ -50,13 +51,15 @@ tar -xf "$tar" -C "$stage"
 if ($LASTEXITCODE -ne 0) { throw 'tar failed' }
 Remove-Item $tar
 
-# The executables, and their asset names: no spaces, the platform in them.
+# The executables, and their asset names: no spaces, the platform in them. The launcher's is the
+# setup's: the launcher is the setup, and the manifest sends an update to whichever name it holds.
+$setupName = if ($Platform -eq 'win-x64') { "JondoEmu-Setup-$Platform.exe" } else { "JondoEmu-Setup-$Platform" }
 $assets = @{}
 foreach ($name in $Executables.Keys) {
     Copy-Item -LiteralPath $Executables[$name] -Destination (Join-Path $stage $name)
     $base = [IO.Path]::GetFileNameWithoutExtension($name).ToLowerInvariant() -replace '^jondo\s+', '' -replace '\s+', '-'
     $ext = [IO.Path]::GetExtension($name)
-    $assets[$name] = "$base-$Platform$ext"
+    $assets[$name] = if ($name -like 'Jondo Emulator Launcher*') { $setupName } else { "$base-$Platform$ext" }
 }
 
 # The manifest.
@@ -70,7 +73,6 @@ $files = foreach ($file in (Get-ChildItem -LiteralPath $stage -Recurse -File -Fo
 }
 
 $full = "Jondo-Full-$Tag-$Platform.zip"
-$setupName = if ($Platform -eq 'win-x64') { "JondoEmu-Setup-$Platform.exe" } else { "JondoEmu-Setup-$Platform" }
 $manifest = [ordered]@{
     version  = $Tag
     platform = $Platform
@@ -91,12 +93,10 @@ if ($Platform -eq 'linux-x64' -and (Get-Command zip -ErrorAction SilentlyContinu
     [IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [IO.Compression.CompressionLevel]::Optimal, $true)
 }
 
-# The executables as assets, and the launcher once more as the setup players download.
+# The executables as assets: the launcher under the setup's name, the one players download.
 foreach ($name in $Executables.Keys) {
     Copy-Item -LiteralPath (Join-Path $stage $name) -Destination (Join-Path $OutDir $assets[$name]) -Force
 }
-$launcher = $Executables.Keys | Where-Object { $_ -like 'Jondo Emulator Launcher*' } | Select-Object -First 1
-if ($launcher) { Copy-Item -LiteralPath (Join-Path $stage $launcher) -Destination (Join-Path $OutDir $setupName) -Force }
 
 Remove-Item -Recurse -Force $work
 Write-Host "[Release] $Platform $Tag : $(@($files).Count) files, $full"

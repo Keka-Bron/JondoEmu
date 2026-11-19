@@ -123,10 +123,11 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
-      # The Windows release: the full zip (a folder that runs as it is unpacked, JondoEmu/ at its
-      # root), the three executables as assets of their own, the setup players download (the
-      # launcher, self-contained) and the manifest the launcher updates from -- every file with
-      # its hash, the versioned ones fetched from the repository at the tag. See the script.
+      # The Windows release: the setup players download (the launcher, self-contained, which is
+      # also the launcher's own update), the full zip (a folder that runs as it is unpacked,
+      # JondoEmu/ at its root), the server and Studio as assets of their own and the manifest the
+      # launcher updates from -- every file with its hash, the versioned ones fetched from the
+      # repository at the tag. See the script.
       - name: Package
         shell: pwsh
         run: |
@@ -137,6 +138,9 @@ jobs:
               'Jondo Studio.exe' = 'Jondo Studio.exe'
             }
 
+      # The notes open with the one file to download for each system: the release also carries
+      # what the launcher fetches by itself, and nothing on the page tells them apart otherwise.
+      # GitHub puts the generated notes after this body.
       - name: Create draft release
         uses: ncipollo/release-action@v1
         with:
@@ -145,8 +149,25 @@ jobs:
           commit: ${{ steps.version.outputs.sha }}
           draft: true
           generateReleaseNotes: true
-          artifacts: release/*.zip,release/*.exe,release/*.json,TestResults/tests.trx
+          body: |
+            ## Download
+
+            - **Windows:** [**JondoEmu-Setup-win-x64.exe**](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/JondoEmu-Setup-win-x64.exe)
+            - **Linux:** [**JondoEmu-Setup-linux-x64**](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/JondoEmu-Setup-linux-x64) (make it executable first: `chmod +x JondoEmu-Setup-linux-x64`)
+
+            Download the one for your system and run it: it installs the emulator, fetches the Dofus client and keeps everything up to date. **The other files are what it downloads by itself; you do not need them.** `Jondo-Full-…zip` is the same folder ready to unpack, for installing by hand.
+
+          artifacts: release/*.zip,release/*.exe,release/*.json
           artifactErrorsFailBuild: true
+
+      # The test results stay with the run, not among the files players see.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          if-no-files-found: ignore
 
   # The Linux release: the same folder as the Windows one with the three tools built for
   # linux-x64 (the mods ride along unused: the native Linux client has no mod loader), its
