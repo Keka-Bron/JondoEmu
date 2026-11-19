@@ -1,0 +1,37 @@
+syntax = "proto3";
+option csharp_namespace = "Jondo.Unity.Protocol.Game.Wire.Storage";
+message lfh {
+     int32 gaqm = 1 ;
+}
+message lfj {
+     string gaqv = 1 ;
+}
+message lhh {
+     int32 gbaq = 2 ;
+}
+message lhs {
+     int32 gbcv = 2 ;
+  oneof gbde {
+     lhh gbcx = 1 ;
+     lob gbcy = 3 ;
+     lnw gbcz = 4 ;
+     lmq gbda = 6 ;
+     lfh gbdb = 7 ;
+     lfj gbdc = 8 ;
+     lpp gbdd = 9 ;
+  }
+}
+message lmq {
+     int32 gbzt = 2 ;
+}
+message lnw {
+     string gcfc = 2 ;
+}
+message lob {
+     bool gcgv = 2 ;
+     int32 gcgw = 3 ;
+}
+message lpp {
+     int32 gcmz = 2 ;
+     int32 gcna = 3 ;
+}

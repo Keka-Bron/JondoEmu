@@ -1,0 +1,125 @@
+{
+  "stableNamespace": "Jondo.Unity.Protocol.Game",
+  "generatedNamespace": "Jondo.Unity.Protocol.Game.Wire",
+  "conversionException": "GameConversionException",
+  "className": "ShortcutStorageBindings",
+  "root": "Shortcut",
+  "messages": {
+    "lfh": {
+      "name": "ShortcutSmiley",
+      "fields": {
+        "gaqm": "SmileyId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfj": {
+      "name": "ShortcutOutfit",
+      "fields": {
+        "gaqv": "OutfitUuid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhh": {
+      "name": "ShortcutEmote",
+      "fields": {
+        "gbaq": "EmoteId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhs": {
+      "name": "Shortcut",
+      "fields": {
+        "gbcv": "SlotId"
+      },
+      "oneofs": {
+        "gbde": {
+          "member": "ShortcutCase",
+          "cases": {
+            "gbcx": {
+              "type": "ShortcutCaseShortcutEmote",
+              "member": "Value"
+            },
+            "gbcy": {
+              "type": "ShortcutCaseShortcutCosmeticObject",
+              "member": "Value"
+            },
+            "gbcz": {
+              "type": "ShortcutCaseShortcutPreset",
+              "member": "Value"
+            },
+            "gbda": {
+              "type": "ShortcutCaseShortcutSpell",
+              "member": "Value"
+            },
+            "gbdb": {
+              "type": "ShortcutCaseShortcutSmiley",
+              "member": "Value"
+            },
+            "gbdc": {
+              "type": "ShortcutCaseShortcutOutfit",
+              "member": "Value"
+            },
+            "gbdd": {
+              "type": "ShortcutCaseShortcutObjectItem",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lmq": {
+      "name": "ShortcutSpell",
+      "fields": {
+        "gbzt": "SpellId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lnw": {
+      "name": "ShortcutPreset",
+      "fields": {
+        "gcfc": "PresetUuid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lob": {
+      "name": "ShortcutCosmeticObject",
+      "fields": {
+        "gcgv": "Enable",
+        "gcgw": "ObjectGid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lpp": {
+      "name": "ShortcutObjectItem",
+      "fields": {
+        "gcmz": "ItemGid",
+        "gcna": "ItemUid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    }
+  }
+}

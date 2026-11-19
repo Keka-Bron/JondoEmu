@@ -1,0 +1,245 @@
+syntax = "proto3";
+option csharp_namespace = "Jondo.Unity.Protocol.Connection.Wire.Messages";
+enum mic {
+  fiey = 0;
+  fiez = 1;
+  fifa = 2;
+  fifb = 3;
+  fifc = 4;
+  fifd = 5;
+  fife = 6;
+}
+enum mja {
+  fikf = 0;
+  fikg = 1;
+  fikh = 2;
+  fiki = 3;
+  fikj = 4;
+  fikk = 5;
+  fikl = 6;
+  fikm = 7;
+  fikn = 8;
+  fiko = 9;
+  fikp = 10;
+  fikq = 11;
+  fikr = 12;
+  fiks = 13;
+  fikt = 14;
+}
+enum mjh {
+  filr = 0;
+  fils = 1;
+  filt = 2;
+  filu = 3;
+  filv = 4;
+}
+enum mjo {
+  finb = 0;
+  finc = 1;
+  find = 2;
+  fine = 3;
+}
+enum mjr {
+  fino = 0;
+  finp = 1;
+}
+enum mka {
+  fipb = 0;
+  fipc = 1;
+}
+enum mkf {
+  fipu = 0;
+  fipv = 1;
+}
+enum mko {
+  firf = 0;
+  firg = 1;
+  firh = 2;
+  firi = 3;
+}
+message mif {
+  oneof gicw {
+     mih gict = 1 ;
+     mij gicu = 2 ;
+     mil gicv = 3 ;
+  }
+}
+message mih {
+     string gida = 1 ;
+  oneof gidi {
+     mim gidb = 2 ;
+     mir gidc = 3 ;
+     mjf gidd = 4 ;
+     mju gide = 5 ;
+     mjz gidf = 6 ;
+     mkd gidg = 7 ;
+     mkl gidh = 8 ;
+  }
+}
+message mij {
+     string gidm = 1 ;
+  oneof gidt {
+     mio gidn = 2 ;
+     mje gido = 3 ;
+     mjk gidp = 4 ;
+     mjw gidq = 5 ;
+     mkk gidr = 6 ;
+     mks gids = 7 ;
+  }
+}
+message mil {
+  oneof gidy {
+     mip gidx = 1 ;
+  }
+}
+message mim {
+}
+message mio {
+}
+message mip {
+     mjq giei = 1 ;
+}
+message mir {
+     string giem = 1 ;
+     string giep = 5 ;
+  oneof gieq {
+     miu gien = 3 ;
+     miv gieo = 4 ;
+  }
+}
+message miu {
+     string giez = 1 ;
+     mis gifa = 2 ;
+}
+message mis {
+     int64 gieu = 1 ;
+     string giev = 2 ;
+}
+message miv {
+     string gife = 1 ;
+}
+message mje {
+  oneof gign {
+     miz gigl = 1 ;
+     mjc gigm = 2 ;
+  }
+}
+message miz {
+     int64 gifp = 1 ;
+     string gifq = 2 ;
+     string gifr = 3 ;
+     mjn gifs = 4 ;
+     string gifu = 5 ;
+     mix gifv = 6 ;
+    optional int32 gifw = 7 ;
+     mjx gify = 8 ;
+     mkt gifz = 9 ;
+}
+message mix {
+     bool gifi = 1 ;
+     bool gifj = 2 ;
+     bool gifk = 3 ;
+     bool gifl = 4 ;
+}
+message mjc {
+     mja gigd = 1 ;
+     string gige = 2 ;
+     string gigg = 3 ;
+}
+message mjf {
+     int32 gigr = 1 ;
+}
+message mjk {
+  oneof gihe {
+     mji gihb = 1 ;
+     mjh gihc = 2 ;
+  }
+}
+message mji {
+     string gigv = 1 ;
+     string gigw = 2 ;
+    repeated int32 gigx = 3 ;
+}
+message mjn {
+    repeated mjq gihn = 1 ;
+    repeated mjl giho = 2 ;
+     bool gihp = 3 ;
+}
+message mjl {
+     mic gihi = 1 ;
+     int32 gihj = 2 ;
+}
+message mjq {
+     mjt giht = 1 ;
+     mjo gihu = 2 ;
+    repeated mkc gihv = 3 ;
+}
+message mjt {
+     int32 gihz = 1 ;
+     mjr giia = 2 ;
+     mic giib = 3 ;
+}
+message mju {
+     int64 giif = 1 ;
+}
+message mjw {
+  oneof giil {
+     mjx giij = 2 ;
+     mjy giik = 3 ;
+  }
+}
+message mjx {
+     bool giip = 1 ;
+     int64 giiq = 2 ;
+     string giir = 3 ;
+     string giis = 4 ;
+     mjn giit = 5 ;
+}
+message mjy {
+}
+message mjz {
+}
+message mkc {
+     string gijd = 1 ;
+     int32 gije = 2 ;
+     mka gijf = 3 ;
+     int32 gijg = 4 ;
+     string gijh = 5 ;
+}
+message mkd {
+}
+message mkk {
+  oneof gikb {
+     mki gijy = 1 ;
+     mkf gijz = 2 ;
+  }
+}
+message mki {
+    repeated mkg giju = 1 ;
+}
+message mkg {
+     string gijo = 1 ;
+     string gijp = 2 ;
+    repeated int32 gijq = 3 ;
+}
+message mkl {
+     string gikf = 1 ;
+     string gikg = 2 ;
+}
+message mks {
+  oneof giku {
+     mkn giks = 1 ;
+     mkq gikt = 2 ;
+  }
+}
+message mkn {
+    repeated int32 gikk = 1 ;
+}
+message mkq {
+     mko giko = 1 ;
+}
+message mkt {
+     string giky = 1 ;
+     string gikz = 2 ;
+    repeated int32 gila = 3 ;
+}
