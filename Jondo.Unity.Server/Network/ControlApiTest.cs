@@ -92,6 +92,7 @@ namespace Jondo.Unity.Server.Network
                 "items" => TestItemList(cuerpo),
                 "item" => TestItem(cuerpo),
                 "equip" => TestEquip(cuerpo),
+                "align" => TestAlign(cuerpo),
                 "finish" => TestFinish(cuerpo),
                 "crit" => TestCrit(cuerpo),
                 "kill" => TestKill(cuerpo),
@@ -579,6 +580,8 @@ namespace Jondo.Unity.Server.Network
                         else if (op == Op.Kee) await TradeHandler.KamasAsync(stream, frame);
                         // A document's «start the quest» button (a wanted poster's), with the document open.
                         else if (op == "ido") await QuestHandler.StartFromDocumentAsync(session, frame);
+                        // The alliance editor's founding, without walking to the Temple's door.
+                        else if (op == Op.Mdk) await AllianceHandler.CreateAsync(stream, frame);
                         else throw new InvalidOperationException($"op {op} is not one the harness sends");
                     }
                     finally
@@ -919,22 +922,37 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
-        /// Any client message the harness may send: its op and its varint fields, { "fields": { "1": 300, "4": 161 } }.
+        /// Any client message the harness may send: its op and its fields by number -- a number is a
+        /// varint, a string a string, an object a submessage: { "fields": { "1": 300, "2": "x", "3": { "1": 4 } } }.
         /// </summary>
         private static Respuesta TestInject(string cuerpo)
         {
             var session = TestSessionOnline();
             if (session == null || session.Stream == null) return Mal(404, "offline");
             string op = Texto(cuerpo, "op");
-            var body = Pb.New();
+            byte[] body;
             using (var doc = System.Text.Json.JsonDocument.Parse(cuerpo))
-            {
-                if (doc.RootElement.TryGetProperty("fields", out var fields) && fields.ValueKind == System.Text.Json.JsonValueKind.Object)
-                    foreach (var field in fields.EnumerateObject().OrderBy(f => int.Parse(f.Name)))
-                        body.Var(int.Parse(field.Name), field.Value.GetInt64());
-            }
-            var lines = RunAsClient(session, op, body.Build());
+                body = doc.RootElement.TryGetProperty("fields", out var fields) && fields.ValueKind == System.Text.Json.JsonValueKind.Object
+                    ? InjectedFields(fields).Build()
+                    : Array.Empty<byte>();
+            var lines = RunAsClient(session, op, body);
             return Bien(new { lines, fight = FightView(session) });
+        }
+
+        private static Pb InjectedFields(System.Text.Json.JsonElement fields)
+        {
+            var body = Pb.New();
+            foreach (var field in fields.EnumerateObject().OrderBy(f => int.Parse(f.Name)))
+            {
+                int number = int.Parse(field.Name);
+                switch (field.Value.ValueKind)
+                {
+                    case System.Text.Json.JsonValueKind.String: body.Str(number, field.Value.GetString() ?? ""); break;
+                    case System.Text.Json.JsonValueKind.Object: body.Msg(number, InjectedFields(field.Value)); break;
+                    default: body.Var(number, field.Value.GetInt64()); break;
+                }
+            }
+            return body;
         }
 
         /// <summary>

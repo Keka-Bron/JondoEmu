@@ -165,7 +165,7 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>Where a house of a list stands (lgl): { f1: street map, f2: x, f4: subarea, f5: y }.</summary>
-        private static Pb Where(Owned house)
+        internal static Pb Where(Owned house)
             => Pb.New()
                 .Var(1, house.StreetMapId)
                 .VarIfNotZero(2, house.WorldX)

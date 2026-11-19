@@ -106,6 +106,24 @@ namespace Jondo.Unity.Server.Network
         }
 
         /// <summary>
+        /// { side, honour?, pvp? }: the slot's character sworn to a side (2 neutral, 3 Bonta, 4
+        /// Brakmar), with that much honour more and his PvP switch as given.
+        /// </summary>
+        private static Respuesta TestAlign(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null) return Mal(404, "offline");
+            long character = session.State.CharacterId;
+            int side = (int)Numero(cuerpo, "side");
+            if (side != Alignments.Neutral && side != Alignments.Bonta && side != Alignments.Brakmar) return Mal(400, "side");
+            Alignments.Set(character, side, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            int honour = (int)Numero(cuerpo, "honour");
+            if (honour > 0) Alignments.AddHonour(character, honour);
+            var now = Alignments.SetPvp(character, Numero(cuerpo, "pvp") != 0);
+            return Bien(new { character, side = now.Side, honour = now.Honour, grade = now.HonourGrade, pvp = now.PvpOn });
+        }
+
+        /// <summary>
         /// { gid }: the item worn by the slot's character, out of a fight -- in the weapon's hand,
         /// the shield's or the first Dofus slot -- and whatever the harness had put on before back
         /// in the bag. The next fight reads it as it reads anybody's equipment.

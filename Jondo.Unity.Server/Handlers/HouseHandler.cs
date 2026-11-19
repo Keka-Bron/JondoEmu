@@ -600,7 +600,7 @@ namespace Jondo.Unity.Server.Handlers
             => session.SendAsync(HouseListMessages.Account(session.AccountId));
 
         /// <summary>A house as the lists carry it, with where its street is; null for a door that is not a house.</summary>
-        private static HouseProtocol.Owned? OwnedOf(HouseStore.House house)
+        internal static HouseProtocol.Owned? OwnedOf(HouseStore.House house)
         {
             if (!Houses.TryGetDoor(house.MapId, house.ElementId, out var door)) return null;
             var street = MapManager.GetMapInfo(house.MapId);

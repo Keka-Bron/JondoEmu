@@ -219,6 +219,43 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// What a character wears, read out of the database without touching anybody's session:
+        /// the player card's equipment tab, for a character online or not.
+        /// </summary>
+        public static List<Item> WornItemsOf(long characterId)
+        {
+            var worn = new List<Item>();
+            try
+            {
+                using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Uid, Gid, Quantity, Position, Effects FROM CharacterItems " +
+                                      "WHERE CharacterId = $id AND Position BETWEEN 0 AND $last ORDER BY Position;";
+                command.Parameters.AddWithValue("$id", characterId);
+                command.Parameters.AddWithValue("$last", LastWornSlot);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    var item = new Item
+                    {
+                        Uid = reader.GetInt64(0),
+                        Template = reader.GetInt32(1),
+                        Quantity = reader.IsDBNull(2) ? 1 : reader.GetInt32(2),
+                        Position = reader.GetInt32(3),
+                    };
+                    if (!reader.IsDBNull(4)) ReadEffects(reader.GetString(4), item);
+                    worn.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[Equipment] Could not read what character {characterId} wears: {ex.Message}");
+            }
+            return worn;
+        }
+
+        /// <summary>
         /// Reads the character's inventory out of the database, which is where it belongs.
         ///
         /// Until now the inventory was replayed from the capture, so it was somebody else's: the
