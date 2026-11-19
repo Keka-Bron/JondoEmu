@@ -354,12 +354,15 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri(Op.Kav)) await FightHandler.RefuseSwapAsync(stream, payload);
                 // A player's card («Mostrar perfil»).
                 else if (payloadStr == Op.Uri("kxh")) await PlayerCardHandler.ShowAsync(stream, payload);
+                else if (payloadStr == Op.Uri("lag")) await PlayerCardHandler.TabAsync(stream, payload);
+                // The jobs it shows, picked in its general tab.
+                else if (payloadStr == Op.Uri("kxs")) await PlayerCardHandler.SetJobsAsync(payload);
                 // «Informaciones» on a player's menu: the date and who he is, in the chat.
                 else if (payloadStr == Op.Uri("lqw")) await WhoisHandler.AskAsync(stream, payload);
                 // A ping on somebody standing on the map.
                 else if (payloadStr == Op.Uri(Op.Ijg)) await EntityPingHandler.PingAsync(stream, payload);
                 // Its background, picked in the card's own window.
-                else if (payloadStr == Op.Uri("kye")) await PlayerCardHandler.SetBackgroundAsync(payload);
+                else if (payloadStr == Op.Uri("kye")) await PlayerCardHandler.SetBackgroundAsync(stream, payload);
                 // The chat's community, acknowledged.
                 else if (payloadStr == Op.Uri("hos")) await ChatHandler.CommunityAsync(stream, payload);
                 // The cosmetics collection: items into it and back out.

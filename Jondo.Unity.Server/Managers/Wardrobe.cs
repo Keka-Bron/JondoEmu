@@ -74,6 +74,19 @@ namespace Jondo.Unity.Server.Managers
                     // it was already there
                 }
 
+                // The jobs the player card shows (kxs), «12,26»; empty is none picked.
+                try
+                {
+                    var oficios = connection.CreateCommand();
+                    oficios.CommandText =
+                        "ALTER TABLE CharacterWardrobe ADD COLUMN CardJobs TEXT NOT NULL DEFAULT '';";
+                    oficios.ExecuteNonQuery();
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    // it was already there
+                }
+
                 // The aura picked in the appearance window or the emotes (lxw); 0 is none.
                 try
                 {
@@ -246,6 +259,52 @@ namespace Jondo.Unity.Server.Managers
 
         public static void SaveCardBackground(long characterId, int background)
             => Save(characterId, "CardBackground", background);
+
+        /// <summary>The most jobs the player card shows: its window's «(5 MAX)».</summary>
+        public const int MostCardJobs = 5;
+
+        /// <summary>The jobs the player card shows, in the order they were picked.</summary>
+        public static List<int> CardJobsOf(long characterId)
+        {
+            var jobs = new List<int>();
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT CardJobs FROM CharacterWardrobe WHERE CharacterId = $id;";
+                command.Parameters.AddWithValue("$id", characterId);
+                if (command.ExecuteScalar() is string saved)
+                    foreach (string one in saved.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                        if (int.TryParse(one, out int job) && job > 0) jobs.Add(job);
+            }
+            catch (Exception)
+            {
+                // the column comes with Initialize; before it none is picked
+            }
+            return jobs;
+        }
+
+        /// <summary>The jobs the player card shows from now on: the first five, without repeats.</summary>
+        public static void SaveCardJobs(long characterId, IEnumerable<int> jobs)
+        {
+            string value = string.Join(",", jobs.Where(j => j > 0).Distinct().Take(MostCardJobs));
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "INSERT INTO CharacterWardrobe (CharacterId, CardJobs) VALUES ($id, $v) " +
+                                      "ON CONFLICT(CharacterId) DO UPDATE SET CardJobs = $v;";
+                command.Parameters.AddWithValue("$id", characterId);
+                command.Parameters.AddWithValue("$v", value);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Appearances] Could not save the card's jobs: {ex.Message}");
+            }
+        }
 
         public static void SaveTitle(long characterId, int titleId)
             => Save(characterId, "TitleId", titleId);
