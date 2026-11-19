@@ -167,9 +167,14 @@ namespace Jondo.Unity.Tests.World
                 await FightHandler.DispararAsync(null, fight, flor, EffectEngine.AlAcabarElTurno);
                 Assert.True(people[0].CurrentHP > 1000);                           // its petal heals its camp
 
+                // Every turn start of that round, as the fight runs them: the wait is its caster's.
                 int back = fight.RoundNumber + 2;
                 while (fight.RoundNumber < back) fight.NextTurn();
-                await FightHandler.ApplyDuePendingAsync(null, fight);
+                while (fight.RoundNumber == back && flor.TeamId != FightInstance.Rojos)
+                {
+                    await FightHandler.ApplyDuePendingAsync(null, fight);
+                    if (flor.TeamId != FightInstance.Rojos) fight.NextTurn();
+                }
                 Assert.Equal(FightInstance.Rojos, flor.TeamId);
                 Assert.Contains(flor, fight.Rojo);
                 Assert.False(flor.Buffs.TieneEstado(56));

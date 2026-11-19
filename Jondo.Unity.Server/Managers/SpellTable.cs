@@ -362,11 +362,14 @@ namespace Jondo.Unity.Server.Managers
         /// on grade 2, and put at grade 2 his critical bonus never came.
         /// </summary>
         public static int PassiveGrade(int spellId, int level)
+            => GradesSpreadOverLevels(spellId) ? Math.Max(1, HighestGrade(spellId, level)) : 1;
+
+        /// <summary>Whether a spell's grades open at levels of their own, each after the one before.</summary>
+        public static bool GradesSpreadOverLevels(int spellId)
         {
             Ensure();
-            if (!_grades.TryGetValue(spellId, out var grades) || grades.Count == 0) return 1;
-            bool spread = grades.TryGetValue(1, out int first) && grades.Where(g => g.Key > 1).All(g => g.Value > first);
-            return spread ? Math.Max(1, HighestGrade(spellId, level)) : 1;
+            if (!_grades.TryGetValue(spellId, out var grades) || grades.Count < 2) return false;
+            return grades.TryGetValue(1, out int first) && grades.Where(g => g.Key > 1).All(g => g.Value > first);
         }
 
         /// <summary>The pair a spell belongs to, or null if it belongs to none.</summary>

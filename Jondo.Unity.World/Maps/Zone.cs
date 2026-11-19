@@ -189,7 +189,10 @@ namespace Jondo.Unity.World.Maps
         public static int FalloffCells(int shape, int size, int minSize, int caster, int centre, int target)
         {
             if (!MapGeometry.IsValid(centre) || !MapGeometry.IsValid(target)) return 0;
-            if (shape is 0 or ' ' or TodoElMapa or WholeMap || size > 50) return 0;
+            // A point is one cell, its own centre: whoever its row lands on takes it whole, however
+            // far from the aimed cell the mask found him. Esfera de Xelor's 25% return and Arenas
+            // del Tiempo's bounces are "P" rows, and lost 10% a cell to the attacker's distance.
+            if (shape is 0 or ' ' or Punto or TodoElMapa or WholeMap || size > 50) return 0;
 
             int measure;
             switch (shape)

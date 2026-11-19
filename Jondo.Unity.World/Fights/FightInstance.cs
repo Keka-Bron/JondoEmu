@@ -1157,6 +1157,13 @@ namespace Jondo.Unity.World.Fights
         public Dictionary<long, long> Telefrags { get; set; } = new Dictionary<long, long>();
 
         /// <summary>
+        /// The pairs a teleport swapped in the whole cast being resolved, its sub-casts' included,
+        /// the lower id first. Each sub-cast has its own <see cref="Telefrags"/>, and Arenas del
+        /// Tiempo's bounce swapped back at once the two its blow had just swapped.
+        /// </summary>
+        public HashSet<(long, long)> SwapsOfTheCast { get; set; } = new HashSet<(long, long)>();
+
+        /// <summary>
         /// The dead, in the order they fell: "Invoca al último aliado muerto" (780, 1034) brings
         /// back the last of the caster's side.
         /// </summary>

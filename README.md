@@ -48,6 +48,16 @@ its spells must pass.
 
 - ✅ Legendary items, Dofus and prismaradites: all 74 answer every trigger the fights provoke
 
+### Classes checked beyond the harness
+
+Played by hand in the client, or audited spell by spell over several turns, initiative orders and
+chained sub-spells against what each spell's sheet says.
+
+| Class | How | Bugs found | Fixed | Still open |
+|---|---|:---:|:---:|---|
+| Foggernaut | Played by hand ([#100](https://github.com/Keka-Bron/JondoEmu/issues/100)) | 9 | 9 | — |
+| Xelor | Multi-turn audit of all 44 spells, then fixes, each checked in a fight but the server's own cast-in-line check (the client offers no other cell): **44/44 with no known bug** | 14 | 14 | — |
+
 ---
 
 ## 📑 Contents

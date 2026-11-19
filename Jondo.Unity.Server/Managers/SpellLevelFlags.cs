@@ -17,8 +17,26 @@
     /// </remarks>
     public static class SpellLevelFlags
     {
+        /// <summary>It can be cast along a straight line (the client's CastInLine, 1).</summary>
+        public const int CastInLine = 1 << 0;
+
         /// <summary>It can be cast along a diagonal (the client's CastInDiagonal, 2).</summary>
         public const int CastInDiagonal = 1 << 1;
+
+        /// <summary>
+        /// Whether <paramref name="aim"/> lies where a level with these flags may be cast from
+        /// <paramref name="from"/>: anywhere when it asks for neither, else along the straight lines
+        /// (CastInLine), the diagonals (CastInDiagonal) or either when it has both.
+        /// </summary>
+        public static bool OnItsLines(int flags, int from, int aim)
+        {
+            bool inLine = (flags & CastInLine) != 0, inDiagonal = (flags & CastInDiagonal) != 0;
+            if (!inLine && !inDiagonal) return true;
+            var (ax, ay) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(from);
+            var (bx, by) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(aim);
+            return inLine && (ax == bx || ay == by)
+                || inDiagonal && System.Math.Abs(ax - bx) == System.Math.Abs(ay - by);
+        }
 
         /// <summary>
         /// Its cell must be in the caster's line of sight (the client's CastTestLos, 4): the same

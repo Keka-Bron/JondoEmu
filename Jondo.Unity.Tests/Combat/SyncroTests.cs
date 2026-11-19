@@ -64,6 +64,26 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(syncro.Buffs.TieneEstado(3712), "the syncro was not given its Xelor's telefrag states");
         }
 
+        /// <summary>
+        /// The passive Syncro is at the character's level's grade, thirteen at 200, and gives every
+        /// telefrag spell's state: Falla's 3724 and Premonición's 3726 come with the grades above
+        /// two. Put at Syncro's grade (two), it left eleven spells unable to grow the syncro.
+        /// </summary>
+        [Fact]
+        public void The_passive_is_at_the_level_s_grade_and_gives_every_telefrag_state()
+        {
+            var known = FightSpellLayout.ForFight(5, 200, 0).Spells;
+            var (_, grade) = Assert.Single(ClassPassives.ForFight(5, known, 200), p => p.Spell == Pasivo);
+            Assert.Equal(13, grade);
+
+            var fight = new FightInstance(1, 1);
+            var xelor = Xelor(fight);
+            EffectEngine.Resolver(fight, xelor, Pasivo, grade, xelor, EffectEngine.AlLanzar, fight.RoundNumber);
+
+            Assert.True(xelor.Buffs.TieneEstado(3724));
+            Assert.True(xelor.Buffs.TieneEstado(3726));
+        }
+
         [Fact]
         public void A_telefrag_of_teletransportacion_grows_the_syncro_once()
         {

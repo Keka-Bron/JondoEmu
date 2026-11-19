@@ -36,6 +36,16 @@ namespace Jondo.Unity.Tests.World
         public void The_whole_map_does_not_fall_off(int shape, int size)
             => Assert.Equal(0, Zone.FalloffCells(shape, size, 0, Centre, Centre, At(4, 3)));
 
+        /// <summary>
+        /// A point is its own centre: the one its row lands on, found by the mask far from the
+        /// aimed cell, takes it whole -- Esfera de Xelor's return, Arenas del Tiempo's bounces.
+        /// </summary>
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        public void A_point_does_not_fall_off(int size)
+            => Assert.Equal(0, Zone.FalloffCells(Zone.Punto, size, 0, Centre, Centre, At(4, 3)));
+
         [Fact]
         public void A_circle_with_a_hole_counts_from_its_inner_edge()
         {

@@ -372,7 +372,7 @@ namespace Jondo.Unity.Server.Managers
 
             // Its class's own, as a character's: the initial spells of its picks, the passive last.
             int passive = ClassPassives.PassiveOf(spec.Breed);
-            foreach (var (spell, grade) in ClassPassives.ForFight(spec.Breed, spells))
+            foreach (var (spell, grade) in ClassPassives.ForFight(spec.Breed, spells, fighter.Level))
                 if (spell != passive) fighter.Buffs.PonerActitud(spell, grade);
             // At the grade its level gives it, as a character's (SpellTable.PassiveGrade): put at
             // grade 1, a level-200 Pandawa carried for +10 power instead of his +50.
