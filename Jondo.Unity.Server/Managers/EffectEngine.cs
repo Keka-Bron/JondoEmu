@@ -1736,6 +1736,13 @@ namespace Jondo.Unity.Server.Managers
             };
         }
 
+        /// <summary>Whether nobody stands on a cell and it can be stood on.</summary>
+        private static bool LibreYPisable(FightInstance combat, int cell)
+        {
+            var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
+            return cell >= 0 && (walkable == null || walkable.Contains(cell)) && EnLaCasilla(combat, cell) == null;
+        }
+
         /// <summary>Whether a fighter stays where he is whatever moves him: Indesplazable, or a flagged state.</summary>
         internal static bool NoSeDejaMover(Fighter quien)
         {
@@ -3021,8 +3028,10 @@ namespace Jondo.Unity.Server.Managers
                     // Rempotage's sub-cast is cast by the doll towards its owner. Mode 63
                     // picks the first free cell from that owner towards the doll, rather
                     // than attempting to occupy the owner's cell (capture: 286 -> 272,
-                    // owner on 259; then 273 -> 244, owner on 230).
-                    if (efecto.DiceNum == 63)
+                    // owner on 259; then 273 -> 244, owner on 230). Only when the aimed cell is
+                    // taken: Superposicionamiento's 30196 is a 63 too, aimed at a free cell, and
+                    // landed one cell short of it -- or not at all when it was next door.
+                    if (efecto.DiceNum == 63 && !LibreYPisable(combat, aDonde))
                     {
                         var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
                         int ownerCell = aDonde;
