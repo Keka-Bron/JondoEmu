@@ -350,6 +350,67 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// Taking a hero in hand sends his own quest journal: with no map loaded again, the client
+        /// kept showing the journal of the one played before until the next login (#198).
+        /// </summary>
+        [Fact]
+        public async Task A_hero_taken_in_hand_is_shown_his_own_quest_journal()
+        {
+            QuestEngine.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 12, "Diario-" + tag, 8);
+            long hero = Character(Account + 12, "Pagina-" + tag, 9);
+            // The same quest, done by the master and still under way for the hero.
+            DatabaseManager.SaveQuestProgress(master, new DatabaseManager.QuestRow(1648, 0, "", true));
+            DatabaseManager.SaveQuestProgress(hero, new DatabaseManager.QuestRow(1648, 2268, "", false));
+            var codec = new Recording();
+            await using var pipe = await ClientPipe.OpenAsync(Account + 12, master, Map, "Diario-" + tag, codec);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                if (!MapManager.Maps.ContainsKey(RealMap)) MapManager.Initialize();
+                if (MapManager.Maps.TryGetValue(RealMap, out var real)) MapManager.Maps[Map] = real;
+                if (MapManager.WalkableCells.TryGetValue(RealMap, out var cells)) MapManager.WalkableCells[Map] = cells;
+                using (SessionContext.Push(pipe.Session)) DatabaseManager.LoadCharacter(master);
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+
+                int before = codec.Frames.Count;
+                Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, hero));
+
+                var journal = Assert.Single(codec.Frames.Skip(before).Select(f => f.Content).OfType<Jondo.Unity.Protocol.Game.QuestsEvent>());
+                Assert.Contains(journal.ActiveQuests, quest => quest.QuestId == 1648);
+                Assert.DoesNotContain(journal.FinishedQuests, quest => quest.QuestId == 1648);
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(hero);
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
+        /// <summary>The real codec, keeping what it encodes.</summary>
+        private sealed class Recording : Jondo.Unity.Protocol.Game.IGameCodec
+        {
+            private readonly Jondo.Unity.Protocol.Game.Wire.GameCodec _real = new();
+            public readonly System.Collections.Concurrent.ConcurrentQueue<Jondo.Unity.Protocol.Game.GameFrame> Queue = new();
+            public System.Collections.Generic.List<Jondo.Unity.Protocol.Game.GameFrame> Frames => Queue.ToList();
+            public Jondo.Unity.Protocol.Game.GameFrame Decode(ReadOnlySpan<byte> payload) => _real.Decode(payload);
+            public byte[] Encode(Jondo.Unity.Protocol.Game.GameFrame message)
+            {
+                Queue.Enqueue(message);
+                return _real.Encode(message);
+            }
+        }
+
         /// <summary>A connected hero stands on his master's map beside him, and is in the world for his guild.</summary>
         [Fact]
         public async Task A_hero_stands_beside_his_master_and_is_online()
