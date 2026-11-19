@@ -178,6 +178,8 @@ namespace Jondo.Unity.Tests.Commands
         [InlineData("int", "intelligence")]
         [InlineData("cha", "chance")]
         [InlineData("agilidad", "agility")]
+        [InlineData("retpa", "apreduction")]
+        [InlineData("RPM", "mpreduction")]
         public void A_characteristic_by_the_names_staff_type(string typed, string stat)
         {
             Assert.True(CommandHandler.TryParseStat(typed, out string got));

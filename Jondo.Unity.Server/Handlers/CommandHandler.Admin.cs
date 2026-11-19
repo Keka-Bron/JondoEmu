@@ -805,14 +805,18 @@ namespace Jondo.Unity.Server.Handlers
                 "int" or "inteligencia" or "intelligence" => "intelligence",
                 "cha" or "suerte" or "chance" => "chance",
                 "agi" or "agilidad" or "agility" or "agilite" => "agility",
+                "retpa" or "rpa" => ApReduction,
+                "retpm" or "rpm" => MpReduction,
                 _ => "",
             };
             return stat.Length > 0;
         }
 
+        /// <summary>The two ".stats" sets that are no base characteristic: the staff's own AP and MP reduction.</summary>
+        internal const string ApReduction = "apreduction", MpReduction = "mpreduction";
+
         private static async Task StatsAsync(NetworkStream stream, string rest, int channel)
         {
-            if (!await NotInAFightAsync(stream, channel)) return;
             var parts = rest.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2 || !TryParseStat(parts[0], out string stat)
                 || !int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out int value))
@@ -823,6 +827,25 @@ namespace Jondo.Unity.Server.Handlers
             // The control API's own ceiling: a vitality at int.MaxValue overflows the maximum life.
             value = Math.Clamp(value, 0, 10_000_000);
             var s = SessionContext.State;
+
+            // AP and MP reduction, in a fight too: what a removal is rolled against, to try a spell
+            // that steals AP on a boss that dodges. Added to the fighter at once, by the difference.
+            if (stat is ApReduction or MpReduction)
+            {
+                bool ap = stat == ApReduction;
+                int before = ap ? s.StaffApReduction : s.StaffMpReduction;
+                if (ap) s.StaffApReduction = value; else s.StaffMpReduction = value;
+                if (s.IsInFight && FightHandler.FightOf(s.CharacterId)?.Buscar(s.CharacterId) is { } fighter)
+                {
+                    int characteristic = ap ? EffectEngine.RetiraPA : EffectEngine.RetiraPM;
+                    fighter.Otras[characteristic] = fighter.Otra(characteristic) + value - before;
+                }
+                await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
+                await NotifyAsync(stream, T("stats.result", s.CharacterName, ap ? "retpa" : "retpm", value), channel, 0);
+                return;
+            }
+
+            if (!await NotInAFightAsync(stream, channel)) return;
             switch (stat)
             {
                 case "vitality": s.StatVitality = value; break;
