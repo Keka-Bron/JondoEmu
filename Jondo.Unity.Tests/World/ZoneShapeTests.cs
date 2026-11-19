@@ -45,6 +45,27 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// A line cast on the caster's own cell runs along direction 1, the cell below to its
+        /// right, as the client draws it: Funoroshi's fires each lay their L1 glyph (16863)
+        /// on themselves and that cell, and a player puts a fire out by stepping on it.
+        /// </summary>
+        [Fact]
+        public void A_line_cast_on_the_casters_own_cell_runs_along_direction_one()
+        {
+            const int fire = 262;
+            var (x, y) = MapGeometry.CellToPoint(fire);
+
+            var glyph = Zone.Casillas(Zone.Linea, 1, desde: fire, centro: fire);
+
+            Assert.Equal(new[] { fire, MapGeometry.PointToCell(x + 1, y) }, glyph);
+            Assert.Equal(Zone.Direcciones[1], (1, 0));
+            Assert.Equal(new[] { fire, MapGeometry.PointToCell(x, y + 2), MapGeometry.PointToCell(x, y - 2),
+                                 MapGeometry.PointToCell(x, y + 1), MapGeometry.PointToCell(x, y - 1) }
+                             .OrderBy(c => c),
+                         Zone.Casillas(Zone.LineaPerpendicular, 2, desde: fire, centro: fire).OrderBy(c => c));
+        }
+
+        /// <summary>
         /// Colado is a ring of two: the eight cells exactly two away, the centre and the
         /// neighbours left out. In its capture the bomb it mirrors is two from the centre in
         /// every cast.

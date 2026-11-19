@@ -314,10 +314,9 @@ namespace Jondo.Unity.World.Maps
                     // from the caster to the centre. The same bar as '-'; where the two differ
                     // is not measured (the client's text keeps '-' for line casts only).
                     fuera.Add(centro);
-                    var d = DireccionEntre(desde, centro);
-                    if (!d.HasValue) return fuera;
-                    Estirar(fuera, centro, -d.Value.Dy, d.Value.Dx, tamano);
-                    Estirar(fuera, centro, d.Value.Dy, -d.Value.Dx, tamano);
+                    var d = Direcciones[Heading(desde, centro)];
+                    Estirar(fuera, centro, -d.Dy, d.Dx, tamano);
+                    Estirar(fuera, centro, d.Dy, -d.Dx, tamano);
                     return fuera;
                 }
 
@@ -555,23 +554,25 @@ namespace Jondo.Unity.World.Maps
                 case Linea:
                 case DiagonalLine:
                 {
-                    // They carry on straight in the direction it was cast in.
+                    // They carry on straight in the direction it was cast in. Cast on the
+                    // caster's own cell, that is direction 1, as for every shape that turns
+                    // (grw::blht asks og::ovk, which answers 1 for two equal cells): each of
+                    // Funoroshi's fires lays its L1 glyph (16863) on itself and the cell below
+                    // to its right, the one a player steps on to put it out.
                     fuera.Add(centro);
-                    var d = DireccionEntre(desde, centro);
-                    if (d.HasValue) Estirar(fuera, centro, d.Value.Dx, d.Value.Dy, tamano);
+                    var d = Direcciones[Heading(desde, centro)];
+                    Estirar(fuera, centro, d.Dx, d.Dy, tamano);
                     return fuera;
                 }
 
                 case LineaPerpendicular:
                 {
                     // The centre and a ray to each side of it, across the cast: the direction
-                    // turned a quarter both ways. Without a direction -- the caster standing on
-                    // the centre -- it is the centre alone.
+                    // turned a quarter both ways, direction 1 on the caster's own cell.
                     fuera.Add(centro);
-                    var d = DireccionEntre(desde, centro);
-                    if (!d.HasValue) return fuera;
-                    Estirar(fuera, centro, -d.Value.Dy, d.Value.Dx, tamano);
-                    Estirar(fuera, centro, d.Value.Dy, -d.Value.Dx, tamano);
+                    var d = Direcciones[Heading(desde, centro)];
+                    Estirar(fuera, centro, -d.Dy, d.Dx, tamano);
+                    Estirar(fuera, centro, d.Dy, -d.Dx, tamano);
                     return fuera;
                 }
 
