@@ -149,8 +149,8 @@ namespace Jondo.Unity.Server.Handlers
         /// An idle animation from the idles tab (lwu { f1: idle }): the plain one, or the breed's
         /// known one (<see cref="IdleTable.OfferedFreely"/>). The answer is lwn { f2: 1 }, which
         /// makes the client copy it into its drafted outfit, and lwn without it otherwise. The
-        /// choice is kept; how the others are told of it is not known -- no capture changes an
-        /// idle --, so for now only the window shows it. INFERRED from the client.
+        /// choice is kept and travels in the map look's f2 (see CharacterLookBuilder.Resolve), so
+        /// the character is redrawn with it. INFERRED from the client: no capture changes an idle.
         /// </summary>
         public static async Task IdleAsync(NetworkStream stream, byte[] frame)
         {
@@ -167,6 +167,8 @@ namespace Jondo.Unity.Server.Handlers
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Lwn, Pb.New().VarIfNotZero(2, taken ? 1 : 0).Build(),
                                           ConnectionProtocol.RequestId(frame)));
+            // The idle travels in the map look's f2: redrawn, the character plays it for everyone.
+            if (taken) await SlotLookHandler.RedrawAsync(stream);
             Console.WriteLine(taken ? $"[Appearances] Idle {idle}." : $"[Appearances] Idle {idle} is not offered.");
         }
 

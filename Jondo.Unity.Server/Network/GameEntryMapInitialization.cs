@@ -22,10 +22,14 @@ internal sealed class GameEntryMapInitialization(IGameEntryMapBackend backend)
         await backend.SendMapAsync(session, character);
         // The capture's houses, journal, emotes, achievements and presets no longer
         // travel; these are the current account's and character's state.
+        // The emotes go before the wardrobe's cosmetic collection (lwt), as the official
+        // entry sends them: the client builds the appearance window's aura entries from the
+        // emotes it already knows when the collection arrives, and an aura told after it
+        // never shows in that tab (CosmeticAuraView; only a khi adds one later).
+        await Emotes.SendListAsync(session);
         await backend.SendWardrobeAsync(session);
         await backend.SendHousesAsync(session);
         await backend.SendJournalAsync(session);
-        await Emotes.SendListAsync(session);
         await backend.SendAchievementsAsync(session);
         await backend.SendPresetsAsync(session);
         await backend.SendMarksAsync(session);

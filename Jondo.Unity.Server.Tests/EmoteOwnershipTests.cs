@@ -142,7 +142,7 @@ public sealed class EmoteOwnershipTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Production_map_hook_sequence_sends_snapshot_between_journal_and_achievements_under_the_existing_turn(bool empty)
+    public async Task Production_map_hook_sequence_sends_snapshot_before_the_wardrobe_under_the_existing_turn(bool empty)
     {
         var calls = new List<string>();
         var target = Recipient(71_001, frame =>
@@ -160,7 +160,7 @@ public sealed class EmoteOwnershipTests
                 .WaitAsync(TimeSpan.FromSeconds(5));
             Assert.Same(ambient.Session, SessionContext.Actual);
         }
-        Assert.Equal(new[] { "map", "wardrobe", "houses", "journal", "emotes", "achievements", "presets", "marks" }, calls);
+        Assert.Equal(new[] { "map", "emotes", "wardrobe", "houses", "journal", "achievements", "presets", "marks" }, calls);
         Assert.Equal(empty ? [] : new[] { 81_001, 81_003 }, Assert.IsType<EmotesEvent>(Assert.Single(target.Frames).Content).EmotesId);
         Assert.Empty(ambient.Frames);
         Assert.Equal(1, target.Codec.Encodes);
@@ -179,7 +179,7 @@ public sealed class EmoteOwnershipTests
                 new GameEntryMapInitialization(new MapBackend(target.Session, calls)).SendAsync(target.Session, new() { Id = 71_001 })));
             Assert.Same(ambient.Session, SessionContext.Actual);
         }
-        Assert.Equal(new[] { "map", "wardrobe", "houses", "journal" }, calls);
+        Assert.Equal(new[] { "map" }, calls);
         Assert.Equal(1, target.Codec.Encodes);
     }
 

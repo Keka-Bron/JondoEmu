@@ -326,8 +326,13 @@ blocks carry 3 and **617 do not**, spread over fourteen opcodes; `iqj` carries s
 than 3 in all 73 of its blocks. The sub-entities settle it without any matcher at all, since they
 are looks by position: of the 4,062 hanging off an `f7`, **176 carry values other than 3** — 8, 4,
 26, 25, 20 and more — while being otherwise ordinary looks, colours and bones and scale and skins.
-What the field means is not known. The emulator writes a constant 3 (`CharacterLookBuilder.LookType`)
-and nothing has gone wrong yet, which is the only argument for keeping it that way.
+**It is the idle the entity plays** (the appearance window's «poses»), an id of the client's
+`IdlesDataRoot`: 3 is the plain idle, and 4, 8, 20, 25, 26 are breeds' and unlocked ones. Read off
+the client (18 November 2026): `vd::bqd`, which turns a network look into
+`Core.Rendering.Look.EntityLook`, copies `f2` into the look's idle, and
+`EntityAnimator::rrg` looks it up in `IdlesDataRoot` for its `animationKey`. The emulator writes 3
+(`CharacterLookBuilder.LookType`, the stable member's historical name) except for a character's
+game look, which carries the idle the appearance window picked.
 
 **Attachment points**, from `f4`:
 

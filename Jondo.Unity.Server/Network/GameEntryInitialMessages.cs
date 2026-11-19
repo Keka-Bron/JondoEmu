@@ -97,7 +97,7 @@ internal sealed class GameEntryInitialMessages(
         // the end of world/map initialization. Its position is server-owned too.
         await SendAsync(new CharacterLoadingCompleteEvent());
         await SendAsync(presentation.Colors());
-        await SendAsync(InitialPresentationMessages.Aura());
+        await SendAsync(presentation.Aura());
         await SendAsync(InitialPresentationMessages.Ornament());
         // OutfitLookUpdated tag 3 is unused under the same omission policy. The
         // typed look contains current data, with no opaque capture extras.

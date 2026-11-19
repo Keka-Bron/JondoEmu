@@ -9,11 +9,19 @@ public sealed class InitialPresentationProtocolTests
     private readonly GameCodec _codec = new();
 
     [Fact]
-    public void Sequence_aura_and_ornament_are_uncorrelated_empty_events()
+    public void Sequence_and_ornament_are_uncorrelated_empty_events()
     {
         Event("lqg", [], new SequenceNumberEvent());
-        Event("lym", [], new OutfitAuraChangedEvent());
         Event("hif", [], new OrnamentSelectedEvent());
+    }
+
+    [Fact]
+    public void Aura_keeps_the_main_aura_and_optional_zero_apart_from_absence()
+    {
+        Event("lym", [], new OutfitAuraChangedEvent(null));
+        Event("lym", [0x08, 0x00], new OutfitAuraChangedEvent(0));
+        Event("lym", [0x08, 0xce, 0x01], new OutfitAuraChangedEvent(206));
+        Event("lym", [0x08, 0xab, 0x02], new OutfitAuraChangedEvent(299));
     }
 
     [Theory]
@@ -78,7 +86,6 @@ public sealed class InitialPresentationProtocolTests
     [Fact]
     public void Unused_indeterminate_values_are_omitted_by_stable_emission_while_raw_inspection_retains_them()
     {
-        Check("lym", Var(1, 206), []);
         Check("hif", Var(1, 135), []);
         Check("krj", Msg(1, [.. Var(1, 30), .. Var(2, 5), .. Var(3, 300)]), []);
         Check("krj", Msg(2, Msg(1, Msg(7, Var(1, 91)))), Msg(2, Msg(1, [])));

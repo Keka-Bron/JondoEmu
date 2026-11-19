@@ -9,6 +9,7 @@ internal sealed class InitialPresentationMessages(
     Func<CharacterCapabilitiesEvent> capabilities,
     Func<CharacterAppearanceCollectionEvent> colors,
     Func<ConfigurationEvent> configuration,
+    Func<OutfitAuraChangedEvent> aura,
     Func<OutfitLookUpdatedEvent> look)
 {
     // Guild creation/modification has no category-ownership restrictions in Jondo.
@@ -25,9 +26,11 @@ internal sealed class InitialPresentationMessages(
         () => new(AllowedEmblemCategories),
         () => new(new(PaletteSlots, [new(Palette(CharacterLookBuilder.SavedColors(character)))], PaletteSlots)),
         () => new(GuildPolicy()),
+        () => Aura(Wardrobe.AuraOf(character.Id)),
         () => new(ConnectionProtocol.LookIdOf(character.Id), CharacterLookBuilder.SemanticLook(character, paraLaVentana: true)));
 
     internal CharacterCapabilitiesEvent Capabilities() => capabilities();
+    internal OutfitAuraChangedEvent Aura() => aura();
     internal CharacterAppearanceCollectionEvent Colors()
     {
         var snapshot = colors();
@@ -47,10 +50,14 @@ internal sealed class InitialPresentationMessages(
         value.SubEntities.Select(child => new SubEntityInformation(Snapshot(child.SubEntityLook)!,
             child.BindingPointIndex, child.BindingPointCategory)).ToArray());
 
+    // The character's own aura, absent for none: the client reads it as its main aura, the
+    // one «Activer automatiquement mon aura de face» shows. Seen in game: without it that
+    // option never shows anything. See docs/populated-unmapped-fields.md#after-selection-omission-policy.
+    internal static OutfitAuraChangedEvent Aura(int aura) => new(aura == Wardrobe.None ? null : aura);
+
     // Unused for outbound construction by project policy: the native audit was
-    // indeterminate. Omit both tag-1 values, rather than replaying 206/135.
+    // indeterminate. Omit the tag-1 value, rather than replaying 135.
     // See docs/populated-unmapped-fields.md#after-selection-omission-policy.
-    internal static OutfitAuraChangedEvent Aura() => new();
     internal static OrnamentSelectedEvent Ornament() => new();
 
     internal static GuildConfiguration GuildPolicy()

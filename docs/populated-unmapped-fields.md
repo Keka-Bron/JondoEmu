@@ -37,13 +37,17 @@ The following fields are **unused for outbound construction**, by the project's
 
 | Owner | Omitted field | Construction |
 |---|---|---|
-| OutfitAuraChangedEvent / `lym` | Tag **1**, optional int32; captured **206** | Empty typed event; shared legacy aura writer also emits no value. |
 | OrnamentSelectedEvent / `hif` | Tag **1**, int32; captured **135** | Empty typed event; shared legacy ornament writer also emits no value. |
 | ConfigurationEvent / `krj` | Tag **1**, message; captured `{1:30, 2:5, 3:300}` | Construct only the mapped guild configuration. |
 | GuildActivityConfiguration / `krh.krg.krf` | Tag **7**, message | Construct only the six mapped activity settings. |
 | CharacterColors / `lvs` | Tag **2**, int32 | Supply unlocked/total slots and palettes only. |
 | ColorPalette / `lvd` | Tag **1**, repeated int32 | Supply the mapped tag-2 RGB/inheritance values only. |
 | OutfitLookUpdatedEvent / `lxc` | Tag **3**, EntityLook | Supply the owned identifier and mapped tag-2 look only. |
+
+`OutfitAuraChangedEvent` / `lym` tag **1** left this list on 18 November 2026: it is
+mapped as `AuraEmoteId` and carries the character's main aura, absent for none. Seen in
+game, the client reads it as the aura «Activer automatiquement mon aura de face» shows:
+with the value omitted, facing the screen never showed one.
 
 `InitialPresentationMessages` and the relevant send/build sites link to this section.
 After-selection construction reads no manifest rows, copies no captured extras and
@@ -136,7 +140,6 @@ or meaning of its scalar.
 
 | Message / wire identity | Field | Non-default population evidence | Client-use finding |
 |---|---|---|---|
-| OutfitAuraChangedEvent / `lym` | Tag **1**, optional int32 | **Documented capture measurement:** **206** in the retired entry reconstruction. **Historical code:** `BuildAura` emitted the field when `aura != 0`; it now returns an empty payload. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding: no positive business consumer; indeterminate caller coverage. |
 | OrnamentSelectedEvent / `hif` | Tag **1**, int32 | **Documented capture measurement:** **135** in the retired entry reconstruction. `BuildOrnamentUpdated` now returns an empty payload. | **Unused/omit** under the [after-selection policy](#after-selection-omission-policy). Native finding: no positive business consumer; indeterminate caller coverage. |
 | CommunityChannelEvent / `hou` | Tag **1**, int32 | **Documented capture measurement:** **2** in the retired entry reconstruction; the 15 November emulator reply carried **1**. | **Omitted** at both entry and request-driven owner sends. Renewed MCP classification remains indeterminate, with no use witness and incomplete native caller coverage. |
 | TitleSelectionErrorEvent / `hii` | Tag **1**, enum | **Documented capture measurement:** numeric value **2** in the retired entry reconstruction. | A registered handler exists, but inspection did not establish a message-rooted load of this enum into logging/gameplay state. |
@@ -151,8 +154,8 @@ Map entry and the `hos`-driven owner reply construct `CommunityChannelEvent()` d
 and omit tag 1. This is an explicit type-only outbound policy; the native-use finding
 remains indeterminate and no field name or acknowledgement meaning is inferred.
 
-**Handling:** apply the omission policy above rather than retaining aura/ornament
-values in compatibility sends. `hii` value 2 is not successful initialization
+**Handling:** apply the omission policy above rather than retaining ornament
+values in compatibility sends; the aura is mapped (`AuraEmoteId`, see above). `hii` value 2 is not successful initialization
 state; no title-selection error is generated at initial entry. Do not introduce
 scalar names solely from the surrounding message name or builder parameter.
 

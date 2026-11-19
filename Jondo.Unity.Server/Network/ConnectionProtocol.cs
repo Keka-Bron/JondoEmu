@@ -445,10 +445,11 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildDraftOutfit(DbCharacter character, string draftId)
             => Pb.New().Bytes(1, AppearanceBody(character, draftId)).Build();
 
-        /// <summary>Type-only aura notification; its former tag-1 value is no longer emitted.</summary>
-        public static byte[] BuildAura(int aura)
-            // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.
-            => Array.Empty<byte>();
+        /// <summary>
+        /// lym { f1: aura }, empty for none: the character's main aura, the one the client asks to
+        /// show (khl f2) when he faces the screen. See docs/populated-unmapped-fields.md#after-selection-omission-policy.
+        /// </summary>
+        public static byte[] BuildAura(int aura) => Pb.New().VarIfNotZero(1, aura).Build();
 
         /// <summary>The worn outfit as the window drafts it, under the draft's own uuid.</summary>
         private static byte[] AppearanceBody(DbCharacter character, string draftId)

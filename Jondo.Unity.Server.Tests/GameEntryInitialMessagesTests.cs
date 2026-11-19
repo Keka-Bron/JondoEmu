@@ -118,7 +118,7 @@ public sealed class GameEntryInitialMessagesTests
             new ServerExperienceModifierEvent(105, 105, limit),
             new CharacterCapabilitiesEvent(0), new AlmanachCalendarDateEvent(81_001), new HavenBagPackListEvent([lastTheme, firstTheme]), rooms,
             new StorageKamasUpdateEvent(0), new ConfigurationEvent(null), new BonusesEvent([]), new CharacterLoadingCompleteEvent(),
-            new CharacterAppearanceCollectionEvent(null), new OutfitAuraChangedEvent(), new OrnamentSelectedEvent(), new OutfitLookUpdatedEvent("", null)];
+            new CharacterAppearanceCollectionEvent(null), new OutfitAuraChangedEvent(null), new OrnamentSelectedEvent(), new OutfitLookUpdatedEvent("", null)];
         for (int i = 0; i < packets.Count; i++) AssertEvent(expected[i], packets[i]);
     }
 
@@ -137,7 +137,7 @@ public sealed class GameEntryInitialMessagesTests
             new AlterationsEvent([]),
             new ServerExperienceModifierEvent(105, 105, 0), new CharacterCapabilitiesEvent(0), new AlmanachCalendarDateEvent(81_001), new HavenBagPackListEvent([]), rooms,
             new StorageKamasUpdateEvent(0), new ConfigurationEvent(null), new BonusesEvent([]), new CharacterLoadingCompleteEvent(),
-            new CharacterAppearanceCollectionEvent(null), new OutfitAuraChangedEvent(), new OrnamentSelectedEvent(), new OutfitLookUpdatedEvent("", null)];
+            new CharacterAppearanceCollectionEvent(null), new OutfitAuraChangedEvent(null), new OrnamentSelectedEvent(), new OutfitLookUpdatedEvent("", null)];
         for (int i = 0; i < packets.Count; i++) AssertEvent(expected[i], packets[i]);
     }
 

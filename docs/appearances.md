@@ -160,7 +160,7 @@ Layout confirmed against the character-selection and appearance captures
 | field | contents |
 |---|---|
 | `f1` | colours, packed varints, colour index in the high byte |
-| `f2` | `3` in 5,295 of the 5,306 look blocks decoded. The eleven exceptions carry 8, 10 or 19 and all sit on bones 1 or 2, in fight and bank captures — never on a drawn character |
+| `f2` | **the idle (pose)**, an `IdlesDataRoot` id: `3`, the plain one, in 5,295 of the 5,306 look blocks decoded. The eleven exceptions carry 8, 10 or 19, other idles. The game look carries the one the idles tab picked (`CharacterLookBuilder.Resolve`); see `docs/protocol.md` |
 | `f3` | bones id |
 | `f5` | scales, packed |
 | `f6` | skins, packed |
@@ -476,7 +476,7 @@ Nine tables plus a comment block. Keys are item ids as strings.
 | `slotsVariante` | 61 | living object → `{ variant → slot }`. 543 pairs in total. |
 | `pets` | 242 | item → sub-entity for binding point 1. |
 | `mounts` | 272 | item → root override. 151 petsmounts + 121 mounts. |
-| `auras` | 3 | aura id → bones. |
+| `auras` | 27 | aura id → bones; see section 15 for which are confirmed. |
 | `titles` | 476 | title ids the real server accepted. |
 | `ornaments` | 166 | ornament ids the real server accepted. |
 
@@ -671,7 +671,21 @@ S -> C  lwx { f1: 1 }      answer
 Aura ids seen on the wire: 22, 171, 206. Their bones show up separately, as a sub-entity at binding
 point 6 inside `kmb` — 16 occurrences across the captures, with bones 169, 170, 4829 and 5138.
 Pairing the `lym` id with the `kmb` bones is where `cosmetic_skins.json`'s `auras` table came from:
-`22 → 170`, `171 → 4829`, `206 → 5138`. Bones 169 belongs to an aura that was never swept.
+`22 → 170`, `171 → 4829`, `206 → 5138`.
+
+The client data does not pair aura emotes with bones, but aura bones are recognisable: their
+bundle (`Content/Characters/Bones/bones_assets_bone_N.bundle`) holds only `AnimStatique`, in the
+directions 0, 1, 2, 5 and 6, and they come in runs. The rest of the table was filled from those
+runs and checked in game, one aura at a time (18 November 2026):
+
+- `22` (power aura) is `169` below level 200 and `170` from 200 on (`Cosmetics.AuraBones`).
+- `171`–`175` (Oméga 100 to 500) are `4829`–`4833`, in order.
+- `202`–`207` (Nordes, Mériana, Rathrosk, Djaul, Septange, Rimanda) are `5141`, `5142`, `5139`,
+  `5140`, `5138`, `5143`.
+- `324` (Temporelle) is `9247`, `325` (Eliacube) `9246` and `319` (Confettis) `9228`.
+- The others in the table show an aura in game, but which aura has not been confirmed. Bones
+  `269`, `1831`–`1833` and `9564` with the same signature are props (a penguin, a fir tree, a cat,
+  a present, a ghost), not auras.
 
 The aura id also travels in `f9` of the appearance body inside `lxo` and `lyt` — the same three ids,
 which is how it was identified.
@@ -682,9 +696,22 @@ own aura emotes, keeps it (`CharacterWardrobe.AuraId`), answers `lym` and redraw
 the map. The wearer draws it from the id, and so do the others, from the actor's options:
 `f5 { f1 { f1: aura } }`, the first option of the humanoid body in 140 actors of the captures. The
 map look (`jsn`, `jss`, `kmb` -- never the `lxc` preview) also carries it as a sub-entity,
-`{ f1 { f2: 3, f3: bones }, f4: 6 }`: after the pet on foot, before the rider when mounted; only the
-three measured auras have bones, the option does for the rest. `lym` goes out with the current aura after `lyt` on entering
-the world and with every item move -- the 206 every equip capture carries was the recorded account's.
+`{ f1 { f2: 3, f3: bones }, f4: 6 }`: after the pet on foot, before the rider when mounted. An
+aura with no bones in the table shows nothing. `lym` goes out with the current aura after `lyt` on
+entering the world and with every item move -- the 206 every equip capture carries was the recorded
+account's. Its id is what the client takes as the main aura, the one «Activer automatiquement mon
+aura de face» shows when the character faces the screen.
+
+Facing the screen, the client sends `khl { f1: main aura, f2: 1 }`. It shows nothing by itself:
+the server answers as for an aura clicked in the attitudes, redrawing the character with it until
+the next step (`Emotes.PlayAsync`). A `khl` with `f2` that names another aura is ignored.
+
+The appearance window's aura tab (`CosmeticAurasTab`) does not list emotes but item wrappers the
+client builds in the cosmetic storage (`CosmeticAuraView`: position 63, item category 17 `Auras`,
+uids from `Inventory.AuraMarginInterval`, -175000). A `khi` for an aura not yet known adds one, a
+`khj` removes it, and `khn` adds none: the entry's own pass over the known emotes builds them, so
+`khn` goes before the wardrobe's `lwt`, as in the official entry (`GameEntryMapInitialization`).
+Sent after it, the tab stays empty.
 
 ---
 
@@ -694,7 +721,7 @@ the world and with every item move -- the 206 every equip capture carries was th
 |---|---|---|---|
 | garment skin | **replaces** the equipped item's skin | **appends** to the skin list | the emulator does not yet do the removal. The real items' skins are now measured — see section 17 — so this can be closed; until it is, the result is identical on screen as long as nothing is worn underneath. |
 | `hhy` | only what the account owns | the whole catalogue (539 + 167) | a single-player emulator with nothing unlocked has nothing to show |
-| aura | the actor's first option, and a sub-entity at binding point 6 of the map look | the option always; the sub-entity for the three auras whose bones are measured | the client data has no bones for the others; see section 15 |
+| aura | the actor's first option, and a sub-entity at binding point 6 of the map look | the option always; the sub-entity for the auras whose bones are in the table | the client data does not pair auras with bones; see section 15 |
 | `hie` / `hii` | pushed alongside look updates, always `{ f1: 2 }` (129 and 131 occurrences, never any other value) | pushed on equip and unequip (`EquipmentHandler`), not on an appearance save | constant with no established meaning. Copied where a capture shows them, not guessed at elsewhere. |
 | `lxo` / `lyt` `f9` | carries the current aura id | the same | see section 15 |
 | miscellaneous items (49) | presumably resolved | not in the tables | they mimic amulet, ring, belt and boots, which are never drawn |
