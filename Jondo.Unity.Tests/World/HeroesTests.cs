@@ -198,6 +198,19 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal(10, plan[master].Kamas);
                 Assert.Equal(4, plan[777].Loot[287]);
 
+                // A quest's item dropped for one alone stays his: the bag of jewels of 1648, which
+                // all went to the recipient and left the others' quests stuck.
+                plan = new System.Collections.Generic.Dictionary<long, FightHandler.Reward>
+                {
+                    [master] = new() { Loot = new() { [16540] = 1, [287] = 2 }, Own = new() { [16540] = 1 } },
+                    [hero] = new() { Loot = new() { [16540] = 1 }, Own = new() { [16540] = 1 } },
+                };
+                FightHandler.GatherHeroLoot(plan);
+                Assert.Equal(1, plan[master].Loot[16540]);
+                Assert.False(plan[master].Loot.ContainsKey(287));
+                Assert.Equal(1, plan[hero].Loot[16540]);
+                Assert.Equal(2, plan[hero].Loot[287]);
+
                 // The same one again: back to each his own.
                 Assert.True(Heroes.SetLootTo(master, hero));
                 Assert.Equal(0, Heroes.LootTo(master));
