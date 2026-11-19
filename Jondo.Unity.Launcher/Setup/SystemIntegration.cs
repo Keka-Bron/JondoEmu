@@ -144,7 +144,7 @@ namespace Jondo.Unity.Launcher.Setup
             Directory.CreateDirectory(request.Root);
             if (OperatingSystem.IsWindows())
             {
-                if (request.UserSid.Length > 0) GrantModify(request.Root, request.UserSid);
+                if (request.UserSid.Length > 0) GiveThePlayerTheFolder(request.Root, request.UserSid);
                 if (request.DotNetInstaller.Length > 0) DotNetRuntime.Install(request.DotNetInstaller);
                 Register(request.Root, request.Version);
                 if (request.Shortcuts) Shortcuts(request.Root, allUsers: IsElevated());
@@ -163,6 +163,21 @@ namespace Jondo.Unity.Launcher.Setup
         [SupportedOSPlatform("windows")]
         public static bool IsElevated()
             => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+
+        /// <summary>
+        /// The player's right to write in the folder, given once. A repair finds it given: the
+        /// install handed the Program Files folder to him, so the repair asks for no administrator,
+        /// and changing the folder's rights again as the player is refused ("Attempted to perform
+        /// an unauthorized operation") -- writing in it lets him change what is inside, not who may.
+        /// Returns whether the rights were changed.
+        /// </summary>
+        [SupportedOSPlatform("windows")]
+        internal static bool GiveThePlayerTheFolder(string root, string sid)
+        {
+            if (!IsElevated() && CanWriteInside(root)) return false;
+            GrantModify(root, sid);
+            return true;
+        }
 
         /// <summary>Modify rights for the player on the folder and everything under it, now and to come.</summary>
         [SupportedOSPlatform("windows")]
@@ -223,11 +238,19 @@ namespace Jondo.Unity.Launcher.Setup
         private static void Shortcuts(string root, bool allUsers)
         {
             string launcher = Path.Combine(root, InstallLayout.LauncherFileName);
-            string menu = Environment.GetFolderPath(allUsers ? Environment.SpecialFolder.CommonPrograms : Environment.SpecialFolder.Programs);
-            string desktop = Environment.GetFolderPath(allUsers ? Environment.SpecialFolder.CommonDesktopDirectory : Environment.SpecialFolder.DesktopDirectory);
-            foreach (string folder in new[] { menu, desktop })
+            var places = new[]
             {
+                (Own: Environment.SpecialFolder.Programs, Common: Environment.SpecialFolder.CommonPrograms),
+                (Own: Environment.SpecialFolder.DesktopDirectory, Common: Environment.SpecialFolder.CommonDesktopDirectory),
+            };
+            foreach (var (own, common) in places)
+            {
+                string folder = Environment.GetFolderPath(allUsers ? common : own);
                 if (string.IsNullOrEmpty(folder)) continue;
+                // A repair run as the player keeps the shortcuts the install made for everybody:
+                // one of his own would sit beside each of them.
+                string everybody = Environment.GetFolderPath(common);
+                if (!allUsers && everybody.Length > 0 && File.Exists(Path.Combine(everybody, DisplayName + ".lnk"))) continue;
                 CreateShortcut(Path.Combine(folder, DisplayName + ".lnk"), launcher, root);
             }
         }
