@@ -286,7 +286,8 @@ namespace Jondo.Unity.Tests.Economy
             try
             {
                 var codec = new PriceCodec(fail);
-                await using var pipe = await ClientPipe.OpenAsync(account, 8_195_702, 191105026, codec: codec);
+                // A map of its own: it checks that nothing else reached the buyer.
+                await using var pipe = await ClientPipe.OpenAsync(account, 8_195_702, 990_100_185, codec: codec);
                 var wrong = GameSession.SinSocket();
                 using var context = SessionContext.Push(wrong);
                 using var turn = await pipe.Session.EnterTurnAsync();

@@ -16,6 +16,12 @@ namespace Jondo.Unity.Tests.Sessions;
 
 public sealed class CharacteristicRefreshTests
 {
+    /// <summary>
+    /// A map of their own: these tests check that nothing else reached the owner, and on 191105026
+    /// the map broadcasts of tests running alongside did (another character's achievement).
+    /// </summary>
+    private const long Map = 990_100_181;
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -23,7 +29,7 @@ public sealed class CharacteristicRefreshTests
     {
         var codec = new RecordingCodec(fail);
         long character = fail ? 8_941_730_002 : 8_941_730_001;
-        await using var pipe = await ClientPipe.OpenAsync(character, character, 191105026, "Reward", codec);
+        await using var pipe = await ClientPipe.OpenAsync(character, character, Map, "Reward", codec);
         var session = pipe.Session;
         session.State.CharacterLevel = 200;
         session.State.Experience = ExperienceTable.LevelFloor(200);
@@ -64,7 +70,7 @@ public sealed class CharacteristicRefreshTests
     {
         var codec = new RecordingCodec(fail);
         long character = fail ? 8_941_730_004 : 8_941_730_003;
-        await using var pipe = await ClientPipe.OpenAsync(character, character, 191105026, "Expiry", codec);
+        await using var pipe = await ClientPipe.OpenAsync(character, character, Map, "Expiry", codec);
         pipe.Session.State.StatStrength = 41;
         var wrong = GameSession.SinSocket();
         wrong.State.StatStrength = 999;

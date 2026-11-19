@@ -25,7 +25,9 @@ namespace Jondo.Unity.Tests.World
         [InlineData(true)]
         public async Task An_invited_member_follows_the_owner_and_exits_only_after_the_owners_typed_mark_clear(bool fail)
         {
-            const long owner = 900_000_000_011, guest = 900_000_000_012, street = 191105026;
+            // A street of its own: 191105026 is where most tests stand, and the arrivals of those
+            // running alongside reached the owner once he was back on it.
+            const long owner = 900_000_000_011, guest = 900_000_000_012, street = 191105024;
             if (!MapManager.WalkableCells.ContainsKey(Jail.MapId)) MapManager.Initialize();
             Interactives.Initialize();
             Dreams.OlvidarTodo();
@@ -101,7 +103,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public async Task A_no_leaves_the_member_where_he_is()
         {
-            const long owner = 900_000_000_021, guest = 900_000_000_022, street = 191105026;
+            const long owner = 900_000_000_021, guest = 900_000_000_022, street = 191105024;
             Interactives.Initialize();
             Dreams.OlvidarTodo();
             DreamHandler.ForgetGroups();

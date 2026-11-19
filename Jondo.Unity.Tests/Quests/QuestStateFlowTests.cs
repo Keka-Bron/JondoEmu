@@ -13,6 +13,11 @@ namespace Jondo.Unity.Tests.Quests;
 public sealed class QuestStateFlowTests
 {
     private const long Character = 8_965_100_001, OtherCharacter = 8_965_100_002;
+    /// <summary>
+    /// A map of their own: they check that nothing else reached the owner, and 191105026 is where
+    /// most tests stand, whose map broadcasts would.
+    /// </summary>
+    private const long Map = 990_100_184;
 
     [Theory]
     [InlineData(false)]
@@ -23,8 +28,8 @@ public sealed class QuestStateFlowTests
         ClearFollowed(Character);
         ClearFollowed(OtherCharacter);
         var codec = new RecordingCodec();
-        await using var own = await ClientPipe.OpenAsync(Character, Character, 191105026, codec: codec);
-        await using var peer = await ClientPipe.OpenAsync(OtherCharacter, OtherCharacter, 191105026);
+        await using var own = await ClientPipe.OpenAsync(Character, Character, Map, codec: codec);
+        await using var peer = await ClientPipe.OpenAsync(OtherCharacter, OtherCharacter, Map);
         var log = Log(own.Session);
         if (!empty)
         {
@@ -77,7 +82,7 @@ public sealed class QuestStateFlowTests
         QuestEngine.Load();
         ClearFollowed(Character);
         var codec = new RecordingCodec { FailAt = failAt };
-        await using var own = await ClientPipe.OpenAsync(Character, Character, 191105026, codec: codec);
+        await using var own = await ClientPipe.OpenAsync(Character, Character, Map, codec: codec);
         Log(own.Session).Restore(2048, 0, null, true);
         FollowedQuests.Follow(Character, 2048);
         var wrong = GameSession.SinSocket();

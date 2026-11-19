@@ -17,6 +17,11 @@ namespace Jondo.Unity.Tests.Sessions;
 public sealed class AchievementStateFlowTests : IDisposable
 {
     private const long Character = 9_969_100_001, Account = 8_969_100_001;
+    /// <summary>
+    /// A map of their own: they check that nothing else reached the owner, and 191105026 is where
+    /// most tests stand, whose map broadcasts would.
+    /// </summary>
+    private const long Map = 990_100_183;
     private readonly AchievementCatalogue _book;
 
     public AchievementStateFlowTests()
@@ -77,7 +82,7 @@ public sealed class AchievementStateFlowTests : IDisposable
     public async Task Live_list_is_sorted_detached_and_uses_the_explicit_owner_with_claimed_level_absence(int level)
     {
         var codec = new RecordingCodec();
-        await using var own = await ClientPipe.OpenAsync(Account, Character, 191105026, codec: codec);
+        await using var own = await ClientPipe.OpenAsync(Account, Character, Map, codec: codec);
         own.Session.State.CharacterLevel = level;
         var log = Log(own.Session);
         log.Restore(81_005, false, Character + 4);
@@ -115,7 +120,7 @@ public sealed class AchievementStateFlowTests : IDisposable
     [InlineData(true)]
     public async Task Real_framed_list_sends_empty_loaded_state_or_mixed_account_owners(bool empty)
     {
-        await using var pipe = await ClientPipe.OpenAsync(Account, Character, 191105026);
+        await using var pipe = await ClientPipe.OpenAsync(Account, Character, Map);
         pipe.Session.State.CharacterLevel = 247;
         var log = Log(pipe.Session);
         if (!empty)
@@ -138,7 +143,7 @@ public sealed class AchievementStateFlowTests : IDisposable
     [Fact]
     public async Task Live_entry_sends_the_old_snapshot_before_new_unlocks_and_a_repeat_list_contains_the_new_credit()
     {
-        await using var pipe = await ClientPipe.OpenAsync(Account, Character, 191105026);
+        await using var pipe = await ClientPipe.OpenAsync(Account, Character, Map);
         pipe.Session.State.CharacterLevel = 200;
         pipe.Session.State.Achievements = new(_book, new Achievements.CharacterFacts());
         using var turn = await pipe.Session.EnterTurnAsync();
@@ -173,7 +178,7 @@ public sealed class AchievementStateFlowTests : IDisposable
     public async Task Deferred_count_keeps_explicit_owner_state_and_map_check_clears_pending_before_failed_unlock_delivery()
     {
         var codec = new RecordingCodec { FailAt = 0 };
-        await using var pipe = await ClientPipe.OpenAsync(Account, Character, 191105026, codec: codec);
+        await using var pipe = await ClientPipe.OpenAsync(Account, Character, Map, codec: codec);
         var source = pipe.Session;
         source.State.CharacterLevel = 1;
         source.State.Achievements = new(_book, new Achievements.CharacterFacts());
@@ -204,7 +209,7 @@ public sealed class AchievementStateFlowTests : IDisposable
     public async Task Missing_log_omits_the_list_and_failed_list_encoding_does_not_check_or_change_the_level_marker()
     {
         var codec = new RecordingCodec { FailAt = 0 };
-        await using var own = await ClientPipe.OpenAsync(Account, Character, 191105026, codec: codec);
+        await using var own = await ClientPipe.OpenAsync(Account, Character, Map, codec: codec);
         own.Session.State.CharacterLevel = 200;
         own.Session.State.AchievementLevelChecked = -1;
         await Achievements.SendListAsync(own.Session);
@@ -304,7 +309,7 @@ public sealed class AchievementStateFlowTests : IDisposable
         command.ExecuteNonQuery();
         try
         {
-            await using var pipe = await ClientPipe.OpenAsync(Account, Character, 191105026);
+            await using var pipe = await ClientPipe.OpenAsync(Account, Character, Map);
             pipe.Session.State.CharacterLevel = 137;
             var log = Log(pipe.Session);
             log.Restore(81_001, false);
