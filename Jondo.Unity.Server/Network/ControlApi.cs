@@ -100,6 +100,8 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "heroes/create": return ConSesion(cuerpo, cuenta => HeroesCreate(cuerpo, cuenta));
                     case Prefijo + "heroes/name": return ConSesion(cuerpo, HeroesName);
                     case Prefijo + "heroes/preview": return ConSesion(cuerpo, _ => HeroesPreview(cuerpo));
+                    // JondoFix's monster group tooltip: its loot and achievements (ControlApiMonsterTooltip.cs).
+                    case Prefijo + "monsters/tooltip": return ConSesion(cuerpo, cuenta => MonsterTooltip(cuerpo, cuenta));
 
                     // ─── Administration ─────────────────────────────────────────────────────
                     // They command the server, not an account. Role 4 and it is checked here,

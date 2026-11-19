@@ -144,7 +144,7 @@ The live game is on 3.6.11.12 and Ankama's launcher only provides the current ve
 
 It is the stock Ankama client. A 3.6.10.11 or 3.6.10.10 install from before the patch also works: keep the official launcher from updating it.
 
-What the mods do: **JondoFix** sends the client's sockets, Named Pipes and DNS queries to the emulator (ports `8888`, `5555`, `15881`, `6337`), accepts its self-signed certificate and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window and the [admin window (F10)](#-admin-window-f10). **Cazacabezas** is the [head hunters' window](#-head-hunters) and **Heroes** the [hero mode](docs/heroes.md)'s window (Ctrl+Tab). The launcher puts the three into the client's `Mods/` each time it starts it, if the ones there differ.
+What the mods do: **JondoFix** sends the client's sockets, Named Pipes and DNS queries to the emulator (ports `8888`, `5555`, `15881`, `6337`), accepts its self-signed certificate and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window, the loot and achievements to the monster group tooltip, and the [admin window (F10)](#-admin-window-f10). **Cazacabezas** is the [head hunters' window](#-head-hunters) and **Heroes** the [hero mode](docs/heroes.md)'s window (Ctrl+Tab). The launcher puts the three into the client's `Mods/` each time it starts it, if the ones there differ.
 
 MelonLoader drops a **`version.dll`** next to `Dofus.exe`: renaming it to `version.dll.disabled` turns the mods off to play the official game, and renaming it back turns them on. It writes a log per run under **`MelonLoader/Logs/`**: if the client starts but never reaches the emulator, look there first.
 
@@ -886,6 +886,8 @@ One fight engine serves four kinds of fight:
   their lists; the fight's sides can close it to spectators
 - ✅ A won fight is shared among the players
 - ✅ Experience as the monster group's tooltip counts it: group bonus, levels, wisdom and the 5 % bonus
+- ✅ The monster group's tooltip also lists the achievements beating it can still earn (the boss's
+  challenges too) and what it drops, each item with its chance at your prospecting (JondoFix)
 - ✅ Limit on earned experience, from the characteristics panel
 - ✅ As in Dofus 3, mounts gain experience by breeding and guilds by their weekly activity
 - ✅ Losing costs energy and half the life, and sends you back to the zaap; no ghosts or phoenixes,

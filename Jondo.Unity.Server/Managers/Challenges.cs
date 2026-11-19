@@ -498,6 +498,10 @@ namespace Jondo.Unity.Server.Managers
 
         public static Challenge? Get(int id) => _byId.TryGetValue(id, out var reto) ? reto : null;
 
+        /// <summary>The challenges this monster imposes where it fights: a dungeon boss's «Duo», «Zombie»...</summary>
+        public static IReadOnlyList<Challenge> CarriedBy(int monster)
+            => _byMonster.TryGetValue(monster, out var suyos) ? suyos : Array.Empty<Challenge>();
+
         /// <summary>
         /// The watched challenge this one is equivalent to. A generic one is its own judge; a
         /// boss's is judged by the twin <see cref="FindJudges"/> found it, or by nobody.
