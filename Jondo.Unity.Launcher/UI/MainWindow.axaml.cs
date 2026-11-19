@@ -510,6 +510,7 @@ namespace Jondo.Unity.Launcher.UI
                 TextoRuta.Text = Recortar(ruta) + "   ·   " + idioma;
                 TextoRuta.Foreground = new SolidColorBrush(LauncherSkin.CardText);
             }
+            RefrescarCdn();
         }
 
         /// <summary>Long paths cut in the middle: the end is what identifies the file.</summary>
@@ -958,11 +959,7 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Title = Textos.WhereIsTheClient(_idioma),
                 AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType(ClientInstallation.ExecutableName) { Patterns = new[] { ClientInstallation.ExecutableName } },
-                    FilePickerFileTypes.All,
-                },
+                FileTypeFilter = TiposDeCliente(),
             };
 
             string actual = LauncherService.ResolveClient();
@@ -986,6 +983,9 @@ namespace Jondo.Unity.Launcher.UI
             var elegidos = await StorageProvider.OpenFilePickerAsync(opciones);
             string? ruta = elegidos.Count > 0 ? elegidos[0].TryGetLocalPath() : null;
             if (string.IsNullOrEmpty(ruta)) return;
+            // Linux clients are often pointed at by their start script; the launcher starts what it runs.
+            ruta = Setup.ClientCdn.ExecutableChosen(ruta);
+            if (!Setup.ClientCdn.RunsHere(Setup.ClientCdn.PlatformOf(ruta))) { Avisar(SetupTexts.ClientCannotRunHere(_idioma)); return; }
 
             LauncherPreferences.SetClientExecutable(ruta);
             RefrescarIdiomasDelJuego();

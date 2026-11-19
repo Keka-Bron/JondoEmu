@@ -141,6 +141,13 @@ namespace Jondo.Unity.Launcher.Packs
                     if (!string.Equals(Path.GetFullPath(other), Path.GetFullPath(keep), StringComparison.OrdinalIgnoreCase))
                         TryDelete(other);
                 }
+
+                // Before the cache was split by platform, the Windows manifests lay one folder up.
+                // Nothing reads them there any more.
+                string? parent = Path.GetDirectoryName(Path.GetFullPath(_folder));
+                if (parent != null && Directory.Exists(parent))
+                    foreach (string legacy in Directory.GetFiles(parent, CytrusCdn.ReleasePrefix + "*.manifest"))
+                        TryDelete(legacy);
             }
             catch (IOException)
             {

@@ -138,8 +138,82 @@ namespace Jondo.Unity.Tests.Launcher
         {
             var cdn = new FakeCdn(SyntheticPack.Build());
 
-            Assert.False(await ClientCdn.IsServedAsync(new HttpClient(cdn), "3.6.10.11", CancellationToken.None));
+            Assert.False(await ClientCdn.IsServedAsync(new HttpClient(cdn), "3.6.10.11", ClientCdn.Windows, CancellationToken.None));
             Assert.Contains(cdn.Others, url => url.EndsWith("/dofus/releases/dofus3/windows/6.0_3.6.10.11.manifest", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task The_linux_client_is_asked_for_by_its_own_manifest()
+        {
+            var cdn = new FakeCdn(SyntheticPack.Build());
+
+            await ClientCdn.IsServedAsync(new HttpClient(cdn), "3.6.10.11", ClientCdn.Linux, CancellationToken.None);
+
+            Assert.Contains(cdn.Others, url => url.EndsWith("/dofus/releases/dofus3/linux/6.0_3.6.10.11.manifest", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public void Each_platform_has_its_executable_and_a_folder_of_its_own()
+        {
+            Assert.Equal("Dofus.exe", ClientCdn.ExecutableFor(ClientCdn.Windows));
+            Assert.Equal("Dofus.x64", ClientCdn.ExecutableFor(ClientCdn.Linux));
+            Assert.Equal(ClientCdn.Windows, ClientCdn.PlatformOf(@"C:\Games\Dofus.exe"));
+            Assert.Equal(ClientCdn.Linux, ClientCdn.PlatformOf("/home/player/Dofus/Dofus.x64"));
+            // Their executable parts write different files under the same names in Dofus_Data.
+            Assert.Equal("Cliente 3.6.10.11", ClientCdn.FolderName("3.6.10.11", ClientCdn.Windows));
+            Assert.Equal("Cliente 3.6.10.11 Linux", ClientCdn.FolderName("3.6.10.11", ClientCdn.Linux));
+            Assert.NotEqual(ClientCdn.FolderName("3.6.10.11", ClientCdn.Windows), ClientCdn.FolderName("3.6.10.11", ClientCdn.Linux));
+        }
+
+        [Fact]
+        public void Only_a_client_this_machine_can_start_is_playable_here()
+        {
+            Assert.True(ClientCdn.RunsHere(ClientCdn.HostPlatform));
+            // The Windows client runs everywhere (through Wine off Windows); the Linux one only on Linux.
+            Assert.True(ClientCdn.RunsHere(ClientCdn.Windows));
+            Assert.Equal(!OperatingSystem.IsWindows(), ClientCdn.RunsHere(ClientCdn.Linux));
+        }
+
+        [Fact]
+        public void The_start_script_of_a_linux_client_stands_for_the_executable_beside_it()
+        {
+            File.WriteAllText(Path.Combine(_root, ClientCdn.StartScript), "#!/bin/sh");
+            Assert.Equal(Path.Combine(_root, ClientCdn.StartScript), ClientCdn.ExecutableChosen(Path.Combine(_root, ClientCdn.StartScript)));
+
+            File.WriteAllText(Path.Combine(_root, "Dofus.x64"), "");
+            Assert.Equal(Path.Combine(_root, "Dofus.x64"), ClientCdn.ExecutableChosen(Path.Combine(_root, ClientCdn.StartScript)));
+            Assert.Equal(Path.Combine(_root, "Dofus.exe"), ClientCdn.ExecutableChosen(Path.Combine(_root, "Dofus.exe")));
+            Assert.Equal(ClientCdn.Linux, ClientCdn.PlatformIn(_root));
+        }
+
+        [Fact]
+        public async Task A_folder_holding_the_other_platforms_client_is_refused_before_anything_is_fetched()
+        {
+            var cdn = new FakeCdn(SyntheticPack.Build());
+            File.WriteAllText(Path.Combine(_root, "Dofus.exe"), "");
+
+            var error = await Assert.ThrowsAsync<SetupException>(() => ClientCdn.FetchAsync(
+                new HttpClient(cdn), "3.6.10.11", ClientCdn.Linux, _root, null, null, CancellationToken.None));
+
+            Assert.Contains("windows", error.Message);
+            Assert.Empty(cdn.Requests);
+            Assert.Empty(cdn.Others);
+        }
+
+        [Fact]
+        public async Task Files_the_manifest_marks_executable_can_be_run_after_the_download()
+        {
+            if (OperatingSystem.IsWindows()) return; // NTFS has no execute bit to set.
+            var data = SyntheticPack.Build();
+            var cdn = new FakeCdn(data);
+            var files = data.Fragment.Files.Select((f, n) => n == 0 ? f with { Executable = true } : f).ToArray();
+            var fragment = data.Fragment with { Files = files };
+
+            await ClientCdn.DownloadAsync(new HttpClient(cdn), new[] { fragment }, _root, null, CancellationToken.None);
+
+            var mode = File.GetUnixFileMode(Local(files[0].Name));
+            Assert.True(mode.HasFlag(UnixFileMode.UserExecute));
+            Assert.False(File.GetUnixFileMode(Local(files[1].Name)).HasFlag(UnixFileMode.UserExecute));
         }
 
         [Fact]

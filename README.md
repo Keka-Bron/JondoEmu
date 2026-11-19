@@ -97,7 +97,7 @@ chained sub-spells against what each spell's sheet says.
 Before it starts, the installer asks three things, each with a default:
 
 * **Installation folder**: `C:\Program Files\JondoEmu` (Windows asks for permission once), or `~/.local/share/JondoEmu` on Linux.
-* **Dofus 3.6 client**: download it, from Ankama's official CDN or from the link below, or **I already have it** and choose your `Dofus.exe`.
+* **Dofus 3.6 client**: download it, from Ankama's official CDN or from the link below, or **I already have it** and choose your `Dofus.exe` (on Linux, `Dofus.x64` or `zaap-start.sh` too). On Linux the download offers the native **Linux** client or the **Windows** one through Wine.
 * **Server**: **On this computer**, or **On another machine (VPS, LAN…)** with its IP or name.
 
 Then it goes through each step with an animated progress bar, the step's name, its percentage and an estimated time:
@@ -216,6 +216,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ Updates from the repository's GitHub releases, required before playing: only the files that changed, or the whole release when most did
 - ✅ Server on this computer, started by the launcher, or on another machine (VPS, LAN); update repository and uninstall in *Settings*
 - ✅ HD and 4K scenery packs from Ankama's own CDN for the client's version: resumable and verified downloads
+- ✅ The Windows or Linux client from Ankama's CDN in *Settings*: downloads it whole, or checks the one in use and fetches only what is missing or damaged; on Windows the Linux client can be saved to take to another computer
 - ✅ Animated neon sign and falling stars
 - 🚧 OAuth sign-in
 

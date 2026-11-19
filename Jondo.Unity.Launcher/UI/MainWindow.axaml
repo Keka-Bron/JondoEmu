@@ -304,6 +304,30 @@
                         </Button>
                         <TextBlock x:Name="PieCliente" Classes="pie" Margin="0,6,0,0" />
                       </StackPanel>
+                      <!-- The client from Ankama's CDN: downloaded, or checked and completed. -->
+                      <StackPanel x:Name="ClienteDelCdn" Spacing="8">
+                        <TextBlock x:Name="RotuloCdn" Classes="label" />
+                        <Border Classes="segment" HorizontalAlignment="Stretch">
+                          <Grid ColumnDefinitions="*,*">
+                            <Button x:Name="AjusteClienteWindows" Classes="seg" Grid.Column="0" HorizontalAlignment="Stretch"
+                                    Click="AlElegirPlataformaCdn" Tag="windows">
+                              <TextBlock x:Name="TextoAjusteClienteWindows" />
+                            </Button>
+                            <Button x:Name="AjusteClienteLinux" Classes="seg" Grid.Column="1" HorizontalAlignment="Stretch"
+                                    Click="AlElegirPlataformaCdn" Tag="linux">
+                              <TextBlock x:Name="TextoAjusteClienteLinux" />
+                            </Button>
+                          </Grid>
+                        </Border>
+                        <TextBlock x:Name="PieCdn" Classes="pie" TextWrapping="Wrap" />
+                        <Button x:Name="BotonCdn" Classes="secondary" HorizontalAlignment="Left" MinWidth="130"
+                                Click="AlPulsarCdn">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <w:Icon x:Name="IconoCdn" Kind="download" Width="15" Height="15" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TextoBotonCdn" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                      </StackPanel>
                       <StackPanel x:Name="NativeClientSettings" Spacing="8" IsVisible="False">
                         <Button x:Name="ConfigureClient" Classes="secondary" HorizontalAlignment="Left"
                                 Click="ConfigureNativeClient" />
@@ -530,6 +554,22 @@
                           </StackPanel>
                         </Grid>
                       </Button>
+                    </StackPanel>
+                    <!-- Which client to download: Windows, or Linux where it can be played. -->
+                    <StackPanel x:Name="PlataformaInstalar" Spacing="6">
+                      <Border Classes="segment" HorizontalAlignment="Stretch">
+                        <Grid ColumnDefinitions="*,*">
+                          <Button x:Name="InstalarClienteWindows" Classes="seg" Grid.Column="0" HorizontalAlignment="Stretch"
+                                  Click="AlElegirPlataformaInstalar" Tag="windows">
+                            <TextBlock x:Name="TextoInstalarClienteWindows" />
+                          </Button>
+                          <Button x:Name="InstalarClienteLinux" Classes="seg" Grid.Column="1" HorizontalAlignment="Stretch"
+                                  Click="AlElegirPlataformaInstalar" Tag="linux" ToolTip.ShowOnDisabled="True">
+                            <TextBlock x:Name="TextoInstalarClienteLinux" />
+                          </Button>
+                        </Grid>
+                      </Border>
+                      <TextBlock x:Name="PiePlataformaInstalar" Classes="pie" TextWrapping="Wrap" />
                     </StackPanel>
                     <Button x:Name="BotonClienteInstalar" Classes="path" Click="AlPulsarClienteInstalar">
                       <Grid ColumnDefinitions="Auto,*,Auto">

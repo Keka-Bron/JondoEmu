@@ -125,7 +125,13 @@ public sealed record ClientInstallation(string Executable)
             return new(Path.GetFullPath(configured));
         foreach (string parent in parents)
             foreach (string version in SupportedVersions)
+            {
+                // The launcher downloads the Linux client beside the Windows one, under a name of
+                // its own; on Linux it is the one preferred.
+                if (!OperatingSystem.IsWindows() && InDirectory(Path.Combine(parent, "Cliente " + version + " Linux")) is { } native)
+                    return native;
                 if (InDirectory(Path.Combine(parent, "Cliente " + version)) is { } installation) return installation;
+            }
         return InDirectory(fallbackDirectory);
     }
 }

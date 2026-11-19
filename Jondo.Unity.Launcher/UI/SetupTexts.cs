@@ -143,7 +143,10 @@ namespace Jondo.Unity.Launcher.UI
         public static string ClientDownload(Language i, string size)
             => T(i, $"Descargarlo ({size})", $"Download it ({size})", $"Le télécharger ({size})", $"Baixá-lo ({size})");
         public static string ClientExisting(Language i) => T(i, "Ya lo tengo", "I already have it", "Je l'ai déjà", "Já tenho");
-        public static string ClientPick(Language i) => T(i, "Elegir Dofus.exe…", "Choose Dofus.exe…", "Choisir Dofus.exe…", "Escolher o Dofus.exe…");
+        public static string ClientPick(Language i) => OperatingSystem.IsWindows()
+            ? T(i, "Elegir Dofus.exe…", "Choose Dofus.exe…", "Choisir Dofus.exe…", "Escolher o Dofus.exe…")
+            : T(i, "Elegir Dofus.x64, zaap-start.sh o Dofus.exe…", "Choose Dofus.x64, zaap-start.sh or Dofus.exe…",
+                   "Choisir Dofus.x64, zaap-start.sh ou Dofus.exe…", "Escolher o Dofus.x64, zaap-start.sh ou Dofus.exe…");
         public static string Connection(Language i) => T(i, "Servidor", "Server", "Serveur", "Servidor");
         public static string ConnectionLocal(Language i) => T(i, "En este equipo", "On this computer", "Sur cet ordinateur", "Neste computador");
         public static string ConnectionRemote(Language i)
@@ -293,9 +296,9 @@ namespace Jondo.Unity.Launcher.UI
         public static string ClientDownloadReadmeDesc(Language i)
             => T(i, "Del enlace que da el README del repositorio.", "From the link in the repository's README.",
                     "Depuis le lien du README du dépôt.", "Do link que está no README do repositório.");
-        public static string FromAnkama(Language i, string version)
-            => T(i, $"Dofus {version} desde el CDN de Ankama", $"Dofus {version} from Ankama's CDN",
-                    $"Dofus {version} depuis le CDN d'Ankama", $"Dofus {version} do CDN da Ankama");
+        public static string FromAnkama(Language i, string version, string platform)
+            => T(i, $"Dofus {version} para {Platform(platform)} desde el CDN de Ankama", $"Dofus {version} for {Platform(platform)} from Ankama's CDN",
+                    $"Dofus {version} pour {Platform(platform)} depuis le CDN d'Ankama", $"Dofus {version} para {Platform(platform)} do CDN da Ankama");
         public static string ReadingFileList(Language i, double fraction)
             => T(i, $"Leyendo la lista de archivos… {fraction:P0}", $"Reading the file list… {fraction:P0}",
                     $"Lecture de la liste des fichiers… {fraction:P0}", $"Lendo a lista de arquivos… {fraction:P0}");
@@ -311,6 +314,110 @@ namespace Jondo.Unity.Launcher.UI
         public static string ConnectionRemoteDesc(Language i)
             => T(i, "Un VPS u otro PC donde ya esté en marcha.", "A VPS or another PC where it already runs.",
                     "Un VPS ou un autre PC où il tourne déjà.", "Um VPS ou outro PC onde ele já esteja rodando.");
+
+        // ─── The client's platform, and the client from Ankama's CDN in the settings ─────────
+
+        /// <summary>A platform as the window names it: the CDN's «windows» and «linux».</summary>
+        public static string Platform(string platform) => platform == Setup.ClientCdn.Windows ? "Windows" : "Linux";
+
+        /// <summary>The selector's label: the Windows client on Linux runs through Wine, and says so.</summary>
+        public static string PlatformChoice(string platform)
+            => platform == Setup.ClientCdn.Windows && !OperatingSystem.IsWindows() ? "Windows (Wine)" : Platform(platform);
+
+        /// <summary>What the chosen platform means on this machine, under the selector.</summary>
+        public static string PlatformNote(Language i, string platform)
+        {
+            if (platform == Setup.ClientCdn.Windows)
+                return OperatingSystem.IsWindows() ? ""
+                    : T(i, "Se abre con Wine, como en Windows: es el que carga los mods de Jondo.",
+                           "Opens through Wine, as on Windows: the one that loads Jondo's mods.",
+                           "S'ouvre avec Wine, comme sous Windows : c'est celui qui charge les mods de Jondo.",
+                           "Abre com o Wine, como no Windows: é o que carrega os mods do Jondo.");
+            return OperatingSystem.IsWindows()
+                ? T(i, "Solo para llevarlo a un equipo con Linux: en Windows no se juega.",
+                       "Only to take to a Linux computer: it does not play on Windows.",
+                       "Seulement pour l'emporter sur un ordinateur sous Linux : il ne se joue pas sous Windows.",
+                       "Só para levar a um computador com Linux: não roda no Windows.")
+                : T(i, "El cliente nativo de Linux, sin Wine.", "The native Linux client, without Wine.",
+                       "Le client Linux natif, sans Wine.", "O cliente nativo do Linux, sem Wine.");
+        }
+
+        /// <summary>The tooltip of the Linux choice where it cannot be played: the installer on Windows.</summary>
+        public static string LinuxOnlyOnLinux(Language i)
+            => T(i, "El cliente de Linux solo se juega desde Linux. Desde Ajustes puedes descargarlo para otro equipo.",
+                    "The Linux client only plays on Linux. From the settings you can download it for another computer.",
+                    "Le client Linux ne se joue que sous Linux. Depuis les paramètres, tu peux le télécharger pour un autre ordinateur.",
+                    "O cliente do Linux só roda no Linux. Nos ajustes você pode baixá-lo para outro computador.");
+
+        public static string ClientNotOnCdn(Language i, string version, string platform)
+            => T(i, $"El CDN de Ankama ya no sirve Dofus {version} para {Platform(platform)}. Indica dónde está tu cliente.",
+                    $"Ankama's CDN no longer serves Dofus {version} for {Platform(platform)}. Point to your client instead.",
+                    $"Le CDN d'Ankama ne sert plus Dofus {version} pour {Platform(platform)}. Indique où est ton client.",
+                    $"O CDN da Ankama não serve mais o Dofus {version} para {Platform(platform)}. Indique onde está o seu cliente.");
+
+        public static string ClientCannotRunHere(Language i)
+            => T(i, "Ese es el cliente de Linux y aquí solo se juega con el de Windows: elige Dofus.exe.",
+                    "That is the Linux client, and only the Windows one plays here: choose Dofus.exe.",
+                    "C'est le client Linux, et seul celui de Windows se joue ici : choisis Dofus.exe.",
+                    "Esse é o cliente do Linux, e aqui só roda o do Windows: escolha o Dofus.exe.");
+
+        public static string CdnTitle(Language i)
+            => T(i, "Descargar del CDN de Ankama", "Download from Ankama's CDN", "Télécharger depuis le CDN d'Ankama", "Baixar do CDN da Ankama");
+
+        /// <summary>What the CDN button will do with the platform chosen.</summary>
+        public static string CdnNote(Language i, string platform, string version, bool verifies, string folder)
+            => verifies
+                ? T(i, $"Comprueba Dofus {version} para {Platform(platform)} y baja solo lo que falte o esté dañado.",
+                       $"Checks Dofus {version} for {Platform(platform)} and downloads only what is missing or damaged.",
+                       $"Vérifie Dofus {version} pour {Platform(platform)} et ne télécharge que ce qui manque ou est abîmé.",
+                       $"Confere o Dofus {version} para {Platform(platform)} e baixa só o que falta ou está danificado.")
+                : folder.Length > 0
+                    ? T(i, $"Dofus {version} para {Platform(platform)}, en {folder}. Lo que ya esté se conserva.",
+                           $"Dofus {version} for {Platform(platform)}, into {folder}. What is already there is kept.",
+                           $"Dofus {version} pour {Platform(platform)}, dans {folder}. Ce qui est déjà là est conservé.",
+                           $"Dofus {version} para {Platform(platform)}, em {folder}. O que já existe é mantido.")
+                    : T(i, $"Dofus {version} para {Platform(platform)}, en la carpeta que elijas.",
+                           $"Dofus {version} for {Platform(platform)}, into the folder you choose.",
+                           $"Dofus {version} pour {Platform(platform)}, dans le dossier de ton choix.",
+                           $"Dofus {version} para {Platform(platform)}, na pasta que você escolher.");
+
+        public static string CdnDownload(Language i) => T(i, "Descargar", "Download", "Télécharger", "Baixar");
+        public static string CdnVerify(Language i) => T(i, "Comprobar", "Verify", "Vérifier", "Verificar");
+
+        public static string CdnWhere(Language i, string platform)
+            => T(i, $"¿Dónde guardar el cliente de {Platform(platform)}?", $"Where should the {Platform(platform)} client go?",
+                    $"Où enregistrer le client {Platform(platform)} ?", $"Onde salvar o cliente do {Platform(platform)}?");
+
+        public static string CdnDownloading(Language i, string platform)
+            => T(i, $"Descargando el cliente de {Platform(platform)}", $"Downloading the {Platform(platform)} client",
+                    $"Téléchargement du client {Platform(platform)}", $"Baixando o cliente do {Platform(platform)}");
+
+        public static string CdnVerifying(Language i, string platform)
+            => T(i, $"Comprobando el cliente de {Platform(platform)}", $"Verifying the {Platform(platform)} client",
+                    $"Vérification du client {Platform(platform)}", $"Verificando o cliente do {Platform(platform)}");
+
+        public static string CdnReady(Language i) => T(i, "Cliente listo", "Client ready", "Client prêt", "Cliente pronto");
+
+        public static string CdnReadyNote(Language i, string version, string platform, string folder, bool used)
+            => used
+                ? T(i, $"Dofus {version} para {Platform(platform)} está completo en {folder} y es el que abre el launcher.",
+                       $"Dofus {version} for {Platform(platform)} is complete in {folder}, and the launcher opens it.",
+                       $"Dofus {version} pour {Platform(platform)} est complet dans {folder}, et c'est lui qu'ouvre le lanceur.",
+                       $"O Dofus {version} para {Platform(platform)} está completo em {folder} e é o que o launcher abre.")
+                : T(i, $"Dofus {version} para {Platform(platform)} está completo en {folder}. Cópialo al equipo donde vayas a jugar.",
+                       $"Dofus {version} for {Platform(platform)} is complete in {folder}. Copy it to the computer you will play on.",
+                       $"Dofus {version} pour {Platform(platform)} est complet dans {folder}. Copie-le sur l'ordinateur où tu joueras.",
+                       $"O Dofus {version} para {Platform(platform)} está completo em {folder}. Copie-o para o computador onde vai jogar.");
+
+        public static string CdnBusy(Language i)
+            => T(i, "Espera a que termine la descarga del pack.", "Wait for the pack's download to finish.",
+                    "Attends la fin du téléchargement du pack.", "Espere terminar o download do pack.");
+
+        public static string CdnModsMissing(Language i)
+            => T(i, "Le faltan MelonLoader y los mods de Jondo: «Reparar» los instala.",
+                    "It lacks MelonLoader and Jondo's mods: «Repair» installs them.",
+                    "Il lui manque MelonLoader et les mods de Jondo : « Réparer » les installe.",
+                    "Faltam o MelonLoader e os mods do Jondo: «Reparar» os instala.");
 
         public static string RepairShort(Language i) => T(i, "Reparar", "Repair", "Réparer", "Reparar");
 

@@ -42,6 +42,9 @@ namespace Jondo.Unity.Launcher.UI
         /// <summary>Set once the size is being asked for, so switching back and forth asks once.</summary>
         private bool _midiendoCliente;
 
+        /// <summary>The client to download: Windows, or Linux where it can be played.</summary>
+        private string _plataformaCliente = ClientCdn.HostPlatform;
+
         // ─── What is running ───────────────────────────────────────────────────
 
         /// <summary>The steps of the work on screen.</summary>
@@ -153,6 +156,8 @@ namespace Jondo.Unity.Launcher.UI
         {
             if (_midiendoCliente) return;
             _midiendoCliente = true;
+            // A switch of platform while this one is asked for makes its answer stale.
+            string plataforma = _plataformaCliente;
             try
             {
                 string repositorio = ReleaseFeed.Normalize(CampoRepositorio.Text) ?? ReleaseFeed.DefaultRepository;
@@ -161,13 +166,15 @@ namespace Jondo.Unity.Launcher.UI
                 catch (Exception ex) { Console.WriteLine($"[Setup] The README could not be read: {ex.Message}"); }
                 string version = enlace?.Version ?? ClientDownload.Version;
 
-                if (await ClientCdn.IsServedAsync(Http.Shared, version, CancellationToken.None))
+                if (await ClientCdn.IsServedAsync(Http.Shared, version, plataforma, CancellationToken.None))
                 {
-                    _tamanoCliente = await Task.Run(async () =>
-                        ClientCdn.Size(await ClientCdn.ManifestAsync(Http.Shared, version, null, CancellationToken.None)));
+                    long tamano = await Task.Run(async () =>
+                        ClientCdn.Size(await ClientCdn.ManifestAsync(Http.Shared, version, plataforma, null, CancellationToken.None)));
+                    if (plataforma != _plataformaCliente) return;
+                    _tamanoCliente = tamano;
                     _clienteDelCdn = true;
                 }
-                else if (enlace is { } e)
+                else if (plataforma == ClientCdn.Windows && enlace is { } e)
                 {
                     var (_, size) = await ClientDownload.ProbeAsync(e.Url, CancellationToken.None);
                     _tamanoCliente = size;
@@ -203,6 +210,8 @@ namespace Jondo.Unity.Launcher.UI
             TextoTengoCliente.Text = SetupTexts.ClientExisting(_idioma);
             DescTengoCliente.Text = SetupTexts.ClientExistingDesc(_idioma);
             DescDescargarCliente.Text = SetupTexts.ClientDownloadDesc(_idioma);
+            TextoInstalarClienteWindows.Text = SetupTexts.PlatformChoice(ClientCdn.Windows);
+            TextoInstalarClienteLinux.Text = SetupTexts.PlatformChoice(ClientCdn.Linux);
             RotuloServidorInstalar.Text = SetupTexts.Connection(_idioma);
             DescServidorInstalar.Text = Textos.DescServidor(_idioma);
             TextoServidorLocal.Text = SetupTexts.ConnectionLocal(_idioma);
@@ -249,6 +258,18 @@ namespace Jondo.Unity.Launcher.UI
             DescDescargarCliente.Text = _clienteDelCdn ? SetupTexts.ClientDownloadDesc(_idioma) : SetupTexts.ClientDownloadReadmeDesc(_idioma);
             BotonClienteInstalar.IsVisible = !_descargarCliente;
             TextoClienteInstalar.Text = _clienteElegido.Length > 0 ? _clienteElegido : SetupTexts.ClientPick(_idioma);
+
+            // The platform, for a download: on Windows only its own client can be played, and
+            // the Linux one stays in sight, greyed, saying where it can be had.
+            PlataformaInstalar.IsVisible = _descargarCliente;
+            InstalarClienteWindows.Classes.Set("on", _plataformaCliente == ClientCdn.Windows);
+            InstalarClienteLinux.Classes.Set("on", _plataformaCliente == ClientCdn.Linux);
+            bool linuxAqui = ClientCdn.RunsHere(ClientCdn.Linux);
+            InstalarClienteLinux.IsEnabled = linuxAqui;
+            ToolTip.SetTip(InstalarClienteLinux, linuxAqui ? null : SetupTexts.LinuxOnlyOnLinux(_idioma));
+            string notaPlataforma = linuxAqui ? SetupTexts.PlatformNote(_idioma, _plataformaCliente) : SetupTexts.LinuxOnlyOnLinux(_idioma);
+            PiePlataformaInstalar.Text = notaPlataforma;
+            PiePlataformaInstalar.IsVisible = notaPlataforma.Length > 0;
 
             // The drive the folder is on, and whether the client fits there.
             var disco = Disco(_carpetaInstalacion);
@@ -332,20 +353,44 @@ namespace Jondo.Unity.Launcher.UI
             if (_descargarCliente) _ = MedirElClienteAsync();
         }
 
+        private void AlElegirPlataformaInstalar(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            string plataforma = (remitente as Button)?.Tag as string ?? ClientCdn.HostPlatform;
+            if (plataforma == _plataformaCliente || !ClientCdn.RunsHere(plataforma)) return;
+            _plataformaCliente = plataforma;
+            // Each platform has its own manifest, and its size is asked for again.
+            _tamanoCliente = 0;
+            _clienteDelCdn = true;
+            _midiendoCliente = false;
+            RefrescarInstalador();
+            _ = MedirElClienteAsync();
+        }
+
+        /// <summary>The file types a client can be chosen by: Dofus.exe, and on Linux its own client too.</summary>
+        private static FilePickerFileType[] TiposDeCliente()
+        {
+            var nombres = OperatingSystem.IsWindows()
+                ? new[] { ClientCdn.ExecutableFor(ClientCdn.Windows) }
+                : new[] { ClientCdn.ExecutableFor(ClientCdn.Linux), ClientCdn.StartScript, ClientCdn.ExecutableFor(ClientCdn.Windows) };
+            return new[]
+            {
+                new FilePickerFileType(string.Join(", ", nombres)) { Patterns = nombres },
+                FilePickerFileTypes.All,
+            };
+        }
+
         private async void AlPulsarClienteInstalar(object? remitente, Avalonia.Interactivity.RoutedEventArgs e)
         {
             var elegidos = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = Textos.WhereIsTheClient(_idioma),
                 AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType(ClientInstallation.ExecutableName) { Patterns = new[] { ClientInstallation.ExecutableName } },
-                    FilePickerFileTypes.All,
-                },
+                FileTypeFilter = TiposDeCliente(),
             });
             string? ruta = elegidos.Count > 0 ? elegidos[0].TryGetLocalPath() : null;
             if (string.IsNullOrEmpty(ruta)) return;
+            ruta = ClientCdn.ExecutableChosen(ruta);
+            if (!ClientCdn.RunsHere(ClientCdn.PlatformOf(ruta))) { Avisar(SetupTexts.ClientCannotRunHere(_idioma)); return; }
             _clienteElegido = ruta;
             RefrescarInstalador();
         }
@@ -381,6 +426,7 @@ namespace Jondo.Unity.Launcher.UI
                 Root = _carpetaInstalacion,
                 Repository = repositorio,
                 ExistingClient = _descargarCliente ? "" : Path.GetFullPath(_clienteElegido),
+                ClientPlatform = _plataformaCliente,
                 ServerHost = _servidorRemoto ? servidor : "",
                 Shortcuts = _accesos,
             };
@@ -438,6 +484,9 @@ namespace Jondo.Unity.Launcher.UI
                 Root = layout.Root,
                 Repository = state.Repository.Length > 0 ? state.Repository : ReleaseFeed.DefaultRepository,
                 ExistingClient = File.Exists(state.Client) ? state.Client : "",
+                // A client gone from disk comes back for the platform it was.
+                ClientPlatform = state.Client.Length > 0 && ClientCdn.RunsHere(ClientCdn.PlatformOf(state.Client))
+                    ? ClientCdn.PlatformOf(state.Client) : ClientCdn.HostPlatform,
                 ServerHost = LauncherPreferences.ServerIsLocal ? "" : LauncherPreferences.ServerHost,
                 Shortcuts = false,
             };
@@ -800,8 +849,9 @@ namespace Jondo.Unity.Launcher.UI
         }
 
         /// <summary>For the screenshot harness: the setup's page, without asking the network for the client's size.</summary>
-        internal void MostrarInstaladorDeMentira(bool descargar = false)
+        internal void MostrarInstaladorDeMentira(bool descargar = false, string? plataforma = null)
         {
+            if (plataforma != null) _plataformaCliente = plataforma;
             _clienteElegido = descargar ? "" : (ClientInstallation.Find()?.Executable ?? "");
             _descargarCliente = descargar || _clienteElegido.Length == 0;
             _tamanoCliente = 12_860_000_000;

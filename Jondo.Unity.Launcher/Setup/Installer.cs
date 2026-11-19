@@ -16,6 +16,13 @@ namespace Jondo.Unity.Launcher.Setup
         /// <summary>The client the player already has; empty to download it.</summary>
         public string ExistingClient { get; set; } = "";
 
+        /// <summary>
+        /// Which client to download when there is none: <see cref="ClientCdn.Windows"/> or
+        /// <see cref="ClientCdn.Linux"/>. Only one this machine can play makes sense here; on
+        /// Linux that is either.
+        /// </summary>
+        public string ClientPlatform { get; set; } = ClientCdn.HostPlatform;
+
         /// <summary>The server's address; empty or 127.0.0.1 for this machine.</summary>
         public string ServerHost { get; set; } = "";
 
@@ -197,34 +204,35 @@ namespace Jondo.Unity.Launcher.Setup
                 // emulator's own when the README cannot be read or links none.
                 var link = await ReadmeLinkAsync(feed, release.Tag, cancel);
                 string version = link?.Version ?? ClientDownload.Version;
-                string folder = Path.Combine(layout.Root, $"Cliente {version}");
+                string clientPlatform = ClientCdn.RunsHere(_options.ClientPlatform) ? _options.ClientPlatform : ClientCdn.HostPlatform;
+                string folder = Path.Combine(layout.Root, ClientCdn.FolderName(version, clientPlatform));
+                // The chosen platform's own executable: a folder can hold both clients, and
+                // looking for "a" client would take whichever this system prefers.
+                string executable = Path.Combine(folder, ClientCdn.ExecutableFor(clientPlatform));
 
-                if (state.ClientDownloaded && ClientInstallation.InDirectory(folder) is { } had
+                if (state.ClientDownloaded && File.Exists(executable)
                     && Packs.ClientVersion.Read(folder) == version
                     && !Directory.Exists(Path.Combine(folder, ClientCdn.WorkFolder)))
                 {
-                    client = had.Executable;
+                    client = executable;
                     step.Skip(UI.SetupTexts.AlreadyThere(_lang));
                 }
                 else
                 {
-                    if (await Guard(step, () => ClientCdn.IsServedAsync(Http.Shared, version, cancel)))
+                    if (await Guard(step, () => ClientCdn.IsServedAsync(Http.Shared, version, clientPlatform, cancel)))
                     {
-                        step.Say(UI.SetupTexts.FromAnkama(_lang, version));
+                        step.Say(UI.SetupTexts.FromAnkama(_lang, version, clientPlatform));
                         var reading = new Progress<Packs.PackProgress>(p => dlStep.Report(0, UI.SetupTexts.ReadingFileList(_lang, p.Fraction)));
                         var fetching = FromCdn(dlStep);
-                        client = await Guard(step, async () =>
-                        {
-                            var manifest = await Task.Run(() => ClientCdn.ManifestAsync(Http.Shared, version, reading, cancel), cancel);
-                            var fragments = await Task.Run(() => ClientCdn.Fragments(manifest), cancel);
-                            await Task.Run(() => ClientCdn.DownloadAsync(Http.Shared, fragments, folder, fetching, cancel), cancel);
-                            return ClientInstallation.InDirectory(folder)?.Executable
-                                   ?? throw new SetupException("The CDN's files did not make a Dofus client.");
-                        });
+                        client = await Guard(step, () => Task.Run(
+                            () => ClientCdn.FetchAsync(Http.Shared, version, clientPlatform, folder, reading, fetching, cancel), cancel));
                     }
                     else
                     {
-                        // Not on the CDN any more: the README's link, an archive to download and unpack.
+                        // Not on the CDN any more: the README's link, an archive to download and
+                        // unpack. It is the Windows client; a Linux one has nowhere else to come from.
+                        if (clientPlatform != ClientCdn.Windows)
+                            throw Fail(step, UI.SetupTexts.ClientNotOnCdn(_lang, version, clientPlatform));
                         if (link is not { } l) throw Fail(step, UI.SetupTexts.NoClientLink(_lang));
                         step.Say(l.Url);
                         string archive = await Guard(step, () => ClientDownload.DownloadAsync(l.Url, downloads, Scaled(dlStep, 0, 0.75),
@@ -326,7 +334,9 @@ namespace Jondo.Unity.Launcher.Setup
         /// <summary>The client the player pointed at: there, a supported version, and a folder MelonLoader can write in.</summary>
         private string CheckClient(SetupStep step, string executable)
         {
+            executable = ClientCdn.ExecutableChosen(executable);
             if (!File.Exists(executable)) throw Fail(step, UI.SetupTexts.ClientNotFound(_lang));
+            if (!ClientCdn.RunsHere(ClientCdn.PlatformOf(executable))) throw Fail(step, UI.SetupTexts.ClientCannotRunHere(_lang));
             string root = Path.GetDirectoryName(Path.GetFullPath(executable))!;
             string? version = Packs.ClientVersion.Read(root);
             if (version is not ("3.6.10.11" or "3.6.10.10"))
@@ -341,11 +351,14 @@ namespace Jondo.Unity.Launcher.Setup
                 $"{Format.Bytes(t.Done)} / {Format.Bytes(t.Total)}" + (t.BytesPerSecond > 0 ? $" · {Format.Speed(t.BytesPerSecond)}" : "")));
 
         /// <summary>The CDN's download on the step's bar: bytes and speed, or the part being checked.</summary>
-        private IProgress<ClientCdnProgress> FromCdn(SetupStep step)
+        private IProgress<ClientCdnProgress> FromCdn(SetupStep step) => FromCdn(step, _lang);
+
+        /// <summary>The same for a step of the settings' own download.</summary>
+        internal static IProgress<ClientCdnProgress> FromCdn(SetupStep step, UI.Language lang)
             => new Progress<ClientCdnProgress>(p => step.Report(p.Fraction, p.Phase switch
             {
-                Packs.PackPhase.Checking => UI.SetupTexts.CheckingWhatIsThere(_lang, p.Fragment),
-                Packs.PackPhase.Verifying => UI.SetupTexts.VerifyingPart(_lang, p.Fragment),
+                Packs.PackPhase.Checking => UI.SetupTexts.CheckingWhatIsThere(lang, p.Fragment),
+                Packs.PackPhase.Verifying => UI.SetupTexts.VerifyingPart(lang, p.Fragment),
                 _ => $"{Format.Bytes((long)(p.Fraction * p.Total))} / {Format.Bytes(p.Total)}"
                      + (p.BytesPerSecond > 0 ? $" · {Format.Speed(p.BytesPerSecond)}" : ""),
             }));
