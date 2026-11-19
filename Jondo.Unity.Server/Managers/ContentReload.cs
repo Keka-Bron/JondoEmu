@@ -40,6 +40,8 @@ namespace Jondo.Unity.Server.Managers
             // fights stand on: read at the start only, they waited for a restart.
             Managers.MobSpawnManager.ReloadWritten();
             Managers.FightWinAlterations.Forget();
+            Managers.IdolRules.Forget();
+            Managers.IdolRules.Load();
             Managers.MonsterSummonCaps.Reload();
             Managers.Readables.Forget();
             Managers.InteractiveWays.Forget();

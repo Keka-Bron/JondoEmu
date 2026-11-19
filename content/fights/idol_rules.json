@@ -1,0 +1,186 @@
+{
+  "why": "The fight rules of the quest idols of the Turquoise Dofus (1660-1662). Each idol (type 289) sets an alteration for one fight in its boss room, and the client only describes what that fight is like, in the idol's own spell (its 1175, whose only row is the marker 666). The descriptions are made of the old idols' rules, whose spells the client still carries with their rows (5878-5946: Trespeó, Caracho, Hóskar...), at the grade that matches the numbers. So each rule lists those spells as attitudes: «enemies» go on the monsters of the fight as it begins, «allies» on the characters. What no old idol does at the right number is written under the idol's own spell in «spells». Dofus pour les noobs, «La bénédiction de Viti», «La bénédiction de Thomahon» and «La bénédiction de Foluk», gives the same rules.",
+  "rules": [
+    {
+      "alteration": 238,
+      "idol": 28444,
+      "enemies": [
+        { "spell": 28438, "grade": 1 },
+        { "spell": 5921, "grade": 2 },
+        { "spell": 5884, "grade": 1 }
+      ],
+      "allies": [],
+      "why": "Ídolo de Viti Chamuscado (spell 28438): «Los enemigos reducen los daños de los ataques a distancia un 40%» (28438's written row, 2807 +40); «Cuando se ataca a un enemigo, los aliados alrededor del atacante en una zona de 3 casillas reciben un 100% de los daños ocasionados» (Pikmi 5921 grade 2: 5946 grade 2, 100% of the blow on the attacker's side within 3 cells); «Los adversarios ganan 1 PM cada vez que son alcanzados» (Genkyatto 5884: +1 MP for a turn when hit)."
+    },
+    {
+      "alteration": 239,
+      "idol": 28447,
+      "enemies": [
+        { "spell": 5885, "grade": 3 },
+        { "spell": 28441, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5893, "grade": 1 }
+      ],
+      "why": "Ídolo de Viti Vegetal (spell 28441): «Los enemigos ganan 3 PM» (Dinamo 5885 grade 3); «Los enemigos reducen los daños de los ataques a distancia un 40%» (28441's written row); «Si se está alineado con un enemigo o un aliado al final de turno, se pierde un 50% de los PdV durante 2 turnos» (Hóskar 5893 on each character: at his turn's end, anybody in line with him, and -50% vitality for 2 turns)."
+    },
+    {
+      "alteration": 240,
+      "idol": 28448,
+      "enemies": [
+        { "spell": 5918, "grade": 3 },
+        { "spell": 5911, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5890, "grade": 1 }
+      ],
+      "why": "Ídolo de Viti Helado (spell 28442): «Al final de su turno, los enemigos atraen 1 casilla a todos los aliados situados a más de 4 AL» (Trespeó 5918 grade 3: 5943 grade 3, attract 1 beyond 4 cells); «Si se permanece en una casilla adyacente a la de un enemigo al final de turno, se pierde un 50% de los PdV durante 2 turnos» (Ugah 5890 on each character); «En cada inicio de turno de un enemigo, el personaje más cercano al enemigo que empieza su turno recibe un 50% de daños adicionales durante 1 turno (acumulación máx. de 2)» (Caracho 5911 grade 1: 6003, damage taken x150%)."
+    },
+    {
+      "alteration": 241,
+      "idol": 28445,
+      "enemies": [
+        { "spell": 5879, "grade": 3 },
+        { "spell": 28439, "grade": 1 },
+        { "spell": 5908, "grade": 2 }
+      ],
+      "allies": [],
+      "why": "Ídolo de Thomahon Nauseabundo (spell 28439): «Los daños en contacto de los adversarios aumentan un 200%» (Avetoro 5879 grade 3, +200% melee damage); «Los enemigos devuelven un 50% de los daños recibidos» (28439's written row); «Cuando un enemigo muere, los enemigos ganan 2 PM durante 1 turno» (Hulhu 5908 grade 2: 5936 grade 2, +2 MP for a turn to the dead one's side)."
+    },
+    {
+      "alteration": 242,
+      "idol": 28449,
+      "enemies": [
+        { "spell": 28443, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5891, "grade": 1 },
+        { "spell": 5915, "grade": 4 }
+      ],
+      "why": "Ídolo de Thomahon Marino (spell 28443): «Si no se permanece en una casilla adyacente a la de un enemigo al final de turno, se pierde un 50% de los PdV durante 2 turnos» (Muta 5891 on each character: the state 297 an adjacent enemy leaves spares him); «Cuando un aliado recibe daños, sus aliados situados a 4 casillas o menos de él reciben un 200% de dichos daños» (Rapa 5915 grade 4: 5940 grade 4, 200% within 4 cells); «Los enemigos devuelven un 50% de los daños recibidos» (28443's written row)."
+    },
+    {
+      "alteration": 243,
+      "idol": 28450,
+      "enemies": [
+        { "spell": 5885, "grade": 4 },
+        { "spell": 5918, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5893, "grade": 1 }
+      ],
+      "why": "Ídolo de Thomahon Arborícola (spell 28444): «Si se está alineado con un enemigo o un aliado al final de turno, se pierde un 50% de los PdV durante 2 turnos» (Hóskar 5893 on each character); «Los enemigos ganan 4 PM» (Dinamo 5885 grade 4); «Al final de su turno, los enemigos atraen 1 casilla a todos los aliados situados a más de 8 AL» (Trespeó 5918 grade 1: attract 1 beyond 8 cells)."
+    },
+    {
+      "alteration": 244,
+      "idol": 28451,
+      "enemies": [
+        { "spell": 5917, "grade": 5 },
+        { "spell": 28445, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5890, "grade": 1 },
+        { "spell": 5915, "grade": 3 }
+      ],
+      "why": "Ídolo de Thomahon de Obsidiana (spell 28445): «Si se permanece en una casilla adyacente a la de un enemigo al final de turno, se pierde un 50% de los PdV durante 2 turnos» (Ugah 5890 on each character); «Al principio de su turno, los enemigos aplican un aumento de los daños recibidos del 100% a los aliados a menos de 6 casillas» (Teletab 5917 grade 5, the one at the turn's start: 5941 grade 4 within 6 cells, 5942 grade 4, damage taken x200%); «Cuando un aliado sufre daños, sus aliados situados a 2 casillas sufren un 200% de dichos daños» (Rapa 5915 grade 3: 200% within 2 cells); «Los enemigos reducen los daños de los ataques a distancia un 20%» (28445's written row)."
+    },
+    {
+      "alteration": 245,
+      "idol": 28446,
+      "enemies": [
+        { "spell": 5918, "grade": 4 },
+        { "spell": 5911, "grade": 2 }
+      ],
+      "allies": [
+        { "spell": 28440, "grade": 1 }
+      ],
+      "why": "Ídolo de Foluk Dorado (spell 28440): «Si se termina el turno a 2 casillas o menos de un aliado, se da 2 PM a los enemigos» (28440's written row on each character: Domo's 5945 grade 3, +2 MP to the enemies, when another ally stands within 2 cells); «Al final de su turno, los enemigos atraen 2 casillas a todos los aliados situados a más de 4 AL» (Trespeó 5918 grade 4); «En cada inicio de turno de un enemigo, el personaje más cercano al enemigo que empieza su turno recibe un 100% de daños adicionales durante 1 turno (acumulación máx. de 2)» (Caracho 5911 grade 2: 6004, damage taken x200%)."
+    },
+    {
+      "alteration": 246,
+      "idol": 28452,
+      "enemies": [
+        { "spell": 5882, "grade": 3 },
+        { "spell": 5884, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5886, "grade": 1 }
+      ],
+      "why": "Ídolo de Foluk Arañado (spell 28446): «No es posible ni robar vida a los enemigos ni curarse» (Penitente 5886 on each character: the state Incurable, 76); «Los daños de los enemigos aumentan un 40% cada turno de juego» (Dagob 5882 grade 3: +40% melee and ranged damage at each of their turns' start); «Los adversarios ganan 1 PM cada vez que son alcanzados» (Genkyatto 5884)."
+    },
+    {
+      "alteration": 247,
+      "idol": 28453,
+      "enemies": [
+        { "spell": 5896, "grade": 1 },
+        { "spell": 5878, "grade": 1 },
+        { "spell": 28447, "grade": 1 }
+      ],
+      "allies": [
+        { "spell": 5916, "grade": 1 }
+      ],
+      "why": "Ídolo de Foluk Feérico (spell 28447): «Los aliados colocan un glifo al principio de su turno de manera indefinida. Si los enemigos empiezan o terminan su turno sobre él, se hacen invulnerables» (Ultram 5916 on each character: its glyphs and the state Ultram, 299); «Los monstruos son invulnerables mientras no se desplacen. Los daños por empuje les hacen ganar un 200% de daños» (Djim 5896: the state Djim, 298, switched off when pushed or pulled, +200% damage for 2 turns on a push's damage); «Al morir, los enemigos matan a sus enemigos que estén en las casillas adyacentes a la suya» (Próximo 5878); «Los daños de los enemigos aumentan un 400% y van disminuyendo un 40% cada turno de juego» (28447's written rows, Sak 5883's at those numbers)."
+    }
+  ],
+  "spells": [
+    {
+      "spell": 28438,
+      "grade": 1,
+      "why": "Ídolo de Viti Chamuscado: «Los enemigos reducen los daños de los ataques a distancia un 40%», +40% ranged resistance on the monster that bears it, for the whole fight. Written on Horizón's row (5880), 2807 for its 2804.",
+      "effects": [
+        {"m_flags":15,"effectUid":9900001,"baseEffectId":0,"effectId":2807,"order":0,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"I","effectElement":-1,"spellId":28438,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":40,"diceSide":0,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28441,
+      "grade": 1,
+      "why": "Ídolo de Viti Vegetal: «Los enemigos reducen los daños de los ataques a distancia un 40%», as 28438.",
+      "effects": [
+        {"m_flags":15,"effectUid":9900002,"baseEffectId":0,"effectId":2807,"order":0,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"I","effectElement":-1,"spellId":28441,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":40,"diceSide":0,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28445,
+      "grade": 1,
+      "why": "Ídolo de Thomahon de Obsidiana: «Los enemigos reducen los daños de los ataques a distancia un 20%», as 28438 at 20.",
+      "effects": [
+        {"m_flags":15,"effectUid":9900003,"baseEffectId":0,"effectId":2807,"order":0,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"I","effectElement":-1,"spellId":28445,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":20,"diceSide":0,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28439,
+      "grade": 1,
+      "why": "Ídolo de Thomahon Nauseabundo: «Los enemigos devuelven un 50% de los daños recibidos». The row of Paradoja del Pikabeto (11273), which hands half of a melee blow back to its dealer through 11276 (1123, 50% of the damage first taken, on the attacker), here under every blow taken (DBE) rather than the melee ones only (DM).",
+      "effects": [
+        {"m_flags":9,"effectUid":9900004,"baseEffectId":0,"effectId":1017,"order":0,"targetId":0,"targetMask":"C","duration":0,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"DBE","effectElement":-1,"spellId":28439,"effectTriggerDuration":63,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":11276,"diceSide":1,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28443,
+      "grade": 1,
+      "why": "Ídolo de Thomahon Marino: «Los enemigos devuelven un 50% de los daños recibidos», as 28439.",
+      "effects": [
+        {"m_flags":9,"effectUid":9900005,"baseEffectId":0,"effectId":1017,"order":0,"targetId":0,"targetMask":"C","duration":0,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"DBE","effectElement":-1,"spellId":28443,"effectTriggerDuration":63,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":11276,"diceSide":1,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28447,
+      "grade": 1,
+      "why": "Ídolo de Foluk Feérico: «Los daños de los enemigos aumentan un 400% y van disminuyendo un 40% cada turno de juego». Sak's rows (5883: +100% melee and ranged damage at once, -10% of each at every turn's start) at 400 and 40.",
+      "effects": [
+        {"m_flags":15,"effectUid":9900006,"baseEffectId":0,"effectId":2801,"order":0,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"TB","effectElement":-1,"spellId":28447,"effectTriggerDuration":10,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":40,"diceSide":0,"displayZero":0},
+        {"m_flags":15,"effectUid":9900007,"baseEffectId":0,"effectId":2805,"order":1,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"TB","effectElement":-1,"spellId":28447,"effectTriggerDuration":10,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":40,"diceSide":0,"displayZero":0},
+        {"m_flags":15,"effectUid":9900008,"baseEffectId":0,"effectId":2800,"order":2,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"I","effectElement":-1,"spellId":28447,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":400,"diceSide":0,"displayZero":0},
+        {"m_flags":15,"effectUid":9900009,"baseEffectId":0,"effectId":2804,"order":3,"targetId":0,"targetMask":"C","duration":-1,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"I","effectElement":-1,"spellId":28447,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":80,"param1":1,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":0,"diceNum":400,"diceSide":0,"displayZero":0}
+      ]
+    },
+    {
+      "spell": 28440,
+      "grade": 1,
+      "why": "Ídolo de Foluk Dorado: «Si se termina el turno a 2 casillas o menos de un aliado, se da 2 PM a los enemigos». Domo's own (5919 grade 3: 5944's nearest target within 2 cells, 5945's +2 MP to the enemies) looks for that ally with «l,i,m», which takes the caster himself and was always met; here with «g», the allies but him.",
+      "effects": [
+        {"m_flags":9,"effectUid":9900010,"baseEffectId":0,"effectId":2160,"order":0,"targetId":0,"targetMask":"g","duration":0,"random":0.0,"group":0,"modificator":0,"dispellable":3,"delay":0,"triggers":"TE","effectElement":-1,"spellId":28440,"effectTriggerDuration":0,"zoneDescr":{"cellIds":[],"shape":67,"param1":2,"param2":0,"damageDecreaseStepPercent":10,"maxDamageDecreaseApplyCount":4,"isStopAtTarget":0,"forcedDirection":0,"includeCarried":1,"onlyAffectIfInSightLine":0},"value":1,"diceNum":5945,"diceSide":3,"displayZero":0}
+      ]
+    }
+  ]
+}

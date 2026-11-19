@@ -9391,6 +9391,10 @@ namespace Jondo.Unity.Server.Handlers
             // Osabana's season on the scene and on everybody, before the monsters' spells read it.
             await LaTemporadaDeOsavoraAsync(stream, fight);
 
+            // A quest idol's rules, when one of the characters holds its alteration: the old idols'
+            // spells on the monsters and on the characters, cast below with the other attitudes.
+            Managers.IdolRules.PutOn(fight, quien => EsDelBandoDeLosMonstruos(fight, quien), Managers.Alterations.Has);
+
             // Both sides: the red one too, whose monsters bring their behaviour spells and whose
             // player, in a duel, his passives. Only the blue side's ever went off.
             foreach (var quien in fight.Azul.Concat(fight.Rojo).ToList())

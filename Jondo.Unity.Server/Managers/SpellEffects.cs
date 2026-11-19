@@ -241,6 +241,39 @@ namespace Jondo.Unity.Server.Managers
             return 0;
         }
 
+        /// <summary>
+        /// Rows written in the content for a spell whose client rows do not do what its text says
+        /// (content/fights/idol_rules.json): the quest idols' spells carry only the marker 666, and
+        /// their descriptions are the fight's rules. Read before the database for that spell and grade.
+        /// </summary>
+        private static readonly Dictionary<(int, int), string> _written = new();
+
+        /// <summary>Writes a spell grade's rows, as the EffectsJson of SpellLevels, over the client's.</summary>
+        public static void Write(int spell, int grade, string effectsJson)
+        {
+            var key = (spell, Math.Max(1, grade));
+            lock (_candado)
+            {
+                _written[key] = effectsJson;
+                _cache.Remove(key);
+                _criticos.Remove(key);
+            }
+        }
+
+        /// <summary>Drops every written row, so the client's are read again (the content reload).</summary>
+        public static void ForgetWritten()
+        {
+            lock (_candado)
+            {
+                foreach (var key in _written.Keys)
+                {
+                    _cache.Remove(key);
+                    _criticos.Remove(key);
+                }
+                _written.Clear();
+            }
+        }
+
         public static IReadOnlyList<SpellEffect> De(int hechizo, int grado)
             => Leer(hechizo, grado).Normales;
 
@@ -257,6 +290,13 @@ namespace Jondo.Unity.Server.Managers
 
                 var normales = new List<SpellEffect>();
                 var criticos = new List<SpellEffect>();
+                if (_written.TryGetValue(clave, out string? written))
+                {
+                    Parsear(written, normales, -1);
+                    _cache[clave] = normales;
+                    _criticos[clave] = criticos;
+                    return (normales, criticos);
+                }
                 try
                 {
                     using var conexion = new SqliteConnection(DatabaseManager.WorldConnectionString);

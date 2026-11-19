@@ -3319,7 +3319,17 @@ namespace Jondo.Unity.Server.Managers
 
                             case Apunta.AlLanzadorPadre:
                                 aQuien = caster;
-                                aQueCasilla = caster.CellId;
+                                // The child's caster is never its target (97 of 97). On a bearer's
+                                // own hook -- an attitude, cast by and on him -- the parent's caster
+                                // is the bearer, and the one the blow came from stands for him:
+                                // Pikabeto's Paradoja (11273, under DM) hands half of a melee blow
+                                // back to its dealer, and Pikmi's 5946 shares it out around him.
+                                if (aQuien == candidato
+                                    && !string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
+                                    && combat.TriggeringAttacker is { IsAlive: true } source
+                                    && source != candidato)
+                                    aQuien = source;
+                                aQueCasilla = aQuien.CellId;
                                 break;
 
                             case Apunta.ALaCasillaDelPadre:

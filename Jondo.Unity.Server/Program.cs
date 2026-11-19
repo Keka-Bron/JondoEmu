@@ -220,6 +220,7 @@ namespace Jondo.Unity.Server
             Managers.Readables.Load();
             Managers.DungeonExitRooms.Load();
             Managers.FightWinAlterations.Load();
+            Managers.IdolRules.Load();
             // After the quests: 259 achievements are earned by finishing one, and the catalogue is indexed
             // by quest when loaded.
             Managers.Achievements.Load();
