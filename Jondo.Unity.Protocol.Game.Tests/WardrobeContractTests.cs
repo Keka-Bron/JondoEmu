@@ -57,7 +57,8 @@ public sealed class WardrobeContractTests
         AssertBody("lyt", [], new OutfitsLoadedEvent([], null));
         AssertBody("hid", [], new TitleSelectedEvent());
         AssertBody("hif", [], new OrnamentSelectedEvent());
-        AssertBody("lym", [], new OutfitAuraChangedEvent());
+        AssertBody("lym", [], new OutfitAuraChangedEvent(null));
+        AssertBody("lym", Var(1, 206), new OutfitAuraChangedEvent(206));
         AssertBody("lxc", Str(1, "id"), new OutfitLookUpdatedEvent("id", null));
         AssertBody("lxc", Body(Str(1, "id"), Msg(2, [])), new OutfitLookUpdatedEvent("id", new([], 0, 0, [], [], [])));
         // Historical populated title scalars remain available through raw inspection;

@@ -27,7 +27,8 @@ internal sealed class WardrobeStateService(IWardrobeStateBackend backend, Wardro
         if (character != null)
         {
             await owner.SendAsync(messages.Snapshot(owner, character, backend.Outfits(character.Id)));
-            await owner.SendAsync(new OutfitAuraChangedEvent());
+            // The aura worn, right after the outfits as in the captures: the client's main aura.
+            await owner.SendAsync(InitialPresentationMessages.Aura(Wardrobe.AuraOf(character.Id)));
         }
         await AnnounceAsync(owner);
         Console.WriteLine($"[Appearances] {owned.Titles.Count} titles and {owned.Ornaments.Count} ornaments offered.");
