@@ -389,13 +389,18 @@ namespace Jondo.Unity.Launcher
                                           "for this client version; starting without it.");
                     }
 
-                    if (OperatingSystem.IsWindows()) InstallMod(clientPath);
+                    // The mods run wherever MelonLoader does: on Windows, in the Windows client
+                    // through Wine, and in the native Linux client that carries it.
+                    var installation = new ClientInstallation(clientPath);
+                    bool modded = OperatingSystem.IsWindows() || WineClient.Runs(installation) || installation.HasLinuxMods;
+                    if (modded) InstallMod(clientPath);
+                    if (installation.HasLinuxMods) installation.LinkDataFolderForMelonLoader();
 
                     var startInfo = ClientStartInfo(clientPath, area.Width, area.Height, instanceId,
                         hash, language, packFlags, UI.LauncherPreferences.ClientConfigDirectory, Paths.LogsDir);
-                    if (OperatingSystem.IsWindows())
+                    if (modded)
                     {
-                        // The shipped mods consume these; Linux uses the unmodified native client.
+                        // The shipped mods consume these.
                         startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         if (Roles.AlMenos(accountRole, Roles.Administrador))
                             startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
@@ -465,16 +470,26 @@ namespace Jondo.Unity.Launcher
             foreach (string argument in new[] { "-screen-fullscreen", "0", "-screen-width",
                 width.ToString(System.Globalization.CultureInfo.InvariantCulture), "-screen-height",
                 height.ToString(System.Globalization.CultureInfo.InvariantCulture) }) start.ArgumentList.Add(argument);
-            if (installation.IsWindows)
+            if (installation.IsWindows || installation.HasLinuxMods)
             {
                 start.ArgumentList.Add("--melonloader.hideconsole");
                 start.ArgumentList.Add("--melonloader.disablestartscreen");
+            }
+            if (installation.HasLinuxMods)
+            {
+                // Linux has no version.dll to hijack: the loader is preloaded. Relative to the
+                // working directory, the client's folder, because LD_PRELOAD splits on spaces and
+                // the client's folder is «Cliente 3.6.10.11». Whatever was preloaded already stays.
+                string preloaded = start.Environment.TryGetValue("LD_PRELOAD", out string? other) ? other ?? "" : "";
+                start.Environment["LD_PRELOAD"] = ("./" + ClientInstallation.LinuxMelonLoader + " " + preloaded).Trim();
             }
             foreach (string argument in new[] { "--port", "15881", "--gameName", "dofus", "--gameRelease", "dofus3",
                 "--instanceId", instanceId.ToString(System.Globalization.CultureInfo.InvariantCulture), "--hash", hash,
                 "--canLogin", "true", "--langCode", language, "--autoConnectType", "1", "--connectionPort", "5555" })
                 start.ArgumentList.Add(argument);
             foreach (string flag in packFlags.Split(' ', StringSplitOptions.RemoveEmptyEntries)) start.ArgumentList.Add(flag);
+            if (WineClient.Runs(installation))
+                WineClient.Wrap(start, installation, $"Jondo{instanceId}", width, height);
             if (!installation.IsWindows)
             {
                 string config = Path.GetFullPath(configDirectory);
