@@ -36,6 +36,10 @@ namespace Jondo.Unity.Server.Handlers
         internal static Task SendSpellsAndBarAsync(GameSession session)
             => SpellMessages.Live.RefreshAsync(session, () => ShortcutBarMessages.Live.SendSpellAsync(session));
 
+        /// <summary>Whether a variant may be chosen now: out of a fight, or in one still placing.</summary>
+        internal static bool MayChangeVariants(bool inFight, Jondo.Unity.World.Fights.FightState? fight)
+            => !inFight || fight == Jondo.Unity.World.Fights.FightState.Placement;
+
         public static async Task HandleVariantAsync(NetworkStream stream, byte[] payload)
         {
             byte[]? hmt = ConnectionProtocol.ReadPayload(payload, Op.Hmt);
@@ -53,6 +57,20 @@ namespace Jondo.Unity.Server.Handlers
             {
                 Console.WriteLine($"[Spells] The client asks for spell {wanted}, which pairs " +
                                   "with none. Nothing changes.");
+                return;
+            }
+
+            // Out of a fight, and in one only while placing, as the characteristics: once it has
+            // started a variant is what the character fights with. Accepted, a Xelor swapped spells
+            // between two of his casts. Refused, the client is told again what it holds: its panel
+            // had swapped them already.
+            var state = Jondo.Unity.Server.Network.SessionContext.State;
+            if (!MayChangeVariants(state.IsInFight, FightHandler.FightOf(state.CharacterId)?.State))
+            {
+                Console.WriteLine($"[Spells] {state.CharacterName} asks for spell {wanted} in a fight " +
+                                  "already started. Nothing changes.");
+                await SendSpellsAndBarAsync(Jondo.Unity.Server.Network.SessionContext.Current);
+                await FightHandler.RefreshPlayerSpellBarAsync(stream);
                 return;
             }
 
