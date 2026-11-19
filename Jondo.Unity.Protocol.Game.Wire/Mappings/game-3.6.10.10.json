@@ -788,7 +788,6 @@
       "name": "GameMapMovementEvent",
       "fields": {
         "fuwy": "Cells",
-        "fuxb": "Pace",
         "fuxd": "CharacterId",
         "fuxe": "Cautious"
       },
@@ -6580,7 +6579,8 @@
         "gamd": "Recruitment",
         "gamf": "CreationDate",
         "gamg": "SubareaNumber",
-        "gami": "MembersNumber"
+        "gami": "MembersNumber",
+        "gamh": "TaxCollectorNumber"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -6590,7 +6590,8 @@
     "leq": {
       "name": "GuildSocialInformation",
       "fields": {
-        "gank": "Emblem"
+        "gank": "Emblem",
+        "gani": "DetailedInformation"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -7169,6 +7170,155 @@
       "defaultOnAbsence": [],
       "defaultOneofs": {},
       "kind": "event"
+    },
+    "itj": {
+      "name": "MarketPriceHistoryRequest",
+      "fields": {
+        "frew": "ObjectGid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "iue": {
+      "name": "MarketPriceHistoryResponse",
+      "fields": {
+        "frit": "HourlyHistory",
+        "friv": "DailyHistory"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "response"
+    },
+    "iuc": {
+      "name": "MarketPriceHistoryEntry",
+      "fields": {
+        "frik": "Quantity",
+        "fril": "AveragePrice",
+        "frip": "DateIso"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kqq": {
+      "name": "ReloginRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kqr": {
+      "name": "ReloginTokenEvent",
+      "fields": {
+        "fysc": "Token",
+        "fysf": "ValidToken"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvm": {
+      "name": "CanCharacterBeCreatedResultEvent",
+      "fields": {
+        "fzke": "Result"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kwa": {
+      "name": "PrepareCharacterDeletionRequest",
+      "fields": {
+        "fzme": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvn": {
+      "name": "CharacterDeletionPrepareEvent",
+      "fields": {
+        "fzki": "Name",
+        "fzkj": "SecretQuestion",
+        "fzkk": "NeedSecretAnswer"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvu": {
+      "name": "CharacterDeletionRequest",
+      "fields": {
+        "fzle": "CharacterId",
+        "fzlf": "SecretAnswerHash"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvh": {
+      "name": "CharacterDeletionCompletedRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "leo": {
+      "name": "GuildDetailedInformation",
+      "fields": {
+        "gamw": "LeaderId",
+        "gamx": "PendingApplicationsCount",
+        "gana": "LastActivityDay",
+        "gand": "Recruitment",
+        "gane": "MembersCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfy": {
+      "name": "GuildRecruitmentInformation",
+      "fields": {
+        "gatk": "LastEditDate",
+        "gatl": "Text",
+        "gatm": "MinLevel",
+        "gatn": "SelectedCriterion",
+        "gato": "RecruitmentType",
+        "gatp": "SelectedLanguages",
+        "gatq": "AutoLocked",
+        "gatr": "LastEditPlayerName",
+        "gats": "MinSuccess",
+        "gatt": "SocialId",
+        "gatu": "MinSuccessFacultative",
+        "gatv": "MinLevelFacultative",
+        "gatw": "Title",
+        "gatx": "TextInError"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
     }
   },
   "enums": {

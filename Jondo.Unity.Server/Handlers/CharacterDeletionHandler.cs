@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -13,7 +12,7 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     /// <remarks>
     /// Measured end to end in "crear personaje - borrar personaje.pcapng", which records one
-    /// deletion. The client asks three times and the real server answers with five frames:
+    /// deletion. The client asks three times and the server answers in three groups:
     ///
     /// <code>
     ///   C-&gt;S  kwa  10928cb8bf8802                       f2: the character id
@@ -32,7 +31,7 @@ namespace Jondo.Unity.Server.Handlers
     /// <code>
     ///   kwa  -&gt;  kvn                    the name, and the popup opens
     ///   kvu  -&gt;  kqp kqp kqp  kvi  jtg  deleted, and here is the list again
-    ///   kvh  -&gt;  kvm                    closed
+    ///   kvh  -&gt;  kvm                    creation eligibility after the popup closes
     /// </code>
     ///
     /// The list goes back framed rather than as a bare kvi, for the same reason it does after a
@@ -58,10 +57,10 @@ namespace Jondo.Unity.Server.Handlers
         /// the id again, so there is no half-finished deletion held between the two, and no state
         /// for another socket to walk into.
         /// </remarks>
-        public static async Task<bool> AskAsync(NetworkStream stream, byte[] framePayload,
-                                                long accountId, int serverId)
+        public static async Task<bool> AskAsync(GameSession session, PrepareCharacterDeletionRequest request)
         {
-            long characterId = ReadCharacterId(framePayload);
+            long characterId = request.CharacterId;
+            long accountId = session.AccountId;
             if (characterId <= 0 || accountId <= 0)
             {
                 Console.WriteLine($"[Characters] Deletion request without an id or without an account " +
@@ -71,7 +70,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // Straight off the list of the account itself, so a character that is not on it has no
             // name to give back and the popup never opens.
-            var owned = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
+            var owned = DatabaseManager.GetCharactersByAccountId(accountId, session.ServerId);
             var target = owned.FirstOrDefault(character => character.Id == characterId);
 
             if (target == null)
@@ -80,26 +79,25 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kvn, Pb.New().Str(1, target.Name).Build()));
+            await session.SendAsync(new CharacterDeletionPrepareEvent(target.Name, SecretQuestion: "", NeedSecretAnswer: false));
 
             Console.WriteLine($"[Characters] Deletion confirmation for {target.Name} ({characterId}).");
             return true;
         }
 
-        /// <summary>The kvh: the client is done with the popup. The kvm closes it.</summary>
-        public static Task CloseAsync(NetworkStream stream)
-            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kvm));
+        /// <summary>The client is done with the popup. Send the existing successful creation-eligibility result.</summary>
+        public static Task CloseAsync(GameSession session)
+            => session.SendAsync(new CanCharacterBeCreatedResultEvent(CharacterCreationResult.CreateOk));
 
         /// <summary>
         /// The kvu: confirmed. Deletes, then sends the list as it now stands.
         /// </summary>
-        public static async Task<bool> DeleteAsync(GameSession session, byte[] framePayload)
+        public static async Task<bool> DeleteAsync(GameSession session, CharacterDeletionRequest request)
         {
             using var context = SessionContext.Push(session);
             long accountId = session.AccountId;
             int serverId = session.ServerId;
-            long characterId = ReadCharacterId(framePayload);
+            long characterId = request.CharacterId;
 
             if (characterId <= 0)
             {
@@ -137,45 +135,11 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
-            await ConnectionProtocol.SendCharacterListAsync(session, characters);
+            await CharacterListService.Live.SendAsync(session, characters);
 
             Console.WriteLine($"[Characters] Deleted {name} ({characterId}). " +
                               $"{characters.Count} left on server {serverId}.");
             return true;
-        }
-
-        /// <summary>
-        /// The character id out of a kvu, or out of the kwa that comes just before it.
-        /// </summary>
-        /// <remarks>
-        /// Two messages carry the same id in different fields -- field 1 in the kvu, field 2 in the
-        /// kwa -- so both are read here rather than assuming the client always gets as far as the
-        /// kvu.
-        /// </remarks>
-        internal static long ReadCharacterId(byte[] framePayload)
-        {
-            try
-            {
-                byte[]? deletion = ConnectionProtocol.ReadPayload(framePayload, Op.Kvu);
-                int idField = 1;
-
-                if (deletion == null)
-                {
-                    deletion = ConnectionProtocol.ReadPayload(framePayload, Op.Kwa);
-                    idField = 2;
-                }
-
-                if (deletion == null || deletion.Length == 0) return 0;
-
-                var message = ProtoMessage.Parse(deletion);
-                return message.Fields.FirstOrDefault(
-                    field => field.FieldNumber == idField && field.WireType == 0)?.VarIntValue ?? 0;
-            }
-            catch (Exception ex)
-            {
-                Program.LogDebug($"[-] Error reading the id to delete: {ex.Message}");
-                return 0;
-            }
         }
     }
 }

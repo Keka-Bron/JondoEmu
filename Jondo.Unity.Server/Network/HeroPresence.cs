@@ -98,7 +98,7 @@ namespace Jondo.Unity.Server.Network
                 if (path.Count < 2) path = new List<int> { state.CellId, target };
                 state.CellId = target;
                 state.Orientation = master.State.Orientation;
-                try { await master.Map.SendAsync(new GameMapMovementEvent(path, hero.CharacterId, false, Pace: 0)); }
+                try { await master.Map.SendAsync(new GameMapMovementEvent(path, hero.CharacterId, false)); }
                 catch (Exception ex) { Program.LogDebug($"[Heroes] {hero.CharacterId} could not follow: {ex.Message}"); }
             }
         }

@@ -42,9 +42,6 @@ namespace Jondo.Unity.Server.Handlers
         ///   up       23 -> 555   +532,  facing 6
         ///   down    542 ->  10   -532,  facing 2
         /// </summary>
-        /// <summary>The move's pace for an overloaded character: walking (GameMapMovementEvent.Pace).</summary>
-        private const int OverloadedPace = 1;
-
         private const int SideStep = 13;
         private const int VerticalStep = 532;
 
@@ -79,12 +76,7 @@ namespace Jondo.Unity.Server.Handlers
             var cells = Remember(session, request);
             if (cells.Count == 0) return;
 
-            // Walking, not running, when he carries more than he can: the real server sends the
-            // move's third field at 1 on every move of an overloaded character and leaves it out
-            // once he is back under (an official capture) -- what the others on the map see.
-            bool overloaded = OverloadRestriction.IsOverloaded(session.State);
-            await map.SendAsync(new GameMapMovementEvent(cells, session.CharacterId, request.Cautious,
-                                                         Pace: overloaded ? OverloadedPace : 0));
+            await map.SendAsync(new GameMapMovementEvent(cells, session.CharacterId, request.Cautious));
 
             // His own client walks or runs on its own, before any answer: its restrictions say so.
             await OverloadRestriction.SyncAsync(session, walking: true);

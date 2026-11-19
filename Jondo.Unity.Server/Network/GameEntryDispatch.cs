@@ -8,7 +8,7 @@ internal static class GameEntryDispatch
     internal static bool IsAllowed(GameSession session, GameRequest request) => request switch
     {
         IdentificationRequest => !session.IsAuthenticated,
-        PingRequest => session.IsAuthenticated,
+        PingRequest or ReloginRequest => session.IsAuthenticated,
         CharacterListRequest or CharacterSelectionRequest or CharacterFirstSelectionRequest
             or CharacterForceSelectionReadyRequest
             => session.IsAuthenticated && !session.IsInWorld,

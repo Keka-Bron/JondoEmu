@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Network.Connection;
-using Jondo.Unity.Protocol;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -112,11 +111,10 @@ namespace Jondo.Unity.Server.Handlers
         /// <c>^([A-Z][a-z]+(\-[a-zA-Z][a-z]*){0,2})$</c> -- a capital, lower case letters, and up to two
         /// more pieces separated by a hyphen. Here it is done with two.
         /// </summary>
-        public static async Task SuggestNameAsync(NetworkStream stream)
+        public static async Task SuggestNameAsync(GameSession session)
         {
             string name = RandomName();
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kvk, Pb.New().Str(1, name).Build()));
+            await session.SendAsync(new CharacterNameSuggestionEvent(name));
 
             Console.WriteLine($"[Characters] Suggested name: {name}");
         }
@@ -146,63 +144,35 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The client has pressed PLAY on the creation screen.</summary>
-        public static async Task CreateAsync(GameSession session, byte[] payload)
+        public static async Task CreateAsync(GameSession session, CharacterCreationRequest request)
         {
             using var context = SessionContext.Push(session);
-            var stream = session.Stream ?? throw new InvalidOperationException("Character creation requires a connected game session.");
             long accountId = session.AccountId;
             int serverId = session.ServerId;
-            // Without an account nothing is created, and this was missing. The branch that gets here does
-            // not look at isAuthenticated -- the one next to it does, and the selection one refuses
-            // accountId<=0 and checks the owner as well --, CreateAsync did not look at the parameter, and
-            // in the database AccountId is a plain INTEGER NOT NULL: no FOREIGN KEY to Accounts, so the
-            // row with account 0 goes in and the transaction commits. A socket that never presented its
-            // ticket could fill the table with orphan characters.
             if (accountId <= 0)
             {
                 Console.WriteLine("[Game Node] Character creation without a resolved account: the ticket has not " +
                                   "been presented. Rejected.");
-                await RefuseAsync(stream, CreationRefused);
+                await SendResultAsync(session, CharacterCreationResult.CreateErrorNoReason);
                 return;
             }
 
-            byte[]? kvz = ConnectionProtocol.ReadPayload(payload, Op.Kvz);
-            if (kvz == null) return;
-
-            string name = "";
-            int head = 0, breed = 1, sex = 0;
-            var colors = new List<long>();
-
-            foreach (var outer in ProtoMessage.Parse(kvz).Fields)
-            {
-                if (outer.FieldNumber != 1 || outer.WireType != 2) continue;
-                foreach (var f in ProtoMessage.Parse(outer.BytesValue).Fields)
-                {
-                    if (f.FieldNumber == 1 && f.WireType == 2) name = Encoding.UTF8.GetString(f.BytesValue);
-                    else if (f.FieldNumber == 2 && f.WireType == 0) head = (int)f.VarIntValue;
-                    else if (f.FieldNumber == 3 && f.WireType == 2) colors = Packed(f.BytesValue);
-                    // lpj.f6 is the sex enum; f4 is a separate submessage.
-                    else if (f.FieldNumber == 6 && f.WireType == 0) sex = (int)f.VarIntValue;
-                    else if (f.FieldNumber == 7 && f.WireType == 0) breed = (int)f.VarIntValue;
-                }
-            }
-
-            var (id, why) = Make(accountId, serverId, name, breed, sex, head, colors);
+            var modeling = request.ModelingInformation;
+            int sex = modeling.Gender switch { Gender.Male => 0, Gender.Female => 1, _ => -1 };
+            var (id, why) = Make(accountId, serverId, modeling.Name, modeling.BreedId, sex, modeling.Head,
+                modeling.Colors.Select(color => (long)color).ToArray());
             if (id == 0)
             {
-                await RefuseAsync(stream, why switch
+                await SendResultAsync(session, why switch
                 {
-                    "full" => TooManyCharacters,
-                    "name" => InvalidName,
-                    "taken" => NameAlreadyTaken,
-                    _ => CreationRefused,
+                    "full" => CharacterCreationResult.CreateErrorTooManyCharacters,
+                    "name" or "taken" => CharacterCreationResult.CreateErrorInvalidName,
+                    _ => CharacterCreationResult.CreateErrorNoReason,
                 });
                 return;
             }
 
-            // Yes: the kvb goes empty. With a reason inside it is a no.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kvb));
+            await SendResultAsync(session, CharacterCreationResult.CreateOk);
 
             // The whole list again, and WITH THE FRESHLY CREATED ONE FIRST.
             //
@@ -217,9 +187,9 @@ namespace Jondo.Unity.Server.Handlers
             // one already there.
             var characters = DatabaseManager.GetCharactersByAccountId(accountId, serverId);
 
-            await ConnectionProtocol.SendCharacterListAsync(session, characters);
+            await CharacterListService.Live.SendAsync(session, characters);
 
-            Console.WriteLine($"[Characters] Created {name} (id {id}), breed {breed}, before the " +
+            Console.WriteLine($"[Characters] Created {modeling.Name} (id {id}), breed {modeling.BreedId}, before the " +
                               $"tutorial's statue, {(ServerSettings.Current.StartingAdventurerSet ? "with" : "without")} the " +
                               $"adventurer's set and with {ServerSettings.Current.StartingKamas} kamas.");
         }
@@ -270,16 +240,6 @@ namespace Jondo.Unity.Server.Handlers
         public static string SuggestName() => RandomName();
 
         /// <summary>
-        /// The reasons the kvb carries in f2 when it says no, as the client reads them (edr.wqk):
-        /// 1 «noReason», 2 «invalidName», 3 «tooManyCharacters», 4 «notSubscriber». A name taken
-        /// has no text of its own and goes as an invalid one.
-        /// </summary>
-        private const int CreationRefused = 1;
-        private const int InvalidName = 2;
-        private const int NameAlreadyTaken = InvalidName;
-        private const int TooManyCharacters = 3;
-
-        /// <summary>
         /// How many of the account's characters live on servers of the same category as
         /// <paramref name="serverId"/>: the slots are counted per category, not per server.
         /// </summary>
@@ -293,26 +253,7 @@ namespace Jondo.Unity.Server.Handlers
             return characters.Count(c => sameCategory.Contains(c.ServerId));
         }
 
-        private static async Task RefuseAsync(NetworkStream stream, int reason)
-        {
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Kvb, Pb.New().Var(2, reason).Build()));
-        }
-
-        /// <summary>Varints one after another, which is how the colours travel. -1 is "the breed's".</summary>
-        private static List<long> Packed(byte[] bytes)
-        {
-            var values = new List<long>();
-            long value = 0;
-            int shift = 0;
-            foreach (byte b in bytes)
-            {
-                value |= (long)(b & 0x7F) << shift;
-                if ((b & 0x80) != 0) { shift += 7; continue; }
-                values.Add(value);
-                value = 0; shift = 0;
-            }
-            return values;
-        }
+        private static Task SendResultAsync(GameSession session, CharacterCreationResult result)
+            => session.SendAsync(new CharacterCreationResultEvent(NameCompliance.NameOk, result));
     }
 }

@@ -1,7 +1,8 @@
 # Stable connection protocol and generated wire types
 
-The connection phase uses the 3.6.10.11 protocol, shared with the supported
-3.6.10.10 client. Client discovery prefers 3.6.10.11. There is one connection codec.
+The connection phase defaults to the 3.6.10.11 protocol, shared with the supported
+3.6.10.10 client. The same codec can be compiled against the `3.8.1.2` beta
+profile using the [build-time protocol target](protocol-targets.md).
 
 ## Ownership
 

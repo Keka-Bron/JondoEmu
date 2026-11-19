@@ -138,6 +138,7 @@ public sealed class ConnectionTests
         finally { ClientLaunchRegistry.Remove(launch); }
     }
 
+#if !JONDO_PROTOCOL_3_8_1_2
     [Fact]
     public void Account_projection_keeps_slot_categories_zero_based_breeds_dates_and_empty_rights()
     {
@@ -196,6 +197,7 @@ public sealed class ConnectionTests
         Assert.Equal(expected.Select(row => row.Value), wire.Gfgx.Select(slot => (int)slot.Gfgr));
         Assert.All(wire.Gfgx, slot => Assert.Equal(ConnectionService.MaxCharactersPerServer, slot.Gfgs));
     }
+#endif
 
     private sealed class Backend : IConnectionBackend
     {

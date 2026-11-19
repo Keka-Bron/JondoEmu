@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Protocol.Game.Wire;
 
 namespace Jondo.Unity.Server.Diagnostics;
@@ -24,7 +25,11 @@ internal static class GameTrafficFormatter
             name = GameBindings.StableName(envelope.Alias) ?? "";
             if (name.Length == 0) return false;
             var message = GameBindings.Decode(frame);
-            string json = GameBindings.SerializePayload(message.Content, Json);
+            // Relogin uses a dashed token, which the byte scrubber's contiguous-hex rule misses.
+            var content = message.Content is ReloginTokenEvent relogin
+                ? relogin with { Token = new string('x', relogin.Token.Length) }
+                : message.Content;
+            string json = GameBindings.SerializePayload(content, Json);
             fields = (message.Uid is int uid ? $"uid={uid} " : "") + json;
             if (fields.Length > MaxLiveFields) fields = fields[..MaxLiveFields] + "…";
             return true;

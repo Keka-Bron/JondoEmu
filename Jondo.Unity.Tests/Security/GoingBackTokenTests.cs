@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -45,13 +47,36 @@ namespace Jondo.Unity.Tests.Security
         public void Dispose() => ClientLaunchRegistry.ForgetEverything();
 
         [Fact]
-        public void A_registered_session_id_resolves_back_to_its_account()
+        public async Task The_relogin_token_is_already_bound_to_the_owning_account_when_encoded()
         {
-            // What the fix has to achieve, in one line: the id we hand out comes back and is known.
-            string sessionId = Guid.NewGuid().ToString();
-            ClientLaunchRegistry.RegisterToken(Account, sessionId);
+            byte[] packet = [0x42]; // Opaque transport token.
+            bool delivered = false;
+            var codec = new RecordingCodec(frame =>
+            {
+                Assert.Null(frame.Uid);
+                var relogin = Assert.IsType<ReloginTokenEvent>(frame.Content);
+                Assert.True(relogin.ValidToken);
+                Assert.True(Guid.TryParseExact(relogin.Token, "D", out _));
+                Assert.Equal(Account, ClientLaunchRegistry.ResolveToken(relogin.Token));
+                return packet;
+            });
+            var session = new GameSession(codec, bytes =>
+            {
+                Assert.Same(packet, bytes);
+                delivered = true;
+                return Task.CompletedTask;
+            });
+            session.BindAccount(Account, 290);
+            using var context = SessionContext.Push(GameSession.SinSocket());
 
-            Assert.Equal(Account, ClientLaunchRegistry.ResolveToken(sessionId));
+            await new GameEntryBackend().SendReturnToSelectionAsync(session);
+            Assert.True(delivered);
+        }
+
+        private sealed class RecordingCodec(Func<GameFrame, byte[]> encode) : IGameCodec
+        {
+            public byte[] Encode(GameFrame frame) => encode(frame);
+            public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new NotSupportedException();
         }
 
         [Fact]

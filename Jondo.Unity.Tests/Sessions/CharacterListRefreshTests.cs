@@ -13,7 +13,7 @@ public sealed class CharacterListRefreshTests
     [Fact]
     public async Task Creation_and_deletion_refresh_the_owning_sessions_list_including_the_last_character()
     {
-        const long account = 8_919_099_001;
+        long account = Random.Shared.NextInt64(8_919_100_000, 8_920_100_000);
         var codec = new RecordingCodec();
         await using var pipe = await ClientPipe.OpenAsync(account, account + 100_000,
             CharacterCreationHandler.StartingMap, codec: codec, enterWorld: false);
@@ -38,16 +38,22 @@ public sealed class CharacterListRefreshTests
             }
 
             string name = Name("New");
-            await CharacterCreationHandler.CreateAsync(pipe.Session, CharacterManagementRequestFixtures.Create(name));
-            Assert.Equal(CharacterManagementRequestFixtures.CreationAccepted, await ReadPacket());
+            await CharacterCreationHandler.CreateAsync(pipe.Session, new(new(name, 0, [-1], null, 0, Gender.Female, 18)));
             fresh = DatabaseManager.GetCharactersByAccountId(account, 290).Single(character => character.Name == name).Id;
+            await ReadEvent(new CharacterCreationResultEvent(NameCompliance.NameOk, CharacterCreationResult.CreateOk));
             await ReadRefresh(fresh, old);
             Assert.Same(unrelated, SessionContext.Actual);
 
+            Assert.False(await CharacterDeletionHandler.AskAsync(unrelated, new(fresh)));
+            Assert.False(await CharacterDeletionHandler.DeleteAsync(unrelated, new(fresh, "")));
+            Assert.True(await CharacterDeletionHandler.AskAsync(pipe.Session, new(fresh)));
+            await ReadEvent(new CharacterDeletionPrepareEvent(name, "", false));
             await Delete(fresh, old);
             await Delete(old);
-            Assert.Equal(15, codec.Frames.Count);
-            Assert.Equal(15, delivered);
+            await CharacterDeletionHandler.CloseAsync(pipe.Session);
+            await ReadEvent(new CanCharacterBeCreatedResultEvent(CharacterCreationResult.CreateOk));
+            Assert.Equal(18, codec.Frames.Count);
+            Assert.Equal(18, delivered);
             Assert.All(codec.Frames, frame => Assert.Null(frame.Uid));
             Assert.Same(unrelated, SessionContext.Actual);
         }
@@ -59,9 +65,14 @@ public sealed class CharacterListRefreshTests
 
         async Task Delete(long id, params long[] remaining)
         {
-            Assert.True(await CharacterDeletionHandler.DeleteAsync(pipe.Session,
-                CharacterManagementRequestFixtures.Delete(id)));
+            Assert.True(await CharacterDeletionHandler.DeleteAsync(pipe.Session, new(id, "")));
             await ReadRefresh(remaining);
+        }
+
+        async Task ReadEvent(GameEvent expected)
+        {
+            Assert.Equal(expected, codec.Frames[delivered].Content);
+            Assert.Equal(codec.Packets[delivered++], await ReadPacket());
         }
 
         async Task ReadRefresh(params long[] characterIds)

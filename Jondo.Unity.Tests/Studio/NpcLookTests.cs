@@ -92,13 +92,18 @@ namespace Jondo.Unity.Tests.Studio
             => Assert.False(NpcLook.Parse(null).Valid);
 
         /// <summary>
-        /// The breed table, which is the one thing in the editor copied out of the client instead
-        /// of read from it. 114 skins over 19 breeds.
+        /// The staged body catalogue selects the rig for each of the client's body skins.
         /// </summary>
         [Fact]
         public void The_breed_table_is_whole()
         {
-            Assert.Equal(114, Breeds.Count);
+            bool november = File.Exists(Path.Combine(Paths.Root, "beta-assets.json"));
+            Assert.Equal(november ? 116 : 114, Breeds.Count);
+            if (november)
+            {
+                Assert.Equal(21, Breeds.Of(6245));
+                Assert.Equal(21, Breeds.Of(6246));
+            }
 
             // The pairs a look actually names. 30 is a Sram, 50 an Ecaflip.
             Assert.Equal(3, Breeds.Of(30));

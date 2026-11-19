@@ -15,7 +15,9 @@ protocol. `GameCodec.JondoVersion` reports the compiled profile. The beta build 
 `.protocol-3.8.1.2`, so it can share an `--artifacts-path` with the default build.
 
 The November profile covers Jondo's mapped semantic messages. Legacy packet
-builders, raw routing and captures still describe the default client. The
+builders, raw routing and captures still describe the default client. The beta
+server skips requests without a typed handler rather than routing their aliases
+to default-client handlers. The
 November profile has no binding for the tag-storage and configuration events,
 so the typed entry sequence omits them. Character breed and sub-entity binding
 point category are now `int32` fields without reviewed target value tables; they

@@ -111,6 +111,10 @@ jobs:
         run: python3 Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
       - name: Test server transport and headless desktop rendering
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+      - name: Test November semantic protocol target
+        run: dotnet msbuild Jondo.Unity.Server/Jondo.Unity.Server.csproj -t:RunTestsBeforePublish -p:JondoProtocolTarget=3.8.1.2
+      - name: Test November asset projections
+        run: python3 AssetImport/test_november_assets.py
       - name: Publish Linux desktop tools locally
         run: |
           for project in Jondo.Unity.Launcher Jondo.Unity.Studio Jondo.Unity.Deobfuscator; do

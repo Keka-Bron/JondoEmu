@@ -16,4 +16,8 @@
     <Protobuf Include="Fixtures/Conversion.proto" GrpcServices="None" />
     <Content Include="../datos/protocolo_conexion_3.6.10.11.proto" Link="Fixtures/JondoConnectionSchema.proto" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">
+    <!-- The compatibility fixture names generated August wire types. -->
+    <Compile Remove="CodecTests.cs" />
+  </ItemGroup>
 </Project>

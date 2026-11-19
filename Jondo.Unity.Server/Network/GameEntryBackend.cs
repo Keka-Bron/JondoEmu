@@ -1,5 +1,4 @@
 using System.Net.Sockets;
-using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 
@@ -171,7 +170,12 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     public Task TickAlterationsAsync(GameSession session) => AlterationHandler.TickAsync(session);
 
     public Task SendReturnToSelectionAsync(GameSession session)
-        => session.SendAsync(ConnectionProtocol.Push(Op.Kqr, BuildReturnToken(session.AccountId)));
+    {
+        // Connection identification must recognize the same dashed token as soon as the client reconnects.
+        string token = Guid.NewGuid().ToString("D");
+        ClientLaunchRegistry.RegisterToken(session.AccountId, token);
+        return session.SendAsync(new ReloginTokenEvent(token, ValidToken: true));
+    }
 
     public void PrepareReturnToSelection(GameSession session)
     {
@@ -189,33 +193,6 @@ internal sealed class GameEntryBackend : IGameEntryBackend
 
     public Task RemoveFromMapAsync(GameSession session)
         => MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
-
-    /// <summary>Reply to the "go back" request: a session id and a one.</summary>
-    /// <remarks>
-    /// THE ID IS REGISTERED BEFORE SENDING IT, and this was what left «Cambiar de
-    /// servidor» hanging.
-    ///
-    /// The shape was right: the real server sends here a GUID WITH HYPHENS, 36 characters
-    /// —«desde world a eleccion servidor.pcapng» opens with
-    /// <c>kqr (40) 0a24 00000000-0000-4000-8000-00000000000a 2001</c>— and we sent
-    /// one just like it. What was missing is that nobody knew ours afterwards.
-    ///
-    /// What the client does with it is measured in the player's log: it closes the
-    /// connection, opens another, and presents THAT SAME id as its identity. The last one we sent
-    /// was b52b…16eb and it is exactly the one that came back and we rejected, with
-    /// «The presented token does not match any account». All the tokens this server
-    /// minted were 32 characters —Guid "N" or sixteen bytes in hexadecimal— so an
-    /// id of 36 could not match any of them by definition.
-    ///
-    /// Registering it opens nothing: the server mints it, it goes through that account's
-    /// already authenticated socket, and it is good for the same as the game token already handed out.
-    /// </remarks>
-    private static byte[] BuildReturnToken(long accountId)
-    {
-        string token = Guid.NewGuid().ToString();
-        if (accountId > 0) ClientLaunchRegistry.RegisterToken(accountId, token);
-        return Pb.New().Str(1, token).Var(4, 1).Build();
-    }
 
     private static NetworkStream StreamOf(GameSession session)
         => session.Stream ?? throw new InvalidOperationException("World entry requires a connected game session.");

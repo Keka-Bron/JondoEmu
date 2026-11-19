@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="ValidateJondoProtocolTarget" BeforeTargets="PrepareForBuild;Protobuf_Compile">
+    <Error Condition="'$(JondoProtocolTarget)' != '' and '$(JondoProtocolTarget)' != '3.8.1.2'"
+           Text="Unsupported JondoProtocolTarget '$(JondoProtocolTarget)'. Omit it for the default protocol or use 3.8.1.2." />
+  </Target>
+</Project>

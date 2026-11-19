@@ -11,10 +11,8 @@ namespace Jondo.Unity.Server.Handlers
     /// { f1: character, f2: restrictions } its played-character state handles, with «CannotRun».
     /// </summary>
     /// <remarks>
-    /// His own client walks or runs on its own, from the click, before any answer of the server:
-    /// the move's third field at 1 (GameMapMovementEvent.Pace) is what the others see, and the
-    /// move's Cautious at 1 changed nothing for him. Told CannotRun, he walked -- tried in game
-    /// against the official server's behaviour, «sobrecargado» walking and running again once under.
+    /// The local client chooses whether to walk or run from the click, before the movement reply.
+    /// The CannotRun restriction makes it walk while overloaded and run again once below capacity.
     /// Sent when the weight crosses the capacity, either way: after every pods refresh (iun) and
     /// every move, only when it changed.
     /// </remarks>

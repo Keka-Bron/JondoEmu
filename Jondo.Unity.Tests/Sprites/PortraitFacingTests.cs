@@ -37,6 +37,20 @@ namespace Jondo.Unity.Tests.Sprites
                                         "bones_assets_bone_1-9-static.bundle"));
 
         [AvaloniaFact]
+        public void November_breed_21_portrait_has_head_and_torso()
+        {
+            if (!File.Exists(Path.Combine(Paths.Root, "beta-assets.json"))) return;
+            var character = new Jondo.Unity.Server.DbCharacter { Breed = 21, Sex = 0 };
+            string look = Jondo.Unity.Server.Managers.CharacterLookBuilder.Drawable(character);
+            Assert.Equal(21, Breeds.Of(NpcLook.Parse(look).Skins[0]));
+            using var sprites = new NpcSprites();
+            Assert.True(sprites.Of(look) is not null, $"{sprites.Trouble} {sprites.Reasons()}");
+            // This rig ships combat stances at directions 1 and 5, not a front pose.
+            Assert.Contains(sprites.LastSlots, slot => slot.Key.StartsWith("Tete", StringComparison.Ordinal) && slot.Value > 0);
+            Assert.Contains(sprites.LastSlots, slot => slot.Key.StartsWith("Torse_", StringComparison.Ordinal) && slot.Value > 0);
+        }
+
+        [AvaloniaFact]
         public void Un_humanoide_se_dibuja_de_frente()
         {
             if (!HayCliente) return;

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text.Json;
+using Jondo.Unity.Launcher;
 
 namespace Jondo.Unity.Sprites
 {
@@ -6,26 +8,12 @@ namespace Jondo.Unity.Sprites
     /// Which humanoid body a skin belongs to.
     /// </summary>
     /// <remarks>
-    /// The humanoid rig is not one rig. It is nineteen —
+    /// The humanoid rig is not one rig —
     /// <c>bones_assets_bone_1-&lt;breed&gt;-static.bundle</c>, one per class — and a look does not
     /// say which: it names its skins, and the <em>first skin</em> decides the body.
     ///
-    /// <b>This is the one table in the editor that is copied out of the client rather than read
-    /// from it, and it is worth saying why.</b> The 114 <c>BodyData</c> records live in
-    /// <c>Data/data_assets_bodiesdataroot.asset.bundle</c> inside Unity's managed-reference
-    /// registry — <c>objectsById</c> holds only an <c>rid</c> per record and the fields hang off
-    /// <c>references.RefIds</c>. <c>AssetsTools.NET</c> parses that registry as an empty container,
-    /// so from C# it cannot be read at all; measured, the walk comes back with zero records. The
-    /// alternatives were to give every humanoid the wrong body, or to write down 114 numbers that
-    /// do not change within a client version.
-    ///
-    /// To regenerate after a patch, with UnityPy, which can read it:
-    /// <code>
-    ///   env = UnityPy.load(".../data_assets_bodiesdataroot.asset.bundle")
-    ///   for o in env.objects:
-    ///       for r in o.read_typetree().get("references", {}).get("RefIds", []):
-    ///           print(r["data"]["skins"], r["data"]["breed"])
-    /// </code>
+    /// Read the extracted <c>datos/bodies.json</c> catalogue. The sprite reader cannot
+    /// read the managed-reference registry in the game's body bundle directly.
     ///
     /// A miss is survivable: <see cref="NpcSprites"/> falls back to the first rig that exists,
     /// which draws the body of the wrong class rather than no body. In an editor that is the right
@@ -33,14 +21,40 @@ namespace Jondo.Unity.Sprites
     /// </remarks>
     public static class Breeds
     {
+        private static readonly Lazy<Dictionary<int, int>> Catalogue = new(Load);
+
         /// <summary>How many skins the table covers.</summary>
-        public static int Count => BySkin.Count;
+        public static int Count => Catalogue.Value.Count;
 
         /// <summary>The breed a skin belongs to, or zero.</summary>
-        public static int Of(int skin) => BySkin.TryGetValue(skin, out int breed) ? breed : 0;
+        public static int Of(int skin) => Catalogue.Value.GetValueOrDefault(skin);
+
+        private static Dictionary<int, int> Load()
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(File.ReadAllText(Paths.BodiesJson));
+                var bySkin = new Dictionary<int, int>();
+                foreach (var body in document.RootElement.GetProperty("bodies").EnumerateObject())
+                {
+                    int skin = body.Value.GetProperty("skin").GetInt32();
+                    int breed = body.Value.GetProperty("breed").GetInt32();
+                    if (bySkin.TryGetValue(skin, out int existing) && existing != breed)
+                        throw new InvalidDataException($"Body skin {skin} has conflicting breeds.");
+                    bySkin[skin] = breed;
+                }
+                if (bySkin.Count > 0) return bySkin;
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException
+                or KeyNotFoundException or InvalidOperationException or FormatException)
+            {
+                // Standalone renderer and older installs can still use the August table.
+            }
+            return BySkin;
+        }
 
         /// <summary>
-        /// Skin to breed, read out of the client's body table for 3.6.10.11.
+        /// Fallback skin-to-breed table for 3.6.10.11 installs without the catalogue.
         /// </summary>
         /// <remarks>
         /// Six skins per breed and nineteen breeds. The first two of each are the original pair and

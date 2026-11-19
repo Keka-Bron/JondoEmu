@@ -282,7 +282,7 @@ namespace Jondo.Unity.Sprites
 
                 if (rig == null || meshes.Count == 0) { Blame("no rig or no mesh"); return null; }
 
-                byte[]? frames = StandingFrames(rig);
+                byte[]? frames = StandingFrames(rig, assets.file);
                 if (frames == null) { Blame("no standing animation"); return null; }
 
                 var records = Frame0(frames);
@@ -416,9 +416,8 @@ namespace Jondo.Unity.Sprites
         /// Which humanoid rig goes with this look.
         /// </summary>
         /// <remarks>
-        /// The humanoid bones are per breed — <c>bones_assets_bone_1-&lt;breed&gt;-static.bundle</c>,
-        /// nineteen of them — and what picks one is the look's <em>first skin</em>, through the body
-        /// table in <c>Data/data_assets_bodiesdataroot.asset.bundle</c>.
+        /// The humanoid bones are per breed — <c>bones_assets_bone_1-&lt;breed&gt;-static.bundle</c> —
+        /// selected by the look's <em>first skin</em> through the extracted body catalogue.
         ///
         /// When that table cannot be read the fallback is to try the rigs in order and keep the
         /// first that exists, which gets a body of the wrong breed rather than no body at all. That
@@ -664,7 +663,7 @@ namespace Jondo.Unity.Sprites
         /// cannot leave without a drawing anyone who is drawn today. Whether it was achieved or not is said by
         /// <see cref="LastDirectionFound"/>, and with which exact animation, <see cref="LastAnimation"/>.
         /// </remarks>
-        private byte[]? StandingFrames(AssetTypeValueField rig)
+        private byte[]? StandingFrames(AssetTypeValueField rig, AssetsFile file)
         {
             byte[]? standing = null;
             byte[]? nearly = null;
@@ -682,14 +681,14 @@ namespace Jondo.Unity.Sprites
             foreach (var animation in rig["animations.Array"])
             {
                 var bytes = animation["dataBytes.Array"];
-                if (bytes.IsDummy) continue;
-
-                byte[] raw = bytes.AsByteArray;
-                if (raw.Length == 0) continue;
+                byte[]? raw = bytes.IsDummy ? null : bytes.AsByteArray;
+                if (raw is not { Length: > 0 }) raw = ReadAnimationAsset(file, animation["data"]);
+                if (raw is not { Length: > 0 }) continue;
 
                 string name = animation["name"].AsString ?? "";
 
                 if (anything == null) { anything = raw; anythingName = name; }
+                if (name.Contains("_to_", StringComparison.Ordinal)) continue;
 
                 var match = Standing.Match(name);
 
@@ -761,6 +760,29 @@ namespace Jondo.Unity.Sprites
 
             LastAnimation = "";
             return null;
+        }
+
+        // November stores frames in a local TextAsset instead of dataBytes. The
+        // TextAsset's m_Script is binary despite its string type; never UTF-8 decode it.
+        private static byte[]? ReadAnimationAsset(AssetsFile file, AssetTypeValueField pointer)
+        {
+            if (pointer.IsDummy || pointer["m_FileID"].AsInt != 0) return null;
+            var asset = file.GetAssetInfo(pointer["m_PathID"].AsLong);
+            if (asset == null || asset.GetTypeId(file) != (int)AssetClassID.TextAsset || asset.ByteSize < 8)
+                return null;
+            var reader = file.Reader;
+            var stream = reader.BaseStream;
+            long start = asset.GetAbsoluteByteOffset(file);
+            long end = start + asset.ByteSize;
+            stream.Position = start;
+            int nameLength = reader.ReadInt32();
+            if (nameLength < 0 || nameLength > asset.ByteSize - 8) return null;
+            stream.Position = start + 4 + ((nameLength + 3L) & ~3L);
+            if (stream.Position + 4 > end) return null;
+            int scriptLength = reader.ReadInt32();
+            if (scriptLength <= 0 || scriptLength > end - stream.Position) return null;
+            byte[] result = reader.ReadBytes(scriptLength);
+            return result.Length == scriptLength ? result : null;
         }
 
         /// <summary>

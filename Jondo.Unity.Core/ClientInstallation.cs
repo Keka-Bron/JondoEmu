@@ -4,7 +4,11 @@ namespace Jondo.Unity.Launcher;
 public sealed record ClientInstallation(string Executable)
 {
     // Newest first: discovery and native-launch validation use the same supported versions.
+#if JONDO_PROTOCOL_3_8_1_2
+    private static readonly string[] SupportedVersions = { "3.8.1.2" };
+#else
     private static readonly string[] SupportedVersions = { "3.6.10.11", "3.6.10.10" };
+#endif
 
     public const string ConfigUrl = "http://127.0.0.1:8888/config/dofus3.json";
     public static string ExecutableName => OperatingSystem.IsWindows() ? "Dofus.exe" : "Dofus.x64";

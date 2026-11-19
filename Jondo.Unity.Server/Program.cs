@@ -131,6 +131,7 @@ namespace Jondo.Unity.Server
             // 0. Resolved data paths. Everything the emulator needs now lives inside its own
             //    folder; the root is derived from the assembly location, not hardcoded.
             Paths.LogResolvedPaths();
+            Console.WriteLine($"[Protocol] Game profile: {Jondo.Unity.Protocol.Game.Wire.GameCodec.JondoVersion}");
             // Freeze this run's settings before the desktop can save edits for the next run.
             _ = ServerSettings.Current;
 

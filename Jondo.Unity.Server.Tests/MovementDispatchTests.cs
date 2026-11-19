@@ -59,9 +59,16 @@ public sealed class MovementDispatchTests
     {
         using var target = new Recipient(12_000_021);
         target.Session.State.CellId = 17;
-        var root = hea.Parser.ParseFrom(Codec.Encode(new(new MapMovementRequest(target.Session.MapId, [42], false), 12)));
+        byte[] valid = Codec.Encode(new(new MapMovementRequest(target.Session.MapId, [42], false), 12));
+#if JONDO_PROTOCOL_3_8_1_2
+        var root = hff.Parser.ParseFrom(valid);
+        if (scenario == "malformed") root.Focl.Focb.Value = ByteString.CopyFrom([0x12, 0x01, 0x80]);
+        else root.Focm = new hfg { Focs = root.Focl.Focb.Clone() };
+#else
+        var root = hea.Parser.ParseFrom(valid);
         if (scenario == "malformed") root.Fllm.Fllg.Value = ByteString.CopyFrom([0x12, 0x01, 0x80]);
         else root.Flll = new hdx { Fllb = root.Fllm.Fllg.Clone() };
+#endif
         Assert.False(await Dispatch(target.Session, root.ToByteArray()));
         Assert.Equal(17, target.Session.State.CellId);
         Assert.Empty(target.Packets);

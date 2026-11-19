@@ -55,6 +55,8 @@ public sealed record BaseFightStatistics(int KillCount, int BlockedDamage, int D
 
 public sealed record BidExchangerObject(int ObjectUid, IReadOnlyList<ObjectEffect> Effects, int ObjectGid, IReadOnlyList<long> Prices);
 
+public sealed record CanCharacterBeCreatedResultEvent(CharacterCreationResult Result) : GameEvent;
+
 public sealed record ChannelUpdateEvent(bool Enable, ChatChannel Channel) : GameEvent;
 
 public sealed record Character(long Id, CharacterComplementCase ComplementCase);
@@ -119,6 +121,12 @@ public sealed record CharacterCreationResultEvent(NameCompliance Reason, Charact
 
 public enum CharacterCreationRights { Allowed, TooManyCharacters, CreationDisabled }
 
+public sealed record CharacterDeletionCompletedRequest() : GameRequest;
+
+public sealed record CharacterDeletionPrepareEvent(string Name, string SecretQuestion, bool NeedSecretAnswer) : GameEvent;
+
+public sealed record CharacterDeletionRequest(long CharacterId, string SecretAnswerHash) : GameRequest;
+
 public sealed record CharacterEpicInformation(int DeathCount, EpicDeathState DeathState, int DeathMaxLevel);
 
 public sealed record CharacterFirstSelectionRequest(bool DoTutorial, long CharacterId) : GameRequest;
@@ -147,7 +155,7 @@ public sealed record CharacterNameSuggestionEvent(string Suggestion) : GameEvent
 
 public sealed record CharacterNameSuggestionRequest() : GameRequest;
 
-public sealed record CharacterRemodelingInformation(string Name, int Head, IReadOnlyList<int> Colors, CharacterToRemodelInformation CharacterToRemodelInformation, int BodyId, Gender Gender, int BreedId);
+public sealed record CharacterRemodelingInformation(string Name, int Head, IReadOnlyList<int> Colors, CharacterToRemodelInformation? CharacterToRemodelInformation, int BodyId, Gender Gender, int BreedId);
 
 public sealed record CharacterSelectionError();
 
@@ -495,7 +503,13 @@ public enum FightInvisibilityState { Invisible, Detected, Visible }
 
 public sealed record FightIsTurnReadyEvent() : GameEvent;
 
-public sealed record FightJoinEvent(bool IsTeamPhase, bool IsFightStarted, long TimeMaxBeforeFightStart, FightType FightType) : GameEvent;
+public sealed record FightJoinEvent(bool IsTeamPhase, bool IsFightStarted,
+#if JONDO_PROTOCOL_3_8_1_2
+    int TimeMaxBeforeFightStart,
+#else
+    long TimeMaxBeforeFightStart,
+#endif
+    FightType FightType) : GameEvent;
 
 public sealed record FightKillStatistics(int Total, int EnemiesKilled, int SummonsKilled);
 
@@ -557,7 +571,18 @@ public sealed record FightReadyRequest(bool IsReady) : GameRequest;
 
 public sealed record FightRefreshCharacterStatsEvent(long FighterId, FightCharacteristics Stats) : GameEvent;
 
-public sealed record FightRemovableEffect(int Param1, long TargetId, int BuffId, int SpellGrade, FightTurn EndTurn, string Trigger, int SpellEffectUid, bool Critical, int Param3, FightTurn StartTurn, int Param2, int SpellId, FightEffectKind Kind, EffectDissipationState DissipationState);
+public sealed record FightRemovableEffect(int Param1, long TargetId, int BuffId, int SpellGrade, FightTurn EndTurn,
+#if JONDO_PROTOCOL_3_8_1_2
+    FightEffectTrigger? Trigger,
+#else
+    string Trigger,
+#endif
+    int SpellEffectUid, bool Critical, int Param3, FightTurn StartTurn, int Param2, int SpellId, FightEffectKind Kind, EffectDissipationState DissipationState);
+
+#if JONDO_PROTOCOL_3_8_1_2
+public sealed record FightEffectTrigger(FightEffectTriggerDetails? Details, IReadOnlyList<int> Parameters, string Name);
+public sealed record FightEffectTriggerDetails(int FormatArg1, string FormatArg2, int FormatArg3);
+#endif
 
 public sealed record FightRemovableEffectExtendedInformation(FightRemovableEffect Effect, long SourceId, int ActionId);
 
@@ -707,13 +732,7 @@ public sealed record GameActionFightEvent(long SourceId, int ActionType, FightAc
 
 public enum GameContext { RolePlay, Fight }
 
-/// <summary>
-/// An actor's walk on the map. <see cref="Pace"/> is how it walks: 1 for an overloaded character,
-/// who walks instead of running -- an official capture sends its third field at 1 on every move
-/// of an overloaded character and leaves it out once he is back under; INFERRED that the value is
-/// a pace and that 0 is running.
-/// </summary>
-public sealed record GameMapMovementEvent(IReadOnlyList<int> Cells, long CharacterId, bool Cautious, int Pace = 0) : GameEvent;
+public sealed record GameMapMovementEvent(IReadOnlyList<int> Cells, long CharacterId, bool Cautious) : GameEvent;
 
 public sealed record GameRolePlayShowActorsEvent(IReadOnlyList<ActorPositionInformation> Actors) : GameEvent;
 
@@ -915,6 +934,12 @@ public sealed record MonsterInGroupInformation(int Gid, int Level, EntityLook? L
 
 public sealed record MonstersInGroupAlternativeInformation(IReadOnlyList<MonsterInGroupInformation> Monsters, int PlayerCount);
 
+public sealed record MarketPriceHistoryEntry(int Quantity, long AveragePrice, string DateIso);
+
+public sealed record MarketPriceHistoryRequest(int ObjectGid) : GameRequest;
+
+public sealed record MarketPriceHistoryResponse(IReadOnlyList<MarketPriceHistoryEntry> HourlyHistory, IReadOnlyList<MarketPriceHistoryEntry> DailyHistory) : GameResponse;
+
 public sealed record Mount();
 
 public sealed record MutantInformation(int PowerLevel, int MonsterId);
@@ -987,7 +1012,14 @@ public sealed record ObjectEffectPaddockGaugeValue(int Cap, int GaugeValue);
 
 public sealed record ObjectEffectRideParentsValue(int FirstParent, int SecondParent);
 
-public enum ObjectError { InventoryFull, CannotEquipTwice, NotTradable, CannotDrop, CannotDropNoPlace, CannotDestroy, LevelTooLow, CannotUnequip, CannotEquipHere, Criterions, SymbioticObjectError, EvolutiveObjectRefusedFood }
+public enum ObjectError
+{
+    InventoryFull, CannotEquipTwice, NotTradable, CannotDrop,
+#if !JONDO_PROTOCOL_3_8_1_2
+    CannotDropNoPlace,
+#endif
+    CannotDestroy = 5, LevelTooLow, CannotUnequip, CannotEquipHere, Criterions, SymbioticObjectError, EvolutiveObjectRefusedFood
+}
 
 public sealed record ObjectErrorEvent(ObjectError Reason) : GameEvent;
 
@@ -1032,6 +1064,8 @@ public sealed record PlayerFightRequest(long TargetId, bool Friendly, int Target
 public sealed record PongEvent(bool Quiet) : GameEvent;
 
 public sealed record PortalInformation(int PortalId, int AreaId);
+
+public sealed record PrepareCharacterDeletionRequest(long CharacterId) : GameRequest;
 
 public sealed record PrismCristal(ObjectItemInventory CristalObject, PrismCristalType Type);
 
@@ -1165,7 +1199,12 @@ public enum SubEntityBindingPointCategory
     HookPointCategoryUnderwaterBubbles, Unknown9, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14
 }
 
-public sealed record SubEntityInformation(EntityLook SubEntityLook, int BindingPointIndex, SubEntityBindingPointCategory BindingPointCategory);
+public sealed record SubEntityInformation(EntityLook SubEntityLook, int BindingPointIndex,
+#if JONDO_PROTOCOL_3_8_1_2
+    SubEntityBindingPointCategory? BindingPointCategory);
+#else
+    SubEntityBindingPointCategory BindingPointCategory);
+#endif
 
 public sealed record TaxCollectorActor(TaxCollectorStaticInformation Identification, int Attack);
 
@@ -1240,7 +1279,7 @@ public sealed record AllianceApplicationInformationEvent(SocialApplicationInform
 
 public sealed record AllianceBulletinEvent(SocialNoticeInformation? BulletinInfo) : GameEvent;
 
-public sealed record AllianceCardInformation(AllianceRecruitmentInformation? Recruitment, long CreationDate, int SubareaNumber, int MembersNumber);
+public sealed record AllianceCardInformation(AllianceRecruitmentInformation? Recruitment, long CreationDate, int SubareaNumber, int MembersNumber, int TaxCollectorNumber = 0);
 
 public sealed record AllianceMemberInformation(int AvaRoleId, Character? Information);
 
@@ -1324,6 +1363,8 @@ public sealed record GuildContributionConfiguration(long KamasCost, int Guildato
 
 public sealed record GuildContributionLeftEvent(int ContributionLeft) : GameEvent;
 
+public sealed record GuildDetailedInformation(long LeaderId, int PendingApplicationsCount, int LastActivityDay, GuildRecruitmentInformation? Recruitment, int MembersCount);
+
 public sealed record GuildGeneralInformationEvent(string CreationDate, int? HallId, int Level, int Score, long ExpLevelFloor, long Experience, long GuildKamas, long ExpLevelNextFloor, int MembersCount) : GameEvent;
 
 public sealed record GuildHousesEvent(IReadOnlyList<House> Houses) : GameEvent;
@@ -1338,7 +1379,9 @@ public sealed record GuildMembershipEvent(GuildInformation? GuildInformation, in
 
 public sealed record GuildRanksEvent(IReadOnlyList<RankInformation> Ranks) : GameEvent;
 
-public sealed record GuildSocialInformation(SocialEmblem? Emblem);
+public sealed record GuildRecruitmentInformation(long LastEditDate, string Text, int MinLevel, IReadOnlyList<int> SelectedCriterion, SocialRecruitmentType RecruitmentType, IReadOnlyList<int> SelectedLanguages, bool AutoLocked, string LastEditPlayerName, int MinSuccess, int SocialId, bool MinSuccessFacultative, bool MinLevelFacultative, string Title, bool TextInError);
+
+public sealed record GuildSocialInformation(SocialEmblem? Emblem, GuildDetailedInformation? DetailedInformation = null);
 
 public sealed record HaapiSessionEvent(string SessionUid) : GameEvent;
 
@@ -1448,6 +1491,10 @@ public sealed record PresetLook(EntityLook? LookWithoutOutfit, EntityLook? LookW
 public sealed record PrismListEvent(IReadOnlyList<PrismLocalizedInformation> Prisms) : GameEvent;
 
 public sealed record PrismLocalizedInformation(long MapId, MapCoordinates? MapCoordinates, int SubAreaId, PrismInformation? Prism);
+
+public sealed record ReloginRequest() : GameRequest;
+
+public sealed record ReloginTokenEvent(string Token, bool ValidToken) : GameEvent;
 
 public sealed record QuestActive(QuestActiveDetails? Details, int QuestId);
 

@@ -1,11 +1,9 @@
 # Typed Game protocol and mapped live logging
 
-Game uses protocol **3.6.10.10**. Clients **3.6.10.10 and 3.6.10.11 use the exact
-same Game protocol**, so both use this single profile. `JondoVersion` is the Game
-wire project's MSBuild selector, defaulting to `3.6.10.10`; unsupported profile
-selections fail the build. `GameCodec.JondoVersion` exposes the same identity at
-runtime. The profile name identifies the protocol, not the launcher version or
-the precise client patch installed.
+Game defaults to protocol **3.6.10.10**, which clients **3.6.10.10 and 3.6.10.11**
+share. Use the [build-time protocol target](protocol-targets.md) to compile
+against the `3.8.1.2` beta profile. `GameCodec.JondoVersion` reports the
+compiled profile identity.
 
 ## Layers
 
@@ -26,8 +24,8 @@ the precise client patch installed.
 | `Jondo.Unity.Server/Network/MovementDispatch.cs` | Typed roleplay and combat movement request dispatch |
 | `Jondo.Unity.Server/Diagnostics/GameTrafficFormatter.cs` | Best-effort typed live-log presentation |
 
-The imported schema contains 2,169 messages. The semantic mapping covers 536
-payload/common message types, 65 enums and 1,382 payload/common fields, plus the
+The imported schema contains 2,169 messages. The semantic mapping covers 556
+payload/common message types, 65 enums and 1,462 payload/common fields, plus the
 four Game envelope roles. JondoEmu's stable
 C# API defines semantic names, required/nullable members and explicit oneof case
 records. Nullable message members and explicit `None` cases preserve absence
@@ -216,6 +214,14 @@ Do not add an invented semantic facing binding to reproduce the legacy bytes.
 Client animation/final-facing smoke testing remains useful alongside automated
 wire/state checks.
 
+Movement tag 3 (`jsj.fuxb`) is also raw-only. An overload capture correlated value
+1 with overload, but the reviewed `11-08-2026` movement handlers (including
+`eon.mye`, RVA `0x4ea7200`) do not read it. The remote-actor path passes cells,
+actor ID, and `Cautious` to `eoo.baju` (`0x4ea7b10`), which selects animation
+using the decoded path and actor state or the separate cautious branch. This
+does not establish tag 3 as a decoy. The local player's overload behavior still
+uses the `CannotRun` restriction.
+
 ## Game identification, selection and entry migration
 
 `GameNodeProxy` decodes identification, character-list/selection (including
@@ -227,6 +233,21 @@ Invalid envelopes use the generic compatibility fallthrough described above. Ent
 require identification before selection and a selected, in-world character before
 map/context initialization. Selection also checks the ticket's server. Tutorial
 preference is decoded; the existing saved-map spawn policy is retained.
+
+Creation, name suggestion, and the three deletion actions are dispatched from
+typed requests. Creation accepts an absent remodel-detail block, as sent by
+`ecf.voz` (`0x4bb82d0` in the reviewed client), and preserves signed palette
+values. The result precedes the shared queue/list/gift
+refresh, with the new character first. Deletion preparation looks up the name
+on the session's account and server, confirmation keeps the transactional account
+check and refreshes the list, and completion sends the creation-eligibility event.
+The server does not store a secret answer to validate the deletion hash against.
+
+Authenticated relogin is accepted from selection and from the world. The backend
+registers the dashed token against the session's account before sending the
+UID-less `ReloginTokenEvent`. When in the world, the service then handles fight
+state and map departure and resets entry initialization. The client reconnects
+using that token.
 
 The force-selection event is constructed directly as `CharacterForceSelectionEvent`.
 The client automatically answers with `CharacterForceSelectionReadyRequest`; the

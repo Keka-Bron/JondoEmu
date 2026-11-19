@@ -18,6 +18,8 @@ namespace Jondo.Unity.Server.Network
     {
         private static TcpListener? _tcpListener;
         private static bool _isRunning;
+        // Raw aliases, packet builders, and the initial hello belong to this profile only.
+        private static bool UsesLegacyRouting => GameCodec.JondoVersion == "3.6.10.10";
 
         private static CancellationTokenSource? _cts;
 
@@ -136,7 +138,7 @@ namespace Jondo.Unity.Server.Network
                 throw new InvalidOperationException("The game stream does not belong to this session.");
 
             byte[] payload = firstPayload;
-            string payloadStr = RoutingTextOf(payload, firstPayloadStr);
+            string payloadStr = UsesLegacyRouting ? RoutingTextOf(payload, firstPayloadStr) : string.Empty;
             var entryService = new GameEntryService(session, new GameEntryBackend());
 
             if (payloadStr.Contains(Op.Uri(Op.Lqu)) || payloadStr.Contains(Op.Uri(Op.Hoy)) || payloadStr.Contains(Op.Uri(Op.Hmt)) || payloadStr.Contains("type.ankama.com/knx"))
@@ -164,24 +166,15 @@ namespace Jondo.Unity.Server.Network
 
                 GameServerProxy.LogTraffic("GAME_C->S", payload, payload.Length);
 
-                var requestFrame = DecodeRequest(session, payload);
-                switch (await DispatchTypedAsync(session, requestFrame, entryService))
-                {
-                    case GameEntryResult.Close:
-                        return;
-                    case GameEntryResult.Handled:
-                        break;
-                    default:
-                        await DispatchLegacyAsync();
-                        break;
-                }
+                if (await DispatchPacketAsync(session, payload, entryService, DispatchLegacyAsync) == GameEntryResult.Close)
+                    return;
 
                 packetTurn.Dispose();
                 // With no account behind it, a frame is small: the 8 MB ceiling is for who plays.
                 payload = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stream,
                     session.IsAuthenticated ? Jondo.Protocol.NetworkMessage.MaxFrameLength : ConnectionGuard.UnauthenticatedFrame);
                 if (payload == null) break;
-                payloadStr = RoutingTextOf(payload, Encoding.UTF8.GetString(payload));
+                if (UsesLegacyRouting) payloadStr = RoutingTextOf(payload, Encoding.UTF8.GetString(payload));
             }
 
             // Only requests without a typed handler (or without a decodable request frame)
@@ -192,25 +185,9 @@ namespace Jondo.Unity.Server.Network
                 // the only source of account/authentication state.
                 bool isAuthenticated = session.IsAuthenticated;
                 long sessionAccountId = session.AccountId;
-                int sessionServerId = session.ServerId;
                 if (payloadStr.Contains("type.ankama.com/krt"))
                 {
                     // Comes along with kqz and expects no response of its own.
-                }
-                else if (payloadStr.Contains("type.ankama.com/kqq"))
-                {
-                    // Going back to the character list or to the server list. In the real capture
-                    // the server only answers kqr and it is the client that closes the connection
-                    // and redoes the handshake with the connection server. Both ways back are
-                    // handled the same: the client decides which of the two screens it lands on.
-                    await entryService.ReturnToSelectionAsync();
-                }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvz)))
-                {
-                    // Creating a character. isAuthenticated is the first of the two guards: the
-                    // second is inside CreateAsync, which rejects an unresolved account. Both
-                    // go because this same branch is also reached from GameServerProxy.
-                    await CharacterCreationHandler.CreateAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Luy)))
                 {
@@ -246,29 +223,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     // And its answer: with f2 it accepts, without it it declines.
                     await ChallengeDuelHandler.AnswerAsync(stream, payload);
-                }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kwa)))
-                {
-                    // The bin. Without this answer the confirmation popup never gets to open.
-                    await CharacterDeletionHandler.AskAsync(stream, payload, sessionAccountId,
-                                                            sessionServerId);
-                }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kvu)))
-                {
-                    // Deleting a character. The usual two guards: isAuthenticated here and the
-                    // resolved account inside, because the client picks the id.
-                    await CharacterDeletionHandler.DeleteAsync(session, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kvh)))
-                {
-                    await CharacterDeletionHandler.CloseAsync(stream);
-                }
-                else if (payloadStr.Contains(Op.Uri("kwd")))
-                {
-                    // The dice button: a random name. The client asks with kwd and the name comes
-                    // back in a kvk («crear personaje - borrar personaje», three times); this branch
-                    // used to wait for the kvk itself, which the client never sends.
-                    await CharacterCreationHandler.SuggestNameAsync(stream);
                 }
                 else if (payloadStr.Contains(Op.Uri(Op.Kme)) && SessionContext.State.SpectatingFightId != 0)
                 {
@@ -1710,7 +1664,16 @@ namespace Jondo.Unity.Server.Network
             }
         }
 
-        /// <summary>Best-effort semantic decoding. Failures leave original bytes available to raw routing.</summary>
+        internal static async Task<GameEntryResult> DispatchPacketAsync(GameSession session, byte[] payload,
+            GameEntryService entryService, Func<Task> dispatchLegacy)
+        {
+            var result = await DispatchTypedAsync(session, DecodeRequest(session, payload), entryService);
+            if (result != GameEntryResult.Unhandled || !UsesLegacyRouting) return result;
+            await dispatchLegacy();
+            return GameEntryResult.Handled;
+        }
+
+        /// <summary>Best-effort semantic decoding; only the August profile has a raw fallback.</summary>
         internal static Game.GameFrame? DecodeRequest(GameSession session, byte[] payload)
         {
             try
@@ -1745,8 +1708,23 @@ namespace Jondo.Unity.Server.Network
                     or Game.CharacterFirstSelectionRequest or Game.CharacterForceSelectionReadyRequest
                     or Game.SequenceNumberRequest or Game.ContextCreationRequest or Game.ContextReadyRequest
                     or Game.MapInformationRequest or Game.FightMapRequest or Game.PingRequest
-                    or Game.ChatChannelSubscriptionRequest:
+                    or Game.ChatChannelSubscriptionRequest or Game.ReloginRequest:
                     return await entryService.HandleAsync(frame);
+                case Game.CharacterCreationRequest create:
+                    if (session.IsAuthenticated) await CharacterCreationHandler.CreateAsync(session, create);
+                    break;
+                case Game.CharacterNameSuggestionRequest:
+                    await CharacterCreationHandler.SuggestNameAsync(session);
+                    break;
+                case Game.PrepareCharacterDeletionRequest prepare:
+                    if (session.IsAuthenticated) await CharacterDeletionHandler.AskAsync(session, prepare);
+                    break;
+                case Game.CharacterDeletionRequest delete:
+                    if (session.IsAuthenticated) await CharacterDeletionHandler.DeleteAsync(session, delete);
+                    break;
+                case Game.CharacterDeletionCompletedRequest:
+                    await CharacterDeletionHandler.CloseAsync(session);
+                    break;
                 case Game.ChatCommunitySelectionRequest:
                     // The server does not track the selection or echo it in the unmapped event fields.
                     await session.SendAsync(new Game.CommunityChannelEvent());
