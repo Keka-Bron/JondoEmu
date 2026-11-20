@@ -224,6 +224,26 @@ namespace Jondo.Unity.World.Achievements
 
         public IReadOnlyCollection<AchievementCategory> Categories => _categories.Values;
 
+        /// <summary>The window's top categories whose achievements pay their items once per account: Donjons, Monstres, Événements.</summary>
+        public static readonly IReadOnlySet<int> ItemsOncePerAccount = new HashSet<int> { 3, 25, 9 };
+
+        /// <summary>The top category of the window's tree a category is under, itself when it is one.</summary>
+        public int RootCategoryOf(int categoryId)
+        {
+            for (int guard = 0; guard < 16 && _categories.TryGetValue(categoryId, out var category) && category.ParentId != 0; guard++)
+                categoryId = category.ParentId;
+            return categoryId;
+        }
+
+        /// <summary>
+        /// Whether an achievement's items are paid once per account and not per character: those of
+        /// the Donjons, Monstres and Événements categories, as the game has had it since 2.45 --
+        /// «les récompenses d'objets des Succès issus des catégories "Donjons", "Monstres" et
+        /// "Événementiel" ne peuvent être obtenus qu'une seule fois par compte et par serveur».
+        /// </summary>
+        public bool PaysItemsOncePerAccount(int achievementId)
+            => Of(achievementId) is { } achievement && ItemsOncePerAccount.Contains(RootCategoryOf(achievement.CategoryId));
+
         /// <summary>The achievements of one category, in the order the category lists them.</summary>
         public IReadOnlyList<Achievement> InCategory(int categoryId)
             => _byCategory.TryGetValue(categoryId, out var list) ? list : (IReadOnlyList<Achievement>)Array.Empty<Achievement>();

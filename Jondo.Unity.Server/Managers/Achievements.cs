@@ -135,12 +135,13 @@ namespace Jondo.Unity.Server.Managers
                 return;
             }
 
-            var log = new AchievementLog(_book, new CharacterFacts());
+            var log = new AchievementLog(_book, new CharacterFacts()) { Owner = characterId };
 
-            // The account's, not the character's: what one character of the account achieved is
-            // achieved for all of them and paid once (the captured lists name up to four different
-            // characters). Read per character, another character of the same account earned it all
-            // again and was paid for it again. The character's own row is preferred, then a paid one.
+            // The account's list: what one character of the account achieved shows for all of
+            // them, with who did it (the captured lists name up to four different characters). The
+            // character's own row is preferred, then a paid one. One another character did is still
+            // his to earn and be paid for (AchievementLog.Owner), as the game has had it since 2.45:
+            // only the items of the Donjons, Monstres and Événements ones are paid once per account.
             long account = DatabaseManager.GetCharacterById(characterId)?.AccountId ?? 0;
             var rowsOf = account != 0
                 ? DatabaseManager.LoadAccountAchievements(account)
@@ -154,10 +155,11 @@ namespace Jondo.Unity.Server.Managers
                 // another character's leaves it to be earned and paid again.
                 if (_book.Of(group.Key)?.EachCharacter == true && group.All(r => r.CharacterId != characterId)) continue;
 
-                bool claimed = group.Any(r => r.Claimed);
                 long achiever = group.Any(r => r.CharacterId == characterId) ? characterId
                                 : group.Where(r => r.Claimed).Select(r => r.CharacterId).FirstOrDefault();
                 if (achiever == 0) achiever = group.First().CharacterId;
+                // Paid or not as the achiever's own row says: another character's claim is not his.
+                bool claimed = group.Any(r => r.CharacterId == achiever && r.Claimed);
                 log.Restore(group.Key, claimed, achiever);
                 log.NoteLevel(group.Key, group.Where(r => r.CharacterId == achiever).Select(r => r.Level).FirstOrDefault());
                 rows++;
@@ -297,10 +299,10 @@ namespace Jondo.Unity.Server.Managers
         /// his level, looked at in his own session and announced on his master's client.
         /// </summary>
         /// <remarks>
-        /// The achievements are the account's, and the master's log stands for the account while
-        /// the group lasts: what it earned since the hero was connected is his before he is looked
-        /// at, and what he earns is the master's after, so that neither earns one twice. The ones
-        /// each character earns for himself (EachCharacter) stay each his own.
+        /// The list is the account's, and the master's log stands for it while the group lasts:
+        /// what it earned since the hero was connected is shown to him before he is looked at, and
+        /// what he earns is shown to the master after. Each earns and is paid for his own, the
+        /// others' included (AchievementLog.Owner), as every character of an account may.
         /// </remarks>
         public static async Task ForHeroAsync(GameSession master, GameSession hero)
         {
@@ -323,9 +325,12 @@ namespace Jondo.Unity.Server.Managers
                 }
                 if (candidates.Count == 0) return;
 
+                // What the group earned since he was connected, shown as the others': his own is
+                // left as it is, and the others' are still his to earn (AchievementLog.Owner).
                 if (account != null)
                     foreach (int id in account.Earned.ToList())
-                        if (book.Of(id)?.EachCharacter != true) log.Restore(id, account.WasClaimed(id), account.AchieverOf(id));
+                        if (book.Of(id)?.EachCharacter != true && !log.Has(id))
+                            log.Restore(id, account.WasClaimed(id), account.AchieverOf(id) is var by && by != 0 ? by : master.CharacterId);
 
                 var earned = log.CheckAll(candidates.Distinct());
                 await AchievementStateService.Live.AnnounceAsync(hero, master, earned);
@@ -676,6 +681,18 @@ namespace Jondo.Unity.Server.Managers
                 owed.AddRange(log.Unclaimed().Where(Mine).OrderBy(i => i));
             }
 
+            // The items of the Donjons, Monstres and Événements ones are paid once per account: those
+            // another character of it has already taken are not paid again.
+            HashSet<int>? takenByOthers = null;
+            bool ItemsTaken(int id)
+            {
+                if (!_book.PaysItemsOncePerAccount(id)) return false;
+                takenByOthers ??= DatabaseManager.LoadAccountAchievements(session.AccountId)
+                    .Where(r => r.Claimed && r.CharacterId != state.CharacterId)
+                    .Select(r => r.Achievement).ToHashSet();
+                return takenByOthers.Contains(id);
+            }
+
             bool levelled = false;
             foreach (int id in owed)
             {
@@ -687,16 +704,18 @@ namespace Jondo.Unity.Server.Managers
                 int earnedAt = log.LevelOf(id);
                 var payout = log.Payout(id, earnedAt > 0 ? earnedAt : state.CharacterLevel,
                                         CombatExperience.CharacterBonusPercent);
+                bool itemsTaken = ItemsTaken(id);
                 if (!log.MarkClaimed(id)) continue;
                 Titles.Grant(state.CharacterId, payout.Titles);
-                // Paid on the row of whoever achieved it: the account's achievement, paid once.
-                long achiever = log.AchieverOf(id);
-                DatabaseManager.SaveAchievement(achiever != 0 ? achiever : state.CharacterId, id, claimed: true);
+                // Paid on his own row: every character of the account is paid for what he achieved.
+                DatabaseManager.SaveAchievement(state.CharacterId, id, claimed: true);
 
                 await CharacterRewards.GiveKamasAsync(stream, payout.Kamas);
                 levelled |= await CharacterRewards.GiveExperienceAsync(stream, payout.Experience);
 
-                foreach (var (item, count) in payout.Items)
+                if (itemsTaken && payout.Items.Count > 0)
+                    Console.WriteLine($"[Achievements] The items of {id} were taken by another character of the account: not paid again.");
+                foreach (var (item, count) in itemsTaken ? new List<(int, int)>() : payout.Items)
                 {
                     if (!await Equipment.GiveAsync(stream, item, Math.Max(1, count)))
                     {
@@ -712,7 +731,7 @@ namespace Jondo.Unity.Server.Managers
                     ConnectionProtocol.Push(Op.Mfs, AchievementProtocol.BuildRewarded(id)));
 
                 Console.WriteLine($"[Achievements] {state.CharacterName} claims {id}: {payout.Experience} " +
-                                  $"experience, {payout.Kamas} kamas, {payout.Items.Count} item(s), " +
+                                  $"experience, {payout.Kamas} kamas, {(itemsTaken ? 0 : payout.Items.Count)} item(s), " +
                                   $"{payout.Emotes.Count} attitude(s)" +
                                   (payout.Titles.Count + payout.Ornaments.Count > 0
                                       ? $", {payout.Titles.Count} title(s) and {payout.Ornaments.Count} ornament(s) that are already offered to everybody."
