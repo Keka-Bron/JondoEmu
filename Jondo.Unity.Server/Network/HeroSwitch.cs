@@ -95,6 +95,7 @@ namespace Jondo.Unity.Server.Network
             backend.LoadCharacterState(session, character);
             DatabaseManager.SaveCurrentCharacter();
 
+            if (!reload) ZaapDiscoveries.Discover(heroId, map);
             await backend.SendInitialStateAsync(session, character);
             await backend.AnnounceMapPresenceAsync(session, character);
             // The map is not loaded again: the actors on it are only

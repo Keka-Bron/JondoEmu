@@ -520,23 +520,6 @@ namespace Jondo.Unity.Server.Managers
         public static bool CanLeaveFrom(long mapId) => ZaapElements(mapId).Count > 0;
 
         /// <summary>
-        /// The zaaps the client is told are discovered on entering the world.
-        ///
-        /// Here the character has them all, so they are all the activated ones for which it is also
-        /// known where their element is. Without this list the travel window comes out empty however
-        /// many destinations the travel window brings; see EntryEnvironmentMessages.
-        /// </summary>
-        public static IEnumerable<long> DiscoveredZaapMaps()
-        {
-            foreach (var waypoint in _ordered)
-            {
-                if (!waypoint.Activated) continue;
-                if (!CanLeaveFrom(waypoint.MapId)) continue;
-                yield return waypoint.MapId;
-            }
-        }
-
-        /// <summary>
         /// The skill instance identifier, which is what the client returns on
         /// using the element. The real server hands out numbers with no visible pattern; here it is derived
         /// from the element so that it is stable between sessions and does not have to be stored.

@@ -1096,7 +1096,7 @@ namespace Jondo.Unity.Server.Handlers
                                                           DateTime.UtcNow),
                 MaxLifeAtFightEntry(fight)));
 
-            await Network.EntryEnvironmentMessages.SendDiscoveredAsync(Network.SessionContext.Current, fight.MapId);
+            await Network.EntryEnvironmentMessages.Live.SendKnownAsync(Network.SessionContext.Current);
 
             Program.LogDebug($"[Fight] Fight #{fight.FightId} on map {fight.MapId}. " +
                              "Waiting for the client to ask for the actors.");
@@ -12572,6 +12572,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(back));
             await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
+            await Network.EntryEnvironmentMessages.SendDiscoveredAsync(Network.SessionContext.Current, back);
 
             Program.LogDebug($"[Fight] Fight #{fight.FightId} is over: " +
                              $"{(alliesAlive ? "victory" : "defeat")}. Back to map {back}.");

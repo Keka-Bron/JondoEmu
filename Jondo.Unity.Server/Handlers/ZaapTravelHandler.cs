@@ -85,6 +85,9 @@ namespace Jondo.Unity.Server.Handlers
             // while a normal zaap's carries forty-eight --. It makes sense: a vestige is not a zaap,
             // it is where an anomaly surfaces.
             bool vestige = Interactives.IsVestige(here, zaap);
+            var session = SessionContext.Current;
+            if (!vestige && ZaapDiscoveries.Discover(session.CharacterId, here))
+                await EntryEnvironmentMessages.Live.SendKnownAsync(session);
             var destinations = vestige ? AnomalyDestinations(here) : Destinations(here);
 
             // f2 is the character's saved zaap, the same wherever the window is opened (eight captures).
@@ -189,9 +192,10 @@ namespace Jondo.Unity.Server.Handlers
             {
                 target = chosen;
                 var waypoint = Interactives.WaypointOf(target);
-                if (waypoint == null)
+                if (waypoint is not { Activated: true } ||
+                    (target != from && !ZaapDiscoveries.KnownMaps(SessionContext.State.CharacterId).Contains(target)))
                 {
-                    Console.WriteLine($"[Zaap] The client asks to travel to {target}, which has no zaap.");
+                    Console.WriteLine($"[Zaap] Destination {target} is unavailable to {SessionContext.State.CharacterId}.");
                     return;
                 }
                 cost = CostBetween(from, target);
@@ -261,22 +265,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The destinations he is offered. All the active zaaps: in this emulator the character has
-        /// discovered all of them.
-        ///
-        /// With one condition: that one can come back from the destination. A map whose zaap we do not know
-        /// the location of is a place there is no way out of, and that is worse than not offering it. The
-        /// place one is already at is offered all the same, because in the real capture one's own map
-        /// appears in the list with cost zero.
+        /// Active, discovered zaaps that have a usable departure element.
+        /// The current zaap is included at zero cost.
         /// </summary>
         private static List<ConnectionProtocol.ZaapDestination> Destinations(long from)
         {
             var salida = new List<ConnectionProtocol.ZaapDestination>();
+            var known = ZaapDiscoveries.KnownMaps(SessionContext.State.CharacterId).ToHashSet();
             foreach (var waypoint in Interactives.Waypoints)
             {
                 if (!waypoint.Activated) continue;
                 if (MapManager.GetMapInfo(waypoint.MapId) == null) continue;
-                if (waypoint.MapId != from && !Interactives.CanLeaveFrom(waypoint.MapId)) continue;
+                if (waypoint.MapId != from && !known.Contains(waypoint.MapId)) continue;
 
                 salida.Add(new ConnectionProtocol.ZaapDestination(
                     waypoint.MapId,
