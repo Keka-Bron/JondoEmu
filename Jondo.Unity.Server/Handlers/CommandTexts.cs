@@ -272,6 +272,7 @@ namespace Jondo.Unity.Server.Handlers
             ["hero.quest.why.notstarted"] = "no tiene esta misión",
             ["hero.quest.why.behind"] = "no estaba en el mismo paso",
             ["hero.quest.why.requirements"] = "no cumple las condiciones de la misión",
+            ["hero.quest.teamshort"] = "Nadie avanza en la misión: a tu equipo le faltan {0} de los objetos pedidos para todos. Desactiva el reparto de misiones de un héroe para avanzar sin él.",
         };
 
         private static readonly IReadOnlyDictionary<string, string> En = new Dictionary<string, string>
@@ -534,6 +535,7 @@ namespace Jondo.Unity.Server.Handlers
             ["hero.quest.why.notstarted"] = "the quest is not started",
             ["hero.quest.why.behind"] = "not on the same step",
             ["hero.quest.why.requirements"] = "the quest's conditions are not met",
+            ["hero.quest.teamshort"] = "Nobody moves on in the quest: your team lacks {0} of the items asked for everyone. Turn a hero's quest sharing off to go on without him.",
         };
 
         private static readonly IReadOnlyDictionary<string, string> Fr = new Dictionary<string, string>
@@ -796,6 +798,7 @@ namespace Jondo.Unity.Server.Handlers
             ["hero.quest.why.notstarted"] = "il n'a pas cette quête",
             ["hero.quest.why.behind"] = "il n'était pas à la même étape",
             ["hero.quest.why.requirements"] = "il ne remplit pas les conditions de la quête",
+            ["hero.quest.teamshort"] = "Personne n'avance dans la quête : il manque à ton équipe {0} des objets demandés pour tout le monde. Coupe le partage des quêtes d'un héros pour avancer sans lui.",
         };
 
         static CommandTexts()

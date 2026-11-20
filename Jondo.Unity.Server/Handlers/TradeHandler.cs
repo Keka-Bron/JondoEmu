@@ -493,14 +493,17 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A stack, or part of it, out of this character's bag: ium when it all goes, ivj with what
-        /// is left when it does not. A marketplace listing takes its lot out the same way.
+        /// is left when it does not. A marketplace listing takes its lot out the same way. Between
+        /// two characters of one account (<paramref name="ownAccount"/>) only the character's own
+        /// binding holds it back.
         /// </summary>
-        internal static (string Opcode, byte[] Body, int Gid, string Effects)? Give(long uid, int quantity)
+        internal static (string Opcode, byte[] Body, int Gid, string Effects)? Give(long uid, int quantity, bool ownAccount = false)
         {
             long me = SessionContext.State.CharacterId;
             var stored = HavenBagStore.FromInventory(me, uid);
-            if (stored == null || stored.Quantity < quantity
-                || ItemBinding.BlocksTransfer(Equipment.ParseEffects(stored.Effects), DateTimeOffset.UtcNow)) return null;
+            if (stored == null || stored.Quantity < quantity) return null;
+            var effects = Equipment.ParseEffects(stored.Effects);
+            if (ownAccount ? ItemBinding.CharacterOnly(effects) : ItemBinding.BlocksTransfer(effects, DateTimeOffset.UtcNow)) return null;
             if (!DatabaseManager.DestroyCharacterItem(me, uid, quantity)) return null;
             Equipment.Remove(uid, quantity);
 
