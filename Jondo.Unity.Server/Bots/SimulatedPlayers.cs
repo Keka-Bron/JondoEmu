@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 namespace Jondo.Unity.Server.Bots
 {
     /// <summary>
-    /// The simulated players (<see cref="ServerSettings.SimulatedPlayers"/>): JondoBot-001,
-    /// JondoBot-002... each an account of its own that comes in the way the client does -- a token,
+    /// The simulated players (<see cref="ServerSettings.SimulatedPlayers"/>): Jondobot-Aa,
+    /// Jondobot-Ab... each an account of its own that comes in the way the client does -- a token,
     /// the connection server, a ticket, the character list, the world -- over a socket of its own,
     /// and then lives there (<see cref="SimulatedPlayer"/>).
     /// </summary>
     /// <remarks>
     /// Asked for on 2026-11-01: a variable number of bots that come and go, of random classes,
-    /// named JondoBot-XXX after their number, that walk, fight monsters now and then, gather, enrol
+    /// named after their number, that walk, fight monsters now and then, gather, enrol
     /// in the Koliseo and fight there, and always accept a duel -- for a world that feels inhabited
     /// and to put the server under the load of that many players, "each with its own connection,
     /// as if it were a real player".
@@ -38,8 +38,11 @@ namespace Jondo.Unity.Server.Bots
         /// <summary>The most the setting allows: room for them and for the people in the 500 sessions.</summary>
         public const int Most = 200;
 
-        /// <summary>A bot's character name: JondoBot- and its number.</summary>
-        public const string NamePrefix = "JondoBot-";
+        /// <summary>A bot's character name: Jondobot- and its number in two letters.</summary>
+        public const string NamePrefix = "Jondobot-";
+
+        /// <summary>What the bots were called before (JondoBot-001), which the naming rule refuses.</summary>
+        private const string LegacyPrefix = "JondoBot-";
 
         private const string LoginPrefix = "jondobot-";
 
@@ -57,7 +60,19 @@ namespace Jondo.Unity.Server.Bots
         /// <summary>Whether an account is one of the bots'.</summary>
         public static bool IsSimulated(long accountId) => _accounts.ContainsKey(accountId);
 
-        internal static string NameOf(int number) => $"{NamePrefix}{number:D3}";
+        /// <summary>
+        /// A bot's character name: Jondobot-Aa for the first, Jondobot-Ab, ... Jondobot-Hr for the
+        /// two hundredth -- letters, not digits, which the character naming rule refuses
+        /// (CharacterNames): JondoBot-001 was turned down at creation, and no bot entered the world.
+        /// </summary>
+        internal static string NameOf(int number)
+        {
+            int n = Math.Max(0, number - 1) % (26 * 26);
+            return $"{NamePrefix}{(char)('A' + n / 26)}{(char)('a' + n % 26)}";
+        }
+
+        /// <summary>The name a bot's character was made under before (JondoBot-001), still its own.</summary>
+        internal static string LegacyNameOf(int number) => $"{LegacyPrefix}{number:D3}";
 
         /// <summary>
         /// A socket to the server for a bot, its local port known before it connects: the server
