@@ -261,8 +261,11 @@ namespace Jondo.Unity.Server.Managers
             string text = Handlers.CommandTexts.Get(language, "hero.quest.behind", name, reason);
             try
             {
+                // Free text goes as information (type 0), red and bold as a dungeon's refusal: as a
+                // warning (type 1), id 0 is an error number to the client, and it wrote «L'erreur
+                // n°0 est survenue.» instead of the sentence.
                 await master.SendAsync(ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.FreeText, text)));
+                    ConnectionProtocol.BuildNotice($"<color=#FF0000><b>{text}</b></color>")));
             }
             catch (Exception ex)
             {

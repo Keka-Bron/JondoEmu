@@ -751,7 +751,11 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
-        /// <summary>The warnings' free texts the master's client has been sent so far.</summary>
+        /// <summary>
+        /// The free texts the master's client has been sent so far and will write: an lqn of type 0
+        /// and id 0 (FreeText). Of type 1 the client takes id 0 for an error number and writes
+        /// «L'erreur n°0 est survenue.» instead -- those are left out.
+        /// </summary>
         private static async Task<System.Collections.Generic.List<string>> WarningsAsync(ClientPipe pipe)
         {
             var texts = new System.Collections.Generic.List<string>();
@@ -763,6 +767,10 @@ namespace Jondo.Unity.Tests.World
                 string opcode = ConnectionProtocol.ReadOpcode(frame) ?? "";
                 if (opcode != Op.Lqn) continue;
                 byte[] payload = ConnectionProtocol.ReadPayload(frame, opcode) ?? Array.Empty<byte>();
+                var fields = ProtoMessage.Parse(payload).Fields;
+                long type = fields.Find(f => f.FieldNumber == 1)?.VarIntValue ?? 0;
+                long id = fields.Find(f => f.FieldNumber == 2)?.VarIntValue ?? 0;
+                if (type != 0 || id != 0) continue;
                 texts.Add(System.Text.Encoding.UTF8.GetString(payload));
             }
         }
