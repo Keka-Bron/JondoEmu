@@ -145,6 +145,11 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The hero a character is connected as, or null.</summary>
         public static Hero? AsHero(long characterId) => _byHero.TryGetValue(characterId, out var hero) ? hero : null;
 
+        /// <summary>The connected hero with that name, case aside, or null: his session is in no registry.</summary>
+        public static Hero? Named(string name)
+            => string.IsNullOrWhiteSpace(name) ? null
+               : _byHero.Values.FirstOrDefault(h => string.Equals(h.Session.State.CharacterName, name.Trim(), StringComparison.OrdinalIgnoreCase));
+
         /// <summary>The session of a hero, or null for anybody who is not one.</summary>
         public static GameSession? SessionOf(long characterId) => AsHero(characterId)?.Session;
 

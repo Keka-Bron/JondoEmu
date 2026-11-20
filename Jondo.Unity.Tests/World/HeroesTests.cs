@@ -147,6 +147,52 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public async Task A_party_invitation_to_a_hero_goes_to_whoever_plays_him()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long other = Account + 1;
+            long master = Character(Account, "Joue-" + tag, 8);
+            long hero = Character(Account, "Suit-" + tag, 1);
+            long inviter = Character(other, "Invite-" + tag, 2);
+            await using var played = await ClientPipe.OpenAsync(Account, master, Map, "Joue-" + tag);
+            await using var asking = await ClientPipe.OpenAsync(other, inviter, Map, "Invite-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(played.Session, hero));
+
+                // The hero, among the others standing there: his master is the one asked (#217).
+                using (SessionContext.Push(asking.Session))
+                    await PartyHandler.InviteAsync(asking.ToClient, ConnectionProtocol.Push(Op.Ime,
+                        Pb.New().Msg(1, Pb.New().Msg(4, Pb.New().Str(1, "Suit-" + tag))).Build()));
+                var party = Parties.Of(inviter);
+                Assert.NotNull(party);
+                Assert.True(party!.Pending.ContainsKey(master));
+                Assert.False(party.Pending.ContainsKey(hero));
+                // The invitation's popup, on the master's client, after his hero's drawing on the map.
+                string seen;
+                do seen = (await played.NextAny()).Opcode; while (seen != Op.Ijz);
+                Parties.Dissolve(party);
+
+                // One's own hero: whoever plays him is oneself, nobody is asked.
+                using (SessionContext.Push(played.Session))
+                    await PartyHandler.InviteAsync(played.ToClient, ConnectionProtocol.Push(Op.Ime,
+                        Pb.New().Msg(1, Pb.New().Msg(4, Pb.New().Str(1, "Suit-" + tag))).Build()));
+                Assert.False(Parties.Of(master)?.Pending.Any() == true);
+            }
+            finally
+            {
+                if (Parties.Of(inviter) is { } left) Parties.Dissolve(left);
+                if (Parties.Of(master) is { } own) Parties.Dissolve(own);
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(played.Session);
+                SessionRegistry.Unregister(asking.Session);
+                foreach (long character in new[] { master, hero })
+                    DatabaseManager.DeleteCharacter(character, Account);
+                DatabaseManager.DeleteCharacter(inviter, other);
+            }
+        }
+
+        [Fact]
         public async Task A_hero_chosen_from_a_client_of_his_own_is_nobodys_hero_any_more()
         {
             string tag = Guid.NewGuid().ToString("N")[..6];
