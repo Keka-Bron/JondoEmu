@@ -69,9 +69,25 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             var guest = SessionRegistry.FindByName(target);
+            // A hero has no session of his own among the connected (Managers.Heroes): the invitation
+            // goes to whoever plays him, and his heroes follow him into the party as they do. Among
+            // several characters standing together, the one played was the only one that could be
+            // invited (Keka-Bron/JondoEmu#217).
+            if (guest == null && Heroes.Named(target) is { } hero)
+            {
+                guest = SessionRegistry.FindByCharacter(hero.MasterId);
+                if (guest != null)
+                    Console.WriteLine($"[Party] {meName} invites {target}, a hero: the invitation goes to {guest.State.CharacterName}, who plays him.");
+            }
             if (guest == null)
             {
                 Console.WriteLine($"[Party] {meName} invites «{target}», who is not connected.");
+                return;
+            }
+            // His own hero: whoever plays him is himself.
+            if (guest.State.CharacterId == meId)
+            {
+                Console.WriteLine($"[Party] {meName} invites his own hero {target}.");
                 return;
             }
 
