@@ -1263,7 +1263,11 @@ namespace Jondo.Unity.Server.Handlers
                     if (Quests.SharedObjective(choice.StartsQuest, stepId, choice.Completes, out _))
                         await Quests.CompleteByReplyAsync(hero, choice.StartsQuest, choice.Completes);
                 }
-            });
+            },
+            quests: new[] { choice.StartsQuest },
+            explain: hero => !CanShareQuestReply(npcId, choice)
+                ? new Heroes.LagCause(Heroes.QuestLagReason.NotShared)
+                : Heroes.CouldNotStart(hero, choice.StartsQuest));
         }
 
         private static async Task<bool> CompleteQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice,
@@ -1281,7 +1285,11 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 if (await Quests.CompleteByReplyAsync(hero, step.QuestId, objectiveId) && giveFromReply)
                     await GiveFromReplyAsync(hero.Stream!, choice);
-            });
+            },
+            quests: new[] { step.QuestId },
+            explain: hero => !CanShareQuestReply(npcId, choice)
+                ? new Heroes.LagCause(Heroes.QuestLagReason.NotShared)
+                : Quests.MissingFor(hero, objective!));
             return true;
         }
 

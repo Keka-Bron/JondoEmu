@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -223,6 +223,16 @@ namespace Heroes
             ["error.none"] = L("No se puede desconectar ahora.", "It cannot be disconnected now.", "Impossible de le déconnecter maintenant."),
             ["error"] = L("No se ha podido.", "It could not be done.", "Cela n'a pas pu se faire."),
             ["hint.quests"] = L("Compartir misiones", "Share quest progress", "Partager la progression des quêtes"),
+            ["quests.behind"] = L("No ha seguido:", "Did not follow:", "N'a pas suivi :"),
+            ["quests.line"] = L("• {0}: {1}", "• {0}: {1}", "• {0} : {1}"),
+            ["quests.why.elsewhere"] = L("no estaba en tu mapa", "not on your map", "pas sur ta carte"),
+            ["quests.why.infight"] = L("estaba en combate", "in a fight", "en combat"),
+            ["quests.why.notinthefight"] = L("no ganó ese combate contigo", "not among the winners of that fight", "n'a pas gagné ce combat avec toi"),
+            ["quests.why.missingitems"] = L("le faltan {0} × {1}", "{0} × {1} missing", "il manque {0} × {1}"),
+            ["quests.why.notshared"] = L("paso que no se comparte (objetos, kamas o viaje)", "step not shared (items, kamas or travel)", "étape non partagée (objets, kamas ou voyage)"),
+            ["quests.why.notstarted"] = L("no tiene la misión", "quest not started", "n'a pas la quête"),
+            ["quests.why.behind"] = L("no estaba en el mismo paso", "not on the same step", "pas à la même étape"),
+            ["quests.why.requirements"] = L("no cumple las condiciones", "conditions not met", "ne remplit pas les conditions"),
             ["hint.auto"] = L("Pase automático del turno", "Automatic turn pass", "Passage automatique du tour"),
             ["hint.loot"] = L("Destinatario del botín", "Loot recipient", "Destinataire du butin"),
             ["hint.play"] = L("Tomar el control de este personaje", "Take control of this character", "Prendre la main sur ce personnage"),
@@ -3043,7 +3053,15 @@ namespace Heroes
                 bool auto = Bool(who, "autoPass");
                 tools.Add(Hint(Toggle(Do(() => Act("heroes/autopass", id, new Dictionary<string, object> { ["on"] = auto ? 0 : 1 })), Glyph(0), auto, height: 20f), "hint.auto"));
                 bool questSync = Bool(who, "questSync");
-                tools.Add(Hint(Toggle(Do(() => Act("heroes/quests", id, new Dictionary<string, object> { ["on"] = questSync ? 0 : 1 })), Glyph(6), questSync, height: 20f), "hint.quests"));
+                var questButton = Toggle(Do(() => Act("heroes/quests", id, new Dictionary<string, object> { ["on"] = questSync ? 0 : 1 })), Glyph(6), questSync, height: 20f);
+                // Red while he is behind his master in a quest: which, and why, on hovering it.
+                var lags = QuestLagsOf(who);
+                if (lags.Count > 0)
+                {
+                    questButton.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.72f, 0.16f, 0.14f, 1f));
+                    tools.Add(ButtonHint(questButton, () => QuestLagHint(lags), ""));
+                }
+                else tools.Add(Hint(questButton, "hint.quests"));
             }
             tools.Add(Hint(Toggle(Do(() => Act("heroes/loot", id)), Glyph(1), lootTo == id, height: 20f), "hint.loot"));
             if (!master && !Bool(who, "inFight"))
@@ -3698,6 +3716,41 @@ namespace Heroes
         /// A button's hint as the game writes its buttons': the words, then the key in a box of its
         /// own when it has one, above the button and centred on it.
         /// </summary>
+        /// <summary>The quests a hero stayed behind his master in, as the server's list names them.</summary>
+        private static List<(int Quest, string Reason, int Item, int Count)> QuestLagsOf(JsonElement who)
+        {
+            var lags = new List<(int, string, int, int)>();
+            if (!who.TryGetProperty("questLag", out var all) || all.ValueKind != JsonValueKind.Array) return lags;
+            foreach (var lag in all.EnumerateArray())
+                lags.Add((Int(lag, "quest"), Str(lag, "reason"), Int(lag, "item"), Int(lag, "count")));
+            return lags;
+        }
+
+        /// <summary>The red quests button's hint: each quest, by the client's own name, and why.</summary>
+        private static string QuestLagHint(List<(int Quest, string Reason, int Item, int Count)> lags)
+        {
+            var text = new System.Text.StringBuilder(T("hint.quests")).Append('\n').Append(T("quests.behind"));
+            foreach (var (quest, reason, item, count) in lags)
+            {
+                string why = reason == "missingitems"
+                    ? T("quests.why.missingitems", count, ItemOf(item).Name ?? "#" + item)
+                    : T("quests.why." + reason);
+                text.Append('\n').Append(T("quests.line", QuestNameOf(quest), why));
+            }
+            return text.ToString();
+        }
+
+        private static string QuestNameOf(int quest)
+        {
+            try
+            {
+                string name = Il2CppCore.DataCenter.DataCenterModule.questsDataRoot?.GetQuestById(quest)?.name;
+                if (!string.IsNullOrEmpty(name)) return name;
+            }
+            catch { }
+            return "#" + quest;
+        }
+
         private static VisualElement ButtonHint(VisualElement target, Func<string> text, string keys)
         {
             try

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Network;
 
 namespace Jondo.Unity.Server.Managers
@@ -79,24 +80,97 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Whether this fighter is a hero whose turns pass on their own.</summary>
         public static bool PassesOnHisOwn(long characterId) => AsHero(characterId)?.AutoPass == true;
 
-        // Keep the character's choice when it switches between leader and hero.
-        private static readonly ConcurrentDictionary<long, byte> _questSync = new();
+        // Sharing quests is on unless the player turned it off for a hero: forgetting to turn it on
+        // is how a hero fell behind without anybody noticing (Keka-Bron/JondoEmu#206). Kept by
+        // character, so the choice stays when he switches between master and hero; a restart of
+        // the server puts it back on, the safe side.
+        private static readonly ConcurrentDictionary<long, byte> _questSyncOff = new();
 
-        internal static bool SharesQuests(long characterId) => _questSync.ContainsKey(characterId);
+        internal static bool SharesQuests(long characterId) => !_questSyncOff.ContainsKey(characterId);
 
         internal static bool SetQuestSync(long masterId, long heroId, bool on)
         {
             lock (_lock)
             {
                 if (AsHero(heroId)?.MasterId != masterId) return false;
-                if (on) _questSync[heroId] = 0;
-                else _questSync.TryRemove(heroId, out _);
+                if (on) _questSyncOff.TryRemove(heroId, out _);
+                else
+                {
+                    _questSyncOff[heroId] = 0;
+                    // Turned off on purpose: what he had not followed is no longer news.
+                    _questLags.TryRemove(heroId, out _);
+                }
                 return true;
             }
         }
 
+        // ─── A hero who did not follow ───────────────────────────────────────────────────
+
+        /// <summary>Why a hero did not follow his master's step of a quest.</summary>
+        public enum QuestLagReason
+        {
+            /// <summary>Not on his master's map.</summary>
+            Elsewhere = 1,
+            /// <summary>In a fight, or his master was.</summary>
+            InFight = 2,
+            /// <summary>Not among the winners of the fight that ticked it.</summary>
+            NotInTheFight = 3,
+            /// <summary>Without the items the objective takes.</summary>
+            MissingItems = 4,
+            /// <summary>The reply that did it is not shared: it takes items or kamas, or moves the master.</summary>
+            NotShared = 5,
+            /// <summary>He does not have the quest.</summary>
+            NotStarted = 6,
+            /// <summary>He was not on the same step.</summary>
+            Behind = 7,
+            /// <summary>He does not meet the quest's conditions: his level, a quest before it.</summary>
+            Requirements = 8,
+        }
+
+        /// <summary>What stopped a hero, with the item and how many of it he lacks when that is it.</summary>
+        public sealed record LagCause(QuestLagReason Reason, int ItemId = 0, int ItemCount = 0);
+
+        /// <summary>A quest a hero stayed behind in, and why.</summary>
+        public sealed record QuestLag(int QuestId, int StepId, QuestLagReason Reason, int ItemId, int ItemCount);
+
+        /// <summary>Each hero's quests he is behind his master in, by quest.</summary>
+        private static readonly ConcurrentDictionary<long, ConcurrentDictionary<int, QuestLag>> _questLags = new();
+
+        /// <summary>
+        /// The quests a hero is still behind his master in. Those he has caught up with since --
+        /// by doing the step himself, or his master having gone back -- are let go as they are read.
+        /// </summary>
+        public static IReadOnlyList<QuestLag> LagsOf(GameSession master, long heroId)
+        {
+            if (!_questLags.TryGetValue(heroId, out var lags) || lags.IsEmpty) return Array.Empty<QuestLag>();
+            var hero = AsHero(heroId);
+            if (hero == null || hero.MasterId != master.CharacterId) return Array.Empty<QuestLag>();
+            foreach (int quest in lags.Keys)
+            {
+                if (Quests.ProgressOf(hero.Session, quest) >= Quests.ProgressOf(master, quest))
+                    lags.TryRemove(quest, out _);
+            }
+            return lags.Values.OrderBy(l => l.QuestId).ToList();
+        }
+
+        /// <summary>
+        /// Does to each hero of the current character who shares quests what the master just did,
+        /// then, for the quests named, tells the master which heroes stayed behind and why.
+        /// </summary>
+        /// <param name="apply">The master's action, done again in each hero's session.</param>
+        /// <param name="participates">Who takes part; by default the heroes on the master's map, out of a fight.</param>
+        /// <param name="quests">The quests the action moved for the master: a hero left behind in one is told.</param>
+        /// <param name="explain">Why a hero who took part still did not follow, when the action knows better than «not on the same step».</param>
+        /// <summary>A hero who could not start the quest because of its conditions, for <see cref="ShareQuestActionAsync"/>'s explain.</summary>
+        internal static LagCause? CouldNotStart(GameSession hero, int questId)
+            => hero.State.Quests is { } log && !log.Active(questId) && !log.Finished(questId) && !log.CanStart(questId, out _)
+                ? new LagCause(QuestLagReason.Requirements)
+                : null;
+
         internal static async Task ShareQuestActionAsync(Func<GameSession, Task> apply,
-                                                         Func<Hero, bool>? participates = null)
+                                                         Func<Hero, bool>? participates = null,
+                                                         IReadOnlyCollection<int>? quests = null,
+                                                         Func<GameSession, LagCause?>? explain = null)
         {
             var master = SessionContext.Current;
             long masterId = master.CharacterId;
@@ -108,19 +182,91 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 bool eligible = participates?.Invoke(hero)
                     ?? (hero.Session.MapId == master.MapId && !hero.Session.State.IsInFight && !master.State.IsInFight);
-                if (!eligible) continue;
 
-                try
+                LagCause? cause = null;
+                if (!eligible)
                 {
-                    using (SessionContext.Push(hero.Session))
-                        await apply(hero.Session);
-                    if (hero.Session.State.AchievementsPending.Count > 0)
-                        await Achievements.ForHeroAsync(master, hero.Session);
+                    cause = new LagCause(participates != null ? QuestLagReason.NotInTheFight
+                        : hero.Session.MapId != master.MapId ? QuestLagReason.Elsewhere
+                        : QuestLagReason.InFight);
                 }
+                else
+                {
+                    try
+                    {
+                        using (SessionContext.Push(hero.Session))
+                            await apply(hero.Session);
+                        if (hero.Session.State.AchievementsPending.Count > 0)
+                            await Achievements.ForHeroAsync(master, hero.Session);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Heroes] Quest sharing failed for {hero.CharacterId}: {ex.Message}");
+                    }
+                }
+
+                if (quests == null || quests.Count == 0) continue;
+                try { await NoteLagsAsync(master, hero, quests, cause, explain); }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[Heroes] Quest sharing failed for {hero.CharacterId}: {ex.Message}");
+                    Console.WriteLine($"[Heroes] Could not tell whether {hero.CharacterId} followed: {ex.Message}");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Each quest the hero is now behind his master in, kept with its reason; the master is told
+        /// once a quest, when the hero falls behind in it, not again at each step after.
+        /// </summary>
+        private static async Task NoteLagsAsync(GameSession master, Hero hero, IReadOnlyCollection<int> quests,
+                                                LagCause? cause, Func<GameSession, LagCause?>? explain)
+        {
+            var lags = _questLags.GetOrAdd(hero.CharacterId, _ => new ConcurrentDictionary<int, QuestLag>());
+            foreach (int quest in quests.Distinct())
+            {
+                int heroAt = Quests.ProgressOf(hero.Session, quest);
+                int masterAt = Quests.ProgressOf(master, quest);
+                if (heroAt >= masterAt)
+                {
+                    lags.TryRemove(quest, out _);
+                    continue;
+                }
+                if (lags.ContainsKey(quest)) continue;
+
+                LagCause? explained = null;
+                if (cause == null && explain != null)
+                {
+                    using (SessionContext.Push(hero.Session)) explained = explain(hero.Session);
+                }
+                LagCause why = cause ?? explained
+                    ?? new LagCause(heroAt < 0 ? QuestLagReason.NotStarted : QuestLagReason.Behind);
+                int step = master.State.Quests?.Run(quest)?.StepId ?? 0;
+                lags[quest] = new QuestLag(quest, step, why.Reason, why.ItemId, why.ItemCount);
+                await TellMasterAsync(master, hero, why);
+                Console.WriteLine($"[Heroes] {hero.CharacterId} stayed behind {master.CharacterId} in quest {quest}: {why.Reason}" +
+                                  (why.ItemId != 0 ? $" ({why.ItemCount}x{why.ItemId})" : ""));
+            }
+
+        }
+
+        /// <summary>The master's warning, in his language: who stayed behind and why.</summary>
+        private static async Task TellMasterAsync(GameSession master, Hero hero, LagCause why)
+        {
+            if (!master.IsInWorld) return;
+            string language = master.State.Language;
+            string name = hero.Session.State.CharacterName is { Length: > 0 } n ? n : hero.CharacterId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string reason = why.Reason == QuestLagReason.MissingItems
+                ? Handlers.CommandTexts.Get(language, "hero.quest.why.missingitems", why.ItemCount)
+                : Handlers.CommandTexts.Get(language, "hero.quest.why." + why.Reason.ToString().ToLowerInvariant());
+            string text = Handlers.CommandTexts.Get(language, "hero.quest.behind", name, reason);
+            try
+            {
+                await master.SendAsync(ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, InfoMessages.FreeText, text)));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Heroes] {master.CharacterId} could not be told about {hero.CharacterId}: {ex.Message}");
             }
         }
 

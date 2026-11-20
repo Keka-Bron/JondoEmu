@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
@@ -73,7 +73,7 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
-        public async Task Quest_sharing_respects_opt_in_and_each_heros_quest_requirements()
+        public async Task Quest_sharing_is_on_by_default_respects_opting_out_and_each_heros_quest_requirements()
         {
             const int posterQuest = 1565;
             const int cellarQuest = 1633, inspectCellar = 9895, lureRat = 9769;
@@ -92,6 +92,10 @@ namespace Jondo.Unity.Tests.World
                 Assert.Equal("ok", Heroes.Connect(pipe.Session, optedIn));
                 Assert.Equal("ok", Heroes.Connect(pipe.Session, lowLevel));
                 Assert.Equal("ok", Heroes.Connect(pipe.Session, optedOut));
+                // On by default (Keka-Bron/JondoEmu#206): forgetting to turn it on left heroes behind.
+                Assert.True(Heroes.SharesQuests(optedIn) && Heroes.SharesQuests(lowLevel) && Heroes.SharesQuests(optedOut));
+                Assert.True(Heroes.SetQuestSync(master, optedOut, false));
+                Assert.False(Heroes.SharesQuests(optedOut));
                 Assert.False(Heroes.SetQuestSync(master + 1, optedIn, true));
                 Assert.True(Heroes.SetQuestSync(master, optedIn, true));
                 Assert.True(Heroes.SetQuestSync(master, lowLevel, true));
@@ -112,11 +116,18 @@ namespace Jondo.Unity.Tests.World
                     Assert.True(eligible.Quests!.Active(posterQuest));
                     Assert.False(ineligible.Quests!.Active(posterQuest));
                     Assert.False(disabled.Quests!.Active(posterQuest));
+                    // The one who could not follow is kept, with why; the one turned off on purpose is not.
+                    var tooLow = Assert.Single(Heroes.LagsOf(pipe.Session, lowLevel));
+                    Assert.Equal((posterQuest, Heroes.QuestLagReason.Requirements), (tooLow.QuestId, tooLow.Reason));
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, optedIn));
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, optedOut));
 
                     Assert.True(await QuestEngine.StartSharedAsync(pipe.Session, cellarQuest));
                     Assert.True(eligible.Quests.Active(cellarQuest));
                     Assert.True(ineligible.Quests.Active(cellarQuest));
                     Assert.True(Heroes.SetQuestSync(master, lowLevel, false));
+                    // Turned off: what he had not followed is no longer news.
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, lowLevel));
                     eligible.MapId = ineligible.MapId = pipe.Session.State.MapId = cellar;
 
                     Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap));
@@ -128,6 +139,18 @@ namespace Jondo.Unity.Tests.World
                     Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap));
                     Assert.True(QuestEngine.Log.ObjectiveDone(lureRat));
                     Assert.False(eligible.Quests.ObjectiveDone(lureRat));
+
+                    // The master pressed it with the lemonade, his hero has none: kept, and said.
+                    var noLemonade = Assert.Single(Heroes.LagsOf(pipe.Session, optedIn));
+                    Assert.Equal(cellarQuest, noLemonade.QuestId);
+                    Assert.Equal(Heroes.QuestLagReason.MissingItems, noLemonade.Reason);
+                    Assert.Equal((lemonade, 1), (noLemonade.ItemId, noLemonade.ItemCount));
+                    Assert.Contains(await WarningsAsync(pipe), text => text.Contains("Sigue-" + tag) && text.Contains("no ha seguido"));
+
+                    // Caught up by himself: let go as it is read.
+                    await QuestEngine.TickAsync(Heroes.SessionOf(optedIn)!, cellarQuest, lureRat);
+                    Assert.True(eligible.Quests.ObjectiveDone(lureRat));
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, optedIn));
                 }
 
                 Assert.True(Heroes.Disconnect(master, optedIn));
@@ -725,6 +748,22 @@ namespace Jondo.Unity.Tests.World
             {
                 Heroes.DisconnectAll(master);
                 SessionRegistry.Unregister(pipe.Session);
+            }
+        }
+
+        /// <summary>The warnings' free texts the master's client has been sent so far.</summary>
+        private static async Task<System.Collections.Generic.List<string>> WarningsAsync(ClientPipe pipe)
+        {
+            var texts = new System.Collections.Generic.List<string>();
+            while (true)
+            {
+                var read = Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer);
+                if (await Task.WhenAny(read, Task.Delay(TimeSpan.FromMilliseconds(500))) != read) return texts;
+                byte[] frame = await read;
+                string opcode = ConnectionProtocol.ReadOpcode(frame) ?? "";
+                if (opcode != Op.Lqn) continue;
+                byte[] payload = ConnectionProtocol.ReadPayload(frame, opcode) ?? Array.Empty<byte>();
+                texts.Add(System.Text.Encoding.UTF8.GetString(payload));
             }
         }
     }
