@@ -121,20 +121,7 @@ namespace Jondo.Unity.Server.Network
                        out var at) ? at : System.DateTimeOffset.MinValue)
                    .ToList();
 
-        // ─── World: heartbeat ───────────────────────────────────────────────────
-
-        /// <summary>
-        /// Answer to kqo, which is a heartbeat and not a request for anything.
-        ///
-        /// The client sends kqo every five seconds for as long as it is in the world and the real
-        /// server answers it with this single message. In the tutorial capture there are
-        /// twenty-four of them in a row, 5.000 ms apart, and after every one the server sends kqy
-        /// and nothing more.
-        ///
-        /// The frame this builds comes out byte for byte like the captured one:
-        /// 1d 0a 1b 0a 19 0a 13 type.ankama.com/kqy 12 02 08 01.
-        /// </summary>
-        public static byte[] BuildHeartbeatAnswer() => Push(Op.Kqy, Pb.New().Var(1, 1).Build());
+        // ─── World: map load ────────────────────────────────────────────────────
 
         /// <summary>
         /// Closes a map load (lva). It carries nothing: it is the "that is every actor" mark.
@@ -939,34 +926,7 @@ namespace Jondo.Unity.Server.Network
         internal static Pb? EffectEntry(Managers.Equipment.ItemEffect effect)
             => ItemEffectMessages.FromCatalogue.Effect(effect) is { } entry ? ItemEffectMessages.Write(entry) : null;
 
-        // ─── World: titles and ornaments ────────────────────────────────────────
-
-        public static byte[] BuildOrnamentUpdated(int ornamentId)
-            // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.
-            => Array.Empty<byte>();
-
         // ─── World: merkasako ───────────────────────────────────────────────────
-
-        /// <summary>
-        /// The furniture placed in the room (jbu), which the client expects after the map.
-        ///
-        ///   f1 (repeated) { f1: cell, f2: furniture, f3: rotation }
-        ///
-        /// It is the same shape as the jbg the client stores them with, only in f1 instead of
-        /// in f2. In the capture of someone who has it decorated it is a thousand-odd bytes.
-        /// </summary>
-        public static byte[] BuildHavenBagFurniture(IEnumerable<Managers.HavenBagStore.Furniture> pieces)
-        {
-            var jbu = Pb.New();
-            foreach (var piece in pieces)
-            {
-                jbu.Msg(1, Pb.New()
-                    .VarIfNotZero(1, piece.Cell)
-                    .Var(2, piece.TypeId)
-                    .VarIfNotZero(3, piece.Orientation));
-            }
-            return jbu.Build();
-        }
 
         /// <summary>
         /// One's rooms (jbf): f1 (repeated) { f1 theme, f2 room }. The captured account's
@@ -978,13 +938,6 @@ namespace Jondo.Unity.Server.Network
             foreach (var (room, theme) in rooms)
                 jbf.Msg(1, Pb.New().Var(1, theme).VarIfNotZero(2, room));
             return jbf.Build();
-        }
-
-        /// <summary>The themes one has (jbo): f1 packed. The captured account's eight, «0a082233020401152003».</summary>
-        public static byte[] BuildHavenBagThemes(IEnumerable<int> themes)
-        {
-            var all = themes.Select(t => (long)t).ToList();
-            return all.Count == 0 ? Array.Empty<byte>() : Pb.New().Packed(1, all).Build();
         }
 
         // ─── World: chest ───────────────────────────────────────────────────────

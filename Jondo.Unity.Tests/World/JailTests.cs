@@ -139,8 +139,8 @@ namespace Jondo.Unity.Tests.World
                 Assert.False(Jail.IsJailed(wardenId));
 
                 // Inside, every road out is shut.
-                using (SessionContext.Push(prisoner.Session))
-                    Assert.Equal(-1, await TeleportHandler.ToMapAsync(prisoner.ToClient, astrub, 300));
+                using (SessionContext.Push(warden.Session))
+                    Assert.Equal(-1, await TeleportHandler.ToMapAsync(prisoner.Session, astrub, 300));
                 Assert.Equal(Jail.MapId, prisoner.Session.State.MapId);
 
                 // Twice is refused.

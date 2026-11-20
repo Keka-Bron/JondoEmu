@@ -73,6 +73,47 @@ namespace Jondo.Unity.Tests.World
         private static string Text(List<ProtoField> fields, int number)
             => Encoding.UTF8.GetString(fields.First(f => f.FieldNumber == number).BytesValue);
 
+        [Fact]
+        public async Task Rejoin_sends_the_snapshot_only_to_the_entrant_and_presence_to_the_other_participant()
+        {
+            var (board, _) = await Launched(Raids.Gigalodon);
+            await using var entrant = await Economy.ClientPipe.OpenAsync(17001, 7001, 123);
+            await using var peer = await Economy.ClientPipe.OpenAsync(17002, 7002, 456);
+            using var ambient = SessionContext.Push(peer.Session);
+            await Server.Handlers.GuildRaidHandler.OnEnterWorldAsync(entrant.Session);
+            Assert.Same(peer.Session, SessionContext.Actual);
+            Assert.Equal(board.Uuid, Text(Fields(await entrant.Next("hvt")), 2));
+            Assert.Equal("7001", Text(Fields(await entrant.Next("hwo")), 1));
+            Assert.Equal("7001", Text(Fields(await peer.Next("iav")), 2));
+            Assert.Equal("7001", Text(Fields(await peer.Next("hwo")), 1));
+            await entrant.Quiet();
+            await peer.Quiet();
+        }
+
+        [Fact]
+        public async Task Rejoin_snapshot_detaches_participants_health_and_score_without_wrapping()
+        {
+            var (board, raid) = await Launched(Raids.Gigalodon);
+            board.Participants[0].Group = 0;
+            raid.CaptainId = 7002;
+            raid.SetHealth(0);
+            raid.Set(RaidInstance.ScoreVariable, int.MaxValue);
+            var joined = RaidEntryMessages.Joined(board, raid);
+            raid.SetHealth(3);
+            board.Participants[0].Group = 7;
+            Assert.Equal(board.Uuid, joined.RaidUuid);
+            Assert.Equal("7002", joined.Raid!.CaptainKey);
+            var member = joined.Raid.Participants["7001"];
+            Assert.Null(member.Group);
+            Assert.Null(member.Health);
+            Assert.Equal(7001, member.Player!.CharacterId);
+            Assert.Equal("7001", member.Player.ParticipantKey);
+            Assert.Equal(int.MaxValue, joined.Raid.State!.Score);
+            Assert.Equal(0, joined.Raid.State.Health);
+            raid.Set(RaidInstance.ScoreVariable, (long)int.MaxValue + 1);
+            Assert.Throws<OverflowException>(() => RaidEntryMessages.Joined(board, raid));
+        }
+
         /// <summary>
         /// The running raid (hvt → ibj): f1 its participants by key, each with his group, card and
         /// state; f2 the raid; f3 its end, which the panel counts down to; f4 the captain's key, the

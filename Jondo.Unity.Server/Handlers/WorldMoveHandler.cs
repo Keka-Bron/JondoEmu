@@ -42,9 +42,6 @@ namespace Jondo.Unity.Server.Handlers
         ///   up       23 -> 555   +532,  facing 6
         ///   down    542 ->  10   -532,  facing 2
         /// </summary>
-        /// <summary>The move's pace for an overloaded character: walking (GameMapMovementEvent.Pace).</summary>
-        private const int OverloadedPace = 1;
-
         private const int SideStep = 13;
         private const int VerticalStep = 532;
 
@@ -79,12 +76,7 @@ namespace Jondo.Unity.Server.Handlers
             var cells = Remember(session, request);
             if (cells.Count == 0) return;
 
-            // Walking, not running, when he carries more than he can: the real server sends the
-            // move's third field at 1 on every move of an overloaded character and leaves it out
-            // once he is back under (an official capture) -- what the others on the map see.
-            bool overloaded = OverloadRestriction.IsOverloaded(session.State);
-            await map.SendAsync(new GameMapMovementEvent(cells, session.CharacterId, request.Cautious,
-                                                         Pace: overloaded ? OverloadedPace : 0));
+            await map.SendAsync(new GameMapMovementEvent(cells, session.CharacterId, request.Cautious));
 
             // His own client walks or runs on its own, before any answer: its restrictions say so.
             await OverloadRestriction.SyncAsync(session, walking: true);
@@ -238,8 +230,12 @@ namespace Jondo.Unity.Server.Handlers
             using var context = SessionContext.Push(session);
             long asked = request.MapId;
             if (asked <= 0) return;
-            var stream = session.Stream ?? throw new InvalidOperationException("Map travel requires a connected game session.");
-            if (await Managers.Jail.KeepsInAsync(stream)) return;
+            if (session.Stream == null) throw new InvalidOperationException("Map travel requires a connected game session.");
+            if (Managers.Jail.HoldNotice(session) is { } jailNotice)
+            {
+                await SendRefusalAsync(jailNotice);
+                return;
+            }
 
             Way way = WayOut(Jondo.Unity.Server.Network.SessionContext.State.MapId, Jondo.Unity.Server.Network.SessionContext.State.CellId, asked);
             long here = SessionContext.State.MapId;
@@ -257,8 +253,11 @@ namespace Jondo.Unity.Server.Handlers
                                                           out long passage, out graphLanding)
                 ? passage
                 : Neighbour(here, way, asked);
-            if (target > 0 && await Managers.GuildRaidManager.KeepsOutAsync(stream,
-                    Jondo.Unity.Server.Network.SessionContext.State.CharacterId, target)) return;
+            if (target > 0 && Managers.GuildRaidManager.ClosedFloorNotice(session.CharacterId, target, session.State.Language) is { } raidNotice)
+            {
+                await SendRefusalAsync(raidNotice);
+                return;
+            }
 
             if (target <= 0 || target == Jondo.Unity.Server.Network.SessionContext.State.MapId)
             {
@@ -285,7 +284,6 @@ namespace Jondo.Unity.Server.Handlers
                 arrival = measuredCell;
                 measuredFacing = facing;
             }
-            long oldMapId = SessionContext.State.MapId;
             var previousMap = session.Map;
 
             // The map changes: whatever was open on the previous one stops being open.
@@ -300,24 +298,20 @@ namespace Jondo.Unity.Server.Handlers
                 : FacingFor(way, Jondo.Unity.Server.Network.SessionContext.State.Orientation);
             DatabaseManager.SaveCurrentCharacter();
 
-            // Exactly the five the capture sends, in the same order. jsd first: the character is
-            // leaving the map it was on, and the client has to be told before it is told to load
-            // another one. With the way out, as the mover's own jsd carries it in "Grupos/con
-            // grupo seguir desplazamiento del lider..." (frames 110, 131, 169, 193, 226).
-            byte[] actorLeft = ConnectionProtocol.BuildActorLeft(
-                Jondo.Unity.Server.Network.SessionContext.State.CharacterId,
-                Jondo.Unity.Server.Network.SessionContext.State.Orientation);
-            await SessionContext.Current.SendAsync(actorLeft);
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap,
-                Jondo.Unity.Server.Network.SessionContext.State.Orientation);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildLoadMap(target));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapClock());
-            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, target);
+            // The mover gets its departure facing before loading the next map. Keep the peer
+            // notifications between departure and load, as in the existing transition sequence.
+            int orientation = session.State.Orientation;
+            await session.SendAsync(new MapChangeOrientationEvent(session.CharacterId, MapActorMessages.Facing(orientation)));
+            await SessionRegistry.AnunciarMudanzaAsync(session, previousMap, orientation);
+            await session.SendAsync(new MapCurrentEvent(target));
+            await session.SendAsync(ServerTimeMessages.Snapshot());
+            await EntryEnvironmentMessages.SendDiscoveredAsync(session, target);
 
             Console.WriteLine($"[Move] Map change {way}: {target}, arriving on cell {arrival} " +
                               $"facing {Jondo.Unity.Server.Network.SessionContext.State.Orientation}. Waiting for jrh.");
+
+            Task SendRefusalAsync(string notice)
+                => session.SendAsync(new TextInformationEvent(TextInformationType.TextInformationMessage, Managers.InfoMessages.FreeText, [notice]));
         }
 
         /// <summary>

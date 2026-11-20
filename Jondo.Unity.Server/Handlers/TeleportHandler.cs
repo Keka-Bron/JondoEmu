@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -126,17 +127,21 @@ namespace Jondo.Unity.Server.Handlers
         /// Leaves the character on that map and tells the client. Returns the cell he landed on, or -1 if
         /// the map is no good.
         /// </summary>
-        public static async Task<int> ToMapAsync(NetworkStream stream, long mapId,
-                                                 int targetCell = MapCentre)
+        public static Task<int> ToMapAsync(NetworkStream stream, long mapId, int targetCell = MapCentre)
+            => ToMapAsync(SessionContext.Current, mapId, targetCell);
+
+        public static async Task<int> ToMapAsync(GameSession session, long mapId, int targetCell = MapCentre)
         {
             if (mapId <= 0) return -1;
 
             // A prisoner goes nowhere until his time is up: see Managers.Jail. Every road that
             // ends in a teleport ends here, so this is the one that cannot be forgotten.
-            if (await Managers.Jail.KeepsInAsync(stream)) return -1;
-
-            // A guild raid's floor that its goals have not opened yet (see GuildRaidManager).
-            if (await Managers.GuildRaidManager.KeepsOutAsync(stream, SessionContext.State.CharacterId, mapId)) return -1;
+            var refusal = Jail.HoldNotice(session) ?? GuildRaidManager.ClosedFloorNotice(session.CharacterId, mapId, session.State.Language);
+            if (refusal != null)
+            {
+                await session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage, InfoMessages.FreeText, [refusal]));
+                return -1;
+            }
 
             // A map that is not in the world data is a map the client cannot load either: it gets
             // the jru, finds nothing and the character appears nowhere. It is the same check the
@@ -147,27 +152,24 @@ namespace Jondo.Unity.Server.Handlers
                 return -1;
             }
 
-            long mapaQueDeja = SessionContext.State.MapId;
-            var previousMap = SessionContext.Current.Map;
-            SessionContext.State.MapId = mapId;
-            SessionContext.State.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
-            DatabaseManager.SaveCurrentCharacter();
+            var previousMap = session.Map;
+            session.State.MapId = mapId;
+            session.State.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
+            DatabaseManager.SaveCharacter(session.State);
 
             // The other two maps involved: the one he leaves and the one he enters. Without this,
             // teleporting left a ghost where he was and he arrived invisible where he went.
-            await SessionRegistry.AnunciarMudanzaAsync(SessionContext.Current, previousMap);
+            await SessionRegistry.AnunciarMudanzaAsync(session, previousMap);
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildActorLeft(SessionContext.State.CharacterId));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildLoadMap(mapId));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.BuildMapClock());
-            await EntryEnvironmentMessages.SendDiscoveredAsync(SessionContext.Current, mapId);
+            // The traveler's orientation resets to zero; peer removal belongs to the map transition above.
+            await session.SendAsync(new Game.MapChangeOrientationEvent(session.CharacterId, Game.Direction.East));
+            await session.SendAsync(new Game.MapCurrentEvent(mapId));
+            await session.SendAsync(ServerTimeMessages.Snapshot());
+            await EntryEnvironmentMessages.SendDiscoveredAsync(session, mapId);
 
-            Console.WriteLine($"[Teleport] To map {mapId}, cell {SessionContext.State.CellId}. " +
+            Console.WriteLine($"[Teleport] To map {mapId}, cell {session.State.CellId}. " +
                               "Waiting for the jrh.");
-            return SessionContext.State.CellId;
+            return session.State.CellId;
         }
     }
 }

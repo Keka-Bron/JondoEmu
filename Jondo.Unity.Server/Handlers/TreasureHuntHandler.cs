@@ -429,10 +429,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>On entering the world: the hunts under way, as they stand.</summary>
-        public static async Task OnWorldEntryAsync(NetworkStream stream, long characterId)
+        public static async Task OnWorldEntryAsync(GameSession session)
         {
-            foreach (var hunt in TreasureHunts.All(characterId))
-                await SendHuntAsync(stream, hunt);
+            foreach (var hunt in TreasureHunts.All(session.CharacterId))
+                await session.SendAsync(TreasureHuntProtocol.Hunt(hunt));
         }
 
         /// <summary>

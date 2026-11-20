@@ -65,18 +65,24 @@ public sealed class TypedActorNotificationTests
             if (fail) await Assert.ThrowsAsync<IOException>(() => sending);
             else await sending;
         }
-        var actor = Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(Assert.Single(codec.Frames).Content).Actors);
+        var actor = Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(codec.Frames[0].Content).Actors);
         Assert.Equal(npc.Spawn.ContextualId, actor.ActorId);
         if (fail)
         {
+            Assert.Single(codec.Frames);
             Assert.False(own.FromServer.DataAvailable);
             Assert.Equal(0, own.Session.State.OpenDialogueNpcId);
         }
         else
         {
-            Assert.Equal(new byte[] { 0x71 }, await Read(own));
-            Assert.Equal(ConnectionProtocol.BuildNpcDialog(npc.Spawn.MapId, npc.Spawn.ContextualId), await own.Next("ioc"));
-            Assert.Equal(ConnectionProtocol.BuildNpcQuestion(NpcFixture.Line, []), await own.Next("ios"));
+            Assert.Collection(codec.Frames.Skip(1),
+                frame => Assert.Equal(new NpcDialogCreationEvent(npc.Spawn.MapId, checked((int)npc.Spawn.ContextualId)), frame.Content),
+                frame =>
+                {
+                    var question = Assert.IsType<NpcDialogQuestionEvent>(frame.Content);
+                    Assert.Equal(NpcFixture.Line, question.MessageId);
+                    Assert.Empty(question.VisibleReplies);
+                });
             Assert.Equal(npc.Spawn.NpcId, own.Session.State.OpenDialogueNpcId);
             Assert.Equal(NpcFixture.Line, own.Session.State.OpenDialogueMessage);
         }

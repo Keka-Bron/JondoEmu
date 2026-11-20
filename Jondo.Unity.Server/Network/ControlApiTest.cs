@@ -573,7 +573,8 @@ namespace Jondo.Unity.Server.Network
                         else if (op == Op.Kep) await WorkshopHandler.CraftAsync(session, frame);
                         // An NPC clicked for one of its actions (Gobiere Trokeur's «Intercambiar»), and a
                         // stack laid on his barter's table.
-                        else if (op == Op.Iov) await NpcHandler.InteractAsync(session, frame);
+                        else if (op == Op.Iov && GameNodeProxy.DecodeRequest(session, frame)?.Content is Jondo.Unity.Protocol.Game.NpcGenericActionRequest action)
+                            await NpcHandler.InteractAsync(session, action);
                         // Or on a workshop's bench, the one opened last: a paper and a thing on the
                         // gift-wrapping table, though a harness never closed an earlier barter.
                         else if (op == Op.Kcr)

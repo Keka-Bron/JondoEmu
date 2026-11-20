@@ -192,7 +192,7 @@ public sealed class GameEntryLifecycleTests
         await h.Send(new PingRequest(false));
         Assert.DoesNotContain("map-initialization", h.Backend.Calls);
 
-        await h.Service.ReturnToSelectionAsync();
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new ReloginRequest(), int.MinValue));
         Assert.False(h.Session.IsInWorld);
         Assert.True(h.Session.IsAuthenticated);
         Assert.Equal(new[] { "return-token", "prepare-return", "remove-from-map" }, h.Backend.Calls.TakeLast(3));
@@ -208,11 +208,40 @@ public sealed class GameEntryLifecycleTests
         var h = new Harness();
         await h.Enter();
         await h.Send(new SequenceNumberRequest(1));
-        await h.Service.ReturnToSelectionAsync();
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new ReloginRequest(), 0));
         await h.Send(new CharacterSelectionRequest(h.Character.Id));
         await h.Send(new SequenceNumberRequest(2));
         await h.Send(new PingRequest(false));
         Assert.Equal(2, h.Backend.Calls.Count(c => c == "map-initialization"));
+    }
+
+    [Fact]
+    public async Task Relogin_from_selection_requires_authentication_and_has_no_world_departure()
+    {
+        var unidentified = new Harness(authenticated: false);
+        Assert.Equal(GameEntryResult.Close, await unidentified.Send(new ReloginRequest()));
+        Assert.Empty(unidentified.Backend.Calls);
+
+        var selecting = new Harness();
+        Assert.Equal(GameEntryResult.Handled, await selecting.Send(new ReloginRequest()));
+        Assert.Equal(new[] { "return-token" }, selecting.Backend.Calls);
+        Assert.False(selecting.Session.IsInWorld);
+    }
+
+    [Fact]
+    public async Task Failed_relogin_send_does_not_start_world_departure()
+    {
+        var h = new Harness();
+        await h.Enter();
+        await h.Send(new SequenceNumberRequest(1));
+        var failure = new IOException("relogin failed");
+        h.Backend.ReturnSend = Task.FromException(failure);
+
+        Assert.Same(failure, await Assert.ThrowsAsync<IOException>(() => h.Send(new ReloginRequest())));
+        Assert.True(h.Session.IsInWorld);
+        Assert.Equal("return-token", h.Backend.Calls.Last());
+        await h.Send(new SequenceNumberRequest(2));
+        Assert.Equal(1, h.Backend.Calls.Count(c => c == "map-initialization"));
     }
 
     [Fact]
@@ -334,6 +363,7 @@ public sealed class GameEntryLifecycleTests
         public HashSet<long> Resumable { get; } = [];
         public Task CloseOthers { get; set; } = Task.CompletedTask;
         public Task BeforeMap { get; set; } = Task.CompletedTask;
+        public Task ReturnSend { get; set; } = Task.CompletedTask;
         public bool? WelcomeWithList { get; private set; }
         public bool? ListWithInitialization { get; private set; }
         public bool FightMapPending { get; set; }
@@ -416,7 +446,7 @@ public sealed class GameEntryLifecycleTests
         public void LoadCharacterState(GameSession session, DbCharacter selected) => Record("load", session);
         public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter selected) { Record("presence", session); return Task.CompletedTask; }
         public Task SendInitialStateAsync(GameSession session, DbCharacter selected) { Record("initial", session); return Task.CompletedTask; }
-        public Task RestoreGuildRaidAsync(long characterId) { Record("raid"); return Task.CompletedTask; }
+        public Task RestoreGuildRaidAsync(GameSession session) { Record("raid"); return Task.CompletedTask; }
         public Task NotifyGuildConnectionAsync(long characterId) { Record("guild"); return Task.CompletedTask; }
         public Task NotifyFriendsAsync(long accountId) { Record("friends"); return Task.CompletedTask; }
         public Task RestoreRemodelAsync(GameSession session, DbCharacter selected) { Record("remodel", session); return Task.CompletedTask; }
@@ -439,7 +469,7 @@ public sealed class GameEntryLifecycleTests
 
         public Task SendMapInformationAsync(GameSession session, DbCharacter selected) { Record("actors", session); return Task.CompletedTask; }
         public Task TickAlterationsAsync(GameSession session) { Record("tick", session); return Task.CompletedTask; }
-        public Task SendReturnToSelectionAsync(GameSession session) { Record("return-token", session); return Task.CompletedTask; }
+        public Task SendReturnToSelectionAsync(GameSession session) { Record("return-token", session); return ReturnSend; }
         public void PrepareReturnToSelection(GameSession session) => Record("prepare-return", session);
         public Task RemoveFromMapAsync(GameSession session) { Record("remove-from-map", session); return Task.CompletedTask; }
     }

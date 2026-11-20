@@ -76,10 +76,10 @@ public sealed class CharacterLookBuilderTests
         ];
 
         var mounted = CharacterLookBuilder.Compose(body, mount, attachments);
-        Assert.Equal(new[] { SubEntityBindingPointCategory.HookPointCategoryPet,
+        Assert.Equal(new SubEntityBindingPointCategory?[] { SubEntityBindingPointCategory.HookPointCategoryPet,
             SubEntityBindingPointCategory.HookPointCategoryBaseForeground,
             SubEntityBindingPointCategory.HookPointCategoryMountDriver },
-            mounted.SubEntities.Select(child => child.BindingPointCategory));
+            mounted.SubEntities.Select(child => (SubEntityBindingPointCategory?)child.BindingPointCategory));
         Assert.Equal(body with { Bones = 2 }, mounted.SubEntities[2].SubEntityLook);
         Assert.Empty(body.SubEntities);
         Assert.Empty(mount.SubEntities);

@@ -3,6 +3,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ConnectionSchema>Schemas/connection-3.6.10.11.proto</ConnectionSchema>
+    <ConnectionMapping>Mappings/connection-3.6.10.11.json</ConnectionMapping>
+    <ConnectionSchema Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">Profiles/$(JondoProtocolTarget)/connection.proto</ConnectionSchema>
+    <ConnectionMapping Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">Profiles/$(JondoProtocolTarget)/connection.json</ConnectionMapping>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Jondo.Unity.Protocol.Connection\Jondo.Unity.Protocol.Connection.csproj" />
@@ -10,17 +14,21 @@
                       ReferenceOutputAssembly="false" OutputItemType="ConnectionGenerator" PrivateAssets="all" />
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
     <PackageReference Include="Grpc.Tools" Version="2.81.1" PrivateAssets="all" />
-    <Protobuf Include="Schemas/connection-3.6.10.11.proto" GrpcServices="None"
+    <Protobuf Include="$(ConnectionSchema)" GrpcServices="None"
               AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)connection.pb" />
     <Compile Include="$(IntermediateOutputPath)ConnectionBindings.g.cs" />
   </ItemGroup>
+  <Target Name="ValidateConnectionProfile" BeforeTargets="PrepareForBuild;Protobuf_Compile" DependsOnTargets="ValidateJondoProtocolTarget">
+    <Error Condition="!Exists('$(ConnectionSchema)') or !Exists('$(ConnectionMapping)')"
+           Text="Missing Connection protocol inputs: $(ConnectionSchema) and $(ConnectionMapping) are both required." />
+  </Target>
   <Target Name="GenerateConnectionBindings" BeforeTargets="CoreCompile" DependsOnTargets="Protobuf_Compile;ResolveReferences"
-          Inputs="$(IntermediateOutputPath)connection.pb;Mappings/connection-3.6.10.11.json;@(ConnectionGenerator);@(ReferencePath)"
+          Inputs="$(IntermediateOutputPath)connection.pb;$(ConnectionMapping);@(ConnectionGenerator);@(ReferencePath)"
           Outputs="$(IntermediateOutputPath)ConnectionBindings.g.cs">
     <ItemGroup>
       <_StableProtocol Include="@(ReferencePath)" Condition="'%(Filename)' == 'Jondo.Unity.Protocol.Connection'" />
     </ItemGroup>
-    <Exec Command="dotnet &quot;@(ConnectionGenerator)&quot; &quot;$(IntermediateOutputPath)connection.pb&quot; &quot;$(MSBuildProjectDirectory)/Mappings/connection-3.6.10.11.json&quot; &quot;@(_StableProtocol)&quot; &quot;$(IntermediateOutputPath)ConnectionBindings.g.cs&quot;" />
+    <Exec Command="dotnet &quot;@(ConnectionGenerator)&quot; &quot;$(IntermediateOutputPath)connection.pb&quot; &quot;$(MSBuildProjectDirectory)/$(ConnectionMapping)&quot; &quot;@(_StableProtocol)&quot; &quot;$(IntermediateOutputPath)ConnectionBindings.g.cs&quot;" />
     <ItemGroup>
       <FileWrites Include="$(IntermediateOutputPath)ConnectionBindings.g.cs;$(IntermediateOutputPath)connection.pb" />
     </ItemGroup>

@@ -47,7 +47,10 @@ internal sealed class GameEntryInitialMessages(
         await SendAsync(arena());
 
         await SendAsync(inventory());
+#if !JONDO_PROTOCOL_3_8_1_2
+        // Remap reports tag storage as not applicable to the November target.
         await SendAsync(AfterSelectionMessages.Tags());
+#endif
         // Capture all set messages before the first send: transport continuations cannot
         // change the later sets in this snapshot. There is no invented set-zero clear.
         foreach (var set in afterSelection.Sets(characterState)) await SendAsync(set);
@@ -91,7 +94,10 @@ internal sealed class GameEntryInitialMessages(
         // Preserve both initial room dispatches while migrating the sequence.
         await SendAsync(roomDispatch);
         await SendAsync(afterSelection.Storage(session.AccountId));
+#if !JONDO_PROTOCOL_3_8_1_2
+        // The reviewed November report marks this configuration message as not applicable.
         await SendAsync(presentation.Configuration());
+#endif
         await SendAsync(AfterSelectionMessages.Bonuses());
         // Loading-complete belongs before the remaining appearance tail, rather than
         // the end of world/map initialization. Its position is server-owned too.

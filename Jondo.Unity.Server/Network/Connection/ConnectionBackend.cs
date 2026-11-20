@@ -70,6 +70,10 @@ internal static class ConnectionAccountProjection
         _ => throw new InvalidOperationException($"Unknown database character gender: {value}.")
     };
 
+#if JONDO_PROTOCOL_3_8_1_2
+    // The November binding leaves the new scalar breed code raw-only.
+    private static CharacterBreed? Breed(int _) => null;
+#else
     // There is no breed 19: the Forgelance is 20, and the client reads wire value 18 back as 20
     // (gr's constructor; anything past 18 is no breed at all).
     private static CharacterBreed Breed(int value) => value switch
@@ -83,4 +87,5 @@ internal static class ConnectionAccountProjection
         20 => CharacterBreed.Forgelance,
         _ => throw new InvalidOperationException($"Unknown database character breed: {value}.")
     };
+#endif
 }

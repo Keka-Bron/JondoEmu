@@ -788,7 +788,6 @@
       "name": "GameMapMovementEvent",
       "fields": {
         "fuwy": "Cells",
-        "fuxb": "Pace",
         "fuxd": "CharacterId",
         "fuxe": "Cautious"
       },
@@ -6020,7 +6019,8 @@
         "fsdu": "RoomCleared",
         "fsdv": "ScaledLevel",
         "fsdw": "Training",
-        "fsdx": "ExperienceBonusPercent"
+        "fsdx": "ExperienceBonusPercent",
+        "fsds": "Life"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -6580,7 +6580,8 @@
         "gamd": "Recruitment",
         "gamf": "CreationDate",
         "gamg": "SubareaNumber",
-        "gami": "MembersNumber"
+        "gami": "MembersNumber",
+        "gamh": "TaxCollectorNumber"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -6590,7 +6591,8 @@
     "leq": {
       "name": "GuildSocialInformation",
       "fields": {
-        "gank": "Emblem"
+        "gank": "Emblem",
+        "gani": "DetailedInformation"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -6610,7 +6612,17 @@
     },
     "lgm": {
       "name": "SocialApplicationPlayerInformation",
-      "fields": {},
+      "fields": {
+        "gavx": "BreedId",
+        "gavz": "Gender",
+        "gawa": "AccountId",
+        "gawb": "Name",
+        "gawc": "AccountTag",
+        "gawd": "CharacterId",
+        "gawe": "AccountNickname",
+        "gawf": "Status",
+        "gawg": "Level"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -7169,6 +7181,581 @@
       "defaultOnAbsence": [],
       "defaultOneofs": {},
       "kind": "event"
+    },
+    "itj": {
+      "name": "MarketPriceHistoryRequest",
+      "fields": {
+        "frew": "ObjectGid"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "iue": {
+      "name": "MarketPriceHistoryResponse",
+      "fields": {
+        "frit": "HourlyHistory",
+        "friv": "DailyHistory"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "response"
+    },
+    "iuc": {
+      "name": "MarketPriceHistoryEntry",
+      "fields": {
+        "frik": "Quantity",
+        "fril": "AveragePrice",
+        "frip": "DateIso"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "kqq": {
+      "name": "ReloginRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kqr": {
+      "name": "ReloginTokenEvent",
+      "fields": {
+        "fysc": "Token",
+        "fysf": "ValidToken"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvm": {
+      "name": "CanCharacterBeCreatedResultEvent",
+      "fields": {
+        "fzke": "Result"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kwa": {
+      "name": "PrepareCharacterDeletionRequest",
+      "fields": {
+        "fzme": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvn": {
+      "name": "CharacterDeletionPrepareEvent",
+      "fields": {
+        "fzki": "Name",
+        "fzkj": "SecretQuestion",
+        "fzkk": "NeedSecretAnswer"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kvu": {
+      "name": "CharacterDeletionRequest",
+      "fields": {
+        "fzle": "CharacterId",
+        "fzlf": "SecretAnswerHash"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kvh": {
+      "name": "CharacterDeletionCompletedRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "leo": {
+      "name": "GuildDetailedInformation",
+      "fields": {
+        "gamw": "LeaderId",
+        "gamx": "PendingApplicationsCount",
+        "gana": "LastActivityDay",
+        "gand": "Recruitment",
+        "gane": "MembersCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfy": {
+      "name": "GuildRecruitmentInformation",
+      "fields": {
+        "gatk": "LastEditDate",
+        "gatl": "Text",
+        "gatm": "MinLevel",
+        "gatn": "SelectedCriterion",
+        "gato": "RecruitmentType",
+        "gatp": "SelectedLanguages",
+        "gatq": "AutoLocked",
+        "gatr": "LastEditPlayerName",
+        "gats": "MinSuccess",
+        "gatt": "SocialId",
+        "gatu": "MinSuccessFacultative",
+        "gatv": "MinLevelFacultative",
+        "gatw": "Title",
+        "gatx": "TextInError"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "hoh": {
+      "name": "PlayersMapAttackableStatusUpdateEvent",
+      "fields": {
+        "fmxo": "PvpPlayers"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hof": {
+      "name": "MapPlayerAttackableStatus",
+      "fields": {
+        "fmxg": "KothRole",
+        "fmxh": "Status",
+        "fmxi": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "hon": {
+      "name": "SelfAttackableStatusUpdateEvent",
+      "fields": {
+        "fmyv": "ProbationEndMs",
+        "fmyy": "KothRole",
+        "fmyz": "Status"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ifa": {
+      "name": "PrismAddOrUpdateEvent",
+      "fields": {
+        "fpbm": "PrismLocalizedInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ilh": {
+      "name": "PartyMemberInFightEvent",
+      "fields": {
+        "fpzk": "MemberId",
+        "fpzl": "TimeBeforeFightStart",
+        "fpzn": "MemberName",
+        "fpzo": "FightId",
+        "fpzq": "Reason",
+        "fpzr": "StandardFightMap"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ixg": {
+      "name": "InfiniteDreamClearEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kmb": {
+      "name": "ContextRefreshEntityLookEvent",
+      "fields": {
+        "fydi": "Look",
+        "fydj": "EntityId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kup": {
+      "name": "CharacterLifeStatusEvent",
+      "fields": {
+        "fzhh": "State",
+        "fzhi": "PhoenixMapId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lea": {
+      "name": "TaxCollectorInformation",
+      "fields": {
+        "gajd": "CallerId",
+        "gaje": "ComplementaryInformation",
+        "gajf": "Coordinates",
+        "gajg": "FirstNameId",
+        "gajh": "Equipments",
+        "gaji": "CallerName",
+        "gajj": "Spells",
+        "gajk": "HiredDate",
+        "gajl": "State",
+        "gajm": "LastNameId",
+        "gajn": "SubAreaId",
+        "gajo": "Uid",
+        "gajp": "EntityLook",
+        "gajq": "Alliance",
+        "gajr": "MapId",
+        "gajs": "CharacterCharacteristics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lee": {
+      "name": "TaxCollectorLootInformation",
+      "fields": {
+        "gaks": "Pods",
+        "gakt": "ItemsKamasValue"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lfc": {
+      "name": "TaxCollectorComplementaryInformation",
+      "fields": {},
+      "oneofs": {
+        "gapm": {
+          "member": "ComplementaryInformationCase",
+          "noneType": "TaxCollectorComplementaryInformationCaseNone",
+          "cases": {
+            "gapl": {
+              "type": "TaxCollectorComplementaryInformationCaseLootInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lli": {
+      "name": "TaxCollectorOrderedSpell",
+      "fields": {
+        "gbti": "SpellLevelId",
+        "gbtj": "SlotId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lvb": {
+      "name": "SubareaRewardRateEvent",
+      "fields": {
+        "gdgv": "SubareaRate"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "mcx": {
+      "name": "AllianceInsiderInformationEvent",
+      "fields": {
+        "gemg": "TaxCollectors",
+        "gemh": "Prisms",
+        "gemi": "Information",
+        "gemj": "Members"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "mep": {
+      "name": "KothUpdateEvent",
+      "fields": {
+        "getc": "Alliances",
+        "getd": "NextTickTimeMs",
+        "gete": "StartingAvaTimestamp"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "men": {
+      "name": "KothAllianceInformation",
+      "fields": {
+        "gest": "Alliance",
+        "gesu": "KothRoles",
+        "gesv": "DominationScore",
+        "gesx": "Scores",
+        "gesy": "MemberCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mei": {
+      "name": "KothAllianceRoleNumber",
+      "fields": {
+        "gesh": "MemberCount",
+        "gesi": "KothRole"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mel": {
+      "name": "KothScore",
+      "fields": {
+        "gesm": "CumulativePoints",
+        "gesp": "ScoreType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "idt": {
+      "name": "GuideModQuitRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "idu": {
+      "name": "QuestStepInformationEvent",
+      "fields": {
+        "fowx": "Information"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "idz": {
+      "name": "QuestStepValidatedEvent",
+      "fields": {
+        "foxn": "QuestId",
+        "foxo": "StepId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ied": {
+      "name": "QuestValidatedEvent",
+      "fields": {
+        "foyk": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ief": {
+      "name": "QuestStartedEvent",
+      "fields": {
+        "foyr": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ieo": {
+      "name": "QuestStepInformationRequest",
+      "fields": {
+        "fpab": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ioc": {
+      "name": "NpcDialogCreationEvent",
+      "fields": {
+        "fqja": "PortalType",
+        "fqjd": "MapId",
+        "fqje": "NpcId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ios": {
+      "name": "NpcDialogQuestionEvent",
+      "fields": {
+        "fqlj": "MessageId",
+        "fqlk": "VisibleReplies",
+        "fqll": "DialogParams"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ioq": {
+      "name": "VisibleReply",
+      "fields": {
+        "fqld": "ReplyId",
+        "fqlf": "Actions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ioo": {
+      "name": "ActionInformation",
+      "fields": {
+        "fqkw": "Id",
+        "fqkx": "Parameters"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "iov": {
+      "name": "NpcGenericActionRequest",
+      "fields": {
+        "fqma": "NpcActionId",
+        "fqmb": "NpcMapId",
+        "fqmc": "NpcId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ioy": {
+      "name": "NpcDialogReplyRequest",
+      "fields": {
+        "fqmg": "ReplyId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kld": {
+      "name": "DialogLeaveEvent",
+      "fields": {
+        "fybb": "DialogType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "knm": {
+      "name": "FriendListRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kno": {
+      "name": "AcquaintanceListRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lzl": {
+      "name": "AnomalySubareaInformationEvent",
+      "fields": {
+        "gdzl": "Subareas"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lzj": {
+      "name": "AnomalySubareaInformation",
+      "fields": {
+        "gdze": "RewardRate",
+        "gdzf": "SubareaId",
+        "gdzg": "HasAnomaly",
+        "gdzh": "AnomalyClosingTime"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
     }
   },
   "enums": {
@@ -7934,6 +8521,50 @@
         "fdxi": "Disguise",
         "fdxj": "Wings",
         "fdxk": "Shoulders"
+      }
+    },
+    "ijv": {
+      "name": "PartyMemberInFightCause",
+      "values": {
+        "eiau": "Unknown",
+        "eiav": "MonsterAttack",
+        "eiaw": "PlayerAttack",
+        "eiax": "MemberAttackedPlayers",
+        "eiay": "MemberChallenge"
+      }
+    },
+    "kun": {
+      "name": "CharacterLifeStatus",
+      "values": {
+        "ewtb": "AliveAndKicking",
+        "ewtc": "Tombstone",
+        "ewtd": "Phantom"
+      }
+    },
+    "lby": {
+      "name": "TaxCollectorState",
+      "values": {
+        "eygh": "StateCollecting",
+        "eygi": "StateWaitingForHelp",
+        "eygj": "StateFighting"
+      }
+    },
+    "mej": {
+      "name": "KothScoreType",
+      "values": {
+        "ffrz": "Fight",
+        "ffsa": "Domination",
+        "ffsb": "Prism"
+      }
+    },
+    "inz": {
+      "name": "NpcDialogPortalType",
+      "values": {
+        "eiyt": "Unsupported",
+        "eiyu": "Enutrosor",
+        "eiyv": "Srambad",
+        "eiyw": "Xelorium",
+        "eiyx": "Ecaflipus"
       }
     }
   },

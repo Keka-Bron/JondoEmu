@@ -46,8 +46,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static async Task DropFromTheBoxAsync(NetworkStream stream, int quest)
         {
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(quest)));
+            await SessionContext.Current.SendAsync(new Jondo.Unity.Protocol.Game.QuestValidatedEvent(quest));
             FollowedQuests.Unfollow(SessionContext.State.CharacterId, quest);
         }
     }

@@ -525,7 +525,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             SessionContext.State.IsHavenBagEditing = false;
 
-            await SendFurnitureAsync(stream);
+            await SendFurnitureAsync(SessionContext.Current);
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Jba));
@@ -535,15 +535,13 @@ namespace Jondo.Unity.Server.Handlers
         /// The furniture and the permissions, which the client expects after the map: the bag's owner's
         /// pieces for the room's theme, and whom he opened it to (jaz { f1 }).
         /// </summary>
-        public static async Task SendFurnitureAsync(NetworkStream stream)
+        public static async Task SendFurnitureAsync(GameSession session)
         {
-            long owner = BagOwnerOf(SessionContext.State);
-            var pieces = HavenBagStore.FurnitureOf(owner, Merkasako.ThemeOfMap(SessionContext.State.MapId));
-
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jbu, ConnectionProtocol.BuildHavenBagFurniture(pieces)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Jaz, Pb.New().VarIfNotZero(1, HavenBagStore.SharedOf(owner)).Build()));
+            long owner = BagOwnerOf(session.State);
+            var pieces = HavenBagStore.FurnitureOf(owner, Merkasako.ThemeOfMap(session.MapId));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.HavenBagFurnitureEvent(pieces.Select(piece =>
+                new Jondo.Unity.Protocol.Game.HavenBagElement(piece.Cell, checked((int)piece.TypeId), piece.Orientation)).ToArray()));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.HavenBagPermissionsUpdateEvent(HavenBagStore.SharedOf(owner)));
         }
     }
 }

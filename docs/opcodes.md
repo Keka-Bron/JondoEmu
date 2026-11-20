@@ -343,7 +343,7 @@ and the range without claiming to be the original.
 | `jbg` | C→S | 3 / 1 file | A slice of the room. It arrives **split** — three in a row in the capture — and each slice carries the **whole** room, not a diff. Saving each slice separately would have the first one erase what the other two carry, so they are collected and written once on close. | `MerkasakoHandler.CollectFurniture` | `f2 (rep) { f1: cell, f2: furniture, f3: orientation }` |
 | `jbk` `jav` `jaw` | C→S | 1 / 1 file each | Close the placement mode. All three arrive together on accept. | `MerkasakoHandler.CloseEditorAsync` | empty |
 | `jba` | S→C | 2 / 1 file | Placement mode closed. | `MerkasakoHandler` | empty |
-| `jbu` | S→C | 10 / 7 files | The furniture in the room, expected behind the map. Same shape as `jbg` but on `f1` instead of `f2`. | `BuildHavenBagFurniture` | `f1 (rep) { f1: cell, f2: furniture, f3: orientation }` |
+| `jbu` | S→C | 10 / 7 files | The furniture in the room, expected behind the map. Same shape as `jbg` but on `f1` instead of `f2`. | `MerkasakoHandler.SendFurnitureAsync` (`HavenBagFurnitureEvent`) | `f1 (rep) { f1: cell, f2: furniture, f3: orientation }` |
 | `jaz` | S→C | 14 / 7 files | Sent with the furniture, between `jss` and `lva`. Meaning *not established*. | `MerkasakoHandler` | empty |
 
 ### 2.11 The appearance window (cosmetics)
@@ -387,7 +387,7 @@ not a zero inside.
 | `lxs` | C→S | 27 / 22 files | **Save.** This is where the draft becomes what is worn, and where the look reaches the rest of the map. | `WardrobeHandler.SaveAsync` | empty |
 | `lyu` | S→C (f3) | 27 / 22 files | Save acknowledged. | `WardrobeHandler` | `f1: 1` |
 | `hid` | S→C | 2 / 2 files | The title now worn. **Empty** means none — not a zero inside. | `BuildTitleUpdated` | `f1: title`, or empty |
-| `hif` | S→C | 4 / 4 files | The ornament now worn, same rule. | `BuildOrnamentUpdated` | `f1: ornament`, or empty |
+| `hif` | S→C | 4 / 4 files | Ornament selection update. The server omits the scalar under the [after-selection policy](populated-unmapped-fields.md#after-selection-omission-policy). | `OrnamentSelectedEvent` | empty in server output |
 | `hhy` | S→C | 8 / 6 files | What the account **owns**. The client already carries the whole catalogue; anything not in this list is drawn greyed out. Sent once, on world entry. A freshly created character's `hhy` arrives with zero bytes. | `BuildTitlesOwned` | `f1: packed titles, f2: packed ornaments` |
 | `lyt` | S→C | 7 / 6 files | The saved wardrobe outfits. **Mandatory**: without it the cosmetics window plays its sound and never draws, dying in `CosmeticUi.DisplayOutfit` on a null reference because it has no outfit to show. Seen in the client's own `Player.log`. | `BuildOutfits` | `f1 (rep): each saved outfit, f2: the one worn` |
 
@@ -433,7 +433,7 @@ values remain unresolved.
 | Opcode | Dir | Wire | What it does | Handler | Payload |
 |---|---|---|---|---|---|
 | `kqo` | C→S | 2890 / 235 files | The heartbeat, every five seconds for as long as the client is in the world. The most frequent client message in the whole capture set and present in 235 of the 242 files. | `GameNodeProxy` | — |
-| `kqy` | S→C | 2881 / 234 files | The answer, and nothing else. Twenty-four in a row 5,000 ms apart in the tutorial capture, each followed by exactly one `kqy`. The frame comes out byte for byte like the captured one: `1d 0a 1b 0a 19 0a 13 type.ankama.com/kqy 12 02 08 01`. Note it travels on root field 1, not the answer field. | `BuildHeartbeatAnswer` | `f1: 1` |
+| `kqy` | S→C | 2881 / 234 files | The answer, and nothing else. Twenty-four in a row 5,000 ms apart in the tutorial capture, each followed by exactly one `kqy`. The frame comes out byte for byte like the captured one: `1d 0a 1b 0a 19 0a 13 type.ankama.com/kqy 12 02 08 01`. Note it travels on root field 1, not the answer field. | `GameEntryService` (`PongEvent`) | `f1: Quiet` (1 in this capture) |
 
 Answering `kqo` with the map block is what made the client reload the world in a loop: the block
 carries `jru`, and `jru` means "load this map". The block now goes out on the first `kqo` of an

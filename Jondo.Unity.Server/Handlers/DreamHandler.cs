@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
@@ -61,18 +61,18 @@ namespace Jondo.Unity.Server.Handlers
         /// done, otherwise a second press of the key would store the plane as the place to return to and
         /// the player would stay there forever.
         /// </remarks>
-        public static async Task ToAstralPlaneAsync(NetworkStream stream)
+        public static async Task ToAstralPlaneAsync(GameSession session)
         {
-            if (GameState.MapId == PlanoAstral)
+            if (session.MapId == PlanoAstral)
             {
                 Console.WriteLine("[Dreams] Already on the Plano Astral.");
                 return;
             }
 
-            Dreams.RecordarDeDondeViene(GameState.CharacterId, GameState.MapId, GameState.CellId);
+            Dreams.RecordarDeDondeViene(session.CharacterId, session.MapId, session.State.CellId);
 
-            int aterriza = await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
-            Console.WriteLine($"[Dreams] {GameState.CharacterId} to the Plano Astral, cell {aterriza}.");
+            int aterriza = await TeleportHandler.ToMapAsync(session, PlanoAstral, 0);
+            Console.WriteLine($"[Dreams] {session.CharacterId} to the Plano Astral, cell {aterriza}.");
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -80,9 +80,9 @@ namespace Jondo.Unity.Server.Handlers
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>Shows the dream's map. It is what answers using the well.</summary>
-        public static async Task ShowAsync(NetworkStream stream)
+        public static async Task ShowAsync(GameSession session)
         {
-            var yo = GameState.CharacterId;
+            var yo = session.CharacterId;
 
             // The dream the character has going, to continue; with none, an empty iyj, and the
             // window only offers a new one -- the long capture, whose player has none, gets zero
@@ -100,11 +100,11 @@ namespace Jondo.Unity.Server.Handlers
             // does not open the window that arrives after it. It gives no error; simply nothing
             // happens, which is what was seen when pressing it. The f4 of that iwn is 184, the same
             // skill already announced in the f11.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
                     Dreams.ElementoDelPozo, Dreams.HabilidadDelPozo, yo)));
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Iyj, DreamProtocol.BuildDreamMap(sueno)));
 
             Console.WriteLine(sueno == null
@@ -138,7 +138,7 @@ namespace Jondo.Unity.Server.Handlers
         /// box only when a code was typed -- or a trial chosen, whose code it is --, the
         /// difficulty and the 1 always.
         /// </remarks>
-        public static async Task StartOrDiscardAsync(NetworkStream stream, byte[] payload)
+        public static async Task StartOrDiscardAsync(GameSession session, byte[] payload)
         {
             byte[]? ixf = ConnectionProtocol.ReadPayload(payload, Op.Ixf);
             if (ixf == null) return;
@@ -178,7 +178,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            long yo = GameState.CharacterId;
+            long yo = session.CharacterId;
 
             if (continuar)
             {
@@ -191,9 +191,9 @@ namespace Jondo.Unity.Server.Handlers
 
                 Console.WriteLine($"[Dreams] {yo} continues in room {enCurso.Actual}.");
 
-                await EntrarEnSalaAsync(stream, enCurso, enCurso.Actual);
+                await EntrarEnSalaAsync(session, enCurso, enCurso.Actual);
 
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                await session.SendAsync(
                     ConnectionProtocol.Answer(Op.Ixa, null, ConnectionProtocol.RequestId(payload)));
                 return;
             }
@@ -209,13 +209,13 @@ namespace Jondo.Unity.Server.Handlers
             if (!string.IsNullOrEmpty(seed) && !Dreams.IsSeed(seed))
             {
                 Console.WriteLine($"[Dreams] {yo} typed «{seed}», which is no dream's code.");
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildNotice(CommandTexts.Get("dream.bad_code", seed))));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildNotice(CommandTexts.Get(session.State.Language, "dream.bad_code", seed))));
                 return;
             }
 
-            var sueno = Dreams.Crear(yo, GameState.CharacterName, GameState.CharacterLevel,
-                                     dificultad, GameState.MapId, GameState.CellId, GameState.Breed,
+            var sueno = Dreams.Crear(yo, session.State.CharacterName, session.State.CharacterLevel,
+                                     dificultad, session.MapId, session.State.CellId, session.State.Breed,
                                      seed, training);
             Persist(sueno);
 
@@ -223,10 +223,10 @@ namespace Jondo.Unity.Server.Handlers
                               (sueno.FromSouvenir ? " (a souvenir, no rewards" + (sueno.Training ? ", training)" : ")") : "") +
                               $": {sueno.Salas.Count} rooms.");
 
-            await EntrarEnSalaAsync(stream, sueno, 0);
+            await EntrarEnSalaAsync(session, sueno, 0);
 
             // The acknowledgement goes through root 3, empty, with the request id.
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Answer(Op.Ixa, null, ConnectionProtocol.RequestId(payload)));
         }
 
@@ -242,12 +242,12 @@ namespace Jondo.Unity.Server.Handlers
         /// inside a dream the doors are interactives that do not exist on the roleplay map, so the
         /// normal path would not know what to do with them.
         /// </remarks>
-        public static async Task<bool> TryDoorAsync(NetworkStream stream, int elementId)
+        public static async Task<bool> TryDoorAsync(GameSession session, int elementId)
         {
             // A dream's doors and fountain are on its own maps: out in the world, a dream left
             // to be continued has nothing to say about what the player clicks.
-            if (!Dreams.IsDreamMap(GameState.MapId)) return false;
-            var sueno = Dreams.De(GameState.CharacterId);
+            if (!Dreams.IsDreamMap(session.MapId)) return false;
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null) return false;
 
             var actual = sueno.SalaActual;
@@ -256,7 +256,7 @@ namespace Jondo.Unity.Server.Handlers
             // The Fontaine onirique of a fountain room: the shop, not a way out.
             if (actual.EsFuente && elementId == Dreams.FountainOf(actual))
             {
-                await ShopAsync(stream, sueno, elementId);
+                await ShopAsync(session, sueno, elementId);
                 return true;
             }
 
@@ -292,11 +292,11 @@ namespace Jondo.Unity.Server.Handlers
                 // It is the same order as the well's, and skipping it has the same price: the
                 // client keeps the door as busy and nothing of what comes after happens.
                 // Without a single error.
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                await session.SendAsync(
                     ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                        elementId, Dreams.HabilidadDelPozo, GameState.CharacterId)));
+                        elementId, Dreams.HabilidadDelPozo, session.CharacterId)));
 
-                await EntrarEnSalaAsync(stream, sueno, actual.Salidas[cual]);
+                await EntrarEnSalaAsync(session, sueno, actual.Salidas[cual]);
                 return true;
             }
 
@@ -313,11 +313,11 @@ namespace Jondo.Unity.Server.Handlers
         /// INFERRED from the client: no capture clicks the map. The room ids are the strings the
         /// map was given (<see cref="DreamProtocol"/>), so the click names one of them.
         /// </remarks>
-        public static async Task ChooseRoomAsync(NetworkStream stream, byte[] payload)
+        public static async Task ChooseRoomAsync(GameSession session, byte[] payload)
         {
             byte[]? ixn = ConnectionProtocol.ReadPayload(payload, Op.Ixn);
-            if (ixn == null || !Dreams.IsDreamMap(GameState.MapId)) return;
-            var sueno = Dreams.De(GameState.CharacterId);
+            if (ixn == null || !Dreams.IsDreamMap(session.MapId)) return;
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null) return;
 
             string clicked = "";
@@ -333,7 +333,7 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine($"[Dreams] Room «{clicked}» clicked on the map: not a way out of where he stands.");
                 return;
             }
-            await EntrarEnSalaAsync(stream, sueno, room.Value);
+            await EntrarEnSalaAsync(session, sueno, room.Value);
         }
 
         /// <summary>The room a click on the map leads to, if the room stood in lets him go there.</summary>
@@ -347,13 +347,13 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>Puts the player in a room: the state and the map change.</summary>
-        private static async Task EntrarEnSalaAsync(NetworkStream stream, Dreams.Sueno sueno,
+        private static async Task EntrarEnSalaAsync(GameSession session, Dreams.Sueno sueno,
                                                     int salaId)
         {
             int pointsBefore = sueno.DreamPoints;
             var sala = Dreams.Enter(sueno, salaId, out var gained);
             if (sala == null) return;
-            _enElSueno[GameState.CharacterId] = true;
+            _enElSueno[session.CharacterId] = true;
 
             // The booster and the points are collected ON ENTERING, before fighting, and only once per room.
             if (gained != null || sueno.DreamPoints != pointsBefore)
@@ -375,13 +375,12 @@ namespace Jondo.Unity.Server.Handlers
                                   $"{sueno.Salas.Count} rooms in all.");
 
                 // And the band it closes is done: the guild missions that asked for it.
-                await GuildMissionWatcher.DreamBandDoneAsync(SessionContext.Current, sueno.Dificultad, sala.Franja);
+                await GuildMissionWatcher.DreamBandDoneAsync(session, sueno.Dificultad, sala.Franja);
             }
 
             Persist(sueno);
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
+            await session.SendAsync(StateOf(sueno));
 
             // And the map change: to the ROOM's map, which is one of the 484 of subarea 904 made
             // for this, not the monster group's. Sending him to the group's is what left him
@@ -402,10 +401,10 @@ namespace Jondo.Unity.Server.Handlers
             else if (!sala.EsFuente && !sala.Hecha) PlantarElGrupo(sala);
             PlantGoblin(sala);
 
-            int aterriza = await TeleportHandler.ToMapAsync(stream, mapa, 0);
+            int aterriza = await TeleportHandler.ToMapAsync(session, mapa, 0);
 
             // And his guests follow him in.
-            if (sueno.CharacterId == GameState.CharacterId) await BringGuestsAsync(sueno);
+            if (sueno.CharacterId == session.CharacterId) await BringGuestsAsync(sueno);
 
             Console.WriteLine($"[Dreams] Room {salaId} (row {sala.Fila}): map {mapa}, " +
                               $"group {sala.Grupo} of map {sala.MapaId} with " +
@@ -449,14 +448,13 @@ namespace Jondo.Unity.Server.Handlers
         /// fountain's offers, or a fight's group as a storm does; 4033 wins it; 4034 goes back to
         /// the room before. 4035, the Rey Gob's, is the reply's dream points (NpcHandler).
         /// </summary>
-        internal static async Task GoblinPowerAsync(NetworkStream stream, IReadOnlyList<long> actions)
+        internal static async Task GoblinPowerAsync(GameSession session, IReadOnlyList<long> actions)
         {
-            var session = SessionContext.Current;
             var sueno = Dreams.De(session.CharacterId);
             var sala = sueno?.SalaActual;
             if (sueno == null || sala == null || sala.Goblin == 0 || sala.GoblinGone)
             {
-                Console.WriteLine($"[Dreams] No goblin of {GameState.CharacterId}'s dream to take a power from here.");
+                Console.WriteLine($"[Dreams] No goblin of {session.CharacterId}'s dream to take a power from here.");
                 return;
             }
             int goblin = sala.Goblin;
@@ -478,7 +476,7 @@ namespace Jondo.Unity.Server.Handlers
             if (actions.Contains(TeleportToPrecedentDreamRoom) && Dreams.GoBack(sueno) is { } before)
             {
                 Console.WriteLine($"[Dreams] Goblin {goblin}: back from room {sala.Id} to room {before.Id}.");
-                await EntrarEnSalaAsync(stream, sueno, before.Id);
+                await EntrarEnSalaAsync(session, sueno, before.Id);
                 return;
             }
 
@@ -489,14 +487,14 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     Dreams.Reroll(sueno, sala);
                     Console.WriteLine($"[Dreams] Goblin {goblin}: room {sala.Id} rerolled.");
-                    await EntrarEnSalaAsync(stream, sueno, sala.Id);
+                    await EntrarEnSalaAsync(session, sueno, sala.Id);
                     return;
                 }
             }
 
             Console.WriteLine($"[Dreams] Goblin {goblin}'s power in room {sala.Id}: {string.Join(", ", actions)}.");
             Persist(sueno);
-            await RefrescarEstadoAsync(stream);
+            await RefrescarEstadoAsync(session);
         }
 
         /// <summary>
@@ -524,30 +522,29 @@ namespace Jondo.Unity.Server.Handlers
         /// way is INFERRED from the window: InfiniteDreamShopUi.Setup is where "isFavor" and the
         /// "ui.infiniteDreams.dreamFavor" title are decided, and it has no other way in.
         /// </remarks>
-        internal static async Task<bool> OfferFavorAsync(NetworkStream stream)
+        internal static async Task<bool> OfferFavorAsync(GameSession session)
         {
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             var sala = sueno?.SalaActual;
             if (sueno == null || sala == null || !sala.EsFavor || sala.FavorChosen)
             {
-                Console.WriteLine($"[Dreams] No favour to offer to {GameState.CharacterId} here.");
+                Console.WriteLine($"[Dreams] No favour to offer to {session.CharacterId} here.");
                 return false;
             }
 
             sala.Offers ??= Dreams.DrawFavor(sueno, sala);
             Persist(sueno);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixm));
+            await session.SendAsync(StateOf(sueno));
+            await session.SendAsync(ConnectionProtocol.Push(Op.Ixm));
             Console.WriteLine($"[Dreams] Favour of room {sala.Id}: " +
                               string.Join(", ", sala.Offers.Select(o => o.Tag)) + ".");
             return true;
         }
 
         /// <summary>Whether the favour of the room one stands in is still to be chosen: what the Dispensador says.</summary>
-        internal static bool FavorPending()
+        internal static bool FavorPending(long characterId)
         {
-            var sala = Dreams.De(GameState.CharacterId)?.SalaActual;
+            var sala = Dreams.De(characterId)?.SalaActual;
             return sala != null && sala.EsFavor && !sala.FavorChosen;
         }
 
@@ -593,11 +590,11 @@ namespace Jondo.Unity.Server.Handlers
         /// and only the f18 and f19 change. This used to add the room's score to the f8, which is
         /// the bonus to experience and loot: 220% became 275% in three rooms.
         /// </remarks>
-        public static bool SalaLimpiada(long grupoDerrotado, long mapa)
+        public static bool SalaLimpiada(long characterId, long grupoDerrotado, long mapa)
         {
             if (grupoDerrotado == 0 || !Dreams.IsDreamMap(mapa)) return false;
 
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(characterId);
             if (sueno == null) return false;
 
             foreach (var sala in sueno.Salas)
@@ -624,18 +621,17 @@ namespace Jondo.Unity.Server.Handlers
         /// a dream left behind is still there to be continued: sent after any fight, it put the
         /// dream's interface over a dungeon's exit.
         /// </remarks>
-        public static async Task RefrescarEstadoAsync(NetworkStream stream)
+        public static async Task RefrescarEstadoAsync(GameSession session)
         {
-            if (!Dreams.IsDreamMap(GameState.MapId)) return;
-            var sueno = Dreams.De(GameState.CharacterId);
+            if (!Dreams.IsDreamMap(session.MapId)) return;
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null) return;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
+            await session.SendAsync(StateOf(sueno));
         }
 
         /// <summary>The izg of a dream, with the bestiary of the room one stands in.</summary>
-        private static byte[] StateOf(Dreams.Sueno sueno)
+        private static Game.InfiniteDreamStateEvent StateOf(Dreams.Sueno sueno)
             => DreamProtocol.BuildDreamState(sueno, BestiaryOf(sueno.SalaActual,
                    sueno.SalaActual?.EsFinal == true ? Dreams.FinalRulesOf(sueno.Dificultad).BaseLevel : Dreams.MonsterLevel(sueno)));
 
@@ -656,9 +652,9 @@ namespace Jondo.Unity.Server.Handlers
         /// Fin du rêve's first wave is the exception, because its fight does scale it: there the
         /// bestiary gets its level too.
         /// </remarks>
-        internal static List<DreamProtocol.Beast> BestiaryOf(Dreams.Sala? sala, int level = 0)
+        internal static List<Game.InfiniteDreamMonster> BestiaryOf(Dreams.Sala? sala, int level = 0)
         {
-            var beasts = new List<DreamProtocol.Beast>();
+            var beasts = new List<Game.InfiniteDreamMonster>();
             if (sala == null || sala.Miembros.Count == 0 || sala.Hecha) return beasts;
 
             var group = MobSpawnManager.ComposeOffMap(sala.Miembros);
@@ -671,8 +667,8 @@ namespace Jondo.Unity.Server.Handlers
                 int cell = i < cells.Count ? cells[i] : cells.FirstOrDefault();
                 var fighter = FightHandler.BuildMonsterFighter(member, -(i + 1), cell);
                 if (level > 0) Dreams.ScaleTo(fighter, level);
-                beasts.Add(new DreamProtocol.Beast(cell, fighter.MonsterId, fighter.Level,
-                                                   Dreams.IsBoss(fighter.MonsterId), StatsOf(fighter)));
+                beasts.Add(new(cell, fighter.MonsterId, Dreams.IsBoss(fighter.MonsterId)
+                    ? Game.InfiniteDreamMonsterKind.Boss : Game.InfiniteDreamMonsterKind.Normal, StatsOf(fighter)));
             }
             return beasts;
         }
@@ -683,9 +679,9 @@ namespace Jondo.Unity.Server.Handlers
         /// it has some, and the two dodges. Evasion and lock are what the fight gives a monster --
         /// nothing, today -- and not a figure of their own.
         /// </summary>
-        internal static List<(int Characteristic, int Value)> StatsOf(Fighter monster)
+        private static Dictionary<int, int> StatsOf(Fighter monster)
         {
-            var stats = new List<(int, int)> { (LifePoints, monster.MaxHP), (ActionPoints, monster.MaxAP) };
+            var stats = new Dictionary<int, int> { [LifePoints] = monster.MaxHP, [ActionPoints] = monster.MaxAP };
             foreach (var (id, value) in new[]
                      {
                          (EarthResistance, monster.EarthResPct), (FireResistance, monster.FireResPct),
@@ -693,14 +689,14 @@ namespace Jondo.Unity.Server.Handlers
                          (NeutralResistance, monster.NeutralResPct),
                      })
             {
-                if (value != 0) stats.Add((id, value));
+                if (value != 0) stats.Add(id, value);
             }
-            stats.Add((Initiative, monster.Initiative));
-            stats.Add((Evasion, monster.Otras.GetValueOrDefault(Evasion)));
-            stats.Add((Lock, monster.Otras.GetValueOrDefault(Lock)));
-            if (monster.MaxMP != 0) stats.Add((MovementPoints, monster.MaxMP));
-            stats.Add((EffectEngine.EsquivaPA, monster.Otras.GetValueOrDefault(EffectEngine.EsquivaPA)));
-            stats.Add((EffectEngine.EsquivaPM, monster.Otras.GetValueOrDefault(EffectEngine.EsquivaPM)));
+            stats.Add(Initiative, monster.Initiative);
+            stats.Add(Evasion, monster.Otras.GetValueOrDefault(Evasion));
+            stats.Add(Lock, monster.Otras.GetValueOrDefault(Lock));
+            if (monster.MaxMP != 0) stats.Add(MovementPoints, monster.MaxMP);
+            stats.Add(EffectEngine.EsquivaPA, monster.Otras.GetValueOrDefault(EffectEngine.EsquivaPA));
+            stats.Add(EffectEngine.EsquivaPM, monster.Otras.GetValueOrDefault(EffectEngine.EsquivaPM));
             return stats;
         }
 
@@ -731,14 +727,13 @@ namespace Jondo.Unity.Server.Handlers
         /// dream's window manager that take bxv are the three that call InfiniteDreamShopUi.Setup.
         /// Nothing else raises bxv. Without it, the fountain was clicked and nothing opened.
         /// </remarks>
-        private static async Task ShopAsync(NetworkStream stream, Dreams.Sueno sueno, int elementId)
+        private static async Task ShopAsync(GameSession session, Dreams.Sueno sueno, int elementId)
         {
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
-                    elementId, Dreams.FountainSkill, GameState.CharacterId)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixm));
+                    elementId, Dreams.FountainSkill, session.CharacterId)));
+            await session.SendAsync(StateOf(sueno));
+            await session.SendAsync(ConnectionProtocol.Push(Op.Ixm));
             Console.WriteLine($"[Dreams] The fountain of room {sueno.Actual}: " +
                               $"{sueno.SalaActual?.Offers?.Count ?? 0} offer(s), {sueno.DreamPoints} dream points.");
         }
@@ -748,11 +743,11 @@ namespace Jondo.Unity.Server.Handlers
         // ═══════════════════════════════════════════════════════════════════
 
         /// <summary>ixq: the loot table of the room one stands in, answered by izo.</summary>
-        public static async Task DropTableAsync(NetworkStream stream, byte[] payload)
+        public static async Task DropTableAsync(GameSession session, byte[] payload)
         {
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             var drops = DropsOf(sueno?.SalaActual, sueno?.Bonus ?? 100);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Answer(Op.Izo, DreamProtocol.BuildDropTable(drops),
                                           ConnectionProtocol.RequestId(payload)));
             Console.WriteLine($"[Dreams] Loot table of room {sueno?.Actual}: {drops.Count} line(s).");
@@ -788,12 +783,12 @@ namespace Jondo.Unity.Server.Handlers
         /// kaz: where a fight on this map would place everybody, answered by jxj -- the cells a
         /// fight here is placed from, computed as the fight computes them.
         /// </summary>
-        public static async Task PositionsAsync(NetworkStream stream, byte[] payload)
+        public static async Task PositionsAsync(GameSession session, byte[] payload)
         {
-            long map = GameState.MapId;
+            long map = session.MapId;
             long arena = MapManager.ResolveArenaMapId(map);
             var (attackers, defenders) = FightHandler.Placement(map);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Answer(Op.Jxj, DreamProtocol.BuildPositions(arena, map, attackers, defenders),
                                           ConnectionProtocol.RequestId(payload)));
             Console.WriteLine($"[Dreams] Positions of map {map}: {attackers.Count} and {defenders.Count} cells.");
@@ -809,13 +804,13 @@ namespace Jondo.Unity.Server.Handlers
         /// "Psst Psst" sends iym { f1: 149 }, the f10 of that offer. The answer to it is not known:
         /// the izg that follows is what tells the client.
         /// </remarks>
-        public static async Task BuyAsync(NetworkStream stream, byte[] payload)
+        public static async Task BuyAsync(GameSession session, byte[] payload)
         {
             byte[]? iym = ConnectionProtocol.ReadPayload(payload, Op.Iym);
             if (iym == null) return;
             Console.WriteLine($"[Dreams] iym (buy, inferred): {Convert.ToHexString(iym).ToLowerInvariant()}");
 
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null)
             {
                 Console.WriteLine("[Dreams] iym with no dream going.");
@@ -835,8 +830,7 @@ namespace Jondo.Unity.Server.Handlers
                                   $"{sueno.DreamPoints} dream points left.");
 
             if (bought != null) Persist(sueno);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
+            await session.SendAsync(StateOf(sueno));
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -855,9 +849,9 @@ namespace Jondo.Unity.Server.Handlers
         /// none left, and not where there is no group to change. At a fountain or a favour it
         /// renews the offers instead: see <see cref="Dreams.RerollOffers"/>.
         /// </remarks>
-        public static async Task AstralStormAsync(NetworkStream stream)
+        public static async Task AstralStormAsync(GameSession session)
         {
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null) return;
 
             var actual = sueno.SalaActual;
@@ -867,14 +861,13 @@ namespace Jondo.Unity.Server.Handlers
             // el favor", and the favour window's reroll button ("ui.infiniteDreams.rerollFavor").
             // Its answer is INFERRED to be the izg with the new offers, as the storm on a fight
             // answers with the izg of the new group.
-            if (actual != null && (actual.EsFavor || actual.EsFuente) && Network.SessionContext.State.FightId == 0
+            if (actual != null && (actual.EsFavor || actual.EsFuente) && session.State.FightId == 0
                 && sueno.Tormentas > 0 && Dreams.RerollOffers(sueno, actual))
             {
                 sueno.Tormentas--;
                 Persist(sueno);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                await session.SendAsync(StateOf(sueno));
+                await session.SendAsync(
                     ConnectionProtocol.Push(Op.Izj, DreamProtocol.BuildStorm()));
                 Console.WriteLine($"[Dreams] Astral storm on the offers of room {actual.Id}: " +
                                   $"{string.Join(", ", actual.Offers!.Select(o => o.Tag))}; {sueno.Tormentas} left.");
@@ -882,23 +875,22 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             string? refusal =
-                Network.SessionContext.State.FightId != 0 ? "in a fight"
+                session.State.FightId != 0 ? "in a fight"
                 : sueno.Tormentas <= 0 ? "no storm left"
                 : actual == null || actual.Miembros.Count == 0 || actual.Hecha ? "no group to change here"
                 : null;
             if (refusal != null)
             {
                 Console.WriteLine($"[Dreams] Astral storm of {sueno.CharacterId} refused: {refusal}.");
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
+                await session.SendAsync(StateOf(sueno));
                 return;
             }
 
             Dreams.Reroll(sueno, actual!);
             sueno.Tormentas--;
-            await EntrarEnSalaAsync(stream, sueno, actual!.Id);
+            await EntrarEnSalaAsync(session, sueno, actual!.Id);
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Izj, DreamProtocol.BuildStorm()));
 
             Console.WriteLine($"[Dreams] Astral storm of {sueno.CharacterId}: room {actual.Id} rerolled, " +
@@ -908,19 +900,17 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Leaving the dream (iyx) and going back to where he was.</summary>
         public static async Task LeaveAsync(GameSession session, byte[] payload)
         {
-            using var context = SessionContext.Push(session);
-            var stream = session.Stream ?? throw new InvalidOperationException("Leaving a dream requires a connected game session.");
             // A guest leaves his host's dream, as the invitation capture's does: the way out (jru),
             // ixg, and the iyb «0801».
-            if (IsGuest(GameState.CharacterId))
+            if (IsGuest(session.CharacterId))
             {
-                await GuestOutAsync(stream);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                await GuestOutAsync(session);
+                await session.SendAsync(
                     ConnectionProtocol.Answer(Op.Iyb, DreamProtocol.BuildLeft(), ConnectionProtocol.RequestId(payload)));
                 return;
             }
 
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno == null) return;
 
             // To where he was BEFORE PRESSING THE BUTTON, not to the map the dream was started
@@ -931,20 +921,19 @@ namespace Jondo.Unity.Server.Handlers
 
             if (mapa != 0 && mapa != PlanoAstral)
             {
-                await TeleportHandler.ToMapAsync(stream, mapa, casilla);
+                await TeleportHandler.ToMapAsync(session, mapa, casilla);
             }
             else
             {
                 // With no known place, to the plane: it is where he went in from and it always exists.
-                await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
+                await TeleportHandler.ToMapAsync(session, PlanoAstral, 0);
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ixg));
-            MarkLeft();
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
+            MarkLeft(session.CharacterId);
             await session.SendAsync(new Jondo.Unity.Protocol.Game.NpcsMapQuestStatusUpdateEvent([]));
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Answer(Op.Iyb, DreamProtocol.BuildLeft(),
                                           ConnectionProtocol.RequestId(payload)));
 
@@ -982,10 +971,10 @@ namespace Jondo.Unity.Server.Handlers
         /// arena the monsters' are not. And on the dream's last room it is the Fin du rêve: its
         /// first wave is brought to its level, and its waves are counted from here.
         /// </summary>
-        internal static void OnFightCreated(Jondo.Unity.World.Fights.FightInstance fight)
+        internal static void OnFightCreated(long characterId, Jondo.Unity.World.Fights.FightInstance fight)
         {
             if (!Dreams.IsDreamMap(fight.RoleplayMapId)) return;
-            var sueno = DreamOf(fight) ?? Dreams.De(GameState.CharacterId);
+            var sueno = DreamOf(fight) ?? Dreams.De(characterId);
             var sala = sueno?.SalaActual;
             if (sueno == null || sala == null || sala.MapaDeLaSala != fight.RoleplayMapId) return;
 
@@ -1089,7 +1078,7 @@ namespace Jondo.Unity.Server.Handlers
             if (owner == null || !Dreams.IsDreamMap(owner.State.MapId)) return;
             try
             {
-                await owner.SendAsync(ConnectionProtocol.Push(Op.Izg, StateOf(sueno)));
+                await owner.SendAsync(StateOf(sueno));
             }
             catch (Exception ex)
             {
@@ -1109,20 +1098,20 @@ namespace Jondo.Unity.Server.Handlers
         /// player back in the room. A dream that ends sends the player out, where he came from.
         /// </remarks>
         internal static (long MapOut, int CellOut, string? Notice, bool Ended, byte[]? Result) AfterTheFight(
-            Jondo.Unity.World.Fights.FightInstance fight, bool won)
+            GameSession session, Jondo.Unity.World.Fights.FightInstance fight, bool won)
         {
             if (!Dreams.IsDreamMap(fight.RoleplayMapId)) { _finales.TryRemove(fight.FightId, out _); return (0, 0, null, false, null); }
 
             // A guest's fight is his host's: he goes back to the room, or out when the dream is over.
-            if (_dreamOver.TryRemove(GameState.CharacterId, out _))
+            if (_dreamOver.TryRemove(session.CharacterId, out _))
             {
-                var (guestMap, guestCell) = GuestWayOut();
+                var (guestMap, guestCell) = GuestWayOut(session.CharacterId);
                 return (guestMap, guestCell, null, true, null);
             }
-            if (IsGuest(GameState.CharacterId)) return (0, 0, null, false, null);
+            if (IsGuest(session.CharacterId)) return (0, 0, null, false, null);
 
             _finales.TryRemove(fight.FightId, out var final);
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             var sala = sueno?.SalaActual;
             if (sueno == null || sala == null || sala.MapaDeLaSala != fight.RoleplayMapId) return (0, 0, null, false, null);
 
@@ -1148,7 +1137,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (DreamTrials.Of(sueno) is { Achievement: > 0 } trial)
                         foreach (long who in fought) CountTrialWon(who, trial.Achievement);
                     var (map, cell) = End(sueno);
-                    return (map, cell, CommandTexts.Get("dream.completed", cleared, fragments), true, result);
+                    return (map, cell, CommandTexts.Get(session.State.Language, "dream.completed", cleared, fragments), true, result);
                 }
             }
 
@@ -1164,12 +1153,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (!sueno.Training) sueno.Arena--;
                 sueno.SpentSands = true;
                 Persist(sueno);
-                return (0, 0, CommandTexts.Get("dream.arena"), false, null);
+                return (0, 0, CommandTexts.Get(session.State.Language, "dream.arena"), false, null);
             }
 
             var lost = ResultOf(sueno, fight, won: false, final?.Cleared ?? 0);
             var (outMap, outCell) = End(sueno);
-            return (outMap, outCell, CommandTexts.Get("dream.over"), true, lost);
+            return (outMap, outCell, CommandTexts.Get(session.State.Language, "dream.over"), true, lost);
         }
 
         /// <summary>The characters who fought a fight: no monster, summon, illusion or bot.</summary>
@@ -1269,10 +1258,10 @@ namespace Jondo.Unity.Server.Handlers
         /// Only the dream's owner starts its fights: «No puedes iniciar un combate en el pozo de los
         /// sueños si no eres jefe de grupo» (1/595). True when the character in session may not.
         /// </summary>
-        internal static async Task<bool> GuestMayNotFightAsync(NetworkStream stream)
+        internal static async Task<bool> GuestMayNotFightAsync(GameSession session)
         {
-            if (!Dreams.IsDreamMap(GameState.MapId) || !IsGuest(GameState.CharacterId)) return false;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            if (!Dreams.IsDreamMap(session.MapId) || !IsGuest(session.CharacterId)) return false;
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(Warning, OnlyTheLeader)));
             return true;
         }
@@ -1283,14 +1272,14 @@ namespace Jondo.Unity.Server.Handlers
         /// name, f2 -300 }), the capture's two -- unless he is fighting (1/593), on a map that does
         /// not let him (1/592) or has another invitation waiting (1/582).
         /// </summary>
-        public static async Task InviteGroupAsync(NetworkStream stream)
+        public static async Task InviteGroupAsync(GameSession host)
         {
-            long me = GameState.CharacterId;
+            long me = host.CharacterId;
             var sueno = Dreams.De(me);
             var party = Managers.Parties.Of(me);
-            if (sueno?.SalaActual == null || party == null || !Dreams.IsDreamMap(GameState.MapId)) return;
+            if (sueno?.SalaActual == null || party == null || !Dreams.IsDreamMap(host.MapId)) return;
 
-            string name = GameState.CharacterName;
+            string name = host.State.CharacterName;
             var now = DateTime.UtcNow;
             foreach (long member in party.Members.ToList())
             {
@@ -1320,9 +1309,9 @@ namespace Jondo.Unity.Server.Handlers
         /// into the owner's room with the owner's dream state (izg), as «recibir invitacion a sueños»
         /// shows after its ixk -- unless the dream already has its three guests (1/585).
         /// </summary>
-        public static async Task AnswerInvitationAsync(NetworkStream stream, byte[] payload)
+        public static async Task AnswerInvitationAsync(GameSession session, byte[] payload)
         {
-            long me = GameState.CharacterId;
+            long me = session.CharacterId;
             byte[]? ixk = ConnectionProtocol.ReadPayload(payload, Op.Ixk);
             if (ixk == null || !_invited.TryRemove(me, out var invitation) || invitation.Until < DateTime.UtcNow) return;
             bool accepts = ProtoMessage.Parse(ixk).Fields.Any(f => f.FieldNumber == 1 && f.WireType == 0 && f.VarIntValue != 0);
@@ -1330,28 +1319,28 @@ namespace Jondo.Unity.Server.Handlers
 
             var owner = Dreams.De(invitation.Owner);
             if (owner?.SalaActual == null || SessionRegistry.FindByCharacter(invitation.Owner) == null) return;
-            if (GameState.IsInFight) return;
+            if (session.State.IsInFight) return;
             if (GuestsOf(invitation.Owner).Count >= MaxGuests)
             {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                await session.SendAsync(
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(Warning, DreamFull)));
                 return;
             }
 
-            if (!Dreams.IsDreamMap(GameState.MapId)) Dreams.RecordarDeDondeViene(me, GameState.MapId, GameState.CellId);
+            if (!Dreams.IsDreamMap(session.MapId)) Dreams.RecordarDeDondeViene(me, session.MapId, session.State.CellId);
             _guests[me] = invitation.Owner;
-            Console.WriteLine($"[Dreams] {GameState.CharacterName} joins the dream of {invitation.Owner}.");
-            await JoinRoomAsync(stream, owner);
+            Console.WriteLine($"[Dreams] {session.State.CharacterName} joins the dream of {invitation.Owner}.");
+            await JoinRoomAsync(session, owner);
         }
 
         /// <summary>A guest into his host's room: the host's dream state (izg) and the room's map.</summary>
-        private static async Task JoinRoomAsync(NetworkStream stream, Dreams.Sueno owner)
+        private static async Task JoinRoomAsync(GameSession guest, Dreams.Sueno owner)
         {
             var sala = owner.SalaActual;
             if (sala == null || sala.MapaDeLaSala == 0) return;
-            _enElSueno[GameState.CharacterId] = true;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Izg, StateOf(owner)));
-            await TeleportHandler.ToMapAsync(stream, sala.MapaDeLaSala, 0);
+            _enElSueno[guest.CharacterId] = true;
+            await guest.SendAsync(StateOf(owner));
+            await TeleportHandler.ToMapAsync(guest, sala.MapaDeLaSala, 0);
         }
 
         /// <summary>
@@ -1364,26 +1353,26 @@ namespace Jondo.Unity.Server.Handlers
             {
                 var session = SessionRegistry.FindByCharacter(guest);
                 if (session?.Stream == null || session.State.IsInFight) continue;
-                using (SessionContext.Push(session)) await JoinRoomAsync(session.Stream, owner);
+                await JoinRoomAsync(session, owner);
             }
         }
 
         /// <summary>Where a guest goes out to: where he came in from, or the Plano Astral.</summary>
-        private static (long Map, int Cell) GuestWayOut()
+        private static (long Map, int Cell) GuestWayOut(long characterId)
         {
-            var (mapa, casilla) = Dreams.DeDondeViene(GameState.CharacterId);
+            var (mapa, casilla) = Dreams.DeDondeViene(characterId);
             if (mapa == 0 || Dreams.IsDreamMap(mapa)) { mapa = PlanoAstral; casilla = 0; }
             return (mapa, casilla);
         }
 
         /// <summary>A guest out of the dream: back where he came from, the interface closed (ixg).</summary>
-        private static async Task GuestOutAsync(NetworkStream stream)
+        private static async Task GuestOutAsync(GameSession guest)
         {
-            _guests.TryRemove(GameState.CharacterId, out _);
-            var (mapa, casilla) = GuestWayOut();
-            _enElSueno[GameState.CharacterId] = false;
-            await TeleportHandler.ToMapAsync(stream, mapa, casilla);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg));
+            _guests.TryRemove(guest.CharacterId, out _);
+            var (mapa, casilla) = GuestWayOut(guest.CharacterId);
+            _enElSueno[guest.CharacterId] = false;
+            await TeleportHandler.ToMapAsync(guest, mapa, casilla);
+            await guest.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
         }
 
         /// <summary>The owner left his dream: his guests leave it too.</summary>
@@ -1393,7 +1382,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 var session = SessionRegistry.FindByCharacter(guest);
                 if (session?.Stream == null || session.State.IsInFight) { _guests.TryRemove(guest, out _); continue; }
-                using (SessionContext.Push(session)) await GuestOutAsync(session.Stream);
+                await GuestOutAsync(session);
             }
         }
 
@@ -1409,7 +1398,7 @@ namespace Jondo.Unity.Server.Handlers
                 _guests.TryRemove(guest, out _);
                 if (session?.Stream == null) continue;
                 if (session.State.IsInFight) { _dreamOver[guest] = true; continue; }
-                using (SessionContext.Push(session)) await GuestOutAsync(session.Stream);
+                await GuestOutAsync(session);
             }
         }
 
@@ -1427,19 +1416,19 @@ namespace Jondo.Unity.Server.Handlers
         /// the world, that map noted as the way back, for the dream to send him there at its end.
         /// </summary>
         internal static async Task<(Dreams.SkipOutcome Outcome, Dreams.Sala? Room, int Skipped)> SkipToAsync(
-            NetworkStream stream, Dreams.Sueno sueno, int? row)
+            GameSession session, Dreams.Sueno sueno, int? row)
         {
             var result = Dreams.SkipTo(sueno, row);
             if (result.Outcome != Dreams.SkipOutcome.Done || result.Room == null) return result;
             sueno.SkippedFights += Math.Max(1, result.Skipped);
 
             Dreams.Unplant(sueno);
-            if (!Dreams.IsDreamMap(GameState.MapId) && GameState.MapId != PlanoAstral)
-                Dreams.RecordarDeDondeViene(sueno.CharacterId, GameState.MapId, GameState.CellId);
+            if (!Dreams.IsDreamMap(session.MapId) && session.MapId != PlanoAstral)
+                Dreams.RecordarDeDondeViene(sueno.CharacterId, session.MapId, session.State.CellId);
 
             Console.WriteLine($"[Dreams] {sueno.CharacterId} skips to room {result.Room.Id} (row {result.Room.Fila}): " +
                               $"{result.Skipped} fight(s) counted as won on the way.");
-            await EntrarEnSalaAsync(stream, sueno, result.Room.Id);
+            await EntrarEnSalaAsync(session, sueno, result.Room.Id);
             return result;
         }
 
@@ -1447,7 +1436,7 @@ namespace Jondo.Unity.Server.Handlers
         private static readonly ConcurrentDictionary<long, bool> _enElSueno = new();
 
         /// <summary>The dream's interface already closed by whoever sent the ixg.</summary>
-        internal static void MarkLeft() => _enElSueno[GameState.CharacterId] = false;
+        internal static void MarkLeft(long characterId) => _enElSueno[characterId] = false;
 
         /// <summary>
         /// A map loaded, however the player got there. Out of the dream's maps by any way but its
@@ -1456,10 +1445,10 @@ namespace Jondo.Unity.Server.Handlers
         /// own, with no iyx before it, in "sueño infinito largo" and "recibir invitacion a
         /// sueños". The dream is kept, as the exit keeps it, and its groups leave their maps.
         /// </summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            long yo = GameState.CharacterId;
-            bool aqui = Dreams.IsDreamMap(GameState.MapId);
+            long yo = session.CharacterId;
+            bool aqui = Dreams.IsDreamMap(session.MapId);
             bool antes = _enElSueno.TryGetValue(yo, out bool estaba) && estaba;
             _enElSueno[yo] = aqui;
 
@@ -1469,12 +1458,12 @@ namespace Jondo.Unity.Server.Handlers
             // Without it the room stood empty, and a room with no group counts as passed.
             if (!antes && aqui)
             {
-                await OnWorldEntryAsync(stream);
+                await OnWorldEntryAsync(session);
                 return;
             }
             if (!antes || aqui) return;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
             _guests.TryRemove(yo, out _);
             var sueno = Dreams.De(yo);
             if (sueno != null)
@@ -1495,28 +1484,28 @@ namespace Jondo.Unity.Server.Handlers
         /// panel -- or, with no dream to go back to, the Plano Astral. A player who logged in
         /// there after a restart stood in a room with no dream around it and no way out.
         /// </summary>
-        public static async Task OnWorldEntryAsync(NetworkStream stream)
+        public static async Task OnWorldEntryAsync(GameSession session)
         {
-            if (!Dreams.IsDreamMap(GameState.MapId)) return;
+            if (!Dreams.IsDreamMap(session.MapId)) return;
 
             // A guest back while his host still dreams: to the host's room.
-            if (Dreams.De(HostOf(GameState.CharacterId)) is { SalaActual: not null } hosts)
+            if (Dreams.De(HostOf(session.CharacterId)) is { SalaActual: not null } hosts)
             {
-                await JoinRoomAsync(stream, hosts);
+                await JoinRoomAsync(session, hosts);
                 return;
             }
 
-            var sueno = Dreams.De(GameState.CharacterId);
+            var sueno = Dreams.De(session.CharacterId);
             if (sueno?.SalaActual == null)
             {
-                Console.WriteLine($"[Dreams] {GameState.CharacterId} woke in a dream's map with no dream: " +
+                Console.WriteLine($"[Dreams] {session.CharacterId} woke in a dream's map with no dream: " +
                                   "to the Plano Astral.");
-                await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
+                await TeleportHandler.ToMapAsync(session, PlanoAstral, 0);
                 return;
             }
 
-            Console.WriteLine($"[Dreams] {GameState.CharacterId} back in room {sueno.Actual} of the dream.");
-            await EntrarEnSalaAsync(stream, sueno, sueno.Actual);
+            Console.WriteLine($"[Dreams] {session.CharacterId} back in room {sueno.Actual} of the dream.");
+            await EntrarEnSalaAsync(session, sueno, sueno.Actual);
         }
     }
 }

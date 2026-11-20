@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -84,7 +85,7 @@ namespace Jondo.Unity.Server.Network
         /// opens. The f3 is not the room one stands in but the rooms behind -- "0" in the first
         /// fight room, "4", "2", "0" in the third -- the same list in every band.
         /// </remarks>
-        private static Pb Graph(Dreams.Sueno sueno, int franja)
+        private static List<Dreams.Sala> RoomsInBand(Dreams.Sueno sueno, int franja)
         {
             var rooms = new List<Dreams.Sala>();
             foreach (var sala in sueno.Salas)
@@ -94,7 +95,12 @@ namespace Jondo.Unity.Server.Network
             }
             // The fountain that opens the band goes first, as in the capture.
             rooms.Sort((a, b) => a.Fila != b.Fila ? a.Fila.CompareTo(b.Fila) : a.Id.CompareTo(b.Id));
+            return rooms;
+        }
 
+        private static Pb Graph(Dreams.Sueno sueno, int franja)
+        {
+            var rooms = RoomsInBand(sueno, franja);
             var graph = Pb.New();
             foreach (var sala in rooms)
             {
@@ -250,38 +256,6 @@ namespace Jondo.Unity.Server.Network
         internal static byte[] BuildReward(Dreams.Reward reward) => RewardEntry(reward).Build();
 
         /// <summary>
-        /// A monster of the bestiary: the cell it will stand on when the fight is placed, what it
-        /// is, its level, whether it is a boss, and its characteristics by id.
-        /// </summary>
-        public sealed record Beast(int Cell, int MonsterId, int Level, bool Boss,
-                                   IReadOnlyList<(int Characteristic, int Value)> Stats);
-
-        /// <summary>
-        /// The ize of the izg, one per monster of the room while its fight is to be won:
-        ///
-        ///   { f1: cell, f2: monster, f3: level, f4: boss, f5 (repeated) { f1: characteristic, f2: value } }
-        ///
-        /// The f1 is the fight's placement cell -- the two of the long capture's room 2, 258 and
-        /// 202, are the first two defender cells of the kba of the fight that follows -- which is
-        /// what the bestiary's map view draws them on. The pairs are a map, key and value always
-        /// written, the zero key of the life points included.
-        /// </summary>
-        private static Pb BeastEntry(Beast beast)
-        {
-            var entry = Pb.New()
-                .Var(1, beast.Cell)
-                .Var(2, beast.MonsterId)
-                .Var(3, beast.Level)
-                .VarIfNotZero(4, beast.Boss ? 1 : 0);
-            foreach (var (characteristic, value) in beast.Stats)
-                entry.Msg(5, Pb.New().Var(1, characteristic).Var(2, value));
-            return entry;
-        }
-
-        /// <summary>For tests: a monster of the bestiary as it goes on the wire.</summary>
-        internal static byte[] BuildBeast(Beast beast) => BeastEntry(beast).Build();
-
-        /// <summary>
         /// A bonus: { f1 { f4: value, f11: effect }, f2: how many }, or with the value inside an f6
         /// for the effects whose text names a spell. The f15 of the izg and the f3 of a room's group.
         /// </summary>
@@ -346,17 +320,8 @@ namespace Jondo.Unity.Server.Network
         /// the invitation capture, whose path goes through a room of "50 niveles de soñador". Not
         /// sent: f5 the party.
         /// </remarks>
-        public static byte[] BuildDreamState(Dreams.Sueno sueno, IReadOnlyList<Beast>? bestiary = null)
+        public static InfiniteDreamStateEvent BuildDreamState(Dreams.Sueno sueno, IReadOnlyList<InfiniteDreamMonster>? bestiary = null)
         {
-            var quien = Pb.New()
-                .Str(1, sueno.Nombre)
-                .Var(3, sueno.CharacterId)
-                .VarIfNotZero(4, sueno.Breed);
-
-            var izg = Pb.New()
-                .Msg(1, quien)
-                .Var(2, sueno.Dificultad);
-
             // The room one stands in: a fight still to win is f18, a clear room is f19 -- the
             // entrance, a room won, a fountain. Measured over the 57: f18 alone on entering a
             // fight room, f19 alone at the entrance and after the win, both at the fountain.
@@ -366,11 +331,6 @@ namespace Jondo.Unity.Server.Network
             bool favourPending = room != null && room.EsFavor && !room.FavorChosen;
             bool fightPending = room != null && room.Miembros.Count > 0 && !room.Hecha;
             bool fountain = room != null && room.EsFuente;
-
-            // The bestiary goes while there is a fight to win, and not after: gone from the izg
-            // that follows the win in the long capture.
-            if (fightPending && bestiary != null)
-                foreach (var beast in bestiary) izg.Msg(3, BeastEntry(beast));
 
             // THE THREE DOORS, not only the ones leading somewhere. In the Pesadilla
             // II capture the entrance room lists all three and the middle one goes with no destination:
@@ -382,57 +342,67 @@ namespace Jondo.Unity.Server.Network
             // The inner f4 is the door number, and zero is not written. Sending only the
             // ones with a destination, the client does not know which of the three is dead and draws
             // all three the same: you press one and nothing happens, without knowing why.
-            var actual = sueno.SalaActual;
-            if (actual != null)
+            var doors = new List<InfiniteDreamDoor>();
+            if (room != null)
             {
                 for (int cual = 0; cual < Dreams.PuertasPorSala; cual++)
                 {
-                    int puerta = Dreams.PuertaDe(actual, cual);
+                    int puerta = Dreams.PuertaDe(room, cual);
                     if (puerta == 0) continue;
 
-                    var entrada = Pb.New();
-                    bool lleva = cual < actual.Salidas.Count;
-                    var destino = lleva ? sueno.Buscar(actual.Salidas[cual]) : null;
-
-                    if (lleva) entrada.Str(1, Texto(actual.Salidas[cual]));
-                    entrada.Var(2, puerta);
-                    if (cual != 0) entrada.Var(4, cual);
-                    if (lleva) entrada.Var(5, PortalOf(destino));
-
-                    izg.Msg(4, entrada);
+                    bool lleva = cual < room.Salidas.Count;
+                    doors.Add(new(lleva ? Texto(room.Salidas[cual]) : "", puerta, (InfiniteDreamDoorPosition)cual,
+                        lleva ? (InfiniteDreamPortalType)PortalOf(sueno.Buscar(room.Salidas[cual])) : InfiniteDreamPortalType.None));
                 }
             }
 
             // The shop, at a fountain: what is left of its offers, after the doors and before the
             // storms, as in the izg of the long capture's room 9. And a favour's three choices,
             // while none is chosen: the client's shop window reads the same list.
-            if ((fountain || favourPending) && room!.Offers != null)
-                foreach (var offer in room.Offers) izg.Msg(6, RewardEntry(offer));
+            return new(Dreamer: new(sueno.Nombre, default, sueno.CharacterId, sueno.Breed), Intensity: sueno.Dificultad,
+                Monsters: fightPending && bestiary != null ? bestiary : [], Doors: doors, Party: [],
+                Rewards: (fountain || favourPending) && room?.Offers is { } offers ? offers.Select(SnapshotReward).ToArray() : [],
+                Rerolls: sueno.Tormentas, LootBonusPercent: sueno.Bonus, DreamPoints: sueno.DreamPoints,
+                Stage: (InfiniteDreamStage)(sueno.Franja - 1), CurrentRoomId: Texto(sueno.Actual), BonusLevels: sueno.DreamerLevels,
+                Bonuses: sueno.Ganados.Select(SnapshotBonus).ToArray(),
+                Maps: Enumerable.Range(1, sueno.Franja).Select(band => SnapshotMap(sueno, band)).ToArray(), Life: sueno.Arena,
+                CanReroll: fightPending || fountain || favourPending, RoomCleared: !fightPending && !favourPending,
+                ScaledLevel: Dreams.DreamerLevel(sueno), Training: false, ExperienceBonusPercent: sueno.BaseBonus);
+        }
 
-            // f7 is the number of ASTRAL STORMS left: in the long capture it goes 1, then
-            // disappears —zero is not written— and later comes back as 2, which is the number the
-            // client draws on its button. It is still not earned; it is spent on using it.
-            izg.VarIfNotZero(7, sueno.Tormentas)
-               .Var(8, sueno.Bonus)
-               .VarIfNotZero(11, sueno.DreamPoints)
-               .VarIfNotZero(12, sueno.Franja - 1)
-               .Str(13, Texto(sueno.Actual))
-               .VarIfNotZero(14, sueno.DreamerLevels);
+        private static InfiniteDreamMap SnapshotMap(Dreams.Sueno dream, int band)
+        {
+            var rooms = RoomsInBand(dream, band);
+            return new(rooms.ToDictionary(r => Texto(r.Id), SnapshotRoom), (InfiniteDreamStage)(band - 1),
+                dream.Visited.Select(Texto).ToArray(),
+                rooms.Where(r => r.Salidas.Count != 0 && !(Dreams.Closes(r) && r.Franja == band))
+                     .ToDictionary(r => Texto(r.Id), r => new InfiniteDreamRoomLinks(r.Salidas.Select(Texto).ToArray())));
+        }
 
-            // THE ACCUMULATED BONUSES, one per f15. 196 measured in the captures, with two
-            // shapes and no more -- see BonusEntry. Those of the rooms already stepped in accumulate: the
-            // bonus is collected ON ENTERING the room, before fighting.
-            foreach (var bono in sueno.Ganados) izg.Msg(15, BonusEntry(bono));
+        private static InfiniteDreamRoom SnapshotRoom(Dreams.Sala room)
+        {
+            var kind = (InfiniteDreamRoomType)KindOf(room);
+            if (kind == InfiniteDreamRoomType.Boss)
+                return new(room.Score, 0, null, kind, room.Fila, InfiniteDreamRoomDifficulty.Hard);
+            if (kind != InfiniteDreamRoomType.Fight)
+                return new(0, 0, null, kind, room.Fila, InfiniteDreamRoomDifficulty.Normal);
 
-            for (int franja = 1; franja <= sueno.Franja; franja++) izg.Msg(16, Graph(sueno, franja));
+            // The fight-room tooltip has a reward message even when the room has no reward data.
+            InfiniteDreamReward reward = room.Reward is { } offer ? SnapshotReward(offer)
+                : new(null, null, [], null, null, default, null, 0, 0, null);
+            return new(room.Score, room.DreamPoints, reward, kind, room.Fila,
+                room.Senalada ? InfiniteDreamRoomDifficulty.Hard : InfiniteDreamRoomDifficulty.Normal);
+        }
 
-            izg.VarIfNotZero(17, sueno.Arena)
-               .VarIfNotZero(18, fightPending || fountain || favourPending ? 1 : 0)
-               .VarIfNotZero(19, fightPending || favourPending ? 0 : 1)
-               .Var(20, Dreams.DreamerLevel(sueno))
-               .Var(22, sueno.BaseBonus);
+        private static InfiniteDreamReward SnapshotReward(Dreams.Reward reward) => new(
+            reward.Storms, reward.Sand, reward.Bonuses.Select(SnapshotBonus).ToArray(), reward.Levels, reward.Points,
+            (InfiniteDreamRewardRarity)reward.Rarity, reward.Price, IconId: reward.Id, RewardId: reward.Tag, Unavailable: false);
 
-            return izg.Build();
+        private static InfiniteDreamBonus SnapshotBonus(Dreams.Bono bonus)
+        {
+            ObjectEffectCase value = bonus.Efecto == Dreams.PassiveEffect ? new ObjectEffectCaseValueDice(new(0, bonus.Valor, 1))
+                : bonus.Anidado ? new ObjectEffectCaseValueDice(new(bonus.Valor, 0, 0)) : new ObjectEffectCaseValueInt(bonus.Valor);
+            return new(new(bonus.Efecto, value), bonus.Count);
         }
 
         /// <summary>

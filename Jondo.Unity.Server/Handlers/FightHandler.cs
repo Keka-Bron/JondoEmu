@@ -59,7 +59,7 @@ namespace Jondo.Unity.Server.Handlers
                                                                bool defeatFree = false, bool? solo = false)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
-            if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
+            if (rules == null && await DreamHandler.GuestMayNotFightAsync(SessionContext.Current)) return;
             // A soul fights nobody, nor is he attacked (Managers.Phantoms).
             if (PhantomHandler.CannotFight(GameState.CharacterId)) return;
 
@@ -214,7 +214,7 @@ namespace Jondo.Unity.Server.Handlers
             ApplyRules(fight, playerFighter, TakeNextRules(GameState.CharacterId));
 
             // On a dream's last room this is the Fin du rêve: its first wave at its level.
-            DreamHandler.OnFightCreated(fight);
+            DreamHandler.OnFightCreated(playerFighter.Id, fight);
 
             // In the Gigalodón's abyss, the darkness of the floor makes its monsters stronger.
             Managers.GuildRaidDarkness.Boost(fight, GameState.CharacterId);
@@ -2436,7 +2436,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             long groupId = Network.FightProtocol.ReadFightRequest(payload);
             if (groupId == 0) return;
-            if (await DreamHandler.GuestMayNotFightAsync(stream)) return;
+            if (await DreamHandler.GuestMayNotFightAsync(SessionContext.Current)) return;
             if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
             if (PhantomHandler.CannotFight(GameState.CharacterId)) return;
 
@@ -12454,7 +12454,7 @@ namespace Jondo.Unity.Server.Handlers
                 // the same room forever.
                 // Nor on a guild raid's floor: inside a raid what is beaten stays beaten (the guides),
                 // and the floors stand again only when the next raid starts.
-                if (!DreamHandler.SalaLimpiada(muerto, fight.RoleplayMapId)
+                if (!DreamHandler.SalaLimpiada(session.CharacterId, muerto, fight.RoleplayMapId)
                     && !Managers.GuildRaidManager.IsRaidMap(fight.RoleplayMapId))
                 {
                     // A dungeon room comes back as itself -- its eight, its boss -- and not as a
@@ -12553,7 +12553,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // A fight in a dream's room decides the dream: won at its end, lost without an arena.
             // Decided here, before the jru below names the map, for the same reason as a dungeon.
-            var (fueraDelSueno, casillaFuera, avisoDelSueno, suenoAcabado, resultadoDelSueno) = DreamHandler.AfterTheFight(fight, alliesAlive);
+            var (fueraDelSueno, casillaFuera, avisoDelSueno, suenoAcabado, resultadoDelSueno) = DreamHandler.AfterTheFight(session, fight, alliesAlive);
             if (fueraDelSueno != 0 && fueraDelSueno != back && MapManager.GetMapInfo(fueraDelSueno) != null)
             {
                 back = fueraDelSueno;
@@ -12569,8 +12569,12 @@ namespace Jondo.Unity.Server.Handlers
             // showing the old ones until the room changes. Only then: any other
             // fight, with a dream left to be continued, put the dream's interface on the world.
             if (Managers.Dreams.IsDreamMap(fight.RoleplayMapId) && !suenoAcabado)
-                await DreamHandler.RefrescarEstadoAsync(stream);
-            if (suenoAcabado) { await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg)); DreamHandler.MarkLeft(); }
+                await DreamHandler.RefrescarEstadoAsync(session);
+            if (suenoAcabado)
+            {
+                await session.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
+                DreamHandler.MarkLeft(session.CharacterId);
+            }
             if (avisoDelSueno != null)
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(avisoDelSueno)));
             // And the dream's result window, with its code to copy.

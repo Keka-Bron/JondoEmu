@@ -197,7 +197,7 @@ namespace Jondo.Unity.Tests.World
             // The izg's f2 is the difficulty, and in the Pesadilla II capture it is 9: the same
             // number that was sent in the ixf. That is what ties the two messages.
             var s = Uno(dificultad: 9);
-            byte[] izg = DreamProtocol.BuildDreamState(s);
+            byte[] izg = DreamProtocol.BuildDreamState(s).Payload();
 
             var campos = ProtoMessage.Parse(izg).Fields;
             var f2 = campos.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0);
@@ -291,7 +291,7 @@ namespace Jondo.Unity.Tests.World
             // Measured in the Pesadilla II izg: the room's three doors, the one leading
             // nowhere included, and the whole graph again in f16.
             var s = Uno();
-            byte[] izg = DreamProtocol.BuildDreamState(s);
+            byte[] izg = DreamProtocol.BuildDreamState(s).Payload();
             var campos = ProtoMessage.Parse(izg).Fields;
 
             int puertas = campos.Count(f => f.FieldNumber == 4);
@@ -393,7 +393,7 @@ namespace Jondo.Unity.Tests.World
             s.Ganados.Add(primera.Regalo!);
             s.Actual = primera.Id;
 
-            byte[] izg = DreamProtocol.BuildDreamState(s);
+            byte[] izg = DreamProtocol.BuildDreamState(s).Payload();
             var campos = ProtoMessage.Parse(izg).Fields;
 
             var bono = Assert.Single(campos, f => f.FieldNumber == 15);
@@ -413,7 +413,7 @@ namespace Jondo.Unity.Tests.World
             s.Ganados.Add(new Dreams.Bono(111, 1));
             s.Ganados.Add(new Dreams.Bono(281, 2, anidado: true));
 
-            string hexa = Convert.ToHexString(DreamProtocol.BuildDreamState(s)).ToLowerInvariant();
+            string hexa = Convert.ToHexString(DreamProtocol.BuildDreamState(s).Payload()).ToLowerInvariant();
 
             Assert.Contains("0a042001586f1001", hexa);
             Assert.Contains("0a07320208025899021001", hexa);

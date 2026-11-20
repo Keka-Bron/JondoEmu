@@ -73,17 +73,16 @@ namespace Jondo.Unity.Server.Managers
             => Math.Clamp(raid.LightAt(floor, now), 0, Luminomachine.MostLight);
 
         /// <summary>A map loaded by a raid member: its floor's band and its machine, at once.</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, RaidInstance raid, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session, RaidInstance raid, long mapId)
         {
             int floor = FloorOf(raid, mapId);
-            if (stream == null || floor == 0) return;
+            if (floor == 0) return;
             int level = LevelOf(raid, floor, DateTimeOffset.UtcNow);
             foreach (string name in new[] { LightName(mapId, level, rising: false), level > 0 ? MachineOn : MachineOff })
             {
                 int id = GuildRaidStagings.IdOf(mapId, name);
                 if (id != GuildRaidStagings.None)
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Hpm, GuildRaidStagings.BuildPlay(id, GuildRaidStagings.AtEnd)));
+                    await session.SendAsync(GuildRaidStagings.StandingEvent(id));
             }
         }
 

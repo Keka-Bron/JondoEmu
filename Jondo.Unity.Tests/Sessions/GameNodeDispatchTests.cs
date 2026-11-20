@@ -124,6 +124,40 @@ public sealed class GameNodeDispatchTests
     }
 
     [Fact]
+    public async Task Character_management_and_relogin_dispatch_typed_uidless_events()
+    {
+        var codec = new CountingCodec();
+        await using var pipe = await Pipe.OpenAsync(codec);
+        pipe.Start(Wire.Encode(new(new CharacterNameSuggestionRequest(), -7)));
+        Assert.False(string.IsNullOrWhiteSpace((await ReadEvent<CharacterNameSuggestionEvent>()).Suggestion));
+
+        // Creation without the nested remodel block must still reach the handler.
+        await pipe.Send(Wire.Encode(new(new CharacterCreationRequest(new("", 0, [-1], null, 0, Gender.Male, 1)), 0)));
+        Assert.Equal(CharacterCreationResult.CreateErrorNoReason, (await ReadEvent<CharacterCreationResultEvent>()).Result);
+
+        await pipe.Send(Wire.Encode(new(new PrepareCharacterDeletionRequest(0), -8)));
+        await pipe.Send(Wire.Encode(new(new CharacterDeletionRequest(0, ""), -9)));
+        await pipe.Send(Wire.Encode(new(new CharacterDeletionCompletedRequest(), int.MinValue)));
+        Assert.Equal(CharacterCreationResult.CreateOk, (await ReadEvent<CanCharacterBeCreatedResultEvent>()).Result);
+
+        await pipe.Send(Wire.Encode(new(new ReloginRequest(), -10)));
+        var relogin = await ReadEvent<ReloginTokenEvent>();
+        Assert.True(relogin.ValidToken);
+        Assert.Equal(pipe.Session.AccountId, ClientLaunchRegistry.ResolveToken(relogin.Token));
+        await pipe.Finish();
+        Assert.Equal(6, codec.Decodes);
+        Assert.Equal(4, codec.Encodes);
+        Assert.False(pipe.ClientStream.DataAvailable);
+
+        async Task<T> ReadEvent<T>() where T : GameEvent
+        {
+            var frame = Wire.Decode(await pipe.Next());
+            Assert.Null(frame.Uid);
+            return Assert.IsType<T>(frame.Content);
+        }
+    }
+
+    [Fact]
     public async Task Retired_map_and_transition_aliases_only_reach_diagnostics_and_leave_the_connection_usable()
     {
         string[] retired = ["kkr", "jqf", "igx", "joi", "jos", "jpp", "loy", "lpj", "hmv", "ibt"];

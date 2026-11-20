@@ -60,7 +60,7 @@ namespace Jondo.Unity.Tests.Quests
                 pipe.Session.State.OpenDialogueNpcId = 4467;
                 pipe.Session.State.OpenDialogueMapId = sokiMap;
                 pipe.Session.State.OpenDialogueMessage = 31502;
-                await NpcHandler.ReplyAsync(pipe.Session, ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, 38183).Build()));
+                await NpcHandler.ReplyAsync(pipe.Session, new(38183));
                 Assert.True(log.ObjectiveDone(handOver));
                 Assert.True(log.Run(quest)!.Finished);
                 Assert.Equal(0, Equipment.HowMany(mouse));

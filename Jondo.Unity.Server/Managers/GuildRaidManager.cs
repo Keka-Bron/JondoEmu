@@ -554,29 +554,25 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public static async Task<bool> KeepsOutAsync(NetworkStream stream, long characterId, long targetMapId)
         {
+            if (ClosedFloorNotice(characterId, targetMapId, SessionContext.State.Language) is not { } notice) return false;
+            if (stream != null) await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lqn, ConnectionProtocol.BuildNotice(notice)));
+            return true;
+        }
+
+        internal static string? ClosedFloorNotice(long characterId, long targetMapId, string language)
+        {
             var raid = RaidOf(characterId);
-            if (raid == null) return false;
+            if (raid == null) return null;
 
             // The Santuario's corridor and tower, closed until the goals they wait for are met.
             if (GuildRaidSanctuary.ClosedBy(raid, targetMapId) is { } waited)
-            {
-                if (stream != null)
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lqn, ConnectionProtocol.BuildNotice(
-                            CommandTexts.Get("raid.way.closed", (object)waited.Name))));
-                return true;
-            }
+                return CommandTexts.Get(language, "raid.way.closed", waited.Name);
 
             int floor = Raids.Of(raid.RaidId)?.FloorOf(SubAreaOf(targetMapId)) ?? 0;
-            if (floor <= 1 || raid.IsOpen(floor)) return false;
+            if (floor <= 1 || raid.IsOpen(floor)) return null;
             var opener = OpenerOf(raid.RaidId, floor);
-            if (opener == null) return false;
-
-            if (stream != null)
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Jondo.Unity.Protocol.Op.Lqn, ConnectionProtocol.BuildNotice(
-                        CommandTexts.Get("raid.floor.closed", (object)opener.Name))));
-            return true;
+            return opener == null ? null : CommandTexts.Get(language, "raid.floor.closed", opener.Name);
         }
 
         /// <summary>The goals met, in the order of the raid's data.</summary>

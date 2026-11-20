@@ -8,11 +8,16 @@ namespace Jondo.Unity.Tests.Launcher;
 
 public sealed class NativeClientTests : IDisposable
 {
+#if JONDO_PROTOCOL_3_8_1_2
+    private const string LaunchVersion = "3.8.1.2";
+#else
+    private const string LaunchVersion = "3.6.10.10";
+#endif
     private readonly string _root = Path.Combine(Path.GetTempPath(), "jondo native client é " + Guid.NewGuid().ToString("N"));
     public NativeClientTests() => Directory.CreateDirectory(_root);
     public void Dispose() => Directory.Delete(_root, recursive: true);
 
-    private ClientInstallation Client(string name = "Dofus.x64")
+    private ClientInstallation Client(string name = "Dofus.x64", string version = "3.6.10.10")
     {
         string executable = Path.Combine(_root, name);
         File.WriteAllText(executable, "");
@@ -20,14 +25,14 @@ public sealed class NativeClientTests : IDisposable
             UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         var client = new ClientInstallation(executable);
         Directory.CreateDirectory(Path.GetDirectoryName(client.VersionFile)!);
-        File.WriteAllText(client.VersionFile, "Version=3.6.10.10\nBuildDate=original\nConfigUrl=https://original\nOther=keep\n");
+        File.WriteAllText(client.VersionFile, $"Version={version}\nBuildDate=original\nConfigUrl=https://original\nOther=keep\n");
         return client;
     }
 
     [Fact]
     public void Configuring_preserves_unrelated_settings_and_an_original_backup()
     {
-        var client = Client();
+        var client = Client(version: LaunchVersion);
         string original = File.ReadAllText(client.VersionFile);
         Assert.Contains(client.VersionFile, Assert.Throws<InvalidOperationException>(client.ValidateNativeLaunch).Message);
         client.Configure(); client.Configure();
@@ -44,7 +49,8 @@ public sealed class NativeClientTests : IDisposable
     {
         var client = Client();
         client.Configure();
-        File.WriteAllText(client.VersionFile, "Version=3.7.10.10\nConfigUrl=" + ClientInstallation.ConfigUrl);
+        string otherProfile = LaunchVersion == "3.8.1.2" ? "3.6.10.10" : "3.8.1.2";
+        File.WriteAllText(client.VersionFile, $"Version={otherProfile}\nConfigUrl=" + ClientInstallation.ConfigUrl);
         Assert.Contains("Unsupported client version", Assert.Throws<InvalidOperationException>(client.ValidateNativeLaunch).Message);
         if (OperatingSystem.IsWindows()) return;
         File.SetUnixFileMode(client.Executable, UnixFileMode.UserRead | UnixFileMode.UserWrite);
@@ -253,12 +259,20 @@ public sealed class NativeClientTests : IDisposable
         Assert.Equal(defaultExecutable, ClientInstallation.Find("missing-client", parents, fallback)!.Executable);
 
         string older = Create(Path.Combine(_root, "Cliente 3.6.10.10"));
+#if JONDO_PROTOCOL_3_8_1_2
+        string newer = Create(Path.Combine(_root, "Cliente 3.8.1.2"));
+#else
         string newer = Create(Path.Combine(_root, "Cliente 3.6.10.11"));
+#endif
         Assert.Equal(newer, ClientInstallation.Find(null, parents, fallback)!.Executable);
         Assert.Equal(older, ClientInstallation.Find(older, parents, fallback)!.Executable);
 
         File.Delete(newer);
+#if JONDO_PROTOCOL_3_8_1_2
+        Assert.Equal(defaultExecutable, ClientInstallation.Find(null, parents, fallback)!.Executable);
+#else
         Assert.Equal(older, ClientInstallation.Find(null, parents, fallback)!.Executable);
+#endif
         File.Delete(older);
         File.Delete(defaultExecutable);
         Assert.Null(ClientInstallation.Find(null, parents, fallback));

@@ -30,14 +30,12 @@ namespace Jondo.Unity.Tests.World
             return bag != 0 && MapManager.GetMapInfo(bag) != null;
         }
 
-        /// <summary>The rooms (jbf) and the themes (jbo) of the captured account, byte for byte.</summary>
+        /// <summary>The rooms (jbf) of the captured account, byte for byte.</summary>
         [Fact]
-        public void Rooms_and_themes_have_the_capture_s_shape()
+        public void Rooms_have_the_capture_s_shape()
         {
             Assert.Equal(Hex("0a0208200a04080410010a04080110020a0408011003"),
                          ConnectionProtocol.BuildHavenBagRooms(new[] { (0, 32), (1, 4), (2, 1), (3, 1) }));
-            Assert.Equal(Hex("0a082233020401152003"),
-                         ConnectionProtocol.BuildHavenBagThemes(new[] { 34, 51, 2, 4, 1, 21, 32, 3 }));
         }
 
         /// <summary>The live typed snapshot keeps the owner's identity and selected room zero.</summary>

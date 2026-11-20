@@ -129,8 +129,7 @@ namespace Jondo.Unity.Tests.Content
                 await using var pipe = await ClientPipe.OpenAsync(8_923_000_071, Character, Cabin);
                 using (SessionContext.Push(pipe.Session))
                 {
-                    await NpcHandler.InteractAsync(pipe.Session, ConnectionProtocol.Push(Op.Iov,
-                        Pb.New().Var(1, Npcs.Talk).Var(2, Cabin).Var(3, gorco.ContextualId).Build()));
+                    await NpcHandler.InteractAsync(pipe.Session, new(Npcs.Talk, Cabin, checked((int)gorco.ContextualId)));
                     await pipe.Next(Op.Ioc);
                     var question = ProtoMessage.Parse(await pipe.Next(Op.Ios)).Fields;
                     Assert.Contains(question, f => f.FieldNumber == 1 && f.WireType == 0 && f.VarIntValue == 18345);

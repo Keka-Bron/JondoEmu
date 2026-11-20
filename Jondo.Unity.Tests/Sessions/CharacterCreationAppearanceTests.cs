@@ -7,6 +7,7 @@ using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Tests.Economy;
 using Microsoft.Data.Sqlite;
 using Jondo.Unity.Server.Database.Migrations;
@@ -41,17 +42,14 @@ namespace Jondo.Unity.Tests.Sessions
             void CheckLook(byte[] look) => AssertLook(look, body, scale, headSkin);
             // Unique, and within the client's naming rule (CharacterNames), which the server checks.
             string name = "Palette-" + string.Concat(Guid.NewGuid().ToString("N")[..11].Select(c => (char)('a' + Convert.ToInt32(c.ToString(), 16))));
-            var creation = Pb.New().Str(1, name).Var(2, head)
-                // The bytes are from the capture, independent of the server's colour writer.
-                .Bytes(3, Convert.FromHexString("EF969E068680A0078780E0078680CC06C7ACE5038680B406"))
-                .Msg(4, Pb.New().Var(1, 17).Var(2, 2))
-                .Var(5, 42).VarIfNotZero(6, sex).Var(7, breed);
+            var creation = new CharacterCreationRequest(new(name, head, Rgb.Select(color => (int)color).ToArray(),
+                null, 42, sex == 1 ? Gender.Female : Gender.Male, breed));
             try
             {
                 pipe.Session.BindAccount(account, 290);
-                await CharacterCreationHandler.CreateAsync(pipe.Session,
-                    ConnectionProtocol.Push(Op.Kvz, Pb.New().Msg(1, creation).Build()));
-                Assert.Empty(await pipe.Next(Op.Kvb));
+                await CharacterCreationHandler.CreateAsync(pipe.Session, creation);
+                var reply = new GameCodec().Decode(await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer));
+                Assert.Equal(new CharacterCreationResultEvent(NameCompliance.NameOk, CharacterCreationResult.CreateOk), reply.Content);
                 for (int i = 0; i < 3; i++) await pipe.Next(Op.Kqp);
                 byte[] list = await pipe.Next(Op.Kvi);
                 await pipe.Next(Op.Jtg);

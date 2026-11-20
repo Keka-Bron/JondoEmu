@@ -226,6 +226,8 @@ namespace Jondo.Unity.Server.Managers
         public static byte[] BuildPlay(int id, int progression)
             => Pb.New().VarIfNotZero(1, progression).Var(2, FullIntensity).Var(3, id).Build();
 
+        internal static Jondo.Unity.Protocol.Game.StagingEvent StandingEvent(int id) => new(AtEnd, FullIntensity, id);
+
         /// <summary>
         /// A staging played from its start to the raid's members on a map, and kept standing
         /// there when it is to be seen again. Nothing when the map has no sequence so called.
@@ -242,15 +244,15 @@ namespace Jondo.Unity.Server.Managers
         /// A map loaded by a raid member: what his raid has standing on it, at its end. The client
         /// keeps the hpm that arrive while it is still loading and plays them once it is ready.
         /// </summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, long characterId, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            if (stream == null) return;
-            var raid = GuildRaidManager.RaidOf(characterId);
+            long mapId = session.MapId;
+            var raid = GuildRaidManager.RaidOf(session.CharacterId);
             foreach (int id in Standing(raid, mapId))
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Hpm, BuildPlay(id, AtEnd)));
+                await session.SendAsync(StandingEvent(id));
 
             // And on the Sima's floors, their light.
-            if (raid != null) await GuildRaidLights.OnMapLoadedAsync(stream, raid, mapId);
+            if (raid != null) await GuildRaidLights.OnMapLoadedAsync(session, raid, mapId);
         }
 
         /// <summary>The raid's red flash for a life lost, on whichever of its maps its members stand.</summary>

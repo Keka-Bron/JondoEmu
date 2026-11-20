@@ -29,6 +29,7 @@ namespace Jondo.Unity.Tests.World
         }
 
         private static List<ProtoField> Fields(byte[] message) => ProtoMessage.Parse(message).Fields.ToList();
+        private static List<ProtoField> Fields(Jondo.Unity.Protocol.Game.InfiniteDreamStateEvent snapshot) => Fields(snapshot.Payload());
 
         private static int? Var(List<ProtoField> fields, int number)
             => (int?)fields.FirstOrDefault(f => f.FieldNumber == number && f.WireType == 0)?.VarIntValue;

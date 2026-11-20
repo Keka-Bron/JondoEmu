@@ -38,10 +38,17 @@ public sealed class GameEntryInitialMessagesTests
         var previous = returning ? new DatabaseManager.LastVisit { When = DateTimeOffset.Parse("2026-11-11T09:08:00+02:00") } : null;
         var (packets, codec, sent) = await CaptureAsync(EmptyState(previous));
         var expected = DirectSequence.ToList();
+#if JONDO_PROTOCOL_3_8_1_2
+        expected.Remove(nameof(TagStoragesRefreshEvent));
+        expected.Remove(nameof(ConfigurationEvent));
+        const int baseCount = 31;
+#else
+        const int baseCount = 33;
+#endif
         if (returning) expected.Insert(expected.IndexOf(nameof(TextInformationEvent)) + 1, nameof(TextInformationEvent));
         Assert.Equal(expected, packets.Select(MessageName));
         Assert.Equal(packets.Count, sent);
-        Assert.Equal(returning ? 34 : 33, codec.Encodes);
+        Assert.Equal(returning ? baseCount + 1 : baseCount, codec.Encodes);
         Assert.Equal(0, codec.Decodes);
         Assert.DoesNotContain(nameof(QuestObjectiveUpdatedEvent), packets.Select(MessageName));
         Assert.DoesNotContain(nameof(TitleSelectionErrorEvent), packets.Select(MessageName));

@@ -61,6 +61,18 @@ namespace Jondo.Unity.Server.Handlers
         internal static Pb LeaOf(TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance)
             => TaxCollectorProtocol.Information(tc, alliance, StateOf(tc), DetailsOf(tc));
 
+        internal static Jondo.Unity.Protocol.Game.TaxCollectorInformation AllianceSheetCollector(
+            TaxCollectorStore.TaxCollector tc, AllianceStore.Alliance alliance)
+        {
+            var items = TaxCollectorStore.Items(tc);
+            var equipment = TaxCollectorStore.EquipmentOf(tc);
+            var map = MapManager.GetMapInfo(tc.MapId);
+            return TaxCollectorMessages.Information(tc, alliance, (Jondo.Unity.Protocol.Game.TaxCollectorState)StateOf(tc),
+                map?.PosX ?? 0, map?.PosY ?? 0, PodsOf(items), WorthOf(items), equipment,
+                TaxCollectorStore.SpellsOf(tc), SheetValues(equipment),
+                gid => Forgemagic.TemplateOf(gid)?.Type ?? 0, ItemEffectMessages.FromCatalogue);
+        }
+
         /// <summary>What its equipment adds, by characteristic, as the player's equipment is summed.</summary>
         internal static Dictionary<int, long> BonusesOf(IEnumerable<HavenBagStore.StoredItem> equipment)
         {
@@ -94,17 +106,19 @@ namespace Jondo.Unity.Server.Handlers
         /// «Recaudador» is, its fight sheet, with what the equipment adds in the bonus column.
         /// </summary>
         internal static List<Pb> SheetOf(IEnumerable<HavenBagStore.StoredItem> equipment)
+            => SheetValues(equipment).Select(value => TaxCollectorProtocol.Characteristic(value.Id, value.Base, value.Bonus)).ToList();
+
+        private static IEnumerable<(int Id, long Base, long Bonus)> SheetValues(IEnumerable<HavenBagStore.StoredItem> equipment)
         {
-            var sheet = new List<Pb>();
             var fighter = BareFighter();
-            if (fighter == null) return sheet;
+            if (fighter == null) yield break;
             var bonuses = BonusesOf(equipment);
             var seen = new HashSet<int>();
             foreach (var (characteristic, baseValue, gear) in FightHandler.FichaParaLaGuardia(fighter))
             {
                 if (!seen.Add(characteristic)) continue;
                 long bonus = gear + bonuses.GetValueOrDefault(characteristic);
-                sheet.Add(TaxCollectorProtocol.Characteristic(characteristic, baseValue, bonus));
+                yield return (characteristic, baseValue, bonus);
             }
             foreach (int characteristic in new[] { Stat.Prospecting, Stat.Pods })
             {
@@ -112,10 +126,8 @@ namespace Jondo.Unity.Server.Handlers
                 long baseValue = characteristic == Stat.Pods
                     ? TaxCollectorProtocol.MaxPods
                     : TaxCollectorProtocol.Prospecting;
-                sheet.Add(TaxCollectorProtocol.Characteristic(characteristic, baseValue,
-                    bonuses.GetValueOrDefault(characteristic)));
+                yield return (characteristic, baseValue, bonuses.GetValueOrDefault(characteristic));
             }
-            return sheet;
         }
 
         /// <summary>The monster «Recaudador» as a fighter, before anything of its own is put on it.</summary>
@@ -573,11 +585,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>At world entry: what happened to his tax collectors while he was away (hkx).</summary>
-        public static async Task OnWorldEntryAsync(NetworkStream stream, long characterId)
+        public static async Task OnWorldEntryAsync(GameSession session)
         {
-            var absences = TaxCollectorStore.TakeAbsences(characterId);
+            var absences = TaxCollectorStore.TakeAbsences(session.CharacterId);
             if (absences.Count == 0) return;
-            await SendAsync(stream, Op.Hkx, TaxCollectorProtocol.BuildAbsences(absences));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.TaxCollectorMovementsOfflineEvent(absences.Select(report =>
+            {
+                var map = MapManager.GetMapInfo(report.MapId);
+                return TaxCollectorMessages.Movement(report, map?.PosX ?? 0, map?.PosY ?? 0);
+            }).ToArray()));
         }
     }
 }

@@ -134,7 +134,7 @@ class Schema:
             raise ValueError(f'Unknown or ambiguous wire type: {alias}')
         return matches[0]
 
-    def normalized(self):
+    def normalized(self, csharp_namespace='Jondo.Unity.Protocol.Game.Wire.Messages'):
         declarations = self.messages | self.enums
         aliases = {name: wire_name(name) for name in declarations}
         if len(set(aliases.values())) != len(aliases):
@@ -148,7 +148,7 @@ class Schema:
                         'fixed32', 'fixed64', 'sfixed32', 'sfixed64', 'bool', 'string', 'bytes'}:
                 return name
             return aliases[self.resolve(name, declarations)]
-        lines = ['syntax = "proto3";', 'option csharp_namespace = "Jondo.Unity.Protocol.Game.Wire.Messages";']
+        lines = ['syntax = "proto3";', f'option csharp_namespace = "{csharp_namespace}";']
         lines += [f'import {x};' for x in self.imports]
         for name, fields in self.enums.items():
             lines += [f'enum {aliases[name]} {{'] + [f'  {n} = {v};' for n, v in fields] + ['}']

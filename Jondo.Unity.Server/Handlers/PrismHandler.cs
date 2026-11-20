@@ -182,10 +182,6 @@ namespace Jondo.Unity.Server.Handlers
             return true;
         }
 
-        /// <summary>An alliance's prisms, as its sheet (mcx) lists them in its f2: their own view, they are its.</summary>
-        public static IEnumerable<Pb> InformationOf(AllianceStore.Alliance alliance)
-            => PrismStore.OfAlliance(alliance.Id).Select(p => PrismProtocol.Information(p, alliance, own: true));
-
         /// <summary>
         /// A prism placed or changed (ifa) to the whole world: its alliance's members get their own
         /// view of it (<see cref="PrismProtocol.State"/>), everybody else the plain one.

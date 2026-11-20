@@ -18,7 +18,7 @@ internal interface IGameEntryBackend
     void LoadCharacterState(GameSession session, DbCharacter character);
     Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character);
     Task SendInitialStateAsync(GameSession session, DbCharacter character);
-    Task RestoreGuildRaidAsync(long characterId);
+    Task RestoreGuildRaidAsync(GameSession session);
     Task NotifyGuildConnectionAsync(long characterId);
     Task NotifyFriendsAsync(long accountId);
     Task RestoreRemodelAsync(GameSession session, DbCharacter character);
@@ -54,7 +54,8 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         if (frame.Content is not GameRequest request || request is not (IdentificationRequest
             or CharacterListRequest or CharacterSelectionRequest or CharacterFirstSelectionRequest
             or CharacterForceSelectionReadyRequest or SequenceNumberRequest or ContextCreationRequest
-             or ContextReadyRequest or MapInformationRequest or FightMapRequest or PingRequest or ChatChannelSubscriptionRequest))
+             or ContextReadyRequest or MapInformationRequest or FightMapRequest or PingRequest
+             or ChatChannelSubscriptionRequest or ReloginRequest))
             return GameEntryResult.Unhandled;
         if (frame.Uid is null || !GameEntryDispatch.IsAllowed(session, request)) return GameEntryResult.Close;
 
@@ -66,6 +67,9 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
                 return GameEntryResult.Handled;
             case IdentificationRequest identification:
                 return await IdentifyAsync(identification);
+            case ReloginRequest:
+                await ReturnToSelectionAsync();
+                return GameEntryResult.Handled;
             case CharacterListRequest:
                 if (_listWentInWelcome)
                 {
@@ -217,7 +221,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         await backend.SendInitialStateAsync(session, character);
         // The account's heroes, back around him when he comes from another of the group.
         Heroes.Regroup(session);
-        await backend.RestoreGuildRaidAsync(character.Id);
+        await backend.RestoreGuildRaidAsync(session);
         await backend.NotifyGuildConnectionAsync(character.Id);
         await backend.NotifyFriendsAsync(session.AccountId);
         await backend.RestoreRemodelAsync(session, character);
@@ -248,13 +252,13 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         _hasSentMapInitialization = true;
     }
 
-    public async Task ReturnToSelectionAsync()
+    private async Task ReturnToSelectionAsync()
     {
-        using var context = SessionContext.Push(session);
+        // The client closes the socket and decides which selection screen to show.
         await backend.SendReturnToSelectionAsync(session);
-        backend.PrepareReturnToSelection(session);
         if (session.IsInWorld)
         {
+            backend.PrepareReturnToSelection(session);
             await backend.RemoveFromMapAsync(session);
             session.LeaveWorld();
         }

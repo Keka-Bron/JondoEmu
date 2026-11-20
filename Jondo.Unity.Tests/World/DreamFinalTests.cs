@@ -98,7 +98,7 @@ namespace Jondo.Unity.Tests.World
             var dream = Whole();
             var end = dream.Salas.Single(r => r.EsFinal);
 
-            var graphs = ProtoMessage.Parse(DreamProtocol.BuildDreamState(dream)).Fields.Where(f => f.FieldNumber == 16).ToList();
+            var graphs = ProtoMessage.Parse(DreamProtocol.BuildDreamState(dream).Payload()).Fields.Where(f => f.FieldNumber == 16).ToList();
             Assert.Equal(Dreams.Bands, graphs.Count);
 
             var rooms = ProtoMessage.Parse(graphs[^1].BytesValue).Fields.Where(f => f.FieldNumber == 1);
@@ -210,13 +210,13 @@ namespace Jondo.Unity.Tests.World
             return fight;
         }
 
-        private static void AsTheDreamer(System.Action body)
+        private static void AsTheDreamer(System.Action<GameSession> body)
         {
             var session = GameSession.SinSocket();
             session.State.CharacterId = Dreamer;
             try
             {
-                using (SessionContext.Push(session)) body();
+                body(session);
             }
             finally
             {
@@ -229,12 +229,12 @@ namespace Jondo.Unity.Tests.World
         /// the dream is over: forgotten, and the player out where he came from.
         /// </summary>
         [Fact]
-        public void A_reve_s_end_has_five_waves_and_ends_the_dream() => AsTheDreamer(() =>
+        public void A_reve_s_end_has_five_waves_and_ends_the_dream() => AsTheDreamer(session =>
         {
             var dream = Whole(difficulty: 2);
             var fight = EndFight(dream, 7_000_001);
 
-            DreamHandler.OnFightCreated(fight);
+            DreamHandler.OnFightCreated(session.CharacterId, fight);
             Assert.Equal(250, fight.Rojo[0].Level);
             Assert.Equal(1170, fight.Rojo[0].MaxHP);   // 1,000 at 200, by the bestiaries' curve
 
@@ -247,7 +247,7 @@ namespace Jondo.Unity.Tests.World
             }
             Assert.Null(DreamHandler.NextWave(fight));
 
-            var (map, cell, notice, ended, _) = DreamHandler.AfterTheFight(fight, won: true);
+            var (map, cell, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: true);
             Assert.True(ended);
             Assert.Equal(100, map);
             Assert.Equal(200, cell);
@@ -258,32 +258,32 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>A Cauchemar's end never runs out of waves: it ends when the player falls, won from the third.</summary>
         [Fact]
-        public void A_cauchemar_s_end_counts_the_waves_that_fell() => AsTheDreamer(() =>
+        public void A_cauchemar_s_end_counts_the_waves_that_fell() => AsTheDreamer(session =>
         {
             var dream = Whole(difficulty: 9);
             var fight = EndFight(dream, 7_000_002);
 
-            DreamHandler.OnFightCreated(fight);
+            DreamHandler.OnFightCreated(session.CharacterId, fight);
             for (int wave = 2; wave <= 20; wave++)
                 Assert.Equal(300 + 15 * (wave - 1), DreamHandler.NextWave(fight)!.Value.Level);
 
-            var (_, _, notice, ended, _) = DreamHandler.AfterTheFight(fight, won: false);
+            var (_, _, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.True(ended);
             Assert.Contains("completado", notice);
         });
 
         /// <summary>Falling before the third wave of a Paradoxe, with no arena left, loses the dream.</summary>
         [Fact]
-        public void Falling_too_soon_loses_the_dream() => AsTheDreamer(() =>
+        public void Falling_too_soon_loses_the_dream() => AsTheDreamer(session =>
         {
             var dream = Whole(difficulty: 5);
             dream.Arena = 0;
             var fight = EndFight(dream, 7_000_003);
 
-            DreamHandler.OnFightCreated(fight);
+            DreamHandler.OnFightCreated(session.CharacterId, fight);
             DreamHandler.NextWave(fight);
 
-            var (map, _, notice, ended, _) = DreamHandler.AfterTheFight(fight, won: false);
+            var (map, _, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.True(ended);
             Assert.Equal(100, map);
             Assert.DoesNotContain("completado", notice);
@@ -292,7 +292,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>A Draconiros arena is a second go: spent on a loss, the dream and the room stay.</summary>
         [Fact]
-        public void An_arena_is_a_second_go() => AsTheDreamer(() =>
+        public void An_arena_is_a_second_go() => AsTheDreamer(session =>
         {
             var dream = Whole(difficulty: 1);
             Assert.Equal(1, dream.Arena);
@@ -300,7 +300,7 @@ namespace Jondo.Unity.Tests.World
             dream.Actual = room.Id;
             var fight = new FightInstance(7_000_004, room.MapaDeLaSala);
 
-            var (map, _, notice, ended, _) = DreamHandler.AfterTheFight(fight, won: false);
+            var (map, _, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.False(ended);
             Assert.Equal(0, map);
             Assert.NotNull(notice);
@@ -308,19 +308,19 @@ namespace Jondo.Unity.Tests.World
             Assert.Same(dream, Dreams.De(Dreamer));
 
             // The second loss is the last.
-            (_, _, _, ended, _) = DreamHandler.AfterTheFight(fight, won: false);
+            (_, _, _, ended, _) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.True(ended);
         });
 
         /// <summary>A room won is not the end of anything: no move, no notice, the dream as it was.</summary>
         [Fact]
-        public void A_room_won_changes_nothing_here() => AsTheDreamer(() =>
+        public void A_room_won_changes_nothing_here() => AsTheDreamer(session =>
         {
             var dream = Whole(difficulty: 1);
             var room = dream.Salas.First(r => r.Fila == 1);
             dream.Actual = room.Id;
 
-            var result = DreamHandler.AfterTheFight(new FightInstance(7_000_005, room.MapaDeLaSala), won: true);
+            var result = DreamHandler.AfterTheFight(session, new FightInstance(7_000_005, room.MapaDeLaSala), won: true);
 
             Assert.Equal((0L, 0, (string?)null, false, (byte[]?)null), result);
             Assert.Same(dream, Dreams.De(Dreamer));

@@ -14,4 +14,12 @@
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">
+    <DefineConstants>$(DefineConstants);JONDO_PROTOCOL_3_8_1_2</DefineConstants>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath Condition="'$(ArtifactsPath)' == ''">$(MSBuildThisFileDirectory)host-artifacts</ArtifactsPath>
+    <!-- Keep both obj and bin isolated, even when both builds share an artifacts root. -->
+    <ArtifactsProjectName>$(MSBuildProjectName).protocol-$(JondoProtocolTarget)</ArtifactsProjectName>
+  </PropertyGroup>
+
 </Project>

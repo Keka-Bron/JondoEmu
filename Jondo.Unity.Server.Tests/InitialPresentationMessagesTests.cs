@@ -56,13 +56,6 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(0xABCDEF, colors.ColorPalettes[0].Colors[2]);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(206)]
-    [InlineData(int.MaxValue)]
-    public void Shared_legacy_writer_also_omits_the_unused_ornament_value(int value)
-        => Assert.Empty(ConnectionProtocol.BuildOrnamentUpdated(value));
-
     [Fact]
     public void Aura_carries_the_main_aura_and_none_is_absent()
     {

@@ -33,6 +33,45 @@ public sealed class AllianceRankFlowTests : IDisposable
     private static AllianceStore.Alliance Create() => AllianceStore.Create(Leader, "Rank snapshots", "RKS", 101, 202, 0x123456, 0, 0xabcdef);
 
     [Fact]
+    public async Task Entry_presence_goes_through_each_other_members_codec_with_opt_in_warnings()
+    {
+        const long account = 8_196_140;
+        long who = Character(account, "Presence-Test");
+        Assert.True(who > 0);
+        try
+        {
+            var alliance = Create();
+            AllianceStore.Join(who, alliance.Id);
+            AllianceStore.Join(Member, alliance.Id);
+            AllianceStore.SetWarnsOnConnection(Leader, true);
+            AllianceStore.SetWarnsOnConnection(Member, false);
+            var a = new RecordingCodec();
+            var b = new RecordingCodec();
+            var c = new RecordingCodec();
+            await using var warned = await ClientPipe.OpenAsync(8_196_141, Leader, 1, codec: a);
+            await using var silent = await ClientPipe.OpenAsync(8_196_142, Member, 2, codec: b);
+            await using var entrant = await ClientPipe.OpenAsync(account, who, 3, codec: c);
+            using var ambient = SessionContext.Push(silent.Session);
+            await AllianceHandler.OnWorldEntryAsync(entrant.Session);
+            Assert.DoesNotContain(c.Encoded, frame => frame.Content is AllianceMemberUpdateEvent or TextInformationEvent);
+            var update = Assert.IsType<AllianceMemberUpdateEvent>(Assert.Single(b.Encoded).Content);
+            Assert.Equal(who, update.Member!.Information!.Id);
+            var basic = Assert.IsType<CharacterComplementCaseCharacterBasicInformation>(update.Member.Information.ComplementCase).Value;
+            var social = Assert.IsType<CharacterBasicInformationComplementCaseSocialMember>(basic.ComplementCase).Value;
+            Assert.Equal(account, social.AccountId);
+            Assert.Equal(AllianceStore.MemberOf(who).JoinedUtcMs, social.EnrollmentDate);
+            Assert.Equal(CharacterState.InRolePlay, social.State);
+            Assert.Collection(a.Encoded, f => Assert.Equal(update, f.Content),
+                f => Assert.Equal(new[] { "Presence-Test", who.ToString() }, Assert.IsType<TextInformationEvent>(f.Content).Parameters));
+            await warned.Next(Op.Mbv);
+            await warned.Next(Op.Lqn);
+            await silent.Next(Op.Mbv);
+            await silent.Quiet();
+        }
+        finally { DatabaseManager.DeleteCharacter(who, account); }
+    }
+
+    [Fact]
     public async Task Entry_sends_actual_custom_ranks_before_membership_using_the_owner_under_another_context()
     {
         var alliance = Create();
@@ -51,11 +90,16 @@ public sealed class AllianceRankFlowTests : IDisposable
         // Membership precedes the typed notices; rank expectations remain semantic.
         Assert.Equal(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, custom.Id)), await Packet(pipe));
         // The sheet, with the tax collectors the minimap draws.
-        Assert.Equal(AllianceHandler.InformationFrame(alliance), await Packet(pipe));
+        var sheet = Assert.IsType<AllianceInsiderInformationEvent>(Codec.Decode(await Packet(pipe)).Content);
+        Assert.Equal(alliance.Uuid, sheet.Information!.Uid);
+        Assert.Equal(2, sheet.Information.CardInformation!.MembersNumber);
+        Assert.Empty(sheet.TaxCollectors);
         await Packet(pipe);
         await Packet(pipe);
         Assert.Collection(spy.Encoded,
             frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
+            frame => Assert.Equal(custom.Id, Assert.IsType<AllianceMembershipEvent>(frame.Content).RankId),
+            frame => Assert.IsType<AllianceInsiderInformationEvent>(frame.Content),
             frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
             frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));
         await pipe.Quiet();
@@ -85,9 +129,66 @@ public sealed class AllianceRankFlowTests : IDisposable
         await Packet(pipe); // bulletin; invented character has no actor to redraw
         Assert.Collection(spy.Encoded,
             frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
+            frame => Assert.IsType<AllianceInsiderInformationEvent>(frame.Content),
             frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
             frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));
         await pipe.Quiet();
+    }
+
+    [Fact]
+    public async Task Member_entry_delivers_the_populated_sheet_before_notices()
+    {
+        const long account = 8_196_561, otherAccount = 8_196_562, map = 9_196_561_001;
+        long who = Character(account, "Sheet-Entrant");
+        long other = Character(otherAccount, "Sheet-Colleague");
+        TaxCollectorStore.ConnectionStringOverride = $"Data Source={_file}";
+        PrismStore.ConnectionStringOverride = $"Data Source={_file}";
+        try
+        {
+            var alliance = Create();
+            AllianceStore.Join(who, alliance.Id);
+            AllianceStore.Join(other, alliance.Id);
+            var profile = AllianceStore.ProfileOf(alliance.Id);
+            profile.Title = "Recruiting";
+            profile.Description = "Looking for scouts";
+            profile.Tags = [2, 7];
+            profile.Languages = [3];
+            AllianceStore.SaveProfile(profile);
+            var collector = TaxCollectorStore.Place(alliance.Id, other, "Sheet-Colleague", map, 701, 300, 1, 35, 109);
+            TaxCollectorStore.SetSpells(collector, new Dictionary<int, int> { [2] = 201 });
+            var prism = PrismStore.Place(alliance.Id, 701, map, 301, 1);
+            prism.CrystalsUsed = PrismProtocol.MaxCrystals;
+
+            var spy = new RecordingCodec();
+            await using var pipe = await ClientPipe.OpenAsync(account, who, map, codec: spy);
+            await AllianceHandler.OnWorldEntryAsync(pipe.Session);
+            await NextRanks(pipe);
+            Assert.IsType<AllianceMembershipEvent>(Codec.Decode(await Packet(pipe)).Content);
+            var frame = Codec.Decode(await Packet(pipe));
+            var sheet = Assert.IsType<AllianceInsiderInformationEvent>(frame.Content);
+            Assert.Null(frame.Uid);
+            Assert.Equal(alliance.Uuid, sheet.Information!.Uid);
+            var card = sheet.Information.CardInformation!;
+            Assert.Equal((3, 1, 1), (card.MembersNumber, card.SubareaNumber, card.TaxCollectorNumber));
+            Assert.Equal("Recruiting", card.Recruitment!.Title);
+            Assert.Equal(new[] { 2, 7 }, card.Recruitment.SelectedCriterion);
+            Assert.Equal(new[] { who, other }.Order(), sheet.Members.Select(m => m.Information!.Id).Order());
+            var detail = Assert.Single(sheet.TaxCollectors);
+            Assert.Equal((collector.Uuid, other, 35, 109), (detail.Uid, detail.CallerId, detail.FirstNameId, detail.LastNameId));
+            Assert.Equal(new TaxCollectorOrderedSpell(201, 2), Assert.Single(detail.Spells));
+            var state = Assert.Single(sheet.Prisms).Prism!;
+            Assert.Equal(0, state.CristalNumberLeft);
+            Assert.Equal(0, state.Cristal!.CristalObject.Item.Gid);
+            Assert.IsType<AllianceMotdEvent>(Codec.Decode(await Packet(pipe)).Content);
+            Assert.IsType<AllianceBulletinEvent>(Codec.Decode(await Packet(pipe)).Content);
+        }
+        finally
+        {
+            TaxCollectorStore.ConnectionStringOverride = null;
+            PrismStore.ConnectionStringOverride = null;
+            DatabaseManager.DeleteCharacter(who, account);
+            DatabaseManager.DeleteCharacter(other, otherAccount);
+        }
     }
 
     [Theory]
@@ -106,8 +207,22 @@ public sealed class AllianceRankFlowTests : IDisposable
             await using var pipe = await ClientPipe.OpenAsync(account, who, 8_196_203, codec: spy);
             using var context = SessionContext.Push(GameSession.SinSocket());
             await AllianceHandler.OnWorldEntryAsync(pipe.Session);
-            Assert.Empty(spy.Encoded);
-            if (application) Assert.NotNull(ConnectionProtocol.ReadPayload(await Packet(pipe), Op.Lzx));
+            if (application)
+            {
+                var sent = Assert.Single(spy.Encoded);
+                Assert.Null(sent.Uid);
+                var restored = Assert.IsType<AllianceApplicationInformationEvent>(Codec.Decode(await Packet(pipe)).Content);
+                Assert.Equal(sent.Content, restored);
+                Assert.Equal(alliance.Uuid, restored.Alliance!.Uid);
+                Assert.Equal("Ready", restored.ApplicationInformation!.Content);
+                var player = restored.ApplicationInformation.PlayerInformation!;
+                Assert.Equal(who, player.CharacterId);
+                Assert.Equal(account, player.AccountId);
+                Assert.Equal("Rank-Applicant", player.Name);
+                Assert.Equal("6502", player.AccountTag);
+                Assert.Equal(CharacterStatusStatus.Available, player.Status!.Status);
+            }
+            else Assert.Empty(spy.Encoded);
             await pipe.Quiet();
         }
         finally { DatabaseManager.DeleteCharacter(who, account); }
@@ -311,7 +426,8 @@ public sealed class AllianceRankFlowTests : IDisposable
             Assert.Equal("Recrue", Rank(snapshot, AllianceStore.RankNewcomer).Name);
             Assert.Equal("Gardien", Rank(snapshot, custom.Id).Name);
             Assert.Equal(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, AllianceStore.RankNewcomer)), await Packet(joining));
-            Assert.Equal(AllianceHandler.InformationFrame(alliance), await Packet(joining));
+            var sheet = Assert.IsType<AllianceInsiderInformationEvent>(Codec.Decode(await Packet(joining)).Content);
+            Assert.Equal(who, Assert.Single(sheet.Members).Information!.Id);
             Assert.Equal(ConnectionProtocol.Push(Op.Mca, AllianceProtocol.BuildJoined(alliance, AllianceStore.RankNewcomer)), await Packet(joining));
             Assert.Equal(ConnectionProtocol.Push(Op.Khi, AllianceProtocol.BuildEmote()), await Packet(joining));
             var redraw = Assert.IsType<GameRolePlayShowActorsEvent>(Codec.Decode(await Packet(joining)).Content);
@@ -324,6 +440,7 @@ public sealed class AllianceRankFlowTests : IDisposable
             // The joiner gets one redraw; map refreshes are encoded by each actual peer's codec.
             Assert.Collection(joiningCodec.Encoded,
                 frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
+                frame => Assert.IsType<AllianceInsiderInformationEvent>(frame.Content),
                 frame => Assert.Equal(who, Assert.Single(Assert.IsType<GameRolePlayShowActorsEvent>(frame.Content).Actors).ActorId),
                 frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
                 frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));

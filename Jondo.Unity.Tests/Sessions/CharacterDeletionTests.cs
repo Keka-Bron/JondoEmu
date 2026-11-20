@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
-using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Xunit;
 
@@ -91,48 +89,6 @@ namespace Jondo.Unity.Tests.Sessions
         public async Task An_empty_account_receives_an_empty_replacement_in_the_same_sequence()
         {
             AssertRefresh(await RefreshAsync([]));
-        }
-
-        // ------------------------------------------------------------------------- reading the id
-
-        [Fact]
-        public void The_id_is_read_from_field_one_of_the_kvu()
-        {
-            // 71000000018, carried as 928cb8bf8802.
-            byte[] frame = ConnectionProtocol.Push(
-                Op.Kvu, Pb.New().Var(1, 71_000_000_018L).Str(2, new string('a', 32)).Build());
-
-            Assert.Equal(71_000_000_018L, CharacterDeletionHandler.ReadCharacterId(frame));
-        }
-
-        [Fact]
-        public void And_from_field_two_of_the_kwa_that_comes_first()
-        {
-            // The client sends the kwa before the kvu, with the same id in a different field.
-            // Reading both means a deletion is not lost if it only gets that far.
-            byte[] frame = ConnectionProtocol.Push(Op.Kwa, Pb.New().Var(2, 100_002L).Build());
-
-            Assert.Equal(100_002L, CharacterDeletionHandler.ReadCharacterId(frame));
-        }
-
-        [Fact]
-        public void A_frame_with_no_id_reads_as_nothing()
-        {
-            // Zero has to mean "no id" rather than "the first character", which is the shape of
-            // bug this whole area has produced before.
-            Assert.Equal(0, CharacterDeletionHandler.ReadCharacterId(ConnectionProtocol.Push(Op.Kvu)));
-            Assert.Equal(0, CharacterDeletionHandler.ReadCharacterId(ConnectionProtocol.Push(Op.Kvh)));
-            Assert.Equal(0, CharacterDeletionHandler.ReadCharacterId(Array.Empty<byte>()));
-        }
-
-        [Fact]
-        public void Another_message_carrying_a_number_is_not_mistaken_for_a_deletion()
-        {
-            // kvw is the selection and also carries an id in field 1. Reading it here would delete
-            // whatever the player just chose to play.
-            byte[] selection = ConnectionProtocol.Push(Op.Kvw, Pb.New().Var(1, 100_002L).Build());
-
-            Assert.Equal(0, CharacterDeletionHandler.ReadCharacterId(selection));
         }
 
         // ------------------------------------------------------------------------- what protects it

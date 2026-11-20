@@ -36,7 +36,7 @@ namespace Jondo.Unity.Server.Handlers
             // Inside a dream, the doors are interactives that do not exist on the roleplay map,
             // so they are tried FIRST: the usual registry would not know what to do with them and
             // would leave them as «unknown use».
-            if (await DreamHandler.TryDoorAsync(stream, elementId)) return;
+            if (await DreamHandler.TryDoorAsync(session, elementId)) return;
 
             long mapId = SessionContext.State.MapId;
 
@@ -57,7 +57,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // The staging the element plays when used (MapStagings): the tutorial's resources.
-            if (elementId != 0) await Managers.MapStagings.PlayAsync(stream, Managers.MapStagings.OfElement(mapId, elementId));
+            if (elementId != 0) await Managers.MapStagings.PlayAsync(session, Managers.MapStagings.OfElement(mapId, elementId));
 
             // Is it something to be read? It goes before quests because a notice is not an
             // objective: the tavern's job offer does not appear in any step of the quest it opens,
@@ -139,7 +139,7 @@ namespace Jondo.Unity.Server.Handlers
                     await LotteryHandler.DrawAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.Dream:
-                    await DreamHandler.ShowAsync(stream);
+                    await DreamHandler.ShowAsync(session);
                     break;
                 case InteractiveActionKind.DreamDoor:
                     // TryDoorAsync has already been tried further up, before the normal dispatch. If

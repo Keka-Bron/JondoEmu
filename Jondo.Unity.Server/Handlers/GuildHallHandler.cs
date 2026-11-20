@@ -81,12 +81,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A hall room loaded: its banners as this visitor is to see them (hpm), at their end.</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, long characterId, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            var visit = GuildHalls.Visit(mapId, characterId);
+            var visit = GuildHalls.Visit(session.MapId, session.CharacterId);
             if (visit == null) return;
             int staging = visit.Value.Own ? GuildHalls.StagingOf(visit.Value.Theme) : GuildHalls.NeutralStaging;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpm, GuildRaidStagings.BuildPlay(staging, GuildRaidStagings.AtEnd)));
+            await session.SendAsync(GuildRaidStagings.StandingEvent(staging));
         }
 
         /// <summary>

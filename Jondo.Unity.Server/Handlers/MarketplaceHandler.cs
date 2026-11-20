@@ -153,14 +153,11 @@ namespace Jondo.Unity.Server.Handlers
         /// iov with no NPC and a marketplace open: its "Vender" (5) or "Comprar" (6) button.
         /// </summary>
         /// <returns>False when it is some NPC's action and not this.</returns>
-        public static async Task<bool> ModeAsync(byte[] payload)
+        public static async Task<bool> ModeAsync(GameSession me, Game.NpcGenericActionRequest request)
         {
-            var me = SessionContext.Current;
             var window = WindowOf(me, out var house);
             if (window == null) return false;
-            byte[]? iov = ConnectionProtocol.ReadPayload(payload, Op.Iov);
-            if (iov == null) return false;
-            long action = VarOf(iov, 1), npc = VarOf(iov, 3);
+            int action = request.NpcActionId, npc = request.NpcId;
             if (npc != MarketplaceProtocol.NoNpc) return false;
             if (action != MarketplaceProtocol.SellAction && action != MarketplaceProtocol.BuyAction) return false;
 
@@ -572,12 +569,12 @@ namespace Jondo.Unity.Server.Handlers
                 MarketplaceListings.HistoryOf(accountId, Clock() - MarketplaceListings.HistoryDepth));
 
         /// <summary>The las a character is given at world entry: null when there is nothing in it.</summary>
-        public static byte[]? SalesHistoryAtEntry(long characterId, long sessionAccountId)
+        public static Jondo.Unity.Protocol.Game.SalesHistoryEvent? SalesHistoryAtEntry(long characterId, long sessionAccountId)
         {
             long account = DatabaseManager.AccountIdOfCharacter(characterId);
             if (account <= 0) account = sessionAccountId;
             var lines = MarketplaceListings.HistoryOf(account, Clock() - MarketplaceListings.HistoryDepth);
-            return lines.Count == 0 ? null : MarketplaceProtocol.BuildSalesHistory(lines);
+            return lines.Count == 0 ? null : MarketplaceProtocol.SalesHistory(lines, ItemEffectMessages.FromCatalogue);
         }
 
         /// <summary>

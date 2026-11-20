@@ -1,0 +1,485 @@
+{
+  "stableNamespace": "Jondo.Unity.Protocol.Connection",
+  "generatedNamespace": "Jondo.Unity.Protocol.Connection.Wire",
+  "className": "ConnectionBindings",
+  "root": "ConnectionMessage",
+  "messages": {
+    "mif": {
+      "name": "ConnectionMessage",
+      "oneofs": {
+        "gicw": {
+          "member": "$self",
+          "cases": {
+            "gict": {
+              "type": "ConnectionRequest"
+            },
+            "gicu": {
+              "type": "ConnectionResponse"
+            },
+            "gicv": {
+              "type": "ConnectionEvent"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mih": {
+      "name": "ConnectionRequest",
+      "fields": {
+        "gida": "CorrelationId"
+      },
+      "oneofs": {
+        "gidi": {
+          "member": "Content",
+          "cases": {
+            "gidb": {
+              "type": "Ping"
+            },
+            "gidc": {
+              "type": "IdentificationRequest"
+            },
+            "gidd": {
+              "type": "SelectServerRequest"
+            },
+            "gide": {
+              "type": "ForceAccountRequest"
+            },
+            "gidf": {
+              "type": "ReleaseAccountRequest"
+            },
+            "gidg": {
+              "type": "FriendListRequest"
+            },
+            "gidh": {
+              "type": "AcquaintanceServersRequest"
+            }
+          }
+        }
+      }
+    },
+    "mij": {
+      "name": "ConnectionResponse",
+      "fields": {
+        "gidm": "CorrelationId"
+      },
+      "oneofs": {
+        "gidt": {
+          "member": "Content",
+          "cases": {
+            "gidn": {
+              "type": "Pong"
+            },
+            "gido": {
+              "type": "IdentificationResponse"
+            },
+            "gidp": {
+              "type": "SelectServerResponse"
+            },
+            "gidq": {
+              "type": "ForceAccountResponse"
+            },
+            "gidr": {
+              "type": "FriendListResponse"
+            },
+            "gids": {
+              "type": "AcquaintanceServersResponse"
+            }
+          }
+        }
+      }
+    },
+    "mil": {
+      "name": "ConnectionEvent",
+      "oneofs": {
+        "gidy": {
+          "member": "Content",
+          "cases": {
+            "gidx": {
+              "type": "UpdateServerEvent"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mim": {
+      "name": "Ping",
+      "fields": {}
+    },
+    "mio": {
+      "name": "Pong",
+      "fields": {}
+    },
+    "mip": {
+      "name": "UpdateServerEvent",
+      "fields": {
+        "giei": "ServerInformation"
+      }
+    },
+    "mir": {
+      "name": "IdentificationRequest",
+      "fields": {
+        "giem": "DeviceIdentifier"
+      },
+      "oneofs": {
+        "gieq": {
+          "member": "Method",
+          "cases": {
+            "gien": {
+              "type": "TokenIdentification"
+            },
+            "gieo": {
+              "type": "LoginIdentification"
+            }
+          }
+        }
+      }
+    },
+    "miu": {
+      "name": "TokenIdentification",
+      "fields": {
+        "giez": "Token",
+        "gifa": "Shield"
+      }
+    },
+    "mis": {
+      "name": "ShieldCertificate",
+      "fields": {
+        "gieu": "CertificateId",
+        "giev": "CertificateHash"
+      }
+    },
+    "miv": {
+      "name": "LoginIdentification",
+      "fields": {
+        "gife": "Login"
+      }
+    },
+    "mje": {
+      "name": "IdentificationResponse",
+      "oneofs": {
+        "gign": {
+          "member": "Result",
+          "cases": {
+            "gigl": {
+              "type": "IdentificationSuccess"
+            },
+            "gigm": {
+              "type": "IdentificationError"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "miz": {
+      "name": "IdentificationSuccess",
+      "fields": {
+        "gifp": "AccountId",
+        "gifq": "Nickname",
+        "gifr": "Tag",
+        "gifs": "ServerList",
+        "gifu": "SubscriptionEndDate",
+        "gifv": "Rights",
+        "gifw": "FightReconnectionServerId",
+        "gify": "ForceAccount",
+        "gifz": "Maintenance"
+      }
+    },
+    "mix": {
+      "name": "AccountRights",
+      "fields": {
+        "gifi": "ShowForceAccount",
+        "gifj": "ShowConsole",
+        "gifk": "UnlimitedAccess",
+        "gifl": "InfiniteSubscription"
+      }
+    },
+    "mjc": {
+      "name": "IdentificationError",
+      "fields": {
+        "gigd": "Reason",
+        "gige": "BanEndDate"
+      }
+    },
+    "mjf": {
+      "name": "SelectServerRequest",
+      "fields": {
+        "gigr": "ServerId"
+      }
+    },
+    "mjk": {
+      "name": "SelectServerResponse",
+      "oneofs": {
+        "gihe": {
+          "member": "Result",
+          "cases": {
+            "gihb": {
+              "type": "SelectServerSuccess"
+            },
+            "gihc": {
+              "type": "SelectServerError",
+              "member": "Reason"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mji": {
+      "name": "SelectServerSuccess",
+      "fields": {
+        "gigv": "Ticket",
+        "gigw": "Host",
+        "gigx": "Ports"
+      }
+    },
+    "mjn": {
+      "name": "ServerList",
+      "fields": {
+        "gihn": "Servers",
+        "giho": "Slots"
+      }
+    },
+    "mjl": {
+      "name": "ServerSlots",
+      "fields": {
+        "gihi": "Category",
+        "gihj": "MaxSlots"
+      }
+    },
+    "mjq": {
+      "name": "ServerInformation",
+      "fields": {
+        "giht": "Server",
+        "gihu": "Accessibility",
+        "gihv": "Characters"
+      }
+    },
+    "mjt": {
+      "name": "Server",
+      "fields": {
+        "gihz": "Id",
+        "giia": "Status",
+        "giib": "Category"
+      }
+    },
+    "mju": {
+      "name": "ForceAccountRequest",
+      "fields": {
+        "giif": "AccountId"
+      }
+    },
+    "mjw": {
+      "name": "ForceAccountResponse",
+      "oneofs": {
+        "giil": {
+          "member": "Result",
+          "cases": {
+            "giij": {
+              "type": "ForceAccountSuccess",
+              "member": "Status"
+            },
+            "giik": {
+              "type": "ForceAccountError"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mjx": {
+      "name": "ForceAccountStatus",
+      "fields": {
+        "giip": "IsForced",
+        "giiq": "AccountId",
+        "giir": "Nickname",
+        "giis": "Tag",
+        "giit": "ServerList"
+      }
+    },
+    "mjy": {
+      "name": "ForceAccountError",
+      "fields": {}
+    },
+    "mjz": {
+      "name": "ReleaseAccountRequest",
+      "fields": {}
+    },
+    "mkc": {
+      "name": "CharacterSummary",
+      "fields": {
+        "gijd": "Name",
+        "gijf": "Gender",
+        "gijg": "Level",
+        "gijh": "LastConnectionDate"
+      },
+      "ignoredStableMembers": [
+        "Breed"
+      ]
+    },
+    "mkd": {
+      "name": "FriendListRequest",
+      "fields": {}
+    },
+    "mkk": {
+      "name": "FriendListResponse",
+      "oneofs": {
+        "gikb": {
+          "member": "Result",
+          "cases": {
+            "gijy": {
+              "type": "FriendListSuccess"
+            },
+            "gijz": {
+              "type": "FriendListError",
+              "member": "Reason"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mki": {
+      "name": "FriendListSuccess",
+      "fields": {
+        "giju": "Friends"
+      }
+    },
+    "mkg": {
+      "name": "ConnectionFriend",
+      "fields": {
+        "gijo": "Name",
+        "gijp": "Tag",
+        "gijq": "Servers"
+      }
+    },
+    "mkl": {
+      "name": "AcquaintanceServersRequest",
+      "fields": {
+        "gikf": "Name",
+        "gikg": "Tag"
+      }
+    },
+    "mks": {
+      "name": "AcquaintanceServersResponse",
+      "oneofs": {
+        "giku": {
+          "member": "Result",
+          "cases": {
+            "giks": {
+              "type": "AcquaintanceServersSuccess"
+            },
+            "gikt": {
+              "type": "AcquaintanceServersError"
+            }
+          }
+        }
+      },
+      "fields": {}
+    },
+    "mkn": {
+      "name": "AcquaintanceServersSuccess",
+      "fields": {
+        "gikk": "Servers"
+      }
+    },
+    "mkq": {
+      "name": "AcquaintanceServersError",
+      "fields": {
+        "giko": "Reason"
+      }
+    },
+    "mkt": {
+      "name": "MaintenanceWindow",
+      "fields": {
+        "giky": "Start",
+        "gikz": "End",
+        "gila": "ServerIds"
+      }
+    }
+  },
+  "enums": {
+    "mic": {
+      "name": "ServerCategory",
+      "values": {
+        "fiey": "MonoAccount",
+        "fiez": "Classic",
+        "fifa": "PioneerMonoAccount",
+        "fifb": "PioneerClassic",
+        "fifc": "Tournament",
+        "fifd": "Epic",
+        "fife": "Temporis"
+      }
+    },
+    "mja": {
+      "name": "IdentificationErrorReason",
+      "values": {
+        "fikf": "UnknownAuthError",
+        "fikg": "AlreadyConnected",
+        "fikh": "OtpTimeout",
+        "fiki": "Banned",
+        "fikj": "InvalidShieldCertificate",
+        "fikk": "Locked",
+        "fikl": "CredentialsReset",
+        "fikm": "WrongCredentials",
+        "fikn": "EmailUnvalidated",
+        "fiko": "AnonymousIpForbidden",
+        "fikp": "NicknameRegistration",
+        "fikq": "Unauthorized",
+        "fikr": "Unknown12",
+        "fiks": "Unknown13",
+        "fikt": "Unknown14"
+      }
+    },
+    "mjh": {
+      "name": "SelectServerErrorReason",
+      "values": {
+        "filr": "Refused",
+        "fils": "SubscriberOnly",
+        "filt": "SingleAccountVerifiedOnly",
+        "filu": "Maintenance"
+      }
+    },
+    "mjo": {
+      "name": "ServerAccessibility",
+      "values": {
+        "finb": "Accessible",
+        "finc": "SubscribeRestriction",
+        "find": "MonoAccountRestriction",
+        "fine": "Unknown3"
+      }
+    },
+    "mjr": {
+      "name": "ConnectionServerStatus",
+      "values": {
+        "fino": "Online",
+        "finp": "Offline"
+      }
+    },
+    "mka": {
+      "name": "CharacterGender",
+      "values": {
+        "fipb": "Male",
+        "fipc": "Female"
+      }
+    },
+    "mkf": {
+      "name": "FriendListErrorReason",
+      "values": {
+        "fipu": "Unknown",
+        "fipv": "Flooding"
+      }
+    },
+    "mko": {
+      "name": "AcquaintanceErrorReason",
+      "values": {
+        "firf": "Unknown",
+        "firg": "NoResult",
+        "firh": "Flood",
+        "firi": "InvalidAccount"
+      }
+    }
+  }
+}

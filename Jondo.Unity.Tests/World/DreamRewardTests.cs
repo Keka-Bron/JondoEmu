@@ -79,8 +79,9 @@ namespace Jondo.Unity.Tests.World
             var row5 = dream.Salas.First(r => r.Fila == 5 && r.Miembros.Count > 0 && !r.Senalada);
             Dreams.Enter(dream, row5.Id, out _);
             Assert.Equal(55, dream.Bonus);
-            Assert.Equal(55, Var(Fields(DreamProtocol.BuildDreamState(dream)), 8));
-            Assert.Equal(50, Var(Fields(DreamProtocol.BuildDreamState(dream)), 22));
+            var snapshot = DreamProtocol.BuildDreamState(dream);
+            Assert.Equal(55, snapshot.LootBonusPercent);
+            Assert.Equal(50, snapshot.ExperienceBonusPercent);
         }
 
         /// <summary>
@@ -222,7 +223,7 @@ namespace Jondo.Unity.Tests.World
             rooms[1].Reward = Dreams.RoomRewards.Single(r => r.Tag == 154);
             Dreams.Enter(dream, rooms[1].Id, out _);
             Assert.Equal(50, dream.DreamerLevels);
-            Assert.Equal(50, Var(Fields(DreamProtocol.BuildDreamState(dream)), 14));
+            Assert.Equal(50, DreamProtocol.BuildDreamState(dream).BonusLevels);
         }
 
         /// <summary>
@@ -249,7 +250,7 @@ namespace Jondo.Unity.Tests.World
                     var fight = new FightInstance(7_000_101, end.MapaDeLaSala);
                     fight.AddPlayer(new Fighter { Id = Dreamer, Level = 200, MaxHP = 1000, CurrentHP = 0 });
                     fight.AddMonster(new Fighter { Id = -1, Level = 275, MaxHP = 1000, CurrentHP = 1000, IsMonster = true });
-                    DreamHandler.OnFightCreated(fight);
+                    DreamHandler.OnFightCreated(session.CharacterId, fight);
 
                     var early = DreamHandler.PayOf(fight, won: false)!;
                     Assert.False(early.Finished);
@@ -263,7 +264,7 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(3, pay.Waves);
                     Assert.Equal(300, pay.Fragments);
 
-                    var (_, _, notice, ended, _) = DreamHandler.AfterTheFight(fight, won: false);
+                    var (_, _, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: false);
                     Assert.True(ended);
                     Assert.Contains("3 oleada", notice);
                     Assert.Contains("300 retazo", notice);

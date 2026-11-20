@@ -4,6 +4,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <JondoVersion Condition="'$(JondoVersion)' == ''">3.6.10.10</JondoVersion>
+    <GameSchema>Schemas/game-$(JondoVersion).proto</GameSchema>
+    <GameMapping>Mappings/game-$(JondoVersion).json</GameMapping>
+    <GameProfile>$(JondoVersion)</GameProfile>
+    <GameSchema Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">Profiles/$(JondoProtocolTarget)/game.proto</GameSchema>
+    <GameMapping Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">Profiles/$(JondoProtocolTarget)/game.json</GameMapping>
+    <GameProfile Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">$(JondoProtocolTarget)</GameProfile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Jondo.Unity.Protocol.Game/Jondo.Unity.Protocol.Game.csproj" />
@@ -11,22 +17,43 @@
                       ReferenceOutputAssembly="false" OutputItemType="GameGenerator" PrivateAssets="all" />
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
     <PackageReference Include="Grpc.Tools" Version="2.81.1" PrivateAssets="all" />
-    <Protobuf Include="Schemas/game-$(JondoVersion).proto" GrpcServices="None"
-              AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)game-$(JondoVersion).pb;--include_imports" />
-    <Compile Include="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs" />
+    <Protobuf Include="$(GameSchema)" GrpcServices="None"
+              AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)game-$(GameProfile).pb;--include_imports" />
+    <Compile Include="$(IntermediateOutputPath)GameBindings-$(GameProfile).g.cs" />
   </ItemGroup>
-  <Target Name="ValidateGameVersion" BeforeTargets="PrepareForBuild">
+  <ItemGroup Condition="'$(JondoProtocolTarget)' == '3.8.1.2'">
+    <Protobuf Include="Storage/shortcut.proto" GrpcServices="None"
+              AdditionalProtocArguments="--descriptor_set_out=$(IntermediateOutputPath)shortcut-storage.pb" />
+    <Compile Include="$(IntermediateOutputPath)ShortcutStorageBindings.g.cs" />
+  </ItemGroup>
+  <Target Name="ValidateGameVersion" BeforeTargets="PrepareForBuild;Protobuf_Compile" DependsOnTargets="ValidateJondoProtocolTarget">
     <Error Condition="'$(JondoVersion)' != '3.6.10.10'" Text="Unsupported JondoVersion '$(JondoVersion)'. Use the 3.6.10.10 Game profile for both 3.6.10.10 and 3.6.10.11 clients." />
+    <Error Condition="!Exists('$(GameSchema)') or !Exists('$(GameMapping)')"
+           Text="Missing Game protocol inputs: $(GameSchema) and $(GameMapping) are both required." />
+    <Error Condition="'$(JondoProtocolTarget)' == '3.8.1.2' and (!Exists('Storage/shortcut.proto') or !Exists('Storage/shortcut.json'))"
+           Text="Missing historical shortcut storage schema or mapping." />
   </Target>
   <Target Name="GenerateGameBindings" BeforeTargets="CoreCompile" DependsOnTargets="Protobuf_Compile;ResolveReferences"
-          Inputs="$(IntermediateOutputPath)game-$(JondoVersion).pb;Mappings/game-$(JondoVersion).json;@(GameGenerator);@(ReferencePath)"
-          Outputs="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs">
+          Inputs="$(IntermediateOutputPath)game-$(GameProfile).pb;$(GameMapping);@(GameGenerator);@(ReferencePath)"
+          Outputs="$(IntermediateOutputPath)GameBindings-$(GameProfile).g.cs">
     <ItemGroup>
       <_StableGame Include="@(ReferencePath)" Condition="'%(Filename)' == 'Jondo.Unity.Protocol.Game'" />
     </ItemGroup>
-    <Exec Command="dotnet &quot;@(GameGenerator)&quot; &quot;$(IntermediateOutputPath)game-$(JondoVersion).pb&quot; &quot;$(MSBuildProjectDirectory)/Mappings/game-$(JondoVersion).json&quot; &quot;@(_StableGame)&quot; &quot;$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs&quot;" />
+    <Exec Command="dotnet &quot;@(GameGenerator)&quot; &quot;$(IntermediateOutputPath)game-$(GameProfile).pb&quot; &quot;$(MSBuildProjectDirectory)/$(GameMapping)&quot; &quot;@(_StableGame)&quot; &quot;$(IntermediateOutputPath)GameBindings-$(GameProfile).g.cs&quot;" />
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)GameBindings-$(JondoVersion).g.cs;$(IntermediateOutputPath)game-$(JondoVersion).pb" />
+      <FileWrites Include="$(IntermediateOutputPath)GameBindings-$(GameProfile).g.cs;$(IntermediateOutputPath)game-$(GameProfile).pb" />
+    </ItemGroup>
+  </Target>
+  <Target Name="GenerateShortcutStorageBindings" BeforeTargets="CoreCompile" DependsOnTargets="Protobuf_Compile;ResolveReferences"
+          Condition="'$(JondoProtocolTarget)' == '3.8.1.2'"
+          Inputs="$(IntermediateOutputPath)shortcut-storage.pb;Storage/shortcut.json;@(GameGenerator);@(ReferencePath)"
+          Outputs="$(IntermediateOutputPath)ShortcutStorageBindings.g.cs">
+    <ItemGroup>
+      <_StorageStableGame Include="@(ReferencePath)" Condition="'%(Filename)' == 'Jondo.Unity.Protocol.Game'" />
+    </ItemGroup>
+    <Exec Command="dotnet &quot;@(GameGenerator)&quot; &quot;$(IntermediateOutputPath)shortcut-storage.pb&quot; &quot;$(MSBuildProjectDirectory)/Storage/shortcut.json&quot; &quot;@(_StorageStableGame)&quot; &quot;$(IntermediateOutputPath)ShortcutStorageBindings.g.cs&quot;" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)ShortcutStorageBindings.g.cs;$(IntermediateOutputPath)shortcut-storage.pb" />
     </ItemGroup>
   </Target>
 </Project>

@@ -100,7 +100,7 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
             MarketplaceHandler.Forget();
         }
 
-        public Task RestoreDreamAsync(GameSession session) => DreamHandler.OnMapLoadedAsync(StreamOf(session));
+        public Task RestoreDreamAsync(GameSession session) => DreamHandler.OnMapLoadedAsync(session);
         public void PrepareAnomaly(long mapId) => AnomalyHandler.BeforeMapLoaded(mapId);
         public Task SendMarksAsync(GameSession session) => Managers.Quests.SendMarksAsync(session, session.MapId);
 
@@ -109,27 +109,27 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
 
         public Task SendFightCountAsync(GameSession session) => FightHandler.SendFightCountAsync(session, session.MapId);
         public bool IsHavenBag(long mapId) => Managers.Merkasako.IsHavenBag(mapId);
-        public Task SendFurnitureAsync(GameSession session) => MerkasakoHandler.SendFurnitureAsync(StreamOf(session));
+        public Task SendFurnitureAsync(GameSession session) => MerkasakoHandler.SendFurnitureAsync(session);
         public Task RestoreRaidStagingsAsync(GameSession session)
-            => Managers.GuildRaidStagings.OnMapLoadedAsync(StreamOf(session), session.CharacterId, session.MapId);
-        public Task RestoreTravelersTowerAsync(GameSession session) => TravelersTowerHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
-        public Task RestoreSeasonAsync(GameSession session) => OsavoraSeasonHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
-        public Task RestoreAnomalyAsync(GameSession session) => AnomalyHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
+            => Managers.GuildRaidStagings.OnMapLoadedAsync(session);
+        public Task RestoreTravelersTowerAsync(GameSession session) => TravelersTowerHandler.OnMapLoadedAsync(session);
+        public Task RestoreSeasonAsync(GameSession session) => OsavoraSeasonHandler.OnMapLoadedAsync(session);
+        public Task RestoreAnomalyAsync(GameSession session) => AnomalyHandler.OnMapLoadedAsync(session);
         public Task RestoreGargandiasAsync(GameSession session) => GargandiasHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
         public Task RestoreGuildHallAsync(GameSession session)
-            => GuildHallHandler.OnMapLoadedAsync(StreamOf(session), session.CharacterId, session.MapId);
+            => GuildHallHandler.OnMapLoadedAsync(session);
         public int SubAreaOf(long mapId) => MapManager.GetMapInfo(mapId)?.SubAreaId ?? 0;
         public Task EnterQuestMapAsync(GameSession session, int subAreaId)
             => Managers.Quests.OnMapEnteredAsync(session, session.MapId, subAreaId);
         public Task EnterAchievementMapAsync(GameSession session, int subAreaId)
             => Managers.Achievements.OnMapEnteredAsync(session, session.MapId, subAreaId);
         public Task EnterConquestMapAsync(GameSession session, int subAreaId)
-            => ConquestHandler.OnMapEnteredAsync(StreamOf(session), session.CharacterId, subAreaId);
+            => ConquestHandler.OnMapEnteredAsync(session, subAreaId);
         public Task EnterLingeringRoomAsync(GameSession session)
             => Managers.LingeringRooms.OnMapEnteredAsync(StreamOf(session), session.CharacterId, session.MapId);
-        public Task RestorePhantomAsync(GameSession session) => PhantomHandler.OnMapLoadedAsync(StreamOf(session));
+        public Task RestorePhantomAsync(GameSession session) => PhantomHandler.OnMapLoadedAsync(session);
         public Task ShowMapStagingAsync(GameSession session)
-            => Managers.MapStagings.ShowAsync(StreamOf(session), Managers.MapStagings.OnArrival(session.MapId));
+            => Managers.MapStagings.ShowAsync(session, Managers.MapStagings.OnArrival(session.MapId));
         public Task PlacePendingBonusItemsAsync(GameSession session) => BonusItemHandler.PlacePendingAsync(StreamOf(session));
 
         private static NetworkStream StreamOf(GameSession session)

@@ -345,6 +345,36 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>What happened while away is kept for the owner, and given once.</summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Entry_consumes_only_the_owners_reports_before_attempting_delivery(bool failTransport)
+        {
+            var report = new TaxCollectorStore.Absence(TaxCollectorStore.AbsenceCollected, 35, 109, 88081167, 25, 77, "Collector");
+            TaxCollectorStore.RecordAbsence(55, report);
+            TaxCollectorStore.RecordAbsence(55, report with { Kind = TaxCollectorStore.AbsenceDefeated, WhoId = 0, WhoName = "" });
+            TaxCollectorStore.RecordAbsence(56, report);
+            var codec = new ReportCodec();
+            var owner = new GameSession(codec, _ => failTransport ? Task.FromException(new IOException()) : Task.CompletedTask);
+            owner.State.CharacterId = 55;
+            using var context = SessionContext.Push(GameSession.SinSocket());
+            if (failTransport) await Assert.ThrowsAsync<IOException>(() => TaxCollectorHandler.OnWorldEntryAsync(owner));
+            else await TaxCollectorHandler.OnWorldEntryAsync(owner);
+            await TaxCollectorHandler.OnWorldEntryAsync(owner);
+            var rows = Assert.IsType<TaxCollectorMovementsOfflineEvent>(Assert.Single(codec.Messages).Content).Movements;
+            Assert.Equal((35, 109, "Collector"), (rows[0].FirstNameId, rows[0].LastNameId, rows[0].PlayerName));
+            Assert.Equal(new[] { TaxCollectorMovementType.TaxCollectorHarvested, TaxCollectorMovementType.TaxCollectorDefeated }, rows.Select(r => r.MovementType));
+            Assert.Equal(0, rows[1].PlayerId);
+            Assert.Single(TaxCollectorStore.TakeAbsences(56));
+        }
+
+        private sealed class ReportCodec : IGameCodec
+        {
+            internal List<GameFrame> Messages { get; } = [];
+            public byte[] Encode(GameFrame frame) { Messages.Add(frame); return [0x11]; }
+            public GameFrame Decode(ReadOnlySpan<byte> bytes) => throw new NotSupportedException();
+        }
+
         [Fact]
         public void What_happened_while_away_is_told_once()
         {

@@ -762,17 +762,17 @@ namespace Jondo.Unity.Server.Handlers
         /// leader who opened fight 471 and none for the two who were put in behind him 0.1 s
         /// later (frames 95, 96 and 108).
         /// </summary>
-        private static async Task PartyAfterEntryAsync(FightInstance fight, Fighter person, bool tellTheParty)
+        internal static async Task PartyAfterEntryAsync(FightInstance fight, Fighter person, bool tellTheParty)
         {
             if (fight.Reglas.PagaElKoliseo) return;
             var party = Parties.Of(person.Id);
             if (party == null || !Parties.IsInParty(person.Id)) return;
 
             var followers = FollowersInto(fight, person);
-            var told = ConnectionProtocol.Push(Op.Ilh, PartyMemberInFight(fight, person, party.Id));
+            var told = tellTheParty ? PartyMemberInFight(fight, person) : null;
             foreach (long member in Parties.MembersOf(party))
             {
-                if (!tellTheParty) break;
+                if (told == null) break;
                 if (member == person.Id || followers.Contains(member)) continue;
                 var session = SessionRegistry.FindByCharacter(member);
                 if (session == null || !session.IsInWorld) continue;
@@ -836,20 +836,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The ilh of a person, for his party.</summary>
-        private static byte[] PartyMemberInFight(FightInstance fight, Fighter person, long partyId)
+        private static Game.PartyMemberInFightEvent PartyMemberInFight(FightInstance fight, Fighter person)
         {
             var map = MapManager.GetMapInfo(fight.RoleplayMapId);
-            var session = SessionRegistry.FindByCharacter(person.Id);
             int left = fight.Reglas.KaaConCuentaAtras
                 ? fight.PlacementDecisecondsLeft(fight.Reglas.RelojDeColocacion, DateTime.UtcNow)
                 : 0;
 
-            return FightJoinProtocol.BuildPartyMemberInFight(
-                person.Id, left, session?.AccountId ?? 0, person.Name, fight.FightId, partyId,
+            return new(person.Id, left, person.Name ?? "", checked((int)fight.FightId),
                 fight.Reglas.EnfrenteHayMonstruos
-                    ? FightJoinProtocol.PartyFightMonsters
-                    : FightJoinProtocol.PartyFightChallenge,
-                fight.RoleplayMapId, map?.PosX ?? 0, map?.PosY ?? 0, map?.SubAreaId ?? 0);
+                    ? Game.PartyMemberInFightCause.MonsterAttack
+                    : Game.PartyMemberInFightCause.MemberChallenge,
+                new(fight.RoleplayMapId, map?.PosX ?? 0, map?.SubAreaId ?? 0, map?.PosY ?? 0));
         }
 
         /// <summary>Whether this character has the automatic entry on. Off until the client says.</summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -26,6 +27,16 @@ namespace Jondo.Unity.Tests.Protocol
     {
         private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 
+        // Keep the existing August capture regressions on the production semantic bindings.
+        private static string Payload(GameEvent message)
+        {
+            var codec = new GameCodec();
+            return Hex(codec.ReadEnvelope(codec.Encode(new(message))).Content.Value.ToByteArray());
+        }
+
+        private static string Step(int quest, int step, int[] objectives, int[] done)
+            => Payload(new QuestStepInformationEvent(QuestMessages.Active(quest, step, objectives, done)));
+
         // These captured mark assertions now exercise semantic construction and the
         // production codec; the old mark builder is retired. Independent protocol
         // fixtures also live in QuestStateContractTests in the Game protocol suite.
@@ -42,7 +53,7 @@ namespace Jondo.Unity.Tests.Protocol
         public void A_quest_starting_is_one_varint()
         {
             // Tutorial capture, quest 2545 starting.
-            Assert.Equal("08f113", Hex(QuestProtocol.BuildQuestStarted(2545)));
+            Assert.Equal("08f113", Payload(new QuestStartedEvent(2545)));
         }
 
         [Fact]
@@ -50,14 +61,14 @@ namespace Jondo.Unity.Tests.Protocol
         {
             // "Misiones\hablar con NPC y aceptar una mision": ief {2432}, right after the player
             // picks the reply on line 50071.
-            Assert.Equal("088013", Hex(QuestProtocol.BuildQuestStarted(2432)));
+            Assert.Equal("088013", Payload(new QuestStartedEvent(2432)));
         }
 
         [Fact]
         public void A_validated_step_names_the_quest_and_the_step()
         {
             // Tutorial capture: idz {quest 2545, step 3226}.
-            Assert.Equal("08f113109a19", Hex(QuestProtocol.BuildStepValidated(2545, 3226)));
+            Assert.Equal("08f113109a19", Payload(new QuestStepValidatedEvent(2545, 3226)));
         }
 
         [Fact]
@@ -72,7 +83,7 @@ namespace Jondo.Unity.Tests.Protocol
             //       10c911      f2 = 2249, the step
             //     18dd0c      f3 = 1629, the quest
             Assert.Equal("0a0f120a0a0510b74b200110c91118dd0c",
-                Hex(QuestProtocol.BuildQuestStep(1629, 2249, new[] { 9655 }, Array.Empty<int>())));
+                Step(1629, 2249, [9655], []));
         }
 
         [Fact]
@@ -81,7 +92,7 @@ namespace Jondo.Unity.Tests.Protocol
             // The same step a moment later in the same capture: 9655 is finished, so it appears
             // with no f4 at all, and 9656 has arrived carrying the flag.
             Assert.Equal("0a14120f0a0310b74b0a0510b84b200110c91118dd0c",
-                Hex(QuestProtocol.BuildQuestStep(1629, 2249, new[] { 9655, 9656 }, new[] { 9655 })));
+                Step(1629, 2249, [9655, 9656], [9655]));
         }
 
         [Fact]
@@ -93,9 +104,9 @@ namespace Jondo.Unity.Tests.Protocol
             // the way out.
             Assert.Equal(
                 "0a2812230a0310d04b0a0310d54b0a0310f84b0a0310894f0a0310a04e0a0510864c200110ca1118de0c",
-                Hex(QuestProtocol.BuildQuestStep(1630, 2250,
+                Step(1630, 2250,
                     new[] { 9680, 9685, 9720, 10121, 10016, 9734 },
-                    new[] { 9680, 9685, 9720, 10121, 10016 })));
+                    new[] { 9680, 9685, 9720, 10121, 10016 }));
         }
 
         [Fact]
@@ -104,8 +115,8 @@ namespace Jondo.Unity.Tests.Protocol
             // Built with Pb rather than ProtoMessage.ToByteArray, which sorts by field number. The
             // objectives are a repeated field and the client lists them in the order they arrive,
             // so a sort would silently reorder somebody's quest steps on screen.
-            string forwards = Hex(QuestProtocol.BuildQuestStep(1, 2, new[] { 10, 20 }, Array.Empty<int>()));
-            string backwards = Hex(QuestProtocol.BuildQuestStep(1, 2, new[] { 20, 10 }, Array.Empty<int>()));
+            string forwards = Step(1, 2, [10, 20], []);
+            string backwards = Step(1, 2, [20, 10], []);
 
             Assert.NotEqual(forwards, backwards);
         }
@@ -229,7 +240,7 @@ namespace Jondo.Unity.Tests.Protocol
         {
             // 9 of the 457 captured frames carry no objective list. Building one must not produce
             // an empty body, or the client is told nothing at all about a quest it asked about.
-            string built = Hex(QuestProtocol.BuildQuestStep(1629, 2249, Array.Empty<int>(), Array.Empty<int>()));
+            string built = Step(1629, 2249, [], []);
 
             Assert.Contains("c911", built);   // the step
             Assert.Contains("dd0c", built);   // the quest

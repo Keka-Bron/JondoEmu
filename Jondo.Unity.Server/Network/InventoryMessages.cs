@@ -10,10 +10,12 @@ internal sealed class InventoryMessages(ItemEffectMessages effects)
     internal InventoryContentEvent Snapshot(SessionState state)
         // The invisible items (type 203) are in the bag but not in the list: the client would show them.
         => new(state.Kamas, state.EquipmentItems.Values.Where(item => !InvisibleItems.Conceal(item.Template, item.Uid))
-            .Select(item => new ObjectItemInventory(
-            item.Position, false, new ObjectItem(item.Template,
+            .Select(InventoryItem).ToArray());
+
+    internal ObjectItemInventory InventoryItem(Equipment.Item item)
+        => new(item.Position, false, new ObjectItem(item.Template,
                 item.Effects.Select(effects.Effect).OfType<ObjectEffect>().ToArray(),
-                Math.Max(1, item.Quantity), checked((int)item.Uid), []))).ToArray());
+                Math.Max(1, item.Quantity), checked((int)item.Uid), []));
 
     internal Task SendAsync(GameSession session) => session.SendAsync(Snapshot(session.State));
 }

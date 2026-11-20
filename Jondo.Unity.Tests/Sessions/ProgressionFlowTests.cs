@@ -246,7 +246,7 @@ namespace Jondo.Unity.Tests.Sessions
                     await AlmanaxOfferingHandler.ReplyAsync(at.ToClient, AlmanaxOfferingHandler.WillingToOffer);
                     // «Nueva misión» (lqn 54) goes before every ief of the tutorial capture.
                     await at.NextAsync(Op.Lqn);
-                    Assert.Equal(QuestProtocol.BuildQuestStarted(965), await at.NextAsync(Op.Ief));
+                    Assert.Equal(new QuestStartedEvent(965), await at.NextEventAsync());
                     Assert.True(QuestEngine.Log!.Active(965));
 
                     // Once handed in, not again the same day.

@@ -68,7 +68,13 @@ public sealed record ServerList(IReadOnlyList<ServerInformation> Servers, IReadO
 public sealed record ServerSlots(ServerCategory Category, int MaxSlots);
 public sealed record ServerInformation(Server? Server, ServerAccessibility Accessibility, IReadOnlyList<CharacterSummary> Characters);
 public sealed record Server(int Id, ConnectionServerStatus Status, ServerCategory Category);
-public sealed record CharacterSummary(string Name, CharacterBreed Breed, CharacterGender Gender, int Level, string LastConnectionDate);
+public sealed record CharacterSummary(string Name,
+#if JONDO_PROTOCOL_3_8_1_2
+    CharacterBreed? Breed,
+#else
+    CharacterBreed Breed,
+#endif
+    CharacterGender Gender, int Level, string LastConnectionDate);
 public sealed record MaintenanceWindow(string Start, string End, IReadOnlyList<int> ServerIds);
 
 // The order and numeric values of these enums are NOT a protobuf contract. The

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game.Wire;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -418,6 +421,64 @@ namespace Jondo.Unity.Tests.Combat
             session.EnterWorld();
             Assert.True(SessionRegistry.Register(session));
             return session;
+        }
+
+        [Fact]
+        public async Task Party_notice_is_typed_and_goes_to_waiting_members_but_not_to_the_fighter_or_followers()
+        {
+            const long leader = 8_101_000_001, follower = 8_101_000_002, stayer = 8_101_000_003, solo = 8_101_000_004;
+            const long map = 188744196;
+            var party = Parties.Create(leader);
+            Parties.Invite(party, follower, leader);
+            Parties.Accept(party, follower);
+            Parties.Invite(party, stayer, leader);
+            Parties.Accept(party, stayer);
+            var leadCodec = new PartyCodec();
+            var followerCodec = new PartyCodec();
+            var stayerCodec = new PartyCodec();
+            await using var lead = await Economy.ClientPipe.OpenAsync(leader, leader, map, codec: leadCodec);
+            await using var follow = await Economy.ClientPipe.OpenAsync(follower, follower, map, codec: followerCodec);
+            await using var stay = await Economy.ClientPipe.OpenAsync(stayer, stayer, map + 1, codec: stayerCodec);
+            try
+            {
+                FightHandler.SetAutoOptions(follower, join: true, ready: false);
+                follow.Session.State.PendingMovementMapId = map;
+                var fight = new FightInstance(9102, map, 191105032) { Reglas = FightRules.Desafio };
+                fight.SetPlacementCells(Enumerable.Range(300, 8), Enumerable.Range(180, 8));
+                var boss = Person(leader, "Leader", 200);
+                fight.AddPlayer(boss);
+                await FightHandler.PartyAfterEntryAsync(fight, Person(solo, "Solo", 200), tellTheParty: true);
+                await FightHandler.PartyAfterEntryAsync(fight, boss, tellTheParty: false);
+                Assert.Empty(stayerCodec.Frames);
+                await FightHandler.PartyAfterEntryAsync(fight, boss, tellTheParty: true);
+
+                var sent = Assert.Single(stayerCodec.Frames);
+                Assert.Null(sent.Uid);
+                var notice = Assert.IsType<Game.PartyMemberInFightEvent>(sent.Content);
+                Assert.Equal(leader, notice.MemberId);
+                Assert.Equal(9102, notice.FightId);
+                Assert.Equal("Leader", notice.MemberName);
+                Assert.Equal(Game.PartyMemberInFightCause.MemberChallenge, notice.Reason);
+                Assert.Equal(0, notice.TimeBeforeFightStart);
+                Assert.Equal(map, notice.StandardFightMap!.MapId);
+                Assert.Equal(notice, new GameCodec().Decode(await Jondo.Protocol.NetworkMessage.ReadFrameAsync(stay.FromServer)
+                    .WaitAsync(TimeSpan.FromSeconds(5))).Content);
+                Assert.Empty(leadCodec.Frames);
+                Assert.Empty(followerCodec.Frames);
+            }
+            finally
+            {
+                using (SessionContext.Push(follow.Session)) await FightHandler.AfterWalkAsync(follow.ToClient);
+                FightHandler.SetAutoOptions(follower, join: false, ready: false);
+                Parties.Dissolve(party);
+            }
+        }
+
+        private sealed class PartyCodec : Game.IGameCodec
+        {
+            public List<Game.GameFrame> Frames { get; } = [];
+            public byte[] Encode(Game.GameFrame frame) { Frames.Add(frame); return new GameCodec().Encode(frame); }
+            public Game.GameFrame Decode(ReadOnlySpan<byte> frame) => throw new InvalidOperationException("A send cannot decode.");
         }
 
         [Fact]

@@ -20,10 +20,14 @@ namespace Jondo.Unity.Tests.World
     [Collection("MapManager")]
     public class GroupDreamTests
     {
+        public enum Exit { Owner, OwnerSendFails, GuestMapChange, GuestRequest }
+
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public async Task An_invited_member_follows_the_owner_and_exits_only_after_the_owners_typed_mark_clear(bool fail)
+        [InlineData(Exit.Owner)]
+        [InlineData(Exit.OwnerSendFails)]
+        [InlineData(Exit.GuestMapChange)]
+        [InlineData(Exit.GuestRequest)]
+        public async Task A_dream_exit_clears_the_interface_in_order_without_replaying_it_on_later_loads(Exit exit)
         {
             // A street of its own: 191105026 is where most tests stand, and the arrivals of those
             // running alongside reached the owner once he was back on it.
@@ -42,26 +46,69 @@ namespace Jondo.Unity.Tests.World
             var party = Parties.Create(owner);
             Parties.Invite(party, guest, owner);
             Parties.Accept(party, guest);
+            bool fail = exit == Exit.OwnerSendFails;
             var codec = new MarkCodec(fail);
             await using var host = await ClientPipe.OpenAsync(990_000_301, owner, room.MapaDeLaSala, "Dueno", codec);
             await using var visitor = await ClientPipe.OpenAsync(990_000_302, guest, street, "Invitado");
             try
             {
-                using (SessionContext.Push(host.Session)) await DreamHandler.InviteGroupAsync(host.ToClient);
+                await DreamHandler.InviteGroupAsync(host.Session);
                 var iyd = ProtoMessage.Parse(await visitor.Next(Op.Iyd));
                 Assert.Equal("Dueno", System.Text.Encoding.UTF8.GetString(iyd.Fields.Single(f => f.FieldNumber == 1).BytesValue));
                 Assert.Equal(-300, (int)iyd.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
 
-                using (SessionContext.Push(visitor.Session))
-                    await DreamHandler.AnswerInvitationAsync(visitor.ToClient, ConnectionProtocol.Push(Op.Ixk, Pb.New().Var(1, 1).Build()));
-                Assert.Equal(owner, DreamHandler.HostOf(guest));
-                Assert.Equal(Op.Izg, (await visitor.NextAny()).Opcode);
-                Assert.Equal(room.MapaDeLaSala, visitor.Session.State.MapId);
-
-                using (SessionContext.Push(visitor.Session))
-                    Assert.True(await DreamHandler.GuestMayNotFightAsync(visitor.ToClient));
+                int hostCell = host.Session.State.CellId;
                 using (SessionContext.Push(host.Session))
-                    Assert.False(await DreamHandler.GuestMayNotFightAsync(host.ToClient));
+                    await DreamHandler.AnswerInvitationAsync(visitor.Session, ConnectionProtocol.Push(Op.Ixk, Pb.New().Var(1, 1).Build()));
+                Assert.Equal(owner, DreamHandler.HostOf(guest));
+                var received = new Jondo.Unity.Protocol.Game.Wire.GameCodec().Decode(await Read(visitor));
+                var snapshot = Assert.IsType<InfiniteDreamStateEvent>(received.Content);
+                Assert.Null(received.Uid);
+                Assert.Equal(owner, snapshot.Dreamer!.CharacterId);
+                Assert.Equal(dream.Arena, snapshot.Life);
+                Assert.Equal(room.MapaDeLaSala, visitor.Session.State.MapId);
+                Assert.Equal(hostCell, host.Session.State.CellId);
+
+                // A guest-triggered refresh is encoded by the owner's session.
+                using (SessionContext.Push(visitor.Session)) await DreamHandler.SendStateToOwnerAsync(dream);
+                var refresh = Assert.Single(codec.Frames, f => f.Content is InfiniteDreamStateEvent);
+                Assert.Null(refresh.Uid);
+                Assert.Equal(MarkCodec.Token(codec.Frames.IndexOf(refresh) + 1), await Read(host));
+
+                Assert.True(await DreamHandler.GuestMayNotFightAsync(visitor.Session));
+                Assert.False(await DreamHandler.GuestMayNotFightAsync(host.Session));
+
+                if (exit is Exit.GuestMapChange or Exit.GuestRequest)
+                {
+                    // The earlier GuestMayNotFight warning is unrelated to the map transition.
+                    Assert.NotNull(await RecyclingTests.Until(visitor, Op.Lqn));
+                    if (exit == Exit.GuestRequest)
+                    {
+                        // Restore the guest's view of the host's dream without binding either session.
+                        Assert.Null(SessionContext.Actual);
+                        await DreamHandler.OnWorldEntryAsync(visitor.Session);
+                        var restored = new Jondo.Unity.Protocol.Game.Wire.GameCodec().Decode(await Read(visitor));
+                        Assert.Equal(owner, Assert.IsType<InfiniteDreamStateEvent>(restored.Content).Dreamer!.CharacterId);
+                        using (SessionContext.Push(host.Session))
+                            await DreamHandler.LeaveAsync(visitor.Session, ConnectionProtocol.Push(Op.Iyx));
+                        Assert.Empty(await RecyclingTests.Until(visitor, Op.Ixg));
+                        await visitor.Next(Op.Iyb);
+                    }
+                    else visitor.Session.State.MapId = street;
+                    using (SessionContext.Push(host.Session))
+                    {
+                        await DreamHandler.OnMapLoadedAsync(visitor.Session);
+                        await DreamHandler.OnMapLoadedAsync(visitor.Session);
+                    }
+                    if (exit == Exit.GuestMapChange) Assert.Empty(await visitor.Next(Op.Ixg));
+                    Assert.False(DreamHandler.IsGuest(guest));
+                    Assert.Equal(street, visitor.Session.MapId);
+                    Assert.Equal(room.MapaDeLaSala, host.Session.MapId);
+                    Assert.Equal(hostCell, host.Session.State.CellId);
+                    Assert.DoesNotContain(codec.Frames, frame => frame.Content is InfiniteDreamClearEvent);
+                    await visitor.Quiet();
+                    return;
+                }
 
                 using (SessionContext.Push(visitor.Session))
                 using (await host.Session.EnterTurnAsync())
@@ -75,11 +122,15 @@ namespace Jondo.Unity.Tests.World
                 var clear = Assert.Single(codec.Frames, frame => frame.Content is NpcsMapQuestStatusUpdateEvent);
                 Assert.Empty(Assert.IsType<NpcsMapQuestStatusUpdateEvent>(clear.Content).MapInformation);
                 Assert.Null(clear.Uid);
-                // Skip earlier teleport/presence frames, retaining the clear → marks → acknowledgment boundary.
+                // The opaque codec emits a token for the typed clear, before the marks and answer.
+                var dreamClear = Assert.Single(codec.Frames, frame => frame.Content is InfiniteDreamClearEvent);
+                Assert.Null(dreamClear.Uid);
+                int clearIndex = codec.Frames.IndexOf(dreamClear);
+                Assert.Equal(clearIndex + 1, codec.Frames.IndexOf(clear));
                 for (int i = 0; i < 64; i++)
                 {
                     byte[] packet = await Read(host);
-                    if (packet[0] != 0xC7 && ConnectionProtocol.ReadOpcode(packet) == Op.Ixg) break;
+                    if (packet.SequenceEqual(MarkCodec.Token(clearIndex + 1))) break;
                     Assert.True(i < 63, "Dream-state clear did not arrive.");
                 }
                 if (!fail)
@@ -119,10 +170,9 @@ namespace Jondo.Unity.Tests.World
             await using var visitor = await ClientPipe.OpenAsync(990_000_312, guest, street, "Invitado");
             try
             {
-                using (SessionContext.Push(host.Session)) await DreamHandler.InviteGroupAsync(host.ToClient);
+                await DreamHandler.InviteGroupAsync(host.Session);
                 await visitor.Next(Op.Iyd);
-                using (SessionContext.Push(visitor.Session))
-                    await DreamHandler.AnswerInvitationAsync(visitor.ToClient, ConnectionProtocol.Push(Op.Ixk));
+                await DreamHandler.AnswerInvitationAsync(visitor.Session, ConnectionProtocol.Push(Op.Ixk));
                 Assert.False(DreamHandler.IsGuest(guest));
                 Assert.Equal(street, visitor.Session.State.MapId);
             }

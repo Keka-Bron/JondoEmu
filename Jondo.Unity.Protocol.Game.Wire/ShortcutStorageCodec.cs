@@ -4,5 +4,9 @@ namespace Jondo.Unity.Protocol.Game.Wire;
 public static class ShortcutStorageCodec
 {
     public static Shortcut Decode(ReadOnlySpan<byte> payload)
+#if JONDO_PROTOCOL_3_8_1_2
+        => ShortcutStorageBindings.Decode(payload);
+#else
         => GameBindings.ToStable(Messages.lhs.Parser.ParseFrom(payload));
+#endif
 }

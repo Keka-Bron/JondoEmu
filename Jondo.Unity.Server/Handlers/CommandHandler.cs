@@ -1155,7 +1155,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            var (outcome, room, skipped) = await DreamHandler.SkipToAsync(stream, dream, row);
+            var (outcome, room, skipped) = await DreamHandler.SkipToAsync(SessionContext.Current, dream, row);
             if (outcome == Dreams.SkipOutcome.Done && room != null)
             {
                 ActivityJournal.Current.Write("dream.skipped",

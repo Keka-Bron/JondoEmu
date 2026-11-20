@@ -114,13 +114,8 @@ public sealed class MappedWorldMovementTests
         Assert.Empty(other.Packets);
     }
 
-    /// <summary>
-    /// An overloaded character walks: the real server sends the move's third field at 1 on each of
-    /// his moves, and leaves it out once he is back under his capacity (an official capture). The
-    /// client ran with any weight in its bag, Cautious at 1 or not.
-    /// </summary>
     [Fact]
-    public async Task An_overloaded_character_walks()
+    public async Task Crossing_capacity_updates_the_local_cannot_run_restriction()
     {
         LoadWorld();
         using var mover = new Peer(MapId);
@@ -131,11 +126,7 @@ public sealed class MappedWorldMovementTests
         mover.Session.State.EquipmentItems[1] = new Equipment.Item { Uid = 1, Template = purse, Quantity = (int)heavy };
 
         await WorldMoveHandler.ConfirmMovementAsync(mover.Session, new(MapId, [(3 << 12) | 100, (5 << 12) | 114], false));
-        byte[] walking = mover.Packets.First(p => Codec.ReadEnvelope(p).Alias == "jsj");
-        Assert.Equal(1, Assert.IsType<GameMapMovementEvent>(Codec.Decode(walking).Content).Pace);
-        Assert.Contains(ProtoMessage.Parse(Codec.ReadEnvelope(walking).Content.Value.ToByteArray()).Fields,
-            f => f.FieldNumber == 3 && f.VarIntValue == 1);
-        // And his own client, which walks or runs on its own, is told it cannot run.
+        // The local client is told it cannot run.
         var told = ProtoMessage.Parse(Codec.ReadEnvelope(mover.Packets.Single(p => Codec.ReadEnvelope(p).Alias == "kur")).Content.Value.ToByteArray());
         Assert.Equal(mover.Session.CharacterId, (long)told.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
         Assert.Equal(new byte[] { OverloadRestriction.CannotRun, OverloadRestriction.CannotAttackAsMutant },
@@ -149,10 +140,6 @@ public sealed class MappedWorldMovementTests
         mover.Session.State.EquipmentItems.Clear();
         mover.Packets.Clear();
         await WorldMoveHandler.ConfirmMovementAsync(mover.Session, new(MapId, [(3 << 12) | 100, (5 << 12) | 114], false));
-        byte[] running = mover.Packets.First(p => Codec.ReadEnvelope(p).Alias == "jsj");
-        Assert.Equal(0, Assert.IsType<GameMapMovementEvent>(Codec.Decode(running).Content).Pace);
-        Assert.DoesNotContain(ProtoMessage.Parse(Codec.ReadEnvelope(running).Content.Value.ToByteArray()).Fields,
-            f => f.FieldNumber == 3);
         // Under again: told he can run, with every player's restriction left -- the whole list.
         var free = ProtoMessage.Parse(Codec.ReadEnvelope(mover.Packets.Single(p => Codec.ReadEnvelope(p).Alias == "kur")).Content.Value.ToByteArray());
         Assert.Equal(new byte[] { OverloadRestriction.CannotAttackAsMutant }, free.Fields.Single(f => f.FieldNumber == 2).BytesValue);

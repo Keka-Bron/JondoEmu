@@ -54,6 +54,21 @@ public sealed class GameTrafficTests
         Assert.Contains("uid=4", log);
     }
 
+    [Fact]
+    public void Typed_relogin_logging_masks_the_dashed_token()
+    {
+        const string token = "00000000-0000-4000-8000-00000000000a";
+        var codec = new GameCodec();
+        byte[] frame = codec.Encode(new(new ReloginTokenEvent(token, true)));
+        Assert.True(GameTrafficFormatter.TryFormat(frame, out var name, out var fields));
+        Assert.Equal("ReloginTokenEvent", name);
+        Assert.DoesNotContain(token, fields);
+        Assert.Contains(new string('x', 36), fields);
+        Assert.Contains("\"ValidToken\":true", fields);
+        Assert.Equal(new ReloginTokenEvent(token, true), codec.Decode(frame).Content);
+    }
+
+#if !JONDO_PROTOCOL_3_8_1_2
     [Theory]
     [InlineData("unknown.payload", false)]
     [InlineData("kqz", true)]
@@ -70,6 +85,7 @@ public sealed class GameTrafficTests
         Assert.Contains("1: 123", log);
         Assert.Contains(alias, log);
     }
+#endif
 
     [Fact]
     public void Live_fields_are_bounded_and_malformed_envelopes_are_nonthrowing()

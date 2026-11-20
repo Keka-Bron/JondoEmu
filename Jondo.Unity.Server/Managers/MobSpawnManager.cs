@@ -1656,7 +1656,7 @@ namespace Jondo.Unity.Server.Managers
                 if (occupied.Count == 0) continue;
                 foreach (var movement in WalkGroups(map.Key, occupied))
                     await audience.SendAsync(
-                        new GameMapMovementEvent(movement.Cells, movement.ActorId, false, Pace: 1),
+                        new GameMapMovementEvent(movement.Cells, movement.ActorId, false),
                         fightId: 0);
             }
         }

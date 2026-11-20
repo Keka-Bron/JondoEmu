@@ -407,10 +407,6 @@ namespace Jondo.Unity.Server.Handlers
                 TaxCollectorProtocol.BuildRemoved(tc.Uuid)));
         }
 
-        /// <summary>The alliance's tax collectors, as its sheet (mcx) lists them in its f1.</summary>
-        public static IEnumerable<Pb> InformationOf(AllianceStore.Alliance alliance)
-            => TaxCollectorStore.OfAlliance(alliance.Id).Select(tc => LeaOf(tc, alliance));
-
         private static int StateOf(TaxCollectorStore.TaxCollector tc)
         {
             var defence = AllianceFights.All.FirstOrDefault(d => d.Kind == TaxCollectorProtocol.FightOfTaxCollector

@@ -142,7 +142,7 @@ namespace Jondo.Unity.Server.Network
             long action = Numero(cuerpo, "action");
             if (action == 0) action = Npcs.Talk;
             var lines = RunInSession(session, _ => NpcHandler.InteractAsync(session,
-                ClientFrame(Op.Iov, Pb.New().Var(1, action).Var(2, map).Var(3, actor).Build())));
+                new(checked((int)action), map, checked((int)actor))));
             return Bien(DialogueNow(session, lines));
         }
 
@@ -153,7 +153,7 @@ namespace Jondo.Unity.Server.Network
             if (session == null) return Mal(404, "offline");
             long reply = Numero(cuerpo, "reply");
             var lines = RunInSession(session, _ => NpcHandler.ReplyAsync(session,
-                ClientFrame(Op.Ioy, Pb.New().Var(1, reply).Build())));
+                new(checked((int)reply))));
             return Bien(DialogueNow(session, lines));
         }
 
@@ -164,9 +164,9 @@ namespace Jondo.Unity.Server.Network
             if (session == null) return Mal(404, "offline");
             // The X closes whatever is open, as the client's kla does (GameNodeProxy): a workshop too,
             // whose closing is what marks a quest's «Fabricar … y cerrar la interfaz».
-            var lines = RunInSession(session, stream => WorkshopHandler.IsOpen
+            var lines = RunInSession(session, _ => WorkshopHandler.IsOpen
                 ? WorkshopHandler.CloseAsync(session)
-                : NpcHandler.CloseAsync(stream));
+                : NpcHandler.CloseAsync(session));
             return Bien(DialogueNow(session, lines));
         }
 

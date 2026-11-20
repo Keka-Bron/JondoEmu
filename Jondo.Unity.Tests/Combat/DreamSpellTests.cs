@@ -195,7 +195,7 @@ namespace Jondo.Unity.Tests.Combat
             var dream = new Dreams.Sueno { CharacterId = 1, Nombre = "a", Dificultad = 1 };
             dream.Ganados.Add(new Dreams.Bono(Dreams.PassiveEffect, 31735, true));
             dream.Ganados.Add(new Dreams.Bono(DreamSpells.LearnEffect, 83551, false, 2));
-            var bonuses = ProtoMessage.Parse(DreamProtocol.BuildDreamState(dream)).Fields.Where(f => f.FieldNumber == 15).ToList();
+            var bonuses = ProtoMessage.Parse(DreamProtocol.BuildDreamState(dream).Payload()).Fields.Where(f => f.FieldNumber == 15).ToList();
 
             var passive = ProtoMessage.Parse(bonuses[0].BytesValue);
             var inner = ProtoMessage.Parse(passive.Fields.Single(f => f.FieldNumber == 1).BytesValue);

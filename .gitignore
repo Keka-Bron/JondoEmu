@@ -47,6 +47,9 @@ DofusClient/
 # run the emulator.
 tools/
 *.py
+!AssetImport/import-beta.py
+!AssetImport/november_assets.py
+!AssetImport/test_november_assets.py
 !Jondo.Unity.Protocol.Game.Wire/Import/import-game.py
 !Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
 __pycache__/

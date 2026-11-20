@@ -2860,10 +2860,13 @@ namespace Jondo.Unity.Server
         }
 
         public static void SaveCurrentCharacter()
+            => SaveCharacter(Jondo.Unity.Server.Network.SessionContext.State);
+
+        internal static void SaveCharacter(SessionState state)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
             connection.Open();
-            var (savedMap, savedCell) = PlaceToSave(Jondo.Unity.Server.Network.SessionContext.State);
+            var (savedMap, savedCell) = PlaceToSave(state);
 
             var command = connection.CreateCommand();
             command.CommandText = @"
@@ -2876,26 +2879,26 @@ namespace Jondo.Unity.Server
                     Level = $lvl, Kamas = $kamas, Experience = $xp
                 WHERE Id = $charId;
             ";
-            command.Parameters.AddWithValue("$charId", Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
+            command.Parameters.AddWithValue("$charId", state.CharacterId);
             command.Parameters.AddWithValue("$mapId", savedMap);
             command.Parameters.AddWithValue("$cellId", savedCell);
-            command.Parameters.AddWithValue("$orientation", Jondo.Unity.Server.Network.SessionContext.State.Orientation);
-            command.Parameters.AddWithValue("$pts", Jondo.Unity.Server.Network.SessionContext.State.CharacterRemainingPoints);
-            command.Parameters.AddWithValue("$vit", Jondo.Unity.Server.Network.SessionContext.State.StatVitality);
-            command.Parameters.AddWithValue("$wis", Jondo.Unity.Server.Network.SessionContext.State.StatWisdom);
-            command.Parameters.AddWithValue("$str", Jondo.Unity.Server.Network.SessionContext.State.StatStrength);
-            command.Parameters.AddWithValue("$int", Jondo.Unity.Server.Network.SessionContext.State.StatIntelligence);
-            command.Parameters.AddWithValue("$cha", Jondo.Unity.Server.Network.SessionContext.State.StatChance);
-            command.Parameters.AddWithValue("$agi", Jondo.Unity.Server.Network.SessionContext.State.StatAgility);
-            command.Parameters.AddWithValue("$svit", Jondo.Unity.Server.Network.SessionContext.State.ScrolledVitality);
-            command.Parameters.AddWithValue("$swis", Jondo.Unity.Server.Network.SessionContext.State.ScrolledWisdom);
-            command.Parameters.AddWithValue("$sstr", Jondo.Unity.Server.Network.SessionContext.State.ScrolledStrength);
-            command.Parameters.AddWithValue("$sint", Jondo.Unity.Server.Network.SessionContext.State.ScrolledIntelligence);
-            command.Parameters.AddWithValue("$scha", Jondo.Unity.Server.Network.SessionContext.State.ScrolledChance);
-            command.Parameters.AddWithValue("$sagi", Jondo.Unity.Server.Network.SessionContext.State.ScrolledAgility);
-            command.Parameters.AddWithValue("$lvl", Jondo.Unity.Server.Network.SessionContext.State.CharacterLevel);
-            command.Parameters.AddWithValue("$kamas", Jondo.Unity.Server.Network.SessionContext.State.Kamas);
-            command.Parameters.AddWithValue("$xp", Jondo.Unity.Server.Network.SessionContext.State.Experience);
+            command.Parameters.AddWithValue("$orientation", state.Orientation);
+            command.Parameters.AddWithValue("$pts", state.CharacterRemainingPoints);
+            command.Parameters.AddWithValue("$vit", state.StatVitality);
+            command.Parameters.AddWithValue("$wis", state.StatWisdom);
+            command.Parameters.AddWithValue("$str", state.StatStrength);
+            command.Parameters.AddWithValue("$int", state.StatIntelligence);
+            command.Parameters.AddWithValue("$cha", state.StatChance);
+            command.Parameters.AddWithValue("$agi", state.StatAgility);
+            command.Parameters.AddWithValue("$svit", state.ScrolledVitality);
+            command.Parameters.AddWithValue("$swis", state.ScrolledWisdom);
+            command.Parameters.AddWithValue("$sstr", state.ScrolledStrength);
+            command.Parameters.AddWithValue("$sint", state.ScrolledIntelligence);
+            command.Parameters.AddWithValue("$scha", state.ScrolledChance);
+            command.Parameters.AddWithValue("$sagi", state.ScrolledAgility);
+            command.Parameters.AddWithValue("$lvl", state.CharacterLevel);
+            command.Parameters.AddWithValue("$kamas", state.Kamas);
+            command.Parameters.AddWithValue("$xp", state.Experience);
             command.ExecuteNonQuery();
         }
 

@@ -16,13 +16,16 @@ internal sealed class PrismMessages(ItemEffectMessages effects, Func<int, IReadO
         {
             var alliance = AllianceStore.ById(prism.AllianceId);
             if (alliance == null) continue;
-            var map = MapManager.GetMapInfo(prism.MapId);
-            // Localized tag 5 (legacy duplicate alliance UUID) is indeterminate;
-            // omit under the outbound policy. The mapped alliance retains its UID.
-            result.Add(new(prism.MapId, new(map?.PosX ?? 0, map?.PosY ?? 0), prism.SubAreaId,
-                State(prism, alliance, own: alliance.Id == mine)));
+            result.Add(Localized(prism, alliance, own: alliance.Id == mine));
         }
         return new(result.ToArray());
+    }
+
+    internal PrismLocalizedInformation Localized(PrismStore.Prism prism, AllianceStore.Alliance alliance, bool own)
+    {
+        var map = MapManager.GetMapInfo(prism.MapId);
+        // The legacy duplicate alliance UUID is indeterminate; the nested alliance retains its UID.
+        return new(prism.MapId, new(map?.PosX ?? 0, map?.PosY ?? 0), prism.SubAreaId, State(prism, alliance, own));
     }
 
     internal PrismInformation State(PrismStore.Prism prism, AllianceStore.Alliance alliance, bool own = false)

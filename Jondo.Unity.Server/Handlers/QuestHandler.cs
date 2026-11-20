@@ -27,22 +27,6 @@ namespace Jondo.Unity.Server.Handlers
     public static class QuestHandler
     {
         /// <summary>
-        /// The client asks where a quest has got to (ieo). Answered with idu.
-        /// </summary>
-        public static async Task StepAsync(GameSession session, byte[] payload)
-        {
-            byte[]? ieo = ConnectionProtocol.ReadPayload(payload, Op.Ieo);
-            if (ieo == null) return;
-
-            // Field 2, not 1: measured over 195 frames. Reading field 1 would answer about
-            // whatever happened to be there and look like it worked.
-            int questId = Field(ieo, 2);
-            if (questId == 0) return;
-
-            await Quests.SendStepAsync(session, questId);
-        }
-
-        /// <summary>
         /// The client says an objective is done (idw): f1 quest, f2 objective.
         /// </summary>
         public static async Task ObjectiveAsync(GameSession session, byte[] payload)
