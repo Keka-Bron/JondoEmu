@@ -256,6 +256,28 @@ namespace Jondo.Unity.Server.Managers
             var state = SessionContext.State;
             if (book == null || Log == null) return;
 
+            var candidates = ArrivedOn(book, mapId, subAreaId);
+
+            if (state.AchievementLevelChecked != state.CharacterLevel)
+            {
+                state.AchievementLevelChecked = state.CharacterLevel;
+                candidates.AddRange(book.WaitingOn("PL"));
+            }
+
+            // And whatever the last fight set aside.
+            candidates.AddRange(state.AchievementsPending);
+            state.AchievementsPending.Clear();
+
+            await CheckAsync(session, candidates);
+        }
+
+        /// <summary>
+        /// What arriving on a map may earn the character of the current context: the zone explored,
+        /// the maps some achievement asks to have been on, and what he stands on and holds there.
+        /// The zone and the maps are written down once, as his own.
+        /// </summary>
+        private static List<int> ArrivedOn(AchievementCatalogue book, long mapId, int subAreaId)
+        {
             var candidates = new List<int>();
             if (subAreaId > 0 && Tally(AchievementCatalogue.ExploreKey, subAreaId) == 0)
             {
@@ -269,12 +291,6 @@ namespace Jondo.Unity.Server.Managers
             candidates.AddRange(book.WaitingOn("HP"));
             candidates.AddRange(book.WaitingOn("lB"));
 
-            if (state.AchievementLevelChecked != state.CharacterLevel)
-            {
-                state.AchievementLevelChecked = state.CharacterLevel;
-                candidates.AddRange(book.WaitingOn("PL"));
-            }
-
             candidates.AddRange(book.WaitingOn("Pm", mapId));
             candidates.AddRange(book.WaitingOn("PO"));
 
@@ -286,12 +302,7 @@ namespace Jondo.Unity.Server.Managers
                 SetTally(VisitedKind, mapId, 1);
                 candidates.AddRange(onTheMap);
             }
-
-            // And whatever the last fight set aside.
-            candidates.AddRange(state.AchievementsPending);
-            state.AchievementsPending.Clear();
-
-            await CheckAsync(session, candidates);
+            return candidates;
         }
 
         /// <summary>
@@ -303,8 +314,13 @@ namespace Jondo.Unity.Server.Managers
         /// what it earned since the hero was connected is shown to him before he is looked at, and
         /// what he earns is shown to the master after. Each earns and is paid for his own, the
         /// others' included (AchievementLog.Owner), as every character of an account may.
+        ///
+        /// Given the map he reached beside his master (<paramref name="mapId"/>), what arriving on
+        /// it earns is his too: the zone he explored with him, the maps he has been on. Only the
+        /// master's session gets the map's information, and the heroes following him through a
+        /// zone were left out of its exploration achievements (Keka-Bron/JondoEmu#213).
         /// </remarks>
-        public static async Task ForHeroAsync(GameSession master, GameSession hero)
+        public static async Task ForHeroAsync(GameSession master, GameSession hero, long mapId = 0, int subAreaId = 0)
         {
             var book = _book;
             var account = master.State.Achievements;
@@ -316,7 +332,8 @@ namespace Jondo.Unity.Server.Managers
                 var log = Log;
                 if (log == null) return;
 
-                var candidates = new List<int>(state.AchievementsPending);
+                var candidates = mapId != 0 ? ArrivedOn(book, mapId, subAreaId) : new List<int>();
+                candidates.AddRange(state.AchievementsPending);
                 state.AchievementsPending.Clear();
                 if (state.AchievementLevelChecked != state.CharacterLevel)
                 {
