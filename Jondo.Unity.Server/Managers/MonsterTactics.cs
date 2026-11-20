@@ -128,6 +128,19 @@ namespace Jondo.Unity.Server.Managers
                                                 && EffectEngine.CasterQualifies(caster, mask));
 
             /// <summary>
+            /// The masks of its mechanics when they are for its side and can never be for the caster:
+            /// «g», one of its side but not himself, or a spell cast from one cell away at least.
+            /// Whom it is aimed at instead of itself. The Tynrils' Forca swaps one with another of
+            /// his side («g», one to sixty-three cells), and aimed at himself it was never cast: in
+            /// the game each of them changes places with another every turn.
+            /// </summary>
+            public IReadOnlyList<string> UtilityOwnSideMasks { get; init; } = Array.Empty<string>();
+
+            /// <summary>Whether one of those masks names that fighter of its side.</summary>
+            public bool UtilityReachesOwnSide(Fighter caster, Fighter ally)
+                => ally != caster && UtilityOwnSideMasks.Any(mask => EffectEngine.CumpleLaMascara(caster, ally, mask));
+
+            /// <summary>
             /// Whether those masks put a condition on the caster: a step of the boss's own script,
             /// cast when its state says so and before anything else of the turn.
             /// </summary>
@@ -861,6 +874,11 @@ namespace Jondo.Unity.Server.Managers
                     foreach (var ally in allies.Where(a => a != monster && spell.UtilityReaches(monster, a)))
                         yield return (ally, ally.CellId);
                 }
+                else if (spell.UtilityOwnSideMasks.Count > 0)
+                {
+                    foreach (var ally in allies.Where(a => spell.UtilityReachesOwnSide(monster, a)))
+                        yield return (ally, ally.CellId);
+                }
                 else yield return (monster, from);
             }
         }
@@ -956,6 +974,12 @@ namespace Jondo.Unity.Server.Managers
                 // Aimed at the one of its side its masks name; a step of its script goes first.
                 if (!onEnemy && target != monster && spell.UtilityReaches(monster, target))
                     value += spell.Utility + (spell.UtilityScripted ? ScriptedStep : 0);
+            }
+            else if (spell.Utility > 0 && spell.UtilityOwnSideMasks.Count > 0)
+            {
+                // Aimed at one of its side, never at itself: the Tynrils' Forca.
+                if (!onEnemy && spell.UtilityReachesOwnSide(monster, target))
+                    value += spell.Utility;
             }
             else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy : target == monster))
                 value += spell.Utility;

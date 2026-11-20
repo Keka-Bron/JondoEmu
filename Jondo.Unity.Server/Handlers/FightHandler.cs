@@ -11097,6 +11097,7 @@ namespace Jondo.Unity.Server.Handlers
                 Managers.SpellEffect? zoneRow = null;
                 double heal = 0, pickedDamage = 0;
                 var masks = new Dictionary<int, string>();
+                var mechanicMasks = new List<string>();
                 foreach (var effect in Managers.SpellEffects.De(spell, grade))
                 {
                     string mask = effect.TargetMask ?? "";
@@ -11135,6 +11136,7 @@ namespace Jondo.Unity.Server.Handlers
                         // Anything else it does when cast: a state, a glyph, a teleport, a sub-cast.
                         mechanics = true;
                         if (enemies) mechanicsOnEnemies = true;
+                        if (!effect.ForClientOnly) mechanicMasks.Add(mask);
                     }
                     else if (!Managers.EffectEngine.EsMarcadorDeGuion(effect.EffectId) && !effect.ForClientOnly)
                     {
@@ -11191,6 +11193,18 @@ namespace Jondo.Unity.Server.Handlers
                     ? allyRows.Select(e => e.TargetMask ?? "").Distinct().ToList()
                     : new List<string>();
 
+                // Whom its mechanics are aimed at when they are all for its side and can never land
+                // on the caster -- «g», one of its side but not himself, or cast from one cell away
+                // at least --: one of its side. The Tynrils' Forca (178 and 8 on «g», one to
+                // sixty-three cells) swaps one with another; weighed as cast on himself, it never was.
+                var utilityOwnSideMasks = utilityAllyMasks.Count == 0 && mechanics && !mechanicsOnEnemies
+                                          && mechanicMasks.Count > 0
+                                          && mechanicMasks.All(m => (HasMask(m, "a") || HasMask(m, "g")) && !HasMask(m, "A"))
+                                          && (data.MinRange > 0
+                                              || mechanicMasks.All(m => !Managers.EffectEngine.CumpleLaMascara(monster, monster, m)))
+                    ? mechanicMasks.Distinct().ToList()
+                    : new List<string>();
+
                 // A blow that spares its own side and sets a state on one of its side it names: the
                 // state is the point, the blow comes with it. Ben el Ripata's Hamrack has Timonel
                 // (2618) for its one move, aimed at Ben beside it: it takes his invulnerability (952
@@ -11226,6 +11240,7 @@ namespace Jondo.Unity.Server.Handlers
                     Buff = buff,
                     SupportMasks = supportMasks,
                     UtilityAllyMasks = utilityAllyMasks,
+                    UtilityOwnSideMasks = utilityOwnSideMasks,
                     Summons = summons,
                     NeedsFreeCell = limits.NeedFreeCell,
                     RangeBoostable = (limits.Flags & Managers.SpellLevelFlags.RangeCanBeBoosted) != 0,

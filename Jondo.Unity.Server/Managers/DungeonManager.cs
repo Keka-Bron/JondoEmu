@@ -150,9 +150,11 @@ namespace Jondo.Unity.Server.Managers
         /// The dungeons whose boss stands alone in his room, not leading a group the room fills up to
         /// eight. The Giant Kralamoure (31): «Troisième et dernier combat : le Kralamoure Géant»,
         /// nobody else (wiki-dofus, Dofus pour les noobs); composed like the others, he came with
-        /// seven of his lair's monsters. Nothing in the client's data says it.
+        /// seven of his lair's monsters. The Tynril's Laboratory (51): its four Tynrils «ne sont pas
+        /// accompagnés d'autres monstres du donjon» (Dofus pour les noobs); a team of five or more
+        /// found the dungeon's other monsters with them. Nothing in the client's data says it.
         /// </summary>
-        public static readonly int[] BossFightsAlone = { 31 };
+        public static readonly int[] BossFightsAlone = { 31, 51 };
 
         /// <summary>
         /// The dungeons as one set: <see cref="Initialize"/> fills a new one on its own thread and
