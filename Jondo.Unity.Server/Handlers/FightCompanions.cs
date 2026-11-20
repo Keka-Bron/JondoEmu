@@ -73,6 +73,7 @@ namespace Jondo.Unity.Server.Handlers
                 MaxHP = Math.Max(1, Stat(0) + Stat(11)),
                 MaxAP = Stat(1),
                 MaxMP = Stat(23),
+                Vitality = Stat(11),
                 Strength = Stat(10),
                 Intelligence = Stat(15),
                 Chance = Stat(13),

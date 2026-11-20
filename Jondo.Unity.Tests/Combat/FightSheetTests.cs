@@ -82,5 +82,39 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(100, entry.Base);
             }
         }
+
+        [Fact]
+        public void Life_goes_without_vitality_which_goes_in_its_own_eleven()
+        {
+            // The client draws the top of the bar as characteristic 0 plus the vitality (hl.ndu):
+            // a whole maximum in 0 with the vitality in 11 counted it twice.
+            var fighter = new Fighter { MaxHP = 1400, Vitality = 1100 };
+            fighter.BasePoints[11] = (1000, 100);
+            var sheet = FightHandler.FichaParaLaGuardia(fighter);
+
+            Assert.Equal(300, sheet.Find(e => e.Characteristic == 0).Base);
+            var vitality = sheet.Find(e => e.Characteristic == 11);
+            Assert.Equal(1000, vitality.Base);
+            Assert.Equal(0, vitality.Gear);
+            Assert.Equal(100, Assert.IsAssignableFrom<System.Collections.Generic.IReadOnlyDictionary<int, long>>(
+                FightHandler.ScrollsOf(fighter))[11]);
+        }
+
+        [Fact]
+        public void The_scrolls_go_in_f3_for_the_character_and_in_the_total_for_the_others()
+        {
+            // EntityDetailedStat(statId, baseValue f2, additionalValue f3, equipmentValue f7, ...).
+            var detailed = Server.Network.ProtoMessage.Parse(
+                Server.Network.FightProtocol.SheetEntry(10, 400, 250, isMonster: false, additional: 100).Build());
+            var slots = Server.Network.ProtoMessage.Parse(detailed.Fields.Single(f => f.FieldNumber == 4).BytesValue);
+            Assert.Equal(400, slots.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
+            Assert.Equal(100, slots.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
+            Assert.Equal(250, slots.Fields.Single(f => f.FieldNumber == 7).VarIntValue);
+
+            var simple = Server.Network.ProtoMessage.Parse(
+                Server.Network.FightProtocol.SheetEntry(10, 400, 250, isMonster: true, additional: 100).Build());
+            var total = Server.Network.ProtoMessage.Parse(simple.Fields.Single(f => f.FieldNumber == 2).BytesValue);
+            Assert.Equal(750, total.Fields.Single(f => f.FieldNumber == 2).VarIntValue);
+        }
     }
 }

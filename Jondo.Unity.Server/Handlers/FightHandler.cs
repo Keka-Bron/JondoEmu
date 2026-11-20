@@ -700,7 +700,7 @@ namespace Jondo.Unity.Server.Handlers
             return Network.FightProtocol.BuildFighter(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter), look,
                 Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false, team: fighter.TeamId);
+                isMonster: false, team: fighter.TeamId, scrolls: ScrollsOf(fighter));
         }
 
         /// <summary>
@@ -742,7 +742,7 @@ namespace Jondo.Unity.Server.Handlers
             return Network.FightProtocol.FighterBlock(
                 fighter.CellId, FacingOf(fight, fighter), fighter.Id, FullSheetOf(fighter), look,
                 Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false, alive: fighter.IsAlive, team: fighter.TeamId);
+                isMonster: false, alive: fighter.IsAlive, team: fighter.TeamId, scrolls: ScrollsOf(fighter));
         }
 
         /// <summary>
@@ -846,6 +846,12 @@ namespace Jondo.Unity.Server.Handlers
             playerFighter.CurrentHP = playerFighter.MaxHP;
             playerFighter.CurrentAP = playerFighter.MaxAP;
             playerFighter.CurrentMP = playerFighter.MaxMP;
+            // His own points and his scrolls, which the sheet sends apart from the equipment.
+            playerFighter.BasePoints[10] = (GameState.StatStrength, GameState.ScrolledStrength);
+            playerFighter.BasePoints[11] = (GameState.StatVitality, GameState.ScrolledVitality);
+            playerFighter.BasePoints[13] = (GameState.StatChance, GameState.ScrolledChance);
+            playerFighter.BasePoints[14] = (GameState.StatAgility, GameState.ScrolledAgility);
+            playerFighter.BasePoints[15] = (GameState.StatIntelligence, GameState.ScrolledIntelligence);
             RellenarLaFicha(playerFighter);
             return playerFighter;
         }
@@ -1802,6 +1808,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                                    bool told = true)
         {
             if (told) fighter.LifeTopTold = fighter.MaxHP;
+            int Own(int characteristic) => fighter.BasePoints.TryGetValue(characteristic, out var p) ? p.Own : 0;
+            int Scrolled(int characteristic) => fighter.BasePoints.TryGetValue(characteristic, out var p) ? p.Scrolled : 0;
             var summonCharacteristic = SummonCharacteristicFor(fighter);
             var ficha = new List<(int, long, long)>
             {
@@ -1836,19 +1844,23 @@ namespace Jondo.Unity.Server.Handlers
                 // items and the bar came out doubled. With the full sheet it no longer mixes: it keeps
                 // ours, and sending only the level's left the character with 1,050 life in the middle
                 // of the fight.
-                // The maximum he has now; the life refresh is told against it (LifeTopTold).
-                (LifeCharacteristic, fighter.MaxHP, 0),
+                // The maximum he has now, less his vitality, which goes in its own 11: the client
+                // draws the top of the bar as characteristic 0 less the erosion (102) PLUS the total
+                // of vitality (hl.ndu in the 3.6.10.11 client, read with Ghidra over the REA IL2CPP
+                // seeds; hl.ndt adds 97 and 102 for the life he has). Sent whole in 0 with 11 at
+                // zero, the bar was right and the sheet showed no vitality; sent whole in 0 with 11
+                // filled, the character went into a fight with 7,856 life where he has 4,453 --
+                // his 3,403 vitality twice. The sum, and so the life refresh told against it
+                // (LifeTopTold), is the same maximum either way.
+                (LifeCharacteristic, fighter.MaxHP - fighter.Vitality, 0),
 
-                (10, 0, fighter.Strength),
-                // Vitality stays at zero ON PURPOSE, even though the real server sends it.
-                // Measured twice: this client ADDS it to maximum life on top of what goes in
-                // characteristic 0, and the character went into a fight with 7,856 life where he
-                // has 4,453 -- exactly his 3,403 vitality too many --. Putting it back requires
-                // first finding out exactly what it expects in 0.
-                (11, 0, 0),
-                (13, 0, fighter.Chance),
-                (14, 0, fighter.Agility),
-                (15, 0, fighter.Intelligence),
+                // A character's own points in the base slot and the rest in the equipment's, less
+                // his scrolls, which go in their own slot (ScrollsOf, FightProtocol.SheetEntry).
+                (10, Own(10), fighter.Strength - Own(10) - Scrolled(10)),
+                (11, Own(11), fighter.Vitality - Own(11) - Scrolled(11)),
+                (13, Own(13), fighter.Chance - Own(13) - Scrolled(13)),
+                (14, Own(14), fighter.Agility - Own(14) - Scrolled(14)),
+                (15, Own(15), fighter.Intelligence - Own(15) - Scrolled(15)),
                 (16, 0, fighter.FlatDamage),
                 (18, 0, fighter.CriticalBonus),
                 (19, 0, fighter.Range),
@@ -1945,6 +1957,16 @@ namespace Jondo.Unity.Server.Handlers
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
                 : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
                                                         fighter.MonsterId, fighter.Level);
+
+        /// <summary>
+        /// A character's scrolls per characteristic, which every sheet of his carries in their own
+        /// slot (FightProtocol.SheetEntry's additional) and FullSheetOf leaves out of the equipment's.
+        /// Null for a fighter with none.
+        /// </summary>
+        internal static IReadOnlyDictionary<int, long>? ScrollsOf(Fighter? fighter)
+            => fighter == null || fighter.BasePoints.Count == 0
+                ? null
+                : fighter.BasePoints.ToDictionary(p => p.Key, p => (long)p.Value.Scrolled);
 
         /// <summary>Whose summon a fighter is, for its sheet's f1; zero for anybody else.</summary>
         private static long SummonerOf(Fighter fighter) => fighter.EsInvocado ? fighter.Invocador : 0;
@@ -7391,7 +7413,8 @@ namespace Jondo.Unity.Server.Handlers
             => ACadaUnoAsync(fight, sesion => WriteFrameAsync(sesion.Stream,
                    ConnectionProtocol.Push(Op.Jxw,
                        Network.FightProtocol.BuildFighterSheet(
-                           fighterId, cambios, fighterId == sesion.State.CharacterId))));
+                           fighterId, cambios, fighterId == sesion.State.CharacterId,
+                           ScrollsOf(fight.Buscar(fighterId))))));
 
         /// <summary>Each his own, built from his own session context.</summary>
         /// <remarks>
@@ -8842,7 +8865,8 @@ namespace Jondo.Unity.Server.Handlers
                             Network.FightProtocol.BuildIllusion(
                                 quienLanza.Id, copia.Id, copia.CellId, FacingOf(fight, copia),
                                 c.CasillaDesde, FacingOf(fight, quienLanza),
-                                suFicha, look, identity: comoEl, team: quienLanza.TeamId)));
+                                suFicha, look, identity: comoEl, team: quienLanza.TeamId,
+                                scrolls: ScrollsOf(quienLanza))));
                     }
                     Program.LogDebug($"[Fight] {quienLanza.Id} jumps from {c.CasillaDesde} to " +
                                      $"{c.CasillaHasta} and leaves {c.Ilusiones.Count} illusions.");

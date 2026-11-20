@@ -293,10 +293,11 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildFighter(int cell, int orientation, long fighterId,
                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                           byte[] look, Pb identity, bool isMonster, long summoner = 0,
-                                          int? team = null, bool companion = false)
+                                          int? team = null, bool companion = false,
+                                          IReadOnlyDictionary<int, long>? scrolls = null)
             => Pb.New()
                 .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster,
-                                     team: team, summoner: summoner, companion: companion))
+                                     team: team, summoner: summoner, companion: companion, scrolls: scrolls))
                 .Build();
 
         /// <summary>
@@ -362,16 +363,20 @@ namespace Jondo.Unity.Server.Network
         ///
         ///   monster, all             f2 { f2: value }         and an empty f2 if it is zero
         ///   player, AP(1) and MP(23) f5 { f1: base, f5: from equipment }
-        ///   player, the rest         f4 { f2: base, f3: 100, f7: from equipment }   f4 empty if zero
+        ///   player, the rest         f4 { f2: base, f3: scrolls, f7: from equipment }   f4 empty if zero
         ///
         /// The capture character's power travels as <c>2a 07 08 19 22 03 38 96 01</c>, that
         /// is f5 { f1: 25, f4 { f7: 150 } }; the shape the emulator emitted for that same thing,
         /// <c>2a 07 08 19 2a 03 08 96 01</c>, does not appear once in the whole capture.
         ///
-        /// The f3 with the hundred is only carried by the five that are distributed with points —strength,
-        /// vitality, chance, agility and intelligence—, just as it was measured; and it is not sent,
-        /// see the end of <see cref="SheetEntry"/>.
+        /// The f3 is only carried by the five that are distributed with points —strength, vitality,
+        /// chance, agility and intelligence—, just as it was measured: it is their scrolls, see the
+        /// end of <see cref="SheetEntry"/>.
         /// </summary>
+        /// <param name="additional">
+        /// The scrolls, f3 in a person's detailed mould and part of the total in the simple one: a
+        /// sheet sent without them took them off the client's characteristic until the next one.
+        /// </param>
         /// <param name="delEmbrujo">
         /// THE BUFF SLOT, f8. It is what spells set and remove during the fight, and it
         /// goes SEPARATE from the base and the equipment: the client keeps all three and adds them itself.
@@ -382,7 +387,7 @@ namespace Jondo.Unity.Server.Network
         /// write it once in 1,713.
         /// </param>
         public static Pb SheetEntry(int characteristic, long baseValue, long fromGear, bool isMonster,
-                                    long delEmbrujo = 0)
+                                    long delEmbrujo = 0, long additional = 0)
         {
             var entry = Pb.New().VarIfNotZero(1, characteristic);
 
@@ -396,7 +401,7 @@ namespace Jondo.Unity.Server.Network
                 // reconnection, a wave, a spectator coming in -- drew it whole: the Iop's
                 // Estratega at 2,094 where the server held 1,402. The erosion stays out of it (it
                 // is off the top already), or the sum takes it off twice.
-                long total = characteristic == TemporaryLifeMalus ? baseValue : baseValue + fromGear + delEmbrujo;
+                long total = characteristic == TemporaryLifeMalus ? baseValue : baseValue + additional + fromGear + delEmbrujo;
                 if (total == 0) entry.EmptyMsg(2);
                 else entry.Msg(2, Pb.New().Var(2, total));
                 return entry;
@@ -416,17 +421,19 @@ namespace Jondo.Unity.Server.Network
                 return entry.Msg(4, Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(8, fromGear));
             }
 
-            if (baseValue == 0 && fromGear == 0 && delEmbrujo == 0)
+            if (baseValue == 0 && additional == 0 && fromGear == 0 && delEmbrujo == 0)
             {
                 return entry.EmptyMsg(4);
             }
 
-            // The f3 with the hundred is NOT sent, even though the real server carries it in five of them.
-            // This client ADDS it instead of taking it as a percentage: with it set, the sheet
-            // showed 568 strength where there are 468, and a hundred too many in intelligence, chance and
-            // agility. Until it is known what exactly it expects, better not to send it.
-            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(7, fromGear)
-                          .VarIfNotZero(8, delEmbrujo);
+            // f3 is the scrolls: the 3.6.10.11 client builds the entry as EntityDetailedStat(statId,
+            // baseValue f2, additionalValue f3, equipmentValue f7, alignmentValue f6, contextValue f8,
+            // temporaryValue f5) -- hn.nef, read with Ghidra over the REA IL2CPP seeds, the names
+            // the client's own -- and draws f3 as «Bonus additionnel». The captures' «hundred» in
+            // the five base characteristics was their character's hundred of scrolls in each. Sent
+            // while the base already held them, the sheet showed 568 strength where there were 468.
+            var valor = Pb.New().VarIfNotZero(2, baseValue).VarIfNotZero(3, additional)
+                          .VarIfNotZero(7, fromGear).VarIfNotZero(8, delEmbrujo);
             return entry.Msg(4, valor);
         }
 
@@ -455,7 +462,7 @@ namespace Jondo.Unity.Server.Network
                                       IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                       byte[] look, Pb identity, bool isMonster, int wave = 0,
                                       bool alive = true, int? team = null, long summoner = 0,
-                                      bool companion = false)
+                                      bool companion = false, IReadOnlyDictionary<int, long>? scrolls = null)
         {
             var stats = Pb.New()
                 .VarIfNotZero(1, summoner)
@@ -463,7 +470,8 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(4, summoner != 0 ? 1 : 0);
             foreach (var (characteristic, baseValue, gear) in sheet)
             {
-                stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster));
+                stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster,
+                                        additional: scrolls != null && scrolls.TryGetValue(characteristic, out long s) ? s : 0));
             }
 
             // Who it is, with its place repeated. It appears in both, with f2 only in the monsters.
@@ -1440,7 +1448,8 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildFighterSheet(long fighterId,
                                                IEnumerable<(int Characteristic, long Base,
                                                             long Gear, long Buff)> sheet,
-                                               bool esElPersonajeControlado)
+                                               bool esElPersonajeControlado,
+                                               IReadOnlyDictionary<int, long>? scrolls = null)
         {
             // A jxw ENTRY REPLACES THE jxb ONE, IT IS NOT ADDED TO IT. Everything follows from that.
             //
@@ -1469,7 +1478,8 @@ namespace Jondo.Unity.Server.Network
             foreach (var (characteristic, baseValue, gear, buff) in sheet)
             {
                 stats.Msg(5, SheetEntry(characteristic, baseValue, gear,
-                                        isMonster: !esElPersonajeControlado, delEmbrujo: buff));
+                                        isMonster: !esElPersonajeControlado, delEmbrujo: buff,
+                                        additional: scrolls != null && scrolls.TryGetValue(characteristic, out long s) ? s : 0));
             }
             return Pb.New().Var(1, fighterId).Msg(3, stats).Build();
         }
@@ -1956,12 +1966,14 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildIllusion(long author, long illusionId, int cell, int orientation,
                                            int originalCell, int originalOrientation,
                                            IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                           byte[] look, Pb identity = null, int team = 0)
+                                           byte[] look, Pb identity = null, int team = 0,
+                                           IReadOnlyDictionary<int, long>? scrolls = null)
         {
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, baseValue, gear) in sheet)
             {
-                stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster: identity == null));
+                stats.Msg(5, SheetEntry(characteristic, baseValue, gear, isMonster: identity == null,
+                                        additional: scrolls != null && scrolls.TryGetValue(characteristic, out long s) ? s : 0));
             }
             var original = Pb.New()
                 .VarIfNotZero(2, team)
