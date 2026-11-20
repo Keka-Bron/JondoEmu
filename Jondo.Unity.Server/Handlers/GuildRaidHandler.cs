@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Content;
@@ -310,8 +311,7 @@ namespace Jondo.Unity.Server.Handlers
         internal static async Task TellRunningRaidAsync(GuildRaidBoard.Raid board, RaidInstance raid, IEnumerable<long> to)
         {
             if (board == null || raid == null) return;
-            byte[] frame = ConnectionProtocol.Push(Op.Hvt,
-                GuildRaidProtocol.BuildRunningRaid(board, raid, GuildRaidManager.VariablesOf(raid)));
+            var frame = RaidEntryMessages.Joined(board, raid);
             foreach (long id in to.ToList())
             {
                 var session = SessionRegistry.FindByCharacter(id);
@@ -334,8 +334,9 @@ namespace Jondo.Unity.Server.Handlers
         internal static async Task TellParticipantStateAsync(RaidInstance raid, long characterId)
         {
             if (raid == null || raid.Uuid.Length == 0) return;
-            await TellRunningWatchersAsync(raid.Uuid, ConnectionProtocol.Push(Op.Hwo,
-                GuildRaidProtocol.BuildRunningParticipantState(raid.Uuid, characterId, GuildRaidProtocol.StateOf(raid, characterId))));
+            var update = new Game.RunningRaidParticipantStateUpdatedEvent(GuildRaidProtocol.KeyOf(characterId),
+                raid.Uuid, RaidEntryMessages.State(raid, characterId));
+            foreach (var session in RunningWatchers(raid.Uuid)) await session.SendAsync(update);
         }
 
         /// <summary>The running raid has a new captain.</summary>
@@ -449,9 +450,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var pending = GuildRaidRewards.Pending(characterId, now);
             if (pending.Count == 0) return;
-            var raids = GuildRaidCatalogue.Raids.Where(r => GuildRaidCatalogue.RewardsOf(r.Id).Any(s => pending.Contains(s.Id)))
-                                                .Select(r => r.Id);
-            await session.SendAsync(ConnectionProtocol.Push(Op.Iac, GuildRaidProtocol.BuildPendingRewards(raids, pending)));
+            await session.SendAsync(new Game.RaidPendingRewardEvent(pending.ToArray()));
         }
 
         /// <summary>
@@ -537,23 +536,21 @@ namespace Jondo.Unity.Server.Handlers
         /// raid's tab shows him connected, and if his raid is running he gets it back, with its
         /// panel, and the others see him there again.
         /// </summary>
-        public static async Task OnEnterWorldAsync(long characterId)
+        public static async Task OnEnterWorldAsync(GameSession me)
         {
-            var me = SessionRegistry.FindByCharacter(characterId);
-            if (me != null)
-            {
-                var now = DateTimeOffset.UtcNow;
-                await TellPendingAsync(me, characterId, now);
-                var paid = await GuildRaidLadder.DeliverAsync(me.Stream, characterId, now);
-                if (paid.Count > 0)
-                    await me.SendAsync(ConnectionProtocol.Push(Op.Ibs, GuildRaidProtocol.BuildLadderRewardsObtained(paid)));
-            }
+            using var context = SessionContext.Push(me);
+            long characterId = me.CharacterId;
+            var now = DateTimeOffset.UtcNow;
+            await TellPendingAsync(me, characterId, now);
+            var paid = await GuildRaidLadder.DeliverAsync(me.Stream, characterId, now);
+            if (paid.Count > 0)
+                await me.SendAsync(new Game.RaidLadderRewardsObtainedEvent(paid.Select(p => new Game.RaidLadderReward(p.RaidId)).ToArray()));
             var raid = GuildRaidBoard.OfParticipant(characterId);
             if (raid == null) return;
             await TellConnectionAsync(raid, characterId, true);
             var running = GuildRaidManager.RunningByUuid(raid.Uuid);
             if (running == null || running.HasLeft(characterId)) return;
-            await TellRunningRaidAsync(raid, running, new[] { characterId });
+            await me.SendAsync(RaidEntryMessages.Joined(raid, running));
             await TellParticipantStateAsync(running, characterId);
         }
 
@@ -571,7 +568,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>A participant's connection, to whoever sees his raid in the tab (iav).</summary>
         private static async Task TellConnectionAsync(GuildRaidBoard.Raid raid, long characterId, bool online)
         {
-            byte[] frame = ConnectionProtocol.Push(Op.Iav, GuildRaidProtocol.BuildParticipantStatus(raid.Uuid, characterId, online));
+            var frame = new Game.RaidParticipantStatusUpdatedEvent(raid.Uuid, GuildRaidProtocol.KeyOf(characterId),
+                SocialStatusMessages.Status(online ? SessionRegistry.FindByCharacter(characterId)?.State : null, online));
             foreach (var session in Watchers(raid))
                 if (session.CharacterId != characterId) await session.SendAsync(frame);
         }

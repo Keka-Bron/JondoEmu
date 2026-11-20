@@ -71,7 +71,7 @@ namespace Jondo.Unity.Tests.Social
 
                     // The next entry opens the Rename window with the name as it is.
                     var me = DatabaseManager.GetCharacterById(character)!;
-                    await RemodelHandler.OnEnterWorldAsync(pipe.ToClient, me);
+                    await RemodelHandler.OnEnterWorldAsync(pipe.Session, me);
                     Assert.Equal("Remodelo-Uno", Encoding.UTF8.GetString(Field(await pipe.Next(Op.Kvk), 1)!.BytesValue));
 
                     // A badly made name is refused with popup 40; a good one is taken.

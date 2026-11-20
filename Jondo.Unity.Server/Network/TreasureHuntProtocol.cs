@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -53,6 +54,15 @@ namespace Jondo.Unity.Server.Network
                     : Pb.New().Msg(3, Pb.New().VarIfNotZero(2, step.Maps).VarIfNotZero(3, step.Direction)));
             return hhf.Build();
         }
+
+        // Current hunts store POI and map-count steps, but no hint ID or portal destination.
+        internal static TreasureHuntEvent Hunt(TreasureHunts.Hunt hunt)
+            => new(hunt.Checkpoint, null, hunt.Stages,
+                hunt.Flags.Select(f => new TreasureHuntFlag((TreasureHuntFlagState)f.State, f.MapId)).ToArray(),
+                hunt.Retries, hunt.StartMap, hunt.Steps.Count, (TreasureHuntType)hunt.Type,
+                hunt.Steps.Take(hunt.Known).Select(s => new TreasureHuntStep(s.Poi > 0
+                    ? new TreasureHuntStepCaseFollowDirectionToPoi(new(s.Poi, MapActorMessages.Facing(s.Direction)))
+                    : new TreasureHuntStepCaseFollowDirection(new(s.Maps, MapActorMessages.Facing(s.Direction))))).ToArray());
 
         public static byte[] BuildFlagAnswer(int type, int index, int result)
             => Pb.New().VarIfNotZero(1, result).VarIfNotZero(2, index).VarIfNotZero(3, type).Build();

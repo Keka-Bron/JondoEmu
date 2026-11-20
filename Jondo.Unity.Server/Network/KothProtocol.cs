@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -25,6 +26,34 @@ namespace Jondo.Unity.Server.Network
     /// </remarks>
     public static class KothProtocol
     {
+        internal static SelfAttackableStatusUpdateEvent SelfStatus(int status, int role = -1)
+            => new(0, status == AllianceProtocol.AvaAggressable && role != -1 ? role : 0, MapActorMessages.AvaStatus(status));
+
+        internal static KothUpdateEvent Update(Conquests.War war, Func<long, AllianceStore.Alliance?> allianceOf, int defaultRole)
+        {
+            var alliances = new List<KothAllianceInformation>();
+            foreach (var side in war.Sides)
+            {
+                var alliance = allianceOf(side.AllianceId);
+                if (alliance == null) continue;
+                var roles = side.Roles.OrderBy(role => role.Key)
+                    .Select(role => new KothAllianceRoleNumber(role.Value, role.Key)).ToList();
+                long counted = roles.Sum(role => role.MemberCount);
+                if (side.Present > counted && defaultRole > 0 && !side.Roles.ContainsKey(defaultRole))
+                    roles.Add(new(side.Present - counted, defaultRole));
+                // Preserve the scoreboard's historical column order and wire kinds.
+                KothScore[] scores =
+                [
+                    new(checked((int)side.Scores[Conquests.ScoreOfMaps]), KothScoreType.Fight),
+                    new(checked((int)side.Scores[Conquests.ScoreOfFights]), KothScoreType.Domination),
+                    new(checked((int)side.Scores[Conquests.ScoreOfPrism]), KothScoreType.Prism),
+                ];
+                alliances.Add(new(MapActorMessages.Alliance(alliance), roles.ToArray(), side.Domination, scores, side.Present));
+            }
+            return new(alliances.ToArray(), war.NextTickUtcMs, DateTimeOffset.FromUnixTimeMilliseconds(war.StartedUtcMs)
+                .UtcDateTime.ToString("o", CultureInfo.InvariantCulture));
+        }
+
         /// <summary>The score (mep): { f1 each alliance, f2 when the next minute is counted, f3 when it began }.</summary>
         public static byte[] BuildUpdate(Conquests.War war, Func<long, AllianceStore.Alliance> allianceOf, int defaultRole)
         {

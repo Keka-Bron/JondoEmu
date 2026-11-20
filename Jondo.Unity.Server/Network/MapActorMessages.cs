@@ -63,7 +63,7 @@ internal static class MapActorMessages
         _ => throw new InvalidOperationException($"Unsupported map actor direction {facing}."),
     };
 
-    private static AttackableStatus AvaStatus(int status) => status switch
+    internal static AttackableStatus AvaStatus(int status) => status switch
     {
         AllianceProtocol.NotAggressable => AttackableStatus.NonAttackable,
         AllianceProtocol.AvaAggressable => AttackableStatus.AvaEnabledAttackable,

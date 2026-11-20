@@ -939,8 +939,7 @@ namespace Jondo.Unity.Server.Handlers
                 await TeleportHandler.ToMapAsync(stream, PlanoAstral, 0);
             }
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ixg));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
             MarkLeft();
             await session.SendAsync(new Jondo.Unity.Protocol.Game.NpcsMapQuestStatusUpdateEvent([]));
 
@@ -1383,7 +1382,7 @@ namespace Jondo.Unity.Server.Handlers
             var (mapa, casilla) = GuestWayOut();
             _enElSueno[GameState.CharacterId] = false;
             await TeleportHandler.ToMapAsync(stream, mapa, casilla);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg));
+            await SessionContext.Current.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
         }
 
         /// <summary>The owner left his dream: his guests leave it too.</summary>
@@ -1456,10 +1455,10 @@ namespace Jondo.Unity.Server.Handlers
         /// own, with no iyx before it, in "sueño infinito largo" and "recibir invitacion a
         /// sueños". The dream is kept, as the exit keeps it, and its groups leave their maps.
         /// </summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            long yo = GameState.CharacterId;
-            bool aqui = Dreams.IsDreamMap(GameState.MapId);
+            long yo = session.CharacterId;
+            bool aqui = Dreams.IsDreamMap(session.MapId);
             bool antes = _enElSueno.TryGetValue(yo, out bool estaba) && estaba;
             _enElSueno[yo] = aqui;
 
@@ -1469,12 +1468,13 @@ namespace Jondo.Unity.Server.Handlers
             // Without it the room stood empty, and a room with no group counts as passed.
             if (!antes && aqui)
             {
-                await OnWorldEntryAsync(stream);
+                using var context = SessionContext.Push(session);
+                await OnWorldEntryAsync(session.Stream ?? throw new InvalidOperationException("Restoring a dream requires a connected game session."));
                 return;
             }
             if (!antes || aqui) return;
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg));
+            await session.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
             _guests.TryRemove(yo, out _);
             var sueno = Dreams.De(yo);
             if (sueno != null)

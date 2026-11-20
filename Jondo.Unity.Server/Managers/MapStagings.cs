@@ -62,8 +62,11 @@ namespace Jondo.Unity.Server.Managers
             => SendAsync(stream, ids, GuildRaidStagings.FromStart);
 
         /// <summary>Shows stagings already played out, as a map that has seen them stands.</summary>
-        public static Task ShowAsync(NetworkStream stream, IEnumerable<int> ids)
-            => SendAsync(stream, ids, GuildRaidStagings.AtEnd);
+        public static async Task ShowAsync(GameSession session, IEnumerable<int> ids)
+        {
+            foreach (int id in ids)
+                if (id > 0) await session.SendAsync(GuildRaidStagings.StandingEvent(id));
+        }
 
         private static async Task SendAsync(NetworkStream stream, IEnumerable<int> ids, int progression)
         {

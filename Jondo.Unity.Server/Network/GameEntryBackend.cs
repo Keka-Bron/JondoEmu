@@ -73,8 +73,8 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     public Task SendInitialStateAsync(GameSession session, DbCharacter character)
         => WorldEntry.SendInitialStateAsync(session, character);
 
-    public Task RestoreGuildRaidAsync(long characterId)
-        => GuildRaidHandler.OnEnterWorldAsync(characterId);
+    public Task RestoreGuildRaidAsync(GameSession session)
+        => GuildRaidHandler.OnEnterWorldAsync(session);
 
     public Task NotifyGuildConnectionAsync(long characterId)
         => GuildHandler.TellConnectionAsync(characterId, online: true);
@@ -83,7 +83,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         => FriendsHandler.AnnouncePresenceAsync(accountId);
 
     public Task RestoreRemodelAsync(GameSession session, DbCharacter character)
-        => RemodelHandler.OnEnterWorldAsync(StreamOf(session), character);
+        => RemodelHandler.OnEnterWorldAsync(session, character);
 
     public Task SendMapInitializationAsync(GameSession session, DbCharacter character)
     {

@@ -737,7 +737,9 @@ namespace Jondo.Unity.Tests.Economy
                 // Asked for by the window.
                 await As(seller, () => MarketplaceHandler.SalesHistoryAsync());
                 Assert.Equal(las, scene.To(seller).Last(s => s.Opcode == Op.Las).Body);
-                Assert.Equal(las, MarketplaceHandler.SalesHistoryAtEntry(seller.CharacterId, seller.AccountId));
+                var entry = MarketplaceHandler.SalesHistoryAtEntry(seller.CharacterId, seller.AccountId);
+                byte[] entryFrame = new Jondo.Unity.Protocol.Game.Wire.GameCodec().Encode(new(entry!));
+                Assert.Equal(las, ConnectionProtocol.ReadPayload(entryFrame, Op.Las));
             }
             finally { ClearBank(seller.AccountId); }
         }

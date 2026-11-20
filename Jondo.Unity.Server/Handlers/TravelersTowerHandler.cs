@@ -164,12 +164,12 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The portal room loaded: the portal as it stands, its staging at its end (the capture's «hpm 100, 100, 4»).</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            if (stream == null || mapId != TravelersTower.PortalRoom) return;
+            if (session.MapId != TravelersTower.PortalRoom) return;
             var open = TravelersTower.Open;
             if (open != null)
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpm, GuildRaidStagings.BuildPlay(open.Staging, GuildRaidStagings.AtEnd)));
+                await session.SendAsync(GuildRaidStagings.StandingEvent(open.Staging));
         }
     }
 }

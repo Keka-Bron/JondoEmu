@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -19,7 +19,7 @@ namespace Jondo.Unity.Server.Handlers
     public static class PhantomHandler
     {
         /// <summary>The session each soul was last told he is one, so a login tells him again.</summary>
-        private static readonly ConcurrentDictionary<long, object> _told = new();
+        private static readonly ConcurrentDictionary<long, Guid> _told = new();
 
         /// <summary>
         /// The character turned into a soul with his phoenix on <paramref name="phoenixMap"/>. Called
@@ -29,24 +29,24 @@ namespace Jondo.Unity.Server.Handlers
         public static void Become(long characterId, long phoenixMap) => Phantoms.Become(characterId, phoenixMap);
 
         /// <summary>The soul told: the life state 2 with his phoenix's map (kup), and his look.</summary>
-        public static async Task TellAsync(NetworkStream stream)
+        public static async Task TellAsync(GameSession session)
         {
-            long me = SessionContext.State.CharacterId;
+            long me = session.CharacterId;
             long phoenix = Phantoms.PhoenixOf(me);
             if (phoenix == 0) return;
-            _told[me] = SessionContext.Current;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kup, KothProtocol.BuildLifeState(KothProtocol.Phantom, phoenix)));
-            await LookChangedAsync(stream);
-            Console.WriteLine($"[Phantoms] {SessionContext.State.CharacterName} is a soul, his phoenix on map {phoenix}.");
+            _told[me] = session.Id;
+            await session.SendAsync(new CharacterLifeStatusEvent(CharacterLifeStatus.Phantom, phoenix));
+            await LookChangedAsync(session);
+            Console.WriteLine($"[Phantoms] {session.State.CharacterName} is a soul, his phoenix on map {phoenix}.");
         }
 
         /// <summary>A map loaded: a soul back into the world with a new session is told again.</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            long me = SessionContext.State.CharacterId;
+            long me = session.CharacterId;
             if (!Phantoms.Is(me)) return;
-            if (_told.TryGetValue(me, out var session) && ReferenceEquals(session, SessionContext.Current)) return;
-            await TellAsync(stream);
+            if (_told.TryGetValue(me, out var told) && told == session.Id) return;
+            await TellAsync(session);
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
             _told.TryRemove(me, out _);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Kup, KothProtocol.BuildLifeState(KothProtocol.Alive)));
-            await LookChangedAsync(stream);
+            await SessionContext.Current.SendAsync(new CharacterLifeStatusEvent(CharacterLifeStatus.AliveAndKicking, 0));
+            await LookChangedAsync(SessionContext.Current);
             Console.WriteLine($"[Phantoms] {SessionContext.State.CharacterName} rises at the phoenix of map {mapId}.");
 
             await Managers.Quests.OnInteractiveUsedAsync(SessionContext.Current, mapId, elementId);
@@ -77,18 +77,14 @@ namespace Jondo.Unity.Server.Handlers
         public static bool CannotFight(long characterId) => Phantoms.Is(characterId);
 
         /// <summary>The character's look as it is now (kmb), to him and to whoever is on his map.</summary>
-        private static async Task LookChangedAsync(NetworkStream stream)
+        private static async Task LookChangedAsync(GameSession session)
         {
-            var me = SessionContext.State;
-            var character = DatabaseManager.GetCharacterById(me.CharacterId);
+            var character = DatabaseManager.GetCharacterById(session.CharacterId);
             if (character == null) return;
-            byte[] kmb = ConnectionProtocol.Push(Op.Kmb,
-                Pb.New().Bytes(1, CharacterLookBuilder.MapLook(character)).Var(2, me.CharacterId).Build());
-            await WriteAsync(stream, kmb);
-            await SessionRegistry.BroadcastToMapAsync(me.MapId, kmb, SessionContext.Current.Id);
+            var look = new ContextRefreshEntityLookEvent(CharacterLookBuilder.SemanticMapLook(character), session.CharacterId);
+            using var context = SessionContext.Push(session);
+            await session.SendAsync(look);
+            await SessionRegistry.BroadcastToMapAsync(session.MapId, look, session.Id);
         }
-
-        private static Task WriteAsync(NetworkStream stream, byte[] frame)
-            => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, frame);
     }
 }

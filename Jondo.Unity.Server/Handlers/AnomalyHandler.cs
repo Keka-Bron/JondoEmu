@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 
@@ -108,8 +109,8 @@ namespace Jondo.Unity.Server.Handlers
         /// territoire» -- from the rate of the last lvb (ehl.xwy, OnMapRewardRate). Nothing sent it,
         /// and an anomaly's zone said 0 %. Its f2, a list of int64, is not known and not sent.
         /// </summary>
-        public static Task ZoneBonusAsync(NetworkStream stream, long mapId)
-            => WriteAsync(stream, ConnectionProtocol.Push("lvb", Pb.New().VarIfNotZero(1, ZoneBonusAt(mapId)).Build()));
+        private static Task ZoneBonusAsync(GameSession session, long mapId)
+            => session.SendAsync(new Game.SubareaRewardRateEvent(ZoneBonusAt(mapId)));
 
         /// <summary>
         /// The world map's «Anomalies, bonus d'expérience et de butin» panel's list (lzh,
@@ -150,30 +151,27 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A map drawn: the anomaly of its zone, the vestige of its zaap, the notice on coming in.</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            if (stream == null) return;
-            long me = SessionContext.State.CharacterId;
+            long me = session.CharacterId, mapId = session.MapId;
             int subArea = DatabaseManager.SubAreaOfMap(mapId);
             _lastSubArea.TryGetValue(me, out int before);
             _lastSubArea[me] = subArea;
 
             // The zone's bonus, on every map: 0 again after an anomaly's zone is left.
-            await ZoneBonusAsync(stream, mapId);
+            await ZoneBonusAsync(session, mapId);
 
             if (Anomalies.TryGet(subArea, out _))
             {
                 if (before != subArea)
-                    await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                        ConnectionProtocol.BuildSystemMessage(AnomalyOpenHere, subArea.ToString())));
+                    await session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage,
+                        AnomalyOpenHere, [subArea.ToString()]));
                 long ends = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + Anomalies.MinutesLeft(subArea) * 60_000L;
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Lzi,
-                    Pb.New().Var(1, subArea).Var(2, 1).Var(3, ends).Build()));
+                await session.SendAsync(new Game.AnomalyStateEvent(subArea, true, ends));
             }
 
             if (AnomalyPlaces.VestigeStaging > 0 && Anomalies.All.Any(a => a.MapId == mapId))
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Hpm,
-                    GuildRaidStagings.BuildPlay(AnomalyPlaces.VestigeStaging, GuildRaidStagings.AtEnd)));
+                await session.SendAsync(GuildRaidStagings.StandingEvent(AnomalyPlaces.VestigeStaging));
         }
 
         /// <summary>

@@ -6517,7 +6517,17 @@
     },
     "lkm": {
       "name": "SocialApplicationPlayerInformation",
-      "fields": {},
+      "fields": {
+        "gefw": "BreedId",
+        "gefx": "Gender",
+        "gefu": "AccountId",
+        "gefr": "Name",
+        "gefz": "AccountTag",
+        "gefy": "CharacterId",
+        "geft": "AccountNickname",
+        "gefs": "Status",
+        "gefv": "Level"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -7218,6 +7228,242 @@
         "gepu": "MinLevelFacultative",
         "gepw": "Title",
         "gepq": "TextInError"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "hoe": {
+      "name": "PlayersMapAttackableStatusUpdateEvent",
+      "fields": {
+        "fplt": "PvpPlayers"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "hoc": {
+      "name": "MapPlayerAttackableStatus",
+      "fields": {
+        "fpll": "KothRole",
+        "fplm": "Status",
+        "fpln": "CharacterId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "hoh": {
+      "name": "SelfAttackableStatusUpdateEvent",
+      "fields": {
+        "fpma": "ProbationEndMs",
+        "fplz": "KothRole",
+        "fply": "Status"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "igb": {
+      "name": "PrismAddOrUpdateEvent",
+      "fields": {
+        "frvs": "PrismLocalizedInformation"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "imx": {
+      "name": "PartyMemberInFightEvent",
+      "fields": {
+        "fstq": "MemberId",
+        "fstm": "TimeBeforeFightStart",
+        "fstl": "MemberName",
+        "fsto": "FightId",
+        "fstk": "Reason",
+        "fstp": "StandardFightMap"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "izk": {
+      "name": "InfiniteDreamClearEvent",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kop": {
+      "name": "ContextRefreshEntityLookEvent",
+      "fields": {
+        "gbam": "Look",
+        "gbal": "EntityId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "kuv": {
+      "name": "CharacterLifeStatusEvent",
+      "fields": {
+        "gbyw": "State",
+        "gbyx": "PhoenixMapId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lin": {
+      "name": "TaxCollectorInformation",
+      "fields": {
+        "gdwu": "CallerId",
+        "gdwm": "ComplementaryInformation",
+        "gdws": "Coordinates",
+        "gdwp": "FirstNameId",
+        "gdxa": "Equipments",
+        "gdwq": "CallerName",
+        "gdwn": "Spells",
+        "gdwl": "HiredDate",
+        "gdwt": "State",
+        "gdwy": "LastNameId",
+        "gdwx": "SubAreaId",
+        "gdww": "Uid",
+        "gdwr": "EntityLook",
+        "gdwz": "Alliance",
+        "gdwv": "MapId",
+        "gdwo": "CharacterCharacteristics"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lii": {
+      "name": "TaxCollectorLootInformation",
+      "fields": {
+        "gdvq": "Pods",
+        "gdvr": "ItemsKamasValue"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lhm": {
+      "name": "TaxCollectorComplementaryInformation",
+      "fields": {},
+      "oneofs": {
+        "gdra": {
+          "member": "ComplementaryInformationCase",
+          "noneType": "TaxCollectorComplementaryInformationCaseNone",
+          "cases": {
+            "gdqy": {
+              "type": "TaxCollectorComplementaryInformationCaseLootInformation",
+              "member": "Value"
+            }
+          }
+        }
+      },
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lps": {
+      "name": "TaxCollectorOrderedSpell",
+      "fields": {
+        "gffa": "SpellLevelId",
+        "gffb": "SlotId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "lwn": {
+      "name": "SubareaRewardRateEvent",
+      "fields": {
+        "gggv": "SubareaRate"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "meb": {
+      "name": "AllianceInsiderInformationEvent",
+      "fields": {
+        "ghno": "TaxCollectors",
+        "ghnn": "Prisms",
+        "ghnm": "Information",
+        "ghnp": "Members"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "mew": {
+      "name": "KothUpdateEvent",
+      "fields": {
+        "ghqv": "Alliances",
+        "ghqs": "NextTickTimeMs",
+        "ghqu": "StartingAvaTimestamp"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "meu": {
+      "name": "KothAllianceInformation",
+      "fields": {
+        "ghqo": "Alliance",
+        "ghql": "KothRoles",
+        "ghqn": "DominationScore",
+        "ghqk": "Scores",
+        "ghqm": "MemberCount"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mep": {
+      "name": "KothAllianceRoleNumber",
+      "fields": {
+        "ghpz": "MemberCount",
+        "ghpy": "KothRole"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "mes": {
+      "name": "KothScore",
+      "fields": {
+        "ghqd": "CumulativePoints",
+        "ghqf": "ScoreType"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -7985,6 +8231,40 @@
         "ffvs": "Disguise",
         "ffvt": "Wings",
         "ffvu": "Shoulders"
+      }
+    },
+    "iky": {
+      "name": "PartyMemberInFightCause",
+      "values": {
+        "ejvy": "Unknown",
+        "ejvz": "MonsterAttack",
+        "ejwa": "PlayerAttack",
+        "ejwb": "MemberAttackedPlayers",
+        "ejwc": "MemberChallenge"
+      }
+    },
+    "kut": {
+      "name": "CharacterLifeStatus",
+      "values": {
+        "eyhg": "AliveAndKicking",
+        "eyhh": "Tombstone",
+        "eyhi": "Phantom"
+      }
+    },
+    "ldn": {
+      "name": "TaxCollectorState",
+      "values": {
+        "faex": "StateCollecting",
+        "faey": "StateWaitingForHelp",
+        "faez": "StateFighting"
+      }
+    },
+    "meq": {
+      "name": "KothScoreType",
+      "values": {
+        "fhmo": "Fight",
+        "fhmp": "Domination",
+        "fhmq": "Prism"
       }
     }
   },

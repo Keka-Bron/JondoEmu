@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 
 namespace Jondo.Unity.Server.Network
@@ -152,6 +153,15 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(4, taxCollectors)
                 .Var(5, members);
 
+        internal static AllianceInformation CardInformation(AllianceStore.Alliance alliance, AllianceStore.Profile profile,
+            string leaderName, int members, int territories, int collectors)
+            => MapActorMessages.Alliance(alliance) with
+            {
+                CardInformation = new(new(leaderName, (SocialRecruitmentType)profile.Recruitment, profile.MinLevel,
+                    profile.Description, profile.Tags.ToArray(), false, false, profile.Title, profile.WhenMs, true,
+                    alliance.Uuid, profile.Languages.ToArray()), alliance.CreatedUtcS, territories, members, collectors),
+            };
+
         /// <summary>
         /// The recruitment card (lmn): f1 the leader's name, f2 the recruitment (1 open), f4 the
         /// minimum level, f5 the description, f6 the tags, f9 the title, f10 when it was written,
@@ -266,7 +276,16 @@ namespace Jondo.Unity.Server.Network
                 .Var(2, row.Role)
                 .Msg(3, Pb.New()
                     .Msg(1, Pb.New().Str(2, row.Name).Var(3, row.Level).Msg(5, details))
-                    .Var(2, row.Member.CharacterId));
+                     .Var(2, row.Member.CharacterId));
+        }
+
+        internal static AllianceMemberInformation MemberInformation(MemberRow row)
+        {
+            var social = new SocialMember(0, row.Member.Rank,
+                row.Online ? CharacterState.InRolePlay : CharacterState.NotConnected, row.AccountId, row.Breed,
+                null, SocialStatusMessages.Status(null, row.Online), SocialStatusMessages.Gender(row.Sex), row.Member.JoinedUtcMs);
+            return new(row.Role, new(row.Member.CharacterId, new CharacterComplementCaseCharacterBasicInformation(
+                new(row.Name, row.Level, new CharacterBasicInformationComplementCaseSocialMember(social)))));
         }
 
         /// <summary>
@@ -343,6 +362,8 @@ namespace Jondo.Unity.Server.Network
         /// <summary>A member's line, new or changed (mbv): f1 the lmr. fgv adds it or replaces it by id.</summary>
         public static byte[] BuildMemberUpdate(MemberRow row) => Pb.New().Msg(1, MemberLine(row)).Build();
 
+        internal static AllianceMemberUpdateEvent MemberUpdate(MemberRow row) => new(MemberInformation(row));
+
         /// <summary>A member gone (mby): f1 his character, which fgv takes out of the list.</summary>
         public static byte[] BuildMemberGone(long characterId) => Pb.New().Var(1, characterId).Build();
 
@@ -351,6 +372,12 @@ namespace Jondo.Unity.Server.Network
         /// <summary>An application with the applicant's sheet.</summary>
         public readonly record struct ApplicationRow(AllianceStore.Application Application, string Name, int Level,
                                                      long AccountId, int Breed, int Sex, bool Online);
+
+        internal static AllianceApplicationInformationEvent ApplicationInformation(ApplicationRow row,
+            AllianceStore.Alliance alliance, string nickname, string tag)
+            => new(new(row.Application.WhenMs, row.Application.Message ?? "", new(row.Breed,
+                SocialStatusMessages.Gender(row.Sex), row.AccountId, row.Name, tag, row.Application.CharacterId,
+                nickname, SocialStatusMessages.Status(null, row.Online), row.Level)), MapActorMessages.Alliance(alliance));
 
         /// <summary>
         /// An application (lpo): f1 when, f3 the message, f4 the applicant (lgm) { f1 class, f3 sex,
@@ -370,10 +397,6 @@ namespace Jondo.Unity.Server.Network
                     .Str(8, row.Name)
                     .Msg(9, row.Online ? Pb.New().Var(1, 1) : Pb.New())
                     .Var(10, row.Level));
-
-        /// <summary>One's own pending application (lzx): f1 the application, f2 the alliance.</summary>
-        public static byte[] BuildOwnApplication(ApplicationRow row, AllianceStore.Alliance alliance)
-            => Pb.New().Msg(1, ApplicationBlock(row)).Msg(2, Block(alliance)).Build();
 
         /// <summary>«Candidatura recibida» (mad): f1 the applicant, f2 his name.</summary>
         public static byte[] BuildApplicationArrived(long characterId, string name)

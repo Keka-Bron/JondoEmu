@@ -446,7 +446,7 @@ public sealed class GameEntryLifecycleTests
         public void LoadCharacterState(GameSession session, DbCharacter selected) => Record("load", session);
         public Task AnnounceMapPresenceAsync(GameSession session, DbCharacter selected) { Record("presence", session); return Task.CompletedTask; }
         public Task SendInitialStateAsync(GameSession session, DbCharacter selected) { Record("initial", session); return Task.CompletedTask; }
-        public Task RestoreGuildRaidAsync(long characterId) { Record("raid"); return Task.CompletedTask; }
+        public Task RestoreGuildRaidAsync(GameSession session) { Record("raid"); return Task.CompletedTask; }
         public Task NotifyGuildConnectionAsync(long characterId) { Record("guild"); return Task.CompletedTask; }
         public Task NotifyFriendsAsync(long accountId) { Record("friends"); return Task.CompletedTask; }
         public Task RestoreRemodelAsync(GameSession session, DbCharacter selected) { Record("remodel", session); return Task.CompletedTask; }

@@ -21,9 +21,10 @@ namespace Jondo.Unity.Tests.World
     public class GroupDreamTests
     {
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public async Task An_invited_member_follows_the_owner_and_exits_only_after_the_owners_typed_mark_clear(bool fail)
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public async Task A_dream_exit_clears_the_interface_in_order_without_replaying_it_on_later_loads(bool fail, bool guestMapExit)
         {
             // A street of its own: 191105026 is where most tests stand, and the arrivals of those
             // running alongside reached the owner once he was back on it.
@@ -63,6 +64,23 @@ namespace Jondo.Unity.Tests.World
                 using (SessionContext.Push(host.Session))
                     Assert.False(await DreamHandler.GuestMayNotFightAsync(host.ToClient));
 
+                if (guestMapExit)
+                {
+                    // The earlier GuestMayNotFight warning is unrelated to the map transition.
+                    Assert.NotNull(await RecyclingTests.Until(visitor, Op.Lqn));
+                    visitor.Session.State.MapId = street;
+                    using (SessionContext.Push(host.Session))
+                    {
+                        await DreamHandler.OnMapLoadedAsync(visitor.Session);
+                        await DreamHandler.OnMapLoadedAsync(visitor.Session);
+                    }
+                    Assert.Empty(await visitor.Next(Op.Ixg));
+                    Assert.False(DreamHandler.IsGuest(guest));
+                    Assert.DoesNotContain(codec.Frames, frame => frame.Content is InfiniteDreamClearEvent);
+                    await visitor.Quiet();
+                    return;
+                }
+
                 using (SessionContext.Push(visitor.Session))
                 using (await host.Session.EnterTurnAsync())
                 {
@@ -75,11 +93,15 @@ namespace Jondo.Unity.Tests.World
                 var clear = Assert.Single(codec.Frames, frame => frame.Content is NpcsMapQuestStatusUpdateEvent);
                 Assert.Empty(Assert.IsType<NpcsMapQuestStatusUpdateEvent>(clear.Content).MapInformation);
                 Assert.Null(clear.Uid);
-                // Skip earlier teleport/presence frames, retaining the clear → marks → acknowledgment boundary.
+                // The opaque codec emits a token for the typed clear, before the marks and answer.
+                var dreamClear = Assert.Single(codec.Frames, frame => frame.Content is InfiniteDreamClearEvent);
+                Assert.Null(dreamClear.Uid);
+                int clearIndex = codec.Frames.IndexOf(dreamClear);
+                Assert.Equal(clearIndex + 1, codec.Frames.IndexOf(clear));
                 for (int i = 0; i < 64; i++)
                 {
                     byte[] packet = await Read(host);
-                    if (packet[0] != 0xC7 && ConnectionProtocol.ReadOpcode(packet) == Op.Ixg) break;
+                    if (packet.SequenceEqual(MarkCodec.Token(clearIndex + 1))) break;
                     Assert.True(i < 63, "Dream-state clear did not arrive.");
                 }
                 if (!fail)

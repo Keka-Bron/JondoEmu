@@ -40,6 +40,22 @@ public sealed class MapInformationServiceTests
     }
 
     [Fact]
+    public async Task Standing_sequences_use_owner_codec_in_order_and_stop_at_first_failure()
+    {
+        var failure = new GameConversionException("staging failure");
+        var codec = new RecordingCodec(frame => { if (((StagingEvent)frame.Content).StagingId == 13) throw failure; });
+        int writes = 0;
+        var owner = new GameSession(codec, _ => { writes++; return Task.CompletedTask; });
+        using var ambient = SessionContext.Push(GameSession.SinSocket());
+        Assert.Same(failure, await Assert.ThrowsAsync<GameConversionException>(() =>
+            Managers.MapStagings.ShowAsync(owner, [7, -1, 7, 13, 99])));
+        Assert.Equal(new[] { 7, 7, 13 }.Select(id => new StagingEvent(100, 100, id)),
+            codec.Frames.Select(f => Assert.IsType<StagingEvent>(f.Content)));
+        Assert.Equal(2, writes);
+        Assert.Equal(0, codec.Decodes);
+    }
+
+    [Fact]
     public async Task Actor_refresh_sends_only_contents_and_modifier_without_replaying_map_arrival_hooks()
     {
         var h = new Harness { IsBag = true };

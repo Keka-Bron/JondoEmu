@@ -12537,7 +12537,11 @@ namespace Jondo.Unity.Server.Handlers
             // fight, with a dream left to be continued, put the dream's interface on the world.
             if (Managers.Dreams.IsDreamMap(fight.RoleplayMapId) && !suenoAcabado)
                 await DreamHandler.RefrescarEstadoAsync(stream);
-            if (suenoAcabado) { await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ixg)); DreamHandler.MarkLeft(); }
+            if (suenoAcabado)
+            {
+                await SessionContext.Current.SendAsync(new Jondo.Unity.Protocol.Game.InfiniteDreamClearEvent());
+                DreamHandler.MarkLeft();
+            }
             if (avisoDelSueno != null)
                 await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(avisoDelSueno)));
             // And the dream's result window, with its code to copy.

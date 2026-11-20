@@ -57,13 +57,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>One of the dimension's maps loaded: its look for the season, as it stands.</summary>
-        public static async Task OnMapLoadedAsync(NetworkStream stream, long mapId)
+        public static async Task OnMapLoadedAsync(GameSession session)
         {
-            if (stream == null) return;
-            int staging = OsavoraSeasons.StagingOn(mapId, OsavoraSeasons.At(DateTimeOffset.UtcNow));
+            int staging = OsavoraSeasons.StagingOn(session.MapId, OsavoraSeasons.At(DateTimeOffset.UtcNow));
             if (staging == 0) return;
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Hpm, GuildRaidStagings.BuildPlay(staging, GuildRaidStagings.AtEnd)));
+            await session.SendAsync(GuildRaidStagings.StandingEvent(staging));
         }
     }
 }

@@ -1,7 +1,4 @@
-using Jondo.Unity.Launcher;
-using Jondo.Unity.Protocol;
 using System;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Jondo.Unity.Server.Network
@@ -55,13 +52,13 @@ namespace Jondo.Unity.Server.Network
             await Handlers.PrismHandler.OnWorldEntryAsync(session);
 
             // What happened to his tax collectors while he was away (hkx).
-            await Handlers.TaxCollectorHandler.OnWorldEntryAsync(stream, character.Id);
+            await Handlers.TaxCollectorHandler.OnWorldEntryAsync(session);
 
             // Inside a dream: restore it, or leave it when there is none to go back to.
             await Handlers.DreamHandler.OnWorldEntryAsync(stream);
 
             // The treasure hunts under way (hhf), as they stand.
-            await Handlers.TreasureHuntHandler.OnWorldEntryAsync(stream, character.Id);
+            await Handlers.TreasureHuntHandler.OnWorldEntryAsync(session);
 
             // Inside a house: which one, when the way in was not kept.
             Handlers.HouseHandler.OnWorldEntry(SessionContext.Current.AccountId);
@@ -69,8 +66,8 @@ namespace Jondo.Unity.Server.Network
             // The guild's houses, for the guild window's «Casas» tab (jjs).
             await Handlers.HouseHandler.SendGuildHousesAsync(session);
 
-            byte[]? sales = Handlers.MarketplaceHandler.SalesHistoryAtEntry(character.Id, SessionContext.Current.AccountId);
-            if (sales != null) await EnviarAsync(stream, ConnectionProtocol.Push(Op.Las, sales));
+            var sales = Handlers.MarketplaceHandler.SalesHistoryAtEntry(character.Id, session.AccountId);
+            if (sales != null) await session.SendAsync(sales);
 
             await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
             sent++;
@@ -84,10 +81,6 @@ namespace Jondo.Unity.Server.Network
                               $"{character.Name}.");
             return sent + tail;
         }
-
-        /// <summary>Writes a frame through the entry projection and owning session's traffic log.</summary>
-        private static Task EnviarAsync(NetworkStream stream, byte[] message)
-            => GameEntryMessages.SendAsync(stream, message);
 
         /// <summary>Sends map-entry state, then fresh characteristics and known zaaps.</summary>
         /// <param name="fightToRejoin">

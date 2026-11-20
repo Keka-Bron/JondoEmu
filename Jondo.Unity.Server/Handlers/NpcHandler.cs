@@ -1839,7 +1839,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 await WorldMoveHandler.TeleportAsync(stream, adonde);
                 Console.WriteLine($"[NPC] Reply {reply}: leads to map {adonde}.");
-                if (elegidaAhora.PhantomPhoenix != 0) await PhantomHandler.TellAsync(stream);
+                if (elegidaAhora.PhantomPhoenix != 0) await PhantomHandler.TellAsync(SessionContext.Current);
 
                 // The orbalantir's, after the map change: the mutation taken away or given.
                 if (elegidaAhora.EndsMutation) await MutationHandler.EndAsync(stream);

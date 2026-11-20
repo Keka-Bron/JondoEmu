@@ -55,10 +55,10 @@ public sealed class AllianceNoticeFlowTests : IDisposable
             Assert.IsType<AllianceMotdEvent>(first).MotdInfo);
         Assert.Equal(new SocialNoticeInformation("", alliance.CreatedUtcS, "", 0),
             Assert.IsType<AllianceBulletinEvent>((await Frame(own)).Content).BulletinInfo);
-        Assert.Collection(codec.Frames,
-            frame => Assert.IsType<AllianceRanksEvent>(frame.Content),
-            frame => Assert.IsType<AllianceMotdEvent>(frame.Content),
-            frame => Assert.IsType<AllianceBulletinEvent>(frame.Content));
+        Type[] expected = joining
+            ? [typeof(AllianceRanksEvent), typeof(AllianceInsiderInformationEvent), typeof(AllianceMotdEvent), typeof(AllianceBulletinEvent)]
+            : [typeof(AllianceRanksEvent), typeof(AllianceMembershipEvent), typeof(AllianceInsiderInformationEvent), typeof(AllianceMotdEvent), typeof(AllianceBulletinEvent)];
+        Assert.Equal(expected, codec.Frames.Select(f => f.Content.GetType()));
         using var connection = Open();
         using var count = connection.CreateCommand();
         count.CommandText = "SELECT COUNT(*) FROM AllianceNotices;";
@@ -170,7 +170,7 @@ public sealed class AllianceNoticeFlowTests : IDisposable
             ? AllianceHandler.SendJoinedAsync(own.Session, alliance) : AllianceHandler.OnWorldEntryAsync(own.Session)));
         Assert.IsType<AllianceMotdEvent>(await UntilNotice(own));
         Assert.Same(other, SessionContext.Actual);
-        Assert.Equal(3, codec.Frames.Count);
+        Assert.Equal(joining ? 4 : 5, codec.Frames.Count);
         await own.Quiet();
     }
 

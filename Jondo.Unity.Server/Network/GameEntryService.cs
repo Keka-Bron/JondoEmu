@@ -18,7 +18,7 @@ internal interface IGameEntryBackend
     void LoadCharacterState(GameSession session, DbCharacter character);
     Task AnnounceMapPresenceAsync(GameSession session, DbCharacter character);
     Task SendInitialStateAsync(GameSession session, DbCharacter character);
-    Task RestoreGuildRaidAsync(long characterId);
+    Task RestoreGuildRaidAsync(GameSession session);
     Task NotifyGuildConnectionAsync(long characterId);
     Task NotifyFriendsAsync(long accountId);
     Task RestoreRemodelAsync(GameSession session, DbCharacter character);
@@ -221,7 +221,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         await backend.SendInitialStateAsync(session, character);
         // The account's heroes, back around him when he comes from another of the group.
         Heroes.Regroup(session);
-        await backend.RestoreGuildRaidAsync(character.Id);
+        await backend.RestoreGuildRaidAsync(session);
         await backend.NotifyGuildConnectionAsync(character.Id);
         await backend.NotifyFriendsAsync(session.AccountId);
         await backend.RestoreRemodelAsync(session, character);

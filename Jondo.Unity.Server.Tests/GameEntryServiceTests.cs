@@ -248,10 +248,10 @@ public sealed class GameEntryServiceTests
             Assert.Same(owner, SessionContext.Actual);
         }
 
-        public Task RestoreGuildRaidAsync(long characterId)
+        public Task RestoreGuildRaidAsync(GameSession session)
         {
             Record("raid");
-            Assert.Equal(owner.CharacterId, characterId);
+            Assert.Same(owner, session);
             return Task.CompletedTask;
         }
 

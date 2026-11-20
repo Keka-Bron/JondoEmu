@@ -1,8 +1,13 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.Tests.Economy;
 using Xunit;
 
 namespace Jondo.Unity.Tests.World
@@ -165,6 +170,37 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(AnomalyHandler.AnomalyZoneBonus, AnomalyHandler.ZoneBonusAt(zoneMap));
             Assert.Equal(0, AnomalyHandler.ZoneBonusAt(191105026));   // Astrub
         }
+
+        [Fact]
+        public async Task Map_load_sends_the_bonus_before_the_warning_and_resets_it_on_every_outside_reply()
+        {
+            var anomaly = Anomalies.All.First(a => DatabaseManager.MapsOfSubArea(a.SubAreaId).Any());
+            var zoneMap = DatabaseManager.MapsOfSubArea(anomaly.SubAreaId).First();
+            const long outside = 191105026;
+            await using var owner = await ClientPipe.OpenAsync(8_685_100_001, 8_685_000_001, zoneMap);
+            await using var other = await ClientPipe.OpenAsync(8_685_100_002, 8_685_000_002, zoneMap);
+            using var ambient = SessionContext.Push(other.Session);
+            await AnomalyHandler.OnMapLoadedAsync(owner.Session);
+            Assert.Equal(new SubareaRewardRateEvent(120), (await Next(owner)).Content);
+            Assert.Equal(AnomalyHandler.AnomalyOpenHere, Assert.IsType<TextInformationEvent>((await Next(owner)).Content).MessageId);
+            var state = Assert.IsType<AnomalyStateEvent>((await Next(owner)).Content);
+            Assert.Equal(anomaly.SubAreaId, state.SubAreaId);
+            if (AnomalyPlaces.VestigeStaging > 0 && Anomalies.All.Any(a => a.MapId == zoneMap))
+                Assert.IsType<StagingEvent>((await Next(owner)).Content);
+            owner.Session.State.MapId = outside;
+            for (int i = 0; i < 2; i++)
+            {
+                await AnomalyHandler.OnMapLoadedAsync(owner.Session);
+                var reset = await Next(owner);
+                Assert.Equal(new SubareaRewardRateEvent(0), reset.Content);
+                Assert.Null(reset.Uid);
+            }
+            await owner.Quiet();
+            await other.Quiet();
+        }
+
+        private static async Task<GameFrame> Next(ClientPipe pipe) => new GameCodec().Decode(
+            await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
 
         /// <summary>The capture read the clocks at 22:26 UTC on 12 August: «00», «26» and «4», «26».</summary>
         [Fact]

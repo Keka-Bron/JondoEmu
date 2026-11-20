@@ -2,6 +2,7 @@ using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Globalization;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using ItemEffect = Jondo.Unity.Server.Managers.Equipment.ItemEffect;
 
@@ -169,6 +170,13 @@ namespace Jondo.Unity.Server.Network
             }
             return las.Build();
         }
+
+        internal static SalesHistoryEvent SalesHistory(IEnumerable<MarketplaceListings.HistoryEntry> lines, ItemEffectMessages effects)
+            => new(lines.Select(line => new SalesHistoryEntry(line.Kamas,
+                line.AtUtc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
+                line.Sold ? SalesHistoryStatus.Sold : SalesHistoryStatus.Unsold,
+                new(line.Gid, Equipment.ParseEffects(line.Effects).Select(effects.Effect).OfType<ObjectEffect>().ToArray(),
+                    new ItemMinimalInformationComplementCaseQuantity(line.Quantity)), line.House)).ToArray());
 
         /// <summary>
         /// A listed lot as kes and kby carry it: { f1: the listing, f2: effects, f3: item, f4: how

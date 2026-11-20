@@ -1281,6 +1281,8 @@ public sealed record AllianceBulletinEvent(SocialNoticeInformation? BulletinInfo
 
 public sealed record AllianceCardInformation(AllianceRecruitmentInformation? Recruitment, long CreationDate, int SubareaNumber, int MembersNumber, int TaxCollectorNumber = 0);
 
+public sealed record AllianceInsiderInformationEvent(IReadOnlyList<TaxCollectorInformation> TaxCollectors, IReadOnlyList<PrismLocalizedInformation> Prisms, AllianceInformation? Information, IReadOnlyList<AllianceMemberInformation> Members) : GameEvent;
+
 public sealed record AllianceMemberInformation(int AvaRoleId, Character? Information);
 
 public sealed record AllianceMemberUpdateEvent(AllianceMemberInformation? Member) : GameEvent;
@@ -1562,7 +1564,7 @@ public sealed record SkinOutfit(int? Skin, int Gid);
 
 public sealed record SocialApplicationInformation(long CreationDate, string Content, SocialApplicationPlayerInformation? PlayerInformation);
 
-public sealed record SocialApplicationPlayerInformation();
+public sealed record SocialApplicationPlayerInformation(int BreedId, Gender Gender, long AccountId, string Name, string AccountTag, long CharacterId, string AccountNickname, CharacterStatus? Status, int Level);
 
 public sealed record SocialEmblem(int SymbolShapeId, int BackgroundShapeId, int BackgroundColor, int SymbolColor);
 
@@ -1665,3 +1667,51 @@ public enum TreasureHuntPortalType { Unknown, Enutrosor, Srambad, Xelorium, Ecaf
 public enum TreasureHuntType { Classic, Portal, Legendary }
 
 public sealed record UpdateLifePointsEvent() : GameEvent;
+
+public sealed record CharacterLifeStatusEvent(CharacterLifeStatus State, long PhoenixMapId) : GameEvent;
+
+public enum CharacterLifeStatus { AliveAndKicking, Tombstone, Phantom }
+
+public sealed record ContextRefreshEntityLookEvent(EntityLook? Look, long EntityId) : GameEvent;
+
+public sealed record InfiniteDreamClearEvent() : GameEvent;
+
+public sealed record KothUpdateEvent(IReadOnlyList<KothAllianceInformation> Alliances, long NextTickTimeMs, string StartingAvaTimestamp) : GameEvent;
+
+public sealed record KothAllianceInformation(AllianceInformation? Alliance, IReadOnlyList<KothAllianceRoleNumber> KothRoles, int DominationScore, IReadOnlyList<KothScore> Scores, long MemberCount);
+
+public sealed record KothAllianceRoleNumber(long MemberCount, int KothRole);
+
+public sealed record KothScore(int CumulativePoints, KothScoreType ScoreType);
+
+public enum KothScoreType { Fight, Domination, Prism }
+
+public sealed record MapPlayerAttackableStatus(int KothRole, AttackableStatus Status, long CharacterId);
+
+public sealed record PartyMemberInFightEvent(long MemberId, int TimeBeforeFightStart, string MemberName, int FightId, PartyMemberInFightCause Reason, MapExtendedCoordinates? StandardFightMap) : GameEvent;
+
+public enum PartyMemberInFightCause { Unknown, MonsterAttack, PlayerAttack, MemberAttackedPlayers, MemberChallenge }
+
+public sealed record PlayersMapAttackableStatusUpdateEvent(IReadOnlyList<MapPlayerAttackableStatus> PvpPlayers) : GameEvent;
+
+public sealed record PrismAddOrUpdateEvent(PrismLocalizedInformation? PrismLocalizedInformation) : GameEvent;
+
+public sealed record SelfAttackableStatusUpdateEvent(long ProbationEndMs, int KothRole, AttackableStatus Status) : GameEvent;
+
+public sealed record SubareaRewardRateEvent(int SubareaRate) : GameEvent;
+
+public sealed record TaxCollectorInformation(long CallerId, IReadOnlyList<TaxCollectorComplementaryInformation> ComplementaryInformation, MapCoordinates? Coordinates, int FirstNameId, IReadOnlyList<ObjectItemInventory> Equipments, string CallerName, IReadOnlyList<TaxCollectorOrderedSpell> Spells, long HiredDate, TaxCollectorState State, int LastNameId, int SubAreaId, string Uid, EntityLook? EntityLook, AllianceInformation? Alliance, long MapId, IReadOnlyList<CharacterCharacteristic> CharacterCharacteristics);
+
+public sealed record TaxCollectorComplementaryInformation(TaxCollectorComplementaryInformationCase ComplementaryInformationCase);
+
+[JsonDerivedType(typeof(TaxCollectorComplementaryInformationCaseNone), "None")]
+[JsonDerivedType(typeof(TaxCollectorComplementaryInformationCaseLootInformation), "LootInformation")]
+public abstract record TaxCollectorComplementaryInformationCase;
+public sealed record TaxCollectorComplementaryInformationCaseNone() : TaxCollectorComplementaryInformationCase;
+public sealed record TaxCollectorComplementaryInformationCaseLootInformation(TaxCollectorLootInformation Value) : TaxCollectorComplementaryInformationCase;
+
+public sealed record TaxCollectorLootInformation(int Pods, long ItemsKamasValue);
+
+public sealed record TaxCollectorOrderedSpell(int SpellLevelId, int SlotId);
+
+public enum TaxCollectorState { StateCollecting, StateWaitingForHelp, StateFighting }

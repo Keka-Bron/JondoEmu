@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -367,7 +368,7 @@ namespace Jondo.Unity.Server.Handlers
             int rank = AllianceStore.RankOf(characterId);
             await AllianceRankService.Live.SendAsync(session, alliance.Id);
             await session.SendAsync(ConnectionProtocol.Push(Op.Mbz, AllianceProtocol.BuildMembership(alliance, rank)));
-            await session.SendAsync(InformationFrame(alliance));
+            await session.SendAsync(Information(alliance));
             await session.SendAsync(ConnectionProtocol.Push(Op.Mca, AllianceProtocol.BuildJoined(alliance, rank)));
             await session.SendAsync(ConnectionProtocol.Push(Op.Khi, AllianceProtocol.BuildEmote()));
             await RedrawAsync(session.Stream, characterId);
@@ -564,7 +565,7 @@ namespace Jondo.Unity.Server.Handlers
             long who = SessionContext.State.CharacterId;
             var alliance = who == 0 ? null : AllianceStore.AllianceOf(who);
             if (alliance == null) return;
-            await WriteAsync(stream, InformationFrame(alliance));
+            await SessionContext.Current.SendAsync(Information(alliance));
         }
 
         // ─── Ranks and rights ───────────────────────────────────────────────────
@@ -955,7 +956,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var row = RowOf(application);
             if (row == null) return;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lzx, AllianceProtocol.BuildOwnApplication(row.Value, alliance)));
+            await SessionContext.Current.SendAsync(OwnApplication(row.Value, alliance));
             await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(ApplicationSent)));
             await TellManagersAsync(alliance, ConnectionProtocol.Push(Op.Mad,
                 AllianceProtocol.BuildApplicationArrived(who, row.Value.Name)));
@@ -983,7 +984,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var row = RowOf(AllianceStore.Apply(who, alliance.Id, message));
             if (row == null) return;
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lzx, AllianceProtocol.BuildOwnApplication(row.Value, alliance)));
+            await SessionContext.Current.SendAsync(OwnApplication(row.Value, alliance));
             await TellManagersAsync(alliance, ConnectionProtocol.Push(Op.Mbb,
                 AllianceProtocol.BuildApplicationsMoved(AllianceProtocol.ApplicationRewritten, row.Value, 0)));
         }
@@ -1356,14 +1357,12 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, ConquestHandler.NoSwitchInAWar)));
-                await WriteAsync(stream, ConnectionProtocol.Push(Op.Hon,
-                    AllianceProtocol.BuildAggressableStatus(AllianceProtocol.AggressableStatus(who))));
+                await SessionContext.Current.SendAsync(KothProtocol.SelfStatus(AllianceProtocol.AggressableStatus(who)));
                 return;
             }
 
             AllianceStore.SetTakesPartInAva(who, on);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Hon,
-                AllianceProtocol.BuildAggressableStatus(AllianceProtocol.AggressableStatus(who))));
+            await SessionContext.Current.SendAsync(KothProtocol.SelfStatus(AllianceProtocol.AggressableStatus(who)));
         }
 
         /// <summary>The directory opens (mba): the empty mag the capture answers with.</summary>
@@ -1420,17 +1419,16 @@ namespace Jondo.Unity.Server.Handlers
                 var applied = application == null ? null : AllianceStore.ById(application.AllianceId);
                 var row = application == null ? null : RowOf(application);
                 if (applied != null && row != null)
-                    await session.SendAsync(ConnectionProtocol.Push(Op.Lzx, AllianceProtocol.BuildOwnApplication(row.Value, applied)));
+                    await session.SendAsync(OwnApplication(row.Value, applied));
                 return;
             }
 
             await AllianceRankService.Live.SendAsync(session, alliance.Id);
-            await session.SendAsync(ConnectionProtocol.Push(Op.Mbz,
-                AllianceProtocol.BuildMembership(alliance, AllianceStore.RankOf(characterId))));
+            await session.SendAsync(new Game.AllianceMembershipEvent(AllianceStore.RankOf(characterId), MapActorMessages.Alliance(alliance)));
             // The sheet, as joining sends it after the mbz: its f1 is the alliance's tax collectors,
             // which the minimap draws. Without it they were drawn only once the alliance window
             // had asked for it (mcf). INFERRED: no capture enters the world in an alliance.
-            await session.SendAsync(InformationFrame(alliance));
+            await session.SendAsync(Information(alliance));
             await SendNoticesAsync(session, alliance);
             await ConnectionChangedAsync(alliance, characterId, online: true);
         }
@@ -1462,7 +1460,7 @@ namespace Jondo.Unity.Server.Handlers
             var alliance = AllianceStore.AllianceOf(characterId);
             var row = alliance == null ? null : RowOf(AllianceStore.MemberOf(characterId));
             if (row == null) return;
-            await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mbv, AllianceProtocol.BuildMemberUpdate(row.Value)));
+            await SendMemberUpdateAsync(alliance, row.Value);
         }
 
         /// <summary>
@@ -1473,11 +1471,11 @@ namespace Jondo.Unity.Server.Handlers
         {
             var row = RowOf(AllianceStore.MemberOf(characterId), online);
             if (row == null) return;
-            await TellMembersAsync(alliance, ConnectionProtocol.Push(Op.Mbv, AllianceProtocol.BuildMemberUpdate(row.Value)), characterId);
+            await SendMemberUpdateAsync(alliance, row.Value, characterId);
             if (!online) return;
 
-            byte[] warning = ConnectionProtocol.Push(Op.Lqn,
-                ConnectionProtocol.BuildSystemMessage(MemberOnline, row.Value.Name, characterId.ToString()));
+            var warning = new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage, MemberOnline,
+                [row.Value.Name, characterId.ToString()]);
             foreach (var member in AllianceStore.Members(alliance.Id))
             {
                 if (member.CharacterId == characterId || !AllianceStore.WarnsOnConnection(member.CharacterId)) continue;
@@ -1529,6 +1527,14 @@ namespace Jondo.Unity.Server.Handlers
                                                        SessionRegistry.IsOnline(application.CharacterId));
         }
 
+        private static async Task SendMemberUpdateAsync(AllianceStore.Alliance alliance, AllianceProtocol.MemberRow row, long except = 0)
+        {
+            var message = AllianceProtocol.MemberUpdate(row);
+            foreach (var member in AllianceStore.Members(alliance.Id))
+                if (member.CharacterId != except && SessionRegistry.FindByCharacter(member.CharacterId) is { } recipient)
+                    await recipient.SendAsync(message);
+        }
+
         /// <summary>A frame for every member connected but one. Returns how many got it.</summary>
         internal static async Task<int> TellMembersAsync(AllianceStore.Alliance alliance, byte[] frame, long except = 0)
         {
@@ -1569,13 +1575,27 @@ namespace Jondo.Unity.Server.Handlers
                                          TaxCollectorStore.OfAlliance(alliance.Id).Count);
         }
 
-        /// <summary>The sheet (mcx) of an alliance: its tax collectors, its card and a line per member.</summary>
-        public static byte[] InformationFrame(AllianceStore.Alliance alliance)
+        private static Game.AllianceApplicationInformationEvent OwnApplication(AllianceProtocol.ApplicationRow row, AllianceStore.Alliance alliance)
         {
-            var rows = AllianceStore.Members(alliance.Id).Select(m => RowOf(m)).Where(r => r != null).Select(r => r.Value);
-            return ConnectionProtocol.Push(Op.Mcx, AllianceProtocol.BuildInformation(alliance, CardOf(alliance), rows,
-                                                                                    TaxCollectorHandler.InformationOf(alliance),
-                                                                                    PrismHandler.InformationOf(alliance)));
+            var account = DatabaseManager.GetAccountById(row.AccountId);
+            return AllianceProtocol.ApplicationInformation(row, alliance, account?.Nickname ?? "",
+                row.AccountId > 0 ? GameServerProxy.BuildAccountTag(row.AccountId) : "");
+        }
+
+        /// <summary>The sheet (mcx): collectors, own-view prisms, the card and the visible member rows.</summary>
+        private static Game.AllianceInsiderInformationEvent Information(AllianceStore.Alliance alliance)
+        {
+            var members = AllianceStore.Members(alliance.Id);
+            var leader = AllianceStore.LeaderOf(alliance.Id);
+            string leaderName = leader == null ? "" : DatabaseManager.GetCharacterById(leader.CharacterId)?.Name ?? "";
+            var prisms = PrismStore.OfAlliance(alliance.Id);
+            var collectors = TaxCollectorStore.OfAlliance(alliance.Id);
+            var card = AllianceProtocol.CardInformation(alliance, AllianceStore.ProfileOf(alliance.Id), leaderName,
+                members.Count, prisms.Select(p => p.SubAreaId).Distinct().Count(), collectors.Count);
+            return new(collectors.Select(tc => TaxCollectorHandler.AllianceSheetCollector(tc, alliance)).ToArray(),
+                prisms.Select(prism => PrismMessages.Live.Localized(prism, alliance, own: true)).ToArray(), card,
+                members.Select(m => RowOf(m)).Where(row => row.HasValue)
+                    .Select(row => AllianceProtocol.MemberInformation(row.Value)).ToArray());
         }
 
         /// <summary>

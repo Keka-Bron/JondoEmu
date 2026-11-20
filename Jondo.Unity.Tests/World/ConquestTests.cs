@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -77,6 +78,78 @@ namespace Jondo.Unity.Tests.World
 
         private static (long, int)[] Of(long alliance, int role = KothRolesDefault) => new[] { (alliance, role) };
         private const int KothRolesDefault = 8;
+
+        [Fact]
+        public async Task Map_entry_sends_owner_prism_then_score_and_a_separate_role_list_per_viewer()
+        {
+            if (MapManager.GetMapInfo(PrismMap) == null) MapManager.Initialize();
+            var own = AllianceStore.Create(CharacterA, "Own", "OWN", 1, 2, 3, 4, 5);
+            var foe = AllianceStore.Create(CharacterB, "Foe", "FOE", 6, 7, 8, 9, 10);
+            AllianceStore.Join(CharacterC, foe.Id);
+            var prism = PrismStore.Place(own.Id, Zone, PrismMap, 300, 1);
+            prism.State = PrismStore.Vulnerable;
+            prism.CrystalsUsed = PrismProtocol.MaxCrystals;
+            long start = 1_800_000_123_456;
+            var war = Conquests.Start(Zone, own.Id, start, start + 90 * Conquests.TickMs, PrismMap);
+            war.Admitted[CharacterA] = (own.Id, KothRoles.Seer);
+            war.Admitted[CharacterB] = (foe.Id, KothRoles.Scout);
+            war.Admitted[CharacterC] = (foe.Id, KothRolesDefault);
+            war.Fallen[CharacterC] = foe.Id;
+            foreach (var id in war.Admitted.Keys) AllianceStore.SetTakesPartInAva(id, true);
+            var aCodec = new HookCodec(1);
+            var bCodec = new HookCodec(2);
+            var cCodec = new HookCodec(3);
+            await using var a = await Economy.ClientPipe.OpenAsync(AccountA, CharacterA, PrismMap, codec: aCodec);
+            await using var b = await Economy.ClientPipe.OpenAsync(AccountB, CharacterB, OtherMap, codec: bCodec);
+            await using var c = await Economy.ClientPipe.OpenAsync(AccountC, CharacterC, OtherMap, codec: cCodec);
+
+            using (SessionContext.Push(b.Session))
+                await ConquestHandler.OnMapEnteredAsync(a.Session, Zone);
+
+            Assert.Collection(aCodec.Frames,
+                frame => Assert.Equal(new Game.SelfAttackableStatusUpdateEvent(0, KothRoles.Seer, Game.AttackableStatus.AvaEnabledAttackable), frame.Content),
+                frame =>
+                {
+                    var update = Assert.IsType<Game.PrismAddOrUpdateEvent>(frame.Content);
+                    var ownPrism = update.PrismLocalizedInformation!.Prism!;
+                    Assert.Equal(0, ownPrism.CristalNumberLeft);
+                    Assert.Equal(0, ownPrism.Cristal!.CristalObject.Item.Gid);
+                    Assert.Equal(own.Uuid, ownPrism.AllianceInformation!.Uid);
+                },
+                frame => Assert.Equal(war.NextTickUtcMs, Assert.IsType<Game.KothUpdateEvent>(frame.Content).NextTickTimeMs),
+                frame => Assert.Equal(new[] { new Game.MapPlayerAttackableStatus(KothRoles.Scout, Game.AttackableStatus.AvaEnabledAttackable, CharacterB),
+                    new Game.MapPlayerAttackableStatus(KothRolesDefault, Game.AttackableStatus.AvaEnabledNonAttackable, CharacterC) },
+                    Assert.IsType<Game.PlayersMapAttackableStatusUpdateEvent>(frame.Content).PvpPlayers.OrderBy(p => p.CharacterId)));
+
+            var bRoles = Assert.IsType<Game.PlayersMapAttackableStatusUpdateEvent>(Assert.Single(bCodec.Frames).Content).PvpPlayers;
+            Assert.Equal(-1, Assert.Single(bRoles, p => p.CharacterId == CharacterA).KothRole);
+            Assert.Equal(KothRolesDefault, Assert.Single(bRoles, p => p.CharacterId == CharacterC).KothRole);
+            Assert.DoesNotContain(bRoles, p => p.CharacterId == CharacterB);
+            Assert.IsType<Game.PlayersMapAttackableStatusUpdateEvent>(Assert.Single(cCodec.Frames).Content);
+            Assert.All(aCodec.Frames.Concat(bCodec.Frames).Concat(cCodec.Frames), frame => Assert.Null(frame.Uid));
+            Assert.Equal(new byte[] { 0xAB, 2, 1 }, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(b.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.Equal(new byte[] { 0xAB, 3, 1 }, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(c.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+
+            await ConquestHandler.OnMapEnteredAsync(a.Session, Zone);
+            Assert.Equal(4, aCodec.Frames.Count);
+            Assert.Single(bCodec.Frames);
+
+            await ConquestHandler.OnMapEnteredAsync(b.Session, Zone);
+            var foreign = Assert.IsType<Game.PrismAddOrUpdateEvent>(bCodec.Frames[2].Content).PrismLocalizedInformation!.Prism!;
+            Assert.Null(foreign.CristalNumberLeft);
+            Assert.Null(foreign.Cristal);
+        }
+
+        private sealed class HookCodec(byte id) : Game.IGameCodec
+        {
+            public List<Game.GameFrame> Frames { get; } = [];
+            public byte[] Encode(Game.GameFrame frame)
+            {
+                Frames.Add(frame);
+                return [0xAB, id, checked((byte)Frames.Count)];
+            }
+            public Game.GameFrame Decode(ReadOnlySpan<byte> frame) => throw new InvalidOperationException("A send cannot decode.");
+        }
 
         // ─── The rules ──────────────────────────────────────────────────────────
 
