@@ -12,6 +12,7 @@ using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
@@ -225,11 +226,61 @@ public sealed class TypedCombatMovementTests
         Assert.NotNull(MapManager.GetMapInfo(target));
         pipe.Session.State.MapId = from;
         pipe.Session.State.CellId = 9;
-        pipe.Start(Codec.Encode(new(new MapChangeRequest(target, false), 71)));
+        var earliest = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        pipe.Start(Codec.Encode(new(new MapChangeRequest(target, false), -71)));
         var frames = await pipe.DrainToBarrier();
         Assert.Equal(target, pipe.Session.MapId);
-        Assert.Equal(new[] { "jsd", "jru", "lqu", "hjk" }, frames.Select(ConnectionProtocol.ReadOpcode));
+        Assert.Collection(AssertTypedEvents(pipe, frames),
+            frame => Assert.Equal(new MapChangeOrientationEvent(pipe.Session.CharacterId, Direction.North), frame.Content),
+            frame => Assert.Equal(new MapCurrentEvent(target), frame.Content),
+            frame =>
+            {
+                var time = Assert.IsType<TimeEvent>(frame.Content);
+                Assert.Equal(120, time.TimezoneOffset);
+                Assert.InRange(time.Timestamp, earliest, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            },
+            frame => Assert.Equal(EntryEnvironmentMessages.Live.Zaaps(target).Destinations,
+                Assert.IsType<ZaapKnownListEvent>(frame.Content).Destinations));
         await pipe.Finish();
+    }
+
+    [Fact]
+    public async Task Typed_border_crossing_sends_only_a_notice_when_jailed()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        const int from = 154010883, target = 154010884, cell = 9;
+        pipe.Session.State.MapId = from;
+        pipe.Session.State.CellId = cell;
+        long id = pipe.Session.CharacterId;
+        Jail.PutForTests(new Jail.Prisoner(id, "Walker", DateTime.UtcNow.AddSeconds(290), from, cell, 0));
+        try
+        {
+            var expected = Jail.HoldNotice(pipe.Session);
+            Assert.False(string.IsNullOrEmpty(expected));
+            pipe.Start(Codec.Encode(new(new MapChangeRequest(target, false), -71)));
+            var frames = await pipe.DrainToBarrier();
+            var notice = Assert.IsType<TextInformationEvent>(Assert.Single(AssertTypedEvents(pipe, frames)).Content);
+            Assert.Equal(TextInformationType.TextInformationMessage, notice.MessageType);
+            Assert.Equal(InfoMessages.FreeText, notice.MessageId);
+            Assert.Equal(expected, Assert.Single(notice.Parameters));
+            Assert.Equal((from, cell), (pipe.Session.MapId, pipe.Session.State.CellId));
+            await pipe.Finish();
+        }
+        finally { Jail.ForgetForTests(id); }
+    }
+
+    private static GameFrame[] AssertTypedEvents(Pipe pipe, IReadOnlyList<byte[]> packets)
+    {
+        // The wire alone cannot distinguish a mapped send from the old raw builders.
+        var encoded = pipe.Codec.Encoded.TakeWhile(frame => frame.Content is not PongEvent).ToArray();
+        Assert.Equal(packets.Count, encoded.Length);
+        for (int i = 0; i < encoded.Length; i++)
+        {
+            Assert.Null(encoded[i].Uid);
+            Assert.IsAssignableFrom<GameEvent>(encoded[i].Content);
+            Assert.Equal(Codec.Encode(encoded[i]), packets[i]);
+        }
+        return packets.Select(packet => Codec.Decode(packet)).ToArray();
     }
 
     private sealed class Battle : IDisposable
@@ -288,8 +339,9 @@ public sealed class TypedCombatMovementTests
     private sealed class CountingCodec : IGameCodec
     {
         internal int Decodes;
+        internal readonly ConcurrentQueue<GameFrame> Encoded = new();
         public GameFrame Decode(ReadOnlySpan<byte> payload) { Decodes++; return Codec.Decode(payload); }
-        public byte[] Encode(GameFrame frame) => Codec.Encode(frame);
+        public byte[] Encode(GameFrame frame) { Encoded.Enqueue(frame); return Codec.Encode(frame); }
     }
 
     private sealed class Pipe(TcpListener listener, TcpClient client, TcpClient server) : IAsyncDisposable
@@ -333,11 +385,12 @@ public sealed class TypedCombatMovementTests
         internal async Task<List<byte[]>> DrainToBarrier()
         {
             await Send(TypedCombatMovementTests.Codec.Encode(new(new PingRequest(false), 999)));
+            byte[] pong = TypedCombatMovementTests.Codec.Encode(new(new PongEvent(false)));
             var frames = new List<byte[]>();
             for (int i = 0; i < 100; i++)
             {
                 byte[] frame = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(clientStream).WaitAsync(Timeout);
-                if (ConnectionProtocol.ReadOpcode(frame) == "kqy") return frames;
+                if (frame.AsSpan().SequenceEqual(pong)) return frames;
                 frames.Add(frame);
             }
             throw new InvalidOperationException("Movement did not reach the Ping barrier.");

@@ -195,9 +195,13 @@ come directly from the codec; the manual combat movement parser is removed. Comb
 action-sequence output and `jti` acknowledgments retain their existing serializers.
 
 Border crossing accepts a typed `MapChangeRequest`, retaining neighbour resolution,
-jail/raid restrictions, measured arrivals, persistence and departure/load/time/zaap
-ordering. The proxy supplies its entry-lifecycle map-change hook. The control harness
-uses the same typed movement dispatch as incoming client frames.
+jail/raid restrictions, measured arrivals and persistence. The mover receives
+`MapChangeOrientationEvent`, then (after the peer notifications) `MapCurrentEvent`,
+`TimeEvent` and `ZaapKnownListEvent` through its session codec, without request UIDs.
+Jail and raid-floor refusals use `TextInformationEvent`. The separate party follower
+position update (`ikv` in `3.6.10.10`) still needs a reviewed binding. The proxy supplies
+its entry-lifecycle map-change hook. The control harness uses the same typed movement
+dispatch as incoming client frames.
 
 `MovementDispatchTests` and `TypedCombatMovementTests` cover lifecycle guards, silent
 combat no-ops, packed/unpacked key cells, single MP charging, placement/turn/MP
