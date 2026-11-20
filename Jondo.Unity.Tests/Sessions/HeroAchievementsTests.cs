@@ -15,7 +15,7 @@ namespace Jondo.Unity.Tests.Sessions
 {
     /// <summary>
     /// A hero's achievements (Achievements.ForHeroAsync): his own, earned in his session, told on
-    /// his master's client and the account's from then on -- not earned twice.
+    /// his master's client and shown in the account's list from then on -- each his own to be paid for.
     /// </summary>
     public class HeroAchievementsTests
     {
@@ -36,7 +36,7 @@ namespace Jondo.Unity.Tests.Sessions
         }
 
         [Fact]
-        public async Task A_heros_level_earns_for_the_account_once_and_on_his_masters_client()
+        public async Task A_heros_level_earns_his_own_achievements_on_his_masters_client()
         {
             if (!File.Exists(Paths.WorldDb) || !File.Exists(Paths.AchievementsJson)) return;
             Achievements.Load();
@@ -68,8 +68,10 @@ namespace Jondo.Unity.Tests.Sessions
                 using var turn = await master.EnterTurnAsync();
                 // His level, never looked at since he was connected: the level achievements.
                 await Achievements.ForHeroAsync(master, hero);
-                var earned = hero.State.Achievements!.Earned.Except(new[] { each, 3 }).ToList();
-                Assert.NotEmpty(earned);
+                // The master's 3 too: what another character of the account did is still the
+                // hero's to earn and be paid for (#196).
+                var earned = hero.State.Achievements!.Earned.Except(new[] { each }).ToList();
+                Assert.Contains(3, earned);
                 // Told through his master's codec, with the hero's credit and capped level.
                 Assert.Equal(earned.Count, codec.Frames.Count);
                 foreach (var frame in codec.Frames)
@@ -83,15 +85,20 @@ namespace Jondo.Unity.Tests.Sessions
                     Assert.Equal(RecordingCodec.Token, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
                 }
 
-                // The account's now, credited to him.
+                // Shown in the master's list now, credited to him -- but the master's own 3, which
+                // stays the master's and paid.
                 var account = master.State.Achievements!;
-                Assert.All(earned, id => Assert.Equal(Hero, account.AchieverOf(id)));
-                Assert.All(earned, id => Assert.Equal(200, account.LevelOf(id)));
+                var heroOnly = earned.Where(id => id != 3).ToList();
+                Assert.All(heroOnly, id => Assert.Equal(Hero, account.AchieverOf(id)));
+                Assert.All(heroOnly, id => Assert.Equal(200, account.LevelOf(id)));
                 Assert.True(account.WasClaimed(each));
                 Assert.False(hero.State.Achievements.WasClaimed(each));
                 Assert.Equal(Hero, hero.State.Achievements.AchieverOf(each));
-                Assert.Equal(Master, hero.State.Achievements.AchieverOf(3));
-                Assert.True(hero.State.Achievements.WasClaimed(3));
+                Assert.Equal(Master, account.AchieverOf(3));
+                Assert.True(account.WasClaimed(3));
+                // His own 3, his reward still to take.
+                Assert.Equal(Hero, hero.State.Achievements.AchieverOf(3));
+                Assert.False(hero.State.Achievements.WasClaimed(3));
                 Assert.Equal(0, master.UnoCadaVez.CurrentCount);
                 Assert.Same(wrong, SessionContext.Actual);
 

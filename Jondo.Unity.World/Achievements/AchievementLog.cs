@@ -100,6 +100,17 @@ namespace Jondo.Unity.World.Achievements
 
         public AchievementCatalogue Book => _book;
 
+        /// <summary>
+        /// The character whose log it is, or zero. The account's achievements are in it for the
+        /// window, each with the character who did it; one another character did is still his to
+        /// earn and be paid for, as every character of an account may since 2.45.
+        /// </summary>
+        public long Owner { get; set; }
+
+        /// <summary>Whether this one was earned by another character of the account, not by the owner.</summary>
+        public bool ByAnother(int achievementId)
+            => Owner != 0 && _achievers.TryGetValue(achievementId, out long who) && who != Owner;
+
         public IReadOnlyCollection<int> Earned => _earned;
         public IReadOnlyCollection<int> Claimed => _claimed;
 
@@ -191,11 +202,25 @@ namespace Jondo.Unity.World.Achievements
         /// </summary>
         public AchievementMove Check(int achievementId)
         {
-            if (_earned.Contains(achievementId)) return AchievementMove.Nothing(achievementId);
-            if (!Holds(achievementId)) return AchievementMove.Nothing(achievementId);
+            if (!Earnable(achievementId) || !Holds(achievementId)) return AchievementMove.Nothing(achievementId);
 
-            _earned.Add(achievementId);
+            Earn(achievementId);
             return new AchievementMove(achievementId, true, Cascade(achievementId));
+        }
+
+        /// <summary>Not earned yet, or earned by another character of the account only.</summary>
+        private bool Earnable(int achievementId) => !_earned.Contains(achievementId) || ByAnother(achievementId);
+
+        /// <summary>Earned by the owner: another character's becomes his own, his reward still to take.</summary>
+        private void Earn(int achievementId)
+        {
+            if (ByAnother(achievementId))
+            {
+                _achievers[achievementId] = Owner;
+                _claimed.Remove(achievementId);
+                _levels.Remove(achievementId);
+            }
+            _earned.Add(achievementId);
         }
 
         /// <summary>
@@ -464,9 +489,9 @@ namespace Jondo.Unity.World.Achievements
 
                 foreach (int candidate in candidates)
                 {
-                    if (_earned.Contains(candidate) || !Holds(candidate)) continue;
+                    if (!Earnable(candidate) || !Holds(candidate)) continue;
 
-                    _earned.Add(candidate);
+                    Earn(candidate);
                     earned.Add(candidate);
                     queue.Enqueue(candidate);
                 }

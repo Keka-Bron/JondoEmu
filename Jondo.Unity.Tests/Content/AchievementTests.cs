@@ -86,6 +86,57 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(log.Has(8518));
         }
 
+        /// <summary>
+        /// One another character of the account did is in the list with who did it, and still this
+        /// one's to earn: his own then, his reward still to take (#196). Earned once by him, it is
+        /// not earned again.
+        /// </summary>
+        [Fact]
+        public void Another_characters_achievement_is_still_this_ones_to_earn()
+        {
+            if (!Available) return;
+
+            var book = new AchievementCatalogue();
+            int level = book.All().First(a => a.Objectives.Count > 0
+                                              && a.Objectives.All(o => o.Link?.Kind == AchievementLink.Level)).Id;
+
+            var mine = new AchievementLog(book, new Player { Level = 200 }) { Owner = 1 };
+            mine.Restore(level, claimed: true, achievedBy: 2);
+            Assert.True(mine.Has(level));
+            Assert.True(mine.ByAnother(level));
+
+            Assert.True(mine.Check(level).Earned);
+            Assert.Equal(1, mine.AchieverOf(level));
+            Assert.False(mine.WasClaimed(level));
+            Assert.Contains(level, mine.Unclaimed());
+            Assert.False(mine.Check(level).Earned);
+
+            // His own, earned already: nothing more.
+            var own = new AchievementLog(book, new Player { Level = 200 }) { Owner = 1 };
+            own.Restore(level, claimed: true, achievedBy: 1);
+            Assert.False(own.Check(level).Earned);
+            Assert.True(own.WasClaimed(level));
+        }
+
+        /// <summary>
+        /// The items of the Donjons, Monstres and Événements achievements are paid once per account,
+        /// the rest -- the quests' Dofus among them -- to every character (#196).
+        /// </summary>
+        [Fact]
+        public void Items_once_per_account_are_those_of_dungeons_monsters_and_events()
+        {
+            if (!Available) return;
+
+            var book = new AchievementCatalogue();
+            foreach (int root in new[] { 3, 25, 9 })
+            {
+                var under = book.All().First(a => book.RootCategoryOf(a.CategoryId) == root && a.CategoryId != root);
+                Assert.True(book.PaysItemsOncePerAccount(under.Id), $"{under.Id} in {under.CategoryId} under {root}");
+            }
+            var quest = book.All().First(a => book.RootCategoryOf(a.CategoryId) == 8);
+            Assert.False(book.PaysItemsOncePerAccount(quest.Id));
+        }
+
         [Fact]
         public void An_objective_this_engine_cannot_judge_does_not_pass_by_default()
         {
