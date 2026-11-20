@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -50,6 +51,30 @@ namespace Jondo.Unity.Tests.Content
                 Assert.True(Judge("(EC>0,99)").Met);
                 Assert.True(Judge("(ES>320,0)").Met);
             }
+        }
+
+        [Fact]
+        public async Task A_Nowel_crafting_achievement_counts_only_scarlet_gifts()
+        {
+            Achievements.Load();
+            var session = GameSession.SinSocket();
+            using var context = SessionContext.Push(session);
+
+            const int incarnamBread = 468, scarletGift = 13007;
+            const string apprenticeCriterion = "(EC>13007,4)";
+            session.State.AchievementTallies[(AchievementCatalogue.CraftKey, 0)] = 100;
+
+            await Achievements.AfterCraftAsync(session, incarnamBread, 5);
+            Assert.True(Judge("(EC>0,104)").Met);
+            var progress = Judge(apprenticeCriterion);
+            Assert.True(progress.FullyJudged);
+            Assert.False(progress.Met);
+
+            await Achievements.AfterCraftAsync(session, scarletGift, 4);
+            Assert.False(Judge(apprenticeCriterion).Met);
+            await Achievements.AfterCraftAsync(session, scarletGift, 1);
+            Assert.True(Judge(apprenticeCriterion).Met);
+            Assert.False(Judge("(EC>13007,24)").Met);
         }
 
         /// <summary>

@@ -360,16 +360,21 @@ namespace Jondo.Unity.Server.Managers
         /// ring is crafted — after the job's level-up and the character sheet, which is where this
         /// is called from.
         /// </remarks>
-        public static Task AfterCraftAsync(GameSession session, int count)
+        public static Task AfterCraftAsync(GameSession session, int itemId, int count)
         {
             using var context = SessionContext.Push(session);
             var book = _book;
             if (book == null || count <= 0) return Task.CompletedTask;
 
             SetTally(AchievementCatalogue.CraftKey, 0, Tally(AchievementCatalogue.CraftKey, 0) + count);
+            var byItem = book.WaitingOn("EC", itemId);
+            if (itemId > 0 && byItem.Count > 0)
+                SetTally("EC", itemId, Tally("EC", itemId) + count);
+
             return CheckAsync(session, book.WaitingOn(AchievementCatalogue.CraftKey)
                 .Concat(book.WaitingOn(AchievementCatalogue.JobKey))
-                .Concat(book.WaitingOn("EC")));
+                .Concat(book.WaitingOn("EC", 0))
+                .Concat(byItem));
         }
 
         /// <summary>A job's level went up: the achievements that want jobs at a level.</summary>
@@ -857,7 +862,7 @@ namespace Jondo.Unity.Server.Managers
                 "EH" => S.ChallengesDone.Contains((int)key) ? 1 : 0,
                 "EB" or "HD" or "NC" or "EI" or "Eu" or "EJ" or VisitedKind => Tally(op, key),
                 _ when FromIntensity.Contains(op) => AtIntensityOrHarder(op, key),
-                "EC" => Tally(AchievementCatalogue.CraftKey, 0),
+                "EC" => key == 0 ? Tally(AchievementCatalogue.CraftKey, 0) : Tally("EC", key),
                 "ES" => Tally(AchievementCatalogue.ExploreKey, key),
                 "HP" => key == 1 && InOwnGuildHall() ? 1 : 0,
 
