@@ -364,13 +364,14 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
-        /// Taking a hero in hand sends his own quest journal: with no map loaded again, the client
-        /// kept showing the journal of the one played before until the next login (#198).
+        /// Taking a hero in hand sends his own quest journal and achievements: with no map loaded
+        /// again, the client kept showing those of the one played before until the next login (#198).
         /// </summary>
         [Fact]
-        public async Task A_hero_taken_in_hand_is_shown_his_own_quest_journal()
+        public async Task A_hero_taken_in_hand_is_shown_his_own_quest_journal_and_achievements()
         {
             QuestEngine.Load();
+            Achievements.Load();
             string tag = Guid.NewGuid().ToString("N")[..6];
             long master = Character(Account + 12, "Diario-" + tag, 8);
             long hero = Character(Account + 12, "Pagina-" + tag, 9);
@@ -400,6 +401,8 @@ namespace Jondo.Unity.Tests.World
                 var journal = Assert.Single(codec.Frames.Skip(before).Select(f => f.Content).OfType<Jondo.Unity.Protocol.Game.QuestsEvent>());
                 Assert.Contains(journal.ActiveQuests, quest => quest.QuestId == 1648);
                 Assert.DoesNotContain(journal.FinishedQuests, quest => quest.QuestId == 1648);
+                // And his achievements: the window kept the one played before's as well.
+                Assert.Single(codec.Frames.Skip(before).Select(f => f.Content).OfType<Jondo.Unity.Protocol.Game.AchievementsEvent>());
             }
             finally
             {
