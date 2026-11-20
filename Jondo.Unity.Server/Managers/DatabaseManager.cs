@@ -328,6 +328,8 @@ namespace Jondo.Unity.Server
                 ";
                 createCharacters.ExecuteNonQuery();
 
+                Managers.ZaapDiscoveries.EnsureTable(worldConnection);
+
                 // Migration: Ensure Orientation column exists
                 try
                 {
@@ -2311,7 +2313,7 @@ namespace Jondo.Unity.Server
             "CharacterChallenges", "CharacterQuests", "CharacterAchievements",
             "CharacterKeyring", "CharacterDungeonProgress", "CharacterElements",
             "CharacterEnergy", "CharacterExperienceLimit",
-            "CharacterSavedPositions", "CharacterPresets", "CharacterItemShortcuts", "CharacterPendingChanges",
+            "CharacterSavedPositions", "CharacterZaapDiscoveries", "CharacterPresets", "CharacterItemShortcuts", "CharacterPendingChanges",
         };
 
         /// <summary>The ids of deleted characters, so that none is ever handed out again.</summary>

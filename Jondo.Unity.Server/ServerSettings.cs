@@ -142,6 +142,9 @@ namespace Jondo.Unity.Server
         /// <summary>Give each new character an Adventurer's Set.</summary>
         public bool StartingAdventurerSet { get; set; } = true;
 
+        /// <summary>Require characters to visit ordinary zaaps before travelling to them. Set in the file.</summary>
+        public bool RequireZaapDiscovery { get; set; } = true;
+
         /// <summary>The server window's language: es, en or fr.</summary>
         public string WindowLanguage { get; set; } = "es";
 

@@ -32,7 +32,7 @@ namespace Jondo.Unity.Server.Network
                 () => GuildRankService.Live.Initial(character.Id),
                 () => CharacterSelectionMessages.Success(character),
                 () => InventoryMessages.FromCatalogue.Snapshot(session.State),
-                EntryEnvironmentMessages.Live.Zaaps, EntryEnvironmentMessages.Live.Calendar,
+                () => EntryEnvironmentMessages.Live.Zaaps(character.Id), EntryEnvironmentMessages.Live.Calendar,
                 () => EntryInformationMessages.PreviousConnection(session.State.PreviousVisit), AfterSelectionMessages.Live,
                 InitialPresentationMessages.Live(character));
             int sent = await initial.SendAsync(session);
@@ -106,7 +106,10 @@ namespace Jondo.Unity.Server.Network
 
             // Snapshot after the map sequence commits the roleplay regeneration timestamp.
             await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
-            await session.SendAsync(EntryEnvironmentMessages.Live.Zaaps());
+            if (fightToRejoin == null)
+                await EntryEnvironmentMessages.SendDiscoveredAsync(session, mapId);
+            else
+                await EntryEnvironmentMessages.Live.SendKnownAsync(session);
             sent += 2;
 
             Task<int> SendReconnectionAsync()

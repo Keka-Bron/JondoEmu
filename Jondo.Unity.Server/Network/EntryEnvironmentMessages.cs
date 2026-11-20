@@ -4,35 +4,14 @@ using Jondo.Unity.Server.Managers;
 namespace Jondo.Unity.Server.Network;
 
 /// <summary>Current server travel catalogue and calendar, with injectable sources for entry.</summary>
-internal sealed class EntryEnvironmentMessages(Func<IEnumerable<long>> destinations, Func<int?> dateId, Action<string> log,
-                                               Func<long, bool>? isZaap = null)
+internal sealed class EntryEnvironmentMessages(Func<long, IEnumerable<long>> destinations, Func<int?> dateId,
+                                               Action<string> log, Action<long, long>? recordDiscovery = null)
 {
-    internal static EntryEnvironmentMessages Live { get; } = new(Interactives.DiscoveredZaapMaps,
-        () => Almanax.Today()?.Id, Console.WriteLine, map => Interactives.WaypointOf(map) != null);
+    internal static EntryEnvironmentMessages Live { get; } = new(ZaapDiscoveries.KnownMaps,
+        () => Almanax.Today()?.Id, Console.WriteLine, (id, map) => ZaapDiscoveries.Discover(id, map));
 
-    /// <summary>
-    /// Known destinations make the travel window show its list: the historical 182-byte
-    /// snapshot contained 45 activated zaaps. Without it the client showed «Ningún destino»
-    /// even when the travel-window packet offered destinations. Jondo currently grants all
-    /// activated zaaps with a usable departure element, rather than persisting discovery.
-    /// </summary>
-    internal ZaapKnownListEvent Zaaps() => new(destinations().ToArray());
-
-    /// <summary>
-    /// The known zaaps again on arriving on a map, the map with them when it is a zaap.
-    /// </summary>
-    /// <remarks>
-    /// The client REPLACES its known list with each hjk (ees.dtd keeps the message's list, after
-    /// telling which ones are new), so a list of the arrival map alone left it knowing that one
-    /// map: after the first step every zaap of the world map was a «?», while the minimap,
-    /// which does not ask, still named them.
-    /// </remarks>
-    internal ZaapKnownListEvent Zaaps(long arrivedOn)
-    {
-        var known = destinations().ToList();
-        if (isZaap?.Invoke(arrivedOn) == true && !known.Contains(arrivedOn)) known.Add(arrivedOn);
-        return new(known.ToArray());
-    }
+    // Each hjk replaces the client's known list. Always send the complete character snapshot.
+    internal ZaapKnownListEvent Zaaps(long characterId) => new(destinations(characterId).ToArray());
 
     internal AlmanachCalendarDateEvent? Calendar()
     {
@@ -41,7 +20,13 @@ internal sealed class EntryEnvironmentMessages(Func<IEnumerable<long>> destinati
         return null;
     }
 
-    internal Task SendKnownAsync(GameSession session, long mapId) => session.SendAsync(Zaaps(mapId));
+    internal Task SendKnownAsync(GameSession session) => session.SendAsync(Zaaps(session.CharacterId));
 
-    internal static Task SendDiscoveredAsync(GameSession session, long mapId) => Live.SendKnownAsync(session, mapId);
+    internal Task RecordArrivalAsync(GameSession session, long mapId)
+    {
+        recordDiscovery?.Invoke(session.CharacterId, mapId);
+        return SendKnownAsync(session);
+    }
+
+    internal static Task SendDiscoveredAsync(GameSession session, long mapId) => Live.RecordArrivalAsync(session, mapId);
 }

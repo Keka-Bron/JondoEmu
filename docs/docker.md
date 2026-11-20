@@ -146,6 +146,13 @@ docker compose cp server_settings.json jondo-server:/app/config/server_settings.
 docker compose restart jondo-server
 ```
 
+## Zaap discovery
+
+In `config/server_settings.json`, `"RequireZaapDiscovery": true` (the default) makes ordinary Zaap
+destinations available only after the character visits their map. Set it to `false` and restart
+to make all usable ordinary Zaaps available immediately. Visits are recorded in both modes, so
+switching back to discovery uses the visits each character has already recorded.
+
 ## Backups
 
 The server's own backups go to `bases/backups` in the `jondo-bases` volume

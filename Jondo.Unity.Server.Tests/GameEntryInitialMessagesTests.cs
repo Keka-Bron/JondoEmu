@@ -248,9 +248,9 @@ public sealed class GameEntryInitialMessagesTests
     public async Task Environment_sources_keep_their_positions_and_missing_calendar_does_not_send_a_fabricated_date()
     {
         var state = new SessionState { ActiveChatChannels = [ChatChannel.Private] };
-        var environment = new EntryEnvironmentMessages(() => [9_000_000_001, 71_001], () => null, _ => { });
+        var environment = new EntryEnvironmentMessages(_ => [9_000_000_001, 71_001], () => null, _ => { });
         var initial = new GameEntryInitialMessages([], [], state, new([], _ => []), 0, 0,
-            () => new([]), EmptyArena, () => new([]), () => Selection(), () => new(0, []), environment.Zaaps, environment.Calendar,
+            () => new([]), EmptyArena, () => new([]), () => Selection(), () => new(0, []), () => environment.Zaaps(state.CharacterId), environment.Calendar,
             () => EntryInformationMessages.PreviousConnection(state.PreviousVisit), AfterSelectionMessagesTests.Empty, InitialPresentationMessagesTests.Empty);
         var (packets, _, count) = await CaptureAsync(initial);
         var names = packets.Select(MessageName).ToArray();

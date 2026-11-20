@@ -16,11 +16,11 @@ public sealed class EntryStatusTests
         var destinations = new List<long> { 9_000_000_001, 71_001, 9_000_000_001 };
         int? today = 81_001;
         var logs = new List<string>();
-        var service = new EntryEnvironmentMessages(() => destinations, () => today, logs.Add);
-        var before = service.Zaaps();
+        var service = new EntryEnvironmentMessages(_ => destinations, () => today, logs.Add);
+        var before = service.Zaaps(1);
         destinations.Clear();
         Assert.Equal(new long[] { 9_000_000_001, 71_001, 9_000_000_001 }, before.Destinations);
-        Assert.Empty(service.Zaaps().Destinations);
+        Assert.Empty(service.Zaaps(1).Destinations);
         Assert.Equal(new AlmanachCalendarDateEvent(81_001), service.Calendar());
         today = 81_002;
         Assert.Equal(new AlmanachCalendarDateEvent(81_002), service.Calendar());
@@ -35,41 +35,38 @@ public sealed class EntryStatusTests
     public void Environment_source_failures_propagate_without_being_replaced_with_defaults()
     {
         var failure = new IOException("catalogue failed");
-        var service = new EntryEnvironmentMessages(() => throw failure, () => throw failure, _ => throw new Exception("Unexpected log"));
-        Assert.Same(failure, Assert.Throws<IOException>(service.Zaaps));
+        var service = new EntryEnvironmentMessages(_ => throw failure, () => throw failure, _ => throw new Exception("Unexpected log"));
+        Assert.Same(failure, Assert.Throws<IOException>(() => service.Zaaps(1)));
         Assert.Same(failure, Assert.Throws<IOException>(service.Calendar));
     }
 
     [Fact]
-    public async Task Live_discovery_uses_the_explicit_owner_and_keeps_int64_map_ids()
+    public async Task Arrival_records_only_for_the_recipient_and_sends_the_full_known_list()
     {
+        const long discovered = 9_000_000_001;
         var own = new StatusRecipient();
+        own.Session.State.CharacterId = 1;
         var other = new StatusRecipient();
-        var service = new EntryEnvironmentMessages(() => new long[] { 71_001 }, () => null, _ => { },
-                                                   map => map == 9_000_000_001);
+        other.Session.State.CharacterId = 2;
+        var known = new Dictionary<long, HashSet<long>> { [1] = [71_001], [2] = [] };
+        var service = new EntryEnvironmentMessages(id => known[id], () => null, _ => { },
+            (id, map) =>
+            {
+                if (map == discovered) known[id].Add(map);
+            });
         using var context = SessionContext.Push(other.Session);
         using var turn = await own.Session.EnterTurnAsync();
-        await service.SendKnownAsync(own.Session, 9_000_000_001).WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(new long[] { 71_001, 9_000_000_001 }, Assert.IsType<ZaapKnownListEvent>(Assert.Single(own.Codec.Frames).Content).Destinations);
+
+        await service.RecordArrivalAsync(own.Session, discovered).WaitAsync(TimeSpan.FromSeconds(5));
+        await service.RecordArrivalAsync(own.Session, 99_999).WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.Equal(2, own.Codec.Frames.Count);
+        Assert.All(own.Codec.Frames, frame => Assert.Equal(new long[] { 71_001, discovered },
+            Assert.IsType<ZaapKnownListEvent>(frame.Content).Destinations.Order()));
+        Assert.Empty(service.Zaaps(other.Session.CharacterId).Destinations);
         Assert.Empty(other.Packets);
         Assert.Equal(0, own.Codec.Decodes);
         Assert.Same(other.Session, SessionContext.Actual);
-    }
-
-    /// <summary>
-    /// The client replaces its known zaaps with each hjk: arriving anywhere sends them all, and the
-    /// arrival map only when it is a zaap. A list of the arrival map alone turned every zaap of the
-    /// world map into a «?».
-    /// </summary>
-    [Fact]
-    public void Arriving_on_a_map_sends_every_known_zaap_and_the_map_only_when_it_is_one()
-    {
-        var service = new EntryEnvironmentMessages(() => new long[] { 71_001, 72_002 }, () => null, _ => { },
-                                                   map => map is 71_001 or 73_003);
-
-        Assert.Equal(new long[] { 71_001, 72_002 }, service.Zaaps(99_999).Destinations);   // not a zaap
-        Assert.Equal(new long[] { 71_001, 72_002 }, service.Zaaps(71_001).Destinations);   // known already
-        Assert.Equal(new long[] { 71_001, 72_002, 73_003 }, service.Zaaps(73_003).Destinations);
     }
 
     [Fact]
