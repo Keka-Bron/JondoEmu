@@ -12,14 +12,21 @@ off unless the server was started with `JONDO_TEST_KEY`.
 
 | Layer | What it drives | What the server needs |
 | --- | --- | --- |
-| Server | `server_start` / `stop` / `restart`, `server_logs`, `admin_call`, `test_call` | The control API on 8888 |
-| A character without a client | `headless_connect`, `game_*`, `fight_*`, `headless_send` | `/api/test/*` (JONDO_TEST_KEY) |
-| The real client | `client_launch`, `client_screenshot`, `client_click`, `client_ui`... | JondoFix with `JONDO_INPUT_PORT` |
+| Server | `server_start` / `stop` / `restart`, `server_logs`, `admin_call`, `test_call`, `run_tests`, `protocol_fields` | The control API on 8888 |
+| A character without a client | `headless_connect`, `game_*` (`game_dialogue`), `fight_*`, `hero_*`, `headless_send` | `/api/test/*` (JONDO_TEST_KEY) |
+| The real client | `client_enter_world`, `client_screenshot`, `client_click`, `client_ui`, `client_set_text`, `client_log`... | JondoFix with `JONDO_INPUT_PORT` |
 
 **Server.** `server_start` runs `Jondo.Unity.Server` headless with the run's test key. With
-`fromSource` (the default) it uses `dotnet run`, so a change is built and tried in one call. A server
-the tools started is killed when the tools exit: a server left behind would hold the ports with a
-key nobody has.
+`fromSource` (the default) it uses `dotnet run`, so a change is built and tried in one call, and it
+reads the source checkout's `content/` (`JONDO_CONTENT_ROOT`): a branch's content goes with its code,
+while the databases stay the data root's. A server the tools started is killed when the tools exit: a
+server left behind would hold the ports with a key nobody has.
+
+`run_tests` runs `Jondo.Unity.Tests` on a checkout (the source, or a worktree's path) with
+`JONDO_EMULATOR_ROOT` on it, copies the data root's databases into its `bases/` when it has none, and
+builds where the tests look for the repository's files. `protocol_fields` tells what a game message's
+fields mean where it has been settled (`docs/protocol_fields.json`): the client's names are rotated,
+so a field's meaning is a finding kept with how it was found.
 
 **A character without a client.** The `/api/test` routes (`ControlApiTest.cs` and its partials) act
 on a test account's character in the world: `jondoplay` for slot 0, `jondoplayNN` for slot n. The
@@ -35,13 +42,32 @@ keeps the last 2,000 frames the server sent it (`headless_frames`). `headless_se
 message to its socket, so the message goes through the server's whole socket loop. `test_call
 inject` hands a message straight to its handler instead.
 
+**Heroes.** `hero_list`, `hero_connect`, `hero_disconnect` and `hero_switch` drive the hero mode as the
+heroes window does (`/api/heroes/*`, with the account's token). To act as a hero without taking him in
+hand, give `"hero": name or id` to any `test_call` body, or `hero=` to `game_state`, `game_give` and
+`game_dialogue`: the route then uses his session -- his quests, his bag.
+
+**Order.** A slot's actions run one after the other, never two at once in its session; what only reads
+is not held. But calls an agent sends together reach the tools in any order: steps that depend on one
+another go in one call. `game_dialogue npc=... replies=[...]` talks to an NPC and chooses the replies
+in order (four replies sent at once ran the second first, and the NPC's conversation closed).
+
 **The real client.** `client_launch` starts Dofus as the launcher does, for the slot's test account.
 The mods come from the source checkout, and `JONDO_INPUT_PORT` is set. On that port JondoFix
 (`TestInput.cs`, `TestInterface.cs`) answers one line per command:
 - a mouse and a keyboard of its own, so it does not move the computer's pointer and works with the
   window in the background;
 - the interface read from UI Toolkit, with every box in window pixels;
-- `shot`, a JPEG of the window taken at the end of a frame.
+- `shot`, a JPEG of the window taken at the end of a frame, or of a region of it, enlarged;
+- `settext`, a text written into a field through the game's own `TextInput` (and validated as Enter
+  would with `settext!`): the harness's keyboard does not reach a field in a client in the
+  background.
+
+`client_enter_world character=...` does the whole way in: the client started when there is none, the
+server's JOUER, the character picked and his JOUER, until the server has him in the world. A client
+left on its connection screen by a server restart (its JOUER greyed for good) is started again.
+`client_find hidden=true` finds hidden elements too -- the error label a field keeps hidden until its
+error style shows it. `client_log` reads MelonLoader's `Latest.log`: what the mods wrote.
 
 A slot is played either headless or by a client, never both at once.
 
@@ -80,7 +106,7 @@ run` writes its build output to stdout, which is the protocol's channel. For Ope
 | Variable | Default | What for |
 | --- | --- | --- |
 | `JONDO_EMULATOR_ROOT` | the folder with `.jondo-root` above the dll | The data the server reads: `bases/`, `content/`, `logs/` |
-| `JONDO_MCP_SOURCE` | the data root | The checkout the server is built from and whose mods the client is given. Point it at a worktree to try a branch against the main checkout's data |
+| `JONDO_MCP_SOURCE` | the data root | The checkout the server is built from, whose `content/` it reads and whose mods the client is given. Point it at a worktree to try a branch against the main checkout's data |
 | `JONDO_TEST_KEY` | drawn for each run | Set it to use a server started by hand with the same key |
 | `JONDO_CLIENT_EXECUTABLE` | as the launcher finds it | The client's `Dofus.exe` |
 
@@ -100,10 +126,12 @@ Then, with the client:
 
 ```text
 headless_disconnect
-client_launch                                 logged in on its own
-client_ui filter=jouer                        [{"t":"JOUER","x":695,"y":758,"w":210,"h":99,...}]
-client_click x=800 y=807
-client_screenshot
+client_enter_world character=Mcp-Yopuka       started, logged in, picked, in the world (~20 s)
+hero_connect character=Mcp-Feca               a hero beside him
+game_state hero=Mcp-Feca                      the hero's own session
+client_set_text element=ti_chatInput text=".item 39 1" submit=true
+client_screenshot x=0 y=640 width=290 height=260 zoom=2 savePath=C:/shots/chat.jpg
+client_log contains=[Heroes]
 ```
 
 ## Things to know

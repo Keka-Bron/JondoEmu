@@ -1,0 +1,56 @@
+{
+  "_": [
+    "What the fields of a game message mean, where it has been settled. The client's message and field",
+    "names are rotated (ind { fqfe, fqff, fqfg } in datos/protocolo_3.6.10.11.proto), so a field's meaning",
+    "is a finding: write how it was found -- a capture, the client's code, a fix checked in the client.",
+    "Read by the MCP's protocol_fields tool. Field numbers as the .proto has them."
+  ],
+  "messages": {
+    "ind": {
+      "name": "a party invitation withdrawn, told to the party",
+      "direction": "server to client",
+      "fields": {
+        "1": "the party's id",
+        "2": "the invitee: taken off the party's list, named second in «ui.party.invitationCancelled»",
+        "3": "who withdrew it: named first"
+      },
+      "settled": "Checked in the 3.6.10.11 client, Keka-Bron/JondoEmu#216: sent { 2 who withdrew, 3 invitee }, the client took the inviter off his own party and wrote «Testas a annulé l'invitation de Lilia» for Lilia's own."
+    },
+    "ilo": {
+      "name": "a party invitation closed, told to the invitee",
+      "direction": "server to client",
+      "fields": {
+        "1": "the party's id",
+        "2": "who withdrew it (or the party's host, when the invitee declined)"
+      },
+      "settled": "The captures send it to whoever declines; the withdrawn invitation's popup closes with it (PartyHandler.CancelInvitationAsync), checked in the client with #216."
+    },
+    "inq": {
+      "name": "withdraw a pending party invitation («Annuler l'invitation»)",
+      "direction": "client to server",
+      "fields": {
+        "1": "the party's id",
+        "2": "the invitee"
+      },
+      "settled": "Sent by the 3.6.10.11 client from the party display's menu, #216."
+    },
+    "iko": {
+      "name": "an invitation turned down, told to the inviter",
+      "direction": "server to client",
+      "fields": {
+        "1": "who turned it down",
+        "2": "the party's id"
+      },
+      "settled": "The captures (ConnectionProtocol.BuildInvitationWithdrawn); Koalitions found the refusal's names right in #216."
+    },
+    "lqn": {
+      "name": "a text message in the chat (InfoMessage)",
+      "direction": "server to client",
+      "fields": {
+        "1": "its type: 0 information (free text with id 0 is written as given), 1 a warning -- with id 0 the client writes «L'erreur n°0 est survenue.» instead of the text",
+        "2": "the message's id in the client's list (0: free text)"
+      },
+      "settled": "Checked in the 3.6.10.11 client with #208: a hero's warning sent as type 1, id 0 showed «L'erreur n°0 est survenue.»; as type 0 (ConnectionProtocol.BuildNotice) the sentence."
+    }
+  }
+}

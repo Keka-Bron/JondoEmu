@@ -32,7 +32,14 @@ namespace JondoFix
             public int h { get; set; }
             public string n { get; set; }
             public string k { get; set; }
+            /// <summary>Set only by a search of hidden elements too: true for one that is not shown.</summary>
+            public bool? hidden { get; set; }
         }
+
+        private static readonly JsonSerializerOptions Quiet = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        };
 
         private static IEnumerable<VisualElement> Roots()
         {
@@ -81,12 +88,20 @@ namespace JondoFix
             return string.IsNullOrWhiteSpace(text) ? null : Tags.Replace(text, "").Trim();
         }
 
-        private static void Walk(VisualElement from, int depth, Action<VisualElement> each)
+        private static void Walk(VisualElement from, int depth, Action<VisualElement> each, bool all = false)
         {
-            if (from == null || depth > 60 || !Shown(from)) return;
+            if (from == null || depth > 60 || !all && !Shown(from)) return;
             each(from);
             int count = from.hierarchy.childCount;
-            for (int i = 0; i < count; i++) Walk(from.hierarchy.ElementAt(i), depth + 1, each);
+            for (int i = 0; i < count; i++) Walk(from.hierarchy.ElementAt(i), depth + 1, each, all);
+        }
+
+        /// <summary>Whether an element and every parent of it are shown.</summary>
+        private static bool ShownAll(VisualElement e)
+        {
+            for (var at = e; at != null; at = at.parent)
+                if (!Shown(at)) return false;
+            return true;
         }
 
         /// <summary>Every text shown, or those containing the filter (case and accents aside).</summary>
@@ -103,11 +118,15 @@ namespace JondoFix
                     var f = Describe(e, text);
                     if (Visible(f)) found.Add(f);
                 });
-            return JsonSerializer.Serialize(found);
+            return JsonSerializer.Serialize(found, Quiet);
         }
 
-        /// <summary>The elements whose name or kind contains the query, with the texts inside them.</summary>
-        public static string Find(string query)
+        /// <summary>
+        /// The elements whose name or kind contains the query, with the texts inside them. With
+        /// <paramref name="all"/>, the hidden ones too, marked so -- the label a field keeps hidden
+        /// until its error style shows it, which a search of what is shown never finds.
+        /// </summary>
+        public static string Find(string query, bool all = false)
         {
             string wanted = Plain(query);
             var found = new List<Found>();
@@ -117,11 +136,95 @@ namespace JondoFix
                     if (found.Count >= Most || wanted.Length == 0) return;
                     if (!Plain(e.name ?? "").Contains(wanted) && !Plain(e.GetIl2CppType().Name).Contains(wanted)) return;
                     var texts = new List<string>();
-                    Walk(e, 0, inner => { if (texts.Count < 80 && TextOf(inner) is string t) texts.Add(t); });
+                    Walk(e, 0, inner => { if (texts.Count < 80 && TextOf(inner) is string t) texts.Add(t); }, all);
                     var f = Describe(e, string.Join(" / ", texts));
-                    if (Visible(f)) found.Add(f);
-                });
-            return JsonSerializer.Serialize(found);
+                    if (all)
+                    {
+                        if (!ShownAll(e) || !Visible(f)) f.hidden = true;
+                        found.Add(f);
+                    }
+                    else if (Visible(f)) found.Add(f);
+                }, all);
+            return JsonSerializer.Serialize(found, Quiet);
+        }
+
+        /// <summary>
+        /// Writes a text into the field named <paramref name="name"/> -- the element itself or the
+        /// first text field inside it --, as typing it would end: its value set and its change
+        /// told, so the screen's own listener takes it (the creation screen's name, the chat's
+        /// line). Typed key by key, the client's fields dropped what came in the background.
+        /// </summary>
+        public static string SetText(string name, string text, bool submit = false)
+        {
+            VisualElement target = null, hiddenOne = null;
+            foreach (var root in Roots())
+                Walk(root, 0, e =>
+                {
+                    if (target != null || !string.Equals(e.name, name, StringComparison.Ordinal)) return;
+                    if (ShownAll(e)) target = e;
+                    else hiddenOne ??= e;
+                }, all: true);
+            target ??= hiddenOne;
+            if (target == null) throw new InvalidOperationException($"no element named {name}");
+
+            // The game's own field keeps its text apart from the text field inside it, and its
+            // screen reads that one: the chat sends it, the creation screen names with it. Its
+            // SetValue sets both and tells its listeners, as typing would.
+            Il2CppCore.UILogic.Components.Figma.TextInput input = null;
+            for (var at = target; at != null && input == null; at = at.parent)
+                input = at.TryCast<Il2CppCore.UILogic.Components.Figma.TextInput>();
+            if (input == null)
+                Walk(target, 0, e => { if (input == null) input = e.TryCast<Il2CppCore.UILogic.Components.Figma.TextInput>(); }, all: true);
+            TextField field = target.TryCast<TextField>();
+            if (field == null)
+                Walk(target, 0, e => { if (field == null) field = e.TryCast<TextField>(); }, all: true);
+            if (input != null)
+            {
+                input.Focus();
+                input.SetValue(text);
+                string how = submit ? Submit(input, field) : "";
+                return JsonSerializer.Serialize(new { name, kind = "TextInput", value = input.text, submitted = how.Length > 0 ? how : null }, Quiet);
+            }
+
+            if (field == null) throw new InvalidOperationException($"{name} ({target.GetIl2CppType().Name}) holds no text field");
+            field.Focus();
+            field.value = text;
+            string sent = submit ? Submit(null, field) : "";
+            return JsonSerializer.Serialize(new { name, kind = field.GetIl2CppType().Name, value = field.value, submitted = sent.Length > 0 ? sent : null }, Quiet);
+        }
+
+        /// <summary>
+        /// The field validated as Enter would: a Return key sent to the text field itself, where the
+        /// game's own field listens for it (its onValidate is set only, as a listener on that key) --
+        /// the key the harness's keyboard sends does not reach a field in a client in the background.
+        /// </summary>
+        private static string Submit(Il2CppCore.UILogic.Components.Figma.TextInput input, TextField field)
+        {
+            // Where the screen listens differs: the key down or up, on the text field or on the game's
+            // field around it, or the navigation's submit. Each is tried until the field empties --
+            // what a sent chat line does --; a field that does not empty gets them all.
+            string Text() => input != null ? input.text : field?.value;
+            string before = Text();
+            var tries = new List<(string Name, Func<EventBase> Make, VisualElement To)>();
+            foreach (var to in new VisualElement[] { field, input })
+            {
+                if (to == null) continue;
+                string where = to == (VisualElement)field ? "field" : "input";
+                tries.Add(("keydown@" + where, () => KeyDownEvent.GetPooled('\n', KeyCode.Return, EventModifiers.None), to));
+                tries.Add(("keyup@" + where, () => KeyUpEvent.GetPooled('\n', KeyCode.Return, EventModifiers.None), to));
+                tries.Add(("submit@" + where, () => NavigationSubmitEvent.GetPooled(), to));
+            }
+            var sent = new List<string>();
+            foreach (var (name, make, to) in tries)
+            {
+                var e = make();
+                e.target = to.Cast<IEventHandler>();
+                to.SendEvent(e);
+                e.Dispose();
+                sent.Add(name);
+                if (!string.IsNullOrEmpty(before) && string.IsNullOrEmpty(Text())) return name;
+            }
+            return string.Join("+", sent) + " (still holds its text)";
         }
 
         /// <summary>The element under a window point and its parents, innermost first.</summary>
@@ -137,7 +240,7 @@ namespace JondoFix
                     found.Add(Describe(e, TextOf(e) ?? ""));
                 if (found.Count > 0) break;
             }
-            return JsonSerializer.Serialize(found);
+            return JsonSerializer.Serialize(found, Quiet);
         }
 
         private const string Accented = "áàâäãåéèêëíìîïóòôöõúùûüñçý";

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Jondo.Unity.Launcher;
 using ModelContextProtocol;
@@ -198,6 +199,138 @@ public sealed class GameClients : IDisposable
         }
         if (reply.StartsWith("ok", StringComparison.Ordinal)) return reply.Length > 3 ? reply[3..] : "";
         throw new McpException(reply.StartsWith("error: ", StringComparison.Ordinal) ? reply[7..] : reply);
+    }
+
+    /// <summary>
+    /// The client's MelonLoader log, numbered from 1, after <paramref name="since"/>: read shared,
+    /// the client writing it all along. A log shorter than <paramref name="since"/> was started anew
+    /// by a new client, and is read from its start.
+    /// </summary>
+    public string ReadLog(int since, string? contains, int max)
+    {
+        var installation = ClientInstallation.Find() ?? throw new McpException("No Dofus client found.");
+        string path = Path.Combine(installation.Root, "MelonLoader", "Latest.log");
+        if (!File.Exists(path)) return "(no log yet)";
+        var lines = new List<string>();
+        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+        using (var reader = new StreamReader(stream))
+        {
+            string? line;
+            while ((line = reader.ReadLine()) != null) lines.Add(line);
+        }
+        string note = "";
+        if (since > lines.Count)
+        {
+            note = "(the log was started anew by a new client)\n";
+            since = 0;
+        }
+        var picked = lines.Select((text, i) => (Number: i + 1, Text: text))
+            .Where(l => l.Number > since && (string.IsNullOrEmpty(contains) || l.Text.Contains(contains, StringComparison.OrdinalIgnoreCase)))
+            .TakeLast(max)
+            .Select(l => $"{l.Number}: {l.Text}");
+        return note + string.Join('\n', picked) + $"\nlastLine={lines.Count}";
+    }
+
+    /// <summary>One text the client's interface shows (client_ui's answer).</summary>
+    private sealed record Shown(string T, int X, int Y, int W, int H, string N);
+
+    private async Task<List<Shown>> ShownAsync(int slot, CancellationToken cancellationToken)
+    {
+        string json = await SendAsync(slot, "ui", TimeSpan.FromSeconds(15), cancellationToken);
+        using var doc = JsonDocument.Parse(json);
+        return doc.RootElement.EnumerateArray().Select(e => new Shown(
+            e.GetProperty("t").GetString() ?? "", e.GetProperty("x").GetInt32(), e.GetProperty("y").GetInt32(),
+            e.GetProperty("w").GetInt32(), e.GetProperty("h").GetInt32(), e.TryGetProperty("n", out var n) ? n.GetString() ?? "" : "")).ToList();
+    }
+
+    private Task ClickAsync(int slot, Shown on, CancellationToken cancellationToken)
+        => SendAsync(slot, FormattableString.Invariant($"click {on.X + on.W / 2} {on.Y + on.H / 2} 1"), cancellationToken: cancellationToken);
+
+    /// <summary>
+    /// The slot's character in the world through the real client, from wherever it is: started when
+    /// there is none, the server's JOUER, the character picked on the list and his JOUER, until the
+    /// server has him in the world. A client stuck on its connection screen -- one left over a
+    /// server's restart, its JOUER greyed for ever -- is closed and started again, once.
+    /// </summary>
+    public async Task<string> EnterWorldAsync(int slot, string character, int width, int height, string language,
+                                              CancellationToken cancellationToken)
+    {
+        var said = new List<string>();
+        if (!_running.TryGetValue(slot, out var running) || running.Process.HasExited)
+            said.Add(await LaunchAsync(slot, width, height, language, cancellationToken));
+
+        bool relaunched = false;
+        string lastScreen = "";
+        var screenSince = DateTime.UtcNow;
+        var until = DateTime.UtcNow.AddMinutes(4);
+        while (DateTime.UtcNow < until)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            string? inWorld = await InWorldAsync(slot, cancellationToken);
+            if (inWorld != null)
+            {
+                if (string.Equals(inWorld, character, StringComparison.OrdinalIgnoreCase))
+                    return string.Join('\n', said.Append($"{character} is in the world.").Where(s => s.Length > 0));
+                throw new McpException($"The slot's client is in the world as {inWorld}, not {character}: hero_switch to him, " +
+                                       "or client_close and client_enter_world again.");
+            }
+
+            List<Shown> shown;
+            try { shown = await ShownAsync(slot, cancellationToken); }
+            catch (McpException) { await Task.Delay(1500, cancellationToken); continue; }
+
+            string screen = string.Join('|', shown.Select(s => s.T).OrderBy(t => t, StringComparer.Ordinal));
+            if (screen != lastScreen) { lastScreen = screen; screenSince = DateTime.UtcNow; }
+            var play = shown.FirstOrDefault(s => s.N == "playButton_label" && s.T.Equals("JOUER", StringComparison.OrdinalIgnoreCase))
+                       ?? shown.FirstOrDefault(s => s.N == "playButton_label");
+            // The character list has the one picked drawn large (lbl_nameMain); the servers' screen
+            // has lbl_names too, for the servers and the account, and none of those.
+            bool characterList = shown.Any(s => s.N == "lbl_nameMain");
+            var names = shown.Where(s => s.N == "lbl_name").ToList();
+            var wanted = names.FirstOrDefault(s => string.Equals(s.T, character, StringComparison.OrdinalIgnoreCase));
+
+            if (characterList && wanted != null)
+            {
+                await ClickAsync(slot, wanted, cancellationToken);
+                await Task.Delay(500, cancellationToken);
+                if (play != null) await ClickAsync(slot, play, cancellationToken);
+            }
+            else if (characterList && DateTime.UtcNow - screenSince > TimeSpan.FromSeconds(10))
+            {
+                throw new McpException($"{character} is not on the slot's character list ({string.Join(", ", names.Select(n => n.T))}).");
+            }
+            else if (!characterList && play != null)
+            {
+                await ClickAsync(slot, play, cancellationToken);
+            }
+
+            // The same screen for long, nothing in the world: the connection screen's JOUER greyed
+            // after a server restart. A new client logs in afresh.
+            if (DateTime.UtcNow - screenSince > TimeSpan.FromSeconds(40))
+            {
+                if (relaunched) throw new McpException("The client stays on the same screen even after a new start: " +
+                                                       "client_screenshot to see it.");
+                relaunched = true;
+                Close(slot);
+                said.Add("The client was stuck on its connection screen: started again.");
+                said.Add(await LaunchAsync(slot, width, height, language, cancellationToken));
+                lastScreen = "";
+                screenSince = DateTime.UtcNow;
+            }
+            await Task.Delay(1500, cancellationToken);
+        }
+        throw new McpException($"{character} was not in the world after 4 minutes: client_screenshot to see where it stopped.");
+    }
+
+    /// <summary>The name of the slot's character in the world, or null.</summary>
+    private async Task<string?> InWorldAsync(int slot, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(await _emulator.TestAsync("session", slot: slot, cancellationToken: cancellationToken));
+            return doc.RootElement.TryGetProperty("name", out var name) ? name.GetString() : null;
+        }
+        catch (McpException) { return null; }
     }
 
     public string Describe(int slot)

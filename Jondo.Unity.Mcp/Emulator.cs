@@ -77,12 +77,30 @@ public sealed class Emulator : IDisposable
         throw new McpException($"HTTP {(int)response.StatusCode} on /api/{route}: {text}");
     }
 
-    /// <summary>A test route for a slot, with the key: { key, slot } added to the body.</summary>
+    /// <summary>The routes that only read: never waited on, whatever else the slot is doing.</summary>
+    private static readonly HashSet<string> Reading = new(StringComparer.Ordinal)
+    {
+        "status", "token", "characters", "classes", "session", "fight", "world", "groups", "quests", "carried",
+        "logs", "headless/frames", "items", "item", "spells", "wanted", "monsters",
+    };
+
+    /// <summary>One gate per test slot: the slot's actions one after the other.</summary>
+    private readonly ConcurrentDictionary<int, SemaphoreSlim> _slotGates = new();
+
+    /// <summary>
+    /// A test route for a slot, with the key: { key, slot } added to the body. A slot's actions go
+    /// one after the other, never two at once in the same session; what only reads is not held.
+    /// Their ORDER is not kept: calls a client sends at once reach the tools in any order -- four
+    /// replies to Oskar Khas sent together ran 25150 first, which his line does not offer, and the
+    /// conversation closed. Steps that depend on one another go in one call (game_dialogue).
+    /// </summary>
     public async Task<string> TestAsync(string route, JsonObject? body = null, int slot = 0, CancellationToken cancellationToken = default)
     {
         body ??= new JsonObject();
         body["key"] = Key;
         if (slot != 0) body["slot"] = slot;
+        var gate = Reading.Contains(route) ? null : _slotGates.GetOrAdd(slot, _ => new SemaphoreSlim(1, 1));
+        if (gate != null) await gate.WaitAsync(cancellationToken);
         try
         {
             return await CallAsync("test/" + route, body, cancellationToken);
@@ -95,6 +113,10 @@ public sealed class Emulator : IDisposable
         {
             throw new McpException("The server was started with another JONDO_TEST_KEY. Restart it from here " +
                                    "(server_stop with force, then server_start), or give the tools its key.");
+        }
+        finally
+        {
+            gate?.Release();
         }
     }
 
@@ -196,6 +218,9 @@ public sealed class Emulator : IDisposable
         start.CreateNoWindow = true;
         start.Environment["JONDO_TEST_KEY"] = Key;
         start.Environment["JONDO_EMULATOR_ROOT"] = DataRoot;
+        // Built from a checkout, its content goes with its code: the data root keeps the databases.
+        string content = Path.Combine(Source, "content");
+        if (fromSource && Directory.Exists(content)) start.Environment["JONDO_CONTENT_ROOT"] = content;
 
         _output.Clear();
         var process = new Process { StartInfo = start, EnableRaisingEvents = true };
@@ -214,7 +239,8 @@ public sealed class Emulator : IDisposable
             if (process.HasExited)
                 throw new McpException($"The server stopped before coming online (exit {process.ExitCode}):\n{Tail(60)}");
             if (await StatusAsync(cancellationToken) is { } now && now.TryGetProperty("enLinea", out var online) && online.GetBoolean())
-                return $"Online (process {process.Id}, {(fromSource ? "built from " + Source : "deployed executable")}, data at {DataRoot}).";
+                return $"Online (process {process.Id}, {(fromSource ? "built from " + Source : "deployed executable")}, data at {DataRoot}" +
+                       (start.Environment.TryGetValue("JONDO_CONTENT_ROOT", out var read) ? $", content from {read}" : "") + ").";
             await Task.Delay(1000, cancellationToken);
         }
         return $"Started (process {process.Id}) but not online after 6 minutes. Last lines:\n{Tail(40)}";
