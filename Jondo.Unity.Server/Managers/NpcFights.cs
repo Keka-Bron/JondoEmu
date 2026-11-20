@@ -92,6 +92,14 @@ namespace Jondo.Unity.Server.Managers
             public string Criterion { get; init; } = "";
 
             /// <summary>
+            /// Whether the fight is played alone («solo»): true, nobody comes in beside the character,
+            /// his heroes neither -- «Le combat se lance et s'effectue seul» (Dofus pour les noobs,
+            /// «Mise à l'épreuve») --; false, a group may; absent, its board decides
+            /// (<see cref="Handlers.FightHandler.PlayedAlone"/>). Keka-Bron/JondoEmu#209.
+            /// </summary>
+            public bool? Solo { get; init; }
+
+            /// <summary>
             /// Monsters that come in later, each wave so many rounds after the one before
             /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers.
             /// </summary>
@@ -165,6 +173,8 @@ namespace Jondo.Unity.Server.Managers
                                 DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                                             ? criterion.GetString() ?? "" : "",
+                                Solo = row.TryGetProperty("solo", out var solo) && solo.ValueKind is JsonValueKind.True or JsonValueKind.False
+                                       ? solo.GetBoolean() : null,
                                 Waves = Waves(row),
                                 Rules = RulesOf(row),
                             });

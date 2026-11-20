@@ -31,6 +31,21 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether a quest's fight is played alone (Keka-Bron/JondoEmu#209): when it says so
+        /// (<paramref name="solo"/> true), or, saying nothing (null), when its board places one
+        /// player only. Caporale Mynerve's tower top (153356292) flags a single cell on the players'
+        /// side, and «Le combat se lance et s'effectue seul» (Dofus pour les noobs, «Mise à
+        /// l'épreuve»); of the 448 fights of npc_fights.json, the 20 on such a board are all solo
+        /// by the guides. False for any other fight.
+        /// </summary>
+        /// <param name="board">
+        /// The map whose placement says it: the arena the fight names, or else the one it starts
+        /// on -- not the arena the server picks for it, which flags none (Mynerve's is 153885696).
+        /// </param>
+        internal static bool PlayedAlone(bool? solo, long board)
+            => solo ?? (Managers.MapPlacements.Of(board) is { } own && own.Blue.Count == 1);
+
+        /// <summary>
         /// Used by monster attacks, aggression and scripted encounters to open their fight.
         /// Builds the FightInstance from real mob data and sends placement bursts 1 and 2.
         /// </summary>
@@ -41,7 +56,7 @@ namespace Jondo.Unity.Server.Handlers
                                                                bool alliesMustLive = false,
                                                                long winMapId = 0, int winCellId = 0, int winMarks = 0,
                                                                long alliesPlayedBy = 0, bool? soulStoneFight = false,
-                                                               bool defeatFree = false)
+                                                               bool defeatFree = false, bool? solo = false)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(stream)) return;
@@ -148,6 +163,8 @@ namespace Jondo.Unity.Server.Handlers
             fight.AddPlayer(playerFighter);
             // A temporal anomaly's guardian is fought by four at most, heroes counted.
             if (Managers.AnomalyPlaces.ByRoom(mapId) != null) fight.PeopleCap = Managers.AnomalyPlaces.PeopleCap;
+            // A quest's fight played alone: one a side, so neither his heroes nor anybody else come in.
+            if (PlayedAlone(solo, namedArena ? arenaMapId : mapId)) fight.PeopleCap = 1;
             // And his heroes beside him, played from his client (FightHeroes.cs).
             AddHeroes(fight, GameState.CharacterId);
 
