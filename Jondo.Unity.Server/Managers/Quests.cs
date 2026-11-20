@@ -255,7 +255,10 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var objective in step.Objectives)
                 {
                     if (objective.NpcId != npcId) continue;
-                    if (!await CompleteNpcObjectiveAsync(session, step, objective, run, npcId)) continue;
+                    if (!await CompleteNpcObjectiveAsync(session, step, objective, run, npcId,
+                            team: () => HeroQuestItems.PoolAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
+                                hero => CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out _))))
+                        continue;
 
                     await Heroes.ShareQuestActionAsync(async hero =>
                     {
@@ -286,7 +289,8 @@ namespace Jondo.Unity.Server.Managers
             => Npcs.OnMap(SessionContext.State.MapId).Any(spawn => spawn.NpcId == npcId);
 
         private static async Task<bool> CompleteNpcObjectiveAsync(GameSession session, QuestStep step,
-                                                                  QuestObjective objective, QuestRun run, int npcId)
+                                                                  QuestObjective objective, QuestRun run, int npcId,
+                                                                  Func<Task<bool>>? team = null)
         {
             if (run.Finished || run.StepId != step.Id || run.Done.Contains(objective.Id)) return false;
             if (run.QuestId == Almanax.Dragon.Quest || !Revealed(step, objective, run)) return false;
@@ -302,6 +306,8 @@ namespace Jondo.Unity.Server.Managers
 
             if (objective.ItemId != 0 && objective.ConsumesItems
                 && Handlers.DungeonHandler.TakesAtTheDoor(npcId, mapId, objective.ItemId)) return false;
+            // The master's: what he and the heroes following him lack, out of the team's bags.
+            if (objective.ItemId != 0 && objective.ConsumesItems && team != null && !await team()) return false;
             if (objective.ItemId != 0 && !await HandOverAsync(session, objective)) return false;
             if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(session, objective)) return false;
 
@@ -758,9 +764,14 @@ namespace Jondo.Unity.Server.Managers
                                                           Func<bool>? canShare = null)
         {
             int stepId = Log?.Run(binding.QuestId)?.StepId ?? 0;
-            if (!await CloseAsync(session, binding)) return false;
+            bool shared = binding.SpawnsMonster == 0 && !binding.OnlyGives;
+            Func<Task<bool>>? team = shared && binding.Starts == 0
+                ? () => HeroQuestItems.PoolAsync(session, binding.Requires,
+                    hero => canShare?.Invoke() != false && SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
+                : null;
+            if (!await CloseAsync(session, binding, team)) return false;
 
-            if (binding.SpawnsMonster == 0 && !binding.OnlyGives)
+            if (shared)
             {
                 await Heroes.ShareQuestActionAsync(async hero =>
                 {
@@ -844,7 +855,8 @@ namespace Jondo.Unity.Server.Managers
                    && Revealed(step, objective, run);
         }
 
-        private static async Task<bool> CloseAsync(GameSession session, QuestBinding binding)
+        private static async Task<bool> CloseAsync(GameSession session, QuestBinding binding,
+                                                   Func<Task<bool>>? team = null)
         {
             var stream = session.Stream;
             var log = Log;
@@ -946,6 +958,8 @@ namespace Jondo.Unity.Server.Managers
             // And the time it waits after one of them: the brew ferments for an hour first.
             if (!WaitedEnough(binding, log)) return false;
 
+            // The master's: what he and the heroes following him lack, out of the team's bags.
+            if (team != null && binding.SpendsRequired && binding.Requires.Count > 0 && !await team()) return false;
             if (!await CarriesWhatItAsksAsync()) return false;
 
             int says = binding.SaysFor(Equipment.HowMany);

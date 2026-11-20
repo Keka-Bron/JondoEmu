@@ -135,21 +135,23 @@ namespace Jondo.Unity.Tests.World
                     Assert.True(eligible.Quests.ObjectiveDone(inspectCellar));
                     Assert.False(ineligible.Quests.ObjectiveDone(inspectCellar));
 
+                    // One lemonade for the master and his hero: all or nobody, so nobody pours it, nothing
+                    // is moved, and the master is told (Keka-Bron/JondoEmu#206).
+                    Assert.True(await Equipment.GiveAsync(pipe.ToClient, lemonade, 1));
+                    await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap);
+                    Assert.False(QuestEngine.Log.ObjectiveDone(lureRat));
+                    Assert.False(eligible.Quests.ObjectiveDone(lureRat));
+                    Assert.Equal(1, Equipment.HowMany(lemonade));
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, optedIn));
+                    Assert.Contains(await WarningsAsync(pipe), text => text.Contains("Nadie avanza") && text.Contains(" 1 "));
+
+                    // Two, both in the master's bag: the hero's is handed to him, and each pours his own.
                     Assert.True(await Equipment.GiveAsync(pipe.ToClient, lemonade, 1));
                     Assert.True(await QuestEngine.OnInteractiveUsedAsync(pipe.Session, cellar, tap));
                     Assert.True(QuestEngine.Log.ObjectiveDone(lureRat));
-                    Assert.False(eligible.Quests.ObjectiveDone(lureRat));
-
-                    // The master pressed it with the lemonade, his hero has none: kept, and said.
-                    var noLemonade = Assert.Single(Heroes.LagsOf(pipe.Session, optedIn));
-                    Assert.Equal(cellarQuest, noLemonade.QuestId);
-                    Assert.Equal(Heroes.QuestLagReason.MissingItems, noLemonade.Reason);
-                    Assert.Equal((lemonade, 1), (noLemonade.ItemId, noLemonade.ItemCount));
-                    Assert.Contains(await WarningsAsync(pipe), text => text.Contains("Sigue-" + tag) && text.Contains("no ha seguido"));
-
-                    // Caught up by himself: let go as it is read.
-                    await QuestEngine.TickAsync(Heroes.SessionOf(optedIn)!, cellarQuest, lureRat);
                     Assert.True(eligible.Quests.ObjectiveDone(lureRat));
+                    Assert.Equal(0, Equipment.HowMany(lemonade));
+                    using (SessionContext.Push(Heroes.SessionOf(optedIn)!)) Assert.Equal(0, Equipment.HowMany(lemonade));
                     Assert.Empty(Heroes.LagsOf(pipe.Session, optedIn));
                 }
 

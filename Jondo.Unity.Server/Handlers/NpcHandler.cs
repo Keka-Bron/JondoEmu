@@ -1276,6 +1276,12 @@ namespace Jondo.Unity.Server.Handlers
             var book = Quests.Book;
             var objective = book?.Objective(objectiveId);
             var step = objective == null ? null : book!.Step(objective.StepId);
+            // What the heroes following lack, out of the team's bags first; all of them or nobody.
+            if (step != null && objective!.ItemId != 0 && objective.ConsumesItems
+                && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _)
+                && !await HeroQuestItems.PoolAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
+                    hero => CanShareQuestReply(npcId, choice) && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _)))
+                return false;
             if (!await Quests.CompleteByReplyAsync(session, choice.Quest, objectiveId)) return false;
             if (step == null) return true;
 
