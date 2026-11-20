@@ -776,5 +776,59 @@ namespace Jondo.Unity.Tests.World
                 texts.Add(System.Text.Encoding.UTF8.GetString(payload));
             }
         }
+
+        [Fact]
+        public void A_quest_fight_is_played_alone_when_it_says_so_or_its_board_places_one_player()
+        {
+            // Caporale Mynerve's tower top flags one cell for the players: «Le combat se lance et
+            // s'effectue seul» (Dofus pour les noobs, «Mise à l'épreuve»), Keka-Bron/JondoEmu#209.
+            const long mynervesTower = 153356292, ratsCellar = 153486338;
+            Assert.True(FightHandler.PlayedAlone(null, mynervesTower));
+            // Not the arena the server picks for her fight (153885696, seen in the client), which flags
+            // no placement at all: the board is the tower she is talked to on.
+            Assert.False(FightHandler.PlayedAlone(null, 153885696));
+            // A board of eight is no word either way: a group's unless the fight says otherwise.
+            Assert.False(FightHandler.PlayedAlone(null, ratsCellar));
+            Assert.True(FightHandler.PlayedAlone(true, ratsCellar));
+            // The fight's own word over the board's.
+            Assert.False(FightHandler.PlayedAlone(false, mynervesTower));
+            Assert.False(FightHandler.PlayedAlone(null, Map));
+
+            // And the guides' word, fight by fight (npc_fights.json «solo»).
+            NpcFights.Forget();
+            Assert.True(NpcFights.For(2894, mynervesTower, 25088)?.Solo);
+            // «Quedarte y luchar contra el fuego maléfico»: alone, «il s'effectue seul», on a board of ten.
+            Assert.True(NpcFights.For(2904, 153879809, 25146)?.Solo);
+            // The Rat Soiffé of «Mort au rat !»: «faisable à plusieurs».
+            Assert.False(NpcFights.For(2912, 153358340, 25037)?.Solo);
+        }
+
+        [Fact]
+        public async Task A_fight_played_alone_keeps_the_heroes_out_and_nobody_joins_it()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account, "Recluta-" + tag, 8);
+            long hero = Character(Account, "Fuera-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account, master, Map, "Recluta-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                var fight = new FightInstance(990_312, Map, Map) { PeopleCap = 1 };
+                fight.SetPlacementCells(new System.Collections.Generic.List<int> { 300, 314 }, new System.Collections.Generic.List<int> { 100, 114 });
+                fight.AddPlayer(new Fighter { Id = master, Name = "Recluta-" + tag, Level = 50, MaxHP = 500, CurrentHP = 500 });
+
+                FightHandler.AddHeroes(fight, master);
+
+                Assert.Single(fight.Azul);
+                Assert.False(Heroes.SessionOf(hero)!.State.IsInFight);
+                // Nor anybody from the map: the side is full at one.
+                Assert.Equal(FightInstance.JoinRefusal.TeamFull, fight.CanJoin(FightInstance.Azules, FightHandler.CapOf(fight)));
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+            }
+        }
     }
 }

@@ -1396,7 +1396,7 @@ namespace Jondo.Unity.Server.Handlers
                     alliesMustLive: npcFight.AlliesMustLive,
                     winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks,
                     alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0,
-                    defeatFree: npcFight.DefeatFree);
+                    defeatFree: npcFight.DefeatFree, solo: npcFight.Solo);
                 // Taken by the fight when it was built; one that did not start leaves none for the next.
                 FightHandler.TakeNextIncarnation(GameState.CharacterId);
                 FightHandler.TakeNextWaves(GameState.CharacterId);
