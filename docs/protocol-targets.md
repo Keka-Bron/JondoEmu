@@ -37,7 +37,10 @@ dotnet publish Jondo.Unity.Server -c Release \
 ```
 
 The November publish gate runs the Connection tests and focused Game and server
-tests against the selected bindings. The default publish gate still runs all
+tests against the selected bindings, including the database-backed `TutorialFlowTests`.
+With the world database installed, these drive character creation and first selection,
+quest acceptance, optional movement confirmation, exit rewards and destination reload
+through the selected Game codec and production dispatcher. The default publish gate still runs all
 four suites, including the general suite and legacy wire fixtures.
 `SkipRootDeploy=true` leaves the published server in its distinct artifacts
 directory instead of copying it over a root deployment.

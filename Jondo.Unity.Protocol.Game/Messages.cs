@@ -1500,6 +1500,27 @@ public sealed record ReloginTokenEvent(string Token, bool ValidToken) : GameEven
 
 public sealed record QuestActive(QuestActiveDetails? Details, int QuestId);
 
+public sealed record QuestStartedEvent(int QuestId) : GameEvent;
+public sealed record QuestStepInformationRequest(int QuestId) : GameRequest;
+public sealed record QuestStepInformationEvent(QuestActive Information) : GameEvent;
+public sealed record QuestStepValidatedEvent(int QuestId, int StepId) : GameEvent;
+public sealed record QuestValidatedEvent(int QuestId) : GameEvent;
+public sealed record GuideModQuitRequest() : GameRequest;
+
+public sealed record NpcGenericActionRequest(int NpcActionId, long NpcMapId, int NpcId) : GameRequest;
+public sealed record NpcDialogReplyRequest(int ReplyId) : GameRequest;
+public enum NpcDialogPortalType { Unsupported, Enutrosor, Srambad, Xelorium, Ecaflipus }
+public sealed record NpcDialogCreationEvent(long MapId, int NpcId, NpcDialogPortalType? PortalType = null) : GameEvent;
+public sealed record ActionInformation(int Id, IReadOnlyList<int> Parameters);
+public sealed record VisibleReply(int ReplyId, IReadOnlyList<ActionInformation> Actions);
+public sealed record NpcDialogQuestionEvent(int MessageId, IReadOnlyList<VisibleReply> VisibleReplies, IReadOnlyList<string> DialogParams) : GameEvent;
+public sealed record DialogLeaveEvent(DialogType DialogType) : GameEvent;
+
+public sealed record FriendListRequest() : GameRequest;
+public sealed record AcquaintanceListRequest() : GameRequest;
+public sealed record AnomalySubareaInformation(int RewardRate, int SubareaId, bool HasAnomaly, long AnomalyClosingTime);
+public sealed record AnomalySubareaInformationEvent(IReadOnlyList<AnomalySubareaInformation> Subareas) : GameEvent;
+
 public sealed record QuestActiveDetails(IReadOnlyList<QuestObjective> Objectives, int StepId);
 
 public sealed record QuestFinished(int QuestId);

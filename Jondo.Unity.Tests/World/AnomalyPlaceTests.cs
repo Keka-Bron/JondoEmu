@@ -133,22 +133,18 @@ namespace Jondo.Unity.Tests.World
             if (Anomalies.All.Count == 0 || AnomalyZones.SubAreas.Count == 0) return;
             Assert.Equal(297, AnomalyZones.SubAreas.Count);
             var now = DateTimeOffset.FromUnixTimeSeconds(1_786_573_500);
-            var entries = Jondo.Unity.Server.Network.ProtoMessage.Parse(AnomalyHandler.BuildSubareaInformation(now))
-                .Fields.Where(f => f.FieldNumber == 1)
-                .Select(f => Jondo.Unity.Server.Network.ProtoMessage.Parse(f.BytesValue).Fields
-                    .ToDictionary(x => x.FieldNumber, x => x.VarIntValue))
-                .ToList();
+            var entries = AnomalyHandler.BuildSubareaInformation(now).Subareas;
             Assert.Equal(AnomalyZones.SubAreas.Union(Anomalies.All.Select(a => a.SubAreaId)).Count(), entries.Count);
 
-            var open = entries.Where(e => e.ContainsKey(3)).ToList();
+            var open = entries.Where(e => e.HasAnomaly).ToList();
             Assert.Equal(Anomalies.All.Count, open.Count);
             foreach (var e in open)
             {
-                Assert.Equal(AnomalyHandler.AnomalyZoneBonus, e[1]);
-                Assert.True(Anomalies.TryGet((int)e[2], out _));
-                Assert.InRange(e[4] - now.ToUnixTimeMilliseconds(), 60_000, Anomalies.Duration * 60_000L);
+                Assert.Equal(AnomalyHandler.AnomalyZoneBonus, e.RewardRate);
+                Assert.True(Anomalies.TryGet(e.SubareaId, out _));
+                Assert.InRange(e.AnomalyClosingTime - now.ToUnixTimeMilliseconds(), 60_000, Anomalies.Duration * 60_000L);
             }
-            Assert.All(entries.Where(e => !e.ContainsKey(3)), e => Assert.Equal(new[] { 2 }, e.Keys));
+            Assert.All(entries.Where(e => !e.HasAnomaly), e => { Assert.Equal(0, e.RewardRate); Assert.Equal(0, e.AnomalyClosingTime); });
         }
 
         /// <summary>

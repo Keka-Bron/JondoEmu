@@ -661,6 +661,9 @@ namespace Jondo.Unity.Server.Managers
         public static async Task<bool> GiveAsync(NetworkStream stream, int gid, int quantity)
             => await GrantAsync(stream, gid, quantity) != null;
 
+        public static async Task<bool> GiveAsync(GameSession session, int gid, int quantity)
+            => await GrantAsync(session, gid, quantity) != null;
+
         /// <summary>
         /// The bag's stack an item handed over joins, or null for a new one: the same template with
         /// the same effects, unless it is a pet or a piece worn, each of which is its own.
@@ -684,9 +687,12 @@ namespace Jondo.Unity.Server.Managers
         /// answers with the uid and the effects — and it is the same method rather than a second
         /// one so that the two can never disagree about whether the client was told.
         /// </remarks>
-        public static async Task<HavenBagStore.StoredItem?> GrantAsync(NetworkStream stream,
-                                                                       int gid, int quantity)
+        public static Task<HavenBagStore.StoredItem?> GrantAsync(NetworkStream stream, int gid, int quantity)
+            => GrantAsync(SessionContext.Current, gid, quantity);
+
+        private static async Task<HavenBagStore.StoredItem?> GrantAsync(GameSession session, int gid, int quantity)
         {
+            using var context = SessionContext.Push(session);
             if (!DatabaseManager.TryGetItemTemplateEffects(gid, out string effects)) return null;
 
             // A pet comes into the world at level 0, and grows (Pets).
@@ -699,8 +705,9 @@ namespace Jondo.Unity.Server.Managers
             var onto = StackFor(gid, effects);
             if (onto != null && Rewrite(onto, onto.Quantity + quantity, onto.Effects))
             {
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(onto.Uid, onto.Quantity)));
+                if (!InvisibleItems.Conceal(gid, onto.Uid))
+                    await session.SendAsync(new Jondo.Unity.Protocol.Game.ObjectQuantityEvent(
+                        Jondo.Unity.Protocol.Game.ObjectOrigin.OriginUndefined, new(checked((int)onto.Uid), onto.Quantity)));
                 return new HavenBagStore.StoredItem { Uid = onto.Uid, Gid = gid, Quantity = quantity, Effects = effects };
             }
 
@@ -734,8 +741,9 @@ namespace Jondo.Unity.Server.Managers
                 Effects = effects,
             };
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Iua, ConnectionProtocol.BuildItemArrived(3, granted)));
+            if (!InvisibleItems.Conceal(gid, uid))
+                await session.SendAsync(new Jondo.Unity.Protocol.Game.ObjectAddedEvent(
+                    Jondo.Unity.Protocol.Game.ObjectOrigin.OriginUndefined, InventoryMessages.FromCatalogue.InventoryItem(Items[uid])));
             return granted;
         }
 

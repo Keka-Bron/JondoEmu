@@ -237,8 +237,6 @@ namespace Jondo.Unity.Server.Network
                 }
                 // The friends window's in-game lists, and adding to and removing from them. kpa used
                 // to be the character list request of an earlier protocol; in 3.6 it is «ignore».
-                else if (payloadStr == Op.Uri("knm")) await FriendsHandler.SendMutualAsync(session);
-                else if (payloadStr == Op.Uri("kno")) await FriendsHandler.SendContactsAsync(session);
                 else if (payloadStr == Op.Uri("kny")) await FriendsHandler.SendBlockedAsync(stream);
                 else if (payloadStr == Op.Uri("koq")) await FriendsHandler.AddContactAsync(session, payload);
                 else if (payloadStr == Op.Uri("kog")) await FriendsHandler.RemoveContactAsync(stream, payload);
@@ -268,8 +266,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("iek")) QuestHandler.Reorder(payload);
                 // A document's «start the quest» button.
                 else if (payloadStr == Op.Uri("ido")) await QuestHandler.StartFromDocumentAsync(session, payload);
-                // The item tooltips' average prices.
-                else if (payloadStr == Op.Uri("ivp")) await MarketplaceHandler.AveragePricesAsync(session);
                 // The «Cours du marché» window, an item's price history.
                 else if (payloadStr == Op.Uri(Op.Itj)) await MarketplaceHandler.PriceHistoryAsync(stream, payload);
                 // The transfer buttons: everything, what is already there, a selection -- onto a
@@ -1362,14 +1358,6 @@ namespace Jondo.Unity.Server.Network
                     if (!await FightHandler.AnswerChoiceAsync(stream, payload))
                         await TravelItemHandler.ChooseAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Lzh)))
-                {
-                    // AnomalySubareaInformationRequest: on entering the world, and each time the world
-                    // map's anomalies panel opens. It was taken for the alterations alone, which still
-                    // go here as before; the panel's own answer is the lzl.
-                    await AlterationHandler.ListAsync(session);
-                    await AnomalyHandler.SubareaInformationAsync(stream);
-                }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // The dialogue's close button. It goes empty and expects an answer: khd if what
@@ -1402,7 +1390,7 @@ namespace Jondo.Unity.Server.Network
                     else if (StorageHandler.IsOpen) await StorageHandler.CloseAsync(stream);
                     else if (ChestHandler.IsOpen) await ChestHandler.CloseAsync(stream);
                     else if (NpcHandler.IsShopOpen) await NpcHandler.CloseShopAsync(stream);
-                    else if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(stream, payload);
+                    else if (NpcHandler.IsDialogueOpen) await NpcHandler.CloseAsync(session);
                     else if (await TaxCollectorHandler.CloseTalkAsync(stream)) { }
                     // A document -- a book, a notice -- closes with the empty kld of the book
                     // capture. Last but the zaap: a book left open must not take another window's X.
@@ -1462,18 +1450,6 @@ namespace Jondo.Unity.Server.Network
                     //   answer: ivk per filled slot, ivr per emptied one (ghost icon otherwise)
                     await SwapShortcutsAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Iov)))
-                {
-                    // He has clicked an NPC: depending on the action, the shop or the dialogue opens for him. With
-                    // a marketplace open and no NPC, it is its buy or sell button.
-                    if (!await MarketplaceHandler.ModeAsync(payload))
-                        await NpcHandler.InteractAsync(session, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Ioy)))
-                {
-                    // He has chosen a reply in the dialogue.
-                    await NpcHandler.ReplyAsync(session, payload);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Kea)))
                 {
                     // Buying something from the NPC with the shop open.
@@ -1483,16 +1459,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     // Selling to the NPC with the shop open: «Vendre» and «Tout vendre».
                     await NpcHandler.SellAsync(stream, payload);
-                }
-                else if (payloadStr == Op.Uri(Op.Idt) || payloadStr.Contains(Op.Uri(Op.Idt)))
-                {
-                    // «Abandonar el tutorial» confirmed: its quests validated, the set given.
-                    await Managers.Quests.LeaveTutorialAsync(session);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Ieo)))
-                {
-                    // Which step is this quest on? It is answered with the idu.
-                    await QuestHandler.StepAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri("mfb")))
                 {
@@ -1712,6 +1678,31 @@ namespace Jondo.Unity.Server.Network
                     return await entryService.HandleAsync(frame);
                 case Game.CharacterCreationRequest create:
                     if (session.IsAuthenticated) await CharacterCreationHandler.CreateAsync(session, create);
+                    break;
+                case Game.NpcGenericActionRequest action:
+                    if (GameEntryDispatch.IsAllowed(session, action)) await NpcHandler.InteractAsync(session, action);
+                    break;
+                case Game.NpcDialogReplyRequest reply:
+                    if (GameEntryDispatch.IsAllowed(session, reply)) await NpcHandler.ReplyAsync(session, reply);
+                    break;
+                case Game.QuestStepInformationRequest step:
+                    if (GameEntryDispatch.IsAllowed(session, step)) await Managers.Quests.SendStepAsync(session, step.QuestId);
+                    break;
+                case Game.GuideModQuitRequest quit:
+                    if (GameEntryDispatch.IsAllowed(session, quit)) await Managers.Quests.LeaveTutorialAsync(session);
+                    break;
+                case Game.FriendListRequest:
+                    await FriendsHandler.SendMutualAsync(session);
+                    break;
+                case Game.AcquaintanceListRequest:
+                    await FriendsHandler.SendContactsAsync(session);
+                    break;
+                case Game.ObjectAveragePricesRequest:
+                    await MarketplaceHandler.AveragePricesAsync(session);
+                    break;
+                case Game.AnomalySubareaInformationRequest:
+                    await AlterationHandler.ListAsync(session);
+                    await session.SendAsync(AnomalyHandler.BuildSubareaInformation(DateTimeOffset.UtcNow));
                     break;
                 case Game.CharacterNameSuggestionRequest:
                     await CharacterCreationHandler.SuggestNameAsync(session);

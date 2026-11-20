@@ -46,9 +46,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>An info line naming a quest: lqn 54, 55 or 56.</summary>
         private static Task TellAsync(GameSession session, int message, int questId)
-            => session.SendAsync(
-                ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                    InfoMessages.Info, message, questId.ToString(CultureInfo.InvariantCulture))));
+            => session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage,
+                message, [questId.ToString(CultureInfo.InvariantCulture)]));
 
         /// <summary>Line of dialogue to the steps it hands over.</summary>
         /// <remarks>
@@ -326,7 +325,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         /// <remarks>
         /// The real server reveals a step's objectives as they become relevant (a growing prefix,
-        /// see QuestProtocol.BuildQuestStep), and a hello only closes the ones that are there. 1629
+        /// see Shown), and a hello only closes the ones that are there. 1629
         /// asks to see Master Curro twice -- 9656 on arriving, 10015 with the ring -- and one hello
         /// closed both, the quest done before a single resource was gathered. So «go back and see
         /// #1» (type 9) waits for everything listed before it, and «go and see #1» (type 1) for
@@ -1485,8 +1484,7 @@ namespace Jondo.Unity.Server.Managers
             for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
             Save(questId, run);
             await TellAsync(session, QuestFinishedMessage, questId);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+            await session.SendAsync(new Game.QuestValidatedEvent(questId));
             FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
             await SendJournalAsync(session);
             await Achievements.AfterQuestAsync(session, questId);
@@ -1517,8 +1515,7 @@ namespace Jondo.Unity.Server.Managers
                 for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
                 Save(questId, run);
                 await TellAsync(session, QuestFinishedMessage, questId);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                await session.SendAsync(new Game.QuestValidatedEvent(questId));
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
             }
             await SendJournalAsync(session);
@@ -1526,10 +1523,9 @@ namespace Jondo.Unity.Server.Managers
             foreach (int item in tutorial.Items)
             {
                 if (Equipment.HowMany(item) > 0) continue;
-                if (await Equipment.GiveAsync(stream, item, 1))
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(
-                            InfoMessages.ItemGained, "1", item.ToString(CultureInfo.InvariantCulture))));
+                if (await Equipment.GiveAsync(session, item, 1) && !Equipment.IsInvisible(item))
+                    await session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage,
+                        InfoMessages.ItemGained, ["1", item.ToString(CultureInfo.InvariantCulture)]));
             }
 
             foreach (int questId in tutorial.Quests)
@@ -1538,10 +1534,10 @@ namespace Jondo.Unity.Server.Managers
             // The mysterious voice's line is still on screen: the client takes it down only on a kld,
             // and in the Dofusarium it would hang over the new character for good.
             if (SessionContext.State.OpenDialogueNpcId != 0)
-                await Handlers.NpcHandler.CloseAsync(stream);
+                await Handlers.NpcHandler.CloseAsync(session);
 
             if (tutorial.MapId != 0)
-                await Handlers.TeleportHandler.ToMapAsync(stream, tutorial.MapId, tutorial.Cell);
+                await Handlers.TeleportHandler.ToMapAsync(session, tutorial.MapId, tutorial.Cell);
             Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} leaves the tutorial.");
         }
 
@@ -1589,8 +1585,7 @@ namespace Jondo.Unity.Server.Managers
                 for (int guard = 0; guard < 40 && log.Active(questId); guard++) log.FinishStep(questId);
                 Save(questId, run);
                 await TellAsync(session, QuestFinishedMessage, questId);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                await session.SendAsync(new Game.QuestValidatedEvent(questId));
                 await Achievements.AfterQuestAsync(session, questId);
             }
             Console.WriteLine($"[Quests] {SessionContext.State.CharacterName} validates the tutorial's new quests in the Dofusarium.");
@@ -1704,8 +1699,7 @@ namespace Jondo.Unity.Server.Managers
             Save(questId, run);
 
             await TellAsync(session, QuestStartedMessage, questId);
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ief, QuestProtocol.BuildQuestStarted(questId)));
+            await session.SendAsync(new Game.QuestStartedEvent(questId));
 
             // A hero's run, socketless, settles the objectives that are not his all the same
             // (SendStepAsync writes nothing without a stream): «Consejo de clase» started for a
@@ -1737,8 +1731,8 @@ namespace Jondo.Unity.Server.Managers
         /// until they are done.
         /// </summary>
         /// <remarks>
-        /// The real server reveals a step's objectives as they become relevant (a growing prefix, see
-        /// QuestProtocol.BuildQuestStep). Which ones it holds back is not in the client's data, but a
+        /// The real server reveals a step's objectives as they become relevant (a growing prefix).
+        /// Which ones it holds back is not in the client's data, but a
         /// binding that waits for others says it for the quests written here: «En la encrucijada de los
         /// mundos» listed the audience with the Daimia and the shield to craft from the start, while
         /// the game only lets them be done after the three recommendations. An «objectives» binding
@@ -1793,9 +1787,8 @@ namespace Jondo.Unity.Server.Managers
             }
             if (settled) Save(questId, run);
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Idu,
-                    QuestProtocol.BuildQuestStep(questId, run.StepId, Shown(log, run, objectives), run.Done)));
+            await session.SendAsync(new Game.QuestStepInformationEvent(
+                QuestMessages.Active(questId, run.StepId, Shown(log, run, objectives), run.Done)));
         }
 
         /// <summary>
@@ -2245,9 +2238,7 @@ namespace Jondo.Unity.Server.Managers
                 // before the next step does. The tutorial shows that order 21 times, each after
                 // the lqn 55 that names the quest.
                 await TellAsync(session, QuestUpdatedMessage, questId);
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Idz,
-                        QuestProtocol.BuildStepValidated(questId, move.FinishedStep)));
+                await session.SendAsync(new Game.QuestStepValidatedEvent(questId, move.FinishedStep));
             }
             else if (move.ObjectiveTicked && !move.StepFinished && move.TickedObjective != 0)
             {
@@ -2283,11 +2274,8 @@ namespace Jondo.Unity.Server.Managers
                 // the quest) and ied, which takes it out of the client's quests under way and out
                 // of its followed box -- without it the box went on asking for an objective long
                 // done. Then the marks, which the quest done may change.
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                        InfoMessages.Info, QuestFinishedMessage, questId.ToString(CultureInfo.InvariantCulture))));
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push("ied", QuestProtocol.BuildQuestValidated(questId)));
+                await TellAsync(session, QuestFinishedMessage, questId);
+                await session.SendAsync(new Game.QuestValidatedEvent(questId));
                 if (move.StepFinished) await PayAsync(session, move.FinishedStep);
                 FollowedQuests.Unfollow(SessionContext.State.CharacterId, questId);
                 if (session.HasTransport) await SendMarksAsync(session, session.MapId);

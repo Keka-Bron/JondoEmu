@@ -128,26 +128,13 @@ namespace Jondo.Unity.Server.Handlers
         /// goes, as the official server sends it: with only the anomalies' zones the world map's window
         /// threw on opening. No zone bonus is kept here: 0 but in an open anomaly's zone, 120.
         /// </remarks>
-        public static Task SubareaInformationAsync(NetworkStream stream)
-            => WriteAsync(stream, ConnectionProtocol.Push("lzl", BuildSubareaInformation(DateTimeOffset.UtcNow)));
-
-        /// <summary>The lzl: every zone of the panel, with its bonus, and for an open anomaly's when it closes.</summary>
-        internal static byte[] BuildSubareaInformation(DateTimeOffset now)
+        internal static Game.AnomalySubareaInformationEvent BuildSubareaInformation(DateTimeOffset now)
         {
-            var lzl = Pb.New();
             long nowMs = now.ToUnixTimeMilliseconds();
             var zones = AnomalyZones.SubAreas.Concat(Anomalies.All.Select(a => a.SubAreaId)).Distinct();
-            foreach (int subArea in zones)
-            {
-                var entry = Pb.New();
-                if (Anomalies.TryGet(subArea, out _))
-                    entry.Var(1, AnomalyZoneBonus).Var(2, subArea).Var(3, 1)
-                         .Var(4, nowMs + Anomalies.MinutesLeft(subArea) * 60_000L);
-                else
-                    entry.Var(2, subArea);
-                lzl.Msg(1, entry);
-            }
-            return lzl.Build();
+            return new(zones.Select(zone => Anomalies.TryGet(zone, out _)
+                ? new Game.AnomalySubareaInformation(AnomalyZoneBonus, zone, true, nowMs + Anomalies.MinutesLeft(zone) * 60_000L)
+                : new Game.AnomalySubareaInformation(0, zone, false, 0)).ToArray());
         }
 
         /// <summary>A map drawn: the anomaly of its zone, the vestige of its zaap, the notice on coming in.</summary>

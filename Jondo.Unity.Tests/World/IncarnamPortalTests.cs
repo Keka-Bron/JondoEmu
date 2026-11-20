@@ -61,18 +61,15 @@ namespace Jondo.Unity.Tests.World
             await using var pipe = await ClientPipe.OpenAsync(who, who, Incarnam, "Portail-Test");
             using (SessionContext.Push(pipe.Session))
             {
-                await NpcHandler.InteractAsync(pipe.Session, ConnectionProtocol.Push(Op.Iov,
-                    Pb.New().Var(1, Npcs.Talk).Var(2, Incarnam).Var(3, portal.ContextualId).Build()));
+                await NpcHandler.InteractAsync(pipe.Session, new(Npcs.Talk, Incarnam, checked((int)portal.ContextualId)));
                 await pipe.Next(Op.Ioc);
                 AssertQuestion(await pipe.Next(Op.Ios), 30637, 36979);
 
-                await NpcHandler.ReplyAsync(pipe.Session,
-                    ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, 36979).Build()));
+                await NpcHandler.ReplyAsync(pipe.Session, new(36979));
                 AssertQuestion(await pipe.Next(Op.Ios), 30638, 36977, 36978);
                 Assert.Equal(Incarnam, pipe.Session.State.MapId);
 
-                await NpcHandler.ReplyAsync(pipe.Session,
-                    ConnectionProtocol.Push(Op.Ioy, Pb.New().Var(1, reply).Build()));
+                await NpcHandler.ReplyAsync(pipe.Session, new(checked((int)reply)));
                 Assert.Equal(1, Number(await pipe.Next(Op.Kld), 1));
                 Assert.False(NpcHandler.IsDialogueOpen);
                 if (crosses)

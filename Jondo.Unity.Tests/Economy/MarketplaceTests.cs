@@ -250,13 +250,11 @@ namespace Jondo.Unity.Tests.Economy
             using (SessionContext.Push(session)) await action();
         }
 
-        private static byte[] Iov(int action) => ConnectionProtocol.Push(Op.Iov,
-            Pb.New().Var(1, action).Var(2, 212600837).Var(3, MarketplaceProtocol.NoNpc).Build());
-
         private static async Task OpenToSell(GameSession session, int element)
         {
             await As(session, () => MarketplaceHandler.OpenAsync(element, Marketplaces.Skill));
-            await As(session, async () => Assert.True(await MarketplaceHandler.ModeAsync(Iov(MarketplaceProtocol.SellAction))));
+            await As(session, async () => Assert.True(await MarketplaceHandler.ModeAsync(session,
+                new(MarketplaceProtocol.SellAction, 212600837, (int)MarketplaceProtocol.NoNpc))));
         }
 
         private static Task Sell(GameSession session, long price, long uid, int lot)

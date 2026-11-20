@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -127,12 +128,9 @@ namespace Jondo.Unity.Server.Handlers
         /// the map is no good.
         /// </summary>
         public static Task<int> ToMapAsync(NetworkStream stream, long mapId, int targetCell = MapCentre)
-            => ToMapAsync(SessionContext.Current, mapId, targetCell, packet => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, packet));
+            => ToMapAsync(SessionContext.Current, mapId, targetCell);
 
-        public static Task<int> ToMapAsync(GameSession session, long mapId, int targetCell = MapCentre)
-            => ToMapAsync(session, mapId, targetCell, session.SendAsync);
-
-        private static async Task<int> ToMapAsync(GameSession session, long mapId, int targetCell, Func<byte[], Task> send)
+        public static async Task<int> ToMapAsync(GameSession session, long mapId, int targetCell = MapCentre)
         {
             if (mapId <= 0) return -1;
 
@@ -141,7 +139,7 @@ namespace Jondo.Unity.Server.Handlers
             var refusal = Jail.HoldNotice(session) ?? GuildRaidManager.ClosedFloorNotice(session.CharacterId, mapId, session.State.Language);
             if (refusal != null)
             {
-                await send(ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildNotice(refusal)));
+                await session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage, InfoMessages.FreeText, [refusal]));
                 return -1;
             }
 
@@ -163,9 +161,10 @@ namespace Jondo.Unity.Server.Handlers
             // teleporting left a ghost where he was and he arrived invisible where he went.
             await SessionRegistry.AnunciarMudanzaAsync(session, previousMap);
 
-            await send(ConnectionProtocol.BuildActorLeft(session.CharacterId));
-            await send(ConnectionProtocol.BuildLoadMap(mapId));
-            await send(ConnectionProtocol.BuildMapClock());
+            // The traveler's orientation resets to zero; peer removal belongs to the map transition above.
+            await session.SendAsync(new Game.MapChangeOrientationEvent(session.CharacterId, Game.Direction.East));
+            await session.SendAsync(new Game.MapCurrentEvent(mapId));
+            await session.SendAsync(ServerTimeMessages.Snapshot());
             await EntryEnvironmentMessages.SendDiscoveredAsync(session, mapId);
 
             Console.WriteLine($"[Teleport] To map {mapId}, cell {session.State.CellId}. " +

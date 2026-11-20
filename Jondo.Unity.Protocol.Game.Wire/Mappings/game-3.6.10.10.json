@@ -7566,6 +7566,196 @@
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
       "defaultOneofs": {}
+    },
+    "idt": {
+      "name": "GuideModQuitRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "idu": {
+      "name": "QuestStepInformationEvent",
+      "fields": {
+        "fowx": "Information"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "idz": {
+      "name": "QuestStepValidatedEvent",
+      "fields": {
+        "foxn": "QuestId",
+        "foxo": "StepId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ied": {
+      "name": "QuestValidatedEvent",
+      "fields": {
+        "foyk": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ief": {
+      "name": "QuestStartedEvent",
+      "fields": {
+        "foyr": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ieo": {
+      "name": "QuestStepInformationRequest",
+      "fields": {
+        "fpab": "QuestId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ioc": {
+      "name": "NpcDialogCreationEvent",
+      "fields": {
+        "fqja": "PortalType",
+        "fqjd": "MapId",
+        "fqje": "NpcId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ios": {
+      "name": "NpcDialogQuestionEvent",
+      "fields": {
+        "fqlj": "MessageId",
+        "fqlk": "VisibleReplies",
+        "fqll": "DialogParams"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "ioq": {
+      "name": "VisibleReply",
+      "fields": {
+        "fqld": "ReplyId",
+        "fqlf": "Actions"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "ioo": {
+      "name": "ActionInformation",
+      "fields": {
+        "fqkw": "Id",
+        "fqkx": "Parameters"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "iov": {
+      "name": "NpcGenericActionRequest",
+      "fields": {
+        "fqma": "NpcActionId",
+        "fqmb": "NpcMapId",
+        "fqmc": "NpcId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "ioy": {
+      "name": "NpcDialogReplyRequest",
+      "fields": {
+        "fqmg": "ReplyId"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kld": {
+      "name": "DialogLeaveEvent",
+      "fields": {
+        "fybb": "DialogType"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "knm": {
+      "name": "FriendListRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "kno": {
+      "name": "AcquaintanceListRequest",
+      "fields": {},
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "request"
+    },
+    "lzl": {
+      "name": "AnomalySubareaInformationEvent",
+      "fields": {
+        "gdzl": "Subareas"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
+    "lzj": {
+      "name": "AnomalySubareaInformation",
+      "fields": {
+        "gdze": "RewardRate",
+        "gdzf": "SubareaId",
+        "gdzg": "HasAnomaly",
+        "gdzh": "AnomalyClosingTime"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
     }
   },
   "enums": {
@@ -8365,6 +8555,16 @@
         "ffrz": "Fight",
         "ffsa": "Domination",
         "ffsb": "Prism"
+      }
+    },
+    "inz": {
+      "name": "NpcDialogPortalType",
+      "values": {
+        "eiyt": "Unsupported",
+        "eiyu": "Enutrosor",
+        "eiyv": "Srambad",
+        "eiyw": "Xelorium",
+        "eiyx": "Ecaflipus"
       }
     }
   },

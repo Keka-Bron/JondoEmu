@@ -58,25 +58,18 @@ namespace Jondo.Unity.Server.Managers
             => Load().Elements.TryGetValue((mapId, elementId), out var ids) ? ids : Array.Empty<int>();
 
         /// <summary>Plays stagings from their start, in order.</summary>
-        public static Task PlayAsync(NetworkStream stream, IEnumerable<int> ids)
-            => SendAsync(stream, ids, GuildRaidStagings.FromStart);
+        public static async Task PlayAsync(GameSession session, IEnumerable<int> ids)
+        {
+            foreach (int id in ids)
+                if (id > 0) await session.SendAsync(new Jondo.Unity.Protocol.Game.StagingEvent(
+                    GuildRaidStagings.FromStart, GuildRaidStagings.FullIntensity, id));
+        }
 
         /// <summary>Shows stagings already played out, as a map that has seen them stands.</summary>
         public static async Task ShowAsync(GameSession session, IEnumerable<int> ids)
         {
             foreach (int id in ids)
                 if (id > 0) await session.SendAsync(GuildRaidStagings.StandingEvent(id));
-        }
-
-        private static async Task SendAsync(NetworkStream stream, IEnumerable<int> ids, int progression)
-        {
-            if (stream == null || ids == null) return;
-            foreach (int id in ids)
-            {
-                if (id <= 0) continue;
-                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Hpm, GuildRaidStagings.BuildPlay(id, progression)));
-            }
         }
 
         /// <summary>For a content reload: read the file again.</summary>
