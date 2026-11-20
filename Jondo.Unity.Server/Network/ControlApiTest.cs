@@ -37,6 +37,13 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The slot this request speaks for, read from its body: 0 is jondoplay itself.</summary>
         [ThreadStatic] private static int _testSlot;
 
+        /// <summary>
+        /// The hero this request acts as, read from its body's «hero» (his id or his name): one of
+        /// the heroes connected beside the slot's character, whose session every route then uses
+        /// -- his quests, his bag --, without switching to him in the client. Empty: the slot's own.
+        /// </summary>
+        [ThreadStatic] private static string? _testHero;
+
         private static string TestLoginNow => _testSlot <= 0 ? TestLogin : $"{TestLogin}{_testSlot:D2}";
 
         private const int TestTimeoutMs = 20000;
@@ -50,13 +57,19 @@ namespace Jondo.Unity.Server.Network
                 return Mal(401, "key");
 
             _testSlot = (int)Math.Clamp(Numero(cuerpo, "slot"), 0, 99);
+            _testHero = Texto(cuerpo, "hero") is { Length: > 0 } heroName ? heroName
+                      : Numero(cuerpo, "hero") is > 0 and var heroId ? heroId.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                      : null;
             try
             {
+                if (_testHero != null && TestSessionOnline() == null)
+                    return Mal(404, "hero: not one of the heroes connected beside the slot's character");
                 return TestDispatch(ruta.Substring(Prefijo.Length + "test/".Length), cuerpo);
             }
             finally
             {
                 _testSlot = 0;
+                _testHero = null;
             }
         }
 
@@ -210,7 +223,11 @@ namespace Jondo.Unity.Server.Network
         private static GameSession? TestSessionOnline()
         {
             long account = DatabaseManager.AccountIdOf(TestLoginNow);
-            return SessionRegistry.All().FirstOrDefault(s => s.AccountId == account && s.IsInWorld);
+            var own = SessionRegistry.All().FirstOrDefault(s => s.AccountId == account && s.IsInWorld);
+            if (own == null || _testHero == null) return own;
+            return Heroes.Of(own.CharacterId).FirstOrDefault(h =>
+                h.CharacterId.ToString(System.Globalization.CultureInfo.InvariantCulture) == _testHero
+                || string.Equals(h.Session.State.CharacterName, _testHero, StringComparison.OrdinalIgnoreCase))?.Session;
         }
 
         /// <summary>How far the slot's client got: connected to the game, and in the world.</summary>

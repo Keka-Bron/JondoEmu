@@ -373,8 +373,16 @@ namespace Jondo.Unity.Launcher
         /// <c>bases/</c>, which are generated. That is the whole point of it being text and being
         /// small: a diff anybody can review, and two people can edit different maps without
         /// colliding. Nothing regenerates this folder, so nothing can quietly wipe it.
+        ///
+        /// JONDO_CONTENT_ROOT, when given, is read instead: the test harness runs a server built
+        /// from a branch's checkout against the data root's databases, and the branch's content
+        /// goes with its code -- a fight's «solo» tried without copying npc_fights.json over the
+        /// data root's and back.
         /// </summary>
-        public static string ContentDir => Path.Combine(Root, "content");
+        public static string ContentDir { get; } =
+            Environment.GetEnvironmentVariable("JONDO_CONTENT_ROOT") is { Length: > 0 } content && Directory.Exists(content)
+                ? Path.GetFullPath(content)
+                : Path.Combine(Root, "content");
 
         /// <summary>
         /// The missing hop to read an NPC dialogue: message id -> translation key.

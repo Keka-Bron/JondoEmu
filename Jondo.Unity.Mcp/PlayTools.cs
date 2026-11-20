@@ -91,11 +91,23 @@ public static class PlayTools
     [McpServerTool(Name = "game_state", ReadOnly = true)]
     [Description("Where the slot's character is and what it is doing: its session (map, cell, level, kamas, fight) and, " +
                  "in a fight, the whole board (fighters with life, points, cells, buffs; turn order; marks).")]
-    public static async Task<string> State(Emulator emulator, [Description(SlotHelp)] int slot = 0, CancellationToken cancellationToken = default)
+    public static async Task<string> State(Emulator emulator, [Description(SlotHelp)] int slot = 0,
+        [Description(HeroHelp)] string? hero = null, CancellationToken cancellationToken = default)
     {
-        string session = await emulator.TestAsync("session", slot: slot, cancellationToken: cancellationToken);
-        string fight = await emulator.TestAsync("fight", slot: slot, cancellationToken: cancellationToken);
+        string session = await emulator.TestAsync("session", AsHero(hero), slot, cancellationToken);
+        string fight = await emulator.TestAsync("fight", AsHero(hero), slot, cancellationToken);
         return $"session: {session}\nfight: {fight}";
+    }
+
+    private const string HeroHelp = "Act as this hero (his name or id), connected beside the slot's character, instead of " +
+                                    "the slot's character. Any test_call body takes \"hero\" the same way.";
+
+    /// <summary>A body that acts as a hero, or an empty one.</summary>
+    internal static JsonObject AsHero(string? hero, JsonObject? body = null)
+    {
+        body ??= new JsonObject();
+        if (!string.IsNullOrWhiteSpace(hero)) body["hero"] = hero.Trim();
+        return body;
     }
 
     [McpServerTool(Name = "game_world", ReadOnly = true)]
@@ -117,6 +129,89 @@ public static class PlayTools
         CancellationToken cancellationToken = default)
         => emulator.TestAsync("command", new JsonObject { ["text"] = text }, slot, cancellationToken);
 
+    [McpServerTool(Name = "game_dialogue")]
+    [Description("Talks to an NPC and chooses the replies given, in that order, in one call: each line's text and the " +
+                 "replies it offers are returned. Stops at the first reply the open line does not offer. Use it instead " +
+                 "of several test_call reply sent together: calls sent at once reach the server in any order, and one reply " +
+                 "out of turn closes the conversation.")]
+    public static async Task<string> Dialogue(Emulator emulator,
+        [Description("The NPC's id (game_world lists those on the map).")] int npc,
+        [Description("The replies' ids, in the order they are chosen; empty to only open the conversation.")] int[]? replies = null,
+        [Description(SlotHelp)] int slot = 0,
+        [Description(HeroHelp)] string? hero = null,
+        CancellationToken cancellationToken = default)
+    {
+        var text = new System.Text.StringBuilder();
+        var chosen = replies ?? Array.Empty<int>();
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            if (attempt > 0)
+            {
+                // Closed under it: right after a change of map, the map's late «loaded» (kmv) lets go
+                // of what was open. Once more, from the start, a moment later.
+                text.AppendLine("the conversation was closed by something else (a map just loaded?): once more.");
+                await Task.Delay(1500, cancellationToken);
+            }
+            string answer = await emulator.TestAsync("talk", AsHero(hero, new JsonObject { ["npc"] = npc }), slot, cancellationToken);
+            text.AppendLine("talk: " + Line(answer));
+            bool closedUnder = false;
+            for (int i = 0; i < chosen.Length; i++)
+            {
+                int reply = chosen[i];
+                if (!Offers(answer, reply))
+                {
+                    text.AppendLine($"stopped: the open line does not offer reply {reply}.");
+                    break;
+                }
+                answer = await emulator.TestAsync("reply", AsHero(hero, new JsonObject { ["reply"] = reply }), slot, cancellationToken);
+                text.AppendLine($"{reply}: " + Line(answer));
+                // A reply the line offered that leads nowhere, more to choose after it: not the end.
+                if (i < chosen.Length - 1 && !IsOpen(answer) && answer.Contains("gives nothing", StringComparison.Ordinal))
+                {
+                    closedUnder = true;
+                    break;
+                }
+            }
+            if (!closedUnder) break;
+        }
+        return text.ToString().TrimEnd();
+    }
+
+    private static bool IsOpen(string json)
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        return doc.RootElement.TryGetProperty("open", out var o) && o.ValueKind == System.Text.Json.JsonValueKind.True;
+    }
+
+    /// <summary>A conversation's answer told short: open or not, the line, its replies, what the server said.</summary>
+    private static string Line(string json)
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        bool open = root.TryGetProperty("open", out var o) && o.ValueKind == System.Text.Json.JsonValueKind.True;
+        var said = new List<string>();
+        if (open)
+        {
+            string line = root.TryGetProperty("text", out var t) ? t.GetString() ?? "" : "";
+            said.Add($"line {Emulator.Field(root, "question")} «{(line.Length > 140 ? line[..140] + "…" : line)}»");
+            if (root.TryGetProperty("replies", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.Array)
+                said.Add("replies " + string.Join(", ", r.EnumerateArray().Select(x => $"{Emulator.Field(x, "id")} «{Emulator.Field(x, "text")}»")));
+        }
+        else said.Add("closed");
+        if (root.TryGetProperty("lines", out var lines) && lines.ValueKind == System.Text.Json.JsonValueKind.Array && lines.GetArrayLength() > 0)
+            said.Add("server: " + string.Join(" | ", lines.EnumerateArray().Select(l => l.GetString())
+                .Where(l => !string.IsNullOrEmpty(l) && !l.Contains("[client>server]", StringComparison.Ordinal) && !l.Contains("[server>client]", StringComparison.Ordinal))
+                .TakeLast(4)));
+        return string.Join("; ", said);
+    }
+
+    private static bool Offers(string json, int reply)
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        return doc.RootElement.TryGetProperty("replies", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.Array
+               && r.EnumerateArray().Any(x => x.TryGetProperty("id", out var id) && id.GetInt64() == reply);
+    }
+
     [McpServerTool(Name = "game_goto")]
     [Description("Teleports the slot's character to a map (and cell), out of a fight.")]
     public static Task<string> Goto(Emulator emulator,
@@ -136,8 +231,9 @@ public static class PlayTools
         [Description("The item template id (gid).")] int item,
         [Description("How many.")] int quantity = 1,
         [Description(SlotHelp)] int slot = 0,
+        [Description(HeroHelp)] string? hero = null,
         CancellationToken cancellationToken = default)
-        => emulator.TestAsync("give", new JsonObject { ["item"] = item, ["quantity"] = quantity }, slot, cancellationToken);
+        => emulator.TestAsync("give", AsHero(hero, new JsonObject { ["item"] = item, ["quantity"] = quantity }), slot, cancellationToken);
 
     [McpServerTool(Name = "fight_team")]
     [Description("Starts a fight for the slot's character against JondoBots of the classes given (and with JondoBot " +

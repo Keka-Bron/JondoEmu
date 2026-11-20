@@ -87,11 +87,40 @@ public static class ServerTools
     public static string Output(Emulator emulator, [Description("How many of the newest lines.")] int lines = 80)
         => emulator.Tail(Math.Clamp(lines, 1, 3000)) is { Length: > 0 } tail ? tail : "(nothing: the server was not started from here, or wrote nothing)";
 
+    [McpServerTool(Name = "run_tests")]
+    [Description("Runs Jondo.Unity.Tests (dotnet test) on a checkout -- the source by default, or a worktree's path -- " +
+                 "with JONDO_EMULATOR_ROOT on that checkout, so the tests read its content. Its bases/ get the data root's " +
+                 "databases when it has none (a worktree: bases/ is not in git), copied, so the tests never write into " +
+                 "the data root's. Built where the tests expect (no --artifacts-path). Answers the summary and each failure " +
+                 "with its message. A data root that holds a real server's data can fail the few tests that count a whole " +
+                 "table (MarketplaceTests' sales history): delete the checkout's bases/ to start from a fresh copy, or " +
+                 "copy a clean world.db there.")]
+    public static Task<string> RunTests(Emulator emulator,
+        [Description("A dotnet test --filter, e.g. \"FullyQualifiedName~HeroesTests\"; empty for every test.")] string? filter = null,
+        [Description("The checkout's folder; the source checkout when empty.")] string? path = null,
+        [Description("The most failures told in full.")] int maxFailures = 20,
+        CancellationToken cancellationToken = default)
+        => TestRunner.RunAsync(emulator, string.IsNullOrWhiteSpace(path) ? emulator.Source : Path.GetFullPath(path),
+                               filter, Math.Clamp(maxFailures, 1, 200), cancellationToken);
+
+    [McpServerTool(Name = "protocol_fields", ReadOnly = true)]
+    [Description("What the fields of a game message mean, where it is known: the client's message names are rotated " +
+                 "(ind { fqfe, fqff, fqfg }), so the meaning of each field number is kept in docs/protocol_fields.json, " +
+                 "with how it was settled -- a capture, the client's code, a fix checked in the client. Without op, every " +
+                 "message listed. Add to the file whenever a field's meaning is settled.")]
+    public static string ProtocolFields(Emulator emulator,
+        [Description("The message's short name (e.g. \"ind\"); empty for all.")] string? op = null)
+        => ProtocolNotes.Describe(emulator.Source, op);
+
     [McpServerTool(Name = "test_call")]
     [Description("""
         Calls any /api/test/<route> of the server (the test harness's routes, ControlApiTest.cs and its partials),
         with the key and the slot added. The body is a JSON object. They act on the slot's test account
         (jondoplay, jondoplay01...), which must be in the world (headless_connect or a client) for most of them.
+        Add "hero": name or id to any body to act as a hero connected beside the slot's character (his quests,
+        his bag) without taking him in hand. A slot's actions run one after the other (reads are not held), but
+        calls sent at once arrive in any order: never send together calls whose order matters (an NPC's replies:
+        use game_dialogue).
         Routes and bodies:
           status, characters, classes, token, world, session, fight, groups, quests, reload, close
           create {breed, level, name?, sex?, tutorial?}      spells {breed, level}     spell {spell, level?, grade?}
