@@ -293,10 +293,10 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildFighter(int cell, int orientation, long fighterId,
                                           IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                           byte[] look, Pb identity, bool isMonster, long summoner = 0,
-                                          int? team = null)
+                                          int? team = null, bool companion = false)
             => Pb.New()
                 .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster,
-                                     team: team, summoner: summoner))
+                                     team: team, summoner: summoner, companion: companion))
                 .Build();
 
         /// <summary>
@@ -454,7 +454,8 @@ namespace Jondo.Unity.Server.Network
         public static Pb FighterBlock(int cell, int orientation, long fighterId,
                                       IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                       byte[] look, Pb identity, bool isMonster, int wave = 0,
-                                      bool alive = true, int? team = null, long summoner = 0)
+                                      bool alive = true, int? team = null, long summoner = 0,
+                                      bool companion = false)
         {
             var stats = Pb.New()
                 .VarIfNotZero(1, summoner)
@@ -477,7 +478,9 @@ namespace Jondo.Unity.Server.Network
             var fighter = Pb.New()
                 .Var(1, isMonster ? 0 : fighterId)
                 .Msg(2, stats);
-            if (isMonster) fighter.Msg(3, identity);
+            // A companion is neither: its own case of the oneof, f8 (CompanionIdentity).
+            if (companion) fighter.Msg(8, identity);
+            else if (isMonster) fighter.Msg(3, identity);
             else fighter.Msg(6, identity);
             fighter.VarIfNotZero(4, wave);
             fighter.Msg(7, again);
@@ -2333,6 +2336,23 @@ namespace Jondo.Unity.Server.Network
                 .VarIfNotZero(1, grade)
                 .Var(2, monsterId)
                 .VarIfNotZero(3, level));
+
+        /// <summary>
+        /// Which companion it is, the fighter's f8: <c>{ f1: its master, f2: his name, f3: the
+        /// companion, f4: the level }</c>.
+        /// </summary>
+        /// <remarks>
+        /// INFERRED: no capture has a companion. The client's fighter message has a fourth case
+        /// beside the monster (f3) and the person (f6), { int64, string, int32, int32 }, and its
+        /// fight details carry a companion as { int64 the master, int32 the companion, ... }
+        /// (lgr's f11): the same master and companion, with his name and its level.
+        /// </remarks>
+        public static Pb CompanionIdentity(long master, string masterName, int companion, int level)
+            => Pb.New()
+                .Var(1, master)
+                .Str(2, masterName ?? "")
+                .Var(3, companion)
+                .VarIfNotZero(4, level);
 
         /// <summary>
         /// Which tax collector it is: <c>f1 { f1: first name, f2: last name, f3: the monster }</c>,

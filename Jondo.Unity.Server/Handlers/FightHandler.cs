@@ -156,6 +156,9 @@ namespace Jondo.Unity.Server.Handlers
             long monsterSeqId = -1;
             int redIdx = 0;
 
+            // And the companion he wears, played by him too (FightCompanions.cs).
+            if (AddCompanion(fight, playerFighter, monsterSeqId) != null) monsterSeqId--;
+
             // Monsters on the player's side, played by the AI against the other side: the tutorial's
             // Master Darmas, fighter -1 before the chafers in the capture.
             // Or played by the character himself, when the fight says so: Barnabé (IsPlayedAlly).
@@ -715,7 +718,7 @@ namespace Jondo.Unity.Server.Handlers
                     NormalFightLook(fighter),
                     IdentityOf(fighter),
                     isMonster: true, wave: fighter.Wave, alive: fighter.IsAlive, team: fighter.TeamId,
-                    summoner: SummonerOf(fighter));
+                    summoner: SummonerOf(fighter), companion: fighter.IsCompanion);
             }
 
             var (look, breed, sex) = CharacterLookOf(fighter);
@@ -1190,7 +1193,8 @@ namespace Jondo.Unity.Server.Handlers
                               fighter.CellId, FacingOf(fight, fighter), fighter.Id,
                               PlacementSheetOf(fighter), MonsterLook(fighter),
                               IdentityOf(fighter),
-                              isMonster: true)
+                              isMonster: true, team: fighter.IsCompanion ? fighter.TeamId : null,
+                              companion: fighter.IsCompanion)
                         : BuildPlayerAppearance(fight, fighter)));
             }
 
@@ -1916,7 +1920,10 @@ namespace Jondo.Unity.Server.Handlers
         /// from one, as its template's grades number them (Summons.Characteristics).
         /// </summary>
         private static Network.Pb IdentityOf(Fighter fighter)
-            => fighter.TaxCollectorFirstName > 0
+            => fighter.IsCompanion
+                ? Network.FightProtocol.CompanionIdentity(fighter.DrivenBy,
+                      DatabaseManager.GetCharacterById(fighter.DrivenBy)?.Name ?? "", fighter.CompanionId, fighter.Level)
+                : fighter.TaxCollectorFirstName > 0
                 ? Network.FightProtocol.TaxCollectorIdentity(fighter.TaxCollectorFirstName,
                                                              fighter.TaxCollectorLastName, fighter.MonsterId)
                 : Network.FightProtocol.MonsterIdentity(fighter.EsInvocado ? fighter.GradeIndex : fighter.GradeIndex + 1,
@@ -1934,7 +1941,8 @@ namespace Jondo.Unity.Server.Handlers
                 ? Network.Pb.New().Msg(2, DoubleBlock(fight, fighter, CurrentFightLook(fight, fighter))).Build()
                 : Network.FightProtocol.BuildFighter(
                     fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
-                    CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter));
+                    CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter),
+                    team: fighter.IsCompanion ? fighter.TeamId : null, companion: fighter.IsCompanion);
 
         /// <summary>
         /// A double (180) in a fighter block -- a jxb's, a reconnection's or a spectator's jxg --:
@@ -10874,7 +10882,7 @@ namespace Jondo.Unity.Server.Handlers
             await Managers.GuildRaidReina.OnDeathAsync(stream, fight, muerto);
 
             // An ally the players were there to protect has fallen: the fight is lost.
-            if (fight.AlliesMustLive && muerto is { IsMonster: true, EsInvocado: false }
+            if (fight.AlliesMustLive && muerto is { IsMonster: true, EsInvocado: false, IsCompanion: false }
                 && muerto.TeamId == FightInstance.Azules && fight.WonByEffect < 0)
             {
                 fight.WonByEffect = FightInstance.Rojos;
@@ -10898,9 +10906,12 @@ namespace Jondo.Unity.Server.Handlers
         /// <returns>Whether anybody fell.</returns>
         private static async Task<bool> SusInvocadosCaenAsync(NetworkStream stream, FightInstance fight, Fighter muerto)
         {
+            // And his companion, which he plays and which goes down with him (FightCompanions.cs).
+            bool Suyo(Fighter f) => f.IsAlive && (f.EsInvocado && f.Invocador == muerto.Id
+                                                  || f.IsCompanion && f.DrivenBy == muerto.Id);
             var suyos = new List<Fighter>();
-            foreach (var f in fight.Azul) if (f.EsInvocado && f.IsAlive && f.Invocador == muerto.Id) suyos.Add(f);
-            foreach (var f in fight.Rojo) if (f.EsInvocado && f.IsAlive && f.Invocador == muerto.Id) suyos.Add(f);
+            foreach (var f in fight.Azul) if (Suyo(f)) suyos.Add(f);
+            foreach (var f in fight.Rojo) if (Suyo(f)) suyos.Add(f);
             if (suyos.Count == 0) return false;
 
             foreach (var invocado in suyos)
@@ -12270,15 +12281,17 @@ namespace Jondo.Unity.Server.Handlers
             // Rogue and the four monsters, and none of the eight bombs and bots he put out.
             var results = new List<Network.FightProtocol.FightResult>();
             long yo = GameState.CharacterId;
+            // Nor the companions: a row of theirs, bare as a monster's, left the client's end
+            // screen empty (FightResultResumeTab.OrganizeFighters threw on it).
             foreach (var f in fight.Azul)
             {
-                if (f.EsInvocado || f.EsIlusion) continue;
+                if (f.EsInvocado || f.EsIlusion || f.IsCompanion) continue;
                 results.Add(FinDe(f, azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
             int lastWave = fight.Rojo.Count == 0 ? 0 : fight.Rojo.Max(f => f.Wave);
             foreach (var f in fight.Rojo)
             {
-                if (f.EsInvocado || f.EsIlusion) continue;
+                if (f.EsInvocado || f.EsIlusion || f.IsCompanion) continue;
                 if (FellInAnEarlierWave(f, lastWave)) continue;
                 results.Add(FinDe(f, !azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
