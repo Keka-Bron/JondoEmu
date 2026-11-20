@@ -12083,6 +12083,11 @@ namespace Jondo.Unity.Server.Handlers
             Fighter fighter, bool gano, bool esQuienMira, long xpGained,
             Network.FightProtocol.Spoils spoils, bool gane, Reward? suyo = null)
         {
+            // A companion by its level alone, in its own case of the row (FightResult.Companion).
+            if (fighter.IsCompanion)
+                return new Network.FightProtocol.FightResult
+                    { Fighter = fighter.Id, Winner = gano, Level = fighter.Level, Companion = true };
+
             // A monster goes without a sheet: only who it is and whether it won.
             if (fighter.IsMonster)
             {
@@ -12281,17 +12286,15 @@ namespace Jondo.Unity.Server.Handlers
             // Rogue and the four monsters, and none of the eight bombs and bots he put out.
             var results = new List<Network.FightProtocol.FightResult>();
             long yo = GameState.CharacterId;
-            // Nor the companions: a row of theirs, bare as a monster's, left the client's end
-            // screen empty (FightResultResumeTab.OrganizeFighters threw on it).
             foreach (var f in fight.Azul)
             {
-                if (f.EsInvocado || f.EsIlusion || f.IsCompanion) continue;
+                if (f.EsInvocado || f.EsIlusion) continue;
                 results.Add(FinDe(f, azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
             int lastWave = fight.Rojo.Count == 0 ? 0 : fight.Rojo.Max(f => f.Wave);
             foreach (var f in fight.Rojo)
             {
-                if (f.EsInvocado || f.EsIlusion || f.IsCompanion) continue;
+                if (f.EsInvocado || f.EsIlusion) continue;
                 if (FellInAnEarlierWave(f, lastWave)) continue;
                 results.Add(FinDe(f, !azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }

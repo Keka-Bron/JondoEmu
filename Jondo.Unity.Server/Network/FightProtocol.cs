@@ -2108,6 +2108,16 @@ namespace Jondo.Unity.Server.Network
             /// and the row's name is read off the len.
             /// </summary>
             public Pb Collector { get; set; }
+
+            /// <summary>
+            /// A companion's row: the «who»'s fifth case, lmh { f1 its level }. Read off the 3.6.10.11
+            /// client (Ghidra over the REA IL2CPP seeds): fkv.bgdw turns case 5 into a row of kind 1,
+            /// named after the fighter's own entity info, which FightResultResumeTab.OrganizeFighters
+            /// lists with the people. A bare row went through fkv.bgdv, which keeps a companion as kind
+            /// 2 with its companion id, and OrganizeFighters then looked that id up among the monsters
+            /// and threw: the whole end screen came out empty.
+            /// </summary>
+            public bool Companion { get; set; }
         }
 
         /// <summary>
@@ -2184,6 +2194,7 @@ namespace Jondo.Unity.Server.Network
 
                 var quien = Pb.New().Var(1, result.Fighter);
                 if (result.Collector != null) quien.Msg(4, Pb.New().Msg(1, result.Collector));
+                else if (result.Companion) quien.Msg(5, Pb.New().VarIfNotZero(1, result.Level));
                 else if (result.Level > 0)
                 {
                     var experiencia = Pb.New()

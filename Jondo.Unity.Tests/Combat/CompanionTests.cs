@@ -89,6 +89,20 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
+        public void A_companions_end_screen_row_is_the_fifth_case_with_its_level()
+        {
+            var jyg = FightProtocol.BuildFightResults(new[]
+            {
+                new FightProtocol.FightResult { Fighter = -1, Winner = true, Level = 50, Companion = true },
+            }, 1000);
+            var row = ProtoMessage.Parse(ProtoMessage.Parse(jyg).Fields.First(f => f.FieldNumber == 2).BytesValue);
+            var who = ProtoMessage.Parse(row.Fields.First(f => f.FieldNumber == 3).BytesValue);
+            var companion = ProtoMessage.Parse(who.Fields.Single(f => f.FieldNumber == 5).BytesValue);
+            Assert.Equal(50, companion.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+            Assert.DoesNotContain(who.Fields, f => f.FieldNumber == 2);
+        }
+
+        [Fact]
         public void A_companion_is_told_in_the_fighters_own_case()
         {
             var identity = FightProtocol.CompanionIdentity(10, "Master", 1, 50);
