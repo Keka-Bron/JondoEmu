@@ -249,7 +249,6 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
   | Experience, drop and kamas bonus | A percent on top, for everybody |
   | Hardcore mode | Monsters at twice their size, with three times their life and characteristics |
   | Dying costs no energy | A lost fight keeps the energy |
-  | Every zaap open | Travel to any zaap without discovering it first |
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
   | Simulate players | Jondobot-Xx bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
@@ -296,7 +295,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 - ✅ **62 zaaps** with the real cost and destination list
 <img width="2560" height="1502" alt="image" src="https://github.com/user-attachments/assets/1524d485-a845-4b62-a71c-b88de3bb7b54" />
 
-- ✅ Zaaps discovered on reaching their map, each character his own, remembered; Frigost's only from level 50
+- ✅ Zaaps discovered on reaching their map, each character his own, remembered (the server's settings file can open them all); Frigost's only from level 50
 - ✅ Saving your position at a zaap: a lost fight and the recall potion bring you back there
 - ✅ Zaapis of Bonta (24) and Brakmar (21)
 <img width="2560" height="1484" alt="image" src="https://github.com/user-attachments/assets/472e09f2-a49d-431e-8935-f60355457cdd" />
