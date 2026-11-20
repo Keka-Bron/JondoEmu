@@ -6019,7 +6019,8 @@
         "fsdu": "RoomCleared",
         "fsdv": "ScaledLevel",
         "fsdw": "Training",
-        "fsdx": "ExperienceBonusPercent"
+        "fsdx": "ExperienceBonusPercent",
+        "fsds": "Life"
       },
       "oneofs": {},
       "ignoredStableMembers": [],

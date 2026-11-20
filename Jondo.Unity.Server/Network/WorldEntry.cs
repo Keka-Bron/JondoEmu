@@ -19,7 +19,7 @@ namespace Jondo.Unity.Server.Network
         public static async Task<int> SendInitialStateAsync(GameSession session, DbCharacter character)
         {
             using var context = SessionContext.Push(session);
-            var stream = session.Stream ?? throw new InvalidOperationException("World entry requires a connected game session.");
+            if (session.Stream == null) throw new InvalidOperationException("World entry requires a connected game session.");
             var initial = new GameEntryInitialMessages(
                 Managers.HavenBagStore.RoomsOf(character.Id), Managers.Merkasako.Themes,
                 session.State, new ProfessionMessages(Handlers.ArtisanHandler.Jobs(), Managers.SkillManager.ForJob),
@@ -55,7 +55,7 @@ namespace Jondo.Unity.Server.Network
             await Handlers.TaxCollectorHandler.OnWorldEntryAsync(session);
 
             // Inside a dream: restore it, or leave it when there is none to go back to.
-            await Handlers.DreamHandler.OnWorldEntryAsync(stream);
+            await Handlers.DreamHandler.OnWorldEntryAsync(session);
 
             // The treasure hunts under way (hhf), as they stand.
             await Handlers.TreasureHuntHandler.OnWorldEntryAsync(session);

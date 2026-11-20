@@ -948,32 +948,32 @@ namespace Jondo.Unity.Server.Network
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyc)))
                 {
                     // The menu's Infinite Dreams button, and the T key: to the Astral Plane.
-                    await DreamHandler.ToAstralPlaneAsync(stream);
+                    await DreamHandler.ToAstralPlaneAsync(session);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixf)))
                 {
                     // Starting a dream, or discarding the one there was.
-                    await DreamHandler.StartOrDiscardAsync(stream, payload);
+                    await DreamHandler.StartOrDiscardAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iym)))
                 {
                     // Buying at the fountain (inferred).
-                    await DreamHandler.BuyAsync(stream, payload);
+                    await DreamHandler.BuyAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixq)))
                 {
                     // The loot table of the dream's room.
-                    await DreamHandler.DropTableAsync(stream, payload);
+                    await DreamHandler.DropTableAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kaz)))
                 {
                     // Where a fight here would place everybody.
-                    await DreamHandler.PositionsAsync(stream, payload);
+                    await DreamHandler.PositionsAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
                 {
                     // The astral storm.
-                    await DreamHandler.AstralStormAsync(stream);
+                    await DreamHandler.AstralStormAsync(session);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iyx)))
                 {
@@ -981,11 +981,11 @@ namespace Jondo.Unity.Server.Network
                     await DreamHandler.LeaveAsync(session, payload);
                 }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Iwt)))
-                    await DreamHandler.InviteGroupAsync(stream);
+                    await DreamHandler.InviteGroupAsync(session);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixk)))
-                    await DreamHandler.AnswerInvitationAsync(stream, payload);
+                    await DreamHandler.AnswerInvitationAsync(session, payload);
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Ixn)))
-                    await DreamHandler.ChooseRoomAsync(stream, payload);
+                    await DreamHandler.ChooseRoomAsync(session, payload);
                 else if (payloadStr.Contains(Op.Uri(Op.Iwo)))
                 {
                     // All the elements go through the same registry; it decides which action is

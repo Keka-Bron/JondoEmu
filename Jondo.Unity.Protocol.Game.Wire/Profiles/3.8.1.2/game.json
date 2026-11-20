@@ -5976,7 +5976,8 @@
         "fuxk": "RoomCleared",
         "fuxs": "ScaledLevel",
         "fuya": "Training",
-        "fuxw": "ExperienceBonusPercent"
+        "fuxw": "ExperienceBonusPercent",
+        "fuxy": "Life"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -6780,7 +6781,9 @@
       "name": "OutfitAuraChangedEvent",
       "fields": {},
       "oneofs": {},
-      "ignoredStableMembers": [],
+      "ignoredStableMembers": [
+        "AuraEmoteId"
+      ],
       "defaultOnAbsence": [],
       "defaultOneofs": {},
       "kind": "event"

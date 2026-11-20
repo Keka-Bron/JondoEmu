@@ -143,14 +143,15 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static async Task<bool> KeepsInAsync(NetworkStream? stream)
         {
-            if (_escorting.Value) return false;
-            long characterId = SessionContext.State.CharacterId;
-            if (!IsJailed(characterId)) return false;
+            if (HoldNotice(SessionContext.Current) is not { } notice) return false;
 
             if (stream != null)
-                await TellAsync(stream, CommandTexts.Get("jail.held", Minutes(Left(characterId))));
+                await TellAsync(stream, notice);
             return true;
         }
+
+        internal static string? HoldNotice(GameSession session) => !_escorting.Value && IsJailed(session.CharacterId)
+            ? CommandTexts.Get(session.State.Language, "jail.held", Minutes(Left(session.CharacterId))) : null;
 
         /// <summary>Whether a line on this chat channel is allowed: a prisoner has the general one only.</summary>
         /// <remarks>Private messages travel by their own message (ktb) and are always allowed.</remarks>

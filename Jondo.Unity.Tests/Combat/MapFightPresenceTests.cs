@@ -268,7 +268,7 @@ public sealed class MapFightPresenceTests
             using (SessionContext.Push(own.Session))
             using (await own.Session.EnterTurnAsync())
             {
-                var sending = DreamHandler.GoblinPowerAsync(own.ToClient, [DreamHandler.HideDreamNpc, DreamHandler.ClearDreamRoom]);
+                var sending = DreamHandler.GoblinPowerAsync(own.Session, [DreamHandler.HideDreamNpc, DreamHandler.ClearDreamRoom]);
                 if (failAt > 0) await Assert.ThrowsAsync<IOException>(() => sending);
                 else await sending;
             }

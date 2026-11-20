@@ -274,7 +274,7 @@ namespace Jondo.Unity.Server.Handlers
             // The Dispensador de favores of a dream favour opens on what the favour is at.
             if (npc.NpcId == Managers.Dreams.FavorNpc)
             {
-                await OpenFavorAsync(stream, npc, mapId);
+                await OpenFavorAsync(session, npc, mapId);
                 return;
             }
 
@@ -628,21 +628,21 @@ namespace Jondo.Unity.Server.Handlers
         /// with no reply but the client's own way out. The lines and their replies are his
         /// template's; which goes with which is the tree in content/npcs/dialogues.json.
         /// </summary>
-        private static async Task OpenFavorAsync(NetworkStream stream, Npcs.Spawn npc, long mapId)
+        private static async Task OpenFavorAsync(GameSession session, Npcs.Spawn npc, long mapId)
         {
             var escrito = NpcDialogues.For(npc.NpcId, mapId);
-            long pregunta = DreamHandler.FavorPending() ? Managers.Dreams.FavorOfferMessage : Managers.Dreams.FavorGivenMessage;
+            long pregunta = DreamHandler.FavorPending(session.CharacterId) ? Managers.Dreams.FavorOfferMessage : Managers.Dreams.FavorGivenMessage;
             var linea = escrito?.Line(pregunta);
             long[] respuestas = linea != null ? LasQueTocan(linea) : Array.Empty<long>();
 
-            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+            await session.SendAsync(
                 ConnectionProtocol.Push(Op.Ioc, ConnectionProtocol.BuildNpcDialog(mapId, npc.ContextualId)));
 
-            SessionContext.State.OpenDialogueNpcId = npc.NpcId;
-            SessionContext.State.OpenDialogueMapId = mapId;
-            SessionContext.State.OpenDialogueMessage = pregunta;
+            session.State.OpenDialogueNpcId = npc.NpcId;
+            session.State.OpenDialogueMapId = mapId;
+            session.State.OpenDialogueMessage = pregunta;
 
-            await PreguntarAsync(stream, pregunta, respuestas, null, linea);
+            await PreguntarAsync(session.Stream!, pregunta, respuestas, null, linea);
             Console.WriteLine($"[Dreams] The Dispensador de favores says {pregunta}, {respuestas.Length} replies.");
         }
 
@@ -1636,7 +1636,7 @@ namespace Jondo.Unity.Server.Handlers
             // of its own: it is this same dialogue, and what it buys is written in the answer.
             if (elegidaAhora != null && elegidaAhora.DreamPointsPercent != 0)
             {
-                var sueno = Managers.Dreams.De(GameState.CharacterId);
+                var sueno = Managers.Dreams.De(session.CharacterId);
                 var aqui = sueno?.SalaActual;
                 if (sueno != null && aqui != null && aqui.FavorTaken)
                 {
@@ -1657,7 +1657,7 @@ namespace Jondo.Unity.Server.Handlers
                                       $"({elegidaAhora.DreamPointsPercent}%).");
 
                     DreamHandler.Persist(sueno);
-                    await DreamHandler.RefrescarEstadoAsync(stream);
+                    await DreamHandler.RefrescarEstadoAsync(session);
                 }
                 else
                 {
@@ -1674,7 +1674,7 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                         ConnectionProtocol.NpcDialogCloseReason)));
-                await DreamHandler.OfferFavorAsync(stream);
+                await DreamHandler.OfferFavorAsync(session);
                 return;
             }
 
@@ -1687,7 +1687,7 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Kld, ConnectionProtocol.BuildDialogClosed(
                         ConnectionProtocol.NpcDialogCloseReason)));
-                await DreamHandler.GoblinPowerAsync(stream, elegidaAhora.Parameters);
+                await DreamHandler.GoblinPowerAsync(session, elegidaAhora.Parameters);
                 return;
             }
 

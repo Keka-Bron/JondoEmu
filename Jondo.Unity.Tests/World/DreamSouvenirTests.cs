@@ -35,13 +35,13 @@ namespace Jondo.Unity.Tests.World
                 $"{s.Id}:{s.Fila}:{string.Join(",", s.Salidas)}:{s.Grupo}:{s.Reward?.Tag}:{s.MapaDeLaSala}:" +
                 $"{s.EsFavor}:{s.EsFuente}:{s.HasReyGob}:{string.Join(",", s.Miembros)}"));
 
-        private static void AsTheDreamer(Action body)
+        private static void AsTheDreamer(Action<GameSession> body)
         {
             var session = GameSession.SinSocket();
             session.State.CharacterId = Dreamer;
             try
             {
-                using (SessionContext.Push(session)) body();
+                body(session);
             }
             finally
             {
@@ -99,7 +99,7 @@ namespace Jondo.Unity.Tests.World
         /// them -- the room is tried again, the dream goes on --; without one there is none.
         /// </summary>
         [Fact]
-        public void Training_never_spends_its_sands() => AsTheDreamer(() =>
+        public void Training_never_spends_its_sands() => AsTheDreamer(session =>
         {
             Assert.False(Dreams.Crear(Dreamer, "Prueba", 200, 2, 100, 200, 0, null, training: true).Training);
 
@@ -109,7 +109,7 @@ namespace Jondo.Unity.Tests.World
             var room = dream.Salas.First(r => r.Fila == 1);
             dream.Actual = room.Id;
 
-            var (_, _, notice, ended, result) = DreamHandler.AfterTheFight(new FightInstance(7_000_011, room.MapaDeLaSala), won: false);
+            var (_, _, notice, ended, result) = DreamHandler.AfterTheFight(session, new FightInstance(7_000_011, room.MapaDeLaSala), won: false);
             Assert.False(ended);
             Assert.Null(result);
             Assert.NotNull(notice);
@@ -118,7 +118,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>A dream from a code pays nothing: "sans aucune récompense (que ce soit xp ou drop)".</summary>
         [Fact]
-        public void A_souvenir_pays_nothing() => AsTheDreamer(() =>
+        public void A_souvenir_pays_nothing() => AsTheDreamer(_ =>
         {
             var dream = Whole(Dreamer, "NOLOOT12", difficulty: 2);
             var room = dream.Salas.First(r => r.Fila == 1);
@@ -171,7 +171,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>The end of a dream hands its result out, won at its end or lost with no sand left.</summary>
         [Fact]
-        public void The_end_hands_the_result_out() => AsTheDreamer(() =>
+        public void The_end_hands_the_result_out() => AsTheDreamer(session =>
         {
             var dream = Whole(Dreamer, null, difficulty: 2);
             dream.Arena = 0;
@@ -180,7 +180,7 @@ namespace Jondo.Unity.Tests.World
             var fight = new FightInstance(7_000_013, room.MapaDeLaSala);
             fight.AddPlayer(new Fighter { Id = Dreamer, Name = "Prueba", MaxHP = 10, CurrentHP = 10 });
 
-            var (_, _, _, ended, result) = DreamHandler.AfterTheFight(fight, won: false);
+            var (_, _, _, ended, result) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.True(ended);
             Assert.NotNull(result);
             var fields = ProtoMessage.Parse(result!).Fields;

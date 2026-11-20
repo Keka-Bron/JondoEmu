@@ -1417,7 +1417,7 @@ public sealed record InfiniteDreamRoom(int Score, int DreamPoints, InfiniteDream
 
 public sealed record InfiniteDreamRoomLinks(IReadOnlyList<string> RoomIds);
 
-public sealed record InfiniteDreamStateEvent(InfiniteDreamCharacter? Dreamer, int Intensity, IReadOnlyList<InfiniteDreamMonster> Monsters, IReadOnlyList<InfiniteDreamDoor> Doors, IReadOnlyList<InfiniteDreamCharacter> Party, IReadOnlyList<InfiniteDreamReward> Rewards, int Rerolls, int LootBonusPercent, int DreamPoints, InfiniteDreamStage Stage, string CurrentRoomId, int BonusLevels, IReadOnlyList<InfiniteDreamBonus> Bonuses, IReadOnlyList<InfiniteDreamMap> Maps, bool CanReroll, bool RoomCleared, int ScaledLevel, bool Training, int ExperienceBonusPercent) : GameEvent;
+public sealed record InfiniteDreamStateEvent(InfiniteDreamCharacter? Dreamer, int Intensity, IReadOnlyList<InfiniteDreamMonster> Monsters, IReadOnlyList<InfiniteDreamDoor> Doors, IReadOnlyList<InfiniteDreamCharacter> Party, IReadOnlyList<InfiniteDreamReward> Rewards, int Rerolls, int LootBonusPercent, int DreamPoints, InfiniteDreamStage Stage, string CurrentRoomId, int BonusLevels, IReadOnlyList<InfiniteDreamBonus> Bonuses, IReadOnlyList<InfiniteDreamMap> Maps, int Life, bool CanReroll, bool RoomCleared, int ScaledLevel, bool Training, int ExperienceBonusPercent) : GameEvent;
 
 public sealed record JobBookSubscription(int JobId, bool Subscribed);
 

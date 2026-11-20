@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -67,7 +68,7 @@ namespace Jondo.Unity.Tests.World
         public void The_fountain_sells_what_it_has_for_dream_points()
         {
             var (dream, fountain) = AtTheCapturedFountain();
-            Assert.Equal(5, Fields(DreamProtocol.BuildDreamState(dream)).Count(f => f.FieldNumber == 6));
+            Assert.Equal(5, DreamProtocol.BuildDreamState(dream).Rewards.Count);
 
             // Five dream points for a price of fifteen: nothing.
             dream.DreamPoints = 5;
@@ -80,7 +81,7 @@ namespace Jondo.Unity.Tests.World
             Assert.NotNull(bought);
             Assert.Equal(5, dream.DreamPoints);
             Assert.Contains(dream.Ganados, b => b.Efecto == 115 && b.Valor == 25);
-            Assert.Equal(5, Fields(DreamProtocol.BuildDreamState(dream)).Count(f => f.FieldNumber == 6));
+            Assert.Equal(5, DreamProtocol.BuildDreamState(dream).Rewards.Count);
             Assert.DoesNotContain(fountain.Offers!, o => o.Tag == 124);
 
             // And by its place in the shop: the first one, with its two bonuses.
@@ -114,7 +115,7 @@ namespace Jondo.Unity.Tests.World
         {
             var dream = New();
             dream.DreamPoints = 100;
-            Assert.DoesNotContain(Fields(DreamProtocol.BuildDreamState(dream)), f => f.FieldNumber == 6);
+            Assert.Empty(DreamProtocol.BuildDreamState(dream).Rewards);
             Assert.Null(Dreams.Buy(dream, 0, out _));
         }
 
@@ -123,21 +124,26 @@ namespace Jondo.Unity.Tests.World
         /// monster 1153 on cell 283, level 200, and its thirteen characteristics.
         /// </summary>
         [Fact]
-        public void A_beast_is_the_bytes_of_the_capture()
+        public void The_snapshot_encodes_the_reviewed_beast_fields_and_omits_the_unmapped_level()
         {
-            var beast = new DreamProtocol.Beast(283, 1153, 200, false, new List<(int, int)>
+            var dream = New();
+            Dreams.Enter(dream, dream.Salas.First(r => r.Miembros.Count > 0).Id, out _);
+            var beast = new InfiniteDreamMonster(283, 1153, InfiniteDreamMonsterKind.Normal, new Dictionary<int, int>
             {
-                (0, 5450), (1, 10), (33, 17), (34, 10), (35, 41), (36, -33), (37, 15),
-                (44, 3263), (78, 88), (79, 88), (23, 4), (27, 69), (28, 69),
+                [0] = 5450, [1] = 10, [33] = 17, [34] = 10, [35] = 41, [36] = -33, [37] = 15,
+                [44] = 3263, [78] = 88, [79] = 88, [23] = 4, [27] = 69, [28] = 69,
             });
-            Assert.Equal("089b0210810918c8012a05080010ca2a2a040801100a2a04082110112a040822100a2a04082310292a0d0824" +
+            var boss = new InfiniteDreamMonster(205, 8099, InfiniteDreamMonsterKind.Boss, new Dictionary<int, int>());
+            var rows = Fields(DreamProtocol.BuildDreamState(dream, [beast, boss]).Payload()).Where(f => f.FieldNumber == 3)
+                .Select(f => Convert.ToHexString(f.BytesValue!).ToLowerInvariant()).ToArray();
+            // The codec elides the map entry's default key (0 = life points); the row and its value remain.
+            Assert.Equal("089b021081092a0310ca2a2a040801100a2a04082110112a040822100a2a04082310292a0d0824" +
                          "10dfffffffffffffffff012a040825100f2a05082c10bf192a04084e10582a04084f10582a04081710042a04" +
                          "081b10452a04081c1045",
-                         Convert.ToHexString(DreamProtocol.BuildBeast(beast)).ToLowerInvariant());
+                          rows[0]);
 
             // A boss carries f4, as monster 8099 does after the storm of the same capture.
-            var boss = new DreamProtocol.Beast(205, 8099, 220, true, new List<(int, int)>());
-            Assert.Equal("08cd0110a33f18dc012001", Convert.ToHexString(DreamProtocol.BuildBeast(boss)).ToLowerInvariant());
+            Assert.Equal("08cd0110a33f2001", rows[1]);
         }
 
         /// <summary>The value-4 bit of m_flags: set on 8099 and 173, which the bestiary marks, not on 209.</summary>
@@ -166,17 +172,16 @@ namespace Jondo.Unity.Tests.World
             var cells = FightHandler.DefenderPlacement(room.MapaDeLaSala);
             for (int i = 0; i < beasts.Count; i++)
             {
-                Assert.Equal(i < cells.Count ? cells[i] : cells[0], beasts[i].Cell);
+                Assert.Equal(i < cells.Count ? cells[i] : cells[0], beasts[i].CellId);
                 Assert.Equal(room.Miembros[i].Monstruo, beasts[i].MonsterId);
-                Assert.Equal(0, beasts[i].Stats[0].Characteristic);
-                Assert.True(beasts[i].Stats[0].Value > 0);
+                Assert.True(beasts[i].Characteristics[0] > 0);
             }
 
-            Assert.Equal(beasts.Count, Fields(DreamProtocol.BuildDreamState(dream, beasts)).Count(f => f.FieldNumber == 3));
+            Assert.Equal(beasts.Count, DreamProtocol.BuildDreamState(dream, beasts).Monsters.Count);
 
             room.Hecha = true;
             Assert.Empty(DreamHandler.BestiaryOf(room));
-            Assert.DoesNotContain(Fields(DreamProtocol.BuildDreamState(dream, beasts)), f => f.FieldNumber == 3);
+            Assert.Empty(DreamProtocol.BuildDreamState(dream, beasts).Monsters);
         }
     }
 }

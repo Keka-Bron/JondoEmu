@@ -60,7 +60,7 @@ namespace Jondo.Unity.Tests.World
             Assert.NotEmpty(back.RewardsTaken);
 
             // And it says the same to the client.
-            Assert.Equal(DreamProtocol.BuildDreamState(dream), DreamProtocol.BuildDreamState(back));
+            Assert.Equal(DreamProtocol.BuildDreamState(dream).Payload(), DreamProtocol.BuildDreamState(back).Payload());
         }
 
         /// <summary>No dream going: the well sends nothing to continue, as the long capture's zero bytes.</summary>

@@ -101,7 +101,7 @@ namespace Jondo.Unity.Tests.Combat
                 };
                 fight.AddMonster(fallen);
 
-                using (SessionContext.Push(pipe.Session)) DreamHandler.OnFightCreated(fight);
+                DreamHandler.OnFightCreated(pipe.Session.CharacterId, fight);
                 fallen.CurrentHP = 0;
 
                 bool cameOn;

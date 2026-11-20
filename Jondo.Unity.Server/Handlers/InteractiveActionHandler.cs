@@ -36,7 +36,7 @@ namespace Jondo.Unity.Server.Handlers
             // Inside a dream, the doors are interactives that do not exist on the roleplay map,
             // so they are tried FIRST: the usual registry would not know what to do with them and
             // would leave them as «unknown use».
-            if (await DreamHandler.TryDoorAsync(stream, elementId)) return;
+            if (await DreamHandler.TryDoorAsync(session, elementId)) return;
 
             long mapId = SessionContext.State.MapId;
 
@@ -139,7 +139,7 @@ namespace Jondo.Unity.Server.Handlers
                     await LotteryHandler.DrawAsync(stream, interactive.Element.Id, action.SkillId);
                     break;
                 case InteractiveActionKind.Dream:
-                    await DreamHandler.ShowAsync(stream);
+                    await DreamHandler.ShowAsync(session);
                     break;
                 case InteractiveActionKind.DreamDoor:
                     // TryDoorAsync has already been tried further up, before the normal dispatch. If
