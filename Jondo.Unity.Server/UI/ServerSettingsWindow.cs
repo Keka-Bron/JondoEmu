@@ -48,7 +48,8 @@ internal sealed class ServerSettingsWindow : Window
         var characters = Card("Characters",
             Number("MaxAp", null, s.MaxActionPoints, 0, 30, 1, "", v => s.MaxActionPoints = (int)v),
             Number("MaxMp", "CapHint", s.MaxMovementPoints, 0, 20, 1, "", v => s.MaxMovementPoints = (int)v),
-            Toggle("NoEnergy", "NoEnergyHint", s.NoEnergyLoss, v => s.NoEnergyLoss = v));
+            Toggle("NoEnergy", "NoEnergyHint", s.NoEnergyLoss, v => s.NoEnergyLoss = v),
+            Toggle("AllZaaps", "AllZaapsHint", !s.RequireZaapDiscovery, v => s.RequireZaapDiscovery = !v));
         var startingBonuses = Card("StartingBonuses",
             Number("StartingKamas", "StartingKamasHint", s.StartingKamas, 0, 1_000_000_000L, 1, "", v => s.StartingKamas = (long)v),
             Number("StartingScrollStats", "StartingScrollStatsHint", s.StartingScrollStats, 0, 10_000, 1, "", v => s.StartingScrollStats = (int)v),

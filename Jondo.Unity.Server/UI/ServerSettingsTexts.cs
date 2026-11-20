@@ -21,6 +21,8 @@ internal static class ServerSettingsTexts
         ["CapHint"] = ("0 = sin tope (oficiales: 12 PA y 6 PM).", "0 = no cap (official: 12 AP and 6 MP).", "0 = sans plafond (officiels : 12 PA et 6 PM)."),
         ["NoEnergy"] = ("Morir no cuesta energía", "Dying costs no energy", "Mourir ne coûte pas d'énergie"),
         ["NoEnergyHint"] = ("Perder un combate no gasta energía.", "A lost fight spends no energy.", "Perdre un combat ne dépense pas d'énergie."),
+        ["AllZaaps"] = ("Todos los zaaps abiertos", "Every zaap open", "Tous les zaaps ouverts"),
+        ["AllZaapsHint"] = ("Se puede viajar a cualquier zaap sin haberlo descubierto antes. Apagado, cada personaje descubre un zaap al llegar a su mapa, como en el juego.", "Travel to any zaap without discovering it first. Off, each character discovers a zaap on reaching its map, as in the game.", "Voyager vers n'importe quel zaap sans l'avoir découvert. Désactivé, chaque personnage découvre un zaap en arrivant sur sa carte, comme dans le jeu."),
         ["Raids"] = ("RAIDS Y BÚSQUEDA DE GRUPO", "RAIDS AND PARTY SEARCH", "RAIDS ET RECHERCHE DE GROUPE"),
         ["RaidMin"] = ("Jugadores mínimos para iniciar una raid", "Fewest players to start a raid", "Joueurs minimum pour lancer un raid"),
         ["RaidMinHint"] = ("0 = los del juego (8).", "0 = the game's (8).", "0 = ceux du jeu (8)."),
