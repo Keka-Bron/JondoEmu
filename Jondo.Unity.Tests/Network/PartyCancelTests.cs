@@ -44,8 +44,9 @@ namespace Jondo.Unity.Tests.Network
                 Assert.Equal("ilo", ilo.Op);
                 Assert.Equal(Pb.New().Var(1, party.Id).Var(2, leader).Build(), ilo.Payload);
 
-                // ind { 1 party, 2 who withdrew, 3 invitee } to the party.
-                byte[] ind = Pb.New().Var(1, party.Id).Var(2, leader).Var(3, guest).Build();
+                // ind { 1 party, 2 invitee, 3 who withdrew } to the party, as the client reads it:
+                // the other way round it took the leader off the list and named him the invitee (#216).
+                byte[] ind = Pb.New().Var(1, party.Id).Var(2, guest).Var(3, leader).Build();
                 Assert.Equal(ind, (await inside.Drain()).Single(f => f.Op == "ind").Payload);
                 Assert.Equal(ind, (await lead.Drain()).Single(f => f.Op == "ind").Payload);
                 Assert.False(party.Pending.ContainsKey(guest));
