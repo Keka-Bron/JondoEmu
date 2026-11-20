@@ -68,8 +68,10 @@ namespace Jondo.Unity.Server.Network
                 if (hero.Session.State.IsInFight) continue;
                 if (mapLeft > 0 && mapLeft != master.State.MapId) await LeaveAsync(mapLeft, hero.CharacterId);
                 await ArriveAsync(master, hero);
-                // What his last fight set aside, and his level, as a player's on reaching a map.
-                try { await Achievements.ForHeroAsync(master, hero.Session); }
+                // What his last fight set aside, his level, and the zone and the map he reached, as
+                // a player's on reaching a map.
+                long map = master.State.MapId;
+                try { await Achievements.ForHeroAsync(master, hero.Session, map, MapManager.GetMapInfo(map)?.SubAreaId ?? 0); }
                 catch (Exception ex) { Program.LogDebug($"[Heroes] {hero.CharacterId}'s achievements not looked at: {ex.Message}"); }
             }
         }

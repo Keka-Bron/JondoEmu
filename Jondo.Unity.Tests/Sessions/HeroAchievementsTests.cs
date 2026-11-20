@@ -8,6 +8,7 @@ using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Tests.Economy;
+using Jondo.Unity.World.Achievements;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -107,6 +108,56 @@ namespace Jondo.Unity.Tests.Sessions
                 await Achievements.ForHeroAsync(master, hero);
                 Assert.Equal(earned.Count, codec.Frames.Count);
                 Assert.Equal(0, codec.Decodes);
+                await pipe.Quiet();
+            }
+            finally
+            {
+                Forget();
+            }
+        }
+
+        [Fact]
+        public async Task A_hero_following_his_master_into_a_zone_explores_it_too()
+        {
+            if (!File.Exists(Paths.WorldDb) || !File.Exists(Paths.AchievementsJson)) return;
+            Achievements.Load();
+            Forget();
+            const int zone = 518, explored = 307;
+            try
+            {
+                var codec = new RecordingCodec();
+                await using var pipe = await ClientPipe.OpenAsync(Account, Master, 1, codec: codec);
+                var master = pipe.Session;
+                using (SessionContext.Push(master)) Achievements.LoadFrom(Master);
+                var hero = GameSession.SinSocket();
+                hero.State.CharacterId = Hero;
+                hero.State.CharacterName = "Lilia";
+                hero.State.CharacterLevel = 50;
+                // His level looked at already: only what arriving earns.
+                hero.State.AchievementLevelChecked = 50;
+                using (SessionContext.Push(hero)) Achievements.LoadFrom(Hero);
+                Assert.False(hero.State.Achievements!.Has(explored));
+                using var turn = await master.EnterTurnAsync();
+
+                // Beside his master on a map of the zone (HeroPresence.MasterMovedAsync): Koalitions'
+                // Lilia was left without it when only the one played got the map (#213).
+                await Achievements.ForHeroAsync(master, hero, 990000310, zone);
+
+                Assert.True(hero.State.Achievements.Has(explored));
+                Assert.Equal(Hero, hero.State.Achievements.AchieverOf(explored));
+                Assert.Contains(codec.Frames, frame => frame.Content is AchievementFinishedEvent done
+                                                       && done.Achievement!.AchievementId == explored
+                                                       && done.Achievement.AchievedBy == Hero);
+                // His exploration, written down as his own: not his master's.
+                using (SessionContext.Push(hero)) Assert.Equal(1, Achievements.Tally(AchievementCatalogue.ExploreKey, zone));
+                using (SessionContext.Push(master)) Assert.Equal(0, Achievements.Tally(AchievementCatalogue.ExploreKey, zone));
+
+                // Back on the zone: nothing earned twice.
+                int told = codec.Frames.Count;
+                await Achievements.ForHeroAsync(master, hero, 990000310, zone);
+                Assert.Equal(told, codec.Frames.Count);
+                for (int i = 0; i < told; i++)
+                    Assert.Equal(RecordingCodec.Token, await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
                 await pipe.Quiet();
             }
             finally
