@@ -217,10 +217,14 @@ namespace Jondo.Unity.Server.Handlers
         /// Read in the client, which no capture records. Its party frame (ffl) answers two messages
         /// with exactly this: <c>ilo { 1 party, 2 who withdrew }</c> takes the «partyInvit_» popup
         /// away and writes «ui.party.invitationCancelledForGuest» -- the same ilo the capture sends
-        /// whoever declines --, and <c>ind { 1 party, 2 who withdrew, 3 invitee }</c> writes
+        /// whoever declines --, and <c>ind { 1 party, 2 invitee, 3 who withdrew }</c> writes
         /// «ui.party.invitationCancelled» with both names and takes the invitee off the party's
         /// list. A party left with nobody but its leader and no invitation open breaks up, as on a
         /// refusal.
+        ///
+        /// The invitee first, then who withdrew, as the client reads them (Keka-Bron/JondoEmu#216):
+        /// sent the other way round, it took the inviter off the list, left the invitee pending
+        /// with his hourglass, and wrote «Testas a annulé l'invitation de Lilia» for Lilia's own.
         /// </remarks>
         public static async Task CancelInvitationAsync(NetworkStream stream, byte[] payload)
         {
@@ -248,7 +252,7 @@ namespace Jondo.Unity.Server.Handlers
                 await HeroesBackAsync(guest);
             }
 
-            byte[] cancelled = ConnectionProtocol.Push("ind", Pb.New().Var(1, partyId).Var(2, meId).Var(3, guestId).Build());
+            byte[] cancelled = ConnectionProtocol.Push("ind", Pb.New().Var(1, partyId).Var(2, guestId).Var(3, meId).Build());
             foreach (long member in Parties.MembersOf(party))
             {
                 var session = SessionRegistry.FindByCharacter(member);
