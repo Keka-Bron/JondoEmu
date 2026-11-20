@@ -1481,6 +1481,7 @@ namespace Heroes
                                 $"colours {(colors == null ? "none" : string.Join(",", Enumerable.Range(0, Math.Min(6, colors.Count)).Select(i => colors[i])))}.");
                 if (name.Length == 0) { NativeError(T("create.error.empty")); return false; }
                 _cBusy = true;
+                NativeError("");
                 Task.Run(async () =>
                 {
                     var (code, body) = await AskAsync("heroes/create", ask);
@@ -1553,12 +1554,38 @@ namespace Heroes
             return false;
         }
 
-        private static void NativeError(string text)
+        private static void NativeError(string text) => NameError(_creationWindow, text);
+
+        /// <summary>
+        /// Why the creation screen made nobody, under its name as the game says it: the name's own
+        /// TextInput turned to its error style with the text (SetToErrorStyle), back to normal with
+        /// none. Keka-Bron/JondoEmu#215: its label found by name and shown by hand stayed hidden --
+        /// the TextInput shows it only in its error style --, and a name refused, taken or empty
+        /// left the screen as it was, «nothing happens». In the heroes window's line when the
+        /// screen has no such input.
+        /// </summary>
+        private static void NameError(VisualElement root, string text)
         {
-            var label = _creationWindow == null ? null : UQueryExtensions.Q(_creationWindow, "textInput_errorMessage", (string)null)?.TryCast<TextElement>();
-            if (label == null) { Say(text); return; }
-            label.text = text;
-            label.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+            var input = root == null ? null
+                : UQueryExtensions.Q(root, "input_name", (string)null)?.TryCast<Il2CppCore.UILogic.Components.Figma.TextInput>();
+            try
+            {
+                if (input != null && !string.IsNullOrEmpty(text))
+                {
+                    // Its error label is in its infos, which the screen's name field keeps hidden.
+                    input.displayInfos = true;
+                    input.SetToErrorStyle(text);
+                    return;
+                }
+                if (input != null)
+                {
+                    input.isInError = false;
+                    input.UpdateViewTextInputStyle();
+                    return;
+                }
+            }
+            catch (Exception ex) { MelonLogger.Warning($"[Heroes] The creation screen's error not shown on its name: {ex.Message}"); }
+            if (!string.IsNullOrEmpty(text)) Say(text);
         }
 
         private static void CloseNativeCreation()
@@ -2036,11 +2063,7 @@ namespace Heroes
             });
         }
 
-        private static void ScreenError(string text)
-        {
-            SetText("textInput_errorMessage", text);
-            Show(Part("textInput_errorMessage"), !string.IsNullOrEmpty(text));
-        }
+        private static void ScreenError(string text) => NameError(_cTree, text);
 
         /// <summary>The screen's CRÉER: the hero made by the server on the creation screen's rules and connected beside his master.</summary>
         private static void CreateFromScreen()
