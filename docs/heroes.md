@@ -131,7 +131,26 @@ quests and advances matching objectives when the active character talks to an NP
 quest object, discovers a location, or wins a fight the hero joined. Each hero uses their
 own quest log, prerequisites and inventory, and receives their own quest rewards. Actions
 such as crafting and paid or teleporting replies still require playing the character.
-The switch starts off and stays with the character across hero swaps until the server restarts.
+The switch starts **on** (Keka-Bron/JondoEmu#206: a forgotten switch left heroes behind unseen);
+turning it off for a hero stays with the character across hero swaps until the server restarts.
+
+When the master moves a quest and a hero who shares quests does not follow, the master is told at
+once, in a warning in his language: «Greensback n'a pas suivi ta quête : il lui manque 2 des objets
+demandés». Once a quest, not again at each step after. The reason is the first that applies:
+
+| Reason | When |
+| --- | --- |
+| Not on your map / in a fight | The hero was elsewhere, or a fight was on |
+| Not among the winners of that fight | A quest monster killed in a fight the hero did not win with him |
+| Items missing | The NPC or element takes items the hero lacks: which, and how many |
+| Step not shared | The reply takes items or kamas, or moves the master |
+| Conditions not met | The hero cannot start the quest: his level, a quest before it |
+| Quest not started / not on the same step | He was behind already |
+
+The hero's quests button then stays **red**; under the pointer it names each quest and why, with the
+client's own quest and item names. It turns back by itself once the hero has caught up -- by doing the
+step himself -- and is cleared when his sharing is turned off. `heroes/list` carries it per hero as
+`questLag: [{ quest, step, reason, item, count }]` (`Heroes.LagsOf`).
 
 Each connected hero's card in the window has three more glyphs -- a chest, three bars, a star --
 that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):

@@ -261,7 +261,9 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out var pending))
                             await CompleteNpcObjectiveAsync(hero, step, objective, pending, npcId);
-                    });
+                    },
+                    quests: new[] { run.QuestId },
+                    explain: hero => MissingFor(hero, objective));
                 }
 
                 if (run.QuestId == Almanax.Dragon.Quest) continue;
@@ -772,9 +774,62 @@ namespace Jondo.Unity.Server.Managers
                     {
                         await CloseAsync(hero, binding);
                     }
-                });
+                },
+                quests: new[] { binding.Starts != 0 ? binding.Starts : binding.QuestId },
+                explain: hero => MissingFor(hero, binding)
+                                 ?? (binding.Starts != 0 ? Heroes.CouldNotStart(hero, binding.Starts) : null));
             }
             return true;
+        }
+
+        /// <summary>
+        /// How far a character is in a quest, to compare a hero's with his master's: -1 without it,
+        /// the step's place in the quest then the objectives ticked on it, the most once it is over.
+        /// </summary>
+        internal static int ProgressOf(GameSession session, int questId)
+        {
+            var run = session.State.Quests?.Run(questId);
+            if (run == null) return -1;
+            if (run.Finished) return int.MaxValue;
+            var steps = _book?.Of(questId)?.Steps;
+            int index = 0;
+            if (steps != null)
+            {
+                for (int i = 0; i < steps.Count; i++)
+                {
+                    if (steps[i].Id == run.StepId) { index = i; break; }
+                }
+            }
+            return index * 1000 + Math.Min(999, run.Done.Count);
+        }
+
+        /// <summary>
+        /// Why a hero could not hand an objective over with his master: the items it asks for, when
+        /// he has fewer of them than it takes. Null when that is not what stopped him.
+        /// </summary>
+        internal static Heroes.LagCause? MissingFor(GameSession hero, QuestObjective objective)
+        {
+            if (objective.ItemId == 0) return null;
+            int wanted = Math.Max(1, objective.ItemCount);
+            int has;
+            using (SessionContext.Push(hero)) has = Equipment.HowMany(objective.ItemId);
+            return has < wanted
+                ? new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, objective.ItemId, wanted - has)
+                : null;
+        }
+
+        /// <summary>The same for an element or a binding that asks to carry items: the first one he lacks.</summary>
+        internal static Heroes.LagCause? MissingFor(GameSession hero, QuestBinding binding)
+        {
+            using (SessionContext.Push(hero))
+            {
+                foreach (var (item, count) in binding.Requires)
+                {
+                    int has = Equipment.HowMany(item);
+                    if (has < count) return new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, item, count - has);
+                }
+            }
+            return null;
         }
 
         internal static bool SharedObjective(int questId, int stepId, int objectiveId, out QuestRun run)
@@ -1116,7 +1171,8 @@ namespace Jondo.Unity.Server.Managers
                             {
                                 if (SharedObjective(run.QuestId, step.Id, objective.Id, out _))
                                     await TickAsync(hero, run.QuestId, objective.Id);
-                            });
+                            },
+                            quests: new[] { run.QuestId });
                         }
                     }
 
@@ -1658,7 +1714,9 @@ namespace Jondo.Unity.Server.Managers
             {
                 if (canShare?.Invoke() != false)
                     await StartAsync(hero, questId);
-            });
+            },
+            quests: new[] { questId },
+            explain: hero => Heroes.CouldNotStart(hero, questId));
             return true;
         }
 

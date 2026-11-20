@@ -74,7 +74,8 @@ namespace Jondo.Unity.Server.Handlers
 
             await Heroes.ShareQuestActionAsync(
                 hero => CreditKillsAsync(hero, beaten, mapId, shared, isHero: true),
-                hero => hero.Session.State.FightId == fight.FightId && fight.HaGanado(hero.CharacterId));
+                hero => hero.Session.State.FightId == fight.FightId && fight.HaGanado(hero.CharacterId),
+                quests: shared.Select(key => key.QuestId).Distinct().ToList());
         }
 
         private static async Task CreditKillsAsync(GameSession session, Dictionary<int, int> beaten, long mapId,

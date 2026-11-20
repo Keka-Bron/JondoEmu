@@ -57,6 +57,18 @@ namespace Jondo.Unity.Server.Network
                         wisdom = stats.Wisdom,
                         autoPass = Heroes.PassesOnHisOwn(c.Id),
                         questSync = heroes.Contains(c.Id) && Heroes.SharesQuests(c.Id),
+                        // The quests he stayed behind his master in, and why: the mod turns his
+                        // quests button red and names them, in the client's language, on hovering it.
+                        questLag = heroes.Contains(c.Id)
+                            ? Heroes.LagsOf(me, c.Id).Select(l => new
+                            {
+                                quest = l.QuestId,
+                                step = l.StepId,
+                                reason = l.Reason.ToString().ToLowerInvariant(),
+                                item = l.ItemId,
+                                count = l.ItemCount,
+                            }).ToList<object>()
+                            : new List<object>(),
                         // His look as the game's protocol carries it, on foot: the mod draws him
                         // with the client's own portrait, seated or standing.
                         look = LookOf(c),
