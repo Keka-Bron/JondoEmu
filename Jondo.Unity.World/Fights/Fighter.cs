@@ -364,6 +364,16 @@ namespace Jondo.Unity.World.Fights
         public bool IsPlayedAlly { get; set; }
 
         /// <summary>
+        /// The companion this fighter is (the client's companions table), zero for anybody else: a
+        /// creature its master brought by wearing it, played by him by hand as a played ally
+        /// (<see cref="DrivenBy"/> is the master), and told to the clients as a companion -- the
+        /// fighter's f8 -- and not as a monster.
+        /// </summary>
+        public int CompanionId { get; set; }
+
+        public bool IsCompanion => CompanionId != 0;
+
+        /// <summary>
         /// A summon with NOTHING TO PLAY: no step to take and no spell of its own. Its turn is
         /// its start-of-turn triggers and then the turn handed on, and nobody gets a jyj for
         /// it. Every other summon is its owner's to play, by hand: the Tymobot (jyj on its

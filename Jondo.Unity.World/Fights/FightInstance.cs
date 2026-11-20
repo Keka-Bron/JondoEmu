@@ -868,7 +868,8 @@ namespace Jondo.Unity.World.Fights
         {
             if (State != FightState.Placement) return JoinRefusal.NotInPlacement;
             if (team != Azules && team != Rojos) return JoinRefusal.NoSuchTeam;
-            if (DefendingAllianceId == 0 && Bando(team).Exists(f => f.IsMonster && !f.EsInvocado))
+            // A companion does not make a side the monsters': its master's friends join him.
+            if (DefendingAllianceId == 0 && Bando(team).Exists(f => f.IsMonster && !f.EsInvocado && !f.IsCompanion))
                 return JoinRefusal.MonsterTeam;
             if (OptionOn(team, OptionClosed)) return JoinRefusal.Closed;
             if (PeopleIn(team) >= maxPeoplePerTeam) return JoinRefusal.TeamFull;
@@ -922,9 +923,19 @@ namespace Jondo.Unity.World.Fights
             Rojo.Remove(who);
             ForgetPreparation(fighterId);
             DeDondeVenian.Remove(fighterId);
+            // His companion goes with him: nobody would play it.
+            foreach (var companion in Todos.Where(f => f.IsCompanion && f.DrivenBy == fighterId).ToList())
+            {
+                Azul.Remove(companion);
+                Rojo.Remove(companion);
+                CompanionsGone.Add(companion.Id);
+            }
             UpdateTurnOrder();
             return true;
         }
+
+        /// <summary>The companions taken off with their master as he left the placement, to tell the clients.</summary>
+        public List<long> CompanionsGone { get; } = new List<long>();
 
         /// <summary>
         /// The monster side rebuilt from scratch: every monster that is not a summon goes, and

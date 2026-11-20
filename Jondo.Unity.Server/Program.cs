@@ -178,6 +178,7 @@ namespace Jondo.Unity.Server
             Managers.Merkasako.Initialize();
             Managers.Zaapis.Initialize();
             Managers.Transports.Initialize();
+            Managers.Companions.Initialize();
             Managers.Bins.Initialize();
             Managers.Anomalies.Initialize();
             Managers.Houses.Initialize();

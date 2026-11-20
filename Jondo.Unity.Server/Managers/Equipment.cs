@@ -95,6 +95,17 @@ namespace Jondo.Unity.Server.Managers
         public static bool IsWorn(int position) => position >= 0 && position <= LastWornSlot;
 
         /// <summary>
+        /// The companion's slot, past the worn ones: the client sends iuk { f3: 28 } when one is
+        /// dropped on the sheet's «Compagnon». It adds nothing to the sheet, but holds one, as a worn
+        /// slot does, and only a companion (super type 23).
+        /// </summary>
+        public const int CompanionSlot = 28;
+        public const int CompanionFamily = 23;
+
+        /// <summary>Whether a slot holds a single item: the worn ones and the companion's.</summary>
+        public static bool HoldsOne(int position) => IsWorn(position) || position == CompanionSlot;
+
+        /// <summary>
         /// The client's item type 203, «Objeto invisible» (datos/item_types_3.6.10.11.json: super type
         /// 26, not in the encyclopedia). Ankama uses it for quest progress flags, 3,072 templates,
         /// most of them named like «[!] Quête 2453 Objet 001».
@@ -130,6 +141,7 @@ namespace Jondo.Unity.Server.Managers
             [1] = new[] { 0 }, [2] = new[] { 1 }, [3] = new[] { 2, 4 }, [4] = new[] { 3 }, [5] = new[] { 5 },
             [7] = new[] { 15 }, [10] = new[] { 6 }, [11] = new[] { 7 }, [12] = new[] { 8 },
             [DofusFamily] = new[] { 9, 10, 11, 12, 13, 14 },
+            [CompanionFamily] = new[] { CompanionSlot },
         };
 
         /// <summary>The family of the dofus, the trophies and the prysmaradites: one of each is worn.</summary>
@@ -146,7 +158,7 @@ namespace Jondo.Unity.Server.Managers
         public static bool MayGoIn(int template, int position)
         {
             if (BonusSlots.IsBonusSlot(position)) return false;
-            if (!IsWorn(position)) return true;
+            if (!HoldsOne(position)) return true;
 
             int? family = RandomLoot.FamilyOf(Forgemagic.TemplateOf(template)?.Type ?? 0);
             // With no item types read, nothing has a family: refusing then would undress everybody.
@@ -506,7 +518,7 @@ namespace Jondo.Unity.Server.Managers
         public static List<Item> Occupants(int position, long exceptUid = 0)
         {
             var busy = new List<Item>();
-            if (!IsWorn(position)) return busy;
+            if (!HoldsOne(position)) return busy;
 
             foreach (var item in Items.Values)
             {
@@ -576,7 +588,7 @@ namespace Jondo.Unity.Server.Managers
 
             foreach (var item in Items.Values)
             {
-                if (!IsWorn(item.Position)) continue;
+                if (!HoldsOne(item.Position)) continue;
                 if (taken.Add(item.Position)) continue;
 
                 item.Position = Bag;

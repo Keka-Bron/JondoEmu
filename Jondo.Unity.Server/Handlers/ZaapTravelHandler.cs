@@ -49,6 +49,18 @@ namespace Jondo.Unity.Server.Handlers
         private const int CostPerStep = 10;
 
         /// <summary>
+        /// Frigost Island (area 48) is closed below level 50: Captain Ardier refuses the crossing
+        /// (dialogues.json, «PL>49»), and on a server that offers every zaap without discovering it
+        /// (ServerSettings.RequireZaapDiscovery off) its zaaps would let anyone in. They are neither
+        /// offered nor travelled to below that level.
+        /// </summary>
+        internal const int FrigostArea = 48;
+        internal const int FrigostLevel = 50;
+
+        internal static bool ClosedToLevel(int subAreaId, int level)
+            => level < FrigostLevel && Interactives.AreaOfSubArea(subAreaId) == FrigostArea;
+
+        /// <summary>
         /// hip: the zaap window's «Guardar», the position saved at the zaap whose window is open,
         /// «Posición guardada.» and the list again with it as the saved one (SavedPositions).
         /// </summary>
@@ -208,6 +220,13 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            if (ClosedToLevel(DatabaseManager.SubAreaOfMap(target), SessionContext.State.CharacterLevel))
+            {
+                Console.WriteLine($"[Zaap] Map {target} is in Frigost and {SessionContext.State.CharacterName} " +
+                                  $"is below level {FrigostLevel}. No travelling.");
+                return;
+            }
+
             if (Jondo.Unity.Server.Network.SessionContext.State.Kamas < cost)
             {
                 Console.WriteLine($"[Zaap] Not enough kamas to go to {target}: it costs {cost} and there are " +
@@ -272,11 +291,13 @@ namespace Jondo.Unity.Server.Handlers
         {
             var salida = new List<ConnectionProtocol.ZaapDestination>();
             var known = ZaapDiscoveries.KnownMaps(SessionContext.State.CharacterId).ToHashSet();
+            int level = SessionContext.State.CharacterLevel;
             foreach (var waypoint in Interactives.Waypoints)
             {
                 if (!waypoint.Activated) continue;
                 if (MapManager.GetMapInfo(waypoint.MapId) == null) continue;
                 if (waypoint.MapId != from && !known.Contains(waypoint.MapId)) continue;
+                if (waypoint.MapId != from && ClosedToLevel(waypoint.SubAreaId, level)) continue;
 
                 salida.Add(new ConnectionProtocol.ZaapDestination(
                     waypoint.MapId,

@@ -166,7 +166,9 @@ namespace Jondo.Unity.Server.Handlers
             var side = fight.Bando(team);
             if (team == FightInstance.Rojos && fight.TaxCollectorUuid != null)
                 return TaxCollectorSideOnMap(fight, side, withMembers);
-            bool monsters = side.Exists(f => f.IsMonster && !f.EsInvocado)
+            // A companion is its master's (FightCompanions.cs): it does not make his side the
+            // monsters', and the map's list leaves it out -- who it is there is not measured.
+            bool monsters = side.Exists(f => f.IsMonster && !f.EsInvocado && !f.IsCompanion)
                             || (team == FightInstance.Rojos && fight.Reglas.EnfrenteHayMonstruos);
 
             long leader = monsters
@@ -180,7 +182,7 @@ namespace Jondo.Unity.Server.Handlers
                 members = new List<Pb>();
                 foreach (var f in side.ToList())
                 {
-                    if (f.EsInvocado || !f.IsAlive) continue;
+                    if (f.EsInvocado || f.IsCompanion || !f.IsAlive) continue;
                     members.Add(f.IsMonster
                         ? FightJoinProtocol.MonsterOnTeam(f.Id, f.MonsterId, f.GradeIndex + 1)
                         : FightJoinProtocol.PersonOnTeam(f.Id, f.Level, f.Name));
@@ -576,6 +578,7 @@ namespace Jondo.Unity.Server.Handlers
                                                         bool followingLeader)
         {
             Fighter fighter;
+            Fighter? companion = null;
             using (SessionContext.Push(who))
             {
                 long me = GameState.CharacterId;
@@ -591,6 +594,10 @@ namespace Jondo.Unity.Server.Handlers
                 bool joined;
                 lock (fight) joined = fight.JoinTeam(fighter, team, CapOf(fight));
                 if (!joined) return false;
+
+                // And the companion he wears, against monsters, beside him (FightCompanions.cs).
+                if (fight.Reglas.EnfrenteHayMonstruos)
+                    lock (fight) companion = AddCompanion(fight, fighter, fight.SiguienteIdDeInvocado());
 
                 var suyo = SessionContext.State;
                 suyo.MapId = fight.MapId;
@@ -624,6 +631,14 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, BuildPlayerAppearance(fight, fighter)));
+
+            // His companion after him, placed and drawn as he is.
+            if (companion != null)
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk,
+                    Network.FightProtocol.BuildFighterPlaced(companion.CellId, FacingOf(fight, companion), companion.Id)));
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, CreatureFighter(fight, companion)));
+            }
 
             // The carousel behind him -- unless a dungeon's monsters are rebuilt, which send one
             // behind each new monster: the dungeon capture goes from his jxg (139) straight to
@@ -981,9 +996,20 @@ namespace Jondo.Unity.Server.Handlers
             // kmu and jzw. The kar alone only cancels his pending swaps in the placement frame
             // (fjw.bfvx); it is the jzw that takes him off (fjw.bfwh), and without it he stayed
             // standing there for the whole fight, struck by spells that did nothing.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kar, FightJoinProtocol.BuildFighterRemoved(me)));
-            await ATodosAsync(fight, new Game.ContextRemoveElementEvent(me));
-            await ATodosAsync(fight, new Game.FightTeamRemoveMemberEvent(checked((int)fight.FightId), TeamIdentity(team), me));
+            // And his companion, taken off with him (FightInstance.LeavePlacement).
+            List<long> gone;
+            lock (fight)
+            {
+                gone = new List<long> { me };
+                gone.AddRange(fight.CompanionsGone);
+                fight.CompanionsGone.Clear();
+            }
+            foreach (long fighter in gone)
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kar, FightJoinProtocol.BuildFighterRemoved(fighter)));
+                await ATodosAsync(fight, new Game.ContextRemoveElementEvent(fighter));
+                await ATodosAsync(fight, new Game.FightTeamRemoveMemberEvent(checked((int)fight.FightId), TeamIdentity(team), fighter));
+            }
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzu,
                 TeamsOf(fight)));
 
