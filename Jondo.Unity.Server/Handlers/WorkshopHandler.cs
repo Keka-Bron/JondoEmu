@@ -344,7 +344,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (bench.Wraps)
             {
-                await WrapAsync(stream, bench);
+                await WrapAsync(session, bench);
                 return true;
             }
 
@@ -441,7 +441,7 @@ namespace Jondo.Unity.Server.Handlers
             await SendPodsAsync(session);
 
             // "Fabricar 1 objeto": the tutorial earns it right here, after the ring.
-            await Managers.Achievements.AfterCraftAsync(session, count);
+            await Managers.Achievements.AfterCraftAsync(session, reportUid == 0 ? 0 : recipe.ResultId, count);
 
             // And what a quest asks to have made, once the bench is closed (CloseAsync).
             bench.Made.TryGetValue(recipe.ResultId, out int madeHere);
@@ -464,8 +464,9 @@ namespace Jondo.Unity.Server.Handlers
         /// the present the paper names (GiftWrapping), «Envuelto por» its wrapper. Both are spent:
         /// the thing is inside now.
         /// </summary>
-        private static async Task WrapAsync(NetworkStream stream, Bench bench)
+        private static async Task WrapAsync(GameSession session, Bench bench)
         {
+            var stream = session.Stream;
             var laid = bench.Slots
                 .Select(s => (Item: Equipment.ByUid(s.Uid), s.Quantity))
                 .Where(s => s.Item != null && s.Item.Position == Equipment.Bag)
@@ -502,7 +503,9 @@ namespace Jondo.Unity.Server.Handlers
             if (created != null)
                 await SendAsync(stream, Op.Itf, WorkshopProtocol.BuildItemsArrived(new[] { Arrival(created) }));
             await SendAsync(stream, Op.Kdr, WorkshopProtocol.BuildCrafted(present, effects, 1, created?.Uid ?? 0));
-            await SendPodsAsync(SessionContext.Current);
+            await SendPodsAsync(session);
+            if (created != null)
+                await Managers.Achievements.CountAsync(session, "EC", present);
 
             bench.Made.TryGetValue(present, out int madeHere);
             bench.Made[present] = madeHere + 1;
