@@ -84,6 +84,14 @@ namespace Jondo.Unity.World.Fights
         /// <summary>Vitality, base plus equipment. It goes in the sheet; life comes from MaxHP.</summary>
         public int Vitality { get; set; }
 
+        /// <summary>
+        /// A character's own points and scrolls in each of his base characteristics (10 to 15), which
+        /// his sheet sends apart from what the rest gives: the client's EntityDetailedStat keeps a
+        /// baseValue and an additionalValue beside the equipment. Empty for anybody else, whose whole
+        /// characteristic goes as equipment.
+        /// </summary>
+        public Dictionary<int, (int Own, int Scrolled)> BasePoints { get; } = new Dictionary<int, (int, int)>();
+
         /// <summary>Critical points granted by the equipment, added on top of the spell's own.</summary>
         public int CriticalBonus { get; set; }
 
