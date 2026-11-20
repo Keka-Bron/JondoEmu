@@ -251,7 +251,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
   | Dying costs no energy | A lost fight keeps the energy |
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
-  | Simulate players | JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
+  | Simulate players | Jondobot-Xx bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
   | Head hunters | The [Cazacabezas](#-head-hunters): hunt orders on players of the other city, with how long a hunt stays open and how long the prey rests between two |
 
   **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
@@ -721,15 +721,15 @@ played through.
 | Astrub | `██████████` **100%** | 51/51 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
+| World Quests | `██░░░░░░░░` **21%** | 31/145 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
-| World Quests | `██░░░░░░░░` **18%** | 26/145 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Cania | `███████░░░` **73%** | 19/26 |
 | Krosmoz | `██████████` **100%** | 18/18 |
+| Pandala Island | `███░░░░░░░` **27%** | 15/55 |
 | Otomai Island | `██████████` **100%** | 14/14 |
-| Pandala Island | `███░░░░░░░` **25%** | 14/55 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Sufokia | `██░░░░░░░░` **18%** | 10/57 |
@@ -741,7 +741,7 @@ played through.
 | Brakmar | `██████████` **100%** | 5/5 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
 | Archipelago of Vulkania | `░░░░░░░░░░` **2%** | 1/60 |
-| **All quests** | **22.4%** | **442/1976** |
+| **All quests** | **22.7%** | **448/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
