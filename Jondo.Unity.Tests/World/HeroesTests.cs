@@ -410,6 +410,93 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// A master trades with a hero of his: the window opens at once, the hero takes what is
+        /// laid down as soon as his master is ready. Asking another player's hero asks the character
+        /// that player plays (#199).
+        /// </summary>
+        [Fact]
+        public async Task A_master_trades_with_his_own_hero_and_anothers_goes_to_his_master()
+        {
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 13, "Dador-" + tag, 8);
+            long hero = Character(Account + 13, "Tomador-" + tag, 9);
+            long stranger = Character(Account + 14, "Vecino-" + tag, 1);
+            long strangersHero = Character(Account + 14, "Escudero-" + tag, 2);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 13, master, Map, "Dador-" + tag);
+            await using var other = await ClientPipe.OpenAsync(Account + 14, stranger, Map, "Vecino-" + tag);
+            using var reading = new System.Threading.CancellationTokenSource();
+            foreach (var p in new[] { pipe, other })
+                _ = Task.Run(async () =>
+                {
+                    var buffer = new byte[65536];
+                    try { while (!reading.IsCancellationRequested && await p.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                    catch { }
+                });
+            long uid = DatabaseManager.NextItemUid();
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                Assert.Equal("ok", Heroes.Connect(other.Session, strangersHero));
+                var heroSession = Heroes.SessionOf(hero)!;
+                pipe.Session.State.Kamas = 5_000;
+                long heroKamas = heroSession.State.Kamas;
+                using (SessionContext.Push(pipe.Session))
+                {
+                    Assert.True(DatabaseManager.InsertCharacterItem(uid, master, 6902, 3, Equipment.Bag, null));
+                    Equipment.Add(uid, 6902, 3, Equipment.Bag, null);
+                }
+
+                byte[] Ask(long whom) => ConnectionProtocol.Push(Op.Keu, Pb.New().Var(2, whom).Build());
+
+                // Another player's hero: asked of the character that player plays, who can accept.
+                using (SessionContext.Push(pipe.Session)) await TradeHandler.RequestAsync(null!, Ask(strangersHero));
+                var asked = pipe.Session.State.Trade;
+                Assert.NotNull(asked);
+                Assert.Equal(stranger, asked!.TargetId);
+                Assert.False(asked.Accepted);
+                Assert.Same(asked, other.Session.State.Trade);
+                Assert.Null(Heroes.SessionOf(strangersHero)!.State.Trade);
+                using (SessionContext.Push(other.Session)) Assert.True(await TradeHandler.CloseAsync());
+                Assert.Null(pipe.Session.State.Trade);
+
+                // His own: open at once, nobody to accept.
+                using (SessionContext.Push(pipe.Session)) await TradeHandler.RequestAsync(null!, Ask(hero));
+                var trade = pipe.Session.State.Trade;
+                Assert.NotNull(trade);
+                Assert.True(trade!.Accepted);
+                Assert.Same(trade, heroSession.State.Trade);
+
+                using (SessionContext.Push(pipe.Session))
+                {
+                    await TradeHandler.MoveAsync(null!, ConnectionProtocol.Push(Op.Kcr, Pb.New().Var(1, 2).Var(2, uid).Build()));
+                    await TradeHandler.KamasAsync(null!, ConnectionProtocol.Push(Op.Kee, Pb.New().Var(1, 3_000).Build()));
+                    // His "ready" is enough: the hero always is.
+                    await TradeHandler.ReadyAsync(null!, ConnectionProtocol.Push(Op.Kep, Pb.New().Var(1, 1).Var(2, 3).Build()));
+                }
+
+                Assert.True(trade.Ended);
+                Assert.Null(pipe.Session.State.Trade);
+                Assert.Null(heroSession.State.Trade);
+                Assert.Equal(2_000, pipe.Session.State.Kamas);
+                Assert.Equal(heroKamas + 3_000, heroSession.State.Kamas);
+                using (SessionContext.Push(pipe.Session)) Assert.Equal(1, Equipment.ByUid(uid)!.Quantity);
+                using (SessionContext.Push(heroSession))
+                    Assert.Contains(Equipment.All, i => i.Template == 6902 && i.Quantity == 2 && i.Uid != uid);
+            }
+            finally
+            {
+                reading.Cancel();
+                foreach (long id in new[] { master, hero })
+                    foreach (var row in DatabaseManager.LoadInventory(id))
+                        DatabaseManager.DestroyCharacterItem(id, row.Uid, 0);
+                Heroes.DisconnectAll(master);
+                Heroes.DisconnectAll(stranger);
+                SessionRegistry.Unregister(pipe.Session);
+                SessionRegistry.Unregister(other.Session);
+            }
+        }
+
         /// <summary>The real codec, keeping what it encodes.</summary>
         private sealed class Recording : Jondo.Unity.Protocol.Game.IGameCodec
         {
