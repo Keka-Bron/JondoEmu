@@ -97,6 +97,11 @@ public sealed class EntryStatusProtocolTests
         Event("hjk", payload, new ZaapKnownListEvent(maps));
     }
 
+    [Fact]
+    public void Haven_bag_packs_keep_the_captured_order_and_packed_payload()
+        => Event("jbo", Convert.FromHexString("0a082233020401152003"),
+            new HavenBagPackListEvent([34, 51, 2, 4, 1, 21, 32, 3]));
+
     [Theory]
     [InlineData(-17)]
     [InlineData(0)]
@@ -127,6 +132,8 @@ public sealed class EntryStatusProtocolTests
             case ChatChannelsEnabledEvent channels: AssertChannels(channels, decoded.Content); break;
             case ZaapKnownListEvent zaaps:
                 Assert.Equal(zaaps.Destinations, Assert.IsType<ZaapKnownListEvent>(decoded.Content).Destinations); break;
+            case HavenBagPackListEvent packs:
+                Assert.Equal(packs.PacksId, Assert.IsType<HavenBagPackListEvent>(decoded.Content).PacksId); break;
             default: Assert.Equal(expected, decoded.Content); break;
         }
         var envelope = _codec.ReadEnvelope(_codec.Encode(new(expected)));

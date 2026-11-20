@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -463,14 +464,15 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         private static void CheckWorldMessages(List<string> failures)
         {
+#if !JONDO_PROTOCOL_3_8_1_2
+            // The typed encoder selects the build's profile; this fixture is from 3.6.10.10.
             const string CapturedKqy =
                 "0a1b0a190a13747970652e616e6b616d612e636f6d2f6b717912020801";
+            Same(failures, "kqy (heartbeat answer)", CapturedKqy, new GameCodec().Encode(new(new PongEvent(Quiet: true))));
+#endif
+
             const string CapturedLva =
                 "0a170a150a13747970652e616e6b616d612e636f6d2f6c7661";
-
-            string kqy = Hex(ConnectionProtocol.BuildHeartbeatAnswer());
-            if (kqy != CapturedKqy)
-                failures.Add($"kqy: the heartbeat answer does not match the capture ({kqy})");
 
             string lva = Hex(ConnectionProtocol.BuildActorsComplete());
             if (lva != CapturedLva)
