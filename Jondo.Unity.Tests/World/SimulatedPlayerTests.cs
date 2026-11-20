@@ -35,6 +35,22 @@ namespace Jondo.Unity.Tests.World
             Assert.All(ways, w => Assert.True(MapManager.IsNeighbour(CharacterCreationHandler.StartingMap, w.To)));
         }
 
+        /// <summary>
+        /// Every bot's name passes the character naming rule, and none is another's: JondoBot-001
+        /// was refused at creation, and no bot entered the world (#203).
+        /// </summary>
+        [Fact]
+        public void Every_bot_name_is_one_a_character_may_have_and_its_own()
+        {
+            var names = Enumerable.Range(1, SimulatedPlayers.Most).Select(SimulatedPlayers.NameOf).ToList();
+            Assert.All(names, name => Assert.True(CharacterNames.IsValid(name), name));
+            Assert.Equal(names.Count, names.Distinct().Count());
+            Assert.Equal("Jondobot-Aa", SimulatedPlayers.NameOf(1));
+            Assert.Equal("Jondobot-Hr", SimulatedPlayers.NameOf(200));
+            // What an earlier version made them under, still theirs.
+            Assert.Equal("JondoBot-001", SimulatedPlayers.LegacyNameOf(1));
+        }
+
         [Fact]
         public void Three_bots_of_five_swear_to_a_city_and_both_cities_get_some()
         {

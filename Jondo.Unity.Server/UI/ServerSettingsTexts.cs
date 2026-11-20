@@ -63,7 +63,7 @@ internal static class ServerSettingsTexts
         ["WelcomePlaceholder"] = ("Sin mensaje", "No message", "Aucun message"),
         ["Bots"] = ("JUGADORES SIMULADOS", "SIMULATED PLAYERS", "JOUEURS SIMULÉS"),
         ["BotsOn"] = ("Simular jugadores", "Simulate players", "Simuler des joueurs"),
-        ["BotsOnHint"] = ("Bots JondoBot-XXX de clase aleatoria, cada uno con su conexión: caminan, combaten monstruos, recolectan, van al Koliseo y aceptan todos los desafíos.", "JondoBot-XXX bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel.", "Des bots JondoBot-XXX de classe aléatoire, chacun avec sa propre connexion : ils marchent, combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis."),
+        ["BotsOnHint"] = ("Bots Jondobot-Xx de clase aleatoria, cada uno con su conexión: caminan, combaten monstruos, recolectan, van al Koliseo y aceptan todos los desafíos.", "Jondobot-Xx bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel.", "Des bots Jondobot-Xx de classe aléatoire, chacun avec sa propre connexion : ils marchent, combattent des monstres, récoltent, vont au Kolizéum et acceptent tous les défis."),
         ["BotsMax"] = ("Máximo a la vez", "Most at once", "Maximum en même temps"),
         ["BotsMaxHint"] = ("Cuántos están conectados varía por debajo de este número, como en un servidor real.", "How many are connected varies below this number, as on a real server.", "Le nombre de connectés varie sous ce nombre, comme sur un vrai serveur."),
         ["HuntersOn"] = ("Cazacabezas", "Head hunters", "Chasseurs de têtes"),

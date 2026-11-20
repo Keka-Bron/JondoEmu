@@ -190,7 +190,9 @@ namespace Jondo.Unity.Server.Bots
 
             var characters = await WithinAsync(_list.Task);
             if (characters == null) return false;
-            var mine = characters.FirstOrDefault(c => c.Name == _name);
+            // Its character, or the one an earlier version made under the old name (JondoBot-001).
+            string legacy = SimulatedPlayers.LegacyNameOf(_number);
+            var mine = characters.FirstOrDefault(c => c.Name == _name || c.Name == legacy);
             bool born = false;
             if (mine.Id == 0)
             {
