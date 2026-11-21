@@ -50,6 +50,27 @@ namespace Jondo.Unity.Tests.World
             Assert.Same(treasure, TreasureFight.TreasureOf(fight, chests[0]));
         }
 
+        /// <summary>
+        /// The chest the client draws on legs -- the one wearing Acalicanto's look (22387), put by
+        /// the Treasure's 21349 -- is the one judged right, whatever the server had drawn before.
+        /// </summary>
+        [Fact]
+        public void The_chest_wearing_the_legs_is_the_right_one()
+        {
+            var (fight, _, chests, player) = Fight();
+            var dice = new Random(7);
+            TreasureFight.Judge(fight, player, chests[0], dice);
+            var legged = chests.First(c => c.Id != TreasureFight.OnLegs(fight));
+            int number = 0;
+            legged.Buffs.Poner(new Buff { EffectId = 149, HechizoOrigen = TreasureFight.LegsSpell, CaducaEnRonda = -1 },
+                               () => ++number);
+
+            Assert.True(TreasureFight.WearsTheLegs(legged));
+            Assert.Equal(TreasureFight.Outcome.Right, TreasureFight.Judge(fight, player, legged, dice));
+            var wrong = chests.First(c => c.Id != legged.Id);
+            Assert.Equal(TreasureFight.Outcome.Wrong, TreasureFight.Judge(fight, player, wrong, dice));
+        }
+
         /// <summary>«Au troisième échec, le joueur est OS».</summary>
         [Fact]
         public void The_third_wrong_chest_kills()

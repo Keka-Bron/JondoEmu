@@ -6651,10 +6651,14 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
-                    // A row's trigger duration is a duration of its own too, when it is a real count:
-                    // the Sacurador's Tact, cast in his turn, is «when I am hit, Tica» until his next
-                    // turn. Falling at the round's start, it was off before any enemy played.
-                    if (c.Efecto != null && (c.Efecto.Duration > 0 || Managers.EffectEngine.CountsItsTriggerRounds(c.Efecto)))
+                    // A row's trigger duration is a duration of its own too, when it is a real count
+                    // and the row is on its caster: the Sacurador's Tact, cast in his turn, is «when I
+                    // am hit, Tica» until his next turn. Falling at the round's start, it was off
+                    // before any enemy played. Not a row put on somebody else: a Blop's projection
+                    // poison on one still to play burns on his turn this round and on no later one.
+                    if (c.Efecto != null && (c.Efecto.Duration > 0
+                                             || (Managers.EffectEngine.CountsItsTriggerRounds(c.Efecto)
+                                                 && grupo.Key.Sobre.Id == grupo.Key.Quien)))
                         byOwnDuration = Math.Max(byOwnDuration, suya);
                     if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
@@ -7788,7 +7792,11 @@ namespace Jondo.Unity.Server.Handlers
             {
                 case Managers.TreasureFight.Outcome.Right:
                     Program.LogDebug($"[Fight] {caster.Id} finds the chest on legs: the Treasure loses a life.");
-                    await UnaParteDelGolpeAsync(stream, fight, caster, NeutralDamageEffect, 0, treasure, 1);
+                    // Through its invulnerability: it is what keeps every other blow off it, and
+                    // its lives go only this way -- stopped by it, no hunt could ever be won.
+                    await UnaParteDelGolpeAsync(stream, fight, caster, NeutralDamageEffect, 0, treasure, 1,
+                                                throughInvulnerability: true);
+                    if (treasure.IsAlive) await TheLegsMoveAsync(stream, fight, treasure);
                     return;
                 case Managers.TreasureFight.Outcome.Wrong:
                     Program.LogDebug($"[Fight] {caster.Id} strikes a wrong chest.");
@@ -7807,6 +7815,29 @@ namespace Jondo.Unity.Server.Handlers
                                                 caster.CurrentHP + caster.MaxHP * 10);
                     return;
             }
+        }
+
+        /// <summary>
+        /// After a right blow, the legs go where Managers.TreasureFight drew them: Acalicanto's look
+        /// off the chest that wore it and on the new one, cast by the Treasure as its 21349 does, so
+        /// the chest the player sees on legs is the one judged right.
+        /// </summary>
+        private static async Task TheLegsMoveAsync(NetworkStream stream, FightInstance fight, Fighter treasure)
+        {
+            long onLegs = Managers.TreasureFight.OnLegs(fight);
+            var chests = fight.Bando(treasure.TeamId)
+                              .Where(f => f.IsAlive && Managers.TreasureFight.IsChest(f.MonsterId)).ToList();
+            var next = chests.FirstOrDefault(c => c.Id == onLegs);
+            if (next == null) return;
+            foreach (var chest in chests.Where(c => c.Id != next.Id && Managers.TreasureFight.WearsTheLegs(c)))
+            {
+                await RemoveSpellRowsAsync(fight, chest, Managers.TreasureFight.LegsSpell);
+                await AnnounceAppearanceAsync(stream, chest, chest.Buffs.AparienciaEn(fight.RoundNumber), fight);
+            }
+            if (!Managers.TreasureFight.WearsTheLegs(next))
+                await AplicarEfectosAsync(stream, fight, treasure, Managers.TreasureFight.LegsSpell, 1, next,
+                                          Managers.EffectEngine.AlLanzar, next.CellId, armar: false, soloAlObjetivo: true);
+            Program.LogDebug($"[Fight] The legs go to chest {next.Id}.");
         }
 
         /// <summary>«Daños Neutral», the effect the treasure's blows are shown as.</summary>
@@ -9593,7 +9624,8 @@ namespace Jondo.Unity.Server.Handlers
         /// (6184): a TB row whose child gives its summoner one AP, «Kelpe vous donne 1 PA par
         /// tour» (DPLN, «Une âme en colère»); asked only at its own turn, which never comes, it
         /// never gave it. Only the attitude -- the summon's own spell -- answers: what others
-        /// hooked on it (a Tymador's bombs) keeps going as before.
+        /// hooked on it (a Tymador's bombs) keeps going as before. A monster's summon holds its
+        /// spell as a behaviour instead, its rows armed on it (<see cref="OwnBehaviourHooksAsync"/>).
         /// </summary>
         private static async Task NonPlayingSummonsAnswerAsync(NetworkStream stream, FightInstance fight,
                                                                Fighter owner, string trigger)
@@ -9601,13 +9633,54 @@ namespace Jondo.Unity.Server.Handlers
             if (owner == null) return;
             var summons = TodosLosCombatientes(fight)
                 .Where(f => f != null && f.IsAlive && f.EsInvocado && !f.JuegaTurno && f.Invocador == owner.Id
-                            && f.Buffs.Actitudes.Count > 0)
+                            && (f.Buffs.Actitudes.Count > 0 || f.Conducta.Spell != 0))
                 .ToList();
             foreach (var summon in summons)
             {
                 if (!summon.IsAlive) continue;
                 await ActitudesAsync(stream, fight, summon, trigger);
+                if (summon.IsAlive && summon.Conducta.Spell != 0)
+                    await OwnBehaviourHooksAsync(stream, fight, summon, trigger);
             }
+        }
+
+        /// <summary>
+        /// A monster's summon that never takes a turn answering its summoner's turn start or end
+        /// with the rows of its behaviour spell, armed on it as it came out (LanzarLaConductaAsync):
+        /// only that spell's hooks it put on itself, not what others hooked on it. The Zarza
+        /// carcelaria (7383, no CanPlay) starts on 28432, «792 under TB: its grade 2», whose 1080
+        /// takes 100 MP from the foes in its melee -- «Elles vous retirent 100PM lorsqu'elles
+        /// commencent leur tour à votre mêlée» (Dofus pour les noobs, «Les derniers d'entre nous»).
+        /// Waiting on a turn of its own that never comes, it never took one.
+        /// </summary>
+        private static async Task OwnBehaviourHooksAsync(NetworkStream stream, FightInstance fight,
+                                                         Fighter summon, string trigger)
+        {
+            summon.Buffs.BarrerEnganches(fight.RoundNumber);
+            var own = summon.Buffs.ActiveSpells
+                .Where(e => e.Hechizo == summon.Conducta.Spell && (e.Lanzador == 0 || e.Lanzador == summon.Id)
+                            && !summon.Buffs.Actitudes.Contains(e.Hechizo))
+                .ToList();
+            if (own.Count == 0) return;
+            await DentroDeUnaSecuenciaAsync(fight, summon, async () =>
+            {
+                foreach (var hook in own)
+                {
+                    if (!summon.IsAlive) break;
+                    // Not from what the same hook, still resolving, has set off (see EngancheAsync).
+                    var resolvingKey = (hook.Hechizo, trigger);
+                    if (fight.HooksResolving.TryGetValue(resolvingKey, out int resolving) && resolving > 0) continue;
+                    fight.HooksResolving[resolvingKey] = resolving + 1;
+                    try
+                    {
+                        await FireHookAsync(stream, fight, summon, trigger, hook);
+                    }
+                    finally
+                    {
+                        if (--fight.HooksResolving[resolvingKey] <= 0) fight.HooksResolving.Remove(resolvingKey);
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -10599,6 +10672,13 @@ namespace Jondo.Unity.Server.Handlers
                     await DispararAsync(stream, fight, target, "D" + turnTrigger);
                 if (erosionado > 0 && target.IsAlive) await DispararAsync(stream, fight, target, "VE");
             }
+            // A killing blow is still damage dealt. The fallen one sets nothing off (DispararAsync
+            // skips the dead), but the one who dealt it counts it, by element too (CDE CDF CDW CDA):
+            // Hell Mina's Rage climbs when a player deals the element she named for the turn, and
+            // the last hit on one of her minions is such a blow.
+            else if (aplicado > 0 && !fulmina)
+                await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, deCerca, damage,
+                                               deHechizo: spell != 0);
             if (umbralCruzado != null && target.IsAlive && target.Buffs.QuitarFila(umbralCruzado))
             {
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
@@ -10740,12 +10820,15 @@ namespace Jondo.Unity.Server.Handlers
         /// sets off nothing of its own -- INFERRED, as the whole share is.
         /// </summary>
         private static async Task UnaParteDelGolpeAsync(NetworkStream stream, FightInstance fight, Fighter caster,
-                                                        int efecto, int elemento, Fighter quien, int dano)
+                                                        int efecto, int elemento, Fighter quien, int dano,
+                                                        bool throughInvulnerability = false)
         {
             if (quien == null || !quien.IsAlive || dano <= 0) return;
             // Still a blow of the caster's: an invulnerable one takes nothing of it, as of the
             // blow itself -- an invulnerable summon took half of a Steamer's spell through a link.
-            if (Managers.SpellStates.ShieldsFromBlow(quien, Jondo.Unity.World.Maps.MapGeometry.Distance(caster.CellId, quien.CellId)))
+            // Not the treasure's life a right chest takes (TreasureBlowAsync).
+            if (!throughInvulnerability
+                && Managers.SpellStates.ShieldsFromBlow(quien, Jondo.Unity.World.Maps.MapGeometry.Distance(caster.CellId, quien.CellId)))
             {
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
                     Network.FightProtocol.BuildDamage(caster.Id, efecto, quien.Id, 0, elemento)));

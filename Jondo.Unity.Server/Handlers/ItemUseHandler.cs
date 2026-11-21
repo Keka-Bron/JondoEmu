@@ -165,6 +165,14 @@ namespace Jondo.Unity.Server.Handlers
                                                                       or TravelItemHandler.OtherMapReferenceEffect);
                     if (journey != null && Managers.TravelData.TryMapReference(journey.Value, out long toMap, out int toCell))
                         await TeleportHandler.ToMapAsync(stream, toMap, toCell);
+
+                    // And the fight it opens (905: the monster in its second number, its grade in the
+                    // first): the «Muestra de mejunje» of «El remedio milagroso» (15140) brings out
+                    // Deyek (3639), «Un combat se lance alors contre Déjé».
+                    var fightEffect = itemEffects.FirstOrDefault(e => e.EffectId == FightEffect && e.DiceSide > 0);
+                    if (fightEffect != null && journey == null
+                        && MobSpawnManager.ComposeOffMap(new[] { (fightEffect.DiceSide, Math.Max(1, fightEffect.DiceNum)) }) is { } foes)
+                        await FightHandler.InitiateFightFromMobCollision(stream, foes, SessionContext.State.MapId);
                 }
                 return;
             }
@@ -256,6 +264,9 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>Effect 194, ┬½+#1{{~1~2 a }}#2 kamas┬╗: a purse's kamas.</summary>
         public const int KamasEffect = 194;
+
+        /// <summary>Effect 905: a fight against the monster of its second number, at the grade of its first.</summary>
+        public const int FightEffect = 905;
 
         /// <summary>The objectives an item's effect 30 validates.</summary>
         internal static List<int> QuestObjectivesOf(int template)

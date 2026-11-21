@@ -31,6 +31,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The mistake that kills: «Au troisième échec, le joueur est OS».</summary>
         public const int FatalMistake = 3;
 
+        /// <summary>
+        /// «Acalicanto» (22387): the look the Treasure's own 21349 puts on the chest on legs, the
+        /// one the client draws with legs (its 149, appearance 1877).
+        /// </summary>
+        public const int LegsSpell = 22387;
+
         public enum Outcome { Nothing, Right, Wrong, Fatal }
 
         private sealed class State
@@ -65,8 +71,13 @@ namespace Jondo.Unity.Server.Managers
             var chests = fight.Bando(target.TeamId).Where(f => IsChest(f.MonsterId) && f.IsAlive).ToList();
             if (chests.Count == 0) return Outcome.Nothing;
 
+            // The chest the player sees on legs is the one: the Treasure's 21349 put Acalicanto's
+            // look on it. Drawn by the server only when none wears it -- 21349 can name 7027 when
+            // it is not out yet --, or after a right blow (FightHandler moves the look after it).
             var state = _states.GetOrCreateValue(fight);
-            if (!chests.Any(c => c.Id == state.OnLegs)) state.OnLegs = chests[dice.Next(chests.Count)].Id;
+            var legged = chests.FirstOrDefault(WearsTheLegs);
+            if (legged != null) state.OnLegs = legged.Id;
+            else if (!chests.Any(c => c.Id == state.OnLegs)) state.OnLegs = chests[dice.Next(chests.Count)].Id;
 
             if (target.Id == state.OnLegs)
             {
@@ -79,7 +90,10 @@ namespace Jondo.Unity.Server.Managers
             return made >= FatalMistake ? Outcome.Fatal : Outcome.Wrong;
         }
 
-        /// <summary>For the tests: which chest is on legs now.</summary>
+        /// <summary>Whether a chest wears Acalicanto's look, the legs the client draws on it.</summary>
+        public static bool WearsTheLegs(Fighter chest) => chest.Buffs.Puestos.Any(row => row.HechizoOrigen == LegsSpell);
+
+        /// <summary>Which chest is on legs now, for the look to follow it and for the tests.</summary>
         internal static long OnLegs(FightInstance fight) => _states.TryGetValue(fight, out var state) ? state.OnLegs : 0;
     }
 }

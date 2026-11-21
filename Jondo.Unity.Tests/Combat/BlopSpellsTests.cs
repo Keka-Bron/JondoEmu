@@ -98,6 +98,35 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// A row with no duration and a trigger duration of one listens until its caster's turn in
+        /// the next round when it is on the caster himself -- the Sacurador's «when I am hit» --, and
+        /// only through the round of the cast when it is on somebody else.
+        /// </summary>
+        [Fact]
+        public void A_trigger_duration_row_lasts_to_the_casters_turn_only_on_the_caster()
+        {
+            const int spell = 990001, round = 3;
+            var blop = Blop(-4, Blopiseta, 290);
+            var me = Person(10, 262);
+            var listens = new SpellEffect { EffectId = 792, DiceNum = 1, DiceSide = 1, Triggers = "D",
+                                            Duration = 0, TriggerDuration = 1 };
+            var outcomes = new System.Collections.Generic.List<Outcome>
+            {
+                new() { Sobre = blop, Caster = blop, Efecto = listens, HechizoOrigen = spell, NivelOrigen = 1, FilaArmada = true },
+                new() { Sobre = me, Caster = blop, Efecto = listens, HechizoOrigen = spell, NivelOrigen = 1, FilaArmada = true },
+            };
+            FightHandler.EngancharLoPendiente(outcomes, spell, 1, blop.Id, round);
+
+            var onHimself = Assert.Single(blop.Buffs.ActiveSpells, h => h.Hechizo == spell);
+            Assert.True(onHimself.Vivo(round + 1));
+            Assert.False(onHimself.Vivo(round + 2));
+
+            var onTheOther = Assert.Single(me.Buffs.ActiveSpells, h => h.Hechizo == spell);
+            Assert.True(onTheOther.Vivo(round));
+            Assert.False(onTheOther.Vivo(round + 1));
+        }
+
+        /// <summary>
         /// Blifo's glyph burns whoever ends his turn ON it, and him alone: «Si un personnage termine
         /// son tour dedans, il subit 60 de dégâts». Its spell, 7176, draws the glyph's own cross; cast
         /// round a Blop ending its turn on one arm, that cross burnt the player standing next to the
