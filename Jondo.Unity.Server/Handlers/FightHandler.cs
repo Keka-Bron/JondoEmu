@@ -2562,10 +2562,11 @@ namespace Jondo.Unity.Server.Handlers
                 // one that disappeared from the map on winning was that first one, not the one he had
                 // clicked. With the ids now matching between the jss and the jpv the lookup should
                 // never fail; if it fails, what has to be done is say so, not attack another one.
+                // Nor a group of another map: a stale id the client still held, looked up in the
+                // whole world, started a fight here with the monsters of a map far away.
                 var mobs = MobSpawnManager.GetMobsForMap(GameState.MapId);
                 var mobGroup = mobContextId != 0
-                    ? (mobs.FirstOrDefault(m => m.MobId == mobContextId)
-                       ?? MobSpawnManager.GetMobGroupById(mobContextId))
+                    ? mobs.FirstOrDefault(m => m.MobId == mobContextId)
                     : null;
 
                 if (mobGroup != null)
