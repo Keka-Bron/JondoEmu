@@ -784,8 +784,18 @@ namespace Jondo.Unity.Server.Managers
 
         private static Dictionary<int, List<int>> _subareaRosters = new Dictionary<int, List<int>>();
 
+        /// <summary>The Kanojedo's punching bag: placed by hand there and in the dojo, never met in the wild.</summary>
+        internal const int PunchingBag = 494;
+
+        /// <summary>
+        /// Whether a subarea's roster may put a monster in its groups. The tables list the punching
+        /// bag in Amakna's subareas, and it came out, level 100 and ten thousand life points, among
+        /// the level-13 monsters of an ordinary map. A criminal of a wanted poster is placed apart.
+        /// </summary>
+        internal static bool Roams(int monster) => monster != PunchingBag && !WantedPosters.Is(monster);
+
         /// <summary>Who lives in each subarea: <c>Subareas.Monsters</c>, a JSON <c>{"Array":[...]}</c>.</summary>
-        private static Dictionary<int, List<int>> LoadSubareaRosters(SqliteConnection connection)
+        internal static Dictionary<int, List<int>> LoadSubareaRosters(SqliteConnection connection)
         {
             var rosters = new Dictionary<int, List<int>>();
             try
@@ -803,7 +813,7 @@ namespace Jondo.Unity.Server.Managers
                     rosters[reader.GetInt32(0)] = array.EnumerateArray()
                         .Where(e => e.ValueKind == System.Text.Json.JsonValueKind.Number)
                         .Select(e => e.GetInt32())
-                        .Where(id => !WantedPosters.Is(id))
+                        .Where(Roams)
                         .ToList();
                 }
             }

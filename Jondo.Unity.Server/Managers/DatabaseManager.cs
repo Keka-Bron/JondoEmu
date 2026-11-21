@@ -1303,7 +1303,7 @@ namespace Jondo.Unity.Server
                 int subAreaId = kvp.Value;
 
                 if (!subareas.TryGetValue(subAreaId, out var allowedMonsters) || allowedMonsters.Count == 0) continue;
-                var validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id) && id != 494).ToList();
+                var validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id) && id != MobSpawnManager.PunchingBag).ToList();
                 if (validMonsters.Count == 0) validMonsters = allowedMonsters.Where(id => monsters.ContainsKey(id)).ToList();
                 if (validMonsters.Count == 0) continue;
 
