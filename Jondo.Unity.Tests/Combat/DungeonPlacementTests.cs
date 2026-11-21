@@ -67,5 +67,45 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(monsters, defenders);
             }
         }
+
+        /// <summary>
+        /// Missiz Freezz's Frostforge (Frigost III on) puts each room's board on the room's own world
+        /// cell: a twin with the room's very name, its id six past the room's. Left off the file,
+        /// the first room was fought on itself, its fight drawn on the map's edge among the scenery.
+        /// </summary>
+        [Theory]
+        [InlineData(109838849, 109838855)]   // first room
+        [InlineData(109839873, 109839879)]   // second room
+        [InlineData(109840897, 109840903)]   // third room
+        [InlineData(109841921, 109841927)]   // fourth room
+        public void Each_Missiz_Freezz_room_fights_on_its_namesake_twin(long room, long board)
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (!MapManager.Maps.ContainsKey(board)) return;   // no data
+
+            Assert.Equal(board, DungeonPlacements.BoardOf(room));
+            Assert.Equal(board, MapManager.ResolveArenaMapId(room));
+        }
+
+        /// <summary>
+        /// A room with no board of its own -- Missiz Freezz's, the boss's -- is fought on itself, on
+        /// the cells it flags, the same every time, never drawn at random over its scenery.
+        /// </summary>
+        [Fact]
+        public void A_room_without_a_board_is_placed_on_its_own_flagged_cells()
+        {
+            const long BossRoom = 109840899;
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            DungeonManager.Initialize();
+            if (!DungeonManager.IsRoom(BossRoom) || MapPlacements.Of(BossRoom) is not { } own) return;
+            Assert.Equal(BossRoom, MapManager.ResolveArenaMapId(BossRoom));
+
+            for (int fight = 0; fight < 3; fight++)
+            {
+                var (attackers, defenders) = FightHandler.TakePlacement(BossRoom, BossRoom);
+                Assert.Equal(own.Blue, attackers);
+                Assert.Equal(own.Red, defenders);
+            }
+        }
     }
 }

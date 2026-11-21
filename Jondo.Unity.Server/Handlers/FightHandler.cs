@@ -1722,6 +1722,13 @@ namespace Jondo.Unity.Server.Handlers
             // the game does: the ones the client marks in the board's cellsData[] (DungeonPlacements).
             if (Managers.DungeonManager.IsRoom(mapId) && Managers.DungeonPlacements.Of(mapId, arenaMapId) is { } official)
                 return (official.Blue, official.Red);
+            // A room with no board of its own (most boss rooms, the expeditions) is fought on itself,
+            // on the cells it flags: drawn at random, the fight landed on the map's edge, among the
+            // scenery, where nobody could see it.
+            if (Managers.DungeonManager.IsRoom(mapId) && arenaMapId == mapId
+                && Managers.MapPlacements.Of(mapId) is { } own
+                && own.Blue.Count >= PlacementLayout.PerTeam && own.Red.Count >= PlacementLayout.PerTeam)
+                return (own.Blue, own.Red);
             return _nextPlacement.GetOrAdd(arenaMapId, arena => Drawn(mapId, arena, Random.Shared));
         }
 
@@ -8632,6 +8639,15 @@ namespace Jondo.Unity.Server.Handlers
                 // all three for them.
                 if (c.VidaQueSeVa > 0)
                 {
+                    // An invulnerable fighter loses none of it either, except to his own spell's cost:
+                    // the Verglasseur's Braquage took 75% of an invulnerable fighter's life through
+                    // the state, where every blow of the same fight was cancelled.
+                    if (c.Sobre != (c.Caster ?? quienLanza) && SpellStates.IsInvulnerable(c.Sobre))
+                    {
+                        Program.LogDebug($"[Fight] {c.Sobre.Id} is invulnerable: effect {c.Efecto.EffectId} " +
+                                         $"takes none of its {c.VidaQueSeVa} life.");
+                        continue;
+                    }
                     int leQuedaba = c.Sobre.CurrentHP;
                     // A spell's life cost is not soaked up by the shield it buys: Trance's "-70% PdV"
                     // on the Zobal and its shield on him resolve together, and the shield, already
@@ -10343,8 +10359,12 @@ namespace Jondo.Unity.Server.Handlers
             // nothing; against one who has had 300 of his cap eaten, it does 60.
             // Blows whose number is not the die grown by the caster: a share of a life, a fixed
             // amount, a share of the blow that set them off, so much per point spent.
-            bool deSuVida = Managers.EffectEngine.ModoDe(efecto.EffectId) != Managers.EffectEngine.ModoDeDano.Normal;
-            if (deSuVida)
+            bool deUnModo = Managers.EffectEngine.ModoDe(efecto.EffectId) != Managers.EffectEngine.ModoDeDano.Normal;
+            // The eroded share is one of them too: Represalias' 20% of 300 eroded is 60, not 60
+            // grown by the caster -- grown by a boss's 700 agility, Helada Mala's 35% of 980
+            // eroded came out at 7,881.
+            bool deSuVida = deUnModo || Managers.EffectEngine.PegaSegunLoErosionado(efecto.EffectId);
+            if (deUnModo)
             {
                 baseDamage = Managers.EffectEngine.BaseDelModo(efecto, sacadoDelDado, caster, target, fight);
                 Program.LogDebug($"[Fight] Effect {efecto.EffectId} ({Managers.EffectEngine.ModoDe(efecto.EffectId)}) " +

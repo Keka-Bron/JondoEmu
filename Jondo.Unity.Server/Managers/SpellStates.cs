@@ -85,6 +85,18 @@ namespace Jondo.Unity.Server.Managers
             return false;
         }
 
+        /// <summary>
+        /// Whether one of the fighter's states makes him invulnerable from every distance: the
+        /// life an effect takes away without a blow (the "-N% HP" of 1048, the "-N HP" of 1047)
+        /// does not get through it either.
+        /// </summary>
+        public static bool IsInvulnerable(Fighter who)
+        {
+            foreach (int stateId in who.Buffs.Estados)
+                if (Of(stateId) is { Invulnerable: true }) return true;
+            return false;
+        }
+
         /// <summary>Whether one of the fighter's states keeps him from being pushed or pulled.</summary>
         public static bool PinsInPlace(Fighter who)
         {
