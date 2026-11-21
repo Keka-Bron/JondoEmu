@@ -20,8 +20,12 @@ namespace Jondo.Unity.Server.Handlers
     /// </remarks>
     public static partial class DungeonHandler
     {
-        /// <summary>One of the group as the planning sees him: his keyring usable here, and how many of the dungeon's keys he has.</summary>
-        internal readonly record struct Member(long Id, bool Keyring, int Keys);
+        /// <summary>
+        /// One of the group as the planning sees him: his keyring usable here, how many of the
+        /// dungeon's keys he has, and whether a quest of his asks for a key to be handed to the
+        /// guardian -- Tassa's laboratory: the keyring does not stand in for it.
+        /// </summary>
+        internal readonly record struct Member(long Id, bool Keyring, int Keys, bool WantsKey = false);
 
         /// <summary>How a hero goes in: by his keyring, or by one key out of someone's bag.</summary>
         internal readonly record struct HeroWay(Heroes.Hero Hero, bool Keyring, long PaidBy);
@@ -38,10 +42,18 @@ namespace Jondo.Unity.Server.Handlers
 
             var plan = new Dictionary<long, long>();
             var waiting = new List<long>();
-            foreach (var hero in heroes)
+            // One whose quest wants the key goes in on a key while the group has one, and by his
+            // keyring only when it has none left: the others keep the keys for him.
+            foreach (var hero in heroes.Where(h => !h.WantsKey))
             {
                 if (hero.Keyring) plan[hero.Id] = 0;
                 else if (spare[hero.Id] > 0) { spare[hero.Id]--; plan[hero.Id] = hero.Id; }
+                else waiting.Add(hero.Id);
+            }
+            var wanting = heroes.Where(h => h.WantsKey).ToList();
+            foreach (var hero in wanting)
+            {
+                if (spare[hero.Id] > 0) { spare[hero.Id]--; plan[hero.Id] = hero.Id; }
                 else waiting.Add(hero.Id);
             }
 
@@ -52,9 +64,13 @@ namespace Jondo.Unity.Server.Handlers
             foreach (long hero in waiting)
             {
                 long payer = payers.FirstOrDefault(p => spare[p] > 0, 0);
-                if (payer == 0) { missing++; continue; }
-                spare[payer]--;
-                plan[hero] = payer;
+                if (payer != 0)
+                {
+                    spare[payer]--;
+                    plan[hero] = payer;
+                }
+                else if (wanting.Any(w => w.Id == hero && w.Keyring)) plan[hero] = 0;
+                else missing++;
             }
             return missing == 0 ? plan : null;
         }
@@ -73,7 +89,7 @@ namespace Jondo.Unity.Server.Handlers
         /// master's own way in takes one of his keys.
         /// </summary>
         private static async Task<List<HeroWay>?> WaysForHeroesAsync(NetworkStream stream, DungeonManager.Dungeon dungeon,
-                                                                     bool masterSpends, DateTime now)
+                                                                     bool masterSpends, DateTime now, int guardian = 0)
         {
             var state = SessionContext.State;
             var heroes = Following(state.CharacterId);
@@ -91,7 +107,8 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     bool keyring = dungeon.OnKeyring && FindInBag(Keyring, 1) != 0
                                    && DungeonKeyring.FreeEntryLeft(hero.CharacterId, dungeon.Id, now);
-                    members.Add(new Member(hero.CharacterId, keyring, KeysInBag(dungeon)));
+                    bool wantsKey = guardian != 0 && dungeon.Required.Any(r => Quests.AwaitsKey(guardian, r.Item));
+                    members.Add(new Member(hero.CharacterId, keyring, KeysInBag(dungeon), wantsKey));
                 }
             }
 

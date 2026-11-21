@@ -129,8 +129,10 @@ a member: class, level, life, AP, MP, initiative, prospecting and wisdom.
 
 **Share quest progress** is the checklist button on each connected hero. It starts eligible
 quests and advances matching objectives when the active character talks to an NPC, uses a
-quest object, reads a quest book the hero carries too, discovers a location, or wins a fight
-the hero joined. Each hero uses their own quest log, prerequisites and inventory, and receives
+quest object, reads a quest book the hero carries too or the notices of the map, hands his key
+to a dungeon's guardian, discovers a location, or wins a fight the hero joined. At such a door a
+hero whose quest wants the key goes in on a key -- his, else the group's -- rather than by his
+keyring. Each hero uses their own quest log, prerequisites and inventory, and receives
 their own quest rewards. Actions such as crafting and paid replies still require playing the
 character; a reply that only moves the master moves his heroes with him, and is shared.
 The switch starts **on** (Keka-Bron/JondoEmu#206: a forgotten switch left heroes behind unseen);

@@ -595,6 +595,62 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The other readings: a book of the bag bound to its objective (the legend of Stiff Yob,
+        /// 5511) goes to the heroes who carry it too, and the elements of the map read by the master
+        /// (Ternette's notice, 9772) to the heroes beside him.
+        /// </summary>
+        [Fact]
+        public async Task A_book_or_a_notice_read_by_the_master_is_read_by_his_heroes()
+        {
+            const int legendQuest = 894, legendStep = 1510, metYob = 5510, readLegend = 5511, legend = 13176;
+            const int noticeQuest = 1634, noticeStep = 2254, readNotice = 9772, notice = 489508;
+            QuestEngine.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 17, "Lector-" + tag, 8);
+            long carries = Character(Account + 17, "Libro-" + tag, 1);
+            long without = Character(Account + 17, "Nada-" + tag, 1);
+            foreach (long character in new[] { master, carries, without })
+            {
+                DatabaseManager.SaveQuestProgress(character, new DatabaseManager.QuestRow(legendQuest, legendStep, metYob.ToString(), false));
+                DatabaseManager.SaveQuestProgress(character, new DatabaseManager.QuestRow(noticeQuest, noticeStep, "", false));
+            }
+            await using var pipe = await ClientPipe.OpenAsync(Account + 17, master, Map, "Lector-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, carries));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, without));
+                var withIt = Heroes.SessionOf(carries)!;
+                var withoutIt = Heroes.SessionOf(without)!;
+                using (SessionContext.Push(pipe.Session))
+                {
+                    QuestEngine.LoadFrom(master);
+                    Assert.True(await Equipment.GiveAsync(pipe.ToClient, legend, 1));
+                    using (SessionContext.Push(withIt)) Assert.True(await Equipment.GiveAsync(withIt, legend, 1));
+
+                    await QuestEngine.OnItemReadAsync(pipe.Session, legend);
+                    Assert.True(QuestEngine.Log!.ObjectiveDone(readLegend));
+                    Assert.True(withIt.State.Quests!.ObjectiveDone(readLegend));
+                    Assert.False(withoutIt.State.Quests!.ObjectiveDone(readLegend));
+                    var lag = Assert.Single(Heroes.LagsOf(pipe.Session, without), l => l.QuestId == legendQuest);
+                    Assert.Equal((Heroes.QuestLagReason.MissingItems, legend), (lag.Reason, lag.ItemId));
+
+                    pipe.Session.State.ElementsUsed.Add(notice);
+                    await QuestEngine.OnReadAsync(pipe.Session, Map);
+                    Assert.True(QuestEngine.Log.ObjectiveDone(readNotice));
+                    Assert.True(withIt.State.Quests.ObjectiveDone(readNotice));
+                    Assert.True(withoutIt.State.Quests!.ObjectiveDone(readNotice));
+                }
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, carries, without })
+                    DatabaseManager.DeleteCharacter(character, Account + 17);
+            }
+        }
+
+        /// <summary>
         /// Incarnam's portal: the reply that crosses it does «Utiliza el portal para ir a Astrub»
         /// (13931) for the heroes too, who go through with their master -- they were taken to Astrub
         /// with nothing ticked, each to be brought back to cross it alone (dagostin, 2026-11-21).
