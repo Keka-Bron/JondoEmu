@@ -62,6 +62,20 @@ namespace Jondo.Unity.Server.Network
             // back -- changing character is how another of it is taken in hand.
             if (session.State.CharacterId > 0) Managers.Heroes.DisconnectAll(session);
 
+            // A turn of his that the fight is waiting on stops waiting for a client that is gone.
+            if (session.State.CharacterId > 0)
+            {
+                try
+                {
+                    using (SessionContext.Push(session))
+                        await FightHandler.HisClientLeftAsync(session);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{listener}] Could not cut the turn of session {session.Id}: {ex.Message}");
+                }
+            }
+
             if (session.State.CharacterId > 0)
             {
                 try

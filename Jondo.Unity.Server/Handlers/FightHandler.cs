@@ -3770,6 +3770,55 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether the client that plays this character is connected. A summon's owner is asked
+        /// in <see cref="TurnDeciseconds"/> itself; a monster and a JondoBot have no client to wait for.
+        /// </summary>
+        private static bool HisClientIsThere(Fighter fighter)
+            => fighter.IsMonster || fighter.EsInvocado || fighter.IsBot
+               || SessionRegistry.FindByCharacter(PlayerOf(fighter)) != null;
+
+        /// <summary>
+        /// His client is gone while the fight waits on him -- his own turn, or one of a summon he
+        /// plays --: what is left of that turn is cut to the length of a turn nobody plays.
+        /// </summary>
+        /// <remarks>
+        /// On a test server a character's turn is the harness hour (<see cref="HarnessTurnDeciseconds"/>).
+        /// A client closed in the middle of its turn left the fight waiting that hour, and the next
+        /// hour on every turn of his after it; a dungeon's boss group stayed "already being fought"
+        /// for everybody else all that time. The fight goes on without him (SessionTeardown), at
+        /// the real game's pace, and he can still come back to it.
+        /// </remarks>
+        internal static async Task HisClientLeftAsync(GameSession session)
+        {
+            long me = session.State.CharacterId;
+            var fight = me > 0 ? FightOf(me) : null;
+            if (fight == null || fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return;
+
+            await InTurnAsync(fight, () =>
+            {
+                var current = fight.CurrentFighter;
+                var announced = fight.LastAnnouncedTurn;
+                if (current == null || !announced.Announced || announced.FighterId != current.Id
+                    || announced.Round != fight.RoundNumber)
+                    return Task.CompletedTask;
+
+                var player = current.EsInvocado ? fight.Buscar(current.Invocador) : current;
+                if (player == null || player.IsMonster || PlayerOf(player) != me) return Task.CompletedTask;
+
+                var now = DateTime.UtcNow;
+                int unplayed = current.EsInvocado ? Network.FightProtocol.SummonTurnDeciseconds
+                                                  : TurnDeciseconds(fight, current, harness: false);
+                if (announced.RemainingDeciseconds(now) <= unplayed) return Task.CompletedTask;
+
+                fight.LastAnnouncedTurn = announced with { Deciseconds = unplayed, StartedUtc = now, Carried = 0 };
+                ArrancarElReloj(session.Stream, fight, current, unplayed);
+                Program.LogDebug($"[Fight] {me}'s client left in the turn of {current.Id}: " +
+                                 $"{unplayed} tenths left of it.");
+                return Task.CompletedTask;
+            });
+        }
+
+        /// <summary>
         /// The client has confirmed (jwz). Now the turn is given to whoever is next.
         /// </summary>
         public static Task ConfirmAsync(NetworkStream stream) => ConfirmAsync(stream, everyoneAnswered: false);
@@ -3857,7 +3906,8 @@ namespace Jondo.Unity.Server.Handlers
             // A choice he has left unanswered is made for him before he plays.
             await ChooseBeforeHisTurnAsync(stream, fight, fighter);
 
-            int duration = TurnDeciseconds(fight, fighter, harness: Network.ControlApi.TestKey.Length > 0);
+            int duration = TurnDeciseconds(fight, fighter,
+                harness: Network.ControlApi.TestKey.Length > 0 && HisClientIsThere(fighter));
 
             // A turn of his, or of a summon he drives, for the per-turn averages of the end.
             if (!fighter.IsMonster || Dueno(fight, fighter) != null)
