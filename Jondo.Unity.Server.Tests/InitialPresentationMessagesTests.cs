@@ -45,7 +45,7 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(-1, messages.Capabilities().GuildEmblemSymbolCategory);
         var colors = messages.Colors().CharacterColors!;
         Assert.Equal(1, colors.SlotsUnlocked);
-        Assert.Equal(1, colors.SlotsTotal);
+        Assert.Equal(Jondo.Unity.Server.Managers.ColorPaletteManager.TotalSlots, colors.SlotsTotal);
         var defaults = Jondo.Unity.Server.Managers.BreedLookCatalog.Get(character.Breed, character.Sex)!.Colors;
         Assert.Equal(new[] { 0x112233, (int)defaults[1], 0xABCDEF, (int)defaults[3], 0, 0xFFFFFF },
             Assert.Single(colors.ColorPalettes).Colors);
@@ -55,6 +55,13 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(0x112233, colors.ColorPalettes[0].Colors[0]);
         Assert.Equal(0xABCDEF, colors.ColorPalettes[0].Colors[2]);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(206)]
+    [InlineData(int.MaxValue)]
+    public void Shared_legacy_writer_also_omits_the_unused_ornament_value(int value)
+        => Assert.Empty(ConnectionProtocol.BuildOrnamentUpdated(value));
 
     [Fact]
     public void Aura_carries_the_main_aura_and_none_is_absent()

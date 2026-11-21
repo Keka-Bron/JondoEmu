@@ -408,10 +408,10 @@ namespace Jondo.Unity.Server.Network
         /// derived from the character's id: constant for him and different from anyone else's. If the
         /// client does not check it, it does not matter; if it checks it, at least it is consistent.
         /// </summary>
-        public static byte[] BuildLookChanged(DbCharacter character)
+        public static byte[] BuildLookChanged(DbCharacter character, IReadOnlyList<long>? draftColors = null)
             => Pb.New()
                 .Str(1, LookIdOf(character.Id))
-                .Bytes(2, CharacterLookBuilder.BuildLook(character, paraLaVentana: true))
+                .Bytes(2, CharacterLookBuilder.BuildLook(character, paraLaVentana: true, onFoot: false, draftColors))
                 .Build();
 
         /// <summary>
@@ -925,6 +925,12 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         internal static Pb? EffectEntry(Managers.Equipment.ItemEffect effect)
             => ItemEffectMessages.FromCatalogue.Effect(effect) is { } entry ? ItemEffectMessages.Write(entry) : null;
+
+        // ─── World: titles and ornaments ────────────────────────────────────────
+
+        public static byte[] BuildOrnamentUpdated(int ornamentId)
+            // Unused by project policy; see docs/populated-unmapped-fields.md#after-selection-omission-policy.
+            => Array.Empty<byte>();
 
         // ─── World: merkasako ───────────────────────────────────────────────────
 

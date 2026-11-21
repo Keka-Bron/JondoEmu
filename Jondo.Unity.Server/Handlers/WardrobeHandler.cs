@@ -99,7 +99,46 @@ namespace Jondo.Unity.Server.Handlers
             Wardrobe.SaveTitle(who, SessionContext.State.WardrobeDraftTitle);
             Wardrobe.SaveOrnament(who, SessionContext.State.WardrobeDraftOrnament);
 
+            if (SessionContext.State.WardrobeDraftColors != null && SessionContext.State.WardrobeDraftColors.Count > 0)
+            {
+                var draftColors = SessionContext.State.WardrobeDraftColors;
+                DatabaseManager.SaveCharacterColors(who, CharacterColors.FromRgb(draftColors));
+                var updatedChar = DatabaseManager.GetCharacterById(who);
+                if (updatedChar != null)
+                {
+                    int paletteIdx = SessionContext.State.WardrobeDraftPaletteIndex;
+                    if (paletteIdx < 0)
+                    {
+                        paletteIdx = ColorPaletteManager.FindMatchingPaletteIndex(who, draftColors);
+                        if (paletteIdx < 0)
+                        {
+                            int unlocked = ColorPaletteManager.GetSlotsUnlocked(who);
+                            var currentPalettes = ColorPaletteManager.GetPalettes(updatedChar);
+                            if (currentPalettes.Count < unlocked)
+                            {
+                                paletteIdx = currentPalettes.Count;
+                            }
+                            else
+                            {
+                                paletteIdx = 0;
+                            }
+                        }
+                    }
+                    var paletteColors = Network.InitialPresentationMessages.Palette(CharacterLookBuilder.SavedColors(updatedChar));
+                    ColorPaletteManager.SavePalette(who, paletteIdx, paletteColors);
+                    await owner.SendAsync(ColorPaletteManager.BuildAppearanceEvent(updatedChar));
+                }
+                SessionContext.State.WardrobeDraftColors = null;
+                SessionContext.State.WardrobeDraftPaletteIndex = -1;
+            }
+
+            if (CharacterRemodel.PendingOf(who) is CharacterRemodel.Change.Colors or CharacterRemodel.Change.Face)
+            {
+                CharacterRemodel.Clear(who);
+            }
+
             await AnnounceAsync(owner);
+            if (owner.Stream != null) await SlotLookHandler.RedrawAsync(owner.Stream);
 
             await owner.SendAsync(
                 ConnectionProtocol.Answer(Op.Lyu, Pb.New().Var(1, 1).Build(),

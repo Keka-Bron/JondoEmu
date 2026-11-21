@@ -24,7 +24,7 @@ internal sealed class InitialPresentationMessages(
 
     internal static InitialPresentationMessages Live(DbCharacter character) => new(
         () => new(AllowedEmblemCategories),
-        () => new(new(PaletteSlots, [new(Palette(CharacterLookBuilder.SavedColors(character)))], PaletteSlots)),
+        () => ColorPaletteManager.BuildAppearanceEvent(character),
         () => new(GuildPolicy()),
         () => Aura(Wardrobe.AuraOf(character.Id)),
         () => new(ConnectionProtocol.LookIdOf(character.Id), CharacterLookBuilder.SemanticLook(character, paraLaVentana: true)));

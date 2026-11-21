@@ -355,6 +355,8 @@ namespace Jondo.Unity.Server
         public int WardrobeDraftTitle { get; set; }
         public int WardrobeDraftOrnament { get; set; }
         public bool IsWardrobeDraftLoaded { get; set; }
+        public List<long>? WardrobeDraftColors { get; set; }
+        public int WardrobeDraftPaletteIndex { get; set; } = -1;
         public long OpenNpcShopId { get; set; }
         public int OpenNpcShopNpcId { get; set; }
 
