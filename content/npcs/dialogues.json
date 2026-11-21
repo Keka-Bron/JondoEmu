@@ -54079,6 +54079,341 @@
         }
       ],
       "why": "Inès Karcel in the Fábrica de Malefíscof's exit room (130287616), her second opening in the client (dialog 5847): «Gracias por habernos ayudado con tanto fervor, he apuntado lo que no les funcionaba bien a los cofrefuertes...» (17884), and «Salir.» (21430) leaves the dungeon (content/world/dungeon_exits.json): «Parlez de nouveau à Inès Karcel pour sortir», whose picture shows her in «Fabrique de Malléfisk - Sortie» with «Sortir.» (Dofus pour les noobs, «Fabrique de Malléfisk»)."
+    },
+    {
+      "npc": 2397,
+      "map": 128977922,
+      "opening": 17532,
+      "lines": [
+        {
+          "message": 17532,
+          "choices": [
+            { "reply": 20997, "next": 17533 },
+            { "reply": 21171, "next": 17661, "quest": 1507, "afterObjective": 8502, "showsNpc": 2402, "completes": 8503, "params": [[30, 8503]] }
+          ]
+        },
+        {
+          "message": 17533,
+          "choices": [
+            { "reply": 20996, "next": 17534 }
+          ]
+        },
+        {
+          "message": 17534,
+          "choices": [
+            { "reply": 20995, "startsQuest": 1507, "params": [[34, 1507]] }
+          ]
+        },
+        {
+          "message": 17661,
+          "choices": []
+        }
+      ],
+      "why": "Graverg at the Cantera aurífera [3,-4], who gives «Las grandes galerías» (1507): «Parlez à Grabergue en [3,-4] pour savoir quel genre de travaux ils font dans le coin» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Se renseigner sur les travaux.» (20997, 17533), «Demander si tout se passe bien.» (20996, 17534: miners trapped by a rockfall) and «Accepter.» (20995). Back with the tamed perforatroces, «Donner les Phorreurs apprivoisés.» (21171) hands them over (8503, a bring objective: Graverg keeps the follower 15311, «ya están al pie del cañón», 17661) and Williamwadui comes up: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (17661: «Williamwadui, ¿has conseguido arreglártelas?»)."
+    },
+    {
+      "npc": 2399,
+      "map": 128977924,
+      "opening": 17662,
+      "lines": [
+        {
+          "message": 17662,
+          "choices": [
+            { "reply": 21177, "next": 17663, "quest": 1507, "beforeObjective": 8500 }
+          ]
+        },
+        {
+          "message": 17663,
+          "choices": [
+            { "reply": 21176, "next": 17664, "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21182, "next": 17675, "quest": 1507, "beforeObjective": 8500 }
+          ]
+        },
+        {
+          "message": 17664,
+          "choices": [
+            { "reply": 21173, "next": 17665, "criterion": "OA=1083", "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21173, "next": 17667, "criterion": "OA!1083", "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21175, "next": 17668, "criterion": "OA!1083", "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21175, "next": 17670, "criterion": "OA=1083", "quest": 1507, "beforeObjective": 8500 }
+          ]
+        },
+        {
+          "message": 17665,
+          "choices": [
+            { "reply": 21172, "next": 17666, "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21178, "next": 17671, "quest": 1507, "beforeObjective": 8501, "completes": 8500, "params": [[30, 8500]] },
+            { "reply": 21179, "next": 17673, "quest": 1507, "afterObjective": 8501, "completes": 8500, "params": [[30, 8500]] }
+          ]
+        },
+        {
+          "message": 17666,
+          "choices": [
+            { "reply": 21172, "next": 17666, "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21178, "next": 17671, "quest": 1507, "beforeObjective": 8501, "completes": 8500, "params": [[30, 8500]] },
+            { "reply": 21179, "next": 17673, "quest": 1507, "afterObjective": 8501, "completes": 8500, "params": [[30, 8500]] }
+          ]
+        },
+        {
+          "message": 17668,
+          "choices": [
+            { "reply": 21174, "next": 17669, "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21180, "next": 17672, "quest": 1507, "beforeObjective": 8501, "completes": 8500, "params": [[30, 8500]] },
+            { "reply": 21181, "next": 17674, "quest": 1507, "afterObjective": 8501, "completes": 8500, "params": [[30, 8500]] }
+          ]
+        },
+        {
+          "message": 17669,
+          "choices": [
+            { "reply": 21174, "next": 17669, "quest": 1507, "beforeObjective": 8500 },
+            { "reply": 21180, "next": 17672, "quest": 1507, "beforeObjective": 8501, "completes": 8500, "params": [[30, 8500]] },
+            { "reply": 21181, "next": 17674, "quest": 1507, "afterObjective": 8501, "completes": 8500, "params": [[30, 8500]] }
+          ]
+        },
+        {
+          "message": 17667,
+          "choices": []
+        },
+        {
+          "message": 17670,
+          "choices": []
+        },
+        {
+          "message": 17675,
+          "choices": []
+        },
+        {
+          "message": 17671,
+          "choices": []
+        },
+        {
+          "message": 17672,
+          "choices": []
+        },
+        {
+          "message": 17673,
+          "choices": []
+        },
+        {
+          "message": 17674,
+          "choices": []
+        }
+      ],
+      "why": "Draifontein at [3,-3], for «Las grandes galerías» (1507, 8500): «Il va vous falloir répondre correctement à toutes ces questions et ne pas lui mentir. Avouez donc être avec les Voyageurs Dimensionnels, dite si oui ou non vous avez vaincu le Phossile, et supposez que les mineurs lui seront reconnaissant de son aide» (Dofus pour les noobs, «Les grandes galeries»). «Hablarle del problema de los mineros» (21177); «Sí» (21176) to being with the travellers, «No» (21182) is a lie he saw through (17675: he saw you come through their portal). On Perfósil, «Sí» (21173) and «No» (21175) are true or false by the dungeon's achievement (1083, «Vencer a Perfósil en su mazmorra»): the truth gets «Eso pensaba» (17665, 17668), a lie «no me gustan ni los mentirosos» (17667, 17670). Then kamas (21172, 21174) get «No me lo trago. Inténtalo otra vez.» (17666, 17669) and the same question, and supposing the miners will share their profit is 8500: «Supones mucho, pero no confirmas nada» (17671, 17672), or, with Foolk already convinced (8501), the same sending you to Yanocoche (17673, 17674) -- the guide's picture, Draifontein seen first, has the one without Yanocoche."
+    },
+    {
+      "npc": 2400,
+      "map": 128976900,
+      "opening": 17680,
+      "lines": [
+        {
+          "message": 17680,
+          "choices": [
+            { "reply": 21193, "next": 17681, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17681,
+          "choices": [
+            { "reply": 21187, "next": 17682, "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21192, "next": 17683, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17682,
+          "choices": []
+        },
+        {
+          "message": 17683,
+          "choices": [
+            { "reply": 21190, "next": 17684, "criterion": "PO>15206,10", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21190, "next": 17688, "criterion": "PO<15206,11", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21202, "next": 17694, "criterion": "PO<15206,11", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21202, "next": 17698, "criterion": "PO>15206,10", "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17684,
+          "choices": [
+            { "reply": 21191, "next": 17685, "criterion": "Qo>8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21191, "next": 17689, "criterion": "Qo<8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21580, "next": 17982, "criterion": "Qo<8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21580, "next": 17985, "criterion": "Qo>8484", "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17694,
+          "choices": [
+            { "reply": 21201, "next": 17695, "criterion": "Qo>8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21201, "next": 17699, "criterion": "Qo<8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21613, "next": 18008, "criterion": "Qo<8484", "quest": 1507, "beforeObjective": 8501 },
+            { "reply": 21613, "next": 18011, "criterion": "Qo>8484", "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17685,
+          "choices": [
+            { "reply": 21188, "next": 17686, "quest": 1507, "beforeObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21189, "next": 17687, "quest": 1507, "afterObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21194, "next": 17690, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17695,
+          "choices": [
+            { "reply": 21198, "next": 17696, "quest": 1507, "beforeObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21199, "next": 17697, "quest": 1507, "afterObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21200, "next": 17700, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17982,
+          "choices": [
+            { "reply": 21577, "next": 17983, "quest": 1507, "beforeObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21578, "next": 17984, "quest": 1507, "afterObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21579, "next": 17986, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 18008,
+          "choices": [
+            { "reply": 21610, "next": 18009, "quest": 1507, "beforeObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21611, "next": 18010, "quest": 1507, "afterObjective": 8500, "completes": 8501, "params": [[30, 8501]] },
+            { "reply": 21612, "next": 18012, "quest": 1507, "beforeObjective": 8501 }
+          ]
+        },
+        {
+          "message": 17686,
+          "choices": []
+        },
+        {
+          "message": 17687,
+          "choices": []
+        },
+        {
+          "message": 17696,
+          "choices": []
+        },
+        {
+          "message": 17697,
+          "choices": []
+        },
+        {
+          "message": 17983,
+          "choices": []
+        },
+        {
+          "message": 17984,
+          "choices": []
+        },
+        {
+          "message": 18009,
+          "choices": []
+        },
+        {
+          "message": 18010,
+          "choices": []
+        },
+        {
+          "message": 17688,
+          "choices": []
+        },
+        {
+          "message": 17689,
+          "choices": []
+        },
+        {
+          "message": 17690,
+          "choices": []
+        },
+        {
+          "message": 17698,
+          "choices": []
+        },
+        {
+          "message": 17699,
+          "choices": []
+        },
+        {
+          "message": 17700,
+          "choices": []
+        },
+        {
+          "message": 17985,
+          "choices": []
+        },
+        {
+          "message": 17986,
+          "choices": []
+        },
+        {
+          "message": 18011,
+          "choices": []
+        },
+        {
+          "message": 18012,
+          "choices": []
+        }
+      ],
+      "why": "Foolk at [2,-3], for «Las grandes galerías» (1507, 8501): «Parlez à Foolk des mineurs prisonniers de la roche. Encore une fois il va falloir lui dire toute la vérité ... Question sur l'Orichor : ... répondre Oui si vous vous en avez plus de 10 et Non si vous en avez moins ou 10. Question sur le Koffromage : ... si vous avez déjà terminé la quête Trésorphelinat, si tel est le cas, répondez Oui, sinon répondez Non» (Dofus pour les noobs, «Les grandes galeries»). «Hablarle del problema de los mineros» (21193); «Insistir mucho más» (21187) gets «Háblale a la pala» (17682), the other (21192) the game (17683). More than ten Oricor (15206) or not: «Sí» (21190) and «No» (21202) lead to the Quesofre's question (17684, 17694) or to «Mientes como un arrancador de dientes de oro» (17688, 17698); the Quesofre is the one of «Tesorfanato» (1505, 8484): «Sí» (21191, 21201) and «No» (21580, 21613) lead to «¿qué consigo yo?» (17685, 17695, 17982, 18008) or to a lie (17689, 17699, 17985, 18011). There, «La verdad es que no lo sé» is 8501 -- the guide's «Avouer ne pas le savoir» gets «Tu m'as convaincu» --, said without Yanocoche (17686, 17696, 17983, 18009) or, Draifontein already convinced (8500), with his perforatroces (17687, 17697, 17984, 18010), the guide's picture; «Su eterno reconocimiento» is a lie (17690, 17700, 17986, 18012)."
+    },
+    {
+      "npc": 2401,
+      "map": 128974848,
+      "opening": 17706,
+      "lines": [
+        {
+          "message": 17706,
+          "choices": [
+            { "reply": 21213, "next": 17707, "quest": 1507, "afterObjectives": [8500, 8501], "beforeObjective": 8503 }
+          ]
+        },
+        {
+          "message": 17707,
+          "choices": [
+            { "reply": 21212, "next": 17708, "quest": 1507, "afterObjectives": [8500, 8501], "beforeObjective": 8503 }
+          ]
+        },
+        {
+          "message": 17708,
+          "choices": [
+            { "reply": 21211, "next": 17709, "quest": 1507, "afterObjectives": [8500, 8501], "gives": 15311, "completes": 8502, "params": [[30, 8502]] },
+            { "reply": 21216, "next": 17711, "quest": 1507, "afterObjective": 8502, "beforeObjective": 8503, "criterion": "PO!15311" }
+          ]
+        },
+        {
+          "message": 17709,
+          "choices": []
+        },
+        {
+          "message": 17711,
+          "choices": [
+            { "reply": 21214, "buyPrice": 6000, "gives": 15311, "quest": 1507, "afterObjective": 8502, "beforeObjective": 8503, "criterion": "PO!15311" },
+            { "reply": 21215, "quest": 1507, "afterObjective": 8502, "beforeObjective": 8503, "criterion": "PO!15311" }
+          ]
+        }
+      ],
+      "why": "Yanocoche at [0,-5], for «Las grandes galerías» (1507, 8502), once Draifontein and Foolk are convinced (8500, 8501): «Allez maintenant auprès de Yanacoché en [0,-5] pour lui demander de vous prêter des phorreurs. Parlez lui donc du problème des mineurs à lui aussi ... Vous obtenez donc 3 phorreurs apprivoisés en personnages suiveurs» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Parler du problème des mineurs.» (21213, 17707), «Recentrer la discussion sur les mineurs en danger.» (21212, 17708), «Demander l'aide de ses Phorreurs» (21211, 17709): the follower 15311. Lost before Graverg has them, they cost what he warns: «Ya te lo había dicho: te costará 6000 kamas» (21216, 17711), «Pagar los 6000 kamas» (21214) or «Ir a buscar kamas» (21215)."
+    },
+    {
+      "npc": 2402,
+      "map": 128977922,
+      "opening": 17535,
+      "lines": [
+        {
+          "message": 17535,
+          "choices": [
+            { "reply": 20999, "next": 17536, "quest": 1507, "afterObjective": 8503, "beforeObjective": 8504 }
+          ]
+        },
+        {
+          "message": 17536,
+          "choices": [
+            { "reply": 20998, "quest": 1507, "afterObjective": 8503, "completes": 8504, "params": [[30, 8504]] }
+          ]
+        }
+      ],
+      "why": "Williamwadui beside Graverg at [3,-4], for «Las grandes galerías» (1507, 8504): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous. En guise de sa reconnaissance, il vous offre un précieux joyaux et la quête se termine» (Dofus pour les noobs, «Les grandes galeries»): «Demander si tout va bien.» (20999), «Sí, creo que te debo una ... acepta esta magnífica joya» (17536), «Agarra la joya.» (20998); the jewel (15318) is the step's reward."
     }
   ]
 }

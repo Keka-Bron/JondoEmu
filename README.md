@@ -720,8 +720,8 @@ played through.
 | Frigost Island | `███░░░░░░░` **27%** | 61/228 |
 | Astrub | `██████████` **100%** | 51/51 |
 | Class Temple | `██████████` **100%** | 39/39 |
+| World Quests | `██░░░░░░░░` **25%** | 36/145 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
-| World Quests | `██░░░░░░░░` **23%** | 33/145 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
@@ -739,9 +739,10 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
+| Enurado | `█░░░░░░░░░` **12%** | 4/33 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
 | Archipelago of Vulkania | `░░░░░░░░░░` **2%** | 1/60 |
-| **All quests** | **22.8%** | **450/1976** |
+| **All quests** | **23.1%** | **457/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

@@ -6542,6 +6542,28 @@
       "cell": 286,
       "orientation": 1,
       "why": "Inès Karcel in the Fábrica de Malefíscof's exit room (130287616), who lets the winners out with «Salir.» (21430): «Parlez de nouveau à Inès Karcel pour sortir» (Dofus pour les noobs, «Fabrique de Malléfisk»). INFERRED cell: the guide's picture has her on the open floor above the emblem, by the left gate and up and right of Malefíscof (369); 286 is that floor, clear of the pillar."
+    },
+    {
+      "map": 128977924,
+      "npc": 2399,
+      "cell": 334,
+      "orientation": 3,
+      "why": "Draifontein at the Cantera aurífera [3,-3], the map through Graverg's right-hand door (484981): «Commencez par aller sur la map de droite afin de parler du problème à Drayefontaine» (Dofus pour les noobs, «Les grandes galeries»), whose pictures of [3,-3] have him beside the cart with the lamp on the right-hand rails. INFERRED cell: that spot, right of the lamp."
+    },
+    {
+      "map": 128977922,
+      "npc": 2402,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qo>8503|Qa=1508|Qf=1508|Qa=1509|Qf=1509",
+      "why": "Williamwadui at the Cantera aurífera [3,-4] once the tamed perforatroces are handed to Graverg (1507, 8503): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (Dofus pour les noobs, «Les grandes galeries»), and he stays for «Un corazón de oro» (1508) and «Maldita generosidad» (1509), whose giver he is; the derived placement on 427 is put aside below, since it showed him during the whole of 1507. INFERRED cell: the guide's picture has him two tiles left of Graverg (412)."
+    },
+    {
+      "map": 128977922,
+      "npc": 2402,
+      "cell": 427,
+      "remove": true,
+      "why": "The derived placement of Williamwadui by Graverg (criterion «(PL>129&Qf=1508)|Qa=1509|Qf=1509|Qa=1507|Qf=1507») showed him from the start of «Las grandes galerías» (1507); he is the one rescued at its end: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (Dofus pour les noobs, «Les grandes galeries»). He stands on 397 instead, from 8503 on."
     }
   ]
 }

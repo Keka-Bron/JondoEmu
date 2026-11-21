@@ -7086,6 +7086,27 @@
    "afterObjectives": [8482],
    "showsNpc": 2390,
    "why": "«Finge que te ahogas en kamas movedizos»: «Une fois sur la map, cliquez sur le tas de pièces. Un Koffromage apparait alors sur votre droite» (Dofus pour les noobs, «Trésorphelinat»): the pile 485005 (graphic 45138) on cell 362, by the last gate, which the guide's picture rings."
+  },
+  {
+   "objective": 8502,
+   "quest": 1507,
+   "kind": "order",
+   "afterObjectives": [8500, 8501],
+   "why": "«Las grandes galerías»: Yanocoche comes once Draifontein and Foolk are convinced; the guide's journal shows «Aller voir Drayefontaine» and «Aller voir Foolk» alone, then «Aller voir Yanacoché» under them."
+  },
+  {
+   "objective": 8503,
+   "quest": 1507,
+   "kind": "order",
+   "afterObjectives": [8502],
+   "why": "«Las grandes galerías»: the perforatroces are brought back once Yanocoche has lent them."
+  },
+  {
+   "objective": 8504,
+   "quest": 1507,
+   "kind": "order",
+   "afterObjectives": [8503],
+   "why": "«Las grandes galerías»: Williamwadui comes up once the perforatroces are with Graverg."
   }
 ]
 }
