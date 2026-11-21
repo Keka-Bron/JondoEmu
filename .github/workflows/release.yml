@@ -35,6 +35,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       version: ${{ steps.version.outputs.version }}
       sha: ${{ steps.version.outputs.sha }}
+      release_id: ${{ steps.draft.outputs.id }}
 
     steps:
       - name: Check the commit input
@@ -142,6 +143,7 @@ jobs:
       # what the launcher fetches by itself, and nothing on the page tells them apart otherwise.
       # GitHub puts the generated notes after this body.
       - name: Create draft release
+        id: draft
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.version.outputs.tag }}
@@ -207,8 +209,16 @@ jobs:
               'Jondo Emulator Launcher' = "$published/Jondo.Unity.Launcher/release_linux-x64/Jondo Emulator Launcher"
               'Jondo Studio' = "$published/Jondo.Unity.Studio/release_linux-x64/Jondo Studio"
             }
+      # By the draft's id, not its tag: a draft has no tag yet, so an older draft of the same
+      # version (one never published) answers to it too, and `gh release upload <tag>` took the
+      # first one -- whose Linux files were already there.
       - name: Attach the Linux files to the draft release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ needs.release.outputs.tag }}
-        run: gh release upload "$TAG" host-artifacts/release/*
+          RELEASE_ID: ${{ needs.release.outputs.release_id }}
+        run: |
+          for file in host-artifacts/release/*; do
+            name=$(basename "$file")
+            curl --fail-with-body -sS -X POST               -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"               -H "Content-Type: application/octet-stream" --data-binary @"$file"               "https://uploads.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID/assets?name=$(jq -rn --arg n "$name" '$n|@uri')"               > /dev/null
+            echo "Attached $name"
+          done
