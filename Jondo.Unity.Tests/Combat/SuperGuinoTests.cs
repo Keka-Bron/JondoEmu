@@ -95,14 +95,14 @@ namespace Jondo.Unity.Tests.Combat
             fight.AddMonster(boss);
             fight.AddMonster(ally);
             fight.StartFight();
-            int n = 100;
+            // Numbered by the fight, as every row is: what was put before his death began is his.
             foreach (int dispellable in new[] { 1, 2, 3, 4 })
             {
                 boss.Buffs.Poner(new Buff
                 {
                     EffectId = 118, Caracteristica = 10, Cuanto = dispellable, Dispellable = dispellable,
                     Quien = ally.Id, HechizoOrigen = 9000 + dispellable, CaducaEnRonda = -1,
-                }, () => ++n);
+                }, fight.SiguienteEmbrujo);
             }
 
             await FightHandler.TestKillAsync(null, fight, ally, character);

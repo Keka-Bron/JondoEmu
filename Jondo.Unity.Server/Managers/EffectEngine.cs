@@ -3541,6 +3541,20 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
+                // "Invoca al último aliado muerto" brings ONE back per cast, as a summon comes out
+                // once: its zone is where he comes back, not a list of whom it is done to. Per
+                // fighter reached, Sylargh's Nécromignon (1034 over C10 from 6) brought back as
+                // many as stood 6 to 10 from the zombie casting it -- «-4 revives -1» and «-4
+                // revives -2» at one turn start -- and none when nobody did; a 1034 over the
+                // whole map (2403) one per fighter of the fight.
+                if (Resucitar.Contains(efecto.EffectId))
+                {
+                    if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
+                    var vuelve = Aplicar(combat, caster, caster, spell, grade, efecto, round, aimedCell, sharedHealRoll);
+                    if (vuelve != null) fuera.Add(vuelve);
+                    continue;
+                }
+
                 // A steal is two rows per target: the characteristic's malus on him and its bonus
                 // on the caster, both with the steal's uid (see Steals).
                 if (Steals.Of(efecto.EffectId) is { } robo)

@@ -33,7 +33,7 @@ namespace Jondo.Unity.Server.Handlers
             var (maxLevel, chance) = SoulCapture.PowerOf(stone.Effects);
             if (maxLevel <= 0) return;
 
-            var beaten = fight.Rojo.Where(m => !m.EsInvocado && m.MonsterId > 0).ToList();
+            var beaten = fight.Rojo.Where(m => m.BeatenAsGroupMember && m.MonsterId > 0).ToList();
             if (beaten.Count == 0) return;
             bool bossRoom = DungeonHandler.IsBossRoom(fight.RoleplayMapId != 0 ? fight.RoleplayMapId : fight.MapId);
             var guardian = bossRoom

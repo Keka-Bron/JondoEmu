@@ -43,7 +43,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!won) return;
             if (fight.Buscar(SessionContext.State.CharacterId) == null) return;
 
-            var beaten = fight.Rojo.Where(m => !m.EsInvocado && m.MonsterId > 0).Select(m => m.MonsterId).Distinct();
+            var beaten = fight.Rojo.Where(m => m.BeatenAsGroupMember && m.MonsterId > 0).Select(m => m.MonsterId).Distinct();
             foreach (int monster in beaten.ToList())
             {
                 var criminal = WantedPosters.ByMonster(monster);

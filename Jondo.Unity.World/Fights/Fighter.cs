@@ -323,6 +323,17 @@ namespace Jondo.Unity.World.Fights
         public bool EsInvocado => Invocador != 0;
 
         /// <summary>
+        /// A monster of the group brought back by a «revive the last ally to fall» (780, 1034): his
+        /// reviver's summon for the rest of the fight, but still one of the monsters the players
+        /// came to beat. Sylargh killed and brought back by a zombie was dropped from the beaten
+        /// as a summon, and the win paid neither his achievement nor his loot.
+        /// </summary>
+        public bool RevivedGroupMember { get; set; }
+
+        /// <summary>Whether he counts among the monsters a won fight beat: loot, experience, achievements, quests.</summary>
+        public bool BeatenAsGroupMember => !EsInvocado || RevivedGroupMember;
+
+        /// <summary>
         /// The spell it behaves with, its grade's <c>startingSpellId</c> in the creature
         /// table. It is what gives it its behaviour: its effects are 792 hooks —"at the start of
         /// my turn cast my grade 2"— just like the attitudes the dofus give away.
@@ -471,6 +482,13 @@ namespace Jondo.Unity.World.Fights
         /// with him still standing, and not again from whatever it sets off.
         /// </summary>
         public bool Muriendo { get; set; }
+
+        /// <summary>
+        /// The fight's last buff number when his death began to go off. What he put after it, he
+        /// put by dying -- a zombie's Zombidule (3608) gives «100 dommages ... pour 2 tours» as it
+        /// falls -- and his death does not take it back. Null when he has not died that way.
+        /// </summary>
+        public int? LastBuffBeforeHisDeath { get; set; }
 
         /// <summary>The copies this fighter has out, by id. Empty for everybody else.</summary>
         public List<long> Ilusiones { get; } = new List<long>();

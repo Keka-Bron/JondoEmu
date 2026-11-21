@@ -159,7 +159,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             if (winners.Count == 0) return;
 
-            var paying = fight.Rojo.Where(m => m.IsMonster && !m.EsInvocado && !m.EsIlusion).ToList();
+            var paying = fight.Rojo.Where(m => m.IsMonster && m.BeatenAsGroupMember && !m.EsIlusion).ToList();
             int extra = ChallengeWatcher.EndBonus(fight, won: true);
 
             // Today's Almanax raises the challenges' bonus where its day says so (type 17).
@@ -351,7 +351,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             Add(Managers.JondoCoin.TemplateId,
-                fight.Rojo.Where(m => m.IsMonster && !m.EsInvocado).Sum(m => Managers.JondoCoin.RewardFor(m.Level)));
+                fight.Rojo.Where(m => m.IsMonster && m.BeatenAsGroupMember).Sum(m => Managers.JondoCoin.RewardFor(m.Level)));
             Add(Dreams.FragmentItem, dream.Fragments);
             return loot;
         }

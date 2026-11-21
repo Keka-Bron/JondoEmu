@@ -1162,9 +1162,10 @@ namespace Jondo.Unity.World.Fights
         /// four of them on one character, one from each serrano, answered each other down to the
         /// depth limit -- 134 blows in one cast. Another trigger of the same spell still answers:
         /// the Osavora season's counter, hooked on the blows, reaches its last state, and the
-        /// hook on that state coming into force casts the season's reaction.
+        /// hook on that state coming into force casts the season's reaction. And so does the same
+        /// spell on another bearer: each zombie Sylargh's Zombidule kills explodes in its turn.
         /// </summary>
-        public Dictionary<(int Spell, string Trigger), int> HooksResolving { get; } = new();
+        public Dictionary<(int Spell, string Trigger, long Bearer), int> HooksResolving { get; } = new();
 
         /// <summary>
         /// The telefrags of the spell being resolved: who swapped cells with whom through a

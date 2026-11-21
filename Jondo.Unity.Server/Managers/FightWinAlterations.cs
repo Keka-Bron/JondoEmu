@@ -91,7 +91,7 @@ namespace Jondo.Unity.Server.Managers
 
             long map = fight.RoleplayMapId;
             int subArea = MapManager.GetMapInfo(map)?.SubAreaId ?? 0;
-            var beaten = fight.Rojo.Where(m => !m.EsInvocado && m.MonsterId > 0).Select(m => m.MonsterId);
+            var beaten = fight.Rojo.Where(m => m.BeatenAsGroupMember && m.MonsterId > 0).Select(m => m.MonsterId);
 
             foreach (int alteration in Gained(beaten, subArea))
             {

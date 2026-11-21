@@ -33,7 +33,7 @@ namespace Jondo.Unity.Server.Handlers
             var beaten = new Dictionary<int, int>();
             foreach (var monster in fight.Rojo)
             {
-                if (monster.EsInvocado) continue;
+                if (!monster.BeatenAsGroupMember) continue;
                 if (monster.MonsterId <= 0) continue;
 
                 beaten.TryGetValue(monster.MonsterId, out int already);
@@ -62,7 +62,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 foreach (var monster in fight.Rojo)
                 {
-                    if (monster.EsInvocado || monster.MonsterId <= 0) continue;
+                    if (!monster.BeatenAsGroupMember || monster.MonsterId <= 0) continue;
                     monsters++;
                     if (DungeonManager.IsBoss(monster.MonsterId)) guardians++;
                 }

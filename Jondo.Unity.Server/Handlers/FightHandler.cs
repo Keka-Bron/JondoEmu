@@ -2688,6 +2688,7 @@ namespace Jondo.Unity.Server.Handlers
             if (quien == null || !quien.IsAlive) return false;
             if (quien.Muriendo) return true;
             quien.Muriendo = true;
+            quien.LastBuffBeforeHisDeath = fight.UltimoEmbrujo;
             var antes = fight.TriggeringAttacker;
             fight.TriggeringAttacker = asesino ?? antes;
             try
@@ -2706,6 +2707,8 @@ namespace Jondo.Unity.Server.Handlers
             finally
             {
                 fight.TriggeringAttacker = antes;
+                // Still standing is the usual end: what fires on a death goes off BEFORE the blow
+                // takes the life. The mark of where his death began stays for that blow's cleanup.
                 if (quien.IsAlive) quien.Muriendo = false;
             }
             return quien.IsAlive;
@@ -6962,7 +6965,8 @@ namespace Jondo.Unity.Server.Handlers
         /// Sylargh's zombie wait on (EON74). Then what the spell writes for him ("U").
         /// </summary>
         private static async Task ResucitarAsync(NetworkStream stream, FightInstance fight, Fighter quien,
-                                                 int hechizo, int grado, int efecto, int porcentaje, int celda)
+                                                 int hechizo, int grado, int efecto, int porcentaje, int celda,
+                                                 Managers.SpellEffect fila = null)
         {
             var muerto = fight.Muertos.LastOrDefault(m => !m.IsAlive && m.TeamId == quien.TeamId
                                                           && m.IsMonster && m != quien);
@@ -6971,13 +6975,32 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[Fight] {quien.Id} wants to revive somebody and none of its side has fallen.");
                 return;
             }
-            int donde = celda >= 0 && !Occupied(fight, celda) && PisableEnCombate(fight, celda)
-                ? celda : CasillaLibreCerca(fight, celda >= 0 ? celda : quien.CellId);
+            int centro = celda >= 0 ? celda : quien.CellId;
+            // A row whose zone has a hole in the middle brings him back in its ring, not on the
+            // aimed cell: Sylargh's Nécromignon (3607, 1034 in C10 from 6) -- «La réinvocation
+            // s'effectue toujours à exactement 6PO de son invocateur ... la règle de la priorité
+            // horaire» (Dofus pour les noobs). Left next to its reviver, his zombie could never
+            // die 5 to 10 cells from him, and his invulnerability never lift.
+            int donde = fila != null && fila.TamanoMinimo > 0 && Jondo.Unity.World.Maps.Zone.IsKnown(fila.Forma)
+                ? PrimeraDelAnillo(Jondo.Unity.World.Maps.Zone.Casillas(fila.Forma, fila.Tamano, quien.CellId, centro,
+                                                                        fila.TamanoMinimo),
+                                   centro, c => !Occupied(fight, c) && PisableEnCombate(fight, c))
+                : -1;
+            if (donde < 0)
+                donde = celda >= 0 && !Occupied(fight, celda) && PisableEnCombate(fight, celda)
+                    ? celda : CasillaLibreCerca(fight, centro);
             if (donde < 0) return;
 
             fight.Muertos.Remove(muerto);
             muerto.Buffs.Vaciar();
+            // And the spells hooked on him: they died with him. Sylargh's Chambranle hooks a
+            // Nécromignon on each ally at the start, and the one revived gets his own again from
+            // the revival (3691); the first one kept, every zombie brought back two at once
+            // where the guide has one: «le prochain monstre qui joue va réinvoquer un monstre».
+            muerto.Buffs.ActiveSpells.Clear();
             muerto.Muriendo = false;
+            muerto.LastBuffBeforeHisDeath = null;
+            if (!muerto.EsInvocado) muerto.RevivedGroupMember = true;
             muerto.Invocador = quien.Id;
             muerto.CellId = donde;
             muerto.CurrentHP = Math.Max(1, muerto.MaxHP * porcentaje / 100);
@@ -7011,6 +7034,35 @@ namespace Jondo.Unity.Server.Handlers
             await DispararAsync(stream, fight, muerto, Managers.EffectEngine.AlPonerseElEstado(EstadoZombi));
             await AplicarLoDelInvocadoAsync(stream, fight, quien, hechizo, grado, muerto);
             await RevisarLosRecuentosAsync(stream, fight);
+        }
+
+        /// <summary>
+        /// The first free cell of a ring, the «priorité horaire» way: the nearest band first, and in
+        /// it from the centre's right («les monstres éliminés sont réinvoqués à leur droite»)
+        /// clockwise as the screen shows it. -1 when none is free.
+        /// </summary>
+        internal static int PrimeraDelAnillo(IEnumerable<int> zona, int centro, Func<int, bool> libre)
+        {
+            if (!MapGeometry.IsValid(centro)) return -1;
+            foreach (int c in zona.Where(MapGeometry.IsValid).Distinct()
+                                  .OrderBy(c => MapGeometry.Distance(centro, c))
+                                  .ThenBy(c => AnguloEnPantalla(centro, c)))
+                if (libre(c)) return c;
+            return -1;
+        }
+
+        /// <summary>
+        /// The angle from one cell to another on the screen, from three o'clock clockwise, in
+        /// [0, 2π): rows are half a cell high and the odd ones shifted half a cell to the right.
+        /// </summary>
+        private static double AnguloEnPantalla(int desde, int hacia)
+        {
+            int fila0 = desde / MapGeometry.MapWidth, fila1 = hacia / MapGeometry.MapWidth;
+            int x0 = 2 * (desde % MapGeometry.MapWidth) + (fila0 & 1);
+            int x1 = 2 * (hacia % MapGeometry.MapWidth) + (fila1 & 1);
+            // A half cell across is twice a half row down.
+            double a = Math.Atan2(fila1 - fila0, 2.0 * (x1 - x0));
+            return a < 0 ? a + 2 * Math.PI : a;
         }
 
         /// <summary>
@@ -7119,9 +7171,12 @@ namespace Jondo.Unity.Server.Handlers
                     // row on him and was hooked on top.
                     if (quien.Buffs.Actitudes.Contains(enganche.Hechizo)) continue;
 
-                    // Not from what a hook of the same spell for the same trigger, still resolving,
-                    // has set off: a reaction does not answer itself (FightInstance.HooksResolving).
-                    var resolvingKey = (enganche.Hechizo, disparador);
+                    // Not from what a hook of the same spell for the same trigger on the same
+                    // bearer, still resolving, has set off: a reaction does not answer itself
+                    // (FightInstance.HooksResolving). Another bearer's still does: the zombie
+                    // a Zombidule kills explodes in turn, «des réactions en chaîne en plaçant le
+                    // Sylargh proche de plusieurs monstres Zombi» (Dofus pour les noobs).
+                    var resolvingKey = (enganche.Hechizo, disparador, quien.Id);
                     if (fight.HooksResolving.TryGetValue(resolvingKey, out int resolving) && resolving > 0) continue;
 
                     // Its rows go off as the cast that put it: through portals or not, to the
@@ -8407,7 +8462,8 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     await ResucitarAsync(stream, fight, c.Caster ?? quienLanza, c.HechizoOrigen, c.NivelOrigen,
                                          c.Efecto.EffectId, c.Revive,
-                                         c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada);
+                                         c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada,
+                                         c.Efecto);
                     continue;
                 }
 
@@ -9668,7 +9724,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (!summon.IsAlive) break;
                     // Not from what the same hook, still resolving, has set off (see EngancheAsync).
-                    var resolvingKey = (hook.Hechizo, trigger);
+                    var resolvingKey = (hook.Hechizo, trigger, summon.Id);
                     if (fight.HooksResolving.TryGetValue(resolvingKey, out int resolving) && resolving > 0) continue;
                     fight.HooksResolving[resolvingKey] = resolving + 1;
                     try
@@ -10650,6 +10706,15 @@ namespace Jondo.Unity.Server.Handlers
             // further away (DR), by anybody -- Remisión on a bomb throws its own Tymador back
             // when he hits it in melee. Melee is the attacker one cell away, "cuerpo a cuerpo"
             // in the sheets; the rest is ranged. A kill is not a blow.
+            //
+            // These hooks read the blow too: the Güinórdido's Rotatinvernal (3598, under DR) sends
+            // back «100% de ses dégâts à toutes les entités alignées» through a 1123, which takes
+            // its number from the fight's blow. Only DispararLosDelGolpeAsync set it, after them,
+            // so the hit it returned was always 0.
+            var danoDelDisparoAntes = fight.DanoDelDisparo;
+            var elementoDelDisparoAntes = fight.ElementoDelDisparo;
+            fight.DanoDelDisparo = damage;
+            fight.ElementoDelDisparo = elemento;
             fight.TriggeringAttacker = caster;
             if (target.LeHanPegado)
             {
@@ -10686,6 +10751,8 @@ namespace Jondo.Unity.Server.Handlers
                 await DispararAsync(stream, fight, target, Managers.EffectEngine.AlCruzarElUmbral(umbralCruzado.HechizoOrigen));
             }
             fight.TriggeringAttacker = null;
+            fight.DanoDelDisparo = danoDelDisparoAntes;
+            fight.ElementoDelDisparo = elementoDelDisparoAntes;
 
             Program.LogDebug($"[Fight] {aplicado} damage to {target.Id} (computed {damage}); " +
                              $"{target.CurrentHP} left.");
@@ -11032,10 +11099,17 @@ namespace Jondo.Unity.Server.Handlers
             {
                 // All but what is written to outlive him (dispellable 3 or 4): the Super-güino a
                 // dying ally of Morsagüino Real casts on him is his for the rest of the fight.
+                // Nor what his death itself put: the zombie's Zombidule gives its +100 «pour 2
+                // tours (débuffable et cumulable 3 fois)» as it falls, a dispellable 1 that went
+                // the moment it was given.
+                int? porSuMuerte = muerto.LastBuffBeforeHisDeath;
+                bool leSobrevive(Jondo.Unity.World.Fights.Buff fila)
+                    => Jondo.Unity.World.Fights.Buffs.OutlivesItsCaster(fila)
+                       || (porSuMuerte is int antes && fila.Numero > antes);
                 foreach (var otro in TodosLosCombatientes(fight).ToList())
                 {
                     if (otro == null || otro == muerto || !otro.IsAlive) continue;
-                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, Jondo.Unity.World.Fights.Buffs.OutlivesItsCaster);
+                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, leSobrevive);
                     foreach (var quitado in quitados)
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
