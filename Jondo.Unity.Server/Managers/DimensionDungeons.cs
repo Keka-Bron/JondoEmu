@@ -25,10 +25,18 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>What every one of these dungeons follows.</summary>
         public sealed record Rules(int Waves, int EveryTurns, int ArrivalState, int LifePercentFromSecondWave,
-                                   IReadOnlySet<int> Dungeons)
+                                   IReadOnlySet<int> Dungeons, IReadOnlyDictionary<int, IReadOnlyList<int>> Beside)
         {
-            public static readonly Rules None = new(0, 0, 0, 100, new HashSet<int>());
+            public static readonly Rules None = new(0, 0, 0, 100, new HashSet<int>(),
+                                                    new Dictionary<int, IReadOnlyList<int>>());
         }
+
+        /// <summary>
+        /// The monsters a dimension dungeon's boss starts the fight with («beside»): King Nidas's
+        /// Bobolsa. They come with him, once, and never in the later waves.
+        /// </summary>
+        public static IReadOnlyList<int> BesideTheBoss(int dungeon)
+            => Current.Beside.TryGetValue(dungeon, out var beside) ? beside : Array.Empty<int>();
 
         private static Rules? _rules;
         private static readonly object _lock = new();
@@ -59,7 +67,8 @@ namespace Jondo.Unity.Server.Managers
         /// The waves after the first, for a fight against <paramref name="group"/>: one fewer than
         /// the rules' count, each of <paramref name="size"/> monsters drawn from the group's own --
         /// every kind once in a shuffled order, then drawn again -- at their grades; the bosses
-        /// never come back. Each comes <see cref="Rules.EveryTurns"/> turns after the one before.
+        /// never come back, nor what came beside them (<see cref="BesideTheBoss"/>, in
+        /// <paramref name="bosses"/> too). Each comes <see cref="Rules.EveryTurns"/> turns after the one before.
         /// </summary>
         public static List<FightInstance.TimedWave> Plan(IReadOnlyList<MobSpawnManager.MobMember> group,
                                                          IReadOnlyCollection<int> bosses, int size, long seed)
@@ -110,12 +119,21 @@ namespace Jondo.Unity.Server.Managers
                         using var doc = JsonDocument.Parse(File.ReadAllText(path));
                         var root = doc.RootElement;
                         var dungeons = new HashSet<int>();
+                        var beside = new Dictionary<int, IReadOnlyList<int>>();
                         if (root.TryGetProperty("dungeons", out var list) && list.ValueKind == JsonValueKind.Array)
                             foreach (var row in list.EnumerateArray())
-                                if (row.TryGetProperty("dungeon", out var id) && id.ValueKind == JsonValueKind.Number)
-                                    dungeons.Add(id.GetInt32());
+                            {
+                                if (!row.TryGetProperty("dungeon", out var id) || id.ValueKind != JsonValueKind.Number) continue;
+                                dungeons.Add(id.GetInt32());
+                                if (row.TryGetProperty("beside", out var with) && with.ValueKind == JsonValueKind.Array)
+                                {
+                                    var monsters = with.EnumerateArray().Where(m => m.TryGetInt32(out int v) && v > 0)
+                                                       .Select(m => m.GetInt32()).Distinct().ToList();
+                                    if (monsters.Count > 0) beside[id.GetInt32()] = monsters;
+                                }
+                            }
                         rules = new Rules(Int(root, "waves", 0), Int(root, "everyTurns", 0), Int(root, "arrivalState", 0),
-                                          Int(root, "lifePercentFromSecondWave", 100), dungeons);
+                                          Int(root, "lifePercentFromSecondWave", 100), dungeons, beside);
                     }
                 }
                 catch (Exception ex)

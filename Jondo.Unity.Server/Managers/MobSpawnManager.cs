@@ -630,8 +630,7 @@ namespace Jondo.Unity.Server.Managers
             var members = bossRoom && dungeon.BossAlone
                 ? ComposeRoom(Array.Empty<int>(), dungeon.Bosses, index, dungeon.Rooms.Count, room)
                 : ComposeRoom(roster, bossRoom ? dungeon.Bosses : Array.Empty<int>(),
-                              index, dungeon.Rooms.Count, room,
-                              dungeon.Quarry.TryGetValue(room, out var quarry) ? quarry : null);
+                              index, dungeon.Rooms.Count, room, QuarryOf(dungeon, room, bossRoom));
             if (members.Count == 0) return null;
 
             return new MobGroup
@@ -643,6 +642,21 @@ namespace Jondo.Unity.Server.Managers
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
                 // A dungeon room's group waits where the room puts it: it does not roam.
             };
+        }
+
+        /// <summary>
+        /// The monsters a room's group must bring, once, right after its bosses: what a quest asks
+        /// to beat there (<see cref="DungeonManager.Dungeon.Quarry"/>) and, in a dimension dungeon's
+        /// boss room, the boss's own company (<see cref="DimensionDungeons.BesideTheBoss"/>): King
+        /// Nidas's Bobolsa, whom his subarea does not list.
+        /// </summary>
+        internal static List<int>? QuarryOf(DungeonManager.Dungeon dungeon, long room, bool bossRoom)
+        {
+            var quarry = dungeon.Quarry.TryGetValue(room, out var written) ? new List<int>(written) : new List<int>();
+            if (bossRoom)
+                foreach (int monster in DimensionDungeons.BesideTheBoss(dungeon.Id))
+                    if (!quarry.Contains(monster)) quarry.Add(monster);
+            return quarry.Count > 0 ? quarry : null;
         }
 
         /// <summary>

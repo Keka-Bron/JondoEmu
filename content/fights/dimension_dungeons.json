@@ -8,14 +8,16 @@
     "until the end of its first turn, and from the second wave on it comes with a quarter less life.",
     "INFERRED: the state that makes them invulnerable (56, the client's own «Invulnerable»), the size of",
     "a wave for fewer than four people (the modular dungeons' four), and who comes in the later waves",
-    "(drawn from the boss room's own monsters, as its group is)."
+    "(drawn from the boss room's own monsters, as its group is). «beside»: the monsters a dungeon's boss",
+    "starts the fight with, once, right after him in the room's group, and never in the later waves."
   ],
   "waves": 5,
   "everyTurns": 5,
   "arrivalState": 56,
   "lifePercentFromSecondWave": 75,
   "dungeons": [
-    { "dungeon": 76, "name": "Palacio del Rey Nidas", "dimension": "Enutrosor" },
+    { "dungeon": 76, "name": "Palacio del Rey Nidas", "dimension": "Enutrosor", "beside": [3649],
+      "why": "King Nidas starts beside his Bobolsa Enemiga (3649): Dofus pour les noobs has her next to the boss at the start, change sides once she falls and bring her Cadeau empoisonné, and the boss's Mi Tesoro (4494) only aims at her (F3649,F3650). Her subarea (825) does not list her, so the room's group never had her. Her own behaviour (her grade's starting spell, Bolsazo 4484) casts Cambio de Campo on her death, which brings her back as the Bobolsa Aliada (3650) on the other side. She comes with the boss's wave, once, and never in the later ones." },
     { "dungeon": 77, "name": "Fábrica de Maleféscof", "dimension": "Enutrosor" },
     { "dungeon": 79, "name": "Galería de Perfósil", "dimension": "Enutrosor" },
     { "dungeon": 81, "name": "Ring del Capitán Eskarlata", "dimension": "Srambad" },

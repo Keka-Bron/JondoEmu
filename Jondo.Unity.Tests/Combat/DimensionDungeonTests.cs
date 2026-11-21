@@ -164,5 +164,48 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Empty(fight.ArrivalShields);
             return arrival.MaxHP;
         }
+
+        private const int Nidas = 3648, Bobolsa = 3649, NidasPalace = 76;
+
+        /// <summary>
+        /// King Nidas starts beside his Bobolsa: right after him in his room's group, so whoever
+        /// comes in alone meets her, once; his Mi Tesoro only ever aims at her.
+        /// </summary>
+        [Fact]
+        public void King_Nidas_starts_beside_his_Bobolsa()
+        {
+            DimensionDungeons.Forget();
+            Assert.Equal(new[] { Bobolsa }, DimensionDungeons.BesideTheBoss(NidasPalace));
+
+            DungeonManager.Initialize();
+            MobSpawnManager.EnsureMonsterData();
+            if (!DungeonManager.All.TryGetValue(NidasPalace, out var palace) || palace.Rooms.Count == 0
+                || MobSpawnManager.GetMonsterData(Bobolsa) == null) return;   // no world base
+
+            var quarry = MobSpawnManager.QuarryOf(palace, palace.LastRoom, bossRoom: true);
+            Assert.NotNull(quarry);
+            Assert.Contains(Bobolsa, quarry!);
+
+            var group = MobSpawnManager.ComposeRoom(new[] { 3653, 3654, 3655, 3656, 3657 }, palace.Bosses,
+                                                    0, palace.Rooms.Count, palace.LastRoom, quarry);
+            Assert.Equal(Nidas, group[0].Monster!.Id);
+            Assert.Equal(Bobolsa, group[1].Monster!.Id);
+            Assert.Single(group, m => m.Monster!.Id == Bobolsa);
+        }
+
+        /// <summary>What came beside the boss never comes back in the later waves.</summary>
+        [Fact]
+        public void What_came_beside_the_boss_is_not_in_the_later_waves()
+        {
+            DimensionDungeons.Forget();
+            var group = new List<MobSpawnManager.MobMember>
+            {
+                Member(Nidas, 4), Member(Bobolsa, 4), Member(3653, 4), Member(3654, 4),
+            };
+            var waves = DimensionDungeons.Plan(group, new[] { Nidas, Bobolsa }, 4, seed: 3);
+
+            Assert.Equal(4, waves.Count);
+            Assert.All(waves, w => Assert.DoesNotContain(w.Monsters, m => m.Monster is Nidas or Bobolsa));
+        }
     }
 }

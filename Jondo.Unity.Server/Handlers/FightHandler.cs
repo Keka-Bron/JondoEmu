@@ -12056,7 +12056,8 @@ namespace Jondo.Unity.Server.Handlers
             if (dungeon == null) return;
 
             int size = MobSpawnManager.MembersFor(where.Group, fight.PeopleIn(FightInstance.Azules)).Count;
-            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, dungeon.Bosses, size, fight.FightId);
+            var once = dungeon.Bosses.Concat(Managers.DimensionDungeons.BesideTheBoss(dungeon.Id)).ToList();
+            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, once, size, fight.FightId);
             if (waves.Count == 0) return;
 
             var rules = Managers.DimensionDungeons.Current;
