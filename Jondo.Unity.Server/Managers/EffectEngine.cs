@@ -4986,6 +4986,13 @@ namespace Jondo.Unity.Server.Managers
                 // que el invocador". Put on the board here, as the illusions are; the fight
                 // announces it and does what the spell writes for it ("a,U").
                 if (celdaApuntada < 0 || sobre != quienLanza) return null;
+                // A monster's behaviour (the Doble's Desdoble at the start of the fight) is cast
+                // on the caster's own cell: its double comes out on the nearest free cell.
+                if (celdaApuntada == quienLanza.CellId)
+                {
+                    celdaApuntada = CeldaLibreMasCercana(combate, celdaApuntada, null);
+                    if (celdaApuntada < 0 || celdaApuntada == quienLanza.CellId) return null;
+                }
                 var suelo = MapManager.GetFightWalkable(combate.ArenaMapId);
                 if (suelo != null && !suelo.Contains(celdaApuntada)) return null;
                 if (EnLaCasilla(combate, celdaApuntada) != null) return null;
