@@ -883,6 +883,18 @@
    "orientation": 3,
    "members": [{"monster": 6364, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}, {"monster": 6365, "grade": 0}],
    "why": "One of the six groups of insects round the secluded spot [22,-34] that «Questions existentielles» (2177, 16718) asks to clear (Dofus pour les noobs («Questions existentielles»)). INFERRED: the cells, the sizes and the mix of Moskito insistente / Araknawa insistente."
+  },
+  {
+   "map": 140773376,
+   "group": -1018704,
+   "remove": true,
+   "why": "Vientre de la Ballena - Sala anexa (dungeon 84) is a crossing without monsters (Dofus pour les noobs, Vientre de la Ballena); the subarea roster seeded it two groups, one with the boss Protozorreur."
+  },
+  {
+   "map": 140773376,
+   "group": -1018705,
+   "remove": true,
+   "why": "Vientre de la Ballena - Sala anexa (dungeon 84) is a crossing without monsters (Dofus pour les noobs, Vientre de la Ballena); the subarea roster seeded it two groups, one with the boss Protozorreur."
   }
   ]
 }
