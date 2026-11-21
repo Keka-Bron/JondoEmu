@@ -46,6 +46,9 @@ namespace Jondo.Unity.Server.Network
             state.MapId = master.State.MapId;
             state.CellId = BesideOf(master, hero.CharacterId);
             state.Orientation = master.State.Orientation;
+            // A zaap reached at his master's side is discovered by him too: a hero has no client to
+            // open it with, and each would otherwise have to be played there on his own.
+            ZaapDiscoveries.Discover(hero.CharacterId, state.MapId);
             await DrawAsync(master, hero);
         }
 

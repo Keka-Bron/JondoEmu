@@ -29,7 +29,8 @@ people on it (`ConnectionProtocol.BuildMapActors`), a hero connecting is drawn (
 taken off (kmu). He walks after his master -- the master's own walk, the first hero stopping one step
 short of its end, the next two -- and goes with him from one map to the next
 (`SessionRegistry.AnunciarMudanzaAsync`). In a fight he is off the map, and back beside his master
-when it is over.
+when it is over. A map he reaches beside his master is his too: the zone explored for his
+achievements, and its zaap discovered (`ZaapDiscoveries.Discover`), with no need to play him there.
 
 For his guild and his alliance he is in the world (`SessionRegistry.IsOnline`): their member lists
 show him connected, and they are told as he connects or is let go. His friends see his account
