@@ -31,9 +31,10 @@ namespace Jondo.Unity.Tests.Combat
         [Theory]
         [InlineData(6693, 4441)]   // Prisión Acuosa, Tryde
         [InlineData(6772, 4457)]   // Puñometeoro
+        [InlineData(7842, 4743)]   // Llegada Aniquiladora, through its 8073
         public void It_lands_at_the_back_of_the_fighter_aimed_at(int spell, int monster)
         {
-            if (!SpellEffects.De(spell, 1).Any(e => e.EffectId == 4)) return;   // no spell data
+            if (SpellEffects.De(spell, 1).Count == 0) return;   // no spell data
             int start = Zone.Casillas('Q', 3, FoeCell, FoeCell, 3).First(MapGeometry.IsValid);
             var (caster, foe) = Cast(spell, monster, start);
 
