@@ -113,6 +113,7 @@ namespace Jondo.Unity.Server.Handlers
             // jpv and the same one the client sends back when clicking it. The mobContextId parameter
             // is unnecessary since both packets hand out the same number; it stays for outside callers.
             fight.DefenderLeaderId = mobGroup.MobId;
+            fight.PlayerTurn = mobGroup.PlayerTurn;
 
             // THE PLACEMENT CELLS COME FROM GetFightWalkable, not from the seeding filter.
             //
@@ -3808,21 +3809,7 @@ namespace Jondo.Unity.Server.Handlers
             // A choice he has left unanswered is made for him before he plays.
             await ChooseBeforeHisTurnAsync(stream, fight, fighter);
 
-            int duration = fighter.EsInvocado
-                ? Network.FightProtocol.SummonTurnDeciseconds
-                : fighter.IsMonster
-                    ? Network.FightProtocol.MonsterTurnDeciseconds
-                    : fight.Reglas.PlayerTurn > 0 ? fight.Reglas.PlayerTurn : Network.FightProtocol.PlayerTurnDeciseconds;
-            // On a server started for the test harness, a player's turn waits an hour for it: it
-            // looks, thinks and clicks far slower than a person, and a whole class is tried in the
-            // one turn (ControlApiTest.cs). Ten minutes ran out on the slower classes, and the
-            // client put up its «Inactividad» notice.
-            if (Network.ControlApi.TestKey.Length > 0 && !fighter.IsMonster && !fighter.EsInvocado) duration = 36000;
-            // And a summon its owner plays -- a turret from Evolution III, an Osamodas's animal --
-            // for the same reason: its 15 seconds (the real game's, measured) ran out before the
-            // harness had cast once with it from the client.
-            if (Network.ControlApi.TestKey.Length > 0 && fighter.EsInvocado && !fighter.PlaysOnItsOwn
-                && Dueno(fight, fighter) != null) duration = 36000;
+            int duration = TurnDeciseconds(fight, fighter, harness: Network.ControlApi.TestKey.Length > 0);
 
             // A turn of his, or of a summon he drives, for the per-turn averages of the end.
             if (!fighter.IsMonster || Dueno(fight, fighter) != null)
@@ -12778,6 +12765,37 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static bool KeepsTurnTime(Fighter fighter)
             => fighter != null && !fighter.IsMonster && !fighter.EsInvocado && !fighter.IsBot;
+
+        /// <summary>The turn the test harness gets: an hour, in tenths.</summary>
+        internal const int HarnessTurnDeciseconds = 36000;
+
+        /// <summary>
+        /// How long a fighter's turn lasts, in tenths, before what he kept of his last one.
+        /// </summary>
+        /// <remarks>
+        /// The captures of the real game: a summon 150, a monster 290, a character 300 to 430
+        /// (40 s here, <see cref="Network.FightProtocol.PlayerTurnDeciseconds"/>) and 900 in a dream.
+        /// The group fought can set the character's (<see cref="FightInstance.PlayerTurn"/>): the
+        /// guided tutorial's Puch celestial gives 6000.
+        ///
+        /// <paramref name="harness"/> is a server started for the test harness (JONDO_TEST_KEY):
+        /// a player's turn, and a summon its owner plays, wait an hour there. The harness looks,
+        /// thinks and clicks far slower than a person and tries a whole class in one turn
+        /// (ControlApiTest.cs): ten minutes ran out on the slower classes, the client put up its
+        /// «Inactividad» notice, and a turret's or an Osamodas animal's 15 seconds ran out before
+        /// it had cast once with it. A server started any other way never takes this branch.
+        /// </remarks>
+        internal static int TurnDeciseconds(FightInstance fight, Fighter fighter, bool harness)
+        {
+            if (fighter.EsInvocado)
+                return harness && !fighter.PlaysOnItsOwn && Dueno(fight, fighter) != null
+                    ? HarnessTurnDeciseconds
+                    : Network.FightProtocol.SummonTurnDeciseconds;
+            if (fighter.IsMonster) return Network.FightProtocol.MonsterTurnDeciseconds;
+            if (harness) return HarnessTurnDeciseconds;
+            if (fight.PlayerTurn > 0) return fight.PlayerTurn;
+            return fight.Reglas.PlayerTurn > 0 ? fight.Reglas.PlayerTurn : Network.FightProtocol.PlayerTurnDeciseconds;
+        }
 
         /// <summary>
         /// The player passes the turn (jxy, empty), or his time runs out.

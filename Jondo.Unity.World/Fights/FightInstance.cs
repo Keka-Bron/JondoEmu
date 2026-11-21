@@ -26,6 +26,13 @@ namespace Jondo.Unity.World.Fights
         public FightRules Reglas { get; set; } = FightRules.ContraMonstruos;
 
         /// <summary>
+        /// A character's turn in this fight, in tenths, when the group fought sets one
+        /// (groups.json «playerTurn»): the guided tutorial's Puch celestial gives ten minutes.
+        /// 0 leaves it to <see cref="Reglas"/>.
+        /// </summary>
+        public int PlayerTurn { get; set; }
+
+        /// <summary>
         /// Whether this monster fight began from a soul stone, or null when its origin is unknown.
         /// No fight here starts from a soul stone yet, so every fight is a plain one unless told
         /// otherwise: left null, the 1,629 loot rows that ask «Ms=0» would never drop.

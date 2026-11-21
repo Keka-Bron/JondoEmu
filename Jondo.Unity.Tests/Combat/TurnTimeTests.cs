@@ -1,5 +1,7 @@
 using System.Linq;
+using Jondo.Unity.Launcher;
 using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.World.Content;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Xunit;
@@ -44,6 +46,59 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(FightHandler.KeepsTurnTime(new Fighter { Id = -1, IsMonster = true }));
             Assert.False(FightHandler.KeepsTurnTime(new Fighter { Id = -2, Invocador = 1 }));
             Assert.False(FightHandler.KeepsTurnTime(new Fighter { Id = 900_000_000_000_001, IsBot = true }));
+        }
+
+        /// <summary>
+        /// A server not started for the test harness -- the one players download -- gives the real
+        /// game's clocks: a character 40 s (the captures run from 30 to 43), a monster 29, a summon
+        /// 15 and a character in a dream 90.
+        /// </summary>
+        [Fact]
+        public void A_server_not_started_for_the_harness_gives_the_real_games_turns()
+        {
+            var fight = new FightInstance(1, 1);
+            var character = new Fighter { Id = 1 };
+            Assert.Equal(400, FightHandler.TurnDeciseconds(fight, character, harness: false));
+            Assert.Equal(290, FightHandler.TurnDeciseconds(fight, new Fighter { Id = -1, IsMonster = true }, harness: false));
+            Assert.Equal(150, FightHandler.TurnDeciseconds(fight, new Fighter { Id = -2, Invocador = 1 }, harness: false));
+            fight.Reglas = FightRules.EnUnSueno;
+            Assert.Equal(900, FightHandler.TurnDeciseconds(fight, character, harness: false));
+        }
+
+        /// <summary>The harness's hour is a character's alone: the monsters keep their 29 seconds.</summary>
+        [Fact]
+        public void Only_the_harness_waits_an_hour_and_only_for_a_character()
+        {
+            var fight = new FightInstance(1, 1);
+            Assert.Equal(36000, FightHandler.TurnDeciseconds(fight, new Fighter { Id = 1 }, harness: true));
+            Assert.Equal(290, FightHandler.TurnDeciseconds(fight, new Fighter { Id = -1, IsMonster = true }, harness: true));
+            // A summon nobody in the fight plays.
+            Assert.Equal(150, FightHandler.TurnDeciseconds(fight, new Fighter { Id = -2, Invocador = 1 }, harness: true));
+        }
+
+        /// <summary>
+        /// The guided tutorial's Puch celestial: every jzc of its fight in the capture of the whole
+        /// tutorial carries 6000 for the character and 290 for the puch, and no f4: nothing is kept
+        /// of a ten-minute turn, which already passes the minute and a half.
+        /// </summary>
+        [Fact]
+        public void A_group_can_give_its_fight_ten_minute_turns_and_none_is_kept()
+        {
+            var fight = new FightInstance(1, 1) { PlayerTurn = 6000 };
+            Assert.Equal(6000, FightHandler.TurnDeciseconds(fight, new Fighter { Id = 1 }, harness: false));
+            Assert.Equal(290, FightHandler.TurnDeciseconds(fight, new Fighter { Id = -1, IsMonster = true }, harness: false));
+            Assert.Equal(0, FightProtocol.SavedAfter(5000, 6000));
+        }
+
+        /// <summary>Only the Puch celestial's group asks for it; the pen's Jalatín fights at the usual clock.</summary>
+        [Fact]
+        public void The_written_puch_of_the_tutorial_carries_its_ten_minutes()
+        {
+            var groups = MobGroupContent.Load(Paths.ContentFile(MobGroupContent.AuthoredFile), _ => { }).Values.ToList();
+            var puch = groups.Single(g => g.MapId == 241438721 && g.Members.Any(m => m.MonsterId == 2785));
+            Assert.Equal(6000, puch.PlayerTurn);
+            var pen = groups.Single(g => g.MapId == 241439745 && g.Members.Any(m => m.MonsterId == 8017));
+            Assert.Equal(0, pen.PlayerTurn);
         }
 
         /// <summary>Coming back in the middle of a turn: what is left counts the carried time.</summary>

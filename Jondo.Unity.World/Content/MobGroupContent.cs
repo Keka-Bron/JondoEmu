@@ -46,6 +46,17 @@ namespace Jondo.Unity.World.Content
         /// </remarks>
         public int Orientation { get; init; } = 1;
 
+        /// <summary>
+        /// How long a character's turn lasts in a fight against this group, in tenths of a second;
+        /// 0 when the file does not say, and the fight's rules decide (FightHandler.TurnDeciseconds).
+        /// </summary>
+        /// <remarks>
+        /// The guided tutorial's Puch celestial gives 6000, ten minutes, in the capture of the whole
+        /// tutorial, where its other two fights give 300: the player reads the tutorial's bubbles
+        /// in his first turns.
+        /// </remarks>
+        public int PlayerTurn { get; init; }
+
         public IReadOnlyList<MobMemberSpec> Members { get; init; } = Array.Empty<MobMemberSpec>();
 
         public MobGroupKey Key => new MobGroupKey(MapId, GroupId);
@@ -164,6 +175,7 @@ namespace Jondo.Unity.World.Content
                         Cell = (int)Number(entry, "cell"),
                         Orientation = entry.TryGetProperty("orientation", out var facing)
                             ? Math.Clamp(facing.GetInt32(), 0, 7) : 1,
+                        PlayerTurn = (int)Math.Clamp(Number(entry, "playerTurn"), 0, int.MaxValue),
                         Members = members,
                     }, from);
                 }
@@ -228,6 +240,9 @@ namespace Jondo.Unity.World.Content
                     writer.WriteNumber("map", group.MapId);
                     writer.WriteNumber("group", group.GroupId);
                     writer.WriteNumber("cell", group.Cell);
+                    // Saved as read: a save from the Studio used to drop them.
+                    if (group.Orientation != 1) writer.WriteNumber("orientation", group.Orientation);
+                    if (group.PlayerTurn > 0) writer.WriteNumber("playerTurn", group.PlayerTurn);
 
                     writer.WritePropertyName("members");
                     writer.WriteStartArray();

@@ -178,6 +178,12 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Which way it faces, 1 to 7. Generated ones face south-east.</summary>
             public int Orientation { get; set; } = 1;
 
+            /// <summary>
+            /// A character's turn against it, in tenths, when its written group sets one
+            /// (groups.json «playerTurn»); 0 leaves it to the fight's rules.
+            /// </summary>
+            public int PlayerTurn { get; set; }
+
             public List<MobMember> Members { get; set; } = new List<MobMember>();
 
             /// <summary>
@@ -828,6 +834,7 @@ namespace Jondo.Unity.Server.Managers
                         MobId = escrito.GroupId,
                         CellId = escrito.Cell,
                         Orientation = escrito.Orientation,
+                        PlayerTurn = escrito.PlayerTurn,
                     };
 
                     foreach (var miembro in escrito.Members)
@@ -1296,6 +1303,7 @@ namespace Jondo.Unity.Server.Managers
             MobId = group.MobId,
             CellId = group.CellId,
             Orientation = group.Orientation,
+            PlayerTurn = group.PlayerTurn,
             Modular = group.Modular,
             Leaders = group.Leaders,
             OnTheFly = group.OnTheFly,

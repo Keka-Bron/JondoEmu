@@ -872,7 +872,7 @@ One fight engine serves four kinds of fight:
 
 - ✅ Tactical arenas, placement phase and cell swapping
 - ✅ Swapping places with an ally during the placement: he is asked and accepts or refuses
-- ✅ Line of sight, turns with their timer, AP and MP; unused turn time partly kept
+- ✅ Line of sight, turns with their timer (40 s, 90 s in a dream, ten minutes in the guided tutorial's first fight), AP and MP; unused turn time partly kept
 - ✅ Movement, tackle and escape
 - ✅ Loot, victory and defeat screens, experience over **1,889 levels**, group respawn
 - ✅ End-of-fight statistics

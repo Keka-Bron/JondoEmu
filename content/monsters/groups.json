@@ -30,6 +30,9 @@
     "",
     "'orientation' is which way the group faces, 1 to 7, south-east when absent.",
     "",
+    "'playerTurn' is how long a character's turn lasts in a fight against the group, in tenths of",
+    "a second; when absent, the fight's own clock (40 s, 90 s in a dream).",
+    "",
     "THE ASTRUB MILITIA TOWER'S PUNCHING BAGS. The same six Puch Ingball on 192415754, the",
     "tower's training room, where the master stands too. Cells, facings and grades are",
     "measured off the four jss of that room in 'bastante combate con steamer': one monster a",
@@ -45,7 +48,9 @@
     "Puch celestial (2785, grade 1) on Ganymed's platform 241438721, cell 327 facing 1, and a",
     "Jalatín celestial (8017) leading a Jalató celestial (2781), both grade 1, on the pen 241439745,",
     "cell 327 facing 3, as the jss of each map in that capture has them. The chafers of the last",
-    "room are NPCs there, not a group (content/npcs/spawns.json).",
+    "room are NPCs there, not a group (content/npcs/spawns.json). The Puch celestial's fight gives",
+    "ten-minute turns (playerTurn 6000): every jzc of that fight in the capture carries 6000, so the",
+    "player can read the tutorial's bubbles, while the pen's and the chafers' carry 300.",
     "",
     "THE MINOTOROR'S LABYRINTH. The base's groups on the antechamber 34473476, the Entrance 34476296",
     "and its copy 34476294 (subarea 210) hold the Minotoror (121) and the Minotot (827), the two",
@@ -696,6 +701,7 @@
       "group": -2000027,
       "cell": 327,
       "orientation": 1,
+      "playerTurn": 6000,
       "members": [
         {
           "monster": 2785,
