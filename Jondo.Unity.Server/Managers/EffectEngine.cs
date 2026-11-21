@@ -1581,6 +1581,14 @@ namespace Jondo.Unity.Server.Managers
         private const int CuraAlAtacante = 786;
 
         /// <summary>
+        /// 788, «Castigo de #2 #1 durante #3 turnos»: a row under "D" on the bearer (the Mane
+        /// curioso's Castigo Fortalecedor, «Castigo de 200 Fuerza durante 5 turnos»). Each blow he
+        /// takes gives him its damage in the characteristic of effect #1 (118, Fuerza) for #3
+        /// turns, never more than #2 in one round.
+        /// </summary>
+        public const int Punishment = 788;
+
+        /// <summary>
         /// 2973, "Cura #1% de los daños ocasionados", and 2020, "Cura #1% de los daños sufridos":
         /// a heal that is a share of the blow that set its spell off. Mala Sombra's hook on the
         /// enemy casts 28716 when he is hit, and its 2973 heals the Sram's allies around him by
@@ -5714,6 +5722,26 @@ namespace Jondo.Unity.Server.Managers
                 if (atacante == null || !atacante.IsAlive || porciento <= 0 || combate.DanoDelDisparo <= 0) return null;
                 return ApplyHealing(combate, quienLanza, atacante, hechizo, grado, efecto, ronda,
                                     combate.DanoDelDisparo * porciento / 100);
+            }
+
+            if (efecto.EffectId == Punishment)
+            {
+                int damage = combate.DanoDelDisparo;
+                if (sobre == null || !sobre.IsAlive || damage <= 0 || efecto.DiceNum <= 0) return null;
+                var key = (sobre.Id, ronda);
+                int already = combate.PunishmentGained.TryGetValue(key, out int gained) ? gained : 0;
+                int gain = efecto.DiceSide > 0 ? Math.Min(damage, efecto.DiceSide - already) : damage;
+                if (gain <= 0) return null;
+                combate.PunishmentGained[key] = already + gain;
+                // Its own row, under the trigger it came from so the blows' bonuses add up
+                // instead of replacing one another.
+                var bonus = new SpellEffect
+                {
+                    EffectId = efecto.DiceNum, EffectUid = efecto.EffectUid, DiceNum = gain,
+                    Duration = Math.Max(1, efecto.Value), Dispellable = efecto.Dispellable,
+                    Triggers = efecto.Triggers,
+                };
+                return AplicarSinRelevo(combate, quienLanza, sobre, hechizo, grado, bonus, ronda);
             }
 
             if (efecto.EffectId == CuraPorElDanoOcasionado || efecto.EffectId == CuraPorElDanoSufrido)

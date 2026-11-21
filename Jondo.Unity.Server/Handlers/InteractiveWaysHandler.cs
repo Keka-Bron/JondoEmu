@@ -67,7 +67,14 @@ namespace Jondo.Unity.Server.Handlers
             if (way == null || way.ToMap == 0) return;
             if (!ItemCriteria.Holds(way.Criterion))
             {
+                // Refused as a passage is (TeleportHandler): the client hears why, and the element is
+                // released so that it may be asked for again once the criterion holds.
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
+                        InfoMessages.Warning, ItemCriteria.RefusalOf(way.Criterion))));
                 Console.WriteLine($"[Ways] Element {interactive.Element.Id} on {interactive.MapId}: «{way.Criterion}» not met.");
+                await TeleportHandler.RefuseAsync(stream, interactive.Element.Id, action.SkillId,
+                                                  interactive.Element.Cell, interactive.Type);
                 return;
             }
             await SessionRegistry.BroadcastToMapAsync(state.MapId, ConnectionProtocol.Push(Op.Iwn,

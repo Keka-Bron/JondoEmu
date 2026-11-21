@@ -116,6 +116,34 @@
       "cell": 472,
       "orientation": 5,
       "measured": "inferred: up the pandawa temple's second stairs (the lower map's left border, cells 28-112) to their head on the terrace, beside the way down (520014, cell 444), not mirrored onto the terrace's top-right corner (cell 219); Dofus pour les noobs («Examen de passage»): «Montez les escaliers deux fois (attention la seconde fois il faut aller sur la gauche ...)»"
+    },
+    {
+      "map": 185074176,
+      "from": 185075200,
+      "cell": 138,
+      "orientation": 3,
+      "measured": "inferred: back down from the Last Sigh Bridge's left end (its border cells 448-532) to the top of the Gates of Onekros' walkway, not mirrored onto the Gates' right edge, which nothing walks on"
+    },
+    {
+      "map": 185076224,
+      "from": 185075200,
+      "cell": 478,
+      "orientation": 1,
+      "measured": "inferred: off the Last Sigh Bridge's right end (its border cells 83-167) onto the bridge's end in the Citadel Entrance, bottom-left; mirrored, it would land on the entrance's upper walkway"
+    },
+    {
+      "map": 185075200,
+      "from": 185076224,
+      "cell": 152,
+      "orientation": 5,
+      "measured": "inferred: back from the Citadel Entrance's bottom-left (its border cells 476-532) onto the Last Sigh Bridge's right end"
+    },
+    {
+      "map": 185077248,
+      "from": 185078272,
+      "cell": 291,
+      "orientation": 5,
+      "measured": "inferred: down from the Hall of Judgment (its border cell 549) to the foot of the waiting room's stairs (511218, cell 292), not mirrored onto the waiting room's top edge"
     }
   ]
 }

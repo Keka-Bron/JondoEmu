@@ -1197,6 +1197,13 @@ namespace Jondo.Unity.World.Fights
         public int DanoDelDisparo { get; set; }
 
         /// <summary>
+        /// What «Castigo» (788) has already given each fighter in a round, by (fighter, round):
+        /// the blows he takes add to it until the effect's cap for the round.
+        /// </summary>
+        public Dictionary<(long, int), int> PunishmentGained => _punishmentGained ??= new Dictionary<(long, int), int>();
+        private Dictionary<(long, int), int> _punishmentGained;
+
+        /// <summary>
         /// The element of that same blow: a share of it returned (1223, 1123) goes out in it --
         /// the Xelor's cómplice returns a 92 of air as a 69 of air, "jwe 1225".
         /// </summary>

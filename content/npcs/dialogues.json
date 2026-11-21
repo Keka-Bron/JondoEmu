@@ -52896,6 +52896,8 @@
           "message": 28774,
           "choices": [
             { "reply": 34520, "next": 28775, "quest": 1906, "afterObjective": 13047, "beforeObjective": 13048, "completes": 13048, "params": [[30, 13048]] },
+            { "reply": 34518, "next": 28777, "criterion": "Qf=1906", "beforeQuest": 1907 },
+            { "reply": 34780, "next": 29004, "quest": 1907, "beforeObjective": 13049 },
             { "reply": 34512, "teleport": 183501836 }
           ]
         },
@@ -52910,13 +52912,661 @@
           "choices": [
             { "reply": 34512, "teleport": 183501836 }
           ]
+        },
+        {
+          "message": 28777,
+          "choices": [
+            { "reply": 34517, "next": 28778 }
+          ]
+        },
+        {
+          "message": 28778,
+          "choices": [
+            { "reply": 34516, "next": 28779, "holds": 19165, "startsQuest": 1907, "params": [[34, 1907]] }
+          ]
+        },
+        {
+          "message": 28779,
+          "choices": [
+            { "reply": 34515, "next": 28780 }
+          ]
+        },
+        {
+          "message": 28780,
+          "choices": [
+            { "reply": 34514 }
+          ]
+        },
+        {
+          "message": 29004,
+          "choices": [
+            { "reply": 34782, "next": 29005 }
+          ]
+        },
+        {
+          "message": 29005,
+          "choices": [
+            { "reply": 34781 }
+          ]
         }
       ],
-      "why": "Ilyzaelle, on her watch before Nas Orazal's wound, the last room of her Lookout. «Examen de paso» (1906), 13048: Dofus pour les noobs, «Vous êtes téléporté devant Ilyzaelle, parlez lui \"En savoir plus sur les créature que vous avez combattues\". La quête se termine». The soul burners (28775) and, asked about the Dofus (34519), the kings' Dofus she took from Leorictus (28776). «Quitter le Belvédère» (34512) leaves for the gate, 183501836."
+      "why": "Ilyzaelle, on her watch before Nas Orazal's wound, the last room of her Lookout. «Examen de paso» (1906), 13048: Dofus pour les noobs, «Vous êtes téléporté devant Ilyzaelle, parlez lui \"En savoir plus sur les créature que vous avez combattues\". La quête se termine». The soul burners (28775) and, asked about the Dofus (34519), the kings' Dofus she took from Leorictus (28776). «Quitter le Belvédère» (34512) leaves for the gate, 183501836. «El Reino Gris» (1907): Dofus pour les noobs, «La quête se lance à la suite de la précédente auprès d'Ilyzaelle ... qui vous autorise à franchir le portail vers Externam». Wanting to cross the wound (34518) she reads Dardondakal's light on you (28777); defending the dragon before Thanatena (34517), she asks how you will cross (28778); showing the death mask (34516, 19165) starts the quest on its step dialog (28779), her touch (34515) and her blessing (28780), «Darle las gracias y acercarte al portal» (34514). Back before crossing, the mask shown again (34780) gets the same words (29004, 29005)."
     },
     {"npc": 4102, "map": 205261569, "opening": 28764, "_byHand": true, "lines": [{"message": 28764, "choices": [{"reply": 34493, "passage": 4102002}, {"reply": 55030, "next": 42278}, {"reply": 34494}]}, {"message": 42278, "choices": [{"reply": 55028, "passage": 4102001}, {"reply": 55029}]}], "why": "The Grobe ferryman at the Pandala pier [27,-27]. Grobe, the land of the ancestors (28764): «Así es. Vamos pues a la isla de Grobe.» (34493) sails to the island, «Uy, tengo fobia a los no muertos» (34494) stays. «¿Hay otro destino final?» (55030) tells of the abandoned temple off Grobe's coast (42278) and «Embarcar hacia el templo» (55028) sails there, «Rechazar y quedarte aquí» (55029) stays: Dofus pour les noobs («Examen de passage»): «parlez au Nocher de Grobe en lui disant d'abord « S'enquérir d'une autre destination finale », puis il faudra choisir « Embarquer pour le temple »». The atoll of the possessed (64560) and the soul road's lines are other quests', not offered here."},
     {"npc": 4102, "map": 206831621, "opening": 28765, "_byHand": true, "lines": [{"message": 28765, "choices": [{"reply": 34495, "passage": 4102003}, {"reply": 55033, "next": 42279}, {"reply": 34496}]}, {"message": 42279, "choices": [{"reply": 55031, "passage": 4102004}, {"reply": 55032}]}], "why": "The Grobe ferryman on the island's pier [34,-40]: «¿Listo para el viaje?» (28765), «Embarcar hacia Tierradala» (34495) back to Pandala, «¿Hay otro destino final?» (55033) to the temple (42279, «Embarcar hacia el templo» 55031, «Rechazar y quedarte aquí» 55032), «Quedarte donde estás» (34496). The soul road's lines (55601, 55608) belong to another quest."},
     {"npc": 4102, "map": 183240203, "opening": 28765, "_byHand": true, "lines": [{"message": 28765, "choices": [{"reply": 34495, "passage": 4102005}, {"reply": 34496}]}], "why": "The Grobe ferryman on the temple's pier: «¿Listo para el viaje?» (28765), «Embarcar hacia Tierradala» (34495) back to Pandala, «Quedarte donde estás» (34496). The temple's maps have no other way out."},
-    {"npc": 4059, "map": 183241227, "opening": 28766, "_byHand": true, "openings": [{"afterElement": -1906001, "message": 28767}], "lines": [{"message": 28766, "choices": [{"reply": 34497}, {"reply": 34498}]}, {"message": 28767, "choices": []}], "why": "The pandawa warrior's ghost before the temple's door (183241227). «Examen de paso» (1906, 13034): Dofus pour les noobs («Examen de passage»): «Montez les escaliers deux fois ... Puis parlez au Fantôme du guerrier pandawa pour le combattre. Un combat se lance, il s'effectue seul ... Une fois le combat terminé, entrez dans le temple et cliquez sur le tombeau de gauche». He twirls his swords and dares the character across the threshold (28766): «Aceptar el combate» (34497) is the fight (npc_fights.json), «Retroceder» (34498) leaves. Once beaten (the mark -1906001) he only wanders like a lost soul (28767)."}
+    {"npc": 4059, "map": 183241227, "opening": 28766, "_byHand": true, "openings": [{"afterElement": -1906001, "message": 28767}], "lines": [{"message": 28766, "choices": [{"reply": 34497}, {"reply": 34498}]}, {"message": 28767, "choices": []}], "why": "The pandawa warrior's ghost before the temple's door (183241227). «Examen de paso» (1906, 13034): Dofus pour les noobs («Examen de passage»): «Montez les escaliers deux fois ... Puis parlez au Fantôme du guerrier pandawa pour le combattre. Un combat se lance, il s'effectue seul ... Une fois le combat terminé, entrez dans le temple et cliquez sur le tombeau de gauche». He twirls his swords and dares the character across the threshold (28766): «Aceptar el combate» (34497) is the fight (npc_fights.json), «Retroceder» (34498) leaves. Once beaten (the mark -1906001) he only wanders like a lost soul (28767)."},
+    {
+      "npc": 4060,
+      "map": 185074176,
+      "opening": 28821,
+      "openings": [
+        { "quest": 1907, "objective": 13050, "message": 28820 },
+        { "after": 1907, "message": 28820 }
+      ],
+      "lines": [
+        {
+          "message": 28821,
+          "choices": [
+            { "reply": 34579, "next": 28822 },
+            { "reply": 34580 }
+          ]
+        },
+        {
+          "message": 28822,
+          "choices": [
+            { "reply": 34575, "next": 28823 },
+            { "reply": 34577, "next": 28826 },
+            { "reply": 34578 }
+          ]
+        },
+        {
+          "message": 28823,
+          "choices": [
+            { "reply": 34574, "next": 28824 },
+            { "reply": 34582, "next": 28827 },
+            { "reply": 34571, "next": 28826 }
+          ]
+        },
+        {
+          "message": 28826,
+          "choices": [
+            { "reply": 34576 }
+          ]
+        },
+        {
+          "message": 28824,
+          "choices": [
+            { "reply": 34573, "next": 28825 }
+          ]
+        },
+        {
+          "message": 28827,
+          "choices": [
+            { "reply": 34581, "next": 28828 }
+          ]
+        },
+        {
+          "message": 28825,
+          "choices": [
+            { "reply": 34572, "passage": 4060001 }
+          ]
+        },
+        {
+          "message": 28828,
+          "choices": [
+            { "reply": 34583, "passage": 4060001 }
+          ]
+        },
+        {
+          "message": 28820,
+          "choices": [
+            { "reply": 34572, "passage": 4060001, "criterion": "Qo>13050|Qf=1907" },
+            { "reply": 34569 },
+            { "reply": 34570 }
+          ]
+        }
+      ],
+      "why": "The Defuncionario (Krokmor) at the foot of the Gates of Onekros' stairs, for «El Reino Gris» (1907). Dofus pour les noobs: «Une fois dans Externam, parlez à Krokmor qui remarque que vous faites partie du monde des vivants et souhaitera vous goûter « Tendre le bras en espérant que ce ne sera pas trop douloureux » puis « Souffrir en silence » et enfin « Demander poliment au Krokmor de cesser son examen »». He smells the living (28821); the arm held out (34579) is bitten (28822), suffered in silence (34575) chewed (28823); asked politely to stop (34582) or borne stoically (34574) he tastes life and dust (28827, 28824), shrugs that you look dead enough to cross the bridge (28828, 28825) and «Subir las escaleras» (34583, 34572) takes the stairs up to the Last Sigh Bridge (passage 4060001). Shouting (34577) or striking him (34571) gets «¡Tú ruidoso!» (28826) and an apology (34576). Once past him he only eyes you (28820), and the stairs stay open."
+    },
+    {
+      "npc": 4063,
+      "map": 185075200,
+      "opening": 28830,
+      "openings": [
+        { "quest": 1907, "objective": 13051, "message": 28853 },
+        { "after": 1907, "message": 28853 }
+      ],
+      "lines": [
+        {
+          "message": 28830,
+          "choices": [
+            { "reply": 34614, "next": 28854, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34614, "next": 28854 },
+            { "reply": 34611 }
+          ]
+        },
+        {
+          "message": 28854,
+          "choices": [
+            { "reply": 34613, "next": 28855 }
+          ]
+        },
+        {
+          "message": 28855,
+          "choices": [
+            { "reply": 34612, "next": 28856 }
+          ]
+        },
+        {
+          "message": 28856,
+          "choices": [
+            { "reply": 34611 }
+          ]
+        },
+        {
+          "message": 28853,
+          "choices": [
+            { "reply": 34611 }
+          ]
+        }
+      ],
+      "why": "The Mane perdido on the Last Sigh Bridge, for «El Reino Gris» (1907), 13051: Dofus pour les noobs, «parlez à la Mâne perdu pour en apprendre plus sur la reine d'Externam, mais elle n'en sait pas plus que vous elle vient juste d'arriver dans ce monde (le pnj semble changer ...)». Asked about the queen (34614) she does not know Externam (28854), told she is dead (34613) she asks about the queen (28855, 28856). Afterwards, her musing (28853)."
+    },
+    {
+      "npc": 4062,
+      "map": 185075200,
+      "opening": 28829,
+      "lines": [
+        {
+          "message": 28829,
+          "choices": [
+            { "reply": 34610, "next": 28852, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34610, "next": 28852 },
+            { "reply": 34609 }
+          ]
+        },
+        {
+          "message": 28852,
+          "choices": [
+            { "reply": 34609 }
+          ]
+        }
+      ],
+      "why": "The Mane ignorante on the Last Sigh Bridge, for «El Reino Gris» (1907), 13051: asked about the queen (34610) he hears «arena» and tells of the Kolossium (28852); one of the manes that «semble changer» (Dofus pour les noobs)."
+    },
+    {
+      "npc": 4064,
+      "map": 185075200,
+      "opening": 28831,
+      "lines": [
+        {
+          "message": 28831,
+          "choices": [
+            { "reply": 34617, "next": 28857, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34617, "next": 28857 },
+            { "reply": 34615 }
+          ]
+        },
+        {
+          "message": 28857,
+          "choices": [
+            { "reply": 34616, "next": 28858 },
+            { "reply": 34615 }
+          ]
+        },
+        {
+          "message": 28858,
+          "choices": [
+            { "reply": 34615 }
+          ]
+        }
+      ],
+      "why": "The Mane resignado on the Last Sigh Bridge, for «El Reino Gris» (1907), 13051: the queen walks the bridge or the Gates of Onekros but mostly stays in the citadel (28857), the heart of the necropolis (28858)."
+    },
+    {
+      "npc": 4065,
+      "map": 185075200,
+      "opening": 28833,
+      "lines": [
+        {
+          "message": 28833,
+          "choices": [
+            { "reply": 34683, "next": 28907, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34683, "next": 28907 },
+            { "reply": 34680 }
+          ]
+        },
+        {
+          "message": 28907,
+          "choices": [
+            { "reply": 34682, "next": 28908 }
+          ]
+        },
+        {
+          "message": 28908,
+          "choices": [
+            { "reply": 34681, "next": 28909 }
+          ]
+        },
+        {
+          "message": 28909,
+          "choices": [
+            { "reply": 34680 }
+          ]
+        }
+      ],
+      "why": "The Mane despegado on the Last Sigh Bridge, for «El Reino Gris» (1907), 13051: the queen made the necropolis (28907), her agents (28908) and the archons who keep her informed (28909)."
+    },
+    {
+      "npc": 4066,
+      "map": 185075200,
+      "opening": 28832,
+      "lines": [
+        {
+          "message": 28832,
+          "choices": [
+            { "reply": 34620, "next": 28859, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34620, "next": 28859 },
+            { "reply": 34618 }
+          ]
+        },
+        {
+          "message": 28859,
+          "choices": [
+            { "reply": 34619, "next": 28860 }
+          ]
+        },
+        {
+          "message": 28860,
+          "choices": [
+            { "reply": 34618 }
+          ]
+        }
+      ],
+      "why": "The Mane nostálgico on the Last Sigh Bridge, for «El Reino Gris» (1907), 13051: the stories about Thanatena (28859) and the black fire she keeps from the necropolis (28860)."
+    },
+    {
+      "npc": 4069,
+      "map": 185076224,
+      "opening": 28910,
+      "lines": [
+        {
+          "message": 28910,
+          "choices": [
+            { "reply": 34686, "next": 28911, "quest": 1907, "afterObjective": 13050, "beforeObjective": 13051, "completes": 13051, "params": [[30, 13051]] },
+            { "reply": 34686, "next": 28911 },
+            { "reply": 34684 }
+          ]
+        },
+        {
+          "message": 28911,
+          "choices": [
+            { "reply": 34685, "next": 28912 }
+          ]
+        },
+        {
+          "message": 28912,
+          "choices": [
+            { "reply": 34684 }
+          ]
+        }
+      ],
+      "why": "The Mane preocupado outside the citadel's door, not ready to go in (28910), for «El Reino Gris» (1907), 13051: the queen's great scythe (28911), her fear of the scales (28912)."
+    },
+    {
+      "npc": 4068,
+      "map": 185077248,
+      "opening": 28915,
+      "lines": [
+        {
+          "message": 28915,
+          "choices": [
+            { "reply": 34700, "next": 28935, "quest": 1907, "afterObjective": 13052, "beforeObjective": 13053 },
+            { "reply": 34702, "next": 28938 },
+            { "reply": 34691 }
+          ]
+        },
+        {
+          "message": 28935,
+          "choices": [
+            { "reply": 34699, "next": 28936 },
+            { "reply": 34698, "next": 28939 }
+          ]
+        },
+        {
+          "message": 28936,
+          "choices": [
+            { "reply": 34698, "next": 28937 }
+          ]
+        },
+        {
+          "message": 28939,
+          "choices": [
+            { "reply": 34701, "quest": 1907, "afterObjective": 13052, "beforeObjective": 13053, "afterElement": -1907002, "marks": -1907001, "showsNpc": 4070, "completes": 13053, "params": [[30, 13053]] },
+            { "reply": 34701, "marks": -1907001 }
+          ]
+        },
+        {
+          "message": 28937,
+          "choices": [
+            { "reply": 34696, "quest": 1907, "afterObjective": 13052, "beforeObjective": 13053, "afterElement": -1907002, "marks": -1907001, "showsNpc": 4070, "completes": 13053, "params": [[30, 13053]] },
+            { "reply": 34696, "marks": -1907001 }
+          ]
+        },
+        {
+          "message": 28938,
+          "choices": [
+            { "reply": 34697 }
+          ]
+        }
+      ],
+      "why": "The Mane impaciente (a goblin) in the citadel's waiting room, for «El Reino Gris» (1907), 13053: Dofus pour les noobs, «franchissez la porte avec les gardes pour parler au Mâne impatient « Demander où trouver un huissier, car vous devez en voir un de toute urgence »». Asked where a bailiff is (34700) he says they come to take manes to the scales (28935); the wait (34699, 28936) and the bailiff he hears coming (28939, 28937). His mark and the nervous mane's: the second of the two heard ticks 13053 and brings the bailiff in. The bogey fight (34702, 28938) is just talk."
+    },
+    {
+      "npc": 4067,
+      "map": 185077248,
+      "opening": 28834,
+      "openings": [
+        { "quest": 1907, "objective": 13053, "message": 28944 },
+        { "after": 1907, "message": 28944 }
+      ],
+      "lines": [
+        {
+          "message": 28834,
+          "choices": [
+            { "reply": 34708, "next": 28940 },
+            { "reply": 34692 }
+          ]
+        },
+        {
+          "message": 28940,
+          "choices": [
+            { "reply": 34707, "next": 28941 },
+            { "reply": 34710, "next": 28945 }
+          ]
+        },
+        {
+          "message": 28941,
+          "choices": [
+            { "reply": 34706, "next": 28942 }
+          ]
+        },
+        {
+          "message": 28942,
+          "choices": [
+            { "reply": 34705, "next": 28943 }
+          ]
+        },
+        {
+          "message": 28943,
+          "choices": [
+            { "reply": 34703, "quest": 1907, "afterObjective": 13052, "beforeObjective": 13053, "afterElement": -1907001, "marks": -1907002, "showsNpc": 4070, "completes": 13053, "params": [[30, 13053]] },
+            { "reply": 34703, "marks": -1907002 }
+          ]
+        },
+        {
+          "message": 28945,
+          "choices": [
+            { "reply": 34709, "quest": 1907, "afterObjective": 13052, "beforeObjective": 13053, "afterElement": -1907001, "marks": -1907002, "showsNpc": 4070, "completes": 13053, "params": [[30, 13053]] },
+            { "reply": 34709, "marks": -1907002 }
+          ]
+        },
+        {
+          "message": 28944,
+          "choices": [
+            { "reply": 34713, "next": 28946 },
+            { "reply": 34704 }
+          ]
+        },
+        {
+          "message": 28946,
+          "choices": [
+            { "reply": 34712, "next": 28947 }
+          ]
+        },
+        {
+          "message": 28947,
+          "choices": [
+            { "reply": 34711 }
+          ]
+        }
+      ],
+      "why": "The Mane nervioso in the citadel's waiting room, for «El Reino Gris» (1907), 13053: Dofus pour les noobs, «parlez à la Mâne nerveux pour « L'interroger à propos de la balance ». Elle vous apprendra que la balance sert à peser l'âme des Manes». The scales (34708, 28940), her fears (34707, 28941, 28942) or calm advice (34710, 28945), and the bailiff she hears coming (28943, 28945): «Volverte hacia el alguacil» leaves her mark, the second of the two manes heard ticks 13053. Once he has come, she frets (28944) about the incorruptible agents (34713, 28946, 28947)."
+    },
+    {
+      "npc": 4145,
+      "map": 185077248,
+      "opening": 28933,
+      "lines": [
+        {
+          "message": 28933,
+          "choices": [
+            { "reply": 34695, "next": 28934 },
+            { "reply": 34693 }
+          ]
+        },
+        {
+          "message": 28934,
+          "choices": [
+            { "reply": 34694 }
+          ]
+        }
+      ],
+      "why": "The Mane taciturno of the citadel's waiting room: silent (28933), he ignores you (28934)."
+    },
+    {
+      "npc": 4070,
+      "map": 185077248,
+      "opening": 28948,
+      "openings": [
+        { "quest": 1907, "objective": 13056, "message": 28962 },
+        { "quest": 1907, "objective": 13055, "message": 28952 }
+      ],
+      "lines": [
+        {
+          "message": 28948,
+          "choices": [
+            { "reply": 34717, "next": 28949, "quest": 1907, "afterObjective": 13053, "beforeObjective": 13054 }
+          ]
+        },
+        {
+          "message": 28949,
+          "choices": [
+            { "reply": 34716, "next": 28950 },
+            { "reply": 34715, "next": 28951 }
+          ]
+        },
+        {
+          "message": 28950,
+          "choices": [
+            { "reply": 34715, "next": 28951 },
+            { "reply": 34718, "next": 28951 }
+          ]
+        },
+        {
+          "message": 28951,
+          "choices": [
+            { "reply": 34714, "quest": 1907, "beforeObjective": 13054, "leaves": true, "thenNpc": 4071, "completes": 13054, "params": [[30, 13054]] }
+          ]
+        },
+        {
+          "message": 28952,
+          "choices": [
+            { "reply": 34722, "next": 28953, "quest": 1907, "beforeObjective": 13056 },
+            { "reply": 34729, "next": 28960, "quest": 1907, "beforeObjective": 13056 },
+            { "reply": 34721, "next": 28954, "quest": 1907, "beforeObjective": 13056 }
+          ]
+        },
+        {
+          "message": 28953,
+          "choices": [
+            { "reply": 34721, "next": 28954 },
+            { "reply": 34729, "next": 28960 }
+          ]
+        },
+        {
+          "message": 28954,
+          "choices": [
+            { "reply": 34720, "next": 28955 },
+            { "reply": 34726, "next": 28956 },
+            { "reply": 34728, "next": 28959 }
+          ]
+        },
+        {
+          "message": 28955,
+          "choices": [
+            { "reply": 34719 }
+          ]
+        },
+        {
+          "message": 28959,
+          "choices": [
+            { "reply": 34727 }
+          ]
+        },
+        {
+          "message": 28956,
+          "choices": [
+            { "reply": 34725, "next": 28957 }
+          ]
+        },
+        {
+          "message": 28957,
+          "choices": [
+            { "reply": 34724, "next": 28958 }
+          ]
+        },
+        {
+          "message": 28958,
+          "choices": [
+            { "reply": 34723, "quest": 1907, "beforeObjective": 13056, "completes": 13056, "params": [[30, 13056]] }
+          ]
+        },
+        {
+          "message": 28960,
+          "choices": [
+            { "reply": 34732, "next": 28961 }
+          ]
+        },
+        {
+          "message": 28961,
+          "choices": [
+            { "reply": 34731, "next": 28962 }
+          ]
+        },
+        {
+          "message": 28962,
+          "choices": [
+            { "reply": 34730, "quest": 1907, "beforeObjective": 13056, "completes": 13056, "params": [[30, 13056]] }
+          ]
+        }
+      ],
+      "why": "The Alguacil de la ciudadela, who comes into the waiting room once two manes have been heard (13053), for «El Reino Gris» (1907). Dofus pour les noobs: «Parlez maintenant à l'Huissier de la Citadelle qui vient de faire son apparition et ne veux pas vous répondre tant que vous n'aurez pas attendu votre tour « Grommeler et se faire une raison »»: asked for an audience (34717) he says to wait (28949, 28950), calls a name and leaves (28951); «Esperar a que vuelva» (34714) is 13054, and the curious mane comes up to you. After her fight (13055): «reparlez à l'Huissier de la Citadelle qui vous demande de ne pas faire de désordre (28952)… Annoncez-lui que c'est Dardondakal qui vous envoie (34721, 28954) … « Hausser les épaules, la reine devra donc attendre avant de savoir ce que veut Dardondakal » (34726). À ces mots, une salle d'audience se libère» (28956, 28957): archon Khebesto will see you, «Sube la escalera» (28958); heading for the stairs (34723) is 13056. The bribe (34720, 28955) and the threat (34728, 28959) get nothing."
+    },
+    {
+      "npc": 4071,
+      "map": 185077248,
+      "opening": 28964,
+      "openings": [
+        { "afterElement": -1907003, "message": 28963 }
+      ],
+      "lines": [
+        {
+          "message": 28964,
+          "choices": [
+            { "reply": 34740, "next": 28965, "quest": 1907, "afterObjective": 13054, "beforeObjective": 13055 }
+          ]
+        },
+        {
+          "message": 28965,
+          "choices": [
+            { "reply": 34739, "next": 28966 }
+          ]
+        },
+        {
+          "message": 28966,
+          "choices": [
+            { "reply": 34738, "next": 28967 }
+          ]
+        },
+        {
+          "message": 28967,
+          "choices": [
+            { "reply": 34737, "next": 28968 }
+          ]
+        },
+        {
+          "message": 28968,
+          "choices": [
+            { "reply": 34736, "next": 28969 }
+          ]
+        },
+        {
+          "message": 28969,
+          "choices": [
+            { "reply": 34735, "next": 28970 }
+          ]
+        },
+        {
+          "message": 28970,
+          "choices": [
+            { "reply": 34734, "quest": 1907, "beforeObjective": 13055, "marks": -1907003 }
+          ]
+        },
+        {
+          "message": 28963,
+          "choices": [
+            { "reply": 34733, "quest": 1907, "beforeObjective": 13055 }
+          ]
+        }
+      ],
+      "why": "The Mane curioso, a sacrier mane sent by Hyrkul, who comes up to you while the bailiff is away, for «El Reino Gris» (1907): Dofus pour les noobs, «parlez à la Mâne curieux qui est en fait ici pour vous passer un message de la part d'Hyrkul ... N'acceptant pas votre refus, la Mâne curieux vous agresse». The waiting room (34740-34737, 28965-28968), Hyrkul's message (28969) refused (34735, 28970) and «Soy todo oídos» (34734) is the fight (npc_fights.json). Lost, she comes back to it: «Eres tenaz...» (28963), «Defenderte del ataque» (34733)."
+    },
+    {
+      "npc": 4072,
+      "map": 185078272,
+      "opening": 28971,
+      "lines": [
+        {
+          "message": 28971,
+          "choices": [
+            { "reply": 34745, "next": 28972, "quest": 1907, "beforeObjective": 13057 },
+            { "reply": 34746, "next": 28976, "quest": 1908, "beforeObjective": 13063 }
+          ]
+        },
+        {
+          "message": 28972,
+          "choices": [
+            { "reply": 34744, "next": 28973 }
+          ]
+        },
+        {
+          "message": 28973,
+          "choices": [
+            { "reply": 34743, "next": 28974, "quest": 1907, "beforeObjective": 13057, "completes": 13057, "params": [[30, 13057]] }
+          ]
+        },
+        {
+          "message": 28974,
+          "choices": [
+            { "reply": 34742, "next": 28975, "criterion": "Qf=1907", "beforeQuest": 1908, "startsQuest": 1908, "params": [[34, 1908]] }
+          ]
+        },
+        {
+          "message": 28975,
+          "choices": [
+            { "reply": 34741 }
+          ]
+        },
+        {
+          "message": 28976,
+          "choices": [
+            { "reply": 34747 }
+          ]
+        }
+      ],
+      "why": "Archon Khebesto in the Hall of Judgment, on the pulpit right of the scales, for «El Reino Gris» (1907) and «Golpe en Anutropía» (1908). Dofus pour les noobs: «Parlez à l'Archonte Kebesto qui vous annoncera que pour rencontrer la Reine il faut faire l'offrande d'une relique à la Nécropole. La quête se termine et vous débloquez la suivante : Casse en Enutrosor»; the guide's screenshot has his first reply, «Dire que vous n'êtes pas là pour cette raison» (34745). He finds your request for an audience (28972), the law of the relic (34744, 28973); «Es un asunto importante» (34743) is 13057, and asking how to get it (34742) starts 1908 on its step dialog, a precious Enutrosor chest to destroy (28975). During 1908, the same words (34746, 28976)."
+    }
   ]
 }

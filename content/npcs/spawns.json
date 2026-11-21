@@ -6285,6 +6285,105 @@
       "npc": 4059,
       "cell": 342,
       "orientation": 1
+    },
+    {
+      "map": 185074176,
+      "npc": 4060,
+      "cell": 165,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907): Krokmor, who tastes the living at the foot of the Gates of Onekros' stairs (Dofus pour les noobs: «Une fois dans Externam, parlez à Krokmor»). INFERRED cell, at the head of the walkway up to the bridge, the part of it the Gates' foreground arches leave in sight."
+    },
+    {
+      "map": 185075200,
+      "npc": 4063,
+      "cell": 287,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907), 13051: the Mane perdido on the Last Sigh Bridge. INFERRED cell, on the open walkway between the bridge's middle arches, where the arches leave it in sight."
+    },
+    {
+      "map": 185075200,
+      "npc": 4062,
+      "cell": 342,
+      "orientation": 7,
+      "why": "«El Reino Gris» (1907), 13051: the Mane ignorante on the Last Sigh Bridge. INFERRED cell."
+    },
+    {
+      "map": 185075200,
+      "npc": 4064,
+      "cell": 205,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907), 13051: the Mane resignado on the Last Sigh Bridge. INFERRED cell."
+    },
+    {
+      "map": 185075200,
+      "npc": 4065,
+      "cell": 300,
+      "orientation": 7,
+      "why": "«El Reino Gris» (1907), 13051: the Mane despegado on the Last Sigh Bridge. INFERRED cell, on the open walkway between the bridge's middle arches, where the arches leave it in sight."
+    },
+    {
+      "map": 185075200,
+      "npc": 4066,
+      "cell": 193,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907), 13051: the Mane nostálgico on the Last Sigh Bridge. INFERRED cell, on the open stretch past the bridge's upper arch, where the arches leave it in sight."
+    },
+    {
+      "map": 185076224,
+      "npc": 4069,
+      "cell": 343,
+      "orientation": 5,
+      "why": "«El Reino Gris» (1907), 13051: the Mane preocupado, not ready to go in, before the citadel's door (511176). INFERRED cell."
+    },
+    {
+      "map": 185077248,
+      "npc": 4068,
+      "cell": 339,
+      "orientation": 1,
+      "why": "«El Reino Gris» (1907), 13053: the Mane impaciente in the citadel's waiting room. INFERRED cell."
+    },
+    {
+      "map": 185077248,
+      "npc": 4067,
+      "cell": 403,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907), 13053: the Mane nervioso in the citadel's waiting room. INFERRED cell."
+    },
+    {
+      "map": 185077248,
+      "npc": 4145,
+      "cell": 466,
+      "orientation": 7,
+      "why": "The Mane taciturno, waiting in silence in the citadel's waiting room. INFERRED cell."
+    },
+    {
+      "map": 185077248,
+      "npc": 4070,
+      "cell": 305,
+      "orientation": 3,
+      "criterion": "(Qa=1907&Qo>13053&Qo<13054)|(Qa=1907&Qo>13055)|Qf=1907",
+      "why": "«El Reino Gris» (1907): the bailiff comes in once two manes have been heard (13053), calls a name and leaves (13054), and is back after the curious mane's fight (13055) (Dofus pour les noobs: «l'Huissier de la Citadelle qui vient de faire son apparition»). INFERRED cell, by the stairs at the back."
+    },
+    {
+      "map": 185077248,
+      "npc": 4071,
+      "cell": 424,
+      "orientation": 1,
+      "criterion": "Qa=1907&Qo>13054&Qo<13055",
+      "why": "«El Reino Gris» (1907): the Mane curioso, Hyrkul's messenger, comes up while the bailiff is away (13054) until her fight is won (13055). INFERRED cell."
+    },
+    {
+      "map": 185078272,
+      "npc": 4072,
+      "cell": 412,
+      "remove": true
+    },
+    {
+      "map": 185078272,
+      "npc": 4072,
+      "cell": 164,
+      "orientation": 3,
+      "why": "«El Reino Gris» (1907) and «Golpe en Anutropía» (1908): archon Khebesto on the pulpit right of the scales, where the guide's screenshot shows him over the judgment ring (Dofus pour les noobs, «Le pays gris»); 164 is one of the hall's lone walkable pulpit cells. The derived placement had him in the middle of the ring (412)."
     }
   ]
 }

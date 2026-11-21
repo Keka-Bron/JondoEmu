@@ -58,6 +58,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await Managers.AbyssalBase.TellShutAsync(stream);
                 Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: its door is shut.");
+                await RefuseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType);
                 return;
             }
 
@@ -66,17 +67,24 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await Managers.PlateGates.TellShutAsync(stream);
                 Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: its gate is shut.");
+                await RefuseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType,
+                                   Managers.PlateGates.IsGateElement(sourceMapId, elementId)
+                                       ? Managers.PlateGates.StateOf(sourceMapId) : 0);
                 return;
             }
 
             // A passage with a criterion opens only for whoever meets it: a vilinsekt's hideout to
             // the rikiki wand worn. Refused, the client hears why, as for an item's criterion.
+            // And the element is released all the same: left without an answer to its iwo, the
+            // client never sends another for it until the map is loaded again -- the death mask
+            // put on after a refusal, Ilyzaelle's portal stayed deaf.
             if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                     ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
                         Managers.InfoMessages.Warning, Managers.ItemCriteria.RefusalOf(route.Criterion))));
                 Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: «{route.Criterion}» not met.");
+                await RefuseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType);
                 return;
             }
 
@@ -101,6 +109,21 @@ namespace Jondo.Unity.Server.Handlers
             if (landed >= 0)
                 Console.WriteLine($"[Teleport] Element {elementId}: {sourceMapId} -> " +
                                   $"{toMap}, cell {landed}.");
+        }
+
+        /// <summary>
+        /// A passage refused: the use is answered as taken and released at once (iwn, then
+        /// ReleaseAsync), with no map change. The client keeps the element it asked for until it
+        /// sees it used; left without that, it never asks for that element again until the map
+        /// is loaded anew.
+        /// </summary>
+        internal static async Task RefuseAsync(NetworkStream stream, int elementId, int skillId, int cellId, int type,
+                                               int state = 0)
+        {
+            await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                ConnectionProtocol.Push(Op.Iwn, ConnectionProtocol.BuildElementInUse(
+                    elementId, skillId, SessionContext.State.CharacterId)));
+            await ReleaseAsync(stream, elementId, skillId, cellId, type, state);
         }
 
         /// <summary>

@@ -280,6 +280,13 @@
       "toMap": 183242242,
       "toCell": 486,
       "why": "Behind the tree at the left of [29,7], into the Moon servant's grave of «Examen de paso» (1906, 13038): Dofus pour les noobs, «Il faut aller en [29,7]. Cliquez derrière l'arbre à gauche de la map. Puis cliquez sur la motte de terre devant la tombe». The grave's way out (511038, a map-change mark on 527) lands on 226 by the trunk, and nothing measured leads in, so the cell it lands on is the way in. INFERRED landing, by the way out."
+    },
+    {
+      "map": 195300364,
+      "cell": 490,
+      "toMap": 185076224,
+      "toCell": 403,
+      "why": "Externam, the Citadel Vestibule [15,14] (subarea 894): the Citadel Entrance's right border leads in (the client's scroll), and the vestibule has no border cell and no element to leave by. Its leftmost floor cell, at the lit opening one comes in by, takes you back to the Entrance's right border (403, by its border cells)."
     }
   ]
 }

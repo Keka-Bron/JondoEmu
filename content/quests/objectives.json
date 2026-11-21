@@ -7029,6 +7029,37 @@
    "map": 184685313,
    "afterObjectives": [13046],
    "why": "«Herida de Nas Orazal» (732320), the map in front of Ilyzaelle, «Ilyzaelle's Lookout - Erzal's Fissure (exit)», 184685313, where the Endless Day guard sends you (35037). Dofus pour les noobs («Examen de passage»): «Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle»."
+  },
+  {
+   "objective": 13049,
+   "quest": 1907,
+   "kind": "enter",
+   "map": 185074176,
+   "why": "«Atraviesa el portal hacia Externam» (732335): the Gates of Onekros (185074176), where Ilyzaelle's portal (511281, worn death mask) lands. Dofus pour les noobs («Le pays gris»): «Commencez par équiper sur vous le Masque mortuaire ... puis cliquez sur le portail qui se trouve à côté d'Illyzaelle»."
+  },
+  {
+   "objective": 13050,
+   "quest": 1907,
+   "kind": "enter",
+   "map": 185075200,
+   "afterObjectives": [13049],
+   "why": "«Puente de los Últimos Suspiros» (732339), a discover-map objective whose catalogue row carries no map: the Last Sigh Bridge, 185075200, up Krokmor's stairs from the Gates of Onekros."
+  },
+  {
+   "objective": 13052,
+   "quest": 1907,
+   "kind": "enter",
+   "map": 185077248,
+   "afterObjectives": [13051],
+   "why": "«Entra en la ciudadela» (732343): through the guarded door of the Citadel Entrance (511176) into its waiting room, 185077248. Dofus pour les noobs: «Continuez donc votre chemin sur la prochaine map et franchissez la porte avec les gardes»."
+  },
+  {
+   "objective": 13055,
+   "quest": 1907,
+   "kind": "beat",
+   "monsters": [5005],
+   "map": 185077248,
+   "why": "«Espera a que regrese el alguacil» (732379): while the bailiff is away the Mane curioso (5005) brings Hyrkul's message and attacks; the bailiff is back once she is beaten. Dofus pour les noobs: «N'acceptant pas votre refus, la Mâne curieux vous agresse ... Une fois le combat terminé, reparlez à l'Huissier de la Citadelle»."
   }
 ]
 }

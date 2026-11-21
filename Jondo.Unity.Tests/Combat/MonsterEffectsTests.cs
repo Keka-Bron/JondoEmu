@@ -157,6 +157,39 @@ namespace Jondo.Unity.Tests.Combat
                                                        new Fighter(), target, new FightInstance(1, 1)));
         }
 
+        /// <summary>
+        /// «Castigo de 200 Fuerza durante 5 turnos» (788, the Mane curioso's Castigo Fortalecedor,
+        /// spell 2144): each blow its bearer takes gives him its damage in Fuerza, never more than
+        /// 200 in one round, and the count starts again the next round.
+        /// </summary>
+        [Fact]
+        public void Punishment_gives_the_blow_s_damage_up_to_its_cap_each_round()
+        {
+            var fight = new FightInstance(1, 1);
+            var bearer = Fighter(1, 1, 300);
+            fight.AddOpponent(bearer);
+            var row = new SpellEffect
+            {
+                EffectId = EffectEngine.Punishment, DiceNum = 118, DiceSide = 200, Value = 5, Duration = 5,
+                TargetMask = "C", Triggers = EffectEngine.AlRecibirDano,
+            };
+            int Strength() => bearer.Buffs.Puestos.Where(b => b.EffectId == 118).Sum(b => b.Cuanto);
+            void Hit(int damage, int round)
+            {
+                fight.DanoDelDisparo = damage;
+                EffectEngine.ResolveEffects(fight, bearer, 2144, 6, bearer, EffectEngine.AlRecibirDano, round, new[] { row });
+            }
+
+            Hit(50, 1);
+            Assert.Equal(50, Strength());
+            Hit(180, 1);
+            Assert.Equal(200, Strength());
+            Hit(90, 1);
+            Assert.Equal(200, Strength());
+            Hit(30, 2);
+            Assert.Equal(230, Strength());
+        }
+
         /// <summary>The forced push moves the Indesplazable, which the ordinary one does not.</summary>
         [Fact]
         public void The_forced_push_moves_the_unmovable()
