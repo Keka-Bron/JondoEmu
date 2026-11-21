@@ -19,7 +19,8 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>A chest, on the map it was put on.</summary>
         public readonly record struct Placement(int RaidId, int SubArea, long MapId, int Cell);
 
-        private static readonly List<Placement> _placed = new();
+        // Swapped whole, never edited in place, as the luminomachines' (Luminomachines._placed).
+        private static IReadOnlyList<Placement> _placed = Array.Empty<Placement>();
 
         /// <summary>The chests, one per raid.</summary>
         public static IReadOnlyList<Placement> Placed => _placed;
@@ -34,10 +35,10 @@ namespace Jondo.Unity.Server.Managers
         /// end of it: the LAST floor, its lowest map by number -- for the Sanctuary, the Castillo del
         /// santuario. The walkable cell nearest the middle, beside the floor's machine if it is there.
         /// </remarks>
-        public static void Place()
+        /// <returns>The chests this call placed, which <see cref="Placed"/> then answers too.</returns>
+        public static IReadOnlyList<Placement> Place()
         {
-            _placed.Clear();
-
+            var placed = new List<Placement>();
             foreach (var kind in Raids.All)
             {
                 if (kind.Floors.Count == 0) continue;
@@ -55,10 +56,11 @@ namespace Jondo.Unity.Server.Managers
                 int cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre);
                 for (int step = 2; machineCells.Contains(cell) && step < 60; step += 2)
                     cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre + step);
-                _placed.Add(new Placement(kind.Id, subArea, mapId, cell));
+                placed.Add(new Placement(kind.Id, subArea, mapId, cell));
             }
 
-            Console.WriteLine($"[Raids] {_placed.Count} chests placed, one at the end of each raid.");
+            Console.WriteLine($"[Raids] {placed.Count} chests placed, one at the end of each raid.");
+            return _placed = placed;
         }
 
         /// <summary>Which raid's chest stands on this map, or zero when none does.</summary>
@@ -116,6 +118,6 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>For the tests: forget where they were.</summary>
-        internal static void Forget() => _placed.Clear();
+        internal static void Forget() => _placed = Array.Empty<Placement>();
     }
 }

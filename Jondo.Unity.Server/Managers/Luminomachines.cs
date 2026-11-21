@@ -22,7 +22,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>A machine, on the map it was put on.</summary>
         public readonly record struct Placement(int Floor, int SubArea, long MapId, int Cell);
 
-        private static readonly List<Placement> _placed = new();
+        // Swapped whole, never edited in place: the NPCs are seeded again (Npcs.Initialize) while
+        // somebody may be reading the list, and a list cleared and refilled under him reads ten.
+        private static IReadOnlyList<Placement> _placed = Array.Empty<Placement>();
 
         /// <summary>The machines, in floor order.</summary>
         public static IReadOnlyList<Placement> Placed => _placed;
@@ -41,12 +43,12 @@ namespace Jondo.Unity.Server.Managers
         /// The sixth floor of the Abyss gets none: it has no light variable of its own, which is
         /// the data's way of saying the boss's floor is not lit with salt.
         /// </remarks>
-        public static void Place()
+        /// <returns>The machines this call placed, which <see cref="Placed"/> then answers too.</returns>
+        public static IReadOnlyList<Placement> Place()
         {
-            _placed.Clear();
-
+            var placed = new List<Placement>();
             var abyss = Raids.Of(Raids.Gigalodon);
-            if (abyss == null || !abyss.HasLight) return;
+            if (abyss == null || !abyss.HasLight) return _placed = placed;
 
             var routes = GuildRaidPassages.Derive();
             for (int floor = 1; floor <= Luminomachine.Machines && floor <= abyss.Floors.Count; floor++)
@@ -60,10 +62,11 @@ namespace Jondo.Unity.Server.Managers
                 int cell = MapManager.GetNearestWalkableCell(mapId, Handlers.TeleportHandler.MapCentre);
                 if (cell < 0) continue;
 
-                _placed.Add(new Placement(floor, subArea, mapId, cell));
+                placed.Add(new Placement(floor, subArea, mapId, cell));
             }
 
-            Console.WriteLine($"[Luminomachines] {_placed.Count} placed, one per floor with light.");
+            Console.WriteLine($"[Luminomachines] {placed.Count} placed, one per floor with light.");
+            return _placed = placed;
         }
 
         /// <summary>The floor whose machine stands on this map, or zero if none does.</summary>

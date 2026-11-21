@@ -288,17 +288,19 @@ namespace Jondo.Unity.Tests.World
                 }
 
                 MapManager.WalkableCells = casillas;
-                Luminomachines.Place();
+                // The list this call placed: other tests seed the NPCs again meanwhile
+                // (Npcs.Initialize), and Luminomachines.Placed is then theirs.
+                var placed = Luminomachines.Place();
 
                 // Each on the map its floor is reached by: the outpost, then where the way down
                 // from the floor above arrives -- never one of the floor's arenas, which have no
                 // position on the raid's world map.
                 var routes = GuildRaidPassages.Derive();
-                Assert.Equal(5, Luminomachines.Placed.Count);
-                Assert.Equal(GuildRaidManager.EntryMapOf(sima), Luminomachines.Placed[0].MapId);
-                for (int i = 0; i < Luminomachines.Placed.Count; i++)
+                Assert.Equal(5, placed.Count);
+                Assert.Equal(GuildRaidManager.EntryMapOf(sima), placed[0].MapId);
+                for (int i = 0; i < placed.Count; i++)
                 {
-                    var machine = Luminomachines.Placed[i];
+                    var machine = placed[i];
                     Assert.Equal(i + 1, machine.Floor);
                     Assert.Equal(sima.Floors[i], machine.SubArea);
                     Assert.Equal(sima.Floors[i], DatabaseManager.SubAreaOfMap(machine.MapId));

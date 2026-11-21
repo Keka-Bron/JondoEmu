@@ -224,10 +224,11 @@ namespace Jondo.Unity.Tests.World
                 }
 
                 MapManager.WalkableCells = casillas;
-                RaidChests.Place();
+                // The list this call placed: other tests seed the NPCs again meanwhile.
+                var placed = RaidChests.Place();
 
-                Assert.Equal(2, RaidChests.Placed.Count);
-                foreach (var chest in RaidChests.Placed)
+                Assert.Equal(2, placed.Count);
+                foreach (var chest in placed)
                 {
                     Assert.Equal(chest.SubArea, DatabaseManager.SubAreaOfMap(chest.MapId));
                     Assert.Contains(chest.Cell, casillas[chest.MapId]);
@@ -236,10 +237,10 @@ namespace Jondo.Unity.Tests.World
 
                 // The Sima's is in its outpost, where the raid comes in: the guides' "outpost chest",
                 // the one the Gigalodón comes out of. The Sanctuary's, at its far end, the castle.
-                var sima = RaidChests.Placed.Single(c => c.RaidId == Raids.Gigalodon);
+                var sima = placed.Single(c => c.RaidId == Raids.Gigalodon);
                 Assert.Equal(GuildRaidManager.EntryMapOf(Raids.Of(Raids.Gigalodon)), sima.MapId);
                 Assert.Equal(1131, sima.SubArea);
-                var sanctuary = RaidChests.Placed.Single(c => c.RaidId == Raids.EternalGardens);
+                var sanctuary = placed.Single(c => c.RaidId == Raids.EternalGardens);
                 Assert.Equal(Raids.Of(Raids.EternalGardens).Floors[^1], sanctuary.SubArea);
             }
             finally
