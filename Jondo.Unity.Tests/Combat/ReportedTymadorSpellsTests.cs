@@ -39,7 +39,8 @@ namespace Jondo.Unity.Tests.Combat
         /// <summary>
         /// The reported cast: the Tymador on 261 fires at 259 with the Ocra on 203, at the end
         /// of the bar. The push goes "hacia los extremos": from the centre outwards along the
-        /// bar, two cells, to (12,2).
+        /// bar. Its two cells run down a diagonal, where a step is two cells away, so the Ocra
+        /// goes one step, to (13,1) (Zone.StepsFor, the client's haf.bnbp).
         /// </summary>
         [Fact]
         public void Fusil_pushes_the_one_at_the_end_of_its_bar_outwards()
@@ -53,7 +54,7 @@ namespace Jondo.Unity.Tests.Combat
                                                  fight.RoundNumber, celdaApuntada: 259);
 
             var push = Assert.Single(outcomes, o => o.Mueve && o.Sobre == ocra);
-            Assert.Equal(MapGeometry.PointToCell(12, 2), push.CasillaHasta);
+            Assert.Equal(MapGeometry.PointToCell(13, 1), push.CasillaHasta);
             Assert.Equal(push.CasillaHasta, ocra.CellId);
         }
 

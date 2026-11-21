@@ -797,9 +797,27 @@ namespace Jondo.Unity.World.Maps
             int dx = d.Value.Dx, dy = d.Value.Dy;
             if (casillas < 0) { dx = -dx; dy = -dy; }   // pulling is the same the other way round
 
-            return PushAlong(aQuien, dx, dy, Math.Abs(casillas), pisables, ocupadas, paran, portal,
-                             pullCentre: casillas < 0 ? centro : -1);
+            return PushAlong(aQuien, dx, dy, StepsFor(Math.Abs(casillas), dx, dy), pisables, ocupadas,
+                             paran, portal, pullCentre: casillas < 0 ? centro : -1);
         }
+
+        /// <summary>
+        /// The steps a displacement of <paramref name="cells"/> cells takes along (dx, dy): as many
+        /// along a walking axis, half of them rounded up along a diagonal, where one step is two
+        /// cells away.
+        /// </summary>
+        /// <remarks>
+        /// The client's fight preview (3.6.10.11, haf.bnbp, the one routine behind every push and
+        /// pull it previews) sets <c>cells = (int)Math.Ceiling(cells * 0.5f)</c> when the way is
+        /// even (og.ovo, a diagonal in our (x, y)), and doubles back the steps left short when it
+        /// works out a crash (haf.guf, see EffectEngine.CollisionOf). The official captures agree:
+        /// every diagonal push of 2 goes one step (Flecha tiránica, Flecha impactante, Pánico,
+        /// Jurón...), pushes of 3 go two (Diamantes destructores, the troll fair's gladiators),
+        /// and none goes further. Walked whole, Violencia's 4 took a fighter four steps where the
+        /// client's preview drew him two away.
+        /// </remarks>
+        public static int StepsFor(int cells, int dx, int dy)
+            => dx != 0 && dy != 0 ? (cells + 1) / 2 : cells;
 
         /// <summary>
         /// A displacement of <paramref name="cells"/> cells from <paramref name="from"/>, one

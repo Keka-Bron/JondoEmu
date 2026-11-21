@@ -138,16 +138,49 @@ namespace Jondo.Unity.Tests.World
             return (MapGeometry.PointToCell(x - 1, y - 1), 288, x, y);
         }
 
-        [Fact]
-        public void A_diagonal_with_open_corners_goes_the_whole_way()
+        /// <summary>
+        /// Along a diagonal a step is two cells away: a push walks half its cells, rounded up
+        /// (the client's haf.bnbp; the official captures' diagonal pushes of 2 go one step, of 3
+        /// two).
+        /// </summary>
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(2, 1)]
+        [InlineData(3, 2)]
+        [InlineData(4, 2)]
+        [InlineData(5, 3)]
+        public void A_diagonal_push_walks_half_its_cells_rounded_up(int cells, int steps)
         {
             var (caster, target, x, y) = ADiagonal();
 
-            var push = Zone.Push(target, caster, target, 2, Everywhere(), new HashSet<int>());
+            var push = Zone.Push(target, caster, target, cells, Everywhere(), new HashSet<int>());
 
             Assert.Equal(Zone.PushStop.None, push.Stop);
-            Assert.Equal(MapGeometry.PointToCell(x + 2, y + 2), push.ToCell);
+            Assert.Equal(0, push.BlockedCells);
+            Assert.Equal(MapGeometry.PointToCell(x + steps, y + steps), push.ToCell);
         }
+
+        [Fact]
+        public void A_push_along_a_walking_axis_walks_all_its_cells()
+        {
+            var (caster, target, behind) = ALineOfThree();
+            var (tx, ty) = MapGeometry.CellToPoint(target);
+            var (bx, by) = MapGeometry.CellToPoint(behind);
+
+            var push = Zone.Push(target, caster, target, 3, Everywhere(), new HashSet<int>());
+
+            Assert.Equal(MapGeometry.PointToCell(tx + 3 * (bx - tx), ty + 3 * (by - ty)), push.ToCell);
+        }
+
+        [Theory]
+        [InlineData(4, 1, 0, 4)]
+        [InlineData(4, 0, -1, 4)]
+        [InlineData(4, 1, 1, 2)]
+        [InlineData(3, -1, 1, 2)]
+        [InlineData(1, 1, -1, 1)]
+        [InlineData(0, 1, 1, 0)]
+        public void The_steps_a_displacement_takes_along_its_way(int cells, int dx, int dy, int steps)
+            => Assert.Equal(steps, Zone.StepsFor(cells, dx, dy));
 
         [Theory]
         [InlineData(1, 0)]
@@ -162,9 +195,10 @@ namespace Jondo.Unity.Tests.World
 
             var push = Zone.Push(target, caster, target, 3, walkable, new HashSet<int>());
 
+            // Three cells down a diagonal are two steps, both left short.
             Assert.Equal(target, push.ToCell);
             Assert.Equal(Zone.PushStop.Obstacle, push.Stop);
-            Assert.Equal(3, push.BlockedCells);
+            Assert.Equal(2, push.BlockedCells);
         }
 
         [Fact]
@@ -178,7 +212,7 @@ namespace Jondo.Unity.Tests.World
 
             Assert.Equal(MapGeometry.PointToCell(x + 1, y + 1), push.ToCell);
             Assert.Equal(Zone.PushStop.Obstacle, push.Stop);
-            Assert.Equal(2, push.BlockedCells);
+            Assert.Equal(1, push.BlockedCells);
         }
 
         [Fact]

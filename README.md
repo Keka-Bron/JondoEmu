@@ -879,7 +879,7 @@ One fight engine serves four kinds of fight:
 - ✅ Monsters and bosses run their own spells' mechanics — see **`docs/bosses.md`**
 - ✅ Monster AI that plans its turn
 - ✅ Weapon strikes, with their slash
-- ✅ Push and collision damage
+- ✅ Push and collision damage; along a diagonal a push goes half its cells, rounded up, as in the real game
 - ✅ Joining someone else's fight; party fights and their options
 - ✅ Cells marked for your side
 - ✅ The Forgelance's spells drawn as in the real game, and its Immortal Lance's states
