@@ -739,6 +739,9 @@ namespace Jondo.Unity.Server
                 if (CharacterColorsMigration.Apply(worldConnection))
                     Console.WriteLine("[SQLite] Migration: Character colour storage is up to date.");
 
+                if (ColorPalettePalettesMigration.Apply(worldConnection))
+                    Console.WriteLine("[SQLite] Migration: Character color palette storage is up to date.");
+
                 // Seed default character if empty
                 var checkChar = worldConnection.CreateCommand();
                 checkChar.CommandText = "SELECT COUNT(*) FROM Characters WHERE Id = 13825558;";

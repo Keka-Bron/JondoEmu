@@ -52,13 +52,21 @@ public static class CharacterLookBuilder
         => Build(character, CharacterLookPurpose.Map);
 
     public static byte[] BuildLook(DbCharacter character,
-        bool paraLaVentana = false, bool onFoot = false)
-        => WriteLook(SemanticLook(character, paraLaVentana, onFoot)).Build();
+        bool paraLaVentana = false, bool onFoot = false, IReadOnlyList<long>? draftColors = null)
+        => WriteLook(SemanticLook(character, paraLaVentana, onFoot, draftColors)).Build();
 
     public static EntityLook SemanticLook(DbCharacter character,
-        bool paraLaVentana = false, bool onFoot = false)
-        => Build(character, paraLaVentana ? CharacterLookPurpose.AppearancePreview : CharacterLookPurpose.Normal,
-            new() { OnFoot = onFoot });
+        bool paraLaVentana = false, bool onFoot = false, IReadOnlyList<long>? draftColors = null)
+    {
+        var overrides = new CharacterLookOverrides
+        {
+            OnFoot = onFoot,
+            Colors = (draftColors != null && draftColors.Count > 0)
+                ? CreationColors(character.Breed, character.Sex, draftColors)
+                : null
+        };
+        return Build(character, paraLaVentana ? CharacterLookPurpose.AppearancePreview : CharacterLookPurpose.Normal, overrides);
+    }
 
     /// <summary>A saved outfit's body and garments over the character's current equipment, on foot.</summary>
     public static byte[] OutfitLook(DbCharacter character, int headId, int bodyId,

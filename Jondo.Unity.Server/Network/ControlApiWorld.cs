@@ -307,5 +307,53 @@ namespace Jondo.Unity.Server.Network
             Jail.Refusal.NoPrison => "sin-carcel",
             _ => "rechazado",
         };
+
+        private static Respuesta SavePalette(string cuerpo, long cuenta)
+        {
+            var sesion = SessionRegistry.InWorld().FirstOrDefault(s => s.AccountId == cuenta);
+            if (sesion == null) return Mal(404, "character-offline");
+
+            using var doc = JsonDocument.Parse(cuerpo);
+            if (!doc.RootElement.TryGetProperty("slot", out var slotProp) ||
+                !doc.RootElement.TryGetProperty("colors", out var colsProp) ||
+                colsProp.ValueKind != JsonValueKind.Array)
+            {
+                return Mal(400, "invalid-data");
+            }
+
+            int slot = slotProp.GetInt32();
+            var cols = new List<int>();
+            foreach (var elem in colsProp.EnumerateArray())
+            {
+                cols.Add(elem.GetInt32());
+            }
+
+            if (cols.Count == 0) return Mal(400, "empty-colors");
+
+            long characterId = sesion.CharacterId;
+            ColorPaletteManager.SavePalette(characterId, slot, cols);
+
+            var charColors = cols.Select(c => (long)c).ToList();
+            DatabaseManager.SaveCharacterColors(characterId, CharacterColors.FromRgb(charColors));
+
+            var dbChar = DatabaseManager.GetCharacterById(characterId);
+            if (dbChar != null)
+            {
+                var appEvent = ColorPaletteManager.BuildAppearanceEvent(dbChar);
+                sesion.SendAsync(appEvent).GetAwaiter().GetResult();
+            }
+
+            using (SessionContext.Push(sesion))
+            {
+                Handlers.WardrobeHandler.AnnounceAsync(sesion).GetAwaiter().GetResult();
+                if (sesion.Stream != null)
+                {
+                    Handlers.SlotLookHandler.RedrawAsync(sesion.Stream).GetAwaiter().GetResult();
+                }
+            }
+
+            Console.WriteLine($"[ColorPalettes] {sesion.State.CharacterName} saved palette #{slot + 1} successfully.");
+            return Bien(new { bien = true, slot });
+        }
     }
 }

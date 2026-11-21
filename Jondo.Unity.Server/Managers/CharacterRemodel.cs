@@ -17,7 +17,7 @@ namespace Jondo.Unity.Server.Managers
     /// </remarks>
     public static class CharacterRemodel
     {
-        public enum Change { None = 0, Name = 1, Sex = 2 }
+        public enum Change { None = 0, Name = 1, Sex = 2, Colors = 3, Face = 4, Class = 5 }
 
         private static readonly object _gate = new object();
         private static volatile bool _tableReady;

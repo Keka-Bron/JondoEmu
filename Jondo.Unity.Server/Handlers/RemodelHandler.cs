@@ -27,44 +27,137 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class RemodelHandler
     {
-        public const int NameEffect = 850, SexEffect = 852;
+        public const int NameEffect = 850;
+        public const int ColorsEffect = 851;
+        public const int SexEffect = 852;
+        public const int FaceEffect = 853;
+        public const int ClassEffect = 854;
 
         /// <summary>The popups (type 4) of the client's info messages.</summary>
         private const int Popup = 4;
-        private const int NameNextTime = 41, SexNextTime = 44, ChangeAlreadyWaiting = 43, NameNotAvailable = 40;
+        private const int NameNotAvailable = 40;
+        private const int NameNextTime = 41;
+        private const int ColorsNextTime = 42;
+        private const int ChangeAlreadyWaiting = 43;
+        private const int SexNextTime = 44;
+        private const int FaceNextTime = 58;
 
 
         private static Task SendAsync(NetworkStream stream, string op, byte[] body)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(op, body));
 
-        /// <summary>A name or sex change potion used: false when the item is no such thing.</summary>
+        /// <summary>A remodel potion used: false when the item is no such thing.</summary>
         public static async Task<bool> TryUseAsync(NetworkStream stream, Equipment.Item item)
         {
             var effects = DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template));
-            var change = effects.Any(e => e.EffectId == NameEffect) ? CharacterRemodel.Change.Name
-                       : effects.Any(e => e.EffectId == SexEffect) ? CharacterRemodel.Change.Sex
+            var change = (effects.Any(e => e.EffectId == NameEffect) || item.Template == 10860) ? CharacterRemodel.Change.Name
+                       : (effects.Any(e => e.EffectId == ColorsEffect) || item.Template is 10861 or 27277 or 27454 or 27724 or 27725) ? CharacterRemodel.Change.Colors
+                       : (effects.Any(e => e.EffectId == SexEffect) || item.Template is 10862 or 25754) ? CharacterRemodel.Change.Sex
+                       : (effects.Any(e => e.EffectId == FaceEffect) || item.Template == 13518) ? CharacterRemodel.Change.Face
+                       : (effects.Any(e => e.EffectId == ClassEffect) || item.Template is 16147 or 28361 or (>= 29124 and <= 29132)) ? CharacterRemodel.Change.Class
                        : CharacterRemodel.Change.None;
             if (change == CharacterRemodel.Change.None) return false;
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
             long character = SessionContext.State.CharacterId;
+
+            if (change == CharacterRemodel.Change.Colors)
+            {
+                var dbChar = DatabaseManager.GetCharacterById(character);
+                int currentUnlocked = ColorPaletteManager.GetSlotsUnlocked(character);
+                if (currentUnlocked >= ColorPaletteManager.TotalSlots)
+                {
+                    await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                        "You have reached the maximum limit of 20 color palettes. You can modify any of your existing palettes in the Appearance menu (adjust its colors and click Validate)."));
+                    return true;
+                }
+
+                bool isUnlimited = item.Template is 27277 or 27454 or 27724 or 27725;
+                if (!isUnlimited)
+                {
+                    await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
+                }
+
+                int unlocked = 1;
+                if (dbChar != null)
+                {
+                    unlocked = ColorPaletteManager.UnlockSlot(character, dbChar);
+                    var appEvent = ColorPaletteManager.BuildAppearanceEvent(dbChar);
+                    if (SessionContext.Current != null)
+                    {
+                        await SessionContext.Current.SendAsync(appEvent);
+                    }
+                }
+
+                await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup, ColorsNextTime));
+                await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                    $"New color palette unlocked! You now have {unlocked} palettes available in the Appearance menu."));
+                Console.WriteLine($"[Remodel] {SessionContext.State.CharacterName} unlocked color palette #{unlocked} (potion {item.Template}).");
+                return true;
+            }
+
             if (!CharacterRemodel.Request(character, change))
             {
                 await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup, ChangeAlreadyWaiting));
                 return true;
             }
-            await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
-            await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup,
-                change == CharacterRemodel.Change.Name ? NameNextTime : SexNextTime));
-            Console.WriteLine($"[Remodel] {SessionContext.State.CharacterName} will change {change} on the next connection.");
+
+            bool isUnlimitedPotion = item.Template is 27277 or 27454 or 27724 or 27725;
+            if (!isUnlimitedPotion)
+            {
+                await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid);
+            }
+
+            int popupId = change switch
+            {
+                CharacterRemodel.Change.Name => NameNextTime,
+                CharacterRemodel.Change.Sex => SexNextTime,
+                CharacterRemodel.Change.Face => FaceNextTime,
+                _ => 0
+            };
+
+            if (popupId > 0)
+            {
+                await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(Popup, popupId));
+            }
+
+            if (change == CharacterRemodel.Change.Name)
+            {
+                await SendAsync(stream, Op.Kvk, Pb.New().Str(1, SessionContext.State.CharacterName).Build());
+            }
+            else if (change == CharacterRemodel.Change.Face)
+            {
+                await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                    "Face change potion activated. You can choose your new face in the Appearance menu."));
+            }
+            else if (change == CharacterRemodel.Change.Class)
+            {
+                await SendAsync(stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                    "Class change potion activated. You can choose your new class on your next login."));
+            }
+
+            Console.WriteLine($"[Remodel] {SessionContext.State.CharacterName} will change {change} (potion {item.Template}).");
             return true;
         }
 
-        /// <summary>Entering the world with a name change waiting: the Rename window, with the name as it is.</summary>
+        /// <summary>Entering the world with a remodel change waiting.</summary>
         public static async Task OnEnterWorldAsync(GameSession session, DbCharacter character)
         {
-            if (CharacterRemodel.PendingOf(character.Id) != CharacterRemodel.Change.Name) return;
-            await session.SendAsync(new Jondo.Unity.Protocol.Game.CharacterNameSuggestionEvent(character.Name));
+            var pending = CharacterRemodel.PendingOf(character.Id);
+            if (pending == CharacterRemodel.Change.Name)
+            {
+                await session.SendAsync(new Jondo.Unity.Protocol.Game.CharacterNameSuggestionEvent(character.Name));
+            }
+            else if (pending == CharacterRemodel.Change.Colors)
+            {
+                await SendAsync(session.Stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                    "You have a pending color change. Open the Appearance menu to choose your colors."));
+            }
+            else if (pending == CharacterRemodel.Change.Face)
+            {
+                await SendAsync(session.Stream, Op.Lqn, ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, InfoMessages.FreeText,
+                    "You have a pending face change. Open the Appearance menu to choose your new face."));
+            }
         }
 
         /// <summary>lvw { f1: the new name }: taken if a change is waiting and the name is free and well made.</summary>

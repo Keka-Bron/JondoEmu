@@ -3307,6 +3307,12 @@ public static class Op
     /// <summary>C→S: the appearance window's colours tab { f1 lvd { f2: the colours } } (AppearanceColorsTab).</summary>
     public const string Lyl = "lyl";
 
+    /// <summary>C→S: palette slot and colors validated { f1: slot, f2: colors }.</summary>
+    public const string Lvl = "lvl";
+
+    /// <summary>C→S: custom colors validated { f1: colors }.</summary>
+    public const string Lvp = "lvp";
+
     /// <summary>C→S: putting on an outfit { f1: its uuid, f2 }, a tile of the outfits list clicked (OutfitListUi.OnTileClicked, action dct).</summary>
     public const string Lyy = "lyy";
 
