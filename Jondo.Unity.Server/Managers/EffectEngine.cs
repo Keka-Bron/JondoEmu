@@ -3275,6 +3275,21 @@ namespace Jondo.Unity.Server.Managers
                             .DefaultIfEmpty(-1).First();
                         if (aDonde < 0) continue;
                     }
+                    // A circle-zoned teleport aimed at a fighter -- the Tryde's Prisión Acuosa
+                    // (6693) and the Puñometeoro of Meno's crew (6772), both cast only at a taken
+                    // cell -- takes the caster to that fighter's back: his free neighbour farthest
+                    // from where the caster stands. Aimed at his own cell, it was refused at every
+                    // cast and the caster never moved.
+                    else if (efecto.Forma == Jondo.Unity.World.Maps.Zone.Circulo
+                             && EnLaCasilla(combat, aDonde) is { } apuntado && apuntado != caster)
+                    {
+                        int desde = caster.CellId;
+                        aDonde = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(apuntado.CellId)
+                            .Where(cell => cell != desde && LibreYPisable(combat, cell))
+                            .OrderByDescending(cell => Jondo.Unity.World.Maps.MapGeometry.Distance(cell, desde)).ThenBy(cell => cell)
+                            .DefaultIfEmpty(-1).First();
+                        if (aDonde < 0) continue;
+                    }
 
                     var saltado = Aplicar(combat, caster, caster, spell, grade, efecto, round,
                                           aDonde, sharedHealRoll);

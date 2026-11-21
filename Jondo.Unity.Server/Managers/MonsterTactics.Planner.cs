@@ -1223,6 +1223,15 @@ namespace Jondo.Unity.Server.Managers
                         // the Iop's Salto, the Ocra's Paso de Cacería, the Selatrop's Estela. It went
                         // looking for somebody on the empty cell and moved nobody.
                         int to = row.Forma == ';' && row.CeldasFijas.Count > 0 ? row.CeldasFijas[0] : aim;
+                        // A circle-zoned one aimed at a fighter lands at his back (Prisión Acuosa).
+                        if (to >= 0 && row.Forma == 'C' && Board.Occupied(to))
+                        {
+                            int target = to, start = caster.CellId;
+                            to = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(target)
+                                .Where(cell => cell != start && !Board.Occupied(cell) && _real.Walkable(cell))
+                                .OrderByDescending(cell => Jondo.Unity.World.Maps.MapGeometry.Distance(cell, start)).ThenBy(cell => cell)
+                                .DefaultIfEmpty(-1).First();
+                        }
                         if (to >= 0 && CasterMeetsAsItBegan(caster, row) && !Board.Occupied(to) && _real.Walkable(to))
                             Moved(caster, to);
                         continue;
