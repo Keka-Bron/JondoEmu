@@ -88,6 +88,26 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// The Count's rooms are fought on the map six past each, whatever the maps are called: the
+        /// Clockmaking Workshop's twin is named the Rhythmetick Room, and it was handed to that room
+        /// by its name, so the workshop was fought on itself among its clocks and shelves.
+        /// </summary>
+        [Theory]
+        [InlineData(112199169, 112199175)]   // Banquet Hall
+        [InlineData(112200193, 112200199)]   // Glacial Gallery
+        [InlineData(112201217, 112201223)]   // Clockmaking Workshop
+        [InlineData(112198145, 112198151)]   // Sinistro Hall
+        public void Each_Count_room_fights_on_the_twin_six_past_it(long room, long board)
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (!MapManager.Maps.ContainsKey(board)) return;   // no data
+
+            Assert.Equal(board, DungeonPlacements.BoardOf(room));
+            Assert.Equal(board, MapManager.ResolveArenaMapId(room));
+            Assert.NotEqual(112201223, DungeonPlacements.BoardOf(112202241));
+        }
+
+        /// <summary>
         /// A room with no board of its own -- Missiz Freezz's, the boss's -- is fought on itself, on
         /// the cells it flags, the same every time, never drawn at random over its scenery.
         /// </summary>
