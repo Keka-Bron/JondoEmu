@@ -151,6 +151,26 @@
       "cell": 285,
       "orientation": 1,
       "measured": "inferred: out of the Cofredía's first room (its right and bottom borders, cells 475-558) to beside Anciago (299) by the rails; mirrored, the landing was 487, hidden inside the giant chest"
+    },
+    {
+      "map": 60032000,
+      "from": 232259584,
+      "cell": 221,
+      "orientation": 3,
+      "measured": "inferred: out of the left border of the ruins' first room (232259584, cells 504-532) to the doorway it was entered by (element 534891 on 208); mirrored, the landing was the right edge of [-82,-73], all cliff and snow wall"
+    },
+    {
+      "map": 232259584,
+      "from": 232260608,
+      "cell": 263,
+      "orientation": 5,
+      "measured": "inferred: out of the left border of the ceremony room (232260608, cells 448-532) to the cave mouth of the first room it was entered by (element 535119 on 237); mirrored, the landing was the room's right edge, all rock"
+    },
+    {
+      "map": 62921728,
+      "cell": 452,
+      "orientation": 1,
+      "measured": "inferred: the haunted temple of «El último de nosotros» (2486) is an island with no border, reached only by Kroa (62920704 and the Antro del Cil's door); on 452 at the foot of the ruined steps, beside Cornelia and Kroa"
     }
   ]
 }

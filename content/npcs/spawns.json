@@ -6566,6 +6566,46 @@
       "why": "The derived placement of Williamwadui by Graverg (criterion «(PL>129&Qf=1508)|Qa=1509|Qf=1509|Qa=1507|Qf=1507») showed him from the start of «Las grandes galerías» (1507); he is the one rescued at its end: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (Dofus pour les noobs, «Les grandes galeries»). He stands on 397 instead, from 8503 on."
     },
     {
+      "map": 147850754,
+      "npc": 2853,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qf=2445&Qf=1621&PL>159&Qa!2486&Qf!2486",
+      "why": "Kroa, Cornelia Trancos' cuerbok, alone at Silvosse's statue in the Bosque Oscuro [-11,-13] (147850754, the cell of datos/npc_spawns_derived.json) for whoever may start «El último de nosotros» (2486: Qf=2445&Qf=1621&PL>159); once it is taken he has flown to the mine. Dofus pour les noobs («Les derniers d'entre nous»): «La quête se lance en [-11,-13] devant la statue de Silvosse dans la Forêt Sombre. Parlez à Kroa le corbac de la forestière d'Amakna qui est là sans sa maîtresse»."
+    },
+    {
+      "map": 147854339,
+      "npc": 2853,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo<18915",
+      "why": "Kroa at the mouth of the abandoned mine [-4,-12] (147854339) while Cornelia is a prisoner (2486, until 18915). Dofus pour les noobs («Les derniers d'entre nous»): «Suivez le corbac jusqu'en [-4,-12], puis reparlez à Kroa qui semble vous indiquer l'entrée de la mine». INFERRED cell, beside the mine's door (element 488146 on 261)."
+    },
+    {
+      "map": 150211588,
+      "npc": 2853,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo<18915",
+      "why": "Kroa in the last room of holes of the mine (150211588) in front of the top hole (cell 259, the floor passage to Cornelia's prison 150209536) while she is a prisoner (2486, until 18915). Dofus pour les noobs («Les derniers d'entre nous»): «Puis le trou en haut (celui devant lequel se trouve Kroa)». INFERRED cell, just below 259."
+    },
+    {
+      "map": 150209536,
+      "npc": 7120,
+      "cell": 344,
+      "orientation": 5,
+      "criterion": "Qa=2486&Qo<18916",
+      "why": "Cornelia Trancos caught in the bramble trap at the bottom of the mine (150209536) until she has followed the character out (2486, 18916 still to do). Dofus pour les noobs («Les derniers d'entre nous»): «Vous voilà arrivé devant Cornelia Granpa mais celle-ci est retenue prisonnière par une prison de ronces». INFERRED cell, the middle of the room."
+    },
+    {
+      "map": 147854339,
+      "npc": 7120,
+      "cell": 302,
+      "orientation": 5,
+      "criterion": "Qa=2486&Qo>18915&Qo<18916",
+      "why": "Cornelia Trancos outside the mine [-4,-12] (147854339) once freed (18915) until she has told of the black egg (18916, her type-1 objective on this map). Dofus pour les noobs («Les derniers d'entre nous»): «Une fois à l'entrée de la mine, reparlez à Cornelia Granpa qui vous parle de l'oeuf noir». INFERRED cell, in front of the mine."
+    },
+    {
       "map": 131858948,
       "npc": 2425,
       "cell": 371,
@@ -6624,6 +6664,238 @@
       "orientation": 1,
       "criterion": "Qo>8560|Qf=1510|Qa=1511|Qf=1511",
       "why": "The llavoro guard in the Cofredía's fourth room, from the moment Yiyo says «Ahí viene el guardia» (8560 of «Espionaje industrial», 1510) and for «Toma de rehenes» (1511), whose giver he is. The derived placement's criterion («...|Qa=1510|...») showed him from the quest's start."
+    },
+    {
+      "map": 126616576,
+      "npc": 2316,
+      "cell": 399,
+      "orientation": 1,
+      "criterion": "(Qf!1480&(Qa!1480|Qo<8312))|Qf=1481",
+      "why": "Ripley Scott, the alhyena wizard, in his cabin at [-2,-57]: «Ramenez le jus d'esclave que vous venez de collecter à Ripley Scott en [-2,-57]» (Dofus pour les noobs, «Remède miracle»); objectives 8282-8286 of 1478 name map 126616576. Gone from it while «¿Dónde andarán?» (1480) looks for him («Allez voir Ripley Scott dans sa cabanne en [-2,-57], cependant, il a mystérieusement disparu», from the bwork book handed over, 8312) and until «Más torpe, ni entrenando» (1481) is over: he is in the ritual grotto [-5,-52] then. INFERRED cell: 399, the floor in front of his pumpkin cauldron."
+    },
+    {
+      "map": 54175012,
+      "npc": 7120,
+      "cell": 244,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18916&Qo<18917",
+      "why": "Cornelia Trancos on Frigost's quay [-81,-37] (54175012), beside Captain Ardier, once she has sent the character after the frost on the hooded figure's cloak (2486, 18916) and until the track is picked up in the Bosque de los Pinos Perdidos (18917). Dofus pour les noobs («Les derniers d'entre nous»): «Rejoignez Cornelia Granpa à Frigost en [-81,-37] qui a eu le temps de poser des questions au capitaine Ardier». INFERRED cell."
+    },
+    {
+      "map": 54162238,
+      "npc": 7120,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18986&Qo<18919",
+      "why": "Cornelia Trancos in the Bosque de los Pinos Perdidos [-57,-62] (54162238), where Kroa smells the egg, from the arrival on Frigost (2486, 18986) until the agent of [-58,-69] has been asked (18919). Dofus pour les noobs («Les derniers d'entre nous»): «Rendez-vous en [-57,-62] et reparlez à Cornelia Granpa qui vous assure que Kroa sent quelque chose de pas normal à cet endroit». INFERRED cell."
+    },
+    {
+      "map": 54162238,
+      "npc": 7130,
+      "cell": 359,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18917&Qo<18918",
+      "why": "The Humus helado that reeks of rotting vegetables, in the Bosque de los Pinos Perdidos [-57,-62] (54162238), once Cornelia has had the place searched (2486, 18917) until the rabid animals hiding behind it are beaten (18918). Dofus pour les noobs («Les derniers d'entre nous»): «Parlez à l'Humus gelé qui dégage une odeur nauséabonde probablement la même qu'Ardier a sentie». INFERRED cell."
+    },
+    {
+      "map": 54162757,
+      "npc": 7120,
+      "cell": 159,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18918&Qo<18919",
+      "why": "Cornelia Trancos beside the Helías P. Goff agent of [-58,-69] (54162757) while he is asked about the hooded traveller (2486, 18919): his «Felicitarle por su astucia y pedirle a Cornelia que describa al extraño encapuchado.» (72346) asks her. Dofus pour les noobs («Les derniers d'entre nous»): «Suivez le flair du corbac de Cornelia jusqu'en [-58,-69] et parlez à l'Agent de la compagnie». INFERRED cell."
+    },
+    {
+      "map": 60035079,
+      "npc": 7120,
+      "cell": 509,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18919&Qo<18921",
+      "why": "Cornelia Trancos at the Bosque Petrificado's transporter (60035079), where Kroa loses the trail, until the frozen map shows where to go (2486, 18921). Dofus pour les noobs («Les derniers d'entre nous»): «Une fois arrivé dans la forêt pétrifiée, reparlez à Cornelia Granpa qui vous explique que Kroa ne semble plus avoir la piste». INFERRED cell."
+    },
+    {
+      "map": 131859972,
+      "npc": 4075,
+      "cell": 400,
+      "orientation": 1,
+      "criterion": "Qa=1908|Qf=1908",
+      "why": "Barnabarbo, head of the Cofradía de los Cofrecillos Valiosos, in the Cofredía building's second room for «Golpe en Anutropía» (1908): «Franchissez la première salle des coffres, puis la seconde salle ... parlez à Barnabarbe» (Dofus pour les noobs, «Casse en Enutrosor»); Inés: «Pasa la mayor parte del tiempo en una de las propiedades privadas de la Cofredía» (28980). No catalogue row places him: INFERRED map and cell, the open floor in the middle of the room."
+    },
+    {
+      "map": 129500160,
+      "npc": 4104,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1908&Qo>13061&Qo<13062",
+      "why": "The Cofrecillo valioso in King Nidas's chest room once Nidas is beaten (13061) and until it is broken (13062), for «Golpe en Anutropía» (1908): «Une fois le donjon terminé, ne sortez pas tout de suite, et parlez au Coffret précieux» (Dofus pour les noobs, «Casse en Enutrosor»). INFERRED cell, the open floor in the middle of the room."
+    },
+    {
+      "map": 185074176,
+      "npc": 4076,
+      "cell": 329,
+      "orientation": 3,
+      "criterion": "Qa=1908&Qo>13063",
+      "why": "Queen Thanatena near the Gates of Onekros once Khebesto has the piece of the chest (13063), for «Golpe en Anutropía» (1908): «Revenez à l'entrée d'Externam et parlez à la Reine Thanatena» (Dofus pour les noobs, «Casse en Enutrosor»); Khebesto: «Ahora mismo se encuentra cerca de las puertas de Onekros» (28995). INFERRED cell, on the open floor between the walkway down from the bridge and the black fire."
+    },
+    {
+      "map": 232260608,
+      "npc": 7120,
+      "cell": 421,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18921&Qo<18924",
+      "why": "Cornelia Trancos at the edge of the ceremony room of the ruins (232260608), spying with the character, from the frozen map (2486, 18921) until she has led him out after the fight (18924). Dofus pour les noobs («Les derniers d'entre nous»): «Reparlez à Cornelia Granpa qui se félicite d'avoir retrouvé l'inconnu encapuchonné … vous propose de l'espionner de loin». INFERRED cell, beside where the room is entered."
+    },
+    {
+      "map": 232260608,
+      "npc": 7131,
+      "cell": 288,
+      "orientation": 5,
+      "criterion": "Qa=2486&Qo>18921&Qo<18922",
+      "why": "The Taumaturgo oscuro in the middle of the ceremony room (232260608) preaching to the gélifux, until his cloak drops (2486, 18922). Dofus pour les noobs («Les derniers d'entre nous»): «Écoutez le Sombre thaumaturge qui semble s'adresser aux givrefoux comme à des disciples». INFERRED cell."
+    },
+    {
+      "map": 232260608,
+      "npc": 7132,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18921&Qo<18922",
+      "why": "The Gélifux grande infectado listening to the Taumaturgo oscuro in the ceremony room (232260608) until the kiss of Kordispec turns the gélifux into plants (2486, 18922). INFERRED cell."
+    },
+    {
+      "map": 232260608,
+      "npc": 7133,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18921&Qo<18922",
+      "why": "A Gélifux infectado listening to the Taumaturgo oscuro in the ceremony room (232260608) until the kiss of Kordispec (2486, 18922). INFERRED cell."
+    },
+    {
+      "map": 232260608,
+      "npc": 7134,
+      "cell": 260,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18921&Qo<18922",
+      "why": "A Gélifux infectado prostrate before the Taumaturgo oscuro in the ceremony room (232260608) until the kiss of Kordispec (2486, 18922). INFERRED cell."
+    },
+    {
+      "map": 232260608,
+      "npc": 7137,
+      "cell": 288,
+      "orientation": 5,
+      "criterion": "Qa=2486&Qo>18922&Qo<18923",
+      "why": "The Discípula de la Funga Oscura -- the Taumaturgo oscuro without his cloak, a Sadida of the Reino de Corrupción -- where he stood in the ceremony room (232260608), from the cloak dropping (2486, 18922) until her chosen are beaten (18923). Dofus pour les noobs («Les derniers d'entre nous»): «L'individu qui possède l'oeuf noir n'est en fait rien d'autre qu'une Sadida du Royaume Corrompu. Continuez à écouter la Disciple de la Fonge Noire»."
+    },
+    {
+      "map": 232260608,
+      "npc": 7135,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18922&Qo<18923",
+      "why": "The Hinchado infectado the big gélifux has become, in the ceremony room (232260608), until the infected are beaten (2486, 18923). INFERRED: which gélifux turned into which infected."
+    },
+    {
+      "map": 232260608,
+      "npc": 7136,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18922&Qo<18923",
+      "why": "An Elegido infectado, a gélifux after the kiss of Kordispec, in the ceremony room (232260608) until the infected are beaten (2486, 18923). INFERRED cell."
+    },
+    {
+      "map": 232260608,
+      "npc": 7136,
+      "cell": 260,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18922&Qo<18923",
+      "why": "The other Elegido infectado of the ceremony room (232260608) until the infected are beaten (2486, 18923). INFERRED cell."
+    },
+    {
+      "map": 60032000,
+      "npc": 7120,
+      "cell": 248,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18923&Qo<18924",
+      "why": "Cornelia Trancos outside the ruins [-82,-73] (60032000) once the infected are beaten (2486, 18923), until Kroa shows the way (18924). Dofus pour les noobs («Les derniers d'entre nous»): «Une fois sortis de la ruine, reparlez à Cornelia Granpa qui vous affirme que Kroa a retrouvé la trace de la Sadida». INFERRED cell, beside the ruins' door."
+    },
+    {
+      "map": 62920704,
+      "npc": 2853,
+      "cell": 325,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18925&Qo<18929",
+      "why": "Kroa in the Antro del Cil's exit room (62920704) once the Cil is beaten (2486, 18925), to lead the way to the haunted temple beyond it. Dofus pour les noobs («Les derniers d'entre nous»): «Une fois le Korriandre vaincu, avant de partir, parlez à Kroa « Suivre Kroa dans les profondeurs du temple mystifié »». INFERRED cell, beside Silvia Canozzi."
+    },
+    {
+      "map": 60036612,
+      "npc": 2853,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18925&Qo<18927",
+      "why": "Kroa at the Antro del Cil's door [-73,-69] (60036612) after the Cil (2486, 18925) and until the temple is purified (18927): whoever went out for the Esencia de silvespíritu goes back down to the temple with him. Dofus pour les noobs («Les derniers d'entre nous»): «Si vous ne l'avez pas vous pouvez sortir pour aller fabriquer l'essence et revenir dans cette salle en parlant au PNJ à l'entrée». INFERRED: Kroa, not the guardian's dungeon resume (72382, «$map#1»), which ends with the boss."
+    },
+    {
+      "map": 62921728,
+      "npc": 2853,
+      "cell": 466,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18925&Qo<18929",
+      "why": "Kroa in the haunted temple (62921728), an island with no border, as its way out to the Antro del Cil's door while 2486 brings anyone there (after 18925). INFERRED."
+    },
+    {
+      "map": 62921728,
+      "npc": 7120,
+      "cell": 438,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18925",
+      "why": "Cornelia Trancos in the haunted temple (62921728) from the Cil (2486, 18925) to her farewell (18929). Dofus pour les noobs («Les derniers d'entre nous»): «Vous retrouvez la Disciple de la Fonge Noire … Cornelia la prend alors pour cible avec son arc»; «Parlez à Cornelia Granpa qui vous explique que le maître dont le petit Dieu a fait mention est bien le maître Corbac». INFERRED cell, beside where Kroa lands."
+    },
+    {
+      "map": 62921728,
+      "npc": 7137,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18925&Qo<18926",
+      "why": "The Discípula de la Funga Oscura at the heart of the haunted temple (62921728), in the middle of her rite, until she gives her life to the putrid fungus (2486, 18926). Dofus pour les noobs («Les derniers d'entre nous»): «Vous retrouvez la Disciple de la Fonge Noire qui semble en plein rituel de communication avec les forces de la nature». INFERRED cell, beside the pedestal."
+    },
+    {
+      "map": 62921728,
+      "npc": 7141,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18926&Qo<18927",
+      "why": "The Funga Oscura the Discípula has turned into, where she knelt in the haunted temple (62921728), from her death (2486, 18926) until the temple is purified (18927). Dofus pour les noobs («Les derniers d'entre nous»): «La fanatique se transforme alors en un champignon marron qu'on va éviter d'approcher»."
+    },
+    {
+      "map": 62921728,
+      "npc": 7142,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18927&Qo<18928",
+      "why": "The Funga Oscura trembling with frustration (its line 54000) while the forest gods stand in the temple (2486, from 18927 to 18928): Nosruo and Juju have come to punish Kordispec's servant."
+    },
+    {
+      "map": 62921728,
+      "npc": 7145,
+      "cell": 258,
+      "orientation": 1,
+      "criterion": "Qa=2486&Qo>18927&Qo<18928",
+      "why": "Campeadol, one of the four little gods the Esencia de silvespíritu brings back to the haunted temple (62921728), from 18927 until they leave (18928). Dofus pour les noobs («Les derniers d'entre nous»): «Quatre petits Dieux font leur apparition, parlez à Korria». INFERRED cell, by the pedestal."
+    },
+    {
+      "map": 62921728,
+      "npc": 7143,
+      "cell": 245,
+      "orientation": 3,
+      "criterion": "Qa=2486&Qo>18927&Qo<18928",
+      "why": "Nosruo, god of the undergrowth, in the haunted temple (62921728) from 18927 until the gods leave (18928). INFERRED cell."
+    },
+    {
+      "map": 62921728,
+      "npc": 7144,
+      "cell": 313,
+      "orientation": 7,
+      "criterion": "Qa=2486&Qo>18927&Qo<18928",
+      "why": "Juju, god of the great forests, in the haunted temple (62921728) from 18927 until the gods leave (18928). INFERRED cell."
     }
   ]
 }

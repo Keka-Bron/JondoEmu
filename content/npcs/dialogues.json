@@ -16605,6 +16605,7 @@
       "map": 0,
       "opening": 3909,
       "openings": [
+        { "quest": 1479, "pending": 8302, "message": 3909 },
         { "after": 225, "before": 891, "message": 10750 },
         { "quest": 217, "step": 402, "holds": 8548, "message": 3950 },
         { "quest": 224, "objective": 911, "pending": 5466, "message": 4040 },
@@ -16617,7 +16618,8 @@
         {
           "message": 3909,
           "choices": [
-            { "reply": 3452, "next": 3910, "beforeQuest": 215 }
+            { "reply": 3452, "next": 3910, "beforeQuest": 215 },
+            { "reply": 20781, "next": 17360, "quest": 1479, "completes": 8302, "params": [[30, 8302]] }
           ]
         },
         {
@@ -16697,9 +16699,13 @@
         {
           "message": 10784,
           "choices": []
+        },
+        {
+          "message": 17360,
+          "choices": []
         }
       ],
-      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought). After «Qui veut la peau du Wabbit ?» (5457 on a hello): here you are, the wedding did not go as planned (10750, «Preguntarle lo que ha pasado»), while you fought the assassin everyone hid, the ceremony suspended (10751); another mission? the prince's family sends a relic (10777, «À un poil près», 891), a first emissary without news, a member of the wey's family in a cawotte field, Allister's signed document (10778). The start of «À un poil près» hands over Allister's signed document (13055). After «À un poil près»: he knew he could count on you, the relic goes to the castle's dining room (10784)."
+      "why": "Intendant San Lavals of Amakna castle [4,-6]: «my faithful friend» (3909). «Émissaire du roi» (215) of Dofus pour les noobs: a mission among nobles (3910), Allisteria, Fallanster's daughter, to be married (3911, the line the step declares); a wabbit prince, with some cunning everybody can be pleased, find him (4057: 927). After «Suite Woyale»: glad to see you again, help once more? (4035); «Un mawiage pwincier» (224): the groom's parents are wabbits, their guests like cawottes, none here (4036, «J'y vais de ce pas»). «Un mawiage pwincier»: the four cawottes (909, on a hello), the dress, the wedding can begin, the prince of Wey has reached the castle (4040: 911). «Usuwpation d'identité»: «hello, master wabbit» to the transformed character (3950), «I am the prince!», not expected so soon (3951), «I had to hurry to stop this horrible wedding!», no wabbit accent, «to me, my faithful jalató!» (3953: 873, «Me han descubierto», the jalató war chief fought). After «Qui veut la peau du Wabbit ?» (5457 on a hello): here you are, the wedding did not go as planned (10750, «Preguntarle lo que ha pasado»), while you fought the assassin everyone hid, the ceremony suspended (10751); another mission? the prince's family sends a relic (10777, «À un poil près», 891), a first emissary without news, a member of the wey's family in a cawotte field, Allister's signed document (10778). The start of «À un poil près» hands over Allister's signed document (13055). After «À un poil près»: he knew he could count on you, the relic goes to the castle's dining room (10784). «El artriste» (1479): «Portez donc l'enveloppe au château d'Amakna en [4,-6]. Donnez la lettre à San Lavalss qui vous prend pour le coursier» (Dofus pour les noobs, «L'art triste»): with Hermes Tafa's letter in hand his greeting is 3909, and «Toma, una carta de Hermes Tafa» (20781) hands it over (8302) -> 17360. INFERRED: which of the eleven copies of that reply and answer the client carries."
     },
     {
       "npc": 307,
@@ -31600,6 +31606,9 @@
       "npc": 1236,
       "map": 167380484,
       "opening": 48636,
+      "openings": [
+        { "after": 612, "message": 48626 }
+      ],
       "lines": [
         {
           "message": 48636,
@@ -31640,9 +31649,17 @@
           "choices": [
             { "reply": 64746 }
           ]
+        },
+        {
+          "message": 48626,
+          "choices": [
+            { "reply": 64736, "next": 48629, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7912 },
+            { "reply": 64745, "teleport": 54175012 },
+            { "reply": 64746 }
+          ]
         }
       ],
-      "why": "Captain Ardier beside the Sanguinario [-34,-16], «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «Capitaine Ardier qui vous attends en [-34,-16]». His welcome (48636); «¿Qué puedes contarme del edicto de Vhelika?» (64736) gets Lario sending him for the burgh (48629), «Seguir escuchando.» (64735) the headache and Astrub's refusal (48630), «¿Quién representaba a Astrub en la asamblea?» (64734) Fallanster (48631) and «Bueno, ¡hasta luego!» (64733) is 7912. «La tierra banquisa» (612): the crossing is offered in 48637 («Venga, vamos a Frigost.», 64753) and hands the quest out, the ship leaving for the first stop; Dofus pour les noobs «La terre banquise»: «Parlez au Capitaine Ardier tout au long du voyage». Review fix: below level 50 the same reply (64753) leads to his refusal 48638 (no quest started), since the quest is for PL>49."
+      "why": "Captain Ardier beside the Sanguinario [-34,-16], «¡Huele a podrido en el reino de Amakna!» (Quelque chose de pourri au royaume d'Amakna, Dofus pour les noobs): «Capitaine Ardier qui vous attends en [-34,-16]». His welcome (48636); «¿Qué puedes contarme del edicto de Vhelika?» (64736) gets Lario sending him for the burgh (48629), «Seguir escuchando.» (64735) the headache and Astrub's refusal (48630), «¿Quién representaba a Astrub en la asamblea?» (64734) Fallanster (48631) and «Bueno, ¡hasta luego!» (64733) is 7912. «La tierra banquisa» (612): the crossing is offered in 48637 («Venga, vamos a Frigost.», 64753) and hands the quest out, the ship leaving for the first stop; Dofus pour les noobs «La terre banquise»: «Parlez au Capitaine Ardier tout au long du voyage». Review fix: below level 50 the same reply (64753) leads to his refusal 48638 (no quest started), since the quest is for PL>49. Once «La tierra banquisa» (612) is done he greets with «¡Has vuelto! Hace un pelín de calor aquí. ¿Quieres tomar el barco para ir a la región de los cubitos de hielo?» (48626, his own dialogData 11611): «Venga, vamos a Frigost.» (64745) sails straight to Frigost's port (54175012) -- without it nobody who had made the first crossing could ever take the Sanguinario again, and «El último de nosotros» (2486, 18986: «Atraviesa el mar Kantil hasta llegar a los muelles del puerto de escarcha») asks for it; «¿Qué puedes contarme del edicto de Vhelika?» (64736) keeps «Huele a podrido» (1424) going there too, and «Bueno, ¡hasta luego!» (64746) leaves. INFERRED: which replies 48626 carries."
     },
     {
       "npc": 2173,
@@ -35871,7 +35888,9 @@
           "message": 17219,
           "choices": [
             { "reply": 20619, "next": 17220, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8235 },
-            { "reply": 20618 }
+            { "reply": 20618 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20754, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20755, "holds": 15138 }
           ]
         },
         {
@@ -35885,11 +35904,13 @@
           "message": 17229,
           "choices": [
             { "reply": 20629, "next": 17220 },
-            { "reply": 20618 }
+            { "reply": 20618 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20754, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20755, "holds": 15138 }
           ]
         }
       ],
-      "why": "The grumpy slave of the Stone Teeth quarry [-4,-52] -- l'esclave Grincheux --: leave me alone, I spend the day breaking stones (17219). For «La risueña miaumiena» (1475), as Dofus pour les noobs, «Chachyène de vie» has it: «¿Sabes dónde está Pol, el panadero?», never heard of him (17220), «Encogerte de hombros e irte» (8235). Once seen, the client's second opening with the same words (17229) asks the same question again (20629) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+      "why": "The grumpy slave of the Stone Teeth quarry [-4,-52] -- l'esclave Grincheux --: leave me alone, I spend the day breaking stones (17219). For «La risueña miaumiena» (1475), as Dofus pour les noobs, «Chachyène de vie» has it: «¿Sabes dónde está Pol, el panadero?», never heard of him (17220), «Encogerte de hombros e irte» (8235). Once seen, the client's second opening with the same words (17229) asks the same question again (20629) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive. «El remedio milagroso» (1478): «Remplissez la fiole en parlant à n'importe quel esclave que vous croiserez (celui en dehors de la cabane par exemple). Vous pouvez prendre sa sueur ou ses selles» (Dofus pour les noobs, «Remède miracle»): with the empty flask (15138), «20754» and «20755» fill it, Secreción de esclavo (15139), objective 8281."
     },
     {
       "npc": 2289,
@@ -35903,7 +35924,9 @@
           "message": 17221,
           "choices": [
             { "reply": 20621, "next": 17222, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8236 },
-            { "reply": 20620 }
+            { "reply": 20620 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20756, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20757, "holds": 15138 }
           ]
         },
         {
@@ -35917,11 +35940,13 @@
           "message": 17230,
           "choices": [
             { "reply": 20630, "next": 17222 },
-            { "reply": 20620 }
+            { "reply": 20620 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20756, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20757, "holds": 15138 }
           ]
         }
       ],
-      "why": "The weary slave [-3,-52] -- l'esclave épuisé --: no whip, only a little break (17221). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», he dug beside him but not any more (17222), «Continúa con tu pausa, yo me voy ya» (8236). Once seen, the client's second opening with the same words (17230) asks the same question again (20630) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+      "why": "The weary slave [-3,-52] -- l'esclave épuisé --: no whip, only a little break (17221). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», he dug beside him but not any more (17222), «Continúa con tu pausa, yo me voy ya» (8236). Once seen, the client's second opening with the same words (17230) asks the same question again (20630) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive. «El remedio milagroso» (1478): «Remplissez la fiole en parlant à n'importe quel esclave que vous croiserez (celui en dehors de la cabane par exemple). Vous pouvez prendre sa sueur ou ses selles» (Dofus pour les noobs, «Remède miracle»): with the empty flask (15138), «20756» and «20757» fill it, Secreción de esclavo (15139), objective 8281."
     },
     {
       "npc": 2290,
@@ -35935,7 +35960,9 @@
           "message": 17223,
           "choices": [
             { "reply": 20623, "next": 17224, "quest": 1475, "afterObjective": 8234, "beforeObjective": 8237 },
-            { "reply": 20622 }
+            { "reply": 20622 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20758, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20759, "holds": 15138 }
           ]
         },
         {
@@ -35949,11 +35976,13 @@
           "message": 17231,
           "choices": [
             { "reply": 20631, "next": 17224 },
-            { "reply": 20622 }
+            { "reply": 20622 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20758, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20759, "holds": 15138 }
           ]
         }
       ],
-      "why": "The vengeful slave [-4,-53] -- l'esclave Revancharde --: one day she will settle Lalat's account (17223). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», no, and the kanigs will not make freeing him easy (17224), «Decir que no te dan miedo e irte» (8237). Once seen, the client's second opening with the same words (17231) asks the same question again (20631) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive."
+      "why": "The vengeful slave [-4,-53] -- l'esclave Revancharde --: one day she will settle Lalat's account (17223). For 1475 (Dofus pour les noobs, «Chachyène de vie»): «¿Sabes dónde está Pol, el panadero?», no, and the kanigs will not make freeing him easy (17224), «Decir que no te dan miedo e irte» (8237). Once seen, the client's second opening with the same words (17231) asks the same question again (20631) for the same answer, with nothing left to tick. The fights the guide warns of («un combat peut aléatoirement se lancer») are the quarry's own kanigs, aggressive. «El remedio milagroso» (1478): «Remplissez la fiole en parlant à n'importe quel esclave que vous croiserez (celui en dehors de la cabane par exemple). Vous pouvez prendre sa sueur ou ses selles» (Dofus pour les noobs, «Remède miracle»): with the empty flask (15138), «20758» and «20759» fill it, Secreción de esclavo (15139), objective 8281."
     },
     {
       "npc": 2291,
@@ -45345,14 +45374,42 @@
         {
           "message": 8427,
           "choices": [
+            { "reply": 72380, "next": 53990, "quest": 2486, "afterObjective": 18924, "beforeObjective": 18925 },
             { "reply": 8449, "startsQuest": 624, "params": [[34, 624]], "criterion": "Qf!624&Qa!624", "door": "key" },
             { "reply": 8450, "startsQuest": 624, "params": [[34, 624]], "criterion": "Qf!624&Qa!624", "door": "keyring" },
             { "reply": 8449, "door": "key" },
             { "reply": 8450, "door": "keyring" }
           ]
+        },
+        {
+          "message": 53990,
+          "choices": [
+            { "reply": 72379, "next": 53991 }
+          ]
+        },
+        {
+          "message": 53991,
+          "choices": [
+            { "reply": 72385, "next": 53993 },
+            { "reply": 72388, "next": 53994 }
+          ]
+        },
+        {
+          "message": 53993,
+          "choices": [
+            { "reply": 72386, "door": "key" },
+            { "reply": 72387 }
+          ]
+        },
+        {
+          "message": 53994,
+          "choices": [
+            { "reply": 72383, "door": "keyring" },
+            { "reply": 72384 }
+          ]
         }
       ],
-      "why": "The guardian of the Cil's Den (Antro del Cil), quest 624 (Dofus pour les noobs, the Frigost dungeon quests): the key reply (8449) or the keyring (8450) starts 624 and opens the dungeon door as the template did; once the quest is done or under way it only opens the door. INFERRED start (the client has no accept reply, the key is the offer)."
+      "why": "The guardian of the Cil's Den (Antro del Cil), quest 624 (Dofus pour les noobs, the Frigost dungeon quests): the key reply (8449) or the keyring (8450) starts 624 and opens the dungeon door as the template did; once the quest is done or under way it only opens the door. INFERRED start (the client has no accept reply, the key is the offer). In «El último de nosotros» (2486, between 18924 and 18925): «Describir brevemente a la fugitiva que persigues.» (72380) → «Pues sí, creo que la he visto pasar... Parecía tener mucha prisa.» (53990), «Ver cómo Cornelia entra sin dudarlo en el santuario en ruinas.» (72379) → «... ¡Hablando de tener prisa!» (53991), whose «Darle la llave.» (72385) and «Utilizar el manojo de llaves.» (72388) ask «¿Seguro que quieres utilizar una llave / el manojo de llaves para entrar?» (53993/53994) and open the door on «Sí.» (72386/72383). Dofus pour les noobs («Les derniers d'entre nous»): «parler à Sylvie Barbe « Décrire brièvement la fugitive que vous poursuivez ». La mamie vous confirme alors que la personne que vous recherchez est entrée dans l'antre il y a peu et aussitôt Cornelia s'engage à sa poursuite»."
     },
     {
       "npc": 1394,
@@ -51409,11 +51466,35 @@
           "choices": [
             {
               "reply": 67838,
-              "door": "keyring"
+              "next": 50604
             },
             {
               "reply": 67833,
+              "next": 50603
+            }
+          ]
+        },
+        {
+          "message": 50604,
+          "choices": [
+            {
+              "reply": 67836,
+              "door": "keyring"
+            },
+            {
+              "reply": 67837
+            }
+          ]
+        },
+        {
+          "message": 50603,
+          "choices": [
+            {
+              "reply": 67835,
               "door": "key"
+            },
+            {
+              "reply": 67834
             }
           ]
         },
@@ -51459,6 +51540,32 @@
           "message": 50740,
           "choices": [
             {
+              "reply": 68022,
+              "next": 50742,
+              "quest": 2451,
+              "beforeObjective": 18573,
+              "completes": 18573,
+              "params": [
+                [
+                  30,
+                  18573
+                ]
+              ]
+            },
+            {
+              "reply": 68017,
+              "next": 50741,
+              "quest": 2451,
+              "beforeObjective": 18573,
+              "completes": 18573,
+              "params": [
+                [
+                  30,
+                  18573
+                ]
+              ]
+            },
+            {
               "reply": 68167,
               "quest": 2451,
               "beforeObjective": 18573,
@@ -51474,22 +51581,51 @@
               "reply": 68167
             }
           ]
+        },
+        {
+          "message": 50742,
+          "choices": [
+            {
+              "reply": 68020,
+              "door": "keyring"
+            },
+            {
+              "reply": 68021
+            }
+          ]
+        },
+        {
+          "message": 50741,
+          "choices": [
+            {
+              "reply": 68019,
+              "door": "key"
+            },
+            {
+              "reply": 68018
+            }
+          ]
         }
       ],
-      "why": "Hell Mina (2217) at the Tertre du long sommeil's entrance [-3,19] (221250562). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): with Karnhell brought, «Indiquer que vous avez retrouvé Karnhell et lui rappeler le marché» (68016, 50737: «yo nunca he aceptado»), «Insistir» (68015, 50738), «Permanecer estoico para que Hell Mina no se dé cuenta de que habla demasiado» (68014) -- she lets slip the secret of the amber block (50739: «Hell Mina a la langue bien pendue et sans le vouloir vous avoue que le tumulus renferme une chose précieuse enfermée dans un bloc d'ambre») --, «¿Puedo ver el bloque más de cerca?» (68013, 50740) and «Ir en busca de algo para entrar en el túmulo y tomarle la palabra» (68167) closes the talk (objective 18573). Hell Mina has no key or keyring reply of the kind the server finds by wording, so without this her door took every answer as the way in (and spent the keyring's free entry on a quest reply): her opening 50601 (the guardian who lets nobody in or out) names the doors, «*le enseñas tu manojo de llaves*» (67838, the keyring) and «Demostrar lo contrario utilizando tu llave» (67833, the key). INFERRED: which of her replies is which door. INFERRED: the pairing of replies and lines, and 50707 as her greeting."
+      "why": "Hell Mina (2217) at the Tertre du long sommeil's entrance [-3,19] (221250562). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): with Karnhell brought, «Indiquer que vous avez retrouvé Karnhell et lui rappeler le marché» (68016, 50737: «yo nunca he aceptado»), «Insistir» (68015, 50738), «Permanecer estoico para que Hell Mina no se dé cuenta de que habla demasiado» (68014) -- she lets slip the secret of the amber block (50739: «Hell Mina a la langue bien pendue et sans le vouloir vous avoue que le tumulus renferme une chose précieuse enfermée dans un bloc d'ambre») --, «¿Puedo ver el bloque más de cerca?» (68013, 50740) and «Ir en busca de algo para entrar en el túmulo y tomarle la palabra» (68167) closes the talk (objective 18573). Hell Mina has no key or keyring reply of the kind the server finds by wording, so without this her door took every answer as the way in (and spent the keyring's free entry on a quest reply): her opening 50601 (the guardian who lets nobody in or out) names the doors, «*le enseñas tu manojo de llaves*» (67838, the keyring) and «Demostrar lo contrario utilizando tu llave» (67833, the key). INFERRED: which of her replies is which door. INFERRED: the pairing of replies and lines, and 50707 as her greeting. Each door answers in her own words before the way in, as the template's ids pair them (content_2451a): the keyring «*le enseñas tu manojo de llaves*» (67838) -> «*mira el manojo de llaves con sospecha*» (50604) -> «Aprovecharte de su vacilación y entrar» (67836) or «Cambiar de opinión y renunciar» (67837); the key «Demostrar lo contrario utilizando tu llave» (67833) -> «¡Tú eres el estúpido por usar la llave!» (50603) -> «Eres demasiado estúpida por dejarme pasar teniendo la llave» (67835) or 67834. Her quest line 50740 carries the second set of the same doors (68022 -> 50742 -> 68020 / 68021; 68017 -> 50741 -> 68019 / 68018), each closing 18573 as 68167 does."
     },
     {
       "npc": 2217,
       "map": 220729859,
-      "opening": 50743,
+      "opening": 50707,
       "lines": [
         {
-          "message": 50743,
+          "message": 50707,
           "choices": [
             {
               "reply": 68023,
               "next": 50743
-            },
+            }
+          ]
+        },
+        {
+          "message": 50743,
+          "choices": [
             {
               "reply": 68024,
               "next": 50744
@@ -51517,7 +51653,7 @@
           ]
         }
       ],
-      "why": "Hell Mina (2217) in the Tertre du long sommeil's post-boss room (220729859), beaten («No creas que me has vencido», 50743). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui vous intime de ne pas vous approcher de l'ambre «Jeter un regard circulaire autour de vous» (68023). Intéressez-vous alors à Kharnel sa karne en lui faisant un signe (68024)... Hell Mina vous fait comprendre que c'est sa karne car elle a peur que vous la lui voliez» (50744, «¡Es MI karne!»); «Te pido disculpas...» (68025) ends the talk, the quest and, as the room's exit reply, the dungeon. INFERRED: the pairing of replies and lines; looking around (68023) only leads back to her opening."
+      "why": "Hell Mina (2217) in the Tertre du long sommeil's post-boss room (220729859), beaten («No creas que me has vencido», 50743). «Arrête-la si tu peux» (2451) (Dofus pour les noobs, «Arrête-la si tu peux»): «Hell Mina qui vous intime de ne pas vous approcher de l'ambre «Jeter un regard circulaire autour de vous» (68023). Intéressez-vous alors à Kharnel sa karne en lui faisant un signe (68024)... Hell Mina vous fait comprendre que c'est sa karne car elle a peur que vous la lui voliez» (50744, «¡Es MI karne!»); «Te pido disculpas...» (68025) ends the talk, the quest and, as the room's exit reply, the dungeon. INFERRED: the pairing of replies and lines. Her opening is 50707 («¡Atrás! El fuego de Vlad... ¡Te consumirá...!», the guide's «vous intime de ne pas vous approcher de l'ambre», and one of the template's dialogData openings, which 50743 is not); looking around (68023) brings 50743, where she owns to watching her karne, and then the karne is noticed (68024) (content_2451b)."
     },
     {
       "npc": 2955,
@@ -52561,7 +52697,9 @@
           "message": 28723,
           "choices": [
             { "reply": 34445, "next": 28724, "quest": 1905, "afterObjective": 13024, "beforeObjective": 13025 },
-            { "reply": 34450, "next": 28730, "criterion": "Qf=1905", "beforeQuest": 1906 }
+            { "reply": 34450, "next": 28730, "criterion": "Qf=1905", "beforeQuest": 1906 },
+            { "reply": 34793, "next": 29010, "quest": 1908, "afterObjective": 13066, "beforeObjective": 13067, "completes": 13067, "params": [[30, 13067]] },
+            { "reply": 34794, "next": 29015, "criterion": "Qf=1908", "beforeQuest": 1909, "startsQuest": 1909, "params": [[34, 1909]] }
           ]
         },
         {
@@ -52625,9 +52763,46 @@
           "choices": [
             { "reply": 34446, "startsQuest": 1906, "params": [[34, 1906]] }
           ]
+        },
+        {
+          "message": 29010,
+          "choices": [
+            { "reply": 34792, "next": 29011 }
+          ]
+        },
+        {
+          "message": 29011,
+          "choices": [
+            { "reply": 34791, "next": 29012 }
+          ]
+        },
+        {
+          "message": 29012,
+          "choices": [
+            { "reply": 34790, "next": 29013 }
+          ]
+        },
+        {
+          "message": 29013,
+          "choices": [
+            { "reply": 34789, "next": 29014, "criterion": "Qf=1908", "beforeQuest": 1909, "startsQuest": 1909, "params": [[34, 1909]] },
+            { "reply": 34789, "next": 29014, "criterion": "Qa=1909|Qf=1909" }
+          ]
+        },
+        {
+          "message": 29014,
+          "choices": [
+            { "reply": 34788 }
+          ]
+        },
+        {
+          "message": 29015,
+          "choices": [
+            { "reply": 34795 }
+          ]
         }
       ],
-      "why": "Dardondakal (4053) in the Ivory Room: «El murmullo de tu voz ha llegado hasta mis oídos, mortal. Habla, te escucho» (28723). «El dragón blanco» (1905), objective 13025: «Parlez à Dardondakal « S'incliner respectueusement devant le dragon » puis « Répondre que la quête des Dofus est la destinée des héros » afin de terminer la quête» (Dofus pour les noobs): «Inclinarte con respeto ante el dragón» (34445) -> «¿Por qué buscas...?» (28724) -> «La búsqueda de los dofus es el destino de los héroes» (34443; INFERRED: «Quiero preservar la armonía...» 34442 and «Busco la gloria y el poder» 34444 end it the same) does 13025 -> «Si cumples con la tarea...» (28725). «La quête se termine mais en poursuivant votre discussion avec Dardondakal, vous obtiendrez la prochaine quête : Examen de passage»: «Estoy en condiciones de cumplir la tarea que deseas encomendarme» (34455) -> tired of death, Thanatena (28726) -> «¿Quién es Thanatena?» (34454) -> the queen of Externam (28727) -> «Yo podría interceder a tu favor ante Thanatena» (34453) -> (28728) -> «Seguir escuchando» (34452) -> «El rey Galdarion de Bonta conoce ese camino» (28729, the step line of «Examen de paso», 1906) -> «Partir inmediatamente hacia Bonta» (34451) starts 1906. Whoever left before: «Cuéntame más» (34450) -> the client's second copy of that chain (28730-28733, 34449-34446) starts it too."
+      "why": "Dardondakal (4053) in the Ivory Room: «El murmullo de tu voz ha llegado hasta mis oídos, mortal. Habla, te escucho» (28723). «El dragón blanco» (1905), objective 13025: «Parlez à Dardondakal « S'incliner respectueusement devant le dragon » puis « Répondre que la quête des Dofus est la destinée des héros » afin de terminer la quête» (Dofus pour les noobs): «Inclinarte con respeto ante el dragón» (34445) -> «¿Por qué buscas...?» (28724) -> «La búsqueda de los dofus es el destino de los héroes» (34443; INFERRED: «Quiero preservar la armonía...» 34442 and «Busco la gloria y el poder» 34444 end it the same) does 13025 -> «Si cumples con la tarea...» (28725). «La quête se termine mais en poursuivant votre discussion avec Dardondakal, vous obtiendrez la prochaine quête : Examen de passage»: «Estoy en condiciones de cumplir la tarea que deseas encomendarme» (34455) -> tired of death, Thanatena (28726) -> «¿Quién es Thanatena?» (34454) -> the queen of Externam (28727) -> «Yo podría interceder a tu favor ante Thanatena» (34453) -> (28728) -> «Seguir escuchando» (34452) -> «El rey Galdarion de Bonta conoce ese camino» (28729, the step line of «Examen de paso», 1906) -> «Partir inmediatamente hacia Bonta» (34451) starts 1906. Whoever left before: «Cuéntame más» (34450) -> the client's second copy of that chain (28730-28733, 34449-34446) starts it too. «Golpe en Anutropía» (1908, 13067), back in the Ivory Room: «reparler à Dardondakal « Résumer votre rencontre avec la reine Thanatena ». Dardondakla reconnait avoir eu tort d'accorder sa confiance à un mortel et il vous parlera aussi d'Hyrkul ... Le seul moyen de sauver Dardondakal serait de changer son destin et seul les Nordes en sont capable. La quête se termine et en continuant votre dialogue vous débloquez la prochaine quête : Nordalie» (Dofus pour les noobs, «Casse en Enutrosor»). «Resumir tu encuentro con la reina Thanatena.» (34793) is 13067, the end of 1908: so be it (29010); «Mencionar tus altercados con los secuaces de Hyrkul.» (34792): Hyrkul the lich (29011); «Thanatena e Ilyzaelle han hablado del destino.» (34791): not master of his fate (29012); «Tiene que haber una manera de cambiar las cosas.» (34790): only the norns (29013); «Estoy dispuesto a negociar con las nordes.» (34789) starts «Nordalía» (1909) on its step dialog (29014), «No regresaré hasta haber hablado con las nordes y convencido a la reina.» (34788). Who left before that is offered the twin pair (34794, 29015, 34795)."
     },
     {
       "npc": 2933,
@@ -52900,6 +53075,7 @@
             { "reply": 34520, "next": 28775, "quest": 1906, "afterObjective": 13047, "beforeObjective": 13048, "completes": 13048, "params": [[30, 13048]] },
             { "reply": 34518, "next": 28777, "criterion": "Qf=1906", "beforeQuest": 1907 },
             { "reply": 34780, "next": 29004, "quest": 1907, "beforeObjective": 13049 },
+            { "reply": 34787, "next": 29006, "quest": 1908, "afterObjective": 13064, "beforeObjective": 13065 },
             { "reply": 34512, "teleport": 183501836 }
           ]
         },
@@ -52950,9 +53126,33 @@
           "choices": [
             { "reply": 34781 }
           ]
+        },
+        {
+          "message": 29006,
+          "choices": [
+            { "reply": 34786, "next": 29007, "quest": 1908, "afterObjective": 13064, "beforeObjective": 13065 }
+          ]
+        },
+        {
+          "message": 29007,
+          "choices": [
+            { "reply": 34785, "next": 29008, "quest": 1908, "afterObjective": 13064, "beforeObjective": 13065 }
+          ]
+        },
+        {
+          "message": 29008,
+          "choices": [
+            { "reply": 34784, "next": 29009, "quest": 1908, "afterObjective": 13064, "beforeObjective": 13065 }
+          ]
+        },
+        {
+          "message": 29009,
+          "choices": [
+            { "reply": 34783, "quest": 1908, "afterObjective": 13064, "beforeObjective": 13065, "completes": 13065, "params": [[30, 13065]] }
+          ]
         }
       ],
-      "why": "Ilyzaelle, on her watch before Nas Orazal's wound, the last room of her Lookout. «Examen de paso» (1906), 13048: Dofus pour les noobs, «Vous êtes téléporté devant Ilyzaelle, parlez lui \"En savoir plus sur les créature que vous avez combattues\". La quête se termine». The soul burners (28775) and, asked about the Dofus (34519), the kings' Dofus she took from Leorictus (28776). «Quitter le Belvédère» (34512) leaves for the gate, 183501836. «El Reino Gris» (1907): Dofus pour les noobs, «La quête se lance à la suite de la précédente auprès d'Ilyzaelle ... qui vous autorise à franchir le portail vers Externam». Wanting to cross the wound (34518) she reads Dardondakal's light on you (28777); defending the dragon before Thanatena (34517), she asks how you will cross (28778); showing the death mask (34516, 19165) starts the quest on its step dialog (28779), her touch (34515) and her blessing (28780), «Darle las gracias y acercarte al portal» (34514). Back before crossing, the mask shown again (34780) gets the same words (29004, 29005)."
+      "why": "Ilyzaelle, on her watch before Nas Orazal's wound, the last room of her Lookout. «Examen de paso» (1906), 13048: Dofus pour les noobs, «Vous êtes téléporté devant Ilyzaelle, parlez lui \"En savoir plus sur les créature que vous avez combattues\". La quête se termine». The soul burners (28775) and, asked about the Dofus (34519), the kings' Dofus she took from Leorictus (28776). «Quitter le Belvédère» (34512) leaves for the gate, 183501836. «El Reino Gris» (1907): Dofus pour les noobs, «La quête se lance à la suite de la précédente auprès d'Ilyzaelle ... qui vous autorise à franchir le portail vers Externam». Wanting to cross the wound (34518) she reads Dardondakal's light on you (28777); defending the dragon before Thanatena (34517), she asks how you will cross (28778); showing the death mask (34516, 19165) starts the quest on its step dialog (28779), her touch (34515) and her blessing (28780), «Darle las gracias y acercarte al portal» (34514). Back before crossing, the mask shown again (34780) gets the same words (29004, 29005). «Golpe en Anutropía» (1908, 13065): «Sortez d'Externam en cliquant sur le feu au centre de la pièce. Puis parlez à Ilyzaelle pour « Relater votre entrevue avec la reine Thanatena ». Elle vous en dira plus sur la personne qui a trahi et enchainé Dardondakal et sur comment elle l'a libéré avec l'aide d'un porteur de Dofus» (Dofus pour les noobs, «Casse en Enutrosor»). «Contar tu entrevista con la reina Thanatena.» (34787): a great honour (29006); «Evocar lo de las cadenas del dofus Marfil.» (34786): a dofus bearer broke them with her (29007); «¿Qué opinas de Dardondakal?» (34785): could the queen change her mind? (29008); «Me parece una esperanza muy pequeña.» (34784): it may be up to you, a dragon waits (29009); «Hasta luego.» (34783) is 13065."
     },
     {"npc": 4102, "map": 205261569, "opening": 28764, "_byHand": true, "lines": [{"message": 28764, "choices": [{"reply": 34493, "passage": 4102002}, {"reply": 55030, "next": 42278}, {"reply": 34494}]}, {"message": 42278, "choices": [{"reply": 55028, "passage": 4102001}, {"reply": 55029}]}], "why": "The Grobe ferryman at the Pandala pier [27,-27]. Grobe, the land of the ancestors (28764): «Así es. Vamos pues a la isla de Grobe.» (34493) sails to the island, «Uy, tengo fobia a los no muertos» (34494) stays. «¿Hay otro destino final?» (55030) tells of the abandoned temple off Grobe's coast (42278) and «Embarcar hacia el templo» (55028) sails there, «Rechazar y quedarte aquí» (55029) stays: Dofus pour les noobs («Examen de passage»): «parlez au Nocher de Grobe en lui disant d'abord « S'enquérir d'une autre destination finale », puis il faudra choisir « Embarquer pour le temple »». The atoll of the possessed (64560) and the soul road's lines are other quests', not offered here."},
     {"npc": 4102, "map": 206831621, "opening": 28765, "_byHand": true, "lines": [{"message": 28765, "choices": [{"reply": 34495, "passage": 4102003}, {"reply": 55033, "next": 42279}, {"reply": 34496}]}, {"message": 42279, "choices": [{"reply": 55031, "passage": 4102004}, {"reply": 55032}]}], "why": "The Grobe ferryman on the island's pier [34,-40]: «¿Listo para el viaje?» (28765), «Embarcar hacia Tierradala» (34495) back to Pandala, «¿Hay otro destino final?» (55033) to the temple (42279, «Embarcar hacia el templo» 55031, «Rechazar y quedarte aquí» 55032), «Quedarte donde estás» (34496). The soul road's lines (55601, 55608) belong to another quest."},
@@ -53534,7 +53734,9 @@
           "message": 28971,
           "choices": [
             { "reply": 34745, "next": 28972, "quest": 1907, "beforeObjective": 13057 },
-            { "reply": 34746, "next": 28976, "quest": 1908, "beforeObjective": 13063 }
+            { "reply": 34746, "next": 28976, "quest": 1908, "beforeObjective": 13062 },
+            { "reply": 34771, "next": 28993, "quest": 1908, "afterObjective": 13062, "beforeObjective": 13063 },
+            { "reply": 34771, "next": 28995, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
           ]
         },
         {
@@ -53566,9 +53768,27 @@
           "choices": [
             { "reply": 34747 }
           ]
+        },
+        {
+          "message": 28993,
+          "choices": [
+            { "reply": 34770, "next": 28994, "quest": 1908, "beforeObjective": 13063, "holds": 19169, "completes": 13063, "params": [[30, 13063]] }
+          ]
+        },
+        {
+          "message": 28994,
+          "choices": [
+            { "reply": 34769, "next": 28995, "takes": 19169 }
+          ]
+        },
+        {
+          "message": 28995,
+          "choices": [
+            { "reply": 34768, "passage": 4072001 }
+          ]
         }
       ],
-      "why": "Archon Khebesto in the Hall of Judgment, on the pulpit right of the scales, for «El Reino Gris» (1907) and «Golpe en Anutropía» (1908). Dofus pour les noobs: «Parlez à l'Archonte Kebesto qui vous annoncera que pour rencontrer la Reine il faut faire l'offrande d'une relique à la Nécropole. La quête se termine et vous débloquez la suivante : Casse en Enutrosor»; the guide's screenshot has his first reply, «Dire que vous n'êtes pas là pour cette raison» (34745). He finds your request for an audience (28972), the law of the relic (34744, 28973); «Es un asunto importante» (34743) is 13057, and asking how to get it (34742) starts 1908 on its step dialog, a precious Enutrosor chest to destroy (28975). During 1908, the same words (34746, 28976)."
+      "why": "Archon Khebesto in the Hall of Judgment, on the pulpit right of the scales, for «El Reino Gris» (1907) and «Golpe en Anutropía» (1908). Dofus pour les noobs: «Parlez à l'Archonte Kebesto qui vous annoncera que pour rencontrer la Reine il faut faire l'offrande d'une relique à la Nécropole. La quête se termine et vous débloquez la suivante : Casse en Enutrosor»; the guide's screenshot has his first reply, «Dire que vous n'êtes pas là pour cette raison» (34745). He finds your request for an audience (28972), the law of the relic (34744, 28973); «Es un asunto importante» (34743) is 13057, and asking how to get it (34742) starts 1908 on its step dialog, a precious Enutrosor chest to destroy (28975). During 1908, the same words (34746, 28976). «Golpe en Anutropía» (1908), back with the piece of the precious chest: «Franchissez toutes les salles jusqu'à la salle d'audience puis parlez à l'Archonte Kebesto pour lui apprendre que vous avez combattu un coffret précieux. Il vous annonce alors que la reine a accepté votre audience» (Dofus pour les noobs, «Casse en Enutrosor»). «Recordar el porqué de tu visita.» (34771): «Ah, eres tú. ¿Has hecho lo necesario?» (28993); «Responder que has destruido un cofrecillo valioso y enseñar un pedazo como muestra de buena fe.» (34770) is 13063; he keeps it (28994) as «Preguntarte cómo hace para leer con los ojos vendados.» (34769) hands it over; the queen waits near the Gates of Onekros (28995) and «Dirigirte al puente de los Últimos Suspiros para llegar hasta las puertas.» (34768) takes you to the bridge's end by the Gates (passage 4072001). Asked again before seeing her, he repeats 28995. The relic question (34746) now stops once the chest is broken (13062)."
     },
     {
       "npc": 2342,
@@ -53917,6 +54137,9 @@
         {
           "message": 17637,
           "choices": [
+            { "reply": 34752, "next": 28979, "quest": 1908, "afterObjective": 13058, "beforeObjective": 13060 },
+            { "reply": 34760, "next": 28985, "quest": 1908, "afterObjective": 13059, "beforeObjective": 13060, "criterion": "Qf!1510&(Qf!1507|Qf!1506)&Qf!1507" },
+            { "reply": 34760, "next": 28986, "quest": 1908, "afterObjective": 13059, "beforeObjective": 13060, "criterion": "Qf!1510&(Qf!1507|Qf!1506)&Qf=1507" },
             { "reply": 21156, "next": 17644, "quest": 1506, "afterObjective": 8494, "beforeObjective": 8495, "completes": 8495, "params": [[30, 8495]] },
             { "reply": 39373, "quest": 1506, "afterObjective": 8495, "beforeObjective": 8498, "criterion": "OA=1088", "teleport": 130287616 },
             { "reply": 21147, "next": 17638 }
@@ -53961,9 +54184,56 @@
           "choices": [
             { "reply": 21143 }
           ]
+        },
+        {
+          "message": 28979,
+          "choices": [
+            { "reply": 34751, "next": 28980, "quest": 1908, "beforeObjective": 13059, "completes": 13059, "params": [[30, 13059]] },
+            { "reply": 34751, "next": 28980, "quest": 1908, "afterObjective": 13059 }
+          ]
+        },
+        {
+          "message": 28980,
+          "choices": [
+            { "reply": 34750, "next": 28981 },
+            { "reply": 34753 }
+          ]
+        },
+        {
+          "message": 28981,
+          "choices": [
+            { "reply": 34755, "next": 28982, "criterion": "Qf!1510&(Qf!1507|Qf!1506)&Qf!1507" },
+            { "reply": 34755, "next": 28983, "criterion": "Qf!1510&(Qf!1507|Qf!1506)&Qf=1507" },
+            { "reply": 34756, "criterion": "Qf=1510|(Qf=1506&Qf=1507)" },
+            { "reply": 34754 }
+          ]
+        },
+        {
+          "message": 28982,
+          "choices": [
+            { "reply": 34758 }
+          ]
+        },
+        {
+          "message": 28983,
+          "choices": [
+            { "reply": 34759 }
+          ]
+        },
+        {
+          "message": 28985,
+          "choices": [
+            { "reply": 34758 }
+          ]
+        },
+        {
+          "message": 28986,
+          "choices": [
+            { "reply": 34759 }
+          ]
         }
       ],
-      "why": "Inès Karcela, who keeps the Fábrica de Malefíscof at [-6,-2]. For «El maleficio del cofre» (1506): «Expliquez alors le problème des Koffrefors à Inès. Inès Karcel vous apprend que Malléfisk est normalement enfermé dans ses coffres ... une puissante sorcière Enutrof transformée ... Pour rencontrer Malléfisk, il vous faut une clef et terminer le donjon» (Dofus pour les noobs, «Malladie»): «Explicarle el problema con los cofrefuertes» (21156, 17644) is 8495; «¿Qué más puedes decirme sobre Malefíscof?» (21155, 17645) and «¿... sobre Riberico?» (21154, 17646) follow. «Me sorprende que una simple anutrof sea responsable de la fábrica de kamas» (21147) is her story (17638-17641), «Irte avergonzado» (21143). The door's own replies (the key, «Retomar...») come from DungeonDoor on top of these. «Tengo una conversación pendiente con Malefíscof, tengo prisa.» (39373) takes whoever has the dungeon done (its achievement 1088) and still owes Malefíscof the conversation (8496-8498) to the exit room, where she stands: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»), without a second key."
+      "why": "Inès Karcela, who keeps the Fábrica de Malefíscof at [-6,-2]. For «El maleficio del cofre» (1506): «Expliquez alors le problème des Koffrefors à Inès. Inès Karcel vous apprend que Malléfisk est normalement enfermé dans ses coffres ... une puissante sorcière Enutrof transformée ... Pour rencontrer Malléfisk, il vous faut une clef et terminer le donjon» (Dofus pour les noobs, «Malladie»): «Explicarle el problema con los cofrefuertes» (21156, 17644) is 8495; «¿Qué más puedes decirme sobre Malefíscof?» (21155, 17645) and «¿... sobre Riberico?» (21154, 17646) follow. «Me sorprende que una simple anutrof sea responsable de la fábrica de kamas» (21147) is her story (17638-17641), «Irte avergonzado» (21143). The door's own replies (the key, «Retomar...») come from DungeonDoor on top of these. «Tengo una conversación pendiente con Malefíscof, tengo prisa.» (39373) takes whoever has the dungeon done (its achievement 1088) and still owes Malefíscof the conversation (8496-8498) to the exit room, where she stands: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»), without a second key. «Golpe en Anutropía» (1908), once through the portal (13058): «Parlez alors à Inès Karcel « Dire que vous cherchez des informations sur les coffrets précieux d'Enutrosor ». Elle vous orientera vers le chef de la confrérie des Coffrets précieux mais vous préviens qu'il vous sera impossible d'en acheter un» (Dofus pour les noobs, «Casse en Enutrosor»). «Estoy buscando información sobre esos cofrecillos valiosos de Anutropía.» (34752): small strongboxes of rare metals, made by a company allied to the Cofredía (28979); «¿Dónde puedo conseguir uno de esos cofrecillos?» (34751) is 13059: no divinutrof will sell one, but try the head of the Cofradía de los Cofrecillos Valiosos, who spends his time in one of the Cofredía's private properties (28980). «¿Qué necesito para acceder a la propiedad?» (34750): Anciago can let you in, if he trusts you (28981). Who has not yet earned it (1510 wants 1506 and 1507) asks «¿Cómo puedo demostrarlo?» (34755) and is sent to Graverg's gold quarry (28982, 1507) or to the dimensional travellers' outpost (28983, 1506); coming back, «¿Cómo demuestro a Anciago que puede confiar en mí?» (34760) gets the same advice (28985, 28986). Who has, «Ir a ver a Anciago.» (34756)."
     },
     {
       "npc": 2395,
@@ -54416,6 +54686,193 @@
       "why": "Williamwadui beside Graverg at [3,-4], for «Las grandes galerías» (1507, 8504): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous. En guise de sa reconnaissance, il vous offre un précieux joyaux et la quête se termine» (Dofus pour les noobs, «Les grandes galeries»): «Demander si tout va bien.» (20999), «Sí, creo que te debo una ... acepta esta magnífica joya» (17536), «Agarra la joya.» (20998); the jewel (15318) is the step's reward."
     },
     {
+      "npc": 2853,
+      "map": 147850754,
+      "opening": 20513,
+      "openings": [
+        { "canStart": 2486, "message": 53912 }
+      ],
+      "lines": [
+        {
+          "message": 20513,
+          "choices": [
+            { "reply": 24543, "next": 20514 },
+            { "reply": 24544 }
+          ]
+        },
+        {
+          "message": 20514,
+          "choices": []
+        },
+        {
+          "message": 53912,
+          "choices": [
+            { "reply": 72288, "next": 53913, "beforeQuest": 2486 }
+          ]
+        },
+        {
+          "message": 53913,
+          "choices": [
+            { "reply": 72287, "next": 53915, "beforeQuest": 2486 }
+          ]
+        },
+        {
+          "message": 53915,
+          "choices": [
+            { "reply": 72286, "next": 53914, "beforeQuest": 2486 }
+          ]
+        },
+        {
+          "message": 53914,
+          "choices": [
+            { "reply": 72284, "startsQuest": 2486, "params": [[34, 2486]], "beforeQuest": 2486 },
+            { "reply": 72285 }
+          ]
+        }
+      ],
+      "why": "Kroa at Silvosse's statue [-11,-13]. To whoever may start «El último de nosotros» (2486): «¡Crua! ¡Cra, crua, craaa! ¡Crua!» (53912), «Reconocer al cuerbok de Cornelia Trancos.» (72288), «*da saltitos mientras grazna*» (53913), «Darte cuenta de que el ave parece estar un tanto estresado.» (72287), «*agita sus alas frenéticamente*» (53915), «¿Tu dueña tiene problemas?» (72286), and the quest's own step line «¡CRUA! ¡CRAAA CRUA! ¡CRA!» (53914): «Decidir seguir al cuerbok.» (72284) starts it, «Alejarte de este pájaro de mal agüero.» (72285) leaves. Dofus pour les noobs («Les derniers d'entre nous»): «Le corbac semble dans tous ses états, il est sûrement arrivé quelque chose à sa maîtresse Cornelia « Décider de suivre le corbac »». Otherwise his own greeting 20513 «¡Cruaa!, ¡cruaaa!»: «Alargar la mano hacia el cuerbok.» (24543) gets a peck (20514), «Dejar al cuerbok graznar.» (24544) leaves. The order of the lines between 53912 and 53914 is INFERRED from the texts and the reply ids (72288 down to 72284)."
+    },
+    {
+      "npc": 2853,
+      "map": 147854339,
+      "opening": 53912,
+      "lines": [
+        {
+          "message": 53912,
+          "choices": [
+            { "reply": 72289 }
+          ]
+        }
+      ],
+      "why": "Kroa at the mouth of the abandoned mine [-4,-12] in «El último de nosotros» (2486): «¡Crua! ¡Cra, crua, craaa! ¡Crua!» (53912) and «Ver cómo Kroa señala la entrada de la galería.» (72289). Dofus pour les noobs («Les derniers d'entre nous»): «reparlez à Kroa qui semble vous indiquer l'entrée de la mine»."
+    },
+    {
+      "npc": 2853,
+      "map": 150211588,
+      "opening": 53915,
+      "lines": [
+        {
+          "message": 53915,
+          "choices": [
+            { "reply": 72290 }
+          ]
+        }
+      ],
+      "why": "Kroa in front of the top hole of the mine's last room (150211588) in «El último de nosotros» (2486): «*agita sus alas frenéticamente*» (53915) and «Escuchar una voz que te llama desde las profundidades.» (72290), Cornelia calling from her prison below. Dofus pour les noobs («Les derniers d'entre nous»): «le trou en haut (celui devant lequel se trouve Kroa)». INFERRED which of Kroa's lines."
+    },
+    {
+      "npc": 7120,
+      "map": 150209536,
+      "opening": 53942,
+      "openings": [
+        { "quest": 2486, "objective": 18915, "message": 53941 }
+      ],
+      "lines": [
+        {
+          "message": 53942,
+          "choices": [
+            { "reply": 72317, "quest": 2486, "beforeObjective": 18915 },
+            { "reply": 72318 }
+          ]
+        },
+        {
+          "message": 53941,
+          "choices": [
+            { "reply": 72316, "quest": 2486, "afterObjective": 18915, "passage": 7120001 },
+            { "reply": 72322, "next": 53943 }
+          ]
+        },
+        {
+          "message": 53943,
+          "choices": [
+            { "reply": 72321, "next": 53944 }
+          ]
+        },
+        {
+          "message": 53944,
+          "choices": [
+            { "reply": 72320, "next": 53945 },
+            { "reply": 72319 }
+          ]
+        },
+        {
+          "message": 53945,
+          "choices": []
+        }
+      ],
+      "why": "Cornelia Trancos in her bramble prison (150209536) in «El último de nosotros» (2486). Caught: «Alabada sea la diosa, ¡Kroa ha conseguido atraer tu atención! Si pudieras liberarme de esta trampa vegetal...» (53942); «Llegar hasta la raíz del problema.» (72317) opens the fight (npc_fights.json, 18915), «Tomarte un tiempo para pensártelo.» (72318) leaves. Freed: «¡Eres más eficaz que un ejército de leñadores! Salgamos de aquí, empiezo a tener claustrofobia.» (53941); «Seguirla hasta fuera.» (72316) takes the character out (teleports.json 7120001). «¿Qué sabes de Kalisto y su cuerbok?» (72322) opens one of her four copies of the Kalisto talk (53943 → «Cuéntame más sobre este tema.» 72321 → 53944, Kokillette → «Ya conozco a Kokillette.» 72320 → 53945, or «Gracias, me voy al Bosque Oscuro.» 72319). Dofus pour les noobs («Les derniers d'entre nous»): «Une fois le combat terminé, reparlez à Cornelia Granpa qui vous remercie et vous demande de la rejoindre dehors». INFERRED: which line the Kalisto copy hangs from (its reply ids 72319-72322 sit beside 72316-72318)."
+    },
+    {
+      "npc": 7120,
+      "map": 147854339,
+      "opening": 53946,
+      "openings": [
+        { "quest": 2486, "objective": 18915, "pending": 18916, "message": 53947 }
+      ],
+      "lines": [
+        {
+          "message": 53946,
+          "choices": []
+        },
+        {
+          "message": 53947,
+          "choices": [
+            { "reply": 72331, "next": 53948 },
+            { "reply": 72332, "next": 53948 }
+          ]
+        },
+        {
+          "message": 53948,
+          "choices": [
+            { "reply": 72330, "next": 53949 }
+          ]
+        },
+        {
+          "message": 53949,
+          "choices": [
+            { "reply": 72329, "next": 53950 }
+          ]
+        },
+        {
+          "message": 53950,
+          "choices": [
+            { "reply": 72328, "next": 53951 }
+          ]
+        },
+        {
+          "message": 53951,
+          "choices": [
+            { "reply": 72327, "next": 53952 }
+          ]
+        },
+        {
+          "message": 53952,
+          "choices": [
+            { "reply": 72326, "next": 53953 }
+          ]
+        },
+        {
+          "message": 53953,
+          "choices": [
+            { "reply": 72325, "next": 53954 }
+          ]
+        },
+        {
+          "message": 53954,
+          "choices": [
+            { "reply": 72324, "next": 53955 }
+          ]
+        },
+        {
+          "message": 53955,
+          "choices": [
+            { "reply": 72323, "quest": 2486, "beforeObjective": 18916, "completes": 18916, "params": [[30, 18916]] }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos outside the mine [-4,-12] (147854339) in «El último de nosotros» (2486), once freed: «Antes que nada, gracias por tu ayuda...» (53947); «Otros exploradores del reino habrían acabado encontrándote.» (72331) or «¿Qué pasó para que te capturaran?» (72332) → «... tenía un motivo concreto para acudir a ti. Un huevo negro...» (53948); «Pensar en el objeto que le diste al Abráknido Ancestral...» (72330) → the egg changed hands (53949); «¿Quién es el nuevo propietario?» (72329) → a hooded figure who controls voodoo dolls (53950); «Hablar de la muñeca conspiradora...» (72328) → 53951; «Cuéntame más sobre lo que esconde el oscuro cascarón.» (72327) → the egg was laid by a cuerbok, the Ancestral Abraknyde (53952); «Seguir escuchando.» (72326) → its power (53953); «Tengo mis dudas con respecto a eso.» (72325) → 53954; «Reconozco que es mejor prepararse para lo peor.» (72324) → frost on the cloak, the west (53955); «Seguiré tu sugerencia.» (72323) does 18916 (her type-1 objective, given its reply so a hello does not tick it). Dofus pour les noobs («Les derniers d'entre nous»): «reparlez à Cornelia Granpa qui vous parle de l'oeuf noir que l'Abraknyde Ancestral vous avait chargé de récupérer … venant de Frigost car ses vêtements étaient recouverts de givre». Her line 53946 «Las hojas del antiguo bosque no caen sin razón...» is her plain greeting. INFERRED: the order, from the texts and the reply ids (72332 down to 72323)."
+    },
+    {
       "npc": 2424,
       "map": 129763328,
       "opening": 17788,
@@ -54424,6 +54881,7 @@
           "message": 17788,
           "choices": [
             { "reply": 21321, "next": 17789, "criterion": "Qc=1510" },
+            { "reply": 21324, "criterion": "Qf=1510", "passage": 2424001 },
             { "reply": 21324, "quest": 1510, "beforeObjective": 8563, "passage": 2424001 },
             { "reply": 21326, "next": 17792, "quest": 1510, "afterObjective": 8553, "beforeObjective": 8554, "takesAll": [15347, 15348, 15349], "completes": 8554, "params": [[30, 8554]] },
             { "reply": 21356, "next": 17819, "quest": 1510, "afterObjective": 8563, "completes": 8564, "params": [[30, 8564]] }
@@ -54464,7 +54922,7 @@
           "choices": []
         }
       ],
-      "why": "Anciago before the Cofredía's building at [-8,-5], who gives «Espionaje industrial» (1510): «Parlez à Ancestro en [-8,-5]» (Dofus pour les noobs, «Espionnage industriel»). «Informarte sobre los empleos disponibles en el sector.» (21321, 17789), «Sí.» (21320, 17790: his brother Riberico spoke of you; a spy in the Cofredía), «Aceptar jugar a los investigadores.» (21319) starts it, and he sends you in (17791, «Entrar en el edificio de la Cofredía.», 21322). His opening has «Accéder au bâtiment» and «Donner les indices» side by side in the guide's picture: «Entrar en el edificio de la Cofredía.» (21324) while the quest is in hand, and «Aquí tienes las pistas que he encontrado.» (21326) once the three clues are carried (8553), which he keeps (8554: «como las has metido de cualquier modo en tu bolso, se han mezclado todas. Sin embargo, me sorprende ver el polvo sulfurado», 17792); «Intentar averiguar cómo ha podido llegar ahí el polvo.» (21325, 17793: question the Cofredía's workers and the Comilones') and in again (21323). Once the guard is told (8563), «Explicar la situación.» (21356) is 8564: «Así que el topo es Yiyo» (17819)."
+      "why": "Anciago before the Cofredía's building at [-8,-5], who gives «Espionaje industrial» (1510): «Parlez à Ancestro en [-8,-5]» (Dofus pour les noobs, «Espionnage industriel»). «Informarte sobre los empleos disponibles en el sector.» (21321, 17789), «Sí.» (21320, 17790: his brother Riberico spoke of you; a spy in the Cofredía), «Aceptar jugar a los investigadores.» (21319) starts it, and he sends you in (17791, «Entrar en el edificio de la Cofredía.», 21322). His opening has «Accéder au bâtiment» and «Donner les indices» side by side in the guide's picture: «Entrar en el edificio de la Cofredía.» (21324) while the quest is in hand, and «Aquí tienes las pistas que he encontrado.» (21326) once the three clues are carried (8553), which he keeps (8554: «como las has metido de cualquier modo en tu bolso, se han mezclado todas. Sin embargo, me sorprende ver el polvo sulfurado», 17792); «Intentar averiguar cómo ha podido llegar ahí el polvo.» (21325, 17793: question the Cofredía's workers and the Comilones') and in again (21323). Once the guard is told (8563), «Explicar la situación.» (21356) is 8564: «Así que el topo es Yiyo» (17819). Once the spy is unmasked (1510 done), «Entrar en el edificio de la Cofredía.» (21324) stays open: for «Golpe en Anutropía» (1908) «Anciago probablemente pueda darte acceso al edificio» (Inés, 28981); «Allez donc en [-8,-5] pour rencontrer Pépénible et accéder au bâtiment de la Koffrérie. NOTE : Pour pouvoir enter dans ce bâtiment il faut avoir terminé la quête Espionnage Industriel» (Dofus pour les noobs, «Casse en Enutrosor»)."
     },
     {
       "npc": 2425,
@@ -54601,6 +55059,1070 @@
         }
       ],
       "why": "The llavoro guard who comes into the Cofredía's fourth room once Yiyo slips away, for «Espionaje industrial» (1510): «¿Has sido tú quien le ha agredido?» (17816), «Explicar la situación.» (21352) is 8561 and he does not believe you: «Vas a arrepentirte de haber agredido a un miembro de la Cofredía» (17817). «Intentar resistir al ataque del guardia.» (21353) fights him alone, «Esperar a que lleguen refuerzos rápidamente para resistir al ataque del guardia.» (21354) with others (8562, npc_fights.json); a loss brings back 17817. Beaten, he apologises (17818) and «Volver a ver a Anciago.» (21355) is 8563 and takes you back outside: «Retourner auprès de Pépénible» (Dofus pour les noobs, «Espionnage industriel»)."
+    },
+    {
+      "npc": 2315,
+      "map": 126615552,
+      "opening": 17320,
+      "openings": [
+        { "quest": 1478, "pending": 8281, "message": 17323 }
+      ],
+      "lines": [
+        {
+          "message": 17320,
+          "choices": [
+            { "reply": 20732, "next": 17322, "criterion": "PL>134", "beforeQuest": 1478 },
+            { "reply": 20750, "next": 17344, "quest": 1478, "completes": 8287, "params": [[30, 8287]] },
+            { "reply": 20728, "next": 17321 },
+            { "reply": 20766, "next": 17350, "criterion": "Qf=1478&Qf=1473", "beforeQuest": 1479 },
+            { "reply": 20767, "next": 17353, "quest": 1479, "beforeObjective": 8295, "completes": 8295, "params": [[30, 8295]] },
+            { "reply": 20768, "next": 17354, "quest": 1479, "afterObjective": 8300, "completes": 8301, "gives": 15145, "params": [[30, 8301]] },
+            { "reply": 20771, "next": 17355, "quest": 1479, "afterObjective": 8302, "beforeObjective": 8303 }
+          ]
+        },
+        {
+          "message": 17322,
+          "choices": [
+            { "reply": 20731, "next": 17323, "startsQuest": 1478, "params": [[34, 1478]] }
+          ]
+        },
+        {
+          "message": 17323,
+          "choices": [
+            { "reply": 20729, "next": 17324, "quest": 1478, "beforeObjective": 8281, "criterion": "PS=0", "gives": 15138 },
+            { "reply": 20730, "next": 17325, "quest": 1478, "beforeObjective": 8281, "criterion": "PS=1", "gives": 15138 }
+          ]
+        },
+        {
+          "message": 17324,
+          "choices": []
+        },
+        {
+          "message": 17325,
+          "choices": []
+        },
+        {
+          "message": 17321,
+          "choices": []
+        },
+        {
+          "message": 17344,
+          "choices": [
+            { "reply": 20749, "next": 17345 }
+          ]
+        },
+        {
+          "message": 17345,
+          "choices": []
+        },
+        {
+          "message": 17350,
+          "choices": [
+            { "reply": 20765, "next": 17351 }
+          ]
+        },
+        {
+          "message": 17351,
+          "choices": [
+            { "reply": 20764, "next": 17352, "startsQuest": 1479, "params": [[34, 1479]] }
+          ]
+        },
+        {
+          "message": 17352,
+          "choices": []
+        },
+        {
+          "message": 17353,
+          "choices": []
+        },
+        {
+          "message": 17354,
+          "choices": []
+        },
+        {
+          "message": 17355,
+          "choices": [
+            { "reply": 20770, "next": 17356 },
+            { "reply": 20769, "quest": 1479, "completes": 8303, "params": [[30, 8303]] }
+          ]
+        },
+        {
+          "message": 17356,
+          "choices": [
+            { "reply": 20769, "quest": 1479, "completes": 8303, "params": [[30, 8303]] }
+          ]
+        }
+      ],
+      "why": "Hermes Tafa, the agent of exotic artists, in his house at [-3,-52] (17320: a busy agenda, unless one has something interesting to say). «El remedio milagroso» (1478), Dofus pour les noobs («Remède miracle»): «Parlez à Edgar Naque l'agent d'artistes très influents afin de lui demander du travail»: «¿Tienes trabajo para mí?» (20732, from level 135, the quest's PL>134) -> «¿Tú quieres trabajar para mí? [...] antes tienes que firmar un contrato de confidencialidad» (17322) -> «Firmar el contrato de confidencialidad» (20731) starts it -> the problem of don Anfer Torero (17323, the step's line) -> «Seguir escuchando» (20729 for a man, 20730 for a woman) gives the empty flask (15138) -> «Toma este frasco vacío [...] explícale la situación con una sola palabra: Mortsono» (17324) or «Mortosno» (17325): «si votre personnage est masculin, répondez lui : Mortsono. si votre personnage est féminin, répondez lui : Mortosno». With the flask lost, his greeting goes back to 17323 while the secretion is still to get. «Rapportez alors la potion à Edgar Naque»: «Aquí tienes el mejunje alquímico» (20750) hands the Mejunje alquímico kanig over (8287, the engine's bring objective) -> «Espera aquí, voy a llevárselo a don Anfer Torero» (17344) -> «Esperaré» (20749) -> the thanks (17345). «Quiero saber más sobre las obras de don Anfer Torero» (20728) -> 17321. INFERRED: the order of the replies (the client gives only the lists of messages and replies); which of 20729/20730 goes with which sex. «El artriste» (1479), Dofus pour les noobs («L'art triste»): «Après avoir aidé l'artiste Emidaphat Soum, demandez de ses nouvelles à Edgar Naque»: «¿Qué es de don Anfer Torero?» (20766, once «El remedio milagroso» and «El acusado de recepción» are over, the quest's Qf=1478&Qf=1473) -> the sculptor's sprained wrist (17350) -> «¿De qué encargo se trata?» (20765) -> Ripley Scott's idol (17351, the step's line) -> «Aceptar echarle una mano al escultor» (20764) starts it -> the materials (17352). «Darle los materiales» (20767) hands them over (8295) -> 17353. «Tempi, retournez voir Edgar Naque. Demandez lui s'il a d'autres tâches à vous confier [...] vous confie une lettre pour l'intendant San Lavalss»: «¿Quedan cosas por hacer?» (20768, after the fisher, 8300) gives the letter (15145, 8301) -> 17354. «Dites lui que le travail est enfin accomplis. Edgar prétend alors qu'il ne touchera pas plus de 200 000 kamas»: «Ya he entregado la carta» (20771) -> 17355 -> «Reprimirte las ganas de llamarlo ladrón» (20769) ends it (8303), or «Dudar en rectificar el valor del alquiler» (20770) -> 17356 first. INFERRED: the order of the replies."
+    },
+    {
+      "npc": 2317,
+      "map": 0,
+      "opening": 17348,
+      "lines": [
+        {
+          "message": 17348,
+          "choices": [
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20760, "holds": 15138 },
+            { "quest": 1478, "beforeObjective": 8281, "completes": 8281, "takes": 15138, "gives": 15139, "params": [[30, 8281]], "reply": 20761, "holds": 15138 },
+            { "reply": 20763, "next": 17349 },
+            { "reply": 20762 }
+          ]
+        },
+        {
+          "message": 17349,
+          "choices": [
+            { "reply": 20762 }
+          ]
+        }
+      ],
+      "why": "The rebellious slave of the quarry [-3,-53] (17348: nobody cares about our fate). «El remedio milagroso» (1478): «Remplissez la fiole en parlant à n'importe quel esclave que vous croiserez (celui en dehors de la cabane par exemple). Vous pouvez prendre sa sueur ou ses selles» (Dofus pour les noobs, «Remède miracle»): with the empty flask (15138), «Compartir su dolor a la vez que consigues su mucosidad nasal» (20760) or «Acabar con su pena rajándole la garganta para conseguir su sangre» (20761) fill it, Secreción de esclavo (15139), objective 8281. «¿Sabes dónde está Pol, el panadero?» (20763) -> 17349, «Irte perplejo» (20762). INFERRED: 17349 answers 20763."
+    },
+    {
+      "npc": 2316,
+      "map": 126616576,
+      "opening": 17326,
+      "lines": [
+        {
+          "message": 17326,
+          "choices": [
+            { "quest": 1478, "afterObjective": 8281, "beforeObjective": 8282, "holds": 15139, "reply": 20734, "next": 17327 },
+            { "quest": 1478, "completes": 8282, "gives": 15140, "params": [[30, 8282]], "reply": 20736, "next": 17334, "criterion": "PS=1" },
+            { "quest": 1478, "afterObjective": 8281, "beforeObjective": 8282, "holds": 15139, "reply": 20736, "next": 17330 },
+            { "quest": 1478, "afterObjective": 8281, "beforeObjective": 8282, "holds": 15139, "reply": 20738, "next": 17332 },
+            { "quest": 1478, "completes": 8282, "gives": 15140, "params": [[30, 8282]], "reply": 20740, "next": 17329, "criterion": "PS=0" },
+            { "quest": 1478, "afterObjective": 8281, "beforeObjective": 8282, "holds": 15139, "reply": 20740, "next": 17335 },
+            { "reply": 20741, "next": 17337, "quest": 1478, "afterObjective": 8283, "completes": 8284, "gives": 15142, "params": [[30, 8284]] },
+            { "reply": 20742, "next": 17338, "quest": 1478, "afterObjective": 8285, "completes": 8286, "gives": 15143, "params": [[30, 8286]] }
+          ]
+        },
+        {
+          "message": 17327,
+          "choices": [
+            { "reply": 20733, "next": 17328 }
+          ]
+        },
+        {
+          "message": 17328,
+          "choices": []
+        },
+        {
+          "message": 17330,
+          "choices": [
+            { "reply": 20735, "next": 17331 }
+          ]
+        },
+        {
+          "message": 17331,
+          "choices": []
+        },
+        {
+          "message": 17332,
+          "choices": [
+            { "reply": 20737, "next": 17333 }
+          ]
+        },
+        {
+          "message": 17333,
+          "choices": []
+        },
+        {
+          "message": 17335,
+          "choices": [
+            { "reply": 20739, "next": 17336 }
+          ]
+        },
+        {
+          "message": 17336,
+          "choices": []
+        },
+        {
+          "message": 17329,
+          "choices": []
+        },
+        {
+          "message": 17334,
+          "choices": []
+        },
+        {
+          "message": 17337,
+          "choices": []
+        },
+        {
+          "message": 17338,
+          "choices": []
+        }
+      ],
+      "why": "Ripley Scott in his cabin [-2,-57], sniffing the air at one's arrival (17326). «El remedio milagroso» (1478), Dofus pour les noobs («Remède miracle»): «si votre personnage est masculin, répondez lui : Mortsono. si votre personnage est féminin, répondez lui : Mortosno». With the slave's secretion (15139) the right word -- «Mortsono» (20740) for a man, «Mortosno» (20736) for a woman -- hands it over (8282) and gives the Muestra de mejunje (15140): «Le tiende la mano. Le das la secreción de esclavo [...] te da una muestra para que te la tragues» (17329 / 17334). The wrong ones are the jokes: «Morstono» (20734) -> the staff (17327) -> «Te sientas sobre el bastón» (20733) -> 17328; «Moortson» (20738) -> minced slave meat (17332) -> 20737 -> 17333; the other sex's word -> a slave's gut (17330 / 17335) -> 20735 / 20739 -> 17331 / 17336. «Double-cliquez sur la potion dans votre inventaire de quête. Un combat se lance alors contre Déjé» (the sample's own effects: 30 = objective 8283, 905 = Deyek 3639). «Une fois le combat fini, plaignez vous auprès du sorcier qui vous fabrique alors une nouvelle potion»: «*Gritas por el desagrado apretando las nalgas.*» (20741, 8284) -> a new mixture to drink (17337) gives the Muestra de mejunje de test (15142), whose drinking is 8285 and the curse Disentería (15141, its effect 193). «Ripley Scott vous donne alors la concoction alchimique Kanig»: «¿Puedes darme el mejunje?» (20742, 8286) -> 17338 gives the Mejunje alquímico kanig (15143). INFERRED: which word leads to which joke, and the pairing of the duplicate lines (17329/17334, 17330/17335) with the sexes."
+    },
+    {
+      "npc": 7120,
+      "map": 54175012,
+      "opening": 53956,
+      "lines": [
+        {
+          "message": 53956,
+          "choices": [
+            { "reply": 72335, "next": 53957 },
+            { "reply": 72336, "next": 53958 },
+            { "reply": 72337 }
+          ]
+        },
+        {
+          "message": 53957,
+          "choices": [
+            { "reply": 72334, "next": 53958 }
+          ]
+        },
+        {
+          "message": 53958,
+          "choices": [
+            { "reply": 72333 }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos on Frigost's quay in «El último de nosotros» (2486): «He hablado un poco con el capitán...» (53956); «Pensar en Yglú y responder que la logorrea es una dolencia común entre ciertos marineros.» (72335) → a discreet traveller who paid in kamas and smelt foul (53957); «¿Ardier sabe dónde fue su pasajero tras abandonar el barco?» (72334) → he did not stay in the burgh, Kroa feels the egg's power north-east in the Bosque de los Pinos Perdidos (53958); «Me voy al bosque.» (72333) leaves. «Háblame de los siguientes pasos de la operación.» (72336) goes straight to 53958 and «Ir al bosque de los pinos perdidos.» (72337) leaves at once. Dofus pour les noobs («Les derniers d'entre nous»): «Selon elle il n'est pas resté à la Bourgade, son corbac Kroa sent d'ailleurs la présence de l'œuf dans la Forêt des pins perdus». INFERRED: the order, from the texts and the reply ids (72337 down to 72333)."
+    },
+    {
+      "npc": 7120,
+      "map": 54162238,
+      "opening": 53936,
+      "openings": [
+        { "quest": 2486, "objective": 18918, "message": 53928 },
+        { "quest": 2486, "objective": 18917, "message": 53932 }
+      ],
+      "lines": [
+        {
+          "message": 53936,
+          "choices": [
+            { "reply": 72311, "next": 53937, "quest": 2486, "beforeObjective": 18917 },
+            { "reply": 72315, "next": 53938 }
+          ]
+        },
+        {
+          "message": 53937,
+          "choices": [
+            { "reply": 72310, "quest": 2486, "beforeObjective": 18917, "showsNpc": 7130, "completes": 18917, "params": [[30, 18917]] }
+          ]
+        },
+        {
+          "message": 53938,
+          "choices": [
+            { "reply": 72314, "next": 53939 }
+          ]
+        },
+        {
+          "message": 53939,
+          "choices": [
+            { "reply": 72313, "next": 53940 },
+            { "reply": 72312 }
+          ]
+        },
+        {
+          "message": 53940,
+          "choices": []
+        },
+        {
+          "message": 53932,
+          "choices": [
+            { "reply": 72309, "next": 53933 }
+          ]
+        },
+        {
+          "message": 53933,
+          "choices": [
+            { "reply": 72308, "next": 53934 }
+          ]
+        },
+        {
+          "message": 53934,
+          "choices": [
+            { "reply": 72307, "next": 53935 },
+            { "reply": 72306 }
+          ]
+        },
+        {
+          "message": 53935,
+          "choices": []
+        },
+        {
+          "message": 53928,
+          "choices": [
+            { "reply": 72301 },
+            { "reply": 72302, "next": 53929 }
+          ]
+        },
+        {
+          "message": 53929,
+          "choices": [
+            { "reply": 72305, "next": 53930 }
+          ]
+        },
+        {
+          "message": 53930,
+          "choices": [
+            { "reply": 72304, "next": 53931 },
+            { "reply": 72303 }
+          ]
+        },
+        {
+          "message": 53931,
+          "choices": []
+        }
+      ],
+      "why": "Cornelia Trancos in the Bosque de los Pinos Perdidos [-57,-62] in «El último de nosotros» (2486). On arriving: «¿Sientes ese frío que hiela los huesos?» (53936), «Ver a Kroa agitándose en la nieve.» (72311) → «Hay algo que no es normal... como una presencia insidiosa» (53937), «Registrar los alrededores.» (72310) does 18917 and brings out the Humus helado. While the animals are to be fought: «Los animales están como rabiosos...» (53932). After the fight: «Este ataque fue obra de nuestro enemigo... Kroa parece impaciente por volar hacia el norte.» (53928), «Irte en esa dirección.» (72301). Each of the three lines carries one of her copies of the Kalisto talk («¿Qué sabes de Kalisto y su cuerbok?» → «Cuéntame más sobre este tema.» → Kokillette → «Ya conozco a Kokillette.» / «Gracias, me voy al Bosque Oscuro.»: 72312-72315 with 53938-53940, 72306-72309 with 53933-53935, 72302-72305 with 53929-53931). Dofus pour les noobs («Les derniers d'entre nous»): «Rendez-vous en [-57,-62] et reparlez à Cornelia Granpa … Elle vous demande d'inspecter le lieu»; «reparlez à Cornelia Granpa qui vous affirme que cette attaque était un piège tendu par le nouveau propriétaire de l'œuf». INFERRED: which copy of the Kalisto talk hangs on which line, from the reply ids."
+    },
+    {
+      "npc": 7130,
+      "map": 54162238,
+      "opening": 53962,
+      "lines": [
+        {
+          "message": 53962,
+          "choices": [
+            { "reply": 72343, "next": 54730 },
+            { "reply": 72344 }
+          ]
+        },
+        {
+          "message": 54730,
+          "choices": [
+            { "reply": 73399, "quest": 2486, "afterObjective": 18917, "beforeObjective": 18918 },
+            { "reply": 73400 }
+          ]
+        }
+      ],
+      "why": "The Humus helado of the Bosque de los Pinos Perdidos in «El último de nosotros» (2486): «*exhala un fuerte olor a vegetales putrefactos*» (53962); «Dar una patada.» (72343) → «*extiende unos efluvios tan desagradables que te dan ganas de golpear alguna cosa*» (54730), whose «Dar una buena patada.» (73399) opens the fight of 18918 (content/fights/npc_fights.json) and «Retroceder y mantenerte a la defensiva.» (73400) leaves; «Escuchar los amenazantes gruñidos de los animales del bosque.» (72344) leaves too. Dofus pour les noobs («Les derniers d'entre nous»): «Parlez à l'Humus gelé … Reparlez une seconde fois à l'Humus gelé pour donner un bon coup de pied dedans». INFERRED: that 72344 leaves."
+    },
+    {
+      "npc": 1286,
+      "map": 54162757,
+      "opening": 7706,
+      "lines": [
+        {
+          "message": 7706,
+          "choices": [
+            { "reply": 72347, "next": 53963, "quest": 2486, "afterObjective": 18918, "beforeObjective": 18919 },
+            { "reply": 7846 }
+          ]
+        },
+        {
+          "message": 53963,
+          "choices": [
+            { "reply": 72346, "next": 53964 }
+          ]
+        },
+        {
+          "message": 53964,
+          "choices": [
+            { "reply": 72345, "quest": 2486, "beforeObjective": 18919, "completes": 18919, "params": [[30, 18919]] }
+          ]
+        }
+      ],
+      "why": "The Helías P. Goff agent of [-58,-69] (54162757). His own line is the one the client gives him, «Si piensas que te voy a dejar utilizar mi transportador estás muy equivocado...» (7706), with «Hasta luego.» (7846). In «El último de nosotros» (2486): «Estoy buscando a alguien.» (72347) → «Te responderé que alguien te ha encontrado... te siguen.» (53963); «Felicitarle por su astucia y pedirle a Cornelia que describa al extraño encapuchado.» (72346) → «Recuerdo a esa persona... Se fue por el pasaje hacia La Cuna de Alma para tomar el transportador.» (53964); «Gracias, ¡hasta luego!» (72345) does 18919 («Sigue con el rastreo»). Dofus pour les noobs («Les derniers d'entre nous»): «parlez à l'Agent de la compagnie Asfog et Fils pour savoir s'il a aperçu un individu encapuchonné … Il est parti vers le berceau d'Alma pour prendre le transporteur»."
+    },
+    {
+      "npc": 1286,
+      "map": 54161738,
+      "opening": 7706,
+      "lines": [
+        {
+          "message": 7706,
+          "choices": [
+            { "reply": 72352, "next": 53967, "quest": 2486, "afterObjective": 18919, "beforeObjective": 18921 },
+            { "reply": 7846 }
+          ]
+        },
+        {
+          "message": 53967,
+          "choices": [
+            { "reply": 72355, "next": 53968 }
+          ]
+        },
+        {
+          "message": 53968,
+          "choices": [
+            { "reply": 72353, "teleport": 60035079 },
+            { "reply": 72354 }
+          ]
+        }
+      ],
+      "why": "The Helías P. Goff agent at La Cuna de Alma's transporter [-56,-74] (54161738), his own line 7706 and «Hasta luego.» (7846). In «El último de nosotros» (2486), after 18919: «¿Qué sabes de un pasajero con un olor nauseabundo?» (72352) → «¿Quieres decir como el tuyo o peor?» (53967); «Hace al menos treinta segundos que nadie me ha hecho un comentario sobre esto.» (72355) → a dark sorcerer or evil priest he took to the Bosque Petrificado (53968); «Embarcarte hacia ese destino.» (72353) flies there (60035079), «Tomo nota de la información.» (72354) leaves. Dofus pour les noobs («Les derniers d'entre nous»): «Allez jusqu'au transporteur frigostien en [-56,-74] et parlez à l'autre Agent … « Embarquer pour cette destination »»."
+    },
+    {
+      "npc": 1286,
+      "map": 60035079,
+      "opening": 8145,
+      "lines": [
+        {
+          "message": 8145,
+          "choices": [
+            { "reply": 72356, "next": 53969, "quest": 2486, "afterObjective": 18919 },
+            { "reply": 8135, "teleport": 54161738 },
+            { "reply": 7846 }
+          ]
+        },
+        {
+          "message": 53969,
+          "choices": [
+            { "reply": 72357 },
+            { "reply": 72358 }
+          ]
+        }
+      ],
+      "why": "The Helías P. Goff agent at the Bosque Petrificado's transporter (60035079): «Hola, los amigos de mis amigos son mis amigos. ¿Te apetece darte un paseíto en mi transportador?» (8145), «Llévame a La Cuna de Alma.» (8135) back to the transporter of [-56,-74] (54161738) -- the way out of the forest for whoever was brought here -- and «Hasta luego.» (7846). In «El último de nosotros» (2486): «¿Hacia dónde se fue el oscuro pasajero?» (72356) → «No lo sé, estaba demasiado ocupado contestando a las preguntas de una horda de ocras...» (53969), «Definitivamente estos bosques tienen muy mala fama.» (72357) / «Cornelia y yo no tenemos nada que ver con estos individuos de dudoso comportamiento.» (72358). INFERRED: the only destination offered is the one this quest's journey came from; the rest of the Frigost transporters is not written."
+    },
+    {
+      "npc": 7120,
+      "map": 54162757,
+      "opening": 53946,
+      "lines": [
+        {
+          "message": 53946,
+          "choices": []
+        }
+      ],
+      "why": "Cornelia Trancos beside the agent of [-58,-69] in «El último de nosotros» (2486, while 18919 is to do), with her plain line «Las hojas del antiguo bosque no caen sin razón...» (53946): the agent is the one to ask."
+    },
+    {
+      "npc": 7120,
+      "map": 60035079,
+      "opening": 53959,
+      "lines": [
+        {
+          "message": 53959,
+          "choices": [
+            { "reply": 73397 },
+            { "reply": 72342, "next": 53960, "holds": 28484 }
+          ]
+        },
+        {
+          "message": 53960,
+          "choices": [
+            { "reply": 72341, "next": 53961 }
+          ]
+        },
+        {
+          "message": 53961,
+          "choices": [
+            { "reply": 72340, "quest": 2486, "beforeObjective": 18921, "completes": 18921, "params": [[30, 18921]] }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos at the Bosque Petrificado's transporter in «El último de nosotros» (2486): «... Kroa no parece reaccionar. Vamos a utilizar otros métodos que han funcionado. *examina la nieve y la vegetación de alrededor*» (53959), «Registrar los alrededores.» (73397) sends the character searching -- the rock by the trunk holds the frozen map (objectives.json, 18921). Holding it: «Enseñarle el mapa a Cornelia.» (72342) → «¡Voy a terminar creyendo que eres vidente!» (53960); «Desmentir esa acusación.» (72341) → the mould prints match, the enemy left it once at its goal (53961); «Seguir esa dirección.» (72340) does 18921. Dofus pour les noobs («Les derniers d'entre nous»): «Reparlez à Cornelia Granpa pour lui montrer la carte … Cornelia remarque un endroit entouré au nord-ouest de la forêt»."
+    },
+    {
+      "npc": 2318,
+      "map": 126615552,
+      "opening": 17413,
+      "lines": [
+        {
+          "message": 17413,
+          "choices": [
+            { "reply": 20866, "next": 17414, "quest": 1479, "afterObjective": 8295, "completes": 8296, "params": [[30, 8296]] }
+          ]
+        },
+        {
+          "message": 17414,
+          "choices": [
+            { "reply": 20849 }
+          ]
+        }
+      ],
+      "why": "Don Anfer Torero, the kanig sculptor, in Hermes Tafa's house [-3,-52] («Escroñeñé», 17413). «El artriste» (1479), Dofus pour les noobs («L'art triste»): «Il vous faut maintenant suivre les instructions d'Emidaphat Soum mais difficile de comprendre, heureusement les gestes peuvent vous faire le comprendre»: «Darle los materiales y explicarle la situación» (20866, 8296) -> his gestures at the flints, the paint and the ropes (17414) -> «Intentar comprender sus instrucciones» (20849). INFERRED: 20868 (the same with Brakmar's black stone powder) and 17437/17440 (the axe) are «Más torpe, ni entrenando» (1481)'s."
+    },
+    {
+      "npc": 2319,
+      "map": 0,
+      "opening": 17415,
+      "lines": [
+        {
+          "message": 17415,
+          "choices": [
+            { "reply": 20850, "next": 17416, "quest": 1479, "afterObjective": 8299, "completes": 8300, "params": [[30, 8300]] },
+            { "reply": 26713, "next": 22179 }
+          ]
+        },
+        {
+          "message": 17416,
+          "choices": []
+        },
+        {
+          "message": 22179,
+          "choices": []
+        }
+      ],
+      "why": "The fishing slave at [-1,-57] (17415: the kanigs do not like getting wet). «El artriste» (1479), Dofus pour les noobs («L'art triste»): «Il vous faut ensuite lui procurer des poissons, pour cela rendez vous auprès de l'esclave Pêcheur [...] Le soucis est que le pêcheur n'a pas de poissons»: «Necesito pescados para don Anfer Torero» (20850, 8300) -> «Tendrás los pescados cuando los haya atrapado, no antes» (17416). «¿Se ha hecho algún descubrimiento subterráneo?» (26713) -> 22179, its other line, open to anybody."
+    },
+    {
+      "npc": 4075,
+      "map": 131859972,
+      "opening": 28988,
+      "lines": [
+        {
+          "message": 28988,
+          "choices": [
+            { "reply": 34765, "next": 28989, "quest": 1908, "afterObjective": 13059, "beforeObjective": 13060 }
+          ]
+        },
+        {
+          "message": 28989,
+          "choices": [
+            { "reply": 34764, "next": 28990, "quest": 1908, "afterObjective": 13059, "beforeObjective": 13060 }
+          ]
+        },
+        {
+          "message": 28990,
+          "choices": [
+            { "reply": 34763, "quest": 1908, "afterObjective": 13059, "beforeObjective": 13060, "completes": 13060, "params": [[30, 13060]] }
+          ]
+        }
+      ],
+      "why": "Barnabarbo, head of the Cofradía de los Cofrecillos Valiosos, in the Cofredía building's second room, for «Golpe en Anutropía» (1908, 13060): «Franchissez la première salle des coffres, puis la seconde salle ... parlez à Barnabarbe qui vous annonce qu'il ne vend ses fabrications qu'aux Enutrofors fortunés. De plus il a livré son dernier coffre à Nidas la veille» (Dofus pour les noobs, «Casse en Enutrosor»). Precious chests are art (28988); «Un cofrecillo valioso es justo lo que ando buscando.» (34765): made to order, for rich divinutrofs only (28989); «Estoy dispuesto a pagar si es necesario.» (34764): no exceptions, and the last one went to king Nidas yesterday (28990); «Tendré que hacer una visita al Palacio de Nidas.» (34763) is 13060."
+    },
+    {
+      "npc": 4104,
+      "map": 129500160,
+      "opening": 28992,
+      "lines": [
+        {
+          "message": 28992,
+          "choices": [
+            { "reply": 34767, "quest": 1908, "afterObjective": 13061, "beforeObjective": 13062 }
+          ]
+        }
+      ],
+      "why": "The Cofrecillo valioso king Nidas got from the Cofradía, in his palace's chest room, for «Golpe en Anutropía» (1908, 13062): «Une fois le donjon terminé, ne sortez pas tout de suite, et parlez au Coffret précieux pour l'attaquer. Un combat se lance donc, il peut se faire à plusieurs» (Dofus pour les noobs, «Casse en Enutrosor»). «*entreabre ligeramente su tapa, y la vuelve a cerrar*» (28992); «Atacar al cofrecillo.» (34767) opens the fight against him (5044, content/fights/npc_fights.json), whose drop row gives the Trozo de cofrecillo valioso (19169) while 13062 is in hand."
+    },
+    {
+      "npc": 4076,
+      "map": 185074176,
+      "opening": 28996,
+      "lines": [
+        {
+          "message": 28996,
+          "choices": [
+            { "reply": 34779, "next": 28997, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 28997,
+          "choices": [
+            { "reply": 34778, "next": 28998, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 28998,
+          "choices": [
+            { "reply": 34777, "next": 28999, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 28999,
+          "choices": [
+            { "reply": 34776, "next": 29000, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 29000,
+          "choices": [
+            { "reply": 34775, "next": 29001, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 29001,
+          "choices": [
+            { "reply": 34774, "next": 29002, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 29002,
+          "choices": [
+            { "reply": 34773, "next": 29003, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+          ]
+        },
+        {
+          "message": 29003,
+          "choices": [
+            { "reply": 34772, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064, "completes": 13064, "params": [[30, 13064]] }
+          ]
+        }
+      ],
+      "why": "Thanatena, queen of Externam, near the Gates of Onekros (Khebesto: «Ahora mismo se encuentra cerca de las puertas de Onekros», 28995), for «Golpe en Anutropía» (1908, 13064): «Revenez à l'entrée d'Externam et parlez à la Reine Thanatena qui vous apprend qu'elle refuse la réincarnation du dragon car celui-ci a été trop crédule» (Dofus pour les noobs, «Casse en Enutrosor»). The black fire (28996); «Arrodillarte delante de la reina Thanatena.» (34779): «Álzate» (28997); «Levantarte y explicar la razón de tu visita.» (34778): the white dragon who behaves like a child (28998); «Desconozco la razón de esa decisión.» (34777): fooled by Leorictus (28999); «Seguir escuchando.» (34776): not a victim (29000); «Intentar defender al dragón.» (34775): you also want the Ivory Dofus (29001); «Reconocer que no conoces los secretos de los dioses.» (34774): he endangered the World of Twelve (29002); «Me parece un castigo muy severo.» (34773): she is not the only one to decide, speak with Ilyzaelle (29003); «Inclinarte e irte.» (34772) is 13064. The eight messages and eight replies run in one line, each reply's id one below the last."
+    },
+    {
+      "npc": 7120,
+      "map": 232260608,
+      "opening": 53927,
+      "openings": [
+        { "quest": 2486, "objective": 18923, "message": 53923 },
+        { "quest": 2486, "objective": 18922, "message": 53925 }
+      ],
+      "lines": [
+        {
+          "message": 53927,
+          "choices": [
+            { "reply": 72338, "next": 53926 }
+          ]
+        },
+        {
+          "message": 53926,
+          "choices": [
+            { "reply": 72300 }
+          ]
+        },
+        {
+          "message": 53925,
+          "choices": []
+        },
+        {
+          "message": 53923,
+          "choices": [
+            { "reply": 72299, "next": 53924 }
+          ]
+        },
+        {
+          "message": 53924,
+          "choices": [
+            { "reply": 72298, "passage": 7120002 }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos in the ceremony room of the ruins (232260608) in «El último de nosotros» (2486). Arriving: «*habla en voz baja para no llamar la atención* Al final lo encontramos... pero no está solo. ¿Qué está haciendo con unos gélifux?» (53927), «Imitar a Cornelia.» (72338) → «*observa en silencio*» (53926), «Observar lo que ocurre.» (72300). Once the cloak has dropped (18922): «No me apetece nada parecerme a una seta... Deshagámonos de estos monstruos» (53925). After the fight (18923): «Nuestra enemiga ha aprovechado para escapar... ¡Kroa! ¿Una idea de la dirección que ha podido tomar?» (53923), «Escuchar cómo el cuerbok emite un grito ronco.» (72299) → «No te gusta este lugar, ¿verdad?...» (53924), «Salir al aire libre.» (72298) takes him out to the ruins' door. Dofus pour les noobs («Les derniers d'entre nous»): «Reparlez à Cornelia Granpa qui … vous propose de l'espionner de loin»; «Une fois le combat terminé, reparlez à Cornelia Granpa qui interroge son corbac … le corbac n'apprécie pas trop le lieu»."
+    },
+    {
+      "npc": 7131,
+      "map": 232260608,
+      "opening": 53977,
+      "openings": [
+        { "quest": 2486, "objective": 18921, "pending": 18922, "message": 53975 }
+      ],
+      "lines": [
+        {
+          "message": 53977,
+          "choices": []
+        },
+        {
+          "message": 53975,
+          "choices": [
+            { "reply": 72362, "next": 53976 }
+          ]
+        },
+        {
+          "message": 53976,
+          "choices": [
+            { "reply": 72361, "next": 53973 }
+          ]
+        },
+        {
+          "message": 53973,
+          "choices": [
+            { "reply": 72360, "next": 53974 }
+          ]
+        },
+        {
+          "message": 53974,
+          "choices": [
+            { "reply": 72359, "quest": 2486, "beforeObjective": 18922, "showsNpc": 7137, "completes": 18922, "params": [[30, 18922]] }
+          ]
+        }
+      ],
+      "why": "The Taumaturgo oscuro's ceremony in «El último de nosotros» (2486): «Sois los elegidos del pueblo de la grieta...» (53975), «Ver cómo los gélifux se agitan.» (72362) → «¡Recibid ahora el beso de Kordispec!» (53976), «Asistir al milagro.» (72361) → «Ahora estás en sintonía con la naturaleza profunda del mundo... ¡Se acerca la hora, niños pútridos!» (53973), «Sentir cómo te recorre un escalofrío.» (72360) → «*alza un huevo negro sobre su cabeza*» (53974), «Contener un grito cuando el inquietante personaje deja caer su capa.» (72359) does 18922 («Asiste a la ceremonia sin que te descubran») and he is the Discípula de la Funga Oscura from then on. His other dialogData line «*farfulla unas oraciones*» (53977) is for anyone else. Dofus pour les noobs («Les derniers d'entre nous»): «L'individu demande aux givrefoux d'accepter le baiser de Kordispec et soudain les givrefoux se transforment en plante … soulève l'oeuf noir … tout en retirant l'habit qui cache son visage»."
+    },
+    {
+      "npc": 7132,
+      "map": 232260608,
+      "opening": 53972,
+      "lines": [
+        {
+          "message": 53972,
+          "choices": []
+        }
+      ],
+      "why": "The Gélifux grande infectado at the ceremony (2486): «*parece fascinado por la silueta encapuchada*» (53972), its one line."
+    },
+    {
+      "npc": 7133,
+      "map": 232260608,
+      "opening": 53970,
+      "lines": [
+        {
+          "message": 53970,
+          "choices": []
+        }
+      ],
+      "why": "A Gélifux infectado at the ceremony (2486): «*escucha religiosamente*» (53970), its one line."
+    },
+    {
+      "npc": 7134,
+      "map": 232260608,
+      "opening": 53971,
+      "lines": [
+        {
+          "message": 53971,
+          "choices": []
+        }
+      ],
+      "why": "A Gélifux infectado at the ceremony (2486): «*se queda postrado*» (53971), its one line."
+    },
+    {
+      "npc": 7136,
+      "map": 232260608,
+      "opening": 53978,
+      "lines": [
+        {
+          "message": 53978,
+          "choices": []
+        }
+      ],
+      "why": "An Elegido infectado after the ceremony (2486): «Koooor... diiiis... speeeec...» (53978), its one line."
+    },
+    {
+      "npc": 7135,
+      "map": 232260608,
+      "opening": 53979,
+      "lines": [
+        {
+          "message": 53979,
+          "choices": [
+            { "reply": 72363, "quest": 2486, "afterObjective": 18922, "beforeObjective": 18923 },
+            { "reply": 72364 }
+          ]
+        }
+      ],
+      "why": "The Hinchado infectado after the ceremony (2486): «¡KOOOR... DIIISSS... PEEEEC!» (53979); «Atacar a las criaturas infectadas.» (72363) opens the fight of 18923 (content/fights/npc_fights.json), «Retroceder.» (72364) leaves."
+    },
+    {
+      "npc": 7137,
+      "map": 232260608,
+      "opening": 53987,
+      "lines": [
+        {
+          "message": 53987,
+          "choices": [
+            { "reply": 72376, "next": 53988 },
+            { "reply": 72375, "next": 53989 },
+            { "reply": 72365, "quest": 2486, "afterObjective": 18922, "beforeObjective": 18923 }
+          ]
+        },
+        {
+          "message": 53988,
+          "choices": [
+            { "reply": 72374, "quest": 2486, "afterObjective": 18922, "beforeObjective": 18923 },
+            { "reply": 72373 }
+          ]
+        },
+        {
+          "message": 53989,
+          "choices": [
+            { "reply": 72378, "quest": 2486, "afterObjective": 18922, "beforeObjective": 18923 },
+            { "reply": 72377 }
+          ]
+        }
+      ],
+      "why": "The Discípula de la Funga Oscura at the ceremony in «El último de nosotros» (2486, after 18922): «*se dirige a los nuevos elegidos* ... ¡Sucumbid al abrazo de la conciencia divina...!» (53987, her dialogData 12963); «Reconocer a una sadida del Reino de Corrupción.» (72376) → «Ahora sois los hijos del bosque pútrido... Los intrusos que nos observan serán un excelente mantillo.» (53988), «Sentir un profundo malestar.» (72375) → the same words (53989); «Defenderte del ataque con la ayuda de Cornelia.» (72374/72378) opens the fight of 18923, «Retirarte mientras te preparas para el combate.» (72373/72377) leaves; «Atacar a las criaturas infectadas.» (72365) opens it at once. Dofus pour les noobs («Les derniers d'entre nous»): «Continuez à écouter la Disciple de la Fonge Noire … « Se défendre contre l'attaque avec l'aide de Cornelia »». INFERRED: that 72365 hangs on 53987."
+    },
+    {
+      "npc": 7120,
+      "map": 60032000,
+      "opening": 53922,
+      "lines": [
+        {
+          "message": 53922,
+          "choices": [
+            { "reply": 72297, "quest": 2486, "afterObjective": 18923, "beforeObjective": 18924, "completes": 18924, "params": [[30, 18924]] }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos outside the ruins [-82,-73] (60032000) in «El último de nosotros» (2486, after 18923): «Parece que Kroa sabe dónde se esconde la encantadora señorita... Fiémonos de él.» (53922), «Sigue la dirección que te indica el cuerbok.» (72297) does 18924 («Persigue a la discípula»). Dofus pour les noobs («Les derniers d'entre nous»): «Une fois sortis de la ruine, reparlez à Cornelia Granpa qui vous affirme que Kroa a retrouvé la trace de la Sadida, elle serait partie vers l'antre du Korriandre»."
+    },
+    {
+      "npc": 2853,
+      "map": 62920704,
+      "opening": 53913,
+      "lines": [
+        {
+          "message": 53913,
+          "choices": [
+            { "reply": 72291, "quest": 2486, "afterObjective": 18925, "beforeObjective": 18929, "teleport": 62921728 },
+            { "reply": 72292, "teleport": 60036612 }
+          ]
+        }
+      ],
+      "why": "Kroa in the Antro del Cil's exit room in «El último de nosotros» (2486, after 18925): «*da saltitos mientras grazna*» (53913), «Seguir a Kroa hasta las profundidades del templo encantado.» (72291) takes the character to the haunted temple (62921728), «Abandonar el Antro del Cil.» (72292) out to its door (60036612). Dofus pour les noobs («Les derniers d'entre nous»): «parlez à Kroa « Suivre Kroa dans les profondeurs du temple mystifié »»."
+    },
+    {
+      "npc": 2853,
+      "map": 60036612,
+      "opening": 53915,
+      "lines": [
+        {
+          "message": 53915,
+          "choices": [
+            { "reply": 72291, "quest": 2486, "afterObjective": 18925, "beforeObjective": 18927, "teleport": 62921728 },
+            { "reply": 72285 }
+          ]
+        }
+      ],
+      "why": "Kroa at the Antro del Cil's door (60036612) in «El último de nosotros» (2486, after 18925 and until 18927): «*agita sus alas frenéticamente*» (53915), «Seguir a Kroa hasta las profundidades del templo encantado.» (72291) goes back down to the temple, «Alejarte de este pájaro de mal agüero.» (72285) leaves. INFERRED: the DPLN's «PNJ à l'entrée» is the guardian's dungeon resume, which ends with the boss in this server."
+    },
+    {
+      "npc": 2853,
+      "map": 62921728,
+      "opening": 53912,
+      "lines": [
+        {
+          "message": 53912,
+          "choices": [
+            { "reply": 72292, "teleport": 60036612 }
+          ]
+        }
+      ],
+      "why": "Kroa in the haunted temple (2486): «¡Crua! ¡Cra, crua, craaa! ¡Crua!» (53912; the louder 53914 is the quest's own step line, the giver's), «Abandonar el Antro del Cil.» (72292) out to the Antro del Cil's door (60036612). INFERRED: the temple has no border, and the Esencia de silvespíritu may have to be fetched."
+    },
+    {
+      "npc": 7137,
+      "map": 62921728,
+      "opening": 53980,
+      "lines": [
+        {
+          "message": 53980,
+          "choices": [
+            { "reply": 72372, "next": 53981 }
+          ]
+        },
+        {
+          "message": 53981,
+          "choices": [
+            { "reply": 72371, "next": 53982 }
+          ]
+        },
+        {
+          "message": 53982,
+          "choices": [
+            { "reply": 72370, "next": 53983 }
+          ]
+        },
+        {
+          "message": 53983,
+          "choices": [
+            { "reply": 72369, "next": 53984 }
+          ]
+        },
+        {
+          "message": 53984,
+          "choices": [
+            { "reply": 72368, "next": 53985 }
+          ]
+        },
+        {
+          "message": 53985,
+          "choices": [
+            { "reply": 72367, "next": 53986 }
+          ]
+        },
+        {
+          "message": 53986,
+          "choices": [
+            { "reply": 72366, "quest": 2486, "afterObjective": 18925, "beforeObjective": 18926, "showsNpc": 7141, "completes": 18926, "params": [[30, 18926]] }
+          ]
+        }
+      ],
+      "why": "The Discípula de la Funga Oscura in the haunted temple in «El último de nosotros» (2486, after 18925), her dialogData 12962: «*reza a las oscuras fuerzas de la naturaleza*» (53980), «Interrumpir las letanías de la discípula.» (72372) → «Te atreves a ponerle trabas a la voluntad del Padre...» (53981), «Sentir un dolor agudo en todo tu cuerpo.» (72371) → «*hace que el huevo negro aparezca entre sus manos*» (53982), «Ver cómo Cornelia empulga una flecha y amenaza a tu enemiga.» (72370) → «¡Eres tú quien va a morir, idiota!» (53983), «Observar con sorpresa que Cornelia parece inmune al dolor que te paraliza.» (72369) → «... ¡Es imposible! ¿Cómo...?» (53984), «Escuchar cómo la ocra pronuncia una última advertencia.» (72368) → «Gran funga pútrida... ¡Soy tu sirvienta para toda la eternidad!» (53985), «Observar cómo la discípula se marchita ante tus ojos.» (72367) → «Te ofrezco mi vida... Arrasa el templo y luego el mundo...» (53986), «Asistir a la muerte de la fanática.» (72366) does 18926 («Neutraliza a la discípula») and leaves the Funga Oscura in her place. Dofus pour les noobs («Les derniers d'entre nous»): «mécontente de votre intervention vous jette comme un sort … Cornelia la prend alors pour cible avec son arc … La fanatique se transforme alors en un champignon marron»."
+    },
+    {
+      "npc": 7141,
+      "map": 62921728,
+      "opening": 53995,
+      "lines": [
+        {
+          "message": 53995,
+          "choices": [
+            { "reply": 72389, "next": 53996 },
+            { "reply": 72391, "next": 53997 },
+            { "reply": 72395, "next": 53998 },
+            { "reply": 72399 }
+          ]
+        },
+        {
+          "message": 53996,
+          "choices": [
+            { "reply": 72390, "next": 53999 },
+            { "reply": 72392 }
+          ]
+        },
+        {
+          "message": 53997,
+          "choices": [
+            { "reply": 72393, "next": 53999 },
+            { "reply": 72394 }
+          ]
+        },
+        {
+          "message": 53998,
+          "choices": [
+            { "reply": 72397, "next": 53999 },
+            { "reply": 72396 }
+          ]
+        },
+        {
+          "message": 53999,
+          "choices": [
+            { "reply": 72398 }
+          ]
+        }
+      ],
+      "why": "The Funga Oscura the Discípula became, in the haunted temple (2486, 18926-18927): «*palpita como un chancro abotargado*» (53995). Attacking it with deadly miasma (72389/72390), trying to talk to it (72391/72393) or threatening it with fungicide (72395/72397) only feeds it: «*se hincha y se alimenta con tu energía*» (53996-53999), each with its «Retroceder.» (72392/72394/72396/72398); «Mantenerte al margen.» (72399) leaves. Dofus pour les noobs («Les derniers d'entre nous»): «un champignon marron qu'on va éviter d'approcher». INFERRED: which reply leads to which of the four identical lines."
+    },
+    {
+      "npc": 7142,
+      "map": 62921728,
+      "opening": 54000,
+      "lines": [
+        {
+          "message": 54000,
+          "choices": []
+        }
+      ],
+      "why": "The Funga Oscura while the forest gods are in the temple (2486, 18927-18928): «*tiembla de frustración*» (54000), its one line."
+    },
+    {
+      "npc": 7143,
+      "map": 62921728,
+      "opening": 54001,
+      "lines": [
+        {
+          "message": 54001,
+          "choices": [
+            { "reply": 72400 },
+            { "reply": 72401 }
+          ]
+        }
+      ],
+      "why": "Nosruo in the haunted temple (2486, 18927-18928): «Subestimamos la sed de poder del parásito. Como guardián supremo de los bosques, es mi deber castigar a este subalterno.» (54001), «Inclinarte ante el dios del sotobosque.» (72400) or «Inclinarte.» (72401)."
+    },
+    {
+      "npc": 7144,
+      "map": 62921728,
+      "opening": 54002,
+      "lines": [
+        {
+          "message": 54002,
+          "choices": [
+            { "reply": 72402 },
+            { "reply": 72403 }
+          ]
+        }
+      ],
+      "why": "Juju in the haunted temple (2486, 18927-18928): «La impertinencia de Kordispec alcanza nuevas cotas...» (54002), «Inclinarte ante el dios de los grandes bosques.» (72402) or «Inclinarte.» (72403)."
+    },
+    {
+      "npc": 7145,
+      "map": 62921728,
+      "opening": 54004,
+      "lines": [
+        {
+          "message": 54004,
+          "choices": [
+            { "reply": 72413, "next": 54005 }
+          ]
+        },
+        {
+          "message": 54005,
+          "choices": [
+            { "reply": 72412, "next": 54006 }
+          ]
+        },
+        {
+          "message": 54006,
+          "choices": [
+            { "reply": 72411, "next": 54007 }
+          ]
+        },
+        {
+          "message": 54007,
+          "choices": [
+            { "reply": 72410, "next": 54008 }
+          ]
+        },
+        {
+          "message": 54008,
+          "choices": [
+            { "reply": 72409, "next": 54009 }
+          ]
+        },
+        {
+          "message": 54009,
+          "choices": [
+            { "reply": 72408, "next": 54010 }
+          ]
+        },
+        {
+          "message": 54010,
+          "choices": [
+            { "reply": 72407, "next": 54012, "criterion": "Qf=2202" },
+            { "reply": 72407, "next": 54011, "criterion": "Qf!2202" }
+          ]
+        },
+        {
+          "message": 54011,
+          "choices": [
+            { "reply": 72406, "quest": 2486, "afterObjective": 18927, "beforeObjective": 18928, "completes": 18928, "params": [[30, 18928]] }
+          ]
+        },
+        {
+          "message": 54012,
+          "choices": [
+            { "reply": 72414, "quest": 2486, "afterObjective": 18927, "beforeObjective": 18928, "completes": 18928, "params": [[30, 18928]] }
+          ]
+        }
+      ],
+      "why": "Campeadol in the haunted temple in «El último de nosotros» (2486, after 18927): «Con tu ofrenda y tus oraciones, has abierto la puerta que se había cerrado...» (54004), «Inclinarte.» (72413) → «Somos los últimos dioses del bosque encantado...» (54005), «Escuchar en silencio.» (72412) → (54006), «Sentir la nostalgia de la diosa.» (72411) → (54007), «Seguir escuchando.» (72410) → «Kordispec surgió de ese terrero...» (54008), «Soy muy consciente de ello.» (72409) → «Muchos tenemos fe en vosotros...» (54009), «Ver cómo la seta se encoge.» (72408) → «*se vuelve hacia Cornelia* Toma esta reliquia y devuélvesela al maestro.» (54010), «Escuchar cómo la ocra acepta esta misión.» (72407) → «Tu destino te lleva allí [Pandala]» (54011) or, to whoever has answered Pandala's spirits, «Tu destino te lleva ahora Amakna» (54012); «Asistir a la partida de los dioses del bosque.» (72406/72414) does 18928 («Conversa con los dioses del bosque»). Dofus pour les noobs («Les derniers d'entre nous»): «parlez à Korria qui vous apprend que vous avez rouvert une porte qui s'était fermée … Korria récupère l'oeuf noir … et le confie à Cornelia … votre destin vous mènera vers Amakna puis les petits Dieux disparaissent». INFERRED: the reply order and Qf=2202 («En el jardín que nos une», the end of Pandala's spirits) for 54012."
+    },
+    {
+      "npc": 7120,
+      "map": 62921728,
+      "opening": 53921,
+      "openings": [
+        { "quest": 2486, "objective": 18928, "message": 53916 },
+        { "quest": 2486, "objective": 18926, "message": 53920 }
+      ],
+      "lines": [
+        {
+          "message": 53921,
+          "choices": []
+        },
+        {
+          "message": 53920,
+          "choices": []
+        },
+        {
+          "message": 53916,
+          "choices": [
+            { "reply": 72296, "next": 53917 }
+          ]
+        },
+        {
+          "message": 53917,
+          "choices": [
+            { "reply": 72295, "next": 53918 }
+          ]
+        },
+        {
+          "message": 53918,
+          "choices": [
+            { "reply": 72294, "next": 53919 }
+          ]
+        },
+        {
+          "message": 53919,
+          "names": true,
+          "choices": [
+            { "reply": 72293, "quest": 2486, "afterObjective": 18928, "beforeObjective": 18929, "teleport": 60036612, "completes": 18929, "params": [[30, 18929]] }
+          ]
+        }
+      ],
+      "why": "Cornelia Trancos in the haunted temple in «El último de nosotros» (2486). Arriving: «Una magia primitiva encanta estas viejas piedras... Es el reflejo de las creencias de antaño.» (53921). Once the Discípula is dead (18926): «*mira a su alrededor con desconcierto* ¡Que los dioses nos ayuden!» (53920). Once the gods are gone (18928): «Parece que lo hemos conseguido... Empezaba a desesperarme.» (53916), «¿El maestro mencionado por la diosa Campeadol es el siniestro maestro Cuerbok?» (72296) → «Se trata de él, sí...» (53917), «Su mala reputación debe desalentar a los inoportunos visitantes.» (72295) → (53918), «Gracias por tu ayuda.» (72294) → «...Es hora de que me vaya a las llanuras de Cania. ¡Hasta pronto, #1!» (53919), «Despedirte de Cornelia y abandonar el templo encantado.» (72293) does 18929 and takes the character out to the Antro del Cil's door. Dofus pour les noobs («Les derniers d'entre nous»): «Parlez à Cornelia Granpa qui vous explique que le maître dont le petit Dieu a fait mention est bien le maître Corbac … elle part en direction de Cania». INFERRED: where leaving the temple lands."
     }
   ]
 }

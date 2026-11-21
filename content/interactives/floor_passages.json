@@ -289,6 +289,14 @@
       "why": "Externam, the Citadel Vestibule [15,14] (subarea 894): the Citadel Entrance's right border leads in (the client's scroll), and the vestibule has no border cell and no element to leave by. Its leftmost floor cell, at the lit opening one comes in by, takes you back to the Entrance's right border (403, by its border cells)."
     },
     {
+      "map": 150211588,
+      "cell": 259,
+      "toMap": 150209536,
+      "toCell": 243,
+      "criterion": "Qa=2486&Qo<18915",
+      "why": "The top hole of the mine's last room (150211588), the one Kroa stands before, drops into Cornelia's prison (150209536) while 2486 is in hand and she is not yet free: the 2.73 graph's passage with its landing moved from 280, off the room's floor, to 243 at the top of it. Dofus pour les noobs («Les derniers d'entre nous»): «Puis le trou en haut (celui devant lequel se trouve Kroa)». INFERRED cell."
+    },
+    {
       "map": 131859972,
       "cell": 254,
       "toMap": 131860996,

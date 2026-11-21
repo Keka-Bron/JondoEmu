@@ -7109,6 +7109,23 @@
    "why": "«Las grandes galerías»: Williamwadui comes up once the perforatroces are with Graverg."
   },
   {
+   "objective": 18914,
+   "quest": 2486,
+   "kind": "enter",
+   "map": 150209536,
+   "overridesMap": true,
+   "why": "«Encuentra a Cornelia Trancos»: reaching her bramble prison at the bottom of the abandoned mine (150209536), through the right holes of its four rooms (the 2.73 graph's floor passages; the last one, 150211588 cell 259, leads there only while 2486 is in hand before 18915). The objective names the mine's mouth (147854339), hence overridesMap. Dofus pour les noobs («Les derniers d'entre nous»): «Vous devez traverser 4 maps en empruntant les bons trous … Vous voilà arrivé devant Cornelia Granpa»."
+  },
+  {
+   "objective": 18915,
+   "quest": 2486,
+   "kind": "beat",
+   "monsters": [7382, 7381],
+   "map": 150209536,
+   "afterObjectives": [18914],
+   "why": "«Libera a Cornelia»: beating the Carcelero silvestre (7382) and the Muñeca malvada (7381) of the fight Cornelia's «Llegar hasta la raíz del problema.» (72317) opens in her prison (150209536; content/fights/npc_fights.json). Dofus pour les noobs («Les derniers d'entre nous»): «il faudra donc l'aider à s'échapper « S'attaquer à la racine du problème ». Un combat se lance, il peut se faire à plusieurs»; its spells are the jailer's (Zarzas Trabadoras, Abrazo Nudoso, Zarza Insidiosa) and the doll's (Manipulación Silvestre, Restauración de Jaula, Exasperación)."
+  },
+  {
    "objective": 8553,
    "quest": 1510,
    "kind": "click",
@@ -7130,6 +7147,192 @@
    "kind": "order",
    "afterObjectives": [8556],
    "why": "«Espionaje industrial»: Cerriyayo once Pizzabu has named him (17797)."
+  },
+  {
+   "objective": 18986,
+   "quest": 2486,
+   "kind": "enter",
+   "map": 54175012,
+   "afterObjectives": [18916],
+   "why": "«Atraviesa el mar Kantil hasta llegar a los muelles del puerto de escarcha»: reaching Frigost's quay [-81,-37] (54175012), by Captain Ardier's Sanguinario from [-34,-16] (content/npcs/dialogues.json, his «Venga, vamos a Frigost.»). Dofus pour les noobs («Les derniers d'entre nous»): «Rejoignez Cornelia Granpa à Frigost en [-81,-37]»."
+  },
+  {
+   "objective": 18918,
+   "quest": 2486,
+   "kind": "beat",
+   "monsters": [7385, 7386, 7387, 7388],
+   "map": 54162238,
+   "afterObjectives": [18917],
+   "why": "«Encuentra a los animales rabiosos y combátelos»: the fight the Humus helado's «Dar una buena patada.» (73399) opens in the Bosque de los Pinos Perdidos (54162238; content/fights/npc_fights.json): the Humus helado (7385), the Ardilla de las nieves rabiosa (7386), the Jabajocero rabioso (7387) and the Smielodón rabioso (7388). Dofus pour les noobs («Les derniers d'entre nous»): «Reparlez une seconde fois à l'Humus gelé pour donner un bon coup de pied dedans … Un combat se lance, il peut se faire à plusieurs»."
+  },
+  {
+   "objective": 18921,
+   "quest": 2486,
+   "kind": "click",
+   "elements": [{"map": 60035079, "element": 534890}],
+   "onlyGives": true,
+   "gives": [{"item": 28484, "count": 1}],
+   "afterObjectives": [18919],
+   "why": "«Explora el Bosque Petrificado»: the little rock at the foot of the trunk left of the transporter (element 534890, graphic 21252, cell 449 of 60035079) hides the Mapa antiguo congelado (28484); the objective is done when Cornelia has read it («Seguir esa dirección.», 72340). Dofus pour les noobs («Les derniers d'entre nous»): «Sur la même map, inspectez le petit rocher au pied du tronc à gauche du transporteur. Vous y découvrez une vieille carte gelée»."
+  },
+  {
+   "objective": 8291,
+   "quest": 1479,
+   "elements": [{"map": 126092567, "element": 484879}],
+   "gives": [{"item": 15149, "count": 8}],
+   "why": "«El artriste» (1479): «Gravats en [-3,-52]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484879, gives the 8 the objective asks for (item 15149). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8289,
+   "quest": 1479,
+   "elements": [{"map": 126092055, "element": 484874}],
+   "gives": [{"item": 15147, "count": 2}],
+   "why": "«El artriste» (1479): «Cordages et Ustensiles détériorés en [-4,-52]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484874, gives the 2 the objective asks for (item 15147). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8292,
+   "quest": 1479,
+   "elements": [{"map": 126092055, "element": 484883}],
+   "gives": [{"item": 15150, "count": 6}],
+   "why": "«El artriste» (1479): «Cordages et Ustensiles détériorés en [-4,-52]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484883, gives the 6 the objective asks for (item 15150). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8288,
+   "quest": 1479,
+   "elements": [{"map": 126091545, "element": 484880}, {"map": 126091545, "element": 484881}],
+   "gives": [{"item": 15146, "count": 5}],
+   "why": "«El artriste» (1479): «Ossements Kanigs en [-5,-54]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484880, 484881, gives the 5 the objective asks for (item 15146). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8294,
+   "quest": 1479,
+   "elements": [{"map": 126616576, "element": 484885}],
+   "gives": [{"item": 15152, "count": 3}],
+   "why": "«El artriste» (1479): «Bougies fondues en [-2,-57]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484885, gives the 3 the objective asks for (item 15152). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8290,
+   "quest": 1479,
+   "elements": [{"map": 126096152, "element": 484877}],
+   "gives": [{"item": 15148, "count": 4}],
+   "why": "«El artriste» (1479): «Rondins des bois en [4,-53]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484877, gives the 4 the objective asks for (item 15148). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8293,
+   "quest": 1479,
+   "elements": [{"map": 126095642, "element": 484884}],
+   "gives": [{"item": 15151, "count": 7}],
+   "why": "«El artriste» (1479): «Peaux usées en [3,-55]» (Dofus pour les noobs, «L'art triste»); the client's own prop on that map, element(s) 484884, gives the 7 the objective asks for (item 15151). INFERRED: which prop of the map is the one (the guide's pictures)."
+  },
+  {
+   "objective": 8295,
+   "quest": 1479,
+   "kind": "order",
+   "requires": [{"item": 15149, "count": 8}, {"item": 15147, "count": 2}, {"item": 15150, "count": 6}, {"item": 15146, "count": 5}, {"item": 15152, "count": 3}, {"item": 15148, "count": 4}, {"item": 15151, "count": 7}],
+   "spends": true,
+   "why": "«El artriste» (1479): «Rapportez les ressources à Edgar Naque en [-3,-52]. Donnez les matériaux à Edgar qui en profite pour se plaindre de votre lenteur» (Dofus pour les noobs, «L'art triste»): «Darle los materiales» (20767) hands the seven over, at the counts of objectives 8288-8294."
+  },
+  {
+   "objective": 8297,
+   "quest": 1479,
+   "elements": [{"map": 126615552, "element": 484906}],
+   "afterObjectives": [8296],
+   "why": "«El artriste» (1479): «Cliquez d'abord sur les silex présents sur l'établi, ensuite le pot de peinture et pour finir sur les cordages à même le sol» (Dofus pour les noobs, «L'art triste»): the flints on the workbench, element 484906 of the house. INFERRED: which of the house's three props (484906-484908) is which."
+  },
+  {
+   "objective": 8298,
+   "quest": 1479,
+   "elements": [{"map": 126615552, "element": 484907}],
+   "afterObjectives": [8297],
+   "why": "«El artriste» (1479): «Cliquez d'abord sur les silex présents sur l'établi, ensuite le pot de peinture et pour finir sur les cordages à même le sol» (Dofus pour les noobs, «L'art triste»): the paint pot, element 484907 of the house. INFERRED: which of the house's three props (484906-484908) is which."
+  },
+  {
+   "objective": 8299,
+   "quest": 1479,
+   "elements": [{"map": 126615552, "element": 484908}],
+   "afterObjectives": [8298],
+   "why": "«El artriste» (1479): «Cliquez d'abord sur les silex présents sur l'établi, ensuite le pot de peinture et pour finir sur les cordages à même le sol» (Dofus pour les noobs, «L'art triste»): the ropes on the floor, element 484908 of the house. INFERRED: which of the house's three props (484906-484908) is which."
+  },
+  {
+   "objective": 13058,
+   "quest": 1908,
+   "kind": "enter",
+   "map": 131596288,
+   "why": "«Atraviesa el portal hacia Anutropía»: «Direction la dimension Divine Enutrosor» (Dofus pour les noobs, «Casse en Enutrosor»); both ways in, the Travelers' Tower's portal and Anutropía's old portal in Amakna's village square, land on the dimension's arrival map (131596288, Managers/TravelersTower.cs)."
+  },
+  {
+   "objective": 13061,
+   "quest": 1908,
+   "kind": "order",
+   "afterObjectives": [13060],
+   "why": "«Golpe en Anutropía»: king Nidas (3648) counts once Barnabarbo has said the last chest went to him (13060, 28990)."
+  },
+  {
+   "objective": 13062,
+   "quest": 1908,
+   "kind": "beat",
+   "monsters": [5044],
+   "map": 129500160,
+   "afterObjectives": [13061],
+   "why": "«Rompe el cofrecillo valioso»: beating the Cofrecillo valioso (5044) of the fight its «Atacar al cofrecillo.» (34767) opens in King Nidas's chest room (content/fights/npc_fights.json), after Nidas (13061). The fight's loot comes before the objective is ticked, so its drop row («Qo=13062») holds."
+  },
+  {
+   "objective": 13064,
+   "quest": 1908,
+   "kind": "order",
+   "afterObjectives": [13063],
+   "why": "«Golpe en Anutropía»: Thanatena receives you once Khebesto has the piece (13063, 28995)."
+  },
+  {
+   "objective": 13065,
+   "quest": 1908,
+   "kind": "order",
+   "afterObjectives": [13064],
+   "why": "«Golpe en Anutropía»: Ilyzaelle after the queen (13064, «Habla con Ilyzaelle», 29003)."
+  },
+  {
+   "objective": 13066,
+   "quest": 1908,
+   "kind": "enter",
+   "map": 183242244,
+   "afterObjectives": [13065],
+   "why": "«Vuelve a la Sala de Marfil, en Zurcalia»: «Retournez en Ecaflipus et entrez de nouveau dans la salle de sortie du Défi du Chaloeil en [-9,-22]» (Dofus pour les noobs, «Casse en Enutrosor»), the Ivorine Room (183242244), after Ilyzaelle (13065)."
+  },
+  {
+   "objective": 13067,
+   "quest": 1908,
+   "kind": "order",
+   "afterObjectives": [13066],
+   "why": "«Golpe en Anutropía»: Dardondakal hears it once back in the Ivory Room (13066)."
+  },
+  {
+   "objective": 18923,
+   "quest": 2486,
+   "kind": "beat",
+   "monsters": [7390, 7389],
+   "map": 232260608,
+   "afterObjectives": [18922],
+   "why": "«Vence al hinchado y a los demás infectados»: the wave fight the Discípula de la Funga Oscura («Defenderte del ataque con la ayuda de Cornelia.», 72374/72378, or «Atacar a las criaturas infectadas.», 72365) or the Hinchado infectado (72363) opens in the ceremony room (232260608; content/fights/npc_fights.json)."
+  },
+  {
+   "objective": 18925,
+   "quest": 2486,
+   "kind": "beat",
+   "monsters": [2968],
+   "map": 62919680,
+   "afterObjectives": [18924],
+   "why": "«Enfréntate al Cil y a los silvespíritus para abrirte paso hacia la guarida»: the Antro del Cil's boss fight in its fifth room (62919680). Dofus pour les noobs («Les derniers d'entre nous»): «Il faut donc réaliser le donjon Antre du Korriandre et vaincre le Korriandre dans son donjon»."
+  },
+  {
+   "objective": 18927,
+   "quest": 2486,
+   "kind": "click",
+   "elements": [{"map": 62921728, "element": 535045}],
+   "afterObjectives": [18926],
+   "requires": [{"item": 28488, "count": 1}],
+   "spends": true,
+   "showsNpc": 7145,
+   "why": "«Purifica el templo encantado»: the Esencia de silvespíritu (28488, crafted by an alchemist of level 180 once 18924 is done: its craftFeasibleCriterion «PZ=1&(Qo>18924|Qf=2486)») poured on the ring of white mushrooms round the pedestal of the haunted temple (62921728, element 535045 on cell 300; the client names the action «Verter una esencia de silvespíritu», 1051410); the forest gods come. Dofus pour les noobs («Les derniers d'entre nous»): «examinez les petits champignons blancs qui forment un cercle autour du piédestal central … cliquez de nouveau sur les champignons blancs … « Verser une essence de Sylvesprit ». Quatre petits Dieux font leur apparition». INFERRED: which of the temple's two elements (535045 on 300, 534775 on 343) is the ring."
   }
 ]
 }

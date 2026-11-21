@@ -388,6 +388,15 @@
       "npc": 2353,
       "replies": [21430],
       "why": "The Fábrica de Malefíscof (dungeon 77): after the machine room (130286592) the winners are in «Brutatax's Factory - Exit» (130287616), where «El maleficio del cofre» (1506) has them talk to Malefíscof: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»); objectives 8496-8498 name this map. Inès Karcel lets them out: «Parlez de nouveau à Inès Karcel pour sortir» (Dofus pour les noobs, «Fabrique de Malléfisk»), her «Salir.» (21430). The map panel offers no way out here: the client shows it only on a map of the dungeon's own (DungeonsDataRoot.GetDungeonByMapId, MapInfoUI.UpdateContextualOptions), and this room is none. INFERRED landing cell, on the emblem in front of Malefíscof."
+    },
+    {
+      "dungeon": 76,
+      "bossRoom": 129500160,
+      "room": 129500160,
+      "cell": 0,
+      "npc": 0,
+      "replies": [],
+      "why": "King Nidas's palace (dungeon 76) has a single room, and its winners stay in it: «Une fois le donjon terminé, ne sortez pas tout de suite, et parlez au Coffret précieux pour l'attaquer» (Dofus pour les noobs, «Casse en Enutrosor», quest 1908). The room is the dungeon's own map, so the map panel's «Salir de la mazmorra» is the way out. The room being the boss room, the winners keep the cell they fought from (FightHandler: no move when the room is the one they are in)."
     }
   ]
 }
