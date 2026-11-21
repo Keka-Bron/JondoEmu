@@ -6,11 +6,12 @@
   "Its board is an arena of its subarea (or its twin, its id but the last byte), a map with",
   "no place in the world. como: name, the one such arena with the room's own name;",
   "scenery, else the one whose graphics share the most with the room's; twin, when the",
-  "subarea has no such arena, the one map on the world's grid with the room's own name.",
+  "subarea has no such arena, the map on the world's grid six past the room and drawn like it, or",
+  "else the one there with the room's own name.",
   "Rooms with no such arena are left out.",
   "The names are the client's, as in koliseo_mapas.json: its red cells are our BLUE team",
   "(team 0, the kba's f1), its blue ones our red.",
-  "641 of the 773 rooms: {'name': 380, 'scenery': 234, 'none': 132, 'twin': 27}."
+  "642 of the 773 rooms: {'name': 380, 'scenery': 234, 'none': 131, 'twin': 28}."
  ],
  "mapas": [
   {
@@ -7931,6 +7932,39 @@
   },
   {
    "sala": 112201217,
+   "id": 112201223,
+   "como": "twin",
+   "rojas": [
+    233,
+    262,
+    339,
+    367,
+    370,
+    395,
+    396,
+    397,
+    425,
+    453,
+    454,
+    455
+   ],
+   "azules": [
+    231,
+    244,
+    245,
+    259,
+    274,
+    288,
+    289,
+    302,
+    318,
+    331,
+    332,
+    346
+   ]
+  },
+  {
+   "sala": 112202241,
    "id": 112201223,
    "como": "twin",
    "rojas": [
