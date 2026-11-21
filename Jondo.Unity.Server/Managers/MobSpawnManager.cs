@@ -595,11 +595,20 @@ namespace Jondo.Unity.Server.Managers
         /// A dungeon room's group: its eight, from the dungeon's own monsters, the boss leading in
         /// the boss room. Null when there is nobody to put in it.
         /// </summary>
+        /// <remarks>
+        /// It stands where the base's first group of the room stood, unless nobody can stand there.
+        /// The base seeded its groups on six fallback cells, inside a wall on one map in three, and
+        /// <see cref="PlaceOnWalkableCells"/> only moves the base's own groups: a boss room's group
+        /// takes a new id, so it stayed in the wall. The Fábrica de Malefíscof's machine room had
+        /// Malefíscof and her seven on 350, outside the room, where nobody could see them, let alone
+        /// click them to start the fight.
+        /// </remarks>
         private static MobGroup? ComposeDungeonRoom(DungeonManager.Dungeon dungeon, int index,
                                                     IReadOnlyList<int> fallback, long id, int? cell)
         {
             long room = dungeon.Rooms[index];
             if (dungeon.EmptyRooms.Contains(room)) return null;
+            if (cell is int seeded && !MapManager.IsCellWalkable(room, seeded)) cell = null;
             if (dungeon.AloneRooms.TryGetValue(room, out var alone))
             {
                 var them = alone.Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0)
@@ -608,7 +617,7 @@ namespace Jondo.Unity.Server.Managers
                 return new MobGroup
                 {
                     MobId = id,
-                    CellId = cell ?? MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre),
+                    CellId = cell ?? MiddleOfTheFloor(room),
                     Members = them,
                     Modular = true,
                     Leaders = them.Count,
@@ -637,12 +646,43 @@ namespace Jondo.Unity.Server.Managers
             return new MobGroup
             {
                 MobId = id,
-                CellId = cell ?? MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre),
+                CellId = cell ?? MiddleOfTheFloor(room),
                 Members = members,
                 Modular = true,
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
                 // A dungeon room's group waits where the room puts it: it does not roam.
             };
+        }
+
+        /// <summary>
+        /// The walkable cell nearest the middle of a room's floor: where a room's group stands when
+        /// the base gives it no cell of its own, or one nobody can stand on.
+        /// </summary>
+        /// <remarks>
+        /// The map's centre cell is no use here: 280 is on the left edge of every map, and a room
+        /// drawn to the right of it -- the Fábrica de Malefíscof's machine room -- had its group in
+        /// the corner against the wall. The middle of the cells one can walk on is the room's own.
+        /// </remarks>
+        internal static int MiddleOfTheFloor(long room)
+        {
+            if (!MapManager.WalkableCells.TryGetValue(room, out var cells) || cells.Count == 0)
+                return MapManager.GetNearestWalkableCell(room, Handlers.TeleportHandler.MapCentre);
+            double x = 0, y = 0;
+            foreach (int c in cells)
+            {
+                var (cx, cy) = MapGeometry.CellToPoint(c);
+                x += cx; y += cy;
+            }
+            x /= cells.Count; y /= cells.Count;
+            int best = cells[0];
+            double nearest = double.MaxValue;
+            foreach (int c in cells)
+            {
+                var (cx, cy) = MapGeometry.CellToPoint(c);
+                double d = (cx - x) * (cx - x) + (cy - y) * (cy - y);
+                if (d < nearest) { nearest = d; best = c; }
+            }
+            return best;
         }
 
         /// <summary>

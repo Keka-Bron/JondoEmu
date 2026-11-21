@@ -6651,7 +6651,11 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
-                    if (c.Efecto != null && c.Efecto.Duration > 0) byOwnDuration = Math.Max(byOwnDuration, suya);
+                    // A row's trigger duration is a duration of its own too, when it is a real count:
+                    // the Sacurador's Tact, cast in his turn, is «when I am hit, Tica» until his next
+                    // turn. Falling at the round's start, it was off before any enemy played.
+                    if (c.Efecto != null && (c.Efecto.Duration > 0 || Managers.EffectEngine.CountsItsTriggerRounds(c.Efecto)))
+                        byOwnDuration = Math.Max(byOwnDuration, suya);
                     if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
                 }
                 // And for as long as what the same cast left on that bearer, as a player spell's

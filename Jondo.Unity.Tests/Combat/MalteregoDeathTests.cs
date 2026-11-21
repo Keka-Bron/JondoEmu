@@ -86,5 +86,20 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(6, EffectEngine.CaducidadDeLaFila(Row("X", 2, 63), 4, false));    // and a duration of its own
             Assert.Equal(-1, EffectEngine.CaducidadDeLaFila(Row("TB", 0, 63), 4, true));   // a behaviour spell's still is
         }
+
+        /// <summary>A row with no duration listens for as many rounds as its trigger duration says.</summary>
+        [Fact]
+        public void A_row_with_no_duration_listens_for_its_trigger_rounds()
+        {
+            SpellEffect Row(int duration, int triggerDuration)
+                => new() { EffectId = 792, Triggers = "D", Duration = duration, TriggerDuration = triggerDuration };
+
+            Assert.Equal(6, EffectEngine.CaducidadDeLaFila(Row(0, 2), 4, false));
+            Assert.Equal(7, EffectEngine.CaducidadDeLaFila(Row(0, 3), 4, false));
+            Assert.True(EffectEngine.CountsItsTriggerRounds(Row(0, 1)));     // the Sacurador's Tact
+            Assert.False(EffectEngine.CountsItsTriggerRounds(Row(0, 63)));   // «no limit» is not a count
+            Assert.False(EffectEngine.CountsItsTriggerRounds(Row(0, 0)));
+            Assert.False(EffectEngine.CountsItsTriggerRounds(Row(2, 2)));    // its own duration rules
+        }
     }
 }

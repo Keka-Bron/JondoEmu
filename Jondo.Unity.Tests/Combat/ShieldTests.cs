@@ -164,6 +164,35 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(target.IsAlive);
         }
 
+        /// <summary>
+        /// 1040 written in a spell is the shield's points, flat, whatever the caster's level or
+        /// life: Malefíscof's Nide Joprová gives her 1000 and her Intereses 500.
+        /// </summary>
+        [Theory]
+        [InlineData(4508, 1000)]
+        [InlineData(4504, 500)]
+        public void A_written_1040_is_a_flat_shield(int spell, int points)
+        {
+            var source = SpellEffects.De(spell, 1).FirstOrDefault(e => e.EffectId == 1040);
+            if (source == null) return;   // no data
+
+            var fight = new FightInstance(1, 1);
+            var caster = Uno();
+            caster.CellId = 300;
+            fight.AddPlayer(caster);
+            var row = new SpellEffect
+            {
+                EffectId = source.EffectId, EffectUid = source.EffectUid, DiceNum = source.DiceNum,
+                Value = source.Value, Duration = source.Duration, Dispellable = source.Dispellable,
+                MaxStack = source.MaxStack, Flags = source.Flags, Triggers = "I", TargetMask = "C",
+            };
+
+            EffectEngine.ResolveEffects(fight, caster, spell, 1, caster,
+                EffectEngine.AlLanzar, 0, new[] { row }, aimedCell: caster.CellId);
+
+            Assert.Equal(points, caster.PuntosDeEscudo);
+        }
+
         private static Fighter Uno(int vida = 1000) => new Fighter
         {
             Id = 1, Level = 200, MaxHP = vida, CurrentHP = vida,

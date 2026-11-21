@@ -1214,11 +1214,24 @@ namespace Jondo.Unity.Server.Managers
         /// its resistances and half its damage» (21477) was armed to the next round, and the copy
         /// that died any later took its penalty with it. Only the death trigger: the turn and
         /// blow rows of a 63 keep their reading.
+        ///
+        /// With no duration of its own, a row listens for its trigger duration's rounds (1 to 62):
+        /// a Sacurador's Tact is «792 Tica under D, duration 0, trigger duration 1», and Blakjak's
+        /// «curas recibidas» row, «duration 0, trigger duration 2», cast in round 5 drops in 7 in
+        /// its capture. Read as one round whatever it said, the two-round listeners lost a round.
         /// </summary>
         public static int CaducidadDeLaFila(SpellEffect fila, int ronda, bool deConducta)
             => fila.Duration < 0 ? -1
              : fila.Duration > 0 ? ronda + fila.Duration
-             : deConducta || WaitsForeverOnDeath(fila) ? -1 : ronda + 1;
+             : deConducta || WaitsForeverOnDeath(fila) ? -1
+             : ronda + (CountsItsTriggerRounds(fila) ? fila.TriggerDuration : 1);
+
+        /// <summary>
+        /// Whether a row with no duration of its own lasts its trigger duration's rounds, as a
+        /// row of that duration would: a real count (1 to 62), not the «no limit» 63.
+        /// </summary>
+        internal static bool CountsItsTriggerRounds(SpellEffect row)
+            => row != null && row.Duration == 0 && row.TriggerDuration > 0 && row.TriggerDuration < NoLimitTriggerDuration;
 
         /// <summary>Whether a row with no duration of its own waits on its bearer's death for as long as the fight lasts.</summary>
         internal static bool WaitsForeverOnDeath(SpellEffect row)
@@ -5223,7 +5236,8 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            if (efecto.EffectId == EscudoPorNivel || efecto.EffectId == EscudoPorVida)
+            if (efecto.EffectId == EscudoPorNivel || efecto.EffectId == EscudoPorVida
+                || efecto.EffectId == ShieldPanelEffect)
             {
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
@@ -5231,8 +5245,14 @@ namespace Jondo.Unity.Server.Managers
                 // 1020 goes on the CASTER's level and 1039 on the RECEIVER's life. They are two
                 // different bases and confusing them gives shields of another order: 150% of the level
                 // is 300 points at level 200, and 150% of life would be thousands.
-                int base_ = efecto.EffectId == EscudoPorNivel ? quienLanza.StatLevel : sobre.MaxHP;
-                int cuanto = base_ * porciento / 100;
+                //
+                // And 1040 written in the spell itself is the points, flat: «1000 escudo» on
+                // Malefíscof's Nide Joprová, 500 on her Intereses once she is under half her life.
+                // 79 spells carry it -- Escudo Espiritual, Yugo Protector, Caballería... -- and it
+                // was sent to the panel as a row worth nothing, with no shield behind it.
+                int cuanto = efecto.EffectId == ShieldPanelEffect
+                    ? porciento
+                    : (efecto.EffectId == EscudoPorNivel ? quienLanza.StatLevel : sobre.MaxHP) * porciento / 100;
                 if (cuanto <= 0) return null;
 
                 int caduca = Caduca(efecto, ronda);
