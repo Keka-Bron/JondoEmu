@@ -3100,8 +3100,14 @@ namespace Jondo.Unity.Server.Managers
                     bool fijas = efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0;
                     var dondeVan = !fijas ? new List<int> { aimedCell }
                                  : EsInvocacion(efecto.EffectId)
-                                     ? efecto.CeldasFijas.Take(efecto.Value > 0 && efecto.Value < 999 ? efecto.Value : int.MaxValue).ToList()
+                                     ? efecto.CeldasFijas.Take(efecto.Value > 0 && efecto.Value < 999 ? efecto.Value : int.MaxValue)
+                                                         .Where(cell => EnLaCasilla(combat, cell) == null).ToList()
                                      : new List<int> { efecto.CeldasFijas[0] };
+                    // A fixed cell somebody stands on gets nothing: Miauvizor's dice (6235, "181 4282
+                    // on ;" over every cell of his face) skip the cells taken, «si une entité est
+                    // présente sur une case où devrait apparaître un Dé, ce dernier n'est pas
+                    // invoqué» (Dofus pour les noobs). Left to the handler, each came out on the
+                    // nearest free cell, off his face.
 
                     // A summon whose zone is a line from the aimed cell comes out on that line's
                     // first free cell, past whoever stands on the aimed one, and nowhere when there
