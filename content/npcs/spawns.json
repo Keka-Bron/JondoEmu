@@ -6237,8 +6237,16 @@
       "npc": 4053,
       "cell": 343,
       "orientation": 1,
-      "criterion": "(Qa=1905&Qo>13024)|Qf=1905",
-      "why": "Dardondakal (4053), the white dragon's soul in the Ivory Room: «cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs, «Le dragon blanc»), so he shows from that click (13024) on, and stays for the quests he gives after. The cell is the derived one (343); its derived criterion showed him from the start of 1905."
+      "criterion": "(Qa=1905&Qo>13024)|(Qf=1905&Qf!1915&Qo<13185)",
+      "why": "Dardondakal (4053), the white dragon's soul in the Ivory Room: «cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs, «Le dragon blanc»), so he shows from that click (13024) on, and stays for the quests he gives after -- until «Es hora de morir» (1915) sees «el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna» (reply 35357) with 13185, after which the incarnate dragon (4054) stands there instead. The cell is the derived one (343); its derived criterion showed him from the start of 1905."
+    },
+    {
+      "map": 183242244,
+      "npc": 4054,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "(Qa=1915&Qo>13185)|Qf=1915",
+      "why": "Dardondakal incarnate (4054), the dragon 1915 sends you back to (13186) once his soul has taken flesh (13185, «Ver cómo el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna», 35357). The derived row had no criterion, so he stood in the Ivory Room from the start of «El dragón blanco» (1905): a solid dragon before the bramble was clicked, on top of the ghost once it was, and the click meant for the ghost opened his line instead."
     }
     ]
 }
