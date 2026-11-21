@@ -1211,11 +1211,19 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
+        /// <summary>
+        /// Whether a reply's quest progress goes to the heroes too. A reply that only moves the master
+        /// -- a passage, a map it leads to -- moves them with him (HeroPresence), and is shared:
+        /// Incarnam's portal does «Utiliza el portal para ir a Astrub» (13931), and the heroes went
+        /// through it with nothing ticked, each to be brought back to cross it himself. What it costs,
+        /// a dungeon's door, the way home of a dream and a body changed on the way are not.
+        /// </summary>
         private static bool CanShareQuestReply(int npcId, DialogueChoice choice)
             => Quests.CanShareNpc(npcId) && choice.BuysItem == 0 && choice.BuysPrice == 0
                && choice.Takes == 0 && choice.TakesAll.Count == 0 && choice.Marks == 0
-               && choice.Door.Length == 0 && choice.TeleportsTo == 0 && choice.TeleportPassage == 0
-               && !choice.ReturnsHome && SeLeOfrece(choice);
+               && choice.Door.Length == 0 && !choice.ReturnsHome
+               && choice.PhantomPhoenix == 0 && choice.GivesMutation == 0 && !choice.EndsMutation
+               && SeLeOfrece(choice);
 
         private static async Task StartQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice)
         {
@@ -1737,8 +1745,10 @@ namespace Jondo.Unity.Server.Handlers
                 CerrarConversacion();
                 if (elegidaAhora != null && elegidaAhora.Door.Length > 0 && elegidaAhora.TakesAll.Count > 0)
                     await TakeAllAsync(stream, elegidaAhora);
-                // Going in can be what hands a quest over: Klasmor's «Criptología».
-                if (startsAfterClosing != 0) await Managers.Quests.StartAsync(session, startsAfterClosing);
+                // Going in can be what hands a quest over: Klasmor's «Criptología», at Kardorim's
+                // crypt. To the heroes too: they went in with him, each by his own way in
+                // (DungeonHeroes), and reached Kardorim without the quest his fight moves.
+                if (startsAfterClosing != 0) await Managers.Quests.StartSharedAsync(session, startsAfterClosing);
                 return;
             }
 

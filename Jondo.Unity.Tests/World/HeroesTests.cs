@@ -485,6 +485,235 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The followed box across a switch: the client keeps it and adds an iel's quests to it, so
+        /// a quest both follow is not sent again -- with quests shared, each Tab showed them once
+        /// more (dagostin, 2026-11-21) --; it is told as the new one's step, and followed by him.
+        /// </summary>
+        [Fact]
+        public async Task A_switch_does_not_add_the_quests_both_follow_to_the_box_again()
+        {
+            const int quest = 1648, step = 2268, other = 1565;
+            QuestEngine.Load();
+            Achievements.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 13, "Caja-" + tag, 8);
+            long hero = Character(Account + 13, "Tapa-" + tag, 9);
+            DatabaseManager.SaveQuestProgress(master, new DatabaseManager.QuestRow(quest, step, "", false));
+            DatabaseManager.SaveQuestProgress(hero, new DatabaseManager.QuestRow(quest, step, "", false));
+            FollowedQuests.Follow(master, quest);
+            FollowedQuests.Follow(master, other);
+            var codec = new Recording();
+            await using var pipe = await ClientPipe.OpenAsync(Account + 13, master, Map, "Caja-" + tag, codec);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                if (!MapManager.Maps.ContainsKey(RealMap)) MapManager.Initialize();
+                if (MapManager.Maps.TryGetValue(RealMap, out var real)) MapManager.Maps[Map] = real;
+                if (MapManager.WalkableCells.TryGetValue(RealMap, out var cells)) MapManager.WalkableCells[Map] = cells;
+                using (SessionContext.Push(pipe.Session)) DatabaseManager.LoadCharacter(master);
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+
+                int before = codec.Frames.Count;
+                Assert.Equal("ok", await HeroSwitch.SwitchAsync(pipe.Session, hero));
+
+                var sent = codec.Frames.Skip(before).Select(f => f.Content).ToList();
+                var box = Assert.Single(sent.OfType<Jondo.Unity.Protocol.Game.QuestsFollowedEvent>());
+                Assert.DoesNotContain(box.Quests, q => q.QuestId == quest);
+                Assert.Contains(sent.OfType<Jondo.Unity.Protocol.Game.QuestStepInformationEvent>(), e => e.Information.QuestId == quest);
+                // The master's other quest, which the hero does not have, out of the box.
+                Assert.Contains(sent.OfType<Jondo.Unity.Protocol.Game.QuestValidatedEvent>(), e => e.QuestId == other);
+                Assert.DoesNotContain(sent.OfType<Jondo.Unity.Protocol.Game.QuestValidatedEvent>(), e => e.QuestId == quest);
+                Assert.Contains(quest, FollowedQuests.Of(hero));
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(hero);
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, hero })
+                {
+                    foreach (int followed in FollowedQuests.Of(character).ToList()) FollowedQuests.Unfollow(character, followed);
+                    DatabaseManager.DeleteCharacter(character, Account + 13);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The recipe of Incarnam's cake read by the master is read by the hero beside him who carries
+        /// his own: the cake asks for it to be crafted (Qa=1637&amp;Qo&gt;9805), and the hero was told
+        /// nothing came out of the ingredients (dagostin, 2026-11-21).
+        /// </summary>
+        [Fact]
+        public async Task A_quest_book_read_by_the_master_is_read_by_the_heroes_who_carry_it()
+        {
+            const int quest = 1637, readIt = 9805, recipe = 16517;
+            QuestEngine.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 14, "Receta-" + tag, 8);
+            long carries = Character(Account + 14, "Lleva-" + tag, 1);
+            long without = Character(Account + 14, "Sin-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 14, master, Map, "Receta-" + tag);
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, carries));
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, without));
+                var withIt = Heroes.SessionOf(carries)!;
+                var withoutIt = Heroes.SessionOf(without)!;
+                using (SessionContext.Push(pipe.Session))
+                {
+                    QuestEngine.LoadFrom(master);
+                    foreach (var session in new[] { pipe.Session, withIt, withoutIt })
+                        using (SessionContext.Push(session)) Assert.NotNull(session.State.Quests!.Start(quest));
+                    Assert.True(await Equipment.GiveAsync(pipe.ToClient, recipe, 1));
+                    using (SessionContext.Push(withIt)) Assert.True(await Equipment.GiveAsync(withIt, recipe, 1));
+
+                    var book = Equipment.All.First(i => i.Template == recipe);
+                    Assert.True(await ReadingItemHandler.TryReadAsync(pipe.Session, book));
+
+                    Assert.True(QuestEngine.Log!.ObjectiveDone(readIt));
+                    Assert.True(withIt.State.Quests!.ObjectiveDone(readIt));
+                    Assert.False(withoutIt.State.Quests!.ObjectiveDone(readIt));
+                    using (SessionContext.Push(withIt)) Assert.True(ItemCriteria.Holds("Qa=1637&Qo>9805&PO!16520"));
+                    var lag = Assert.Single(Heroes.LagsOf(pipe.Session, without));
+                    Assert.Equal((Heroes.QuestLagReason.MissingItems, recipe), (lag.Reason, lag.ItemId));
+                }
+            }
+            finally
+            {
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, carries, without })
+                    DatabaseManager.DeleteCharacter(character, Account + 14);
+            }
+        }
+
+        /// <summary>
+        /// Incarnam's portal: the reply that crosses it does «Utiliza el portal para ir a Astrub»
+        /// (13931) for the heroes too, who go through with their master -- they were taken to Astrub
+        /// with nothing ticked, each to be brought back to cross it alone (dagostin, 2026-11-21).
+        /// </summary>
+        [Fact]
+        public async Task A_reply_that_only_moves_the_master_moves_his_heroes_quests_too()
+        {
+            const long incarnam = 153880835, astrub = 192416776;
+            const int quest = 2004, sawAnemo = 13767, crossed = 13931, portal = 4398;
+            if (MapManager.GetMapInfo(incarnam) == null) MapManager.Initialize();
+            Interactives.Initialize();
+            TeleportManager.Initialize();
+            Npcs.Initialize();
+            QuestEngine.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 15, "Portal-" + tag, 8);
+            long hero = Character(Account + 15, "Cruza-" + tag, 1);
+            // «Destino Astrub» asks for the quest before it (Qf=1635).
+            foreach (long character in new[] { master, hero })
+                DatabaseManager.SaveQuestProgress(character, new DatabaseManager.QuestRow(1635, 0, "", true));
+            await using var pipe = await ClientPipe.OpenAsync(Account + 15, master, incarnam, "Portal-" + tag);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                var follower = Heroes.SessionOf(hero)!;
+                pipe.Session.State.CharacterLevel = follower.State.CharacterLevel = 20;
+                using (SessionContext.Push(pipe.Session))
+                {
+                    QuestEngine.LoadFrom(master);
+                    foreach (var session in new[] { pipe.Session, follower })
+                        using (SessionContext.Push(session)) session.State.Quests!.Start(quest)!.Done.Add(sawAnemo);
+                    Assert.Equal(incarnam, follower.State.MapId);
+
+                    var actor = Assert.Single(Npcs.OnMap(incarnam), n => n.NpcId == portal);
+                    await NpcHandler.InteractAsync(pipe.Session, new(Npcs.Talk, incarnam, checked((int)actor.ContextualId)));
+                    await NpcHandler.ReplyAsync(pipe.Session, new(36980));
+
+                    Assert.Equal(astrub, pipe.Session.State.MapId);
+                    Assert.Equal(astrub, follower.State.MapId);
+                    Assert.True(QuestEngine.Log!.ObjectiveDone(crossed));
+                    Assert.True(follower.State.Quests!.ObjectiveDone(crossed));
+                    Assert.Empty(Heroes.LagsOf(pipe.Session, hero));
+                }
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, hero })
+                    DatabaseManager.DeleteCharacter(character, Account + 15);
+            }
+        }
+
+        /// <summary>
+        /// Kardorim's crypt: the guardian hands «Criptología» over as the master goes in, and the
+        /// heroes who go in with him get it too -- they reached Kardorim without it, and the boss's
+        /// objective could not move for them (dagostin, 2026-11-21).
+        /// </summary>
+        [Fact]
+        public async Task A_quest_handed_over_at_a_dungeons_door_goes_to_the_heroes_who_go_in()
+        {
+            const long outside = 153881600;
+            const int quest = 1638, guardianId = 2907, byKey = 24970, key = 8545;
+            if (MapManager.GetMapInfo(outside) == null) MapManager.Initialize();
+            DungeonManager.Initialize();
+            Npcs.Initialize();
+            DungeonDoor.Initialize();
+            QuestEngine.Load();
+            string tag = Guid.NewGuid().ToString("N")[..6];
+            long master = Character(Account + 16, "Cripta-" + tag, 8);
+            long hero = Character(Account + 16, "Baja-" + tag, 1);
+            await using var pipe = await ClientPipe.OpenAsync(Account + 16, master, outside, "Cripta-" + tag);
+            using var reading = new System.Threading.CancellationTokenSource();
+            var drain = Task.Run(async () =>
+            {
+                var buffer = new byte[65536];
+                try { while (!reading.IsCancellationRequested && await pipe.FromServer.ReadAsync(buffer, reading.Token) > 0) { } }
+                catch { }
+            });
+            try
+            {
+                Assert.Equal("ok", Heroes.Connect(pipe.Session, hero));
+                var follower = Heroes.SessionOf(hero)!;
+                pipe.Session.State.CharacterLevel = follower.State.CharacterLevel = 20;
+                using (SessionContext.Push(pipe.Session))
+                {
+                    QuestEngine.LoadFrom(master);
+                    Assert.True(await Equipment.GiveAsync(pipe.ToClient, key, 1));
+                    using (SessionContext.Push(follower)) Assert.True(await Equipment.GiveAsync(follower, key, 1));
+
+                    var guardian = Assert.Single(Npcs.OnMap(outside), n => n.NpcId == guardianId);
+                    await NpcHandler.InteractAsync(pipe.Session, new(Npcs.Talk, outside, checked((int)guardian.ContextualId)));
+                    await NpcHandler.ReplyAsync(pipe.Session, new(byKey));
+
+                    Assert.NotEqual(outside, pipe.Session.State.MapId);
+                    Assert.Equal(pipe.Session.State.MapId, follower.State.MapId);
+                    Assert.True(QuestEngine.Log!.Active(quest));
+                    Assert.True(follower.State.Quests!.Active(quest));
+                }
+            }
+            finally
+            {
+                reading.Cancel();
+                Heroes.DisconnectAll(master);
+                SessionRegistry.Unregister(pipe.Session);
+                foreach (long character in new[] { master, hero })
+                    DatabaseManager.DeleteCharacter(character, Account + 16);
+            }
+        }
+
+        /// <summary>
         /// A master trades with a hero of his: the window opens at once, the hero takes what is
         /// laid down as soon as his master is ready. Asking another player's hero asks the character
         /// that player plays (#199).

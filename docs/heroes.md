@@ -129,9 +129,10 @@ a member: class, level, life, AP, MP, initiative, prospecting and wisdom.
 
 **Share quest progress** is the checklist button on each connected hero. It starts eligible
 quests and advances matching objectives when the active character talks to an NPC, uses a
-quest object, discovers a location, or wins a fight the hero joined. Each hero uses their
-own quest log, prerequisites and inventory, and receives their own quest rewards. Actions
-such as crafting and paid or teleporting replies still require playing the character.
+quest object, reads a quest book the hero carries too, discovers a location, or wins a fight
+the hero joined. Each hero uses their own quest log, prerequisites and inventory, and receives
+their own quest rewards. Actions such as crafting and paid replies still require playing the
+character; a reply that only moves the master moves his heroes with him, and is shared.
 The switch starts **on** (Keka-Bron/JondoEmu#206: a forgotten switch left heroes behind unseen);
 turning it off for a hero stays with the character across hero swaps until the server restarts.
 
@@ -144,7 +145,7 @@ demandés». Once a quest, not again at each step after. The reason is the first
 | Not on your map / in a fight | The hero was elsewhere, or a fight was on |
 | Not among the winners of that fight | A quest monster killed in a fight the hero did not win with him |
 | Items missing | The NPC or element takes items the hero lacks: which, and how many |
-| Step not shared | The reply takes items or kamas, or moves the master |
+| Step not shared | The reply takes items or kamas, opens a dungeon's door, or changes the master's body on the way (a plain passage or teleport is shared: the heroes go with him) |
 | Conditions not met | The hero cannot start the quest: his level, a quest before it |
 | Quest not started / not on the same step | He was behind already |
 
