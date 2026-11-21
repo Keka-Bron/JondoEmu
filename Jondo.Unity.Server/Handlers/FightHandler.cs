@@ -10236,6 +10236,18 @@ namespace Jondo.Unity.Server.Handlers
                                  $"{finalInfligido}%: {antes} is left at {damage}.");
             }
 
+            // And 150, AllDamageMultiplier in the client's StatId, the striker's on every blow: the
+            // client's preview multiplies a damage effect by it right after 107 (ham.irz in
+            // 3.6.10.11). It was sent at a hundred and never read here.
+            int todosLosDanos = PercentageOf(fuente, Managers.EffectEngine.TodosLosDanos, fight.RoundNumber);
+            if (todosLosDanos != 100 && damage > 0)
+            {
+                int antes = damage;
+                damage = Math.Max(0, (int)Math.Round(damage * todosLosDanos / 100.0));
+                Program.LogDebug($"[Fight] {caster.Id} deals all damage at {todosLosDanos}%: " +
+                                 $"{antes} is left at {damage}.");
+            }
+
             // The damage percentages: the striker's for a spell's or a weapon's blow and for one
             // at melee or at range, then the target's the same two ways (DamagePercentages). They
             // were sent to the client and never read here, so "100 % daños a los hechizos" on a
@@ -10749,6 +10761,13 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await UnEstampadoAsync(stream, fight, quienEmpuja, c.Blocker,
                                        c.CollisionDamageToBlocker, indirecto: true, desdeLejos: desdeLejos);
+            }
+
+            // And those lined up behind him, one after the other down the row.
+            foreach (var (detras, dano) in c.FurtherBlockers)
+            {
+                await UnEstampadoAsync(stream, fight, quienEmpuja, detras, dano, indirecto: true,
+                                       desdeLejos: desdeLejos);
             }
         }
 

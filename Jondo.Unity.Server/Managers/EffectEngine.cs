@@ -291,6 +291,12 @@ namespace Jondo.Unity.Server.Managers
         public int CollisionDamageToBlocker { get; init; }
 
         /// <summary>
+        /// The fighters lined up behind the <see cref="Blocker"/>, in order, each with half of what
+        /// the one before him was worth (EffectEngine.CollisionOf). Empty for most crashes.
+        /// </summary>
+        public IReadOnlyList<(Fighter Who, int Damage)> FurtherBlockers { get; init; } = Array.Empty<(Fighter, int)>();
+
+        /// <summary>
         /// A push that stopped on a portal that is on: the cells it has left, and the step they go
         /// along from the way out. Null for any other push. The fight sends him through and walks
         /// the rest (<see cref="EffectEngine.PastThePortal"/>).
@@ -709,6 +715,13 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>85, «Empuje (fijo)» (fixed push): the receiver's FLAT subtraction.</summary>
         private const int ResistenciaAlEmpuje = 85;
 
+        /// <summary>
+        /// 150, AllDamageMultiplier in the client's StatId: the striker's multiplier on every blow,
+        /// its base at 100. The client's preview multiplies a crash (effect 80) by the pusher's
+        /// (ham.irz), and by none of his other dealt ones.
+        /// </summary>
+        internal const int TodosLosDanos = 150;
+
         /// <summary>The state that pins one to the spot. Not to be confused with characteristic 97.</summary>
         private const int Indesplazable = 97;
 
@@ -745,9 +758,30 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// What a push crashed into costs: the damage to the one pushed, the fighter he was
-        /// pushed into and that one's half.
+        /// pushed into and that one's half, and the fighters lined up behind that one.
         /// </summary>
-        private static (int Damage, Fighter Blocker, int ToBlocker) CollisionOf(
+        /// <remarks>
+        /// The client's own fight preview works the same crash out (3.6.10.11, read with Ghidra over
+        /// the REA IL2CPP seeds; the names are obfuscated). haf.guf takes the cells left, DOUBLES
+        /// them when the push goes along an even direction -- og.ovo(direction) is
+        /// <c>(direction &amp; 1) == 0</c>, the four that touch by a corner, a diagonal in our
+        /// (x, y) --, hurts the pushed one, then each fighter standing in a row behind the blocker,
+        /// as many as those cells, with their rank. hal.bncs is the damage of effect 80 with it:
+        /// <c>floor((84 - the target's 85 + floor(level × 0.5) + 32) × cells / (4 × 2^rank))</c>,
+        /// the level being the summoner's for a summon. ham.irz then multiplies it by the pusher's
+        /// 150 (AllDamageMultiplier), the target's spells-or-weapons taken (141/142, gvq.bmcm), its
+        /// melee-or-range taken (124/121, gvq.bmcn) and its 1163 buffs (ham.bndv); not by
+        /// resistances nor by the pusher's 107 and other dealt ones (gzj.bmvw is false for 80).
+        /// The ids' names are the client's StatId enum's.
+        ///
+        /// The formula at rank 0 is the one measured (see <see cref="DanoDeColision"/>). For the
+        /// blocker the capture wins over the preview: the koliseo's 497/248 is half the pushed one's
+        /// damage, his resistance in it, and not one worked out with the blocker's own as the
+        /// preview does. Those further down the row get halved again at each rank, from the same
+        /// damage: INFERRED, no capture has two fighters behind.
+        /// </remarks>
+        private static (int Damage, Fighter Blocker, int ToBlocker,
+                        List<(Fighter Who, int Damage)> Further) CollisionOf(
             FightInstance fight, Fighter pusher, Fighter pushed, SpellEffect effect, int cells,
             Jondo.Unity.World.Maps.Zone.PushResult push, int round)
         {
@@ -774,6 +808,7 @@ namespace Jondo.Unity.Server.Managers
             // stays at zero until it is measured.
             int damage = 0, toBlocker = 0;
             Fighter blocker = null;
+            var further = new List<(Fighter Who, int Damage)>();
 
             // And a wall is NOT a crash. It stops the displacement, but the damage it deals
             // is its own -- applied by the glyph, over in the handler -- not the damage of
@@ -789,29 +824,96 @@ namespace Jondo.Unity.Server.Managers
                 int resistance = pushed.Otra(ResistenciaAlEmpuje) +
                                  pushed.Buffs.De(ResistenciaAlEmpuje, round);
 
-                damage = DanoDeColision(pusher.StatLevel, pushDamage, resistance, push.BlockedCells);
+                // Along a diagonal each cell counts twice (haf.guf).
+                int blocked = push.BlockedCells * (push.Dx != 0 && push.Dy != 0 ? 2 : 1);
+
+                damage = DanoDeColision(LevelForPush(fight, pusher), pushDamage, resistance, blocked);
 
                 // And the pusher's push damage in percent (158, PushDamagePercent): a dream's
-                // "Carambolage", "+100% de daño de empuje". INFERRED to multiply the whole of it.
+                // "Carambolage", "+100% de daño de empuje". INFERRED to multiply the whole of it;
+                // the client's preview of the crash does not read 158 (hal.bncs, ham.irz).
                 int pushPercent = pusher.Otra(DanoDeEmpujePorCiento) + pusher.Buffs.De(DanoDeEmpujePorCiento, round);
                 if (pushPercent != 0 && damage > 0)
                     damage = Math.Max(0, (int)Math.Round(damage * (100 + pushPercent) / 100.0));
 
-                // And if what stopped him was another fighter, that one pays half. Walls do not pay.
+                // And if what stopped him was another fighter, that one pays half, and each one
+                // standing right behind him half of that again, up to as many as the cells. Walls
+                // do not pay.
+                int shared = damage;
                 if (damage > 0 && push.Stop == Jondo.Unity.World.Maps.Zone.PushStop.Fighter)
                 {
-                    foreach (var other in Todos(fight))
+                    var row = RowBehind(fight, push.BlockerCell, push.Dx, push.Dy, blocked);
+                    for (int rank = 1; rank <= row.Count; rank++)
                     {
-                        if (other == null || !other.IsAlive) continue;
-                        if (other.CellId != push.BlockerCell) continue;
-                        blocker = other;
-                        toBlocker = damage / 2;
-                        break;
+                        int share = PushTaken(fight, pusher, row[rank - 1], shared >> rank, round);
+                        if (rank == 1) { blocker = row[0]; toBlocker = share; }
+                        else if (share > 0) further.Add((row[rank - 1], share));
                     }
                 }
+
+                damage = PushTaken(fight, pusher, pushed, damage, round);
             }
 
-            return (damage, blocker, toBlocker);
+            return (damage, blocker, toBlocker, further);
+        }
+
+        /// <summary>
+        /// The level a push's crash reads: a summon's is its summoner's, as the client's preview
+        /// has it (hal.bncs reads the level of the fighter the summoned one names as its master).
+        /// </summary>
+        internal static int LevelForPush(FightInstance fight, Fighter pusher)
+        {
+            if (pusher.EsInvocado)
+            {
+                var master = Todos(fight).FirstOrDefault(f => f != null && f.Id == pusher.Invocador);
+                if (master != null) return master.StatLevel;
+            }
+            return pusher.StatLevel;
+        }
+
+        /// <summary>
+        /// The fighters standing one after the other from <paramref name="firstCell"/> along
+        /// (<paramref name="dx"/>, <paramref name="dy"/>), at most <paramref name="most"/>: the row
+        /// a crash goes down (haf.bnbn).
+        /// </summary>
+        private static List<Fighter> RowBehind(FightInstance fight, int firstCell, int dx, int dy, int most)
+        {
+            var row = new List<Fighter>();
+            int cell = firstCell;
+            while (row.Count < most && Jondo.Unity.World.Maps.MapGeometry.IsValid(cell))
+            {
+                var there = Todos(fight).FirstOrDefault(f => f != null && f.IsAlive && !f.EstaCargado
+                                                             && f.CellId == cell);
+                if (there == null) break;
+                row.Add(there);
+                var (x, y) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(cell);
+                cell = Jondo.Unity.World.Maps.MapGeometry.PointToCell(x + dx, y + dy);
+            }
+            return row;
+        }
+
+        /// <summary>
+        /// A crash's damage on whoever takes it, through the multipliers the client's preview
+        /// applies to effect 80 (ham.irz, ham.bndv): the pusher's 150; the taker's spells-taken 141
+        /// and melee or range taken (124 next to the pusher, 121 further), each with its base at
+        /// 100; and the taker's 1163 buffs.
+        /// </summary>
+        internal static int PushTaken(FightInstance fight, Fighter pusher, Fighter who, int damage, int round)
+        {
+            if (damage <= 0 || who == null) return Math.Max(0, damage);
+
+            int Percent(Fighter of, int characteristic)
+                => Math.Max(0, 100 + of.Otra(characteristic) + of.Buffs.De(characteristic, round));
+
+            bool melee = Jondo.Unity.World.Maps.MapGeometry.Distance(pusher.CellId, who.CellId) <= 1;
+            double factor = Percent(pusher, TodosLosDanos) / 100.0
+                            * Percent(who, DamagePercentages.SpellsTaken) / 100.0
+                            * Percent(who, melee ? DamagePercentages.MeleeTaken : DamagePercentages.RangedTaken) / 100.0;
+            var kinds = new List<string> { "D", melee ? CuandoMePeganDeCerca : CuandoMePeganDeLejos };
+            if (melee) kinds.Add("DCAC");
+            factor *= who.Buffs.Multiplicador(Buffs.DanoSufridoPorCiento, round, kinds) / 100.0;
+
+            return factor == 1.0 ? damage : Math.Max(0, (int)Math.Round(damage * factor));
         }
 
         /// <summary>
@@ -870,8 +972,8 @@ namespace Jondo.Unity.Server.Managers
             // walk, at the pusher's damage. The sign of the cells says push or pull.
             int cells = leg.Efecto.EffectId is Tirar or EffectSupport.PullToTargetCell or TironForzado
                 ? -rest.Cells : rest.Cells;
-            var (damage, blocker, toBlocker) = CollisionOf(fight, pusher, moved, leg.Efecto,
-                                                           cells, push, fight.RoundNumber);
+            var (damage, blocker, toBlocker, further) = CollisionOf(fight, pusher, moved, leg.Efecto,
+                                                                    cells, push, fight.RoundNumber);
             if (push.ToCell == from && damage <= 0) return null;
 
             return new Outcome
@@ -882,6 +984,7 @@ namespace Jondo.Unity.Server.Managers
                 CollisionDamage = damage,
                 Blocker = blocker,
                 CollisionDamageToBlocker = toBlocker,
+                FurtherBlockers = further,
                 PastThePortal = LeftPastThePortal(push),
             };
         }
@@ -5311,8 +5414,8 @@ namespace Jondo.Unity.Server.Managers
                     judgedFrom: judgedFrom, portal: PortalStops(combate, sobre, efecto));
 
                 sobre.MoverA(empujon.ToCell);
-                var (colision, pared, aLaPared) = CollisionOf(combate, quienLanza, sobre, efecto,
-                                                              cuantas, empujon, ronda);
+                var (colision, pared, aLaPared, detras) = CollisionOf(combate, quienLanza, sobre, efecto,
+                                                                      cuantas, empujon, ronda);
 
                 // It leaves with nothing ONLY if there is no damage either: when the pushed one has not
                 // a single free cell he does not move, but he takes the whole blow. Measured: in that
@@ -5327,6 +5430,7 @@ namespace Jondo.Unity.Server.Managers
                     CollisionDamage = colision,
                     Blocker = pared,
                     CollisionDamageToBlocker = aLaPared,
+                    FurtherBlockers = detras,
                     PastThePortal = LeftPastThePortal(empujon),
                 };
             }
