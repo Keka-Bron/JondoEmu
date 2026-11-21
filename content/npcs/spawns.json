@@ -6564,6 +6564,66 @@
       "cell": 427,
       "remove": true,
       "why": "The derived placement of Williamwadui by Graverg (criterion «(PL>129&Qf=1508)|Qa=1509|Qf=1509|Qa=1507|Qf=1507») showed him from the start of «Las grandes galerías» (1507); he is the one rescued at its end: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (Dofus pour les noobs, «Les grandes galeries»). He stands on 397 instead, from 8503 on."
+    },
+    {
+      "map": 131858948,
+      "npc": 2425,
+      "cell": 371,
+      "remove": true,
+      "why": "Paprikama's derived placement on 371, the middle of the first room's emblem; the guide's picture has him by the right-hand gates (417 below)."
+    },
+    {
+      "map": 131858948,
+      "npc": 2425,
+      "cell": 417,
+      "orientation": 3,
+      "why": "Paprikama in the Cofredía's first room, for «Espionaje industrial» (1510, 8555): the guide's picture of «Poser des questions sur la poudre sulfurée» has him right of the golden emblem, by the barred gates (Dofus pour les noobs, «Espionnage industriel»). INFERRED cell."
+    },
+    {
+      "map": 131859972,
+      "npc": 2426,
+      "cell": 356,
+      "remove": true,
+      "why": "Pizzabu's derived placement on 356, by the oven; the guide's picture has him at the cheese conveyor (459 below)."
+    },
+    {
+      "map": 131859972,
+      "npc": 2426,
+      "cell": 459,
+      "orientation": 3,
+      "why": "Pizzabu in the Cofredía's second room, for «Espionaje industrial» (1510, 8556): the guide's picture of «Poser des questions sur la poudre sulfurée» has him at the bottom right, by the cheese conveyor (Dofus pour les noobs, «Espionnage industriel»). INFERRED cell."
+    },
+    {
+      "map": 131859972,
+      "npc": 2427,
+      "cell": 338,
+      "orientation": 1,
+      "criterion": "Qa=1510",
+      "why": "Cerriyayo in the Cofredía's second room while «Espionaje industrial» (1510) is in hand: Pizzabu sends you to him, «Il travaille pas loin» (Dofus pour les noobs, «Espionnage industriel»). The quest names his map (8557) but no placement has him. INFERRED cell, by the left-hand bench."
+    },
+    {
+      "map": 131860996,
+      "npc": 2428,
+      "cell": 257,
+      "orientation": 1,
+      "criterion": "Qa=1510",
+      "why": "Abureka in the Cofredía's third room while «Espionaje industrial» (1510) is in hand, just come round by the armoured door he was locking (17811). The quest names the room (8558) but no placement has him there; his derived one is the fifth room's, for 1512. INFERRED cell, before the door (243)."
+    },
+    {
+      "map": 131862020,
+      "npc": 2429,
+      "cell": 283,
+      "orientation": 1,
+      "criterion": "Qa=1510&Qo<8560",
+      "why": "Yiyo in the Cofredía's fourth room, among the plans scattered by the drafting table, until he slips away (8560) in «Espionaje industrial» (1510). The quest names the room but no placement has him. INFERRED cell."
+    },
+    {
+      "map": 131862020,
+      "npc": 2430,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qo>8560|Qf=1510|Qa=1511|Qf=1511",
+      "why": "The llavoro guard in the Cofredía's fourth room, from the moment Yiyo says «Ahí viene el guardia» (8560 of «Espionaje industrial», 1510) and for «Toma de rehenes» (1511), whose giver he is. The derived placement's criterion («...|Qa=1510|...») showed him from the quest's start."
     }
   ]
 }

@@ -144,6 +144,13 @@
       "cell": 291,
       "orientation": 5,
       "measured": "inferred: down from the Hall of Judgment (its border cell 549) to the foot of the waiting room's stairs (511218, cell 292), not mirrored onto the waiting room's top edge"
+    },
+    {
+      "map": 129763328,
+      "from": 131858948,
+      "cell": 285,
+      "orientation": 1,
+      "measured": "inferred: out of the Cofredía's first room (its right and bottom borders, cells 475-558) to beside Anciago (299) by the rails; mirrored, the landing was 487, hidden inside the giant chest"
     }
   ]
 }

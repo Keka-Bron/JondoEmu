@@ -7107,6 +7107,29 @@
    "kind": "order",
    "afterObjectives": [8503],
    "why": "«Las grandes galerías»: Williamwadui comes up once the perforatroces are with Graverg."
+  },
+  {
+   "objective": 8553,
+   "quest": 1510,
+   "kind": "click",
+   "givesEach": true,
+   "elements": [{"map": 131858948, "element": 485106, "item": 15347}, {"map": 131859972, "element": 485104, "item": 15348}, {"map": 131859972, "element": 485105, "item": 15349}],
+   "gives": [{"item": 15347, "count": 1}, {"item": 15348, "count": 1}, {"item": 15349, "count": 1}],
+   "why": "«Registra el edificio en busca de pistas»: «Fouillez le bâtiment pour trouver 3 indices» (Dofus pour les noobs, «Espionnage industriel»): the bag in the first room (485106, graphic 45351) and the two things lying in the second (485104, graphic 45353; 485105, graphic 45345). The three clues are the Pelo sintético de barbestrella (15347), the Cola para madera (15348) and the Polvo sulfurado (15349), the one Anciago notices (17792); which of the second room's two gives which is INFERRED. Done once the three are carried."
+  },
+  {
+   "objective": 8556,
+   "quest": 1510,
+   "kind": "order",
+   "afterObjectives": [8555],
+   "why": "«Espionaje industrial»: Pizzabu once Paprikama has sent you to him (17795)."
+  },
+  {
+   "objective": 8557,
+   "quest": 1510,
+   "kind": "order",
+   "afterObjectives": [8556],
+   "why": "«Espionaje industrial»: Cerriyayo once Pizzabu has named him (17797)."
   }
 ]
 }

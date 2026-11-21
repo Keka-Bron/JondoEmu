@@ -287,6 +287,20 @@
       "toMap": 185076224,
       "toCell": 403,
       "why": "Externam, the Citadel Vestibule [15,14] (subarea 894): the Citadel Entrance's right border leads in (the client's scroll), and the vestibule has no border cell and no element to leave by. Its leftmost floor cell, at the lit opening one comes in by, takes you back to the Entrance's right border (403, by its border cells)."
+    },
+    {
+      "map": 131859972,
+      "cell": 254,
+      "toMap": 131860996,
+      "toCell": 352,
+      "why": "The suns of the second room's left-hand arch (elements 505631-505633, graphic 3507) into the third room: the 2.73 graph's passage, with its landing moved from 280, off the third room's floor, to 352, the nearest floor cell at its left-hand gate."
+    },
+    {
+      "map": 131859972,
+      "cell": 240,
+      "toMap": 131860996,
+      "toCell": 352,
+      "why": "The same arch's other walkable sun (505631) as the 254 one above."
     }
   ]
 }

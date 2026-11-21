@@ -54414,6 +54414,193 @@
         }
       ],
       "why": "Williamwadui beside Graverg at [3,-4], for «Las grandes galerías» (1507, 8504): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous. En guise de sa reconnaissance, il vous offre un précieux joyaux et la quête se termine» (Dofus pour les noobs, «Les grandes galeries»): «Demander si tout va bien.» (20999), «Sí, creo que te debo una ... acepta esta magnífica joya» (17536), «Agarra la joya.» (20998); the jewel (15318) is the step's reward."
+    },
+    {
+      "npc": 2424,
+      "map": 129763328,
+      "opening": 17788,
+      "lines": [
+        {
+          "message": 17788,
+          "choices": [
+            { "reply": 21321, "next": 17789, "criterion": "Qc=1510" },
+            { "reply": 21324, "quest": 1510, "beforeObjective": 8563, "passage": 2424001 },
+            { "reply": 21326, "next": 17792, "quest": 1510, "afterObjective": 8553, "beforeObjective": 8554, "takesAll": [15347, 15348, 15349], "completes": 8554, "params": [[30, 8554]] },
+            { "reply": 21356, "next": 17819, "quest": 1510, "afterObjective": 8563, "completes": 8564, "params": [[30, 8564]] }
+          ]
+        },
+        {
+          "message": 17789,
+          "choices": [
+            { "reply": 21320, "next": 17790, "criterion": "Qc=1510" }
+          ]
+        },
+        {
+          "message": 17790,
+          "choices": [
+            { "reply": 21319, "next": 17791, "startsQuest": 1510, "params": [[34, 1510]] }
+          ]
+        },
+        {
+          "message": 17791,
+          "choices": [
+            { "reply": 21322, "quest": 1510, "passage": 2424001 }
+          ]
+        },
+        {
+          "message": 17792,
+          "choices": [
+            { "reply": 21325, "next": 17793, "quest": 1510 }
+          ]
+        },
+        {
+          "message": 17793,
+          "choices": [
+            { "reply": 21323, "quest": 1510, "passage": 2424001 }
+          ]
+        },
+        {
+          "message": 17819,
+          "choices": []
+        }
+      ],
+      "why": "Anciago before the Cofredía's building at [-8,-5], who gives «Espionaje industrial» (1510): «Parlez à Ancestro en [-8,-5]» (Dofus pour les noobs, «Espionnage industriel»). «Informarte sobre los empleos disponibles en el sector.» (21321, 17789), «Sí.» (21320, 17790: his brother Riberico spoke of you; a spy in the Cofredía), «Aceptar jugar a los investigadores.» (21319) starts it, and he sends you in (17791, «Entrar en el edificio de la Cofredía.», 21322). His opening has «Accéder au bâtiment» and «Donner les indices» side by side in the guide's picture: «Entrar en el edificio de la Cofredía.» (21324) while the quest is in hand, and «Aquí tienes las pistas que he encontrado.» (21326) once the three clues are carried (8553), which he keeps (8554: «como las has metido de cualquier modo en tu bolso, se han mezclado todas. Sin embargo, me sorprende ver el polvo sulfurado», 17792); «Intentar averiguar cómo ha podido llegar ahí el polvo.» (21325, 17793: question the Cofredía's workers and the Comilones') and in again (21323). Once the guard is told (8563), «Explicar la situación.» (21356) is 8564: «Así que el topo es Yiyo» (17819)."
+    },
+    {
+      "npc": 2425,
+      "map": 131858948,
+      "opening": 17794,
+      "lines": [
+        {
+          "message": 17794,
+          "choices": [
+            { "reply": 21328, "next": 17795, "quest": 1510, "afterObjective": 8554, "beforeObjective": 8555, "completes": 8555, "params": [[30, 8555]] }
+          ]
+        },
+        {
+          "message": 17795,
+          "choices": []
+        }
+      ],
+      "why": "Paprikama in the Cofredía's first room, for «Espionaje industrial» (1510, 8555): «Hacerle preguntas sobre el polvo sulfurado.» (21328), the guide's «Poser des questions sur la poudre sulfurée» (Dofus pour les noobs, «Espionnage industriel»): he has not seen it since it was banned, Pizzabu may know more (17795)."
+    },
+    {
+      "npc": 2426,
+      "map": 131859972,
+      "opening": 17796,
+      "lines": [
+        {
+          "message": 17796,
+          "choices": [
+            { "reply": 21329, "next": 17797, "quest": 1510, "afterObjective": 8555, "beforeObjective": 8556, "completes": 8556, "params": [[30, 8556]] }
+          ]
+        },
+        {
+          "message": 17797,
+          "choices": []
+        }
+      ],
+      "why": "Pizzabu in the Cofredía's second room, for «Espionaje industrial» (1510, 8556): «Hacerle preguntas sobre el polvo sulfurado.» (21329), after Paprikama sends you to him (Dofus pour les noobs, «Espionnage industriel»): «¿Y yo qué sé?» and the old Cerriyayo of the Gros mangeurs, who works close by (17797)."
+    },
+    {
+      "npc": 2427,
+      "map": 131859972,
+      "opening": 17803,
+      "lines": [
+        {
+          "message": 17803,
+          "choices": [
+            { "reply": 21339, "next": 17804, "quest": 1510, "afterObjective": 8556, "beforeObjective": 8557 }
+          ]
+        },
+        {
+          "message": 17804,
+          "choices": [
+            { "reply": 21338, "next": 17805, "quest": 1510, "afterObjective": 8556, "beforeObjective": 8557 }
+          ]
+        },
+        {
+          "message": 17805,
+          "choices": [
+            { "reply": 21337, "next": 17806, "quest": 1510, "afterObjective": 8556, "completes": 8557, "params": [[30, 8557]] }
+          ]
+        },
+        {
+          "message": 17806,
+          "choices": []
+        }
+      ],
+      "why": "Cerriyayo in the Cofredía's second room, for «Espionaje industrial» (1510, 8557), once Pizzabu names him (Dofus pour les noobs, «Espionnage industriel»): «Sobresaltarte al escuchar la última receta.» (21339, 17804: the sulphur powder's ban), «Insisitir en el problema actual sin revolver el pasado.» (21338, 17805: Flabulento's acute aerophagia), «Preguntarle si recuerda algo más fuera de lo común.» (21337) is 8557: a new cook's apprentice, Yiyo, given an engineering course by Anciago (17806)."
+    },
+    {
+      "npc": 2428,
+      "map": 131860996,
+      "opening": 17810,
+      "lines": [
+        {
+          "message": 17810,
+          "choices": [
+            { "reply": 21344, "next": 17811, "quest": 1510, "afterObjective": 8557, "beforeObjective": 8558, "completes": 8558, "params": [[30, 8558]] }
+          ]
+        },
+        {
+          "message": 17811,
+          "choices": []
+        }
+      ],
+      "why": "Abureka in the Cofredía's third room, for «Espionaje industrial» (1510, 8558, «Busca a Yiyo en el edificio»): «Ay, mi pobre cabeza.» (17810), «Ayudarle.» (21344): he was locking the door when he was struck from behind, and his bunch of keys is gone (17811). The armoured door beside him opens from then on (Dofus pour les noobs, «Espionnage industriel»)."
+    },
+    {
+      "npc": 2429,
+      "map": 131862020,
+      "opening": 17814,
+      "lines": [
+        {
+          "message": 17814,
+          "choices": [
+            { "reply": 21349, "next": 17815, "quest": 1510, "beforeObjective": 8560 }
+          ]
+        },
+        {
+          "message": 17815,
+          "choices": [
+            { "reply": 21348, "showsNpc": 2430, "leaves": true, "quest": 1510, "beforeObjective": 8560, "completes": 8560, "params": [[30, 8560]] }
+          ]
+        }
+      ],
+      "why": "Yiyo among the scattered plans of the Cofredía's fourth room, for «Espionaje industrial» (1510, 8560): «¿Qué haces aquí?» (17814), «¿Por qué tienes el manojo de llaves de Abureka en la mano y un montón de mapas esparcidos alrededor de ti?» (21349): he found the room so and hands you the keys, «Ahí viene el guardia, ya le explicas tú lo que ha pasado» (17815); «Hacer frente al guardia.» (21348) is 8560, the guard comes in and Yiyo slips away (Dofus pour les noobs, «Espionnage industriel»)."
+    },
+    {
+      "npc": 2430,
+      "map": 131862020,
+      "opening": 17816,
+      "openings": [
+        { "quest": 1510, "objective": 8561, "pending": 8562, "message": 17817 },
+        { "quest": 1510, "objective": 8562, "pending": 8564, "message": 17818 }
+      ],
+      "lines": [
+        {
+          "message": 17816,
+          "choices": [
+            { "reply": 21352, "next": 17817, "quest": 1510, "afterObjective": 8560, "completes": 8561, "params": [[30, 8561]] }
+          ]
+        },
+        {
+          "message": 17817,
+          "choices": [
+            { "reply": 21353, "quest": 1510, "afterObjective": 8561, "beforeObjective": 8562 },
+            { "reply": 21354, "quest": 1510, "afterObjective": 8561, "beforeObjective": 8562 }
+          ]
+        },
+        {
+          "message": 17818,
+          "choices": [
+            { "reply": 21355, "quest": 1510, "afterObjective": 8562, "beforeObjective": 8563, "passage": 2430001, "completes": 8563, "params": [[30, 8563]] },
+            { "reply": 21355, "quest": 1510, "afterObjective": 8563, "passage": 2430001 }
+          ]
+        }
+      ],
+      "why": "The llavoro guard who comes into the Cofredía's fourth room once Yiyo slips away, for «Espionaje industrial» (1510): «¿Has sido tú quien le ha agredido?» (17816), «Explicar la situación.» (21352) is 8561 and he does not believe you: «Vas a arrepentirte de haber agredido a un miembro de la Cofredía» (17817). «Intentar resistir al ataque del guardia.» (21353) fights him alone, «Esperar a que lleguen refuerzos rápidamente para resistir al ataque del guardia.» (21354) with others (8562, npc_fights.json); a loss brings back 17817. Beaten, he apologises (17818) and «Volver a ver a Anciago.» (21355) is 8563 and takes you back outside: «Retourner auprès de Pépénible» (Dofus pour les noobs, «Espionnage industriel»)."
     }
   ]
 }

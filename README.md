@@ -739,10 +739,10 @@ played through.
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
-| Enurado | `█░░░░░░░░░` **12%** | 4/33 |
+| Enurado | `██░░░░░░░░` **15%** | 5/33 |
 | Evil Forest | `██░░░░░░░░` **25%** | 1/4 |
 | Archipelago of Vulkania | `░░░░░░░░░░` **2%** | 1/60 |
-| **All quests** | **23.1%** | **457/1976** |
+| **All quests** | **23.2%** | **458/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
