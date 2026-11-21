@@ -70,7 +70,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 foreach (int slot in SpellChoices.Bar.Keys.OrderBy(s => s).ToList())
                 {
-                    SpellChoices.PutInBar(slot, 0);
+                    SpellChoices.RemoveFromBar(slot);
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                         ConnectionProtocol.Push(Op.Ivr, ConnectionProtocol.BuildShortcutRemoved(slot, ConnectionProtocol.SpellBar)));
                 }

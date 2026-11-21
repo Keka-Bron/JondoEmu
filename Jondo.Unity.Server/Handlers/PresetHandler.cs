@@ -419,10 +419,9 @@ namespace Jondo.Unity.Server.Handlers
                 await SendAsync(stream, Op.Hng, ConnectionProtocol.BuildSpellSwapped(spell, grade));
                 changed++;
             }
-            foreach (int slot in SpellChoices.Bar.Keys.ToList()) SpellChoices.PutInBar(slot, 0);
+            foreach (int slot in SpellChoices.Bar.Keys.ToList()) SpellChoices.RemoveFromBar(slot);
             foreach (var (spell, slots) in preset.Spells)
             {
-                if (spell == Network.FightProtocol.HechizoCuerpoACuerpo) continue;
                 foreach (int slot in slots) SpellChoices.PutInBar(slot, spell);
             }
             await ShortcutBarMessages.Live.SendSpellAsync(SessionContext.Current);

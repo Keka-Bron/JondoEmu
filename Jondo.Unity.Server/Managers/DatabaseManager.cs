@@ -733,6 +733,10 @@ namespace Jondo.Unity.Server
                 ";
                 createSpellBarLevel.ExecuteNonQuery();
 
+                // The weapon is saved on the bar now; the bars saved without it get it once.
+                if (WeaponOnSpellBarMigration.Apply(worldConnection))
+                    Console.WriteLine("[SQLite] Migration: the weapon is on every saved spell bar.");
+
                 // Complete the colour migration before inserting any new characters:
                 // old databases still have a NOT NULL Look column to backfill and remove.
                 // Initialize's verified backup has already completed; failures propagate.

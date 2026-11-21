@@ -50,7 +50,7 @@ namespace Jondo.Unity.Tests.Combat
                 new SpellTable.KnownSpell(2, 202, 3),
                 new SpellTable.KnownSpell(3, 303, 1),
             };
-            var saved = new Dictionary<int, int> { [5] = 202, [9] = 101 };
+            var saved = new Dictionary<int, int> { [0] = FightProtocol.HechizoCuerpoACuerpo, [5] = 202, [9] = 101 };
 
             var layout = FightSpellLayout.Build(known, saved);
 
@@ -61,10 +61,10 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
-        public void Close_combat_uses_the_first_free_slot_when_zero_is_occupied()
+        public void Close_combat_stays_in_the_slot_it_was_saved_in()
         {
             var known = new[] { new SpellTable.KnownSpell(1, 101, 1) };
-            var saved = new Dictionary<int, int> { [0] = 101 };
+            var saved = new Dictionary<int, int> { [0] = 101, [1] = FightProtocol.HechizoCuerpoACuerpo };
 
             var layout = FightSpellLayout.Build(known, saved);
 
@@ -81,7 +81,6 @@ namespace Jondo.Unity.Tests.Combat
 
             // Saved bar is non-empty (even though the only entry is out of range), so no auto-fill.
             Assert.DoesNotContain(layout.Bar, entry => entry.Spell == 101);
-            Assert.Contains((0, FightProtocol.HechizoCuerpoACuerpo), layout.Bar);
             Assert.DoesNotContain(layout.Bar, entry => entry.Slot >= FightSpellLayout.SlotCount);
         }
     }

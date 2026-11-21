@@ -117,15 +117,16 @@ namespace Jondo.Unity.Server.Network
                 await Achievements.SendListAsync(session);
             }
 
-            // Sync wardrobe, titles, ornaments and outfits to prevent outfit mixing between heroes
+            // The wardrobe's draft belongs to the one played before. His wardrobe, spells and bar
+            // come with the map's block; with no map loaded again they are sent here, or the
+            // client keeps the other hero's outfits and spells. His look went just above.
             session.State.IsWardrobeDraftLoaded = false;
-            await WardrobeStateService.Live.SendOwnedAsync(session);
-            await session.SendAsync(ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
-
-            // Send spells, spell shortcut bar, and characteristics for the newly active hero
-            await session.SendAsync(SpellMessages.Live.Snapshot(session));
-            await ShortcutBarMessages.Live.SendSpellAsync(session);
-            await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
+            if (!reload)
+            {
+                await WardrobeStateService.Live.SendOwnedAsync(session);
+                await session.SendAsync(SpellMessages.Live.Snapshot(session));
+                await ShortcutBarMessages.Live.SendSpellAsync(session);
+            }
 
             // The one played before back as a hero, where he was in the group's round: the others
             // are in it from the one after the hero taken (Heroes.HandOver). Taking the first hero
