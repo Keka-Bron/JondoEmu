@@ -64,11 +64,22 @@ namespace Jondo.Unity.Server.Managers
         public static bool VisibleNow(Spawn spawn)
         {
             if (string.IsNullOrEmpty(spawn.Criterion)) return true;
+            if (KeepsItsDoor(spawn)) return true;
             var log = Managers.Quests.Log;
             if (log == null) return false;
             var verdict = Jondo.Unity.World.Quests.QuestCriterion.Judge(spawn.Criterion, log);
             return !verdict.Broke && verdict.Met;
         }
+
+        /// <summary>
+        /// A dungeon's guardian on its own door is there for everybody, whatever quest also has
+        /// him give: the Aquadome's guardian hands a quest of the Merkator chain over, so his
+        /// placement was read as that quest's giver's and only shown to whoever had it open, and
+        /// nobody else found a way in.
+        /// </summary>
+        internal static bool KeepsItsDoor(Spawn spawn)
+            => DungeonManager.AtEntrance(spawn.MapId) != null
+               && (DungeonDoor.For(spawn.NpcId).Asks || Handlers.DungeonHandler.NamesItsDoors(spawn.NpcId, spawn.MapId));
 
         /// <summary>One of an NPC's looks, with what is needed to see it that way.</summary>
         public sealed class LookVariant
