@@ -101,6 +101,14 @@ namespace Jondo.Unity.Server.Handlers
         internal const string TackledTrigger = "T";
 
         /// <summary>
+        /// The trigger a tackler's spells wait on when an enemy walks out of his contact: «CT»,
+        /// «quand il est détaclé». The Cuerola's Exhalación heals him and gives him 600 damage so
+        /// (Dofus pour les noobs, «Salons privés de Klime»), and its achievement fails on a
+        /// detackle that costs MP too: leaving is what counts, paid or not.
+        /// </summary>
+        internal const string UntackledTrigger = "CT";
+
+        /// <summary>
         /// Who holds <paramref name="mover"/> on <paramref name="cell"/>, and what leaving it
         /// takes out of the points given. Nobody and nothing when he cannot be held.
         /// </summary>
@@ -151,6 +159,7 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildSequenceStart(mover.Id, Network.FightProtocol.WalkSequence)));
 
             var stretch = new List<int> { path[0] };
+            var untackled = new List<Fighter>();
             for (int i = 0; i < path.Count - 1; i++)
             {
                 int here = path[i];
@@ -175,6 +184,10 @@ namespace Jondo.Unity.Server.Handlers
                 if (movementLeft <= 0) break;
                 stretch.Add(path[i + 1]);
                 walked.Add(path[i + 1]);
+                // Out of the contact of whoever held this cell and does not hold the next one.
+                foreach (var tackler in tacklers)
+                    if (!tackler.Occupies(path[i + 1]) && MapGeometry.Distance(tackler.CellId, path[i + 1]) > 1)
+                        untackled.Add(tackler);
             }
             if (stretch.Count > 1) await AnnounceStretchAsync(fight, mover, stretch, facing);
 
@@ -192,6 +205,17 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), mover.Id,
                                                        Network.FightProtocol.WalkSequence)));
+
+            // What being left sets off on the ones he walked away from, the walker at hand as the one
+            // who set it off.
+            foreach (var tackler in untackled)
+            {
+                if (!tackler.IsAlive) continue;
+                var before = fight.TriggeringAttacker;
+                fight.TriggeringAttacker = mover;
+                await DispararAsync(stream, fight, tackler, UntackledTrigger);
+                fight.TriggeringAttacker = before;
+            }
             return walked;
         }
 

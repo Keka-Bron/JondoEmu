@@ -708,24 +708,46 @@ namespace Jondo.Unity.World.Fights
         private static List<List<Fighter>> Agrupar(List<Fighter> bando, Func<Fighter, (int Place, int Initiative)> orderKey)
         {
             var salida = new List<List<Fighter>>();
+            var puestos = new HashSet<long>();
+            // Behind each one, his summons, and behind each summon its own: a zombie Sylargh's
+            // zombie brought back plays after it. Taken for loose, it went to the side's end and
+            // came round to its first turn after the player had killed it -- without the turn
+            // start that hooks its Zombidule.
+            void ConLosSuyos(Fighter dueno, List<Fighter> grupo)
+            {
+                foreach (var suyo in bando)
+                {
+                    if (!suyo.IsAlive || !suyo.EsInvocado || suyo.Invocador != dueno.Id || !puestos.Add(suyo.Id)) continue;
+                    if (suyo.JuegaTurno) grupo.Add(suyo);
+                    ConLosSuyos(suyo, grupo);
+                }
+            }
             foreach (var quien in bando.Where(f => f.IsAlive && !f.EsInvocado)
                                        .OrderBy(orderKey))
             {
                 var grupo = new List<Fighter> { quien };
-                foreach (var suyo in bando)
-                {
-                    if (suyo.IsAlive && suyo.EsInvocado && suyo.JuegaTurno && suyo.Invocador == quien.Id)
-                    {
-                        grupo.Add(suyo);
-                    }
-                }
+                puestos.Add(quien.Id);
+                ConLosSuyos(quien, grupo);
                 salida.Add(grupo);
             }
 
             // A summon gone over to the other side keeps its turns, on its own: the Flor Maldita in
             // the players' camp heals them at its turn's end.
-            var conDueno = new HashSet<long>(bando.Where(f => !f.EsInvocado).Select(f => f.Id));
-            foreach (var suelto in bando.Where(f => f.IsAlive && f.EsInvocado && f.JuegaTurno && !conDueno.Contains(f.Invocador))
+            // One whose line goes up to somebody of this side who is not a summon is not loose,
+            // even with that one fallen: it plays no more, as before.
+            var porId = bando.GroupBy(f => f.Id).ToDictionary(g => g.Key, g => g.First());
+            bool conDueno(Fighter f)
+            {
+                var visto = new HashSet<long>();
+                var arriba = f;
+                while (arriba.EsInvocado && visto.Add(arriba.Id))
+                {
+                    if (!porId.TryGetValue(arriba.Invocador, out var dueno)) return false;
+                    arriba = dueno;
+                }
+                return !arriba.EsInvocado;
+            }
+            foreach (var suelto in bando.Where(f => f.IsAlive && f.EsInvocado && f.JuegaTurno && !puestos.Contains(f.Id) && !conDueno(f))
                                         .OrderByDescending(f => f.Initiative))
             {
                 salida.Add(new List<Fighter> { suelto });
@@ -1292,10 +1314,11 @@ namespace Jondo.Unity.World.Fights
             => CastLanded is { } landed && landed.Caster == caster && landed.Spell == spell ? landed.Cells : null;
 
         /// <summary>
-        /// The fighters the blows of the cast being resolved have moved, with the cell each stood on
-        /// as it landed: a push of the same spell is judged from there. Null when nobody moved.
+        /// Where each fighter stood as the cast being resolved found him -- as it landed, before
+        /// its blows' hooks moved anybody: a push or pull of the same spell is judged from there,
+        /// whatever its earlier rows or those hooks did to him since. Null outside a cast.
         /// </summary>
-        public IReadOnlyDictionary<Fighter, int> MovedByTheBlows { get; set; }
+        public IReadOnlyDictionary<Fighter, int> CellsTheCastFound { get; set; }
 
         /// <summary>The portals of this fight (effect 1181): see <see cref="PortalNetwork"/>.</summary>
         public PortalNetwork Portales { get; } = new PortalNetwork();

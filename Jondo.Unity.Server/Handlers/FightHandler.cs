@@ -2751,7 +2751,7 @@ namespace Jondo.Unity.Server.Handlers
             var yo = fight.Buscar(characterId);
             if (yo == null) return 0;
             return fight.Bando(yo.TeamId == FightInstance.Azules ? FightInstance.Rojos : FightInstance.Azules)
-                        .Count(f => f != null && !f.IsAlive && !f.EsInvocado && !f.EsIlusion);
+                        .Count(f => f != null && !f.IsAlive && f.BeatenAsGroupMember && !f.EsIlusion);
         }
 
         /// <summary>
@@ -6943,7 +6943,7 @@ namespace Jondo.Unity.Server.Handlers
         /// Kitsunebis their states.
         /// </summary>
         private static async Task AplicarLoDelInvocadoAsync(NetworkStream stream, FightInstance fight, Fighter caster,
-                                                            int hechizo, int grado, Fighter invocado)
+                                                            int hechizo, int grado, Fighter invocado, bool conducta = false)
         {
             if (invocado == null || hechizo == 0 || !invocado.IsAlive) return;
             var filas = Managers.SpellEffects.De(hechizo, grado)
@@ -6952,7 +6952,7 @@ namespace Jondo.Unity.Server.Handlers
                 .ToList();
             if (filas.Count == 0) return;
             await LanzarPorOrdenAsync(stream, fight, caster, hechizo, grado, invocado, invocado.CellId,
-                                      Managers.EffectEngine.AlLanzar, filas, soloAlObjetivo: true);
+                                      Managers.EffectEngine.AlLanzar, filas, soloAlObjetivo: true, conducta: conducta);
         }
 
         /// <summary>The Zombi state a fighter brought back carries: 74, which the dungeons' spells read.</summary>
@@ -6966,7 +6966,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task ResucitarAsync(NetworkStream stream, FightInstance fight, Fighter quien,
                                                  int hechizo, int grado, int efecto, int porcentaje, int celda,
-                                                 Managers.SpellEffect fila = null)
+                                                 Managers.SpellEffect fila = null, bool conducta = false)
         {
             var muerto = fight.Muertos.LastOrDefault(m => !m.IsAlive && m.TeamId == quien.TeamId
                                                           && m.IsMonster && m != quien);
@@ -7032,7 +7032,11 @@ namespace Jondo.Unity.Server.Handlers
                              $"{donde} with {muerto.CurrentHP}/{muerto.MaxHP}.");
 
             await DispararAsync(stream, fight, muerto, Managers.EffectEngine.AlPonerseElEstado(EstadoZombi));
-            await AplicarLoDelInvocadoAsync(stream, fight, quien, hechizo, grado, muerto);
+            // Brought back by its reviver's behaviour (Sylargh's Nécromignon, off his Chambranle),
+            // what the revival writes for him is that behaviour too, for good: the 3691 it casts on
+            // him hooks his own Nécromignon, «le prochain monstre qui joue va réinvoquer un monstre»
+            // at every turn start of his, not at the first alone.
+            await AplicarLoDelInvocadoAsync(stream, fight, quien, hechizo, grado, muerto, conducta);
             await RevisarLosRecuentosAsync(stream, fight);
         }
 
@@ -8463,7 +8467,7 @@ namespace Jondo.Unity.Server.Handlers
                     await ResucitarAsync(stream, fight, c.Caster ?? quienLanza, c.HechizoOrigen, c.NivelOrigen,
                                          c.Efecto.EffectId, c.Revive,
                                          c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada,
-                                         c.Efecto);
+                                         c.Efecto, conducta);
                     continue;
                 }
 
@@ -11124,6 +11128,24 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
+            // His glyphs and traps go with him, on the spot (a bomb's wall is BombWalls'): the dead
+            // Cuereñor's glyphs, left to the next turn start, gave the player who ended his turn on
+            // them their protection twice. «Si un des monstres est achevé, les deux glyphes qu'il a
+            // posé disparaissent» (Dofus pour les noobs, «Salons privés de Klime»).
+            if (muerto != null)
+            {
+                var suyos = fight.Glifos.Where(g => g.Dueno == muerto.Id && !Managers.BombWalls.IsWall(g)).ToList();
+                if (suyos.Count > 0)
+                {
+                    foreach (var glifo in suyos) fight.Glifos.Remove(glifo);
+                    await DentroDeUnaSecuenciaAsync(fight, muerto, async () =>
+                    {
+                        foreach (var glifo in suyos) await MarcaQuitadaAsync(fight, glifo);
+                    });
+                    Program.LogDebug($"[Fight] The {suyos.Count} glyph(s) of {muerto.Id} go with him.");
+                }
+            }
+
             if (muerto != null) await DispararLosDeUnaMuerteAsync(stream, fight, muerto);
 
             if (muerto is { MonsterId: Managers.ForgelanceCombat.Lance, EsInvocado: true }
@@ -12566,9 +12588,11 @@ namespace Jondo.Unity.Server.Handlers
                 results.Add(FinDe(f, azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }
             int lastWave = fight.Rojo.Count == 0 ? 0 : fight.Rojo.Max(f => f.Wave);
+            // A monster of the group brought back by another is still one of the group: Sylargh
+            // killed and revived by a zombie was missing from the end screen's enemies.
             foreach (var f in fight.Rojo)
             {
-                if (f.EsInvocado || f.EsIlusion) continue;
+                if (!f.BeatenAsGroupMember || f.EsIlusion) continue;
                 if (FellInAnEarlierWave(f, lastWave)) continue;
                 results.Add(FinDe(f, !azulGana, f.Id == yo, xpGained, spoils, gane, RewardOf(fight, f.Id)));
             }

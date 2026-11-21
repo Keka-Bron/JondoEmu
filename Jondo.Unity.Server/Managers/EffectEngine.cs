@@ -2736,20 +2736,16 @@ namespace Jondo.Unity.Server.Managers
             var asItLanded = depth == 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
                 ? combat.CellsAtCast(caster.Id, spell)
                 : null;
-            Dictionary<Fighter, int> movedByTheBlows = null;
             foreach (var fighter in Todos(combat))
             {
                 if (fighter == null) continue;
                 int cell = fighter.CellId;
                 if (asItLanded != null && asItLanded.TryGetValue(fighter.Id, out int landedOn) && landedOn != cell)
-                {
-                    (movedByTheBlows ??= new Dictionary<Fighter, int>())[fighter] = landedOn;
                     cell = landedOn;
-                }
                 celdasAlEmpezar[fighter] = cell;
             }
-            var movedOutside = combat.MovedByTheBlows;
-            combat.MovedByTheBlows = movedByTheBlows;
+            var foundOutside = combat.CellsTheCastFound;
+            combat.CellsTheCastFound = celdasAlEmpezar;
 
             // Every state condition of one spell is judged against the SAME snapshot, and Rage is
             // why that matters: grade 1 of spell 13745 carries all three branches -- 0->I, I->II
@@ -3676,7 +3672,7 @@ namespace Jondo.Unity.Server.Managers
             combat.SwapsOfTheCast = swapsDeFuera;
             combat.TeleportsFallidos = fallidosDeFuera;
             combat.CarriedAtCast = cargadoDeFuera;
-            combat.MovedByTheBlows = movedOutside;
+            combat.CellsTheCastFound = foundOutside;
             return fuera;
         }
 
@@ -5477,10 +5473,14 @@ namespace Jondo.Unity.Server.Managers
                 // only border left was the edge of the 560-cell grid, which is much larger than a map's
                 // floor.
                 var pisables = MapManager.GetFightWalkable(combate.ArenaMapId);
-                // Moved by one of the cast's own blows -- Resonancia's Teleportal -- he is pushed
-                // from where he is now, the way the spell found him (FightInstance.CastLanded).
-                int judgedFrom = combate.MovedByTheBlows != null
-                                 && combate.MovedByTheBlows.TryGetValue(sobre, out int landedOn) ? landedOn : -1;
+                // Moved since the cast found him -- by one of its blows' hooks, Resonancia's
+                // Teleportal, or by one of its own rows -- he is pushed from where he is now, the
+                // way the spell found him (FightInstance.CastLanded). Bolaloca pulls 10 and then
+                // pushes 10 («attire la cible de 10 cases puis la repousse de 10»): judged from
+                // where the pull left him, the push drove him back into the Cuerola every time.
+                int judgedFrom = combate.CellsTheCastFound != null
+                                 && combate.CellsTheCastFound.TryGetValue(sobre, out int foundOn)
+                                 && foundOn != sobre.CellId ? foundOn : -1;
                 // AND A BOMB WALL STOPS IT. "Desplazar una entidad a un muro detendra su
                 // desplazamiento y le infligira danos", says the class sheet; it steps onto the
                 // wall cell and goes no further. Which walls count for THIS fighter is the whole

@@ -99,6 +99,56 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// Brought back by Sylargh's behaviour, the zombie keeps what the revival hooks on him for
+        /// good: the 3691 that re-arms his own Nécromignon at every turn start of his. Written as a
+        /// plain cast's, it lasted a round, and a zombie revived nobody after his first turn.
+        /// </summary>
+        [Fact]
+        public async Task A_zombie_brought_back_by_the_behaviour_keeps_its_hooks_for_good()
+        {
+            if (SpellEffects.De(Necromignon, 1).Count == 0) return;
+            const int ReArm = 3691;
+            var fight = new FightInstance(1, 1);
+            var boss = Monster(-1, Sylargh, 300, 19000);
+            var dead = Monster(-2, Brikolosote, 400);
+            var me = Person(10, Beside(300, 7));
+            fight.AddPlayer(me); fight.AddMonster(boss); fight.AddMonster(dead);
+            dead.CurrentHP = 0;
+            fight.Muertos.Add(dead);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, boss, Necromignon, 1, boss, EffectEngine.AlLanzar,
+                                                   boss.CellId, conducta: true);
+
+            Assert.True(dead.IsAlive);
+            Assert.Contains(dead.Buffs.ActiveSpells, h => h.Hechizo == ReArm && h.CaducaEnRonda < 0);
+        }
+
+        /// <summary>
+        /// A zombie a zombie brought back plays behind it, as every summon plays behind its
+        /// summoner. Taken for loose, it went to the end of the side and reached the player's
+        /// turn without the turn start that hooks its Zombidule.
+        /// </summary>
+        [Fact]
+        public void A_summon_s_summon_plays_behind_it()
+        {
+            var fight = new FightInstance(1, 1);
+            var me = Person(10, 100);
+            var boss = Monster(-1, Sylargh, 300, 19000);
+            var other = Monster(-2, Guinordido, 310);
+            var zombie = Monster(-3, Brikolosote, 320);
+            var hisZombie = Monster(-4, Brikolosote, 330);
+            boss.Initiative = 900; other.Initiative = 500; zombie.Initiative = 800; hisZombie.Initiative = 700;
+            zombie.Invocador = boss.Id;
+            hisZombie.Invocador = zombie.Id;
+            fight.AddPlayer(me);
+            foreach (var m in new[] { boss, other, zombie, hisZombie }) fight.AddMonster(m);
+
+            var order = fight.BuildAlternatingTurnOrder().Where(f => f.TeamId == 1).Select(f => f.Id).ToList();
+
+            Assert.Equal(new long[] { boss.Id, zombie.Id, hisZombie.Id, other.Id }, order);
+        }
+
+        /// <summary>
         /// A zombie's death: its Zombidule gives «100 dommages ... pour 2 tours (débuffable et
         /// cumulable 3 fois)» round it, kills the zombies near it, and those explode in turn --
         /// «des réactions en chaîne en plaçant le Sylargh proche de plusieurs monstres Zombi».
