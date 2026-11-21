@@ -308,52 +308,64 @@ namespace Jondo.Unity.Server.Network
             _ => "rechazado",
         };
 
+        /// <summary>
+        /// palette/save { slot, colors }: the palette chosen at that position of the colours tab,
+        /// six RGB colours, kept in its slot and worn. The position must be one of the unlocked
+        /// slots (see <see cref="ColorPaletteManager.SlotAt"/>). Taken under the character's turn,
+        /// like any other change the control API makes to a playing character.
+        /// </summary>
         private static Respuesta SavePalette(string cuerpo, long cuenta)
         {
             var sesion = SessionRegistry.InWorld().FirstOrDefault(s => s.AccountId == cuenta);
-            if (sesion == null) return Mal(404, "character-offline");
+            if (sesion == null) return Mal(404, "personaje-desconectado");
 
-            using var doc = JsonDocument.Parse(cuerpo);
-            if (!doc.RootElement.TryGetProperty("slot", out var slotProp) ||
-                !doc.RootElement.TryGetProperty("colors", out var colsProp) ||
-                colsProp.ValueKind != JsonValueKind.Array)
+            int posicion;
+            var colores = new List<int>();
+            try
             {
-                return Mal(400, "invalid-data");
-            }
-
-            int slot = slotProp.GetInt32();
-            var cols = new List<int>();
-            foreach (var elem in colsProp.EnumerateArray())
-            {
-                cols.Add(elem.GetInt32());
-            }
-
-            if (cols.Count == 0) return Mal(400, "empty-colors");
-
-            long characterId = sesion.CharacterId;
-            ColorPaletteManager.SavePalette(characterId, slot, cols);
-
-            var charColors = cols.Select(c => (long)c).ToList();
-            DatabaseManager.SaveCharacterColors(characterId, CharacterColors.FromRgb(charColors));
-
-            var dbChar = DatabaseManager.GetCharacterById(characterId);
-            if (dbChar != null)
-            {
-                var appEvent = ColorPaletteManager.BuildAppearanceEvent(dbChar);
-                sesion.SendAsync(appEvent).GetAwaiter().GetResult();
-            }
-
-            using (SessionContext.Push(sesion))
-            {
-                Handlers.WardrobeHandler.AnnounceAsync(sesion).GetAwaiter().GetResult();
-                if (sesion.Stream != null)
+                using var doc = JsonDocument.Parse(cuerpo);
+                if (!doc.RootElement.TryGetProperty("slot", out var slotProp) || !slotProp.TryGetInt32(out posicion)
+                    || !doc.RootElement.TryGetProperty("colors", out var colsProp) || colsProp.ValueKind != JsonValueKind.Array)
+                    return Mal(400, "datos-invalidos");
+                foreach (var elem in colsProp.EnumerateArray())
                 {
-                    Handlers.SlotLookHandler.RedrawAsync(sesion.Stream).GetAwaiter().GetResult();
+                    if (!elem.TryGetInt32(out int color)) return Mal(400, "color-invalido");
+                    colores.Add(color);
                 }
             }
+            catch (JsonException) { return Mal(400, "json-invalido"); }
 
-            Console.WriteLine($"[ColorPalettes] {sesion.State.CharacterName} saved palette #{slot + 1} successfully.");
-            return Bien(new { bien = true, slot });
+            if (!ColorPaletteManager.IsPalette(colores)) return Mal(400, "paleta-invalida");
+
+            if (!sesion.UnoCadaVez.Wait(PlazoDelTurno)) return Mal(409, "personaje-ocupado");
+            try
+            {
+                using (SessionContext.Push(sesion))
+                {
+                    if (sesion.State.IsInFight) return Mal(409, "personaje-en-combate");
+                    long characterId = sesion.CharacterId;
+                    var character = DatabaseManager.GetCharacterById(characterId);
+                    if (character == null) return Mal(404, "personaje-desconectado");
+                    if (posicion < 0 || posicion >= ColorPaletteManager.GetSlotsUnlocked(characterId))
+                        return Mal(409, "ranura-bloqueada");
+                    if (ColorPaletteManager.SaveShown(character, posicion, colores.ToArray()) is not int slot)
+                        return Mal(409, "ranura-bloqueada");
+
+                    DatabaseManager.SaveCharacterColors(characterId, CharacterColors.FromRgb(colores.Select(c => (long)c).ToList()));
+                    if (DatabaseManager.GetCharacterById(characterId) is { } saved)
+                        sesion.SendAsync(ColorPaletteManager.BuildAppearanceEvent(saved)).GetAwaiter().GetResult();
+                    Handlers.WardrobeHandler.AnnounceAsync(sesion).GetAwaiter().GetResult();
+                    if (sesion.Stream != null)
+                        Handlers.SlotLookHandler.RedrawAsync(sesion.Stream).GetAwaiter().GetResult();
+
+                    Console.WriteLine($"[ColorPalettes] {sesion.State.CharacterName} saved a palette in slot {slot}.");
+                    return Bien(new { bien = true, slot });
+                }
+            }
+            finally
+            {
+                sesion.UnoCadaVez.Release();
+            }
         }
     }
 }

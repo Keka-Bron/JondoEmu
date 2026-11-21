@@ -4,11 +4,17 @@ using Microsoft.Data.Sqlite;
 
 namespace Jondo.Unity.Server.Database.Migrations;
 
-public static class ColorPalettePalettesMigration
+/// <summary>
+/// The colour palettes of the appearance window: how many slots each character has unlocked with
+/// colour change potions (CharacterColorSlots) and the six colours saved in each slot
+/// (CharacterColorPalettes). A character without rows has one slot and no saved palette.
+/// </summary>
+internal static class ColorPalettePalettesMigration
 {
-    public const string Name = "20261121-character-color-palettes";
+    internal const string Name = "20261121-character-color-palettes";
 
-    public static bool Apply(SqliteConnection connection)
+    /// <summary>Applies to an open world connection; false when already recorded.</summary>
+    internal static bool Apply(SqliteConnection connection)
     {
         if (connection.State != ConnectionState.Open)
             throw new InvalidOperationException("The database connection must already be open.");
@@ -16,25 +22,16 @@ public static class ColorPalettePalettesMigration
         using var transaction = connection.BeginTransaction(deferred: false);
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
-
-        command.CommandText = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'JondoMigrations';";
+        command.CommandText = @"
+            CREATE TABLE IF NOT EXISTS JondoMigrations (Name TEXT PRIMARY KEY, AppliedAt TEXT NOT NULL);
+            SELECT 1 FROM JondoMigrations WHERE Name = $migrationName;";
+        command.Parameters.AddWithValue("$migrationName", Name);
         if (command.ExecuteScalar() != null)
         {
-            command.CommandText = "SELECT 1 FROM JondoMigrations WHERE Name = $migrationName;";
-            command.Parameters.AddWithValue("$migrationName", Name);
-            if (command.ExecuteScalar() != null)
-            {
-                transaction.Commit();
-                return false;
-            }
-        }
-        else
-        {
-            command.CommandText = "CREATE TABLE IF NOT EXISTS JondoMigrations (Name TEXT PRIMARY KEY, AppliedAt TEXT NOT NULL);";
-            command.ExecuteNonQuery();
+            transaction.Commit();
+            return false;
         }
 
-        command.Parameters.Clear();
         command.CommandText = """
             CREATE TABLE IF NOT EXISTS CharacterColorSlots (
                 CharacterId INTEGER PRIMARY KEY,
@@ -46,10 +43,8 @@ public static class ColorPalettePalettesMigration
                 ColorsJson TEXT NOT NULL,
                 PRIMARY KEY (CharacterId, PaletteIndex)
             );
-            INSERT OR REPLACE INTO JondoMigrations (Name, AppliedAt)
-            VALUES ($migrationName, $appliedAt);
+            INSERT INTO JondoMigrations (Name, AppliedAt) VALUES ($migrationName, $appliedAt);
             """;
-        command.Parameters.AddWithValue("$migrationName", Name);
         command.Parameters.AddWithValue("$appliedAt", DateTime.UtcNow.ToString("o"));
         command.ExecuteNonQuery();
 

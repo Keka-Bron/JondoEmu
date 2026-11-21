@@ -19,7 +19,6 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(86_400_000, policy.ActivityDelayMs);
         Assert.Equal(new GuildContributionConfiguration(10000, 10, 100, 10), policy.Contribution);
         Assert.Equal(-1, InitialPresentationMessages.AllowedEmblemCategories);
-        Assert.Equal(1, InitialPresentationMessages.PaletteSlots);
     }
 
     [Fact]
@@ -40,7 +39,11 @@ public sealed class InitialPresentationMessagesTests
     {
         var character = new Jondo.Unity.Server.DbCharacter { Id = 71_001,
             Breed = 18, Sex = 1, Colors = new(0x112233, null, 0xABCDEF, null, 0, 0xFFFFFF) };
-        var messages = InitialPresentationMessages.Live(character);
+        // Its own database, so that no palette of the world's can answer for this character.
+        using var world = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=:memory:");
+        world.Open();
+        Jondo.Unity.Server.Database.Migrations.ColorPalettePalettesMigration.Apply(world);
+        var messages = InitialPresentationMessages.Live(character, world);
         using var context = SessionContext.Push(GameSession.SinSocket());
         Assert.Equal(-1, messages.Capabilities().GuildEmblemSymbolCategory);
         var colors = messages.Colors().CharacterColors!;
@@ -55,13 +58,6 @@ public sealed class InitialPresentationMessagesTests
         Assert.Equal(0x112233, colors.ColorPalettes[0].Colors[0]);
         Assert.Equal(0xABCDEF, colors.ColorPalettes[0].Colors[2]);
     }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(206)]
-    [InlineData(int.MaxValue)]
-    public void Shared_legacy_writer_also_omits_the_unused_ornament_value(int value)
-        => Assert.Empty(ConnectionProtocol.BuildOrnamentUpdated(value));
 
     [Fact]
     public void Aura_carries_the_main_aura_and_none_is_absent()

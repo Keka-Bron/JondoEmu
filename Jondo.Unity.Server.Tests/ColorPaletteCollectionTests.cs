@@ -15,27 +15,7 @@ public sealed class ColorPaletteCollectionTests : IDisposable
     {
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
-        using var cmd = _connection.CreateCommand();
-        cmd.CommandText = """
-            CREATE TABLE CharacterColorSlots (
-                CharacterId INTEGER PRIMARY KEY,
-                SlotsUnlocked INTEGER NOT NULL DEFAULT 1
-            );
-            CREATE TABLE CharacterColorPalettes (
-                CharacterId INTEGER NOT NULL,
-                PaletteIndex INTEGER NOT NULL,
-                ColorsJson TEXT NOT NULL,
-                PRIMARY KEY (CharacterId, PaletteIndex)
-            );
-            CREATE TABLE Characters (
-                Id INTEGER PRIMARY KEY,
-                AccountId INTEGER NOT NULL,
-                Name TEXT NOT NULL,
-                Color1 INTEGER, Color2 INTEGER, Color3 INTEGER,
-                Color4 INTEGER, Color5 INTEGER, Color6 INTEGER
-            );
-            """;
-        cmd.ExecuteNonQuery();
+        Jondo.Unity.Server.Database.Migrations.ColorPalettePalettesMigration.Apply(_connection);
     }
 
     public void Dispose() => _connection.Dispose();
@@ -145,5 +125,103 @@ public sealed class ColorPaletteCollectionTests : IDisposable
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             ColorPaletteManager.SavePaletteDirect(_connection, charId, 0, colors));
+    }
+
+    private static DbCharacter Character(long id) => new() { Id = id, Breed = 18, Sex = 1,
+        Colors = new(0x112233, 0x223344, 0x334455, 0x445566, 0x556677, 0x667788) };
+
+    private static int[] Plain(int color) => [color, color, color, color, color, color];
+
+    [Fact]
+    public void A_character_without_rows_has_one_slot_and_its_own_colours_as_the_only_palette()
+    {
+        var character = Character(800);
+        var colors = ColorPaletteManager.BuildAppearanceEvent(_connection, character).CharacterColors!;
+
+        Assert.Equal(ColorPaletteManager.StartingSlots, colors.SlotsUnlocked);
+        Assert.Equal(ColorPaletteManager.TotalSlots, colors.SlotsTotal);
+        Assert.Equal(new[] { 0x112233, 0x223344, 0x334455, 0x445566, 0x556677, 0x667788 },
+            Assert.Single(colors.ColorPalettes).Colors);
+    }
+
+    [Fact]
+    public void The_first_potion_opens_a_second_slot_and_each_one_after_opens_one_more()
+    {
+        Assert.True(ColorPaletteManager.TryUnlockNextSlotDirect(_connection, 810));
+        Assert.Equal(2, ColorPaletteManager.GetSlotsUnlockedDirect(_connection, 810));
+        Assert.True(ColorPaletteManager.TryUnlockNextSlotDirect(_connection, 810));
+        Assert.Equal(3, ColorPaletteManager.GetSlotsUnlockedDirect(_connection, 810));
+    }
+
+    [Fact]
+    public void A_saved_first_slot_is_shown_as_saved_and_not_replaced_by_the_worn_colours()
+    {
+        var character = Character(820);
+        ColorPaletteManager.SavePaletteDirect(_connection, character.Id, 0, Plain(0xABCDEF));
+
+        var shown = ColorPaletteManager.Shown(character, 1, ColorPaletteManager.GetPalettesDirect(_connection, character.Id));
+
+        Assert.Equal(Plain(0xABCDEF), Assert.Single(shown).Colors);
+    }
+
+    [Fact]
+    public void A_gap_between_saved_slots_is_skipped_and_the_later_palettes_are_still_listed()
+    {
+        var character = Character(830);
+        using (var slots = _connection.CreateCommand())
+        {
+            slots.CommandText = "INSERT INTO CharacterColorSlots VALUES (830, 5);";
+            slots.ExecuteNonQuery();
+        }
+        ColorPaletteManager.SavePaletteDirect(_connection, character.Id, 0, Plain(0x000000));
+        ColorPaletteManager.SavePaletteDirect(_connection, character.Id, 3, Plain(0x333333));
+
+        var shown = ColorPaletteManager.Shown(character, 5, ColorPaletteManager.GetPalettesDirect(_connection, character.Id));
+
+        Assert.Equal(new[] { 0, 3 }, shown.Select(p => p.Slot));
+        Assert.Equal(Plain(0), shown[0].Colors);
+        Assert.Equal(Plain(0x333333), shown[1].Colors);
+    }
+
+    [Fact]
+    public void Saved_palettes_of_slots_no_longer_unlocked_are_not_listed()
+    {
+        var character = Character(840);
+        ColorPaletteManager.SavePaletteDirect(_connection, character.Id, 4, Plain(0x444444));
+
+        var shown = ColorPaletteManager.Shown(character, 2, ColorPaletteManager.GetPalettesDirect(_connection, character.Id));
+
+        Assert.Equal(0, Assert.Single(shown).Slot);
+    }
+
+    [Fact]
+    public void A_list_position_maps_to_its_listed_slot_or_to_the_first_free_one_and_never_past_the_unlocked()
+    {
+        var character = Character(850);
+        var saved = new Dictionary<int, int[]> { [0] = Plain(1), [2] = Plain(2) };
+        var shown = ColorPaletteManager.Shown(character, 4, saved);
+
+        Assert.Equal(0, ColorPaletteManager.SlotAt(shown, 4, 0));
+        Assert.Equal(2, ColorPaletteManager.SlotAt(shown, 4, 1));
+        Assert.Equal(1, ColorPaletteManager.SlotAt(shown, 4, 2));
+        Assert.Null(ColorPaletteManager.SlotAt(shown, 4, 4));
+        Assert.Null(ColorPaletteManager.SlotAt(shown, 4, -1));
+    }
+
+    [Fact]
+    public void Without_a_saved_first_slot_a_new_palette_never_takes_the_slot_of_the_worn_colours()
+    {
+        var shown = ColorPaletteManager.Shown(Character(860), 2, new Dictionary<int, int[]>());
+
+        Assert.Equal(0, ColorPaletteManager.SlotAt(shown, 2, 0));
+        Assert.Equal(1, ColorPaletteManager.SlotAt(shown, 2, 1));
+    }
+
+    [Fact]
+    public void Black_is_a_valid_palette_colour()
+    {
+        Assert.True(ColorPaletteManager.IsPalette(Plain(0)));
+        Assert.False(ColorPaletteManager.IsPalette([0, 0, 0, 0, 0]));
+        Assert.False(ColorPaletteManager.IsPalette([-1, 0, 0, 0, 0, 0]));
     }
 }

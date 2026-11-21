@@ -106,7 +106,7 @@ public sealed class AfterSelectionFlowTests
             Assert.Equal(-1, Assert.Single(first.OfType<CharacterCapabilitiesEvent>()).GuildEmblemSymbolCategory);
             var colors = Assert.Single(first.OfType<CharacterAppearanceCollectionEvent>()).CharacterColors!;
             Assert.Equal(1, colors.SlotsUnlocked);
-            Assert.Equal(1, colors.SlotsTotal);
+            Assert.Equal(Jondo.Unity.Server.Managers.ColorPaletteManager.TotalSlots, colors.SlotsTotal);
             Assert.Single(colors.ColorPalettes);
             var configuration = Assert.Single(first.OfType<ConfigurationEvent>()).GuildConfiguration!;
             Assert.Equal(new GuildActivityConfiguration(32441, 12, 3, 2, 32442, 100), configuration.Activity);

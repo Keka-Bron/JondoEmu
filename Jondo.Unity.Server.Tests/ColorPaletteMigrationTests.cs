@@ -51,6 +51,7 @@ public sealed class ColorPaletteMigrationTests
 
         Assert.Throws<SqliteException>(() => ColorPalettePalettesMigration.Apply(connection));
         Assert.Equal(0L, Scalar(connection, "SELECT COUNT(*) FROM JondoMigrations;"));
+        Assert.Equal(0L, Scalar(connection, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'CharacterColor%';"));
     }
 
     private static object? Scalar(SqliteConnection connection, string sql)

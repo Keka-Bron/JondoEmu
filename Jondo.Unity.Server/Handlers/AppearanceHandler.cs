@@ -46,18 +46,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Opening the window. The lyk comes alone and has no answer of its own.</summary>
         public static async Task OpenAsync(NetworkStream stream, long accountId)
         {
-            var session = SessionContext.Current;
-            if (session != null)
-            {
-                session.State.IsWardrobeDraftLoaded = false;
-                await WardrobeStateService.Live.SendOwnedAsync(session);
-                var character = DatabaseManager.GetCharacterById(session.CharacterId);
-                if (character != null)
-                {
-                    await session.SendAsync(ColorPaletteManager.BuildAppearanceEvent(character));
-                }
-            }
             await PreviewAsync(stream);
+            await Task.CompletedTask;
         }
 
         /// <summary>The window's whole state.</summary>
@@ -192,31 +182,14 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         public static async Task ColorsAsync(NetworkStream stream, byte[] frame)
         {
-            byte[]? payload = ConnectionProtocol.ReadPayload(frame, Op.Lyl)
-                           ?? ConnectionProtocol.ReadPayload(frame, Op.Lvl)
-                           ?? ConnectionProtocol.ReadPayload(frame, Op.Lvp);
-            if (payload == null) return;
+            byte[]? lyl = ConnectionProtocol.ReadPayload(frame, Op.Lyl);
+            if (lyl == null) return;
 
-            var parsed = ProtoMessage.Parse(payload);
-            int slotIndex = -1;
             var colors = new List<long>();
-
-            var slotField = parsed.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0);
-            if (slotField != null) slotIndex = (int)slotField.VarIntValue;
-
-            var lvd = parsed.Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
+            var lvd = ProtoMessage.Parse(lyl).Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 2);
             if (lvd != null)
-            {
                 colors.AddRange(BankHandler.PackedOrSingle(ProtoMessage.Parse(lvd.BytesValue).Fields, 2)
                                            .Select(c => (long)(int)c));
-            }
-            else
-            {
-                var colorFields = BankHandler.PackedOrSingle(parsed.Fields, 2);
-                if (colorFields.Count == 0)
-                    colorFields = BankHandler.PackedOrSingle(parsed.Fields, 1);
-                colors.AddRange(colorFields.Select(c => (long)(int)c));
-            }
 
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             int slots = character == null ? 0 : 6;
@@ -224,17 +197,13 @@ namespace Jondo.Unity.Server.Handlers
                          && colors.TrueForAll(c => c >= -1 && c <= 0xFFFFFF);
             if (taken)
             {
-                SessionContext.State.WardrobeDraftColors = colors;
-                if (slotIndex >= 0)
-                {
-                    SessionContext.State.WardrobeDraftPaletteIndex = slotIndex;
-                }
+                DatabaseManager.SaveCharacterColors(character!.Id, CharacterColors.FromRgb(colors));
                 await PreviewAsync(stream);
             }
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Answer(Op.Lxd, Pb.New().VarIfNotZero(1, taken ? 1 : 0).Build(),
                                           ConnectionProtocol.RequestId(frame)));
-            Console.WriteLine(taken ? $"[Appearances] Draft colours {string.Join(",", colors)} (slot {slotIndex})." : "[Appearances] Colours refused.");
+            Console.WriteLine(taken ? $"[Appearances] Colours {string.Join(",", colors)}." : "[Appearances] Colours refused.");
         }
 
         /// <summary>Putting on a garment and letting the server work out the slot.</summary>
@@ -540,9 +509,8 @@ namespace Jondo.Unity.Server.Handlers
             var character = DatabaseManager.GetCharacterById(Jondo.Unity.Server.Network.SessionContext.State.CharacterId);
             if (character == null) return;
 
-            var draftColors = Jondo.Unity.Server.Network.SessionContext.State.WardrobeDraftColors;
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character, draftColors)));
+                ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
         }
 
         /// <summary>

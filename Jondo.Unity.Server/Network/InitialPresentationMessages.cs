@@ -15,16 +15,15 @@ internal sealed class InitialPresentationMessages(
     // Guild creation/modification has no category-ownership restrictions in Jondo.
     // Advertise every category rather than the recorded account's 12287 mask.
     internal const int AllowedEmblemCategories = -1;
-    // Jondo retains the current palette, without a saved-palette store or slot purchases.
-    internal const int PaletteSlots = 1;
     // Explicit client-facing guild policy, alongside the limits used by the live engines.
     internal const int MaxExcludedRanks = 3;
     internal const int MaxExcludedCategories = 2;
     internal const long ActivityDelayMs = 24L * 60 * 60 * 1000;
 
-    internal static InitialPresentationMessages Live(DbCharacter character) => new(
+    // The palettes come from the world database, or from the given connection when a test keeps its own.
+    internal static InitialPresentationMessages Live(DbCharacter character, Microsoft.Data.Sqlite.SqliteConnection? world = null) => new(
         () => new(AllowedEmblemCategories),
-        () => ColorPaletteManager.BuildAppearanceEvent(character),
+        () => world == null ? ColorPaletteManager.BuildAppearanceEvent(character) : ColorPaletteManager.BuildAppearanceEvent(world, character),
         () => new(GuildPolicy()),
         () => Aura(Wardrobe.AuraOf(character.Id)),
         () => new(ConnectionProtocol.LookIdOf(character.Id), CharacterLookBuilder.SemanticLook(character, paraLaVentana: true)));

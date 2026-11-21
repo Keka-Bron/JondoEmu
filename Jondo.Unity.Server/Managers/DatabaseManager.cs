@@ -2321,6 +2321,7 @@ namespace Jondo.Unity.Server
             "CharacterKeyring", "CharacterDungeonProgress", "CharacterElements",
             "CharacterEnergy", "CharacterExperienceLimit",
             "CharacterSavedPositions", "CharacterZaapDiscoveries", "CharacterPresets", "CharacterItemShortcuts", "CharacterPendingChanges",
+            "CharacterColorSlots", "CharacterColorPalettes",
         };
 
         /// <summary>The ids of deleted characters, so that none is ever handed out again.</summary>
