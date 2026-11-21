@@ -395,6 +395,9 @@ namespace Jondo.Unity.Tests.Sessions
         {
             if (!Available) return;
             Emotes.Load();
+            // The aura column comes with it, as the server starts: on CI's freshly unpacked base no
+            // other test may have added it yet, and the aura saved below was lost in silence.
+            Wardrobe.Initialize();
             const long Account = 8_900_000_042;
             const int Septango = 206;
             long character = DatabaseManager.CreateCharacter(Account, 1, "Aura-Uno", 8, 0, 1,
