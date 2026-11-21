@@ -376,7 +376,7 @@ namespace Jondo.Unity.Server.Managers
         public bool MovesBack => EffectEngine.EsVueltaAtras(Waiting.EffectId);
 
         // These effects change the fighter itself, not just a characteristic in its buff list.
-        public bool Replays => Waiting.EffectId is 405 or 2796
+        public bool Replays => Waiting.EffectId is 405 or 2796 or 1048
             or EffectSupport.ChangeLook or EffectSupport.ChangeAppearance
             or EffectSupport.VitalityPercentBonus or EffectSupport.VitalityPercentMalus
             or EffectSupport.VitalityPercentBoost;
@@ -4918,12 +4918,21 @@ namespace Jondo.Unity.Server.Managers
                 int porciento = efecto.DiceNum != 0 ? efecto.DiceNum : efecto.Value;
                 if (porciento <= 0) return null;
 
+                // A delayed row waits for its round, like every other delayed effect. Mutación
+                // Inestable (6759), which Capitán Meno hands to his crew, writes 25, 33 and 50 with
+                // delays 1, 2 and 3 and a kill at delay 4: all three at the cast killed every
+                // monster of his fight before it ever played.
+                if (efecto.Delay > 0) return Pendiente(combate, quienLanza, sobre, hechizo, grado, efecto, ronda);
+
                 // On the MAXIMUM, not on what he has left: if it were on what he has left, ninety per
                 // cent would never kill anybody however many times it was cast.
                 // Except one's own sacrifice, on what one has left: the Sacrogito's spells
                 // "sacrifican una parte de la vida del lanzador" -- Berserker 70%, Corte 10% -- and
                 // on the maximum Berserker killed him whenever he stood under 70% of his life.
-                int quita = sobre == quienLanza
+                // And a row whose delay is up, on what is left too: Mutación Inestable's 25, 33 and
+                // 50 take a quarter of the maximum each round (75%, 50%, 25%) only that way, and
+                // the kill row closes it; on the maximum the third one already killed.
+                int quita = sobre == quienLanza || efecto.Triggers == Esperando
                     ? Math.Max(1, sobre.CurrentHP * porciento / 100)
                     : Math.Max(1, sobre.MaxHP * porciento / 100);
 
