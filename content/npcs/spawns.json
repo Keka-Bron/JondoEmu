@@ -6501,6 +6501,47 @@
       "orientation": 1,
       "criterion": "Qa=1505&Qo>8489&Qo<8491&PO=15310",
       "why": "«Tesorfanato» (1505): Mimicandy, who followed you, beside the bin (485015, cell 488) at [-6,-1] until thrown in or let go (8491). INFERRED cell, the open floor up and left of the bin: the tiles round it are behind piled gold."
+    },
+    {
+      "map": 130287616,
+      "npc": 2395,
+      "cell": 371,
+      "remove": true
+    },
+    {
+      "map": 130287616,
+      "npc": 2395,
+      "cell": 369,
+      "orientation": 1,
+      "why": "Malefíscof in the Fábrica de Malefíscof's way out (130287616), where «El maleficio del cofre» (1506) has her talked to once the dungeon is done: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»). INFERRED cell, the middle of the gold emblem on the floor; the derived one (371) stood against the pillar in front."
+    },
+    {
+      "map": 130287616,
+      "npc": 2387,
+      "cell": 397,
+      "orientation": 1,
+      "criterion": "Qa=1506&Qo>8496&Qo<8497",
+      "why": "«El maleficio del cofre» (1506): the professor's krosmoglob that appears once Malefíscof refuses (8496) until it is spoken to (8497): «Le Krosmoglob du Professeur Maximilio apparait alors» (Dofus pour les noobs, «Malladie»). INFERRED cell, on the emblem below her."
+    },
+    {
+      "map": 129237504,
+      "npc": 2393,
+      "cell": 344,
+      "remove": true
+    },
+    {
+      "map": 129237504,
+      "npc": 2393,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Kamalvado, the Tesoráculo's mouth before the Fort Thune's dragon-head stairs at [-4,-4], where «El maleficio del cofre» (1506) has him paid the symbolic kama: «Rendez vous devant l'entrée du Fort Thune en [-4,-4]. Parlez alors à Kamalonnête» (Dofus pour les noobs, «Malladie»). INFERRED cell, at the right foot of the stairs, where the guide's picture shows him with the quest mark: the derived one (344) stood in the middle of the paved square where the monster groups stand, which hid him and made a click on him start a fight."
+    },
+    {
+      "map": 130287616,
+      "npc": 2353,
+      "cell": 286,
+      "orientation": 1,
+      "why": "Inès Karcel in the Fábrica de Malefíscof's exit room (130287616), who lets the winners out with «Salir.» (21430): «Parlez de nouveau à Inès Karcel pour sortir» (Dofus pour les noobs, «Fabrique de Malléfisk»). INFERRED cell: the guide's picture has her on the open floor above the emblem, by the left gate and up and right of Malefíscof (369); 286 is that floor, clear of the pillar."
     }
   ]
 }

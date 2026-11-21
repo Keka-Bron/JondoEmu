@@ -379,6 +379,15 @@
         68025
       ],
       "why": "The post-boss room of the Tertre du long sommeil (dungeon 139): quest 2451 «Arrête-la si tu peux» has an objective, 18576, that names this map (220729859) after the boss (Hell Mina, 107): «Une fois le donjon terminé, parlez à Hell Mina» (Dofus pour les noobs, «Arrête-la si tu peux»); her last reply there (68025, «Te pido disculpas...») takes the winners out. INFERRED landing cell."
+    },
+    {
+      "dungeon": 77,
+      "bossRoom": 130286592,
+      "room": 130287616,
+      "cell": 426,
+      "npc": 2353,
+      "replies": [21430],
+      "why": "The Fábrica de Malefíscof (dungeon 77): after the machine room (130286592) the winners are in «Brutatax's Factory - Exit» (130287616), where «El maleficio del cofre» (1506) has them talk to Malefíscof: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»); objectives 8496-8498 name this map. Inès Karcel lets them out: «Parlez de nouveau à Inès Karcel pour sortir» (Dofus pour les noobs, «Fabrique de Malléfisk»), her «Salir.» (21430). The map panel offers no way out here: the client shows it only on a map of the dungeon's own (DungeonsDataRoot.GetDungeonByMapId, MapInfoUI.UpdateContextualOptions), and this room is none. INFERRED landing cell, on the emblem in front of Malefíscof."
     }
   ]
 }

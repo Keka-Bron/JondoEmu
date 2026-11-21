@@ -53583,7 +53583,9 @@
             { "reply": 21038, "next": 17569, "quest": 1504, "beforeObjective": 8466, "completesAll": [8466, 8467, 8468, 8469], "gives": 15308, "criterion": "PO=34133&PO=34134&PO=34135&PO=34136" },
             { "reply": 21041, "next": 17570, "quest": 1504, "afterObjective": 8480, "beforeObjective": 8481, "completes": 8481, "params": [[30, 8481]] },
             { "reply": 21068, "next": 17588, "criterion": "Qf=1504", "beforeQuest": 1505 },
-            { "reply": 21083, "next": 17601, "quest": 1505, "afterObjective": 8487, "beforeObjective": 8488, "completes": 8488, "params": [[30, 8488]] }
+            { "reply": 21083, "next": 17601, "quest": 1505, "afterObjective": 8487, "beforeObjective": 8488, "completes": 8488, "params": [[30, 8488]] },
+            { "reply": 21132, "next": 17627, "criterion": "Qf=1505&PL>79", "beforeQuest": 1506 },
+            { "reply": 21170, "next": 17660, "quest": 1506, "afterObjective": 8498, "beforeObjective": 8499, "completes": 8499, "params": [[30, 8499]] }
           ]
         },
         {
@@ -53643,9 +53645,19 @@
         {
           "message": 17601,
           "choices": []
+        },
+        {
+          "message": 17627,
+          "choices": [
+            { "reply": 21131, "startsQuest": 1506, "params": [[34, 1506]] }
+          ]
+        },
+        {
+          "message": 17660,
+          "choices": []
         }
       ],
-      "why": "Professor Max Ymillán at the Crisol de los Afortunados [-1,-1], for «Cofrología» (1504). Dofus pour les noobs, «Koffrologie»: «Maximilio ... a besoin d'âme de Koffrefors pour les étudier de plus près. Il vous demande donc de lui donner 1 x Moyenne pierre d'âme ... Il vous a également donné une altération du nom de Super capture». Asked about the dimension's dwellers (21037) he wants cofrefuertes caught (17567); «Aceptar» (21036) starts the quest on «¡Perfecto!» (60142), where a medium soul stone (9687) buys the «Supercaptura» (871) the souls drop under (82556), or later from «¿Cómo puedo capturar...?» (82829, 60273, 82558). The four souls handed over (21038) are 8466-8469 and get the whistle (15308) with his tests (17569). Once Riberico has followed you (8480), «Dejar pasar a Riberico» (21041) is 8481 (17570). «Tesorfanato» (1505): «¿Por qué ha venido Riberico?» (21068) once «Cofrología» is done: the Cofredía lets him go on with his experiments (17588), a cofrefuerte has run away from the tesorfanato (17589), Mimicandy, a one-off mimicofre (17590), and the plan is to play the desperate at the orphanage's door (17591); «Aceptar» (21064) starts it. Later «¿Qué opinas sobre esta situación?» (21083, 17601) is 8488: «D'après lui il est inutile de prendre des risques envers la collaboration entre la Koffrérie et les Voyageurs Dimensionnels» (Dofus pour les noobs, «Trésorphelinat»)."
+      "why": "Professor Max Ymillán at the Crisol de los Afortunados [-1,-1], for «Cofrología» (1504). Dofus pour les noobs, «Koffrologie»: «Maximilio ... a besoin d'âme de Koffrefors pour les étudier de plus près. Il vous demande donc de lui donner 1 x Moyenne pierre d'âme ... Il vous a également donné une altération du nom de Super capture». Asked about the dimension's dwellers (21037) he wants cofrefuertes caught (17567); «Aceptar» (21036) starts the quest on «¡Perfecto!» (60142), where a medium soul stone (9687) buys the «Supercaptura» (871) the souls drop under (82556), or later from «¿Cómo puedo capturar...?» (82829, 60273, 82558). The four souls handed over (21038) are 8466-8469 and get the whistle (15308) with his tests (17569). Once Riberico has followed you (8480), «Dejar pasar a Riberico» (21041) is 8481 (17570). «Tesorfanato» (1505): «¿Por qué ha venido Riberico?» (21068) once «Cofrología» is done: the Cofredía lets him go on with his experiments (17588), a cofrefuerte has run away from the tesorfanato (17589), Mimicandy, a one-off mimicofre (17590), and the plan is to play the desperate at the orphanage's door (17591); «Aceptar» (21064) starts it. Later «¿Qué opinas sobre esta situación?» (21083, 17601) is 8488: «D'après lui il est inutile de prendre des risques envers la collaboration entre la Koffrérie et les Voyageurs Dimensionnels» (Dofus pour les noobs, «Trésorphelinat»). «El maleficio del cofre» (1506): «Me preocupa el letargo de los cofrefuertes» (21132) once «Tesorfanato» is done: they fall asleep for hours and cannot be woken (17627); «Aceptar» (21131) starts it. «La negociación con Malefíscof ha sido todo un éxito» (21170, 17660) is 8499: «La quête se termine par des remerciements de Maximilio» (Dofus pour les noobs, «Malladie»)."
     },
     {
       "npc": 2384,
@@ -53780,7 +53792,8 @@
             { "reply": 21061, "next": 17586 },
             { "reply": 21081, "next": 17599, "quest": 1505, "afterObjective": 8485, "beforeObjective": 8486, "completes": 8486, "showsNpc": 2389, "criterion": "PO=15310" },
             { "reply": 21084, "next": 17602, "quest": 1505, "afterObjective": 8488, "beforeObjective": 8489, "completes": 8489, "params": [[30, 8489]] },
-            { "reply": 21094, "next": 17607, "quest": 1505, "afterObjective": 8491, "beforeObjective": 8492, "completes": 8492, "params": [[30, 8492]] }
+            { "reply": 21094, "next": 17607, "quest": 1505, "afterObjective": 8491, "beforeObjective": 8492, "completes": 8492, "params": [[30, 8492]] },
+            { "reply": 21133, "next": 17628, "quest": 1506, "beforeObjective": 8493, "completes": 8493, "params": [[30, 8493]] }
           ]
         },
         {
@@ -53798,9 +53811,13 @@
         {
           "message": 17607,
           "choices": []
+        },
+        {
+          "message": 17628,
+          "choices": []
         }
       ],
-      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586). «Tesorfanato» (1505): Mimicandy handed over and his fate asked (21081) is 8486, «Mimikmatti sera jeté aux ordures» (17599); asking to carry out the sentence yourself (21084) is 8489 (17602, «Conduis Mimikmatti jusqu'à la benne à ordures»); telling him it is done (21094) is 8492, the reward (17607) (Dofus pour les noobs, «Trésorphelinat»)."
+      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586). «Tesorfanato» (1505): Mimicandy handed over and his fate asked (21081) is 8486, «Mimikmatti sera jeté aux ordures» (17599); asking to carry out the sentence yourself (21084) is 8489 (17602, «Conduis Mimikmatti jusqu'à la benne à ordures»); telling him it is done (21094) is 8492, the reward (17607) (Dofus pour les noobs, «Trésorphelinat»). «El maleficio del cofre» (1506): «Abordar el problema de los cofrefuertes» (21133) is 8493: only the Tesoráculo can say more (17628), «Ce dernier vous envoi donc rencontrer Kamalonnête afin que vous puissiez consulter le Trésoracle» (Dofus pour les noobs, «Malladie»)."
     },
     {
       "npc": 2390,
@@ -53866,6 +53883,202 @@
         }
       ],
       "why": "Mimicandy beside the bin at [-6,-1], for «Tesorfanato» (1505): «Parlez à Mimikmatti et choisisez de le jeter aux ordures ou bien de le laisser partir (les deux choix fonctionnent)» (Dofus pour les noobs, «Trésorphelinat»). «Tirar a Mimicandy al cubo de la basura» (21092) or «Dejar que Mimicandy se escape y mentir» (21093) is 8491; either way he stops following you."
+    },
+    {
+      "npc": 2393,
+      "map": 129237504,
+      "opening": 17629,
+      "lines": [
+        {
+          "message": 17629,
+          "choices": [
+            { "reply": 21136, "next": 17630, "quest": 1506, "afterObjective": 8493, "beforeObjective": 8494 }
+          ]
+        },
+        {
+          "message": 17630,
+          "choices": [
+            { "reply": 21135, "next": 17631, "quest": 1506, "beforeObjective": 8494, "buyPrice": 1, "criterion": "PK>0", "completes": 8494, "params": [[30, 8494]] },
+            { "reply": 21134, "quest": 1506, "beforeObjective": 8494, "criterion": "PK<1" }
+          ]
+        },
+        {
+          "message": 17631,
+          "choices": []
+        }
+      ],
+      "why": "Kamalvado, the Tesoráculo's mouth before the Fort Thune at [-4,-4], for «El maleficio del cofre» (1506): «Parlez alors à Kamalonnête et dites lui venir de la part de Ribériche. Donnez alors 1 kama en offrande pour faire parler le Trésoracle. Vous apprendrez alors que le mal viens de Malléfisk un être qu'il vous faudra flatter» (Dofus pour les noobs, «Malladie»). «Explicarle que vienes de parte de Riberico» (21136, 17630), «Darle 1 kama» (21135) pays the symbolic kama and is 8494 (17631); without one, «Buscar 1 kama» (21134)."
+    },
+    {
+      "npc": 2353,
+      "map": 130285568,
+      "opening": 17637,
+      "lines": [
+        {
+          "message": 17637,
+          "choices": [
+            { "reply": 21156, "next": 17644, "quest": 1506, "afterObjective": 8494, "beforeObjective": 8495, "completes": 8495, "params": [[30, 8495]] },
+            { "reply": 39373, "quest": 1506, "afterObjective": 8495, "beforeObjective": 8498, "criterion": "OA=1088", "teleport": 130287616 },
+            { "reply": 21147, "next": 17638 }
+          ]
+        },
+        {
+          "message": 17644,
+          "choices": [
+            { "reply": 21155, "next": 17645 }
+          ]
+        },
+        {
+          "message": 17645,
+          "choices": [
+            { "reply": 21154, "next": 17646 }
+          ]
+        },
+        {
+          "message": 17646,
+          "choices": []
+        },
+        {
+          "message": 17638,
+          "choices": [
+            { "reply": 21146, "next": 17639 }
+          ]
+        },
+        {
+          "message": 17639,
+          "choices": [
+            { "reply": 21145, "next": 17640 }
+          ]
+        },
+        {
+          "message": 17640,
+          "choices": [
+            { "reply": 21144, "next": 17641 }
+          ]
+        },
+        {
+          "message": 17641,
+          "choices": [
+            { "reply": 21143 }
+          ]
+        }
+      ],
+      "why": "Inès Karcela, who keeps the Fábrica de Malefíscof at [-6,-2]. For «El maleficio del cofre» (1506): «Expliquez alors le problème des Koffrefors à Inès. Inès Karcel vous apprend que Malléfisk est normalement enfermé dans ses coffres ... une puissante sorcière Enutrof transformée ... Pour rencontrer Malléfisk, il vous faut une clef et terminer le donjon» (Dofus pour les noobs, «Malladie»): «Explicarle el problema con los cofrefuertes» (21156, 17644) is 8495; «¿Qué más puedes decirme sobre Malefíscof?» (21155, 17645) and «¿... sobre Riberico?» (21154, 17646) follow. «Me sorprende que una simple anutrof sea responsable de la fábrica de kamas» (21147) is her story (17638-17641), «Irte avergonzado» (21143). The door's own replies (the key, «Retomar...») come from DungeonDoor on top of these. «Tengo una conversación pendiente con Malefíscof, tengo prisa.» (39373) takes whoever has the dungeon done (its achievement 1088) and still owes Malefíscof the conversation (8496-8498) to the exit room, where she stands: «Une fois le donjon terminé, parlez à Malléfisk avant de sortir» (Dofus pour les noobs, «Malladie»), without a second key."
+    },
+    {
+      "npc": 2395,
+      "map": 130287616,
+      "opening": 17647,
+      "openings": [
+        { "quest": 1506, "objective": 8497, "message": 17656 }
+      ],
+      "lines": [
+        {
+          "message": 17647,
+          "choices": [
+            { "reply": 21162, "next": 17648, "quest": 1506, "afterObjective": 8495, "beforeObjective": 8496 }
+          ]
+        },
+        {
+          "message": 17648,
+          "choices": [
+            { "reply": 21161, "next": 17649, "quest": 1506, "beforeObjective": 8496 }
+          ]
+        },
+        {
+          "message": 17649,
+          "choices": [
+            { "reply": 21160, "next": 17650, "quest": 1506, "beforeObjective": 8496 }
+          ]
+        },
+        {
+          "message": 17650,
+          "choices": [
+            { "reply": 21159, "next": 17651, "quest": 1506, "beforeObjective": 8496 }
+          ]
+        },
+        {
+          "message": 17651,
+          "choices": [
+            { "reply": 21158, "next": 17652, "quest": 1506, "beforeObjective": 8496 }
+          ]
+        },
+        {
+          "message": 17652,
+          "choices": [
+            { "reply": 21157, "next": 17653, "quest": 1506, "beforeObjective": 8496, "showsNpc": 2387, "completes": 8496, "params": [[30, 8496]] }
+          ]
+        },
+        {
+          "message": 17653,
+          "choices": []
+        },
+        {
+          "message": 17656,
+          "choices": [
+            { "reply": 21168, "next": 17657, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498 },
+            { "reply": 21167, "next": 17658, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498 },
+            { "reply": 21166, "next": 17659, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498, "completes": 8498, "params": [[30, 8498]] }
+          ]
+        },
+        {
+          "message": 17657,
+          "choices": [
+            { "reply": 21169, "next": 17656, "quest": 1506, "beforeObjective": 8498 }
+          ]
+        },
+        {
+          "message": 17658,
+          "choices": [
+            { "reply": 21169, "next": 17656, "quest": 1506, "beforeObjective": 8498 }
+          ]
+        },
+        {
+          "message": 17659,
+          "choices": []
+        }
+      ],
+      "why": "Malefíscof in the factory's way out (130287616), once its fight is won, for «El maleficio del cofre» (1506): «Une fois le donjon terminé, parlez à Malléfisk avant de sortir. Commencez par la flatter afin qu'elle s'intéresse à vous. Malléfisk vous apprend alors qu'elle endors les Koffrefors à distance afin de ne pas rouiller. Cependant lorsque vous lui demandez de réveiller ceux de Maximilio, celle-ci refuse. Le Krosmoglob du Professeur Maximilio apparait alors ... Reparlez alors à Malléfisk pour vous excuser. Finalement après plusieurs essais Malléfisk accepte» (Dofus pour les noobs, «Malladie»). She ignores you (17647); «Hablarle» (21162, 17648), «Elogiar la belleza de sus trazos» (21161, 17649), «Encomiar su magnificiencia» (21160, 17650, «extranjero de lengua bien suelta»), the narcolepsy (21159, 17651), why the professor's (21158, 17652) and «Exigirle que libere a los cofrefuertes» (21157, 17653, «Tú no puedes exigirme nada») is 8496, and the krosmoglob appears. Then she turns to you (17656): her bags (21168, 17657) and the narcolepsy again (21167, 17658) fail, and «Excusarte diciendo que solo eres una larva indigna de interés» (21169) lets you try again; «Alabar su grandeza y mentir sobre una solución para liberarla» (21166, 17659, «aprecio tu espíritu retorcido, por lo que voy a acceder a tu petición») is 8498. The replies run in that order in the client's own numbering, highest first."
+    },
+    {
+      "npc": 2387,
+      "map": 130287616,
+      "opening": 17573,
+      "lines": [
+        {
+          "message": 17573,
+          "choices": [
+            { "reply": 21165, "next": 17654, "quest": 1506, "afterObjective": 8496, "beforeObjective": 8497 }
+          ]
+        },
+        {
+          "message": 17654,
+          "choices": [
+            { "reply": 21164, "next": 17655, "quest": 1506, "beforeObjective": 8497 }
+          ]
+        },
+        {
+          "message": 17655,
+          "choices": [
+            { "reply": 21163, "quest": 1506, "beforeObjective": 8497, "leaves": true, "completes": 8497, "params": [[30, 8497]] }
+          ]
+        }
+      ],
+      "why": "The professor's krosmoglob beside Malefíscof, for «El maleficio del cofre» (1506): «Le Krosmoglob du Professeur Maximilio apparait alors. Expliquez lui donc la situation. La réception entre Maximilio et vous passe mal mais vous comprenez qu'il vous demande de tout faire pour que Malléfisk réveille ses coffres» (Dofus pour les noobs, «Malladie»). «Explicar la situación» (21165, 17654), «Decirle que no y pedirle consejo» (21164, 17655), «¿Estás en un túnel?» (21163) is 8497."
+    },
+    {
+      "npc": 2353,
+      "map": 130287616,
+      "opening": 17884,
+      "lines": [
+        {
+          "message": 17884,
+          "choices": [
+            { "reply": 21430 }
+          ]
+        }
+      ],
+      "why": "Inès Karcel in the Fábrica de Malefíscof's exit room (130287616), her second opening in the client (dialog 5847): «Gracias por habernos ayudado con tanto fervor, he apuntado lo que no les funcionaba bien a los cofrefuertes...» (17884), and «Salir.» (21430) leaves the dungeon (content/world/dungeon_exits.json): «Parlez de nouveau à Inès Karcel pour sortir», whose picture shows her in «Fabrique de Malléfisk - Sortie» with «Sortir.» (Dofus pour les noobs, «Fabrique de Malléfisk»)."
     }
   ]
 }
