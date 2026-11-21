@@ -1505,6 +1505,36 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>Characteristic 101, «% resistencia» on every element (effects 1076 and 1077).</summary>
         private const int EveryElementResistance = 101;
 
+        /// <summary>
+        /// The target's flat reduction to an element, 54 to 58 (Earth, Fire, Water, Air and
+        /// NeutralElementReduction in the client's StatId), with the rows on him: taken off the blow
+        /// before its percentage resistance (ham.bndh, gvq.bmci).
+        /// </summary>
+        internal static int ReduccionFijaDeLaVictima(Fighter target, Jondo.Unity.World.Fights.ElementType element, int round)
+        {
+            int cual = element switch
+            {
+                Jondo.Unity.World.Fights.ElementType.Earth => 54,
+                Jondo.Unity.World.Fights.ElementType.Fire => 55,
+                Jondo.Unity.World.Fights.ElementType.Water => 56,
+                Jondo.Unity.World.Fights.ElementType.Air => 57,
+                _ => 58,
+            };
+            return ConBonos(target, cual, target.Otra(cual), round);
+        }
+
+        /// <summary>98, DamagePercentSpell: a % added to the characteristics for a spell's blow (hal.bncy).</summary>
+        private const int DanoPorCientoHechizos = 98;
+
+        /// <summary>103, WeaponPower: the same for a weapon's blow (hal.bncy).</summary>
+        private const int PotenciaDeArmas = 103;
+
+        /// <summary>31, WeaponDamagePercent: a multiplier on the blow and its flat bonuses (hal.bnde).</summary>
+        private const int DanoPorCientoArmas = 31;
+
+        /// <summary>87, CriticalDamageReduction: the target's, taken off a critical blow (ham.bndh).</summary>
+        private const int ReduccionCritica = 87;
+
         /// <summary>The characteristic that feeds each element in the damage formula.</summary>
         private static int CaracteristicaDelElemento(Jondo.Unity.World.Fights.ElementType elemento)
             => elemento switch
@@ -1762,8 +1792,13 @@ namespace Jondo.Unity.Server.Handlers
             Poner(101, 0);                        // % damage resistance
             Poner(102, 0);
             Poner(95, 0); Poner(96, 0); Poner(97, 0);
-            // Percentage resistances, one per element.
+            // The flat reductions, one per element (Earth to NeutralElementReduction in the client's
+            // StatId): what a blow of that element loses before the percentage.
             foreach (int cual in new[] { 54, 55, 56, 57, 58 }) Poner(cual, 0);
+            // What a blow's damage reads besides (DamageCalculator): the % bonus of spells (98) and
+            // of weapons (103), the weapon damage percent (31) and the critical reduction (87).
+            foreach (int cual in new[] { DanoPorCientoHechizos, PotenciaDeArmas, DanoPorCientoArmas, ReduccionCritica })
+                Poner(cual, 0);
             // Push: 84 is the DAMAGE done by pushing and 85 the RESISTANCE to being pushed. They
             // were swapped: push damage was sent in the resistance slot, and that is why the sheet
             // showed 130 in the resistance column.
@@ -10213,6 +10248,21 @@ namespace Jondo.Unity.Server.Handlers
                                                 fuente.GetStatForElement(element), fight.RoundNumber);
             int potencia = ConBonos(fuente, PotenciaCaracteristica, fuente.Power, fight.RoundNumber);
 
+            // The client's own preview reads the rest of the blow in this order, rounding down at
+            // every step (DamageCalculator; ham.bndh and ham.irz in 3.6.10.11): the % bonus of a
+            // spell's blow (98) or a weapon's (103) with the characteristics, the weapon damage
+            // percent (31), then the target's element reduction (54 to 58) and, on a critical, its
+            // critical reduction (87) taken off before its percentage resistance. The reduction
+            // was sent in the sheet and never taken off here, so the client's estimate came out
+            // lower than the blow.
+            bool porHechizo = spell != 0;
+            int bonusPorCiento = porHechizo
+                ? ConBonos(fuente, DanoPorCientoHechizos, fuente.Otra(DanoPorCientoHechizos), fight.RoundNumber)
+                : ConBonos(fuente, PotenciaDeArmas, fuente.Otra(PotenciaDeArmas), fight.RoundNumber);
+            int armasPorCiento = ConBonos(fuente, DanoPorCientoArmas, fuente.Otra(DanoPorCientoArmas), fight.RoundNumber);
+            int reduccionFija = ReduccionFijaDeLaVictima(target, element, fight.RoundNumber)
+                                + (critical ? ConBonos(target, ReduccionCritica, target.Otra(ReduccionCritica), fight.RoundNumber) : 0);
+
             int damage = Jondo.Unity.World.Fights.DamageCalculator.CalculateDamage(
                 baseDamage: baseDamage,
                 element: element,
@@ -10221,53 +10271,42 @@ namespace Jondo.Unity.Server.Handlers
                 flatElementDamage: deSuVida ? 0 : fuente.GetFlatDamageForElement(element),
                 flatDamage: deSuVida ? 0 : flat,
                 targetResPct: ResistenciaDeLaVictima(target, element, fight.RoundNumber),
-                targetFlatRes: 0);
+                targetFlatRes: reduccionFija,
+                percentBonus: deSuVida ? 0 : bonusPorCiento,
+                weaponDamagePercent: deSuVida ? 0 : armasPorCiento);
 
+            // THE MULTIPLIERS, one after the other and each rounded down, in ham.irz's order: the
+            // striker's for a spell's or a weapon's blow (123/122), for one at melee or at range
+            // (125/120), his final damage (107) and all his damage (150); then the target's taken
+            // for a spell's or a weapon's blow (141/142) and at melee or range (124/121). The
+            // striker's and the target's percentages were sent and never read here before, so
+            // "100 % daños a los hechizos" on a cape changed nothing; then they went in two
+            // products rounded to the nearest, where the client floors each one.
+            bool atMelee = lejos <= 1;
+            var dealt = Managers.DamagePercentages.Dealt(porHechizo, atMelee);
+            var taken = Managers.DamagePercentages.Taken(porHechizo, atMelee);
+            int Multiplica(int dano, int porciento, string que)
+            {
+                if (porciento == 100 || dano <= 0) return dano;
+                int multiplicado = Math.Max(0, Jondo.Unity.World.Fights.DamageCalculator.TimesPercent(dano, porciento));
+                Program.LogDebug($"[Fight] {que} at {porciento}%: {dano} becomes {multiplicado}.");
+                return multiplicado;
+            }
+            if (!fulmina)
+            {
+                damage = Multiplica(damage, PercentageOf(fuente, dealt.Kind, fight.RoundNumber), $"{caster.Id} deals a {(porHechizo ? "spell" : "weapon")} blow");
+                damage = Multiplica(damage, PercentageOf(fuente, dealt.Reach, fight.RoundNumber), $"{caster.Id} deals at {(atMelee ? "melee" : "range")}");
+            }
             // The bestial form puts +20 on characteristic 107, whose base is 100.
-            // It is a final multiplier: it applies after characteristics/resistances and
-            // before the target's damage-taken multipliers.
-            int finalInfligido = 100 + fuente.Buffs.De(DanoFinalInfligidoCaracteristica,
-                                                       fight.RoundNumber);
-            if (finalInfligido != 100)
+            damage = Multiplica(damage, 100 + fuente.Buffs.De(DanoFinalInfligidoCaracteristica, fight.RoundNumber),
+                                $"{caster.Id} hits with final damage");
+            // And 150, AllDamageMultiplier in the client's StatId, the striker's on every blow.
+            damage = Multiplica(damage, PercentageOf(fuente, Managers.EffectEngine.TodosLosDanos, fight.RoundNumber),
+                                $"{caster.Id} deals all damage");
+            if (!fulmina)
             {
-                int antes = damage;
-                damage = Math.Max(0, (int)Math.Round(damage * finalInfligido / 100.0));
-                Program.LogDebug($"[Fight] {caster.Id} hits with final damage at " +
-                                 $"{finalInfligido}%: {antes} is left at {damage}.");
-            }
-
-            // And 150, AllDamageMultiplier in the client's StatId, the striker's on every blow: the
-            // client's preview multiplies a damage effect by it right after 107 (ham.irz in
-            // 3.6.10.11). It was sent at a hundred and never read here.
-            int todosLosDanos = PercentageOf(fuente, Managers.EffectEngine.TodosLosDanos, fight.RoundNumber);
-            if (todosLosDanos != 100 && damage > 0)
-            {
-                int antes = damage;
-                damage = Math.Max(0, (int)Math.Round(damage * todosLosDanos / 100.0));
-                Program.LogDebug($"[Fight] {caster.Id} deals all damage at {todosLosDanos}%: " +
-                                 $"{antes} is left at {damage}.");
-            }
-
-            // The damage percentages: the striker's for a spell's or a weapon's blow and for one
-            // at melee or at range, then the target's the same two ways (DamagePercentages). They
-            // were sent to the client and never read here, so "100 % daños a los hechizos" on a
-            // cape changed nothing. Two multipliers more, each on top of the others: INFERRED, as
-            // no capture holds the same blow with and without them.
-            if (damage > 0 && !fulmina)
-            {
-                bool bySpell = spell != 0, atMelee = lejos <= 1;
-                var dealt = Managers.DamagePercentages.Dealt(bySpell, atMelee);
-                var taken = Managers.DamagePercentages.Taken(bySpell, atMelee);
-                long outgoing = (long)PercentageOf(fuente, dealt.Kind, fight.RoundNumber) * PercentageOf(fuente, dealt.Reach, fight.RoundNumber);
-                long incoming = (long)PercentageOf(target, taken.Kind, fight.RoundNumber) * PercentageOf(target, taken.Reach, fight.RoundNumber);
-                if (outgoing != 100 * 100 || incoming != 100 * 100)
-                {
-                    int before = damage;
-                    damage = (int)Math.Max(0, Math.Round(damage * (outgoing / 10000.0) * (incoming / 10000.0)));
-                    Program.LogDebug($"[Fight] {(bySpell ? "Spell" : "Weapon")} blow at {(atMelee ? "melee" : "range")}: " +
-                                     $"{caster.Id} deals {outgoing / 100.0:0.##}% and {target.Id} takes {incoming / 100.0:0.##}%: " +
-                                     $"{before} becomes {damage}.");
-                }
+                damage = Multiplica(damage, PercentageOf(target, taken.Kind, fight.RoundNumber), $"{target.Id} takes a {(porHechizo ? "spell" : "weapon")} blow");
+                damage = Multiplica(damage, PercentageOf(target, taken.Reach, fight.RoundNumber), $"{target.Id} takes at {(atMelee ? "melee" : "range")}");
             }
 
             // Through portals, the blow grows with the network it crossed: "+#3% daños, +#1% de
@@ -10335,11 +10374,12 @@ namespace Jondo.Unity.Server.Handlers
             // The MULTIPLIERS of whoever receives it: "damage taken x110%" is effect 1163, the one
             // Represalias sets. They go at the end, on the damage already worked out. Salto's is a
             // row under "D", read by any blow of the round.
+            // Rounded down, as the client's preview does it (ham.bndv, then ra.fay).
             int multiplica = target.Buffs.Multiplicador(DanoSufridoPorCiento, fight.RoundNumber, clases);
             if (multiplica != 100)
             {
                 int antes = damage;
-                damage = (int)Math.Round(damage * multiplica / 100.0);
+                damage = Math.Max(0, Jondo.Unity.World.Fights.DamageCalculator.TimesPercent(damage, multiplica));
                 Program.LogDebug($"[Fight] {target.Id} takes damage at {multiplica}%: " +
                                  $"{antes} becomes {damage}.");
             }
