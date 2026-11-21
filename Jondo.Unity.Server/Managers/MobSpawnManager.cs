@@ -623,17 +623,8 @@ namespace Jondo.Unity.Server.Managers
                     Leaders = them.Count,
                 };
             }
-            var bosses = new HashSet<int>(dungeon.Bosses);
             bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
-
-            // Nor the monster a quest wants beaten in ANOTHER of its rooms: that room's own, like a
-            // boss -- Dramak is the fourth auditorium's mini-boss and was leading the first's group.
-            var elsewhere = dungeon.Quarry.Where(pair => pair.Key != room).SelectMany(pair => pair.Value).ToHashSet();
-            // A hand-written dungeon may say who a room is made of: the subarea of Lord Crow's
-            // throne lists Capsálocke's companions and the Master's together.
-            var roster = (dungeon.WrittenRoster.TryGetValue(room, out var written) ? written : RosterOf(room))
-                .Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
-            if (roster.Count == 0) roster = fallback.Where(m => !bosses.Contains(m) && !elsewhere.Contains(m)).ToList();
+            var roster = RoomRoster(dungeon, room, RosterOf(room), fallback, DungeonManager.IsBoss);
 
             // A boss fought alone (DungeonManager.BossFightsAlone): his room is him and nobody else.
             var members = bossRoom && dungeon.BossAlone
@@ -652,6 +643,31 @@ namespace Jondo.Unity.Server.Managers
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
                 // A dungeon room's group waits where the room puts it: it does not roam.
             };
+        }
+
+        /// <summary>
+        /// Who a dungeon room's group is drawn from: what a person wrote for the room, or else its
+        /// subarea's monsters, or else the base's own group; never the dungeon's bosses, whose room is
+        /// the last, nor the monster a quest wants beaten in another of its rooms -- Dramak is the
+        /// fourth auditorium's mini-boss and was leading the first's group.
+        /// </summary>
+        /// <remarks>
+        /// Nor, unless a person wrote it, another dungeon's boss: the Count's subarea lists Klime,
+        /// Missiz Frizz, Nileza and Sylargh with his own clockwork monsters, and they were standing in
+        /// every one of his fifteen rooms.
+        /// </remarks>
+        internal static List<int> RoomRoster(DungeonManager.Dungeon dungeon, long room, IReadOnlyList<int> subarea,
+                                             IReadOnlyList<int> fallback, Func<int, bool> isAnyBoss)
+        {
+            var bosses = new HashSet<int>(dungeon.Bosses);
+            var elsewhere = dungeon.Quarry.Where(pair => pair.Key != room).SelectMany(pair => pair.Value).ToHashSet();
+            bool Belongs(int m) => !bosses.Contains(m) && !elsewhere.Contains(m);
+
+            if (dungeon.WrittenRoster.TryGetValue(room, out var written))
+                return written.Where(Belongs).ToList();
+            var roster = subarea.Where(m => Belongs(m) && !isAnyBoss(m)).ToList();
+            if (roster.Count == 0) roster = fallback.Where(m => Belongs(m) && !isAnyBoss(m)).ToList();
+            return roster;
         }
 
         /// <summary>
