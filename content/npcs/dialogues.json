@@ -9005,6 +9005,7 @@
         {
           "message": 20946,
           "choices": [
+            { "reply": 34469, "next": 28742, "quest": 1906, "afterObjective": 13026, "beforeObjective": 13027 },
             { "reply": 25151, "next": 20947 },
             { "reply": 25156, "next": 20952 },
             { "reply": 25152 }
@@ -9052,9 +9053,33 @@
           "choices": [
             { "reply": 25154 }
           ]
+        },
+        {
+          "message": 28742,
+          "choices": [
+            { "reply": 34468, "next": 28743 }
+          ]
+        },
+        {
+          "message": 28743,
+          "choices": [
+            { "reply": 34467, "next": 28744 }
+          ]
+        },
+        {
+          "message": 28744,
+          "choices": [
+            { "reply": 34466, "next": 28745 }
+          ]
+        },
+        {
+          "message": 28745,
+          "choices": [
+            { "reply": 34465, "quest": 1906, "beforeObjective": 13027, "completes": 13027, "params": [[30, 13027]] }
+          ]
         }
       ],
-      "why": "Oscar Kasa (Oskar Khas), the thief's ghost of the phoenix rock, from his own lines and replies. «Espoirs et tragédies» per Dofus pour les noobs: asked what happened to him, he tells of the Emerald dofus he died for, smells something burning, and the evil fire that haunts him comes back; «Quedarte y luchar contra el fuego maléfico» starts the fight (npc_fights.json). The rest is his talk on death and the phoenix."
+      "why": "Oscar Kasa (Oskar Khas), the thief's ghost of the phoenix rock, from his own lines and replies. «Espoirs et tragédies» per Dofus pour les noobs: asked what happened to him, he tells of the Emerald dofus he died for, smells something burning, and the evil fire that haunts him comes back; «Quedarte y luchar contra el fuego maléfico» starts the fight (npc_fights.json). The rest is his talk on death and the phoenix. «Examen de paso» (1906): told you mean to cross Erazal's wound into Externam (34469), he says a living soul cannot, tells the boatmen's tale of the death masks and sends you to someone who could make one (28742-28745); «Le remercier et suivre son conseil» (34465) is 13027. Dofus pour les noobs: «Dire que vous avez l'intention de franchir la Blessure d'Erazal pour entrer en Externam»."
     },
     {
       "npc": 2911,
@@ -52601,6 +52626,297 @@
         }
       ],
       "why": "Dardondakal (4053) in the Ivory Room: «El murmullo de tu voz ha llegado hasta mis oídos, mortal. Habla, te escucho» (28723). «El dragón blanco» (1905), objective 13025: «Parlez à Dardondakal « S'incliner respectueusement devant le dragon » puis « Répondre que la quête des Dofus est la destinée des héros » afin de terminer la quête» (Dofus pour les noobs): «Inclinarte con respeto ante el dragón» (34445) -> «¿Por qué buscas...?» (28724) -> «La búsqueda de los dofus es el destino de los héroes» (34443; INFERRED: «Quiero preservar la armonía...» 34442 and «Busco la gloria y el poder» 34444 end it the same) does 13025 -> «Si cumples con la tarea...» (28725). «La quête se termine mais en poursuivant votre discussion avec Dardondakal, vous obtiendrez la prochaine quête : Examen de passage»: «Estoy en condiciones de cumplir la tarea que deseas encomendarme» (34455) -> tired of death, Thanatena (28726) -> «¿Quién es Thanatena?» (34454) -> the queen of Externam (28727) -> «Yo podría interceder a tu favor ante Thanatena» (34453) -> (28728) -> «Seguir escuchando» (34452) -> «El rey Galdarion de Bonta conoce ese camino» (28729, the step line of «Examen de paso», 1906) -> «Partir inmediatamente hacia Bonta» (34451) starts 1906. Whoever left before: «Cuéntame más» (34450) -> the client's second copy of that chain (28730-28733, 34449-34446) starts it too."
-    }
+    },
+    {
+      "npc": 2933,
+      "map": 219152384,
+      "opening": 21452,
+      "openings": [
+        { "quest": 1906, "objective": 13026, "message": 28741 }
+      ],
+      "lines": [
+        {
+          "message": 21452,
+          "choices": [
+            { "reply": 34462, "next": 28734, "quest": 1906, "beforeObjective": 13026 }
+          ]
+        },
+        {
+          "message": 28734,
+          "choices": [
+            { "reply": 34461, "next": 28735 }
+          ]
+        },
+        {
+          "message": 28735,
+          "choices": [
+            { "reply": 34460, "next": 28736 }
+          ]
+        },
+        {
+          "message": 28736,
+          "choices": [
+            { "reply": 34459, "next": 28737 }
+          ]
+        },
+        {
+          "message": 28737,
+          "choices": [
+            { "reply": 34458, "next": 28738 }
+          ]
+        },
+        {
+          "message": 28738,
+          "choices": [
+            { "reply": 34457, "next": 28739 }
+          ]
+        },
+        {
+          "message": 28739,
+          "choices": [
+            { "reply": 34456, "next": 28740, "quest": 1906, "beforeObjective": 13026, "completes": 13026, "params": [[30, 13026]] }
+          ]
+        },
+        {
+          "message": 28740,
+          "choices": [
+            { "reply": 34463 }
+          ]
+        },
+        {
+          "message": 28741,
+          "choices": [
+            { "reply": 34464 }
+          ]
+        }
+      ],
+      "why": "King Galdarion (Roi Beldarion) in his throne room, for «Examen de paso» (1906), objective 13026. Dofus pour les noobs: «Il faut commencer par aller voir le Roi Beldarion à Bonta en [-36,-60] ... pour qu'il vous indique un passage vers la dimension des morts». Sent by Dardondakal (34462), he feels the white fire on you (28734), names Nas Orazal's wound and its story (28735-28737), says only a soul marked by death crossed it and points to that hero's friend, the sram ghost Oscar Kasa gone to Incarnam (28738, 28739); thanking him (34456) is 13026 and leads to his farewell (28740). Spoken to again, he repeats where to go (28741)."
+    },
+    {
+      "npc": 3956,
+      "map": 180617216,
+      "opening": 27896,
+      "lines": [
+        {
+          "message": 27896,
+          "choices": [
+            { "reply": 34474, "next": 28746, "quest": 1906, "afterObjective": 13027, "beforeObjective": 13028 },
+            { "reply": 34478, "next": 28750, "quest": 1906, "afterObjective": 13031, "beforeObjective": 13032, "holds": 19165 },
+            { "reply": 34482, "next": 28753, "quest": 1906, "afterObjectives": [13033, 13034, 13035, 13036, 13037, 13038, 13039, 13040, 13041, 13042, 13043, 13044], "beforeObjective": 13045, "holds": 19167 }
+          ]
+        },
+        {
+          "message": 28746,
+          "choices": [
+            { "reply": 34473, "next": 28747 }
+          ]
+        },
+        {
+          "message": 28747,
+          "choices": [
+            { "reply": 34472, "next": 28748 }
+          ]
+        },
+        {
+          "message": 28748,
+          "choices": [
+            { "reply": 34471, "next": 28749 }
+          ]
+        },
+        {
+          "message": 28749,
+          "choices": [
+            { "reply": 34470, "quest": 1906, "beforeObjective": 13028, "completes": 13028, "params": [[30, 13028]] }
+          ]
+        },
+        {
+          "message": 28750,
+          "choices": [
+            { "reply": 34477, "next": 28751 }
+          ]
+        },
+        {
+          "message": 28751,
+          "choices": [
+            { "reply": 34476, "next": 28752 }
+          ]
+        },
+        {
+          "message": 28752,
+          "choices": [
+            { "reply": 34475, "quest": 1906, "beforeObjective": 13032, "gives": 19167, "completes": 13032, "params": [[30, 13032]] }
+          ]
+        },
+        {
+          "message": 28753,
+          "choices": [
+            { "reply": 34481, "next": 28754, "quest": 1906, "beforeObjective": 13045, "completes": 13045, "params": [[30, 13045]] }
+          ]
+        },
+        {
+          "message": 28754,
+          "choices": [
+            { "reply": 34480, "next": 28755 }
+          ]
+        },
+        {
+          "message": 28755,
+          "choices": [
+            { "reply": 34479, "quest": 1906, "afterObjective": 13045, "takes": 19167 }
+          ]
+        }
+      ],
+      "why": "Hellébore Niolle, the undertaker of the Sidimote moors [-15,27], for «Examen de paso» (1906). Dofus pour les noobs: «parler à Hellébore Niolle \"Dire que vous êtes à la recherche d'un masque mortuaire\". Elle vous demandera de retrouver un masque de Jack», then «Montrer le masque mortuaire», then «Dire que vous avez rempli l'urne funéraire». Asking for a mask (34474) gets Jack's story and the two cities' towers (28746-28749), 13028 on leaving for them (34470). Shown the mask (34478; 13032 is showing 19165) she finds its magic spent and hands the funeral urn (19167) to fill at twelve tombs (28750-28752). With the urn full (the twelve dusts, 13033-13044) she pours it on the mask (28753-28755); taking the mask back (34479) is 13045, showing the urn, which she keeps. The filled urn is shown (13045, type 2, «Enséñale») as it is handed over, «Entrégame la urna y la máscara» (28753) answered «Hacer lo que te pide» (34481); she empties it over the mask, and it is gone once she gives the mask back (34479)."
+    },
+    {
+      "npc": 4056,
+      "map": 213910026,
+      "opening": 28756,
+      "lines": [
+        {
+          "message": 28756,
+          "choices": [
+            { "reply": 34487, "next": 28757, "quest": 1906, "afterObjective": 13028, "beforeObjective": 13029, "completes": 13029, "params": [[30, 13029]] },
+            { "reply": 34487, "next": 28757, "quest": 1906, "afterObjective": 13029, "beforeObjective": 13031 },
+            { "reply": 34483 }
+          ]
+        },
+        {
+          "message": 28757,
+          "choices": [
+            { "reply": 34486, "next": 28758 }
+          ]
+        },
+        {
+          "message": 28758,
+          "choices": [
+            { "reply": 34485, "next": 28759, "quest": 1906, "beforeObjective": 13030, "criterion": "Pr=6|Pr=11|Pr=17", "completes": 13030, "params": [[30, 13030]] },
+            { "reply": 34485, "next": 28759, "quest": 1906, "afterObjective": 13030, "beforeObjective": 13031, "criterion": "Pr=6|Pr=11|Pr=17" },
+            { "reply": 34483 }
+          ]
+        },
+        {
+          "message": 28759,
+          "choices": [
+            { "reply": 34484 }
+          ]
+        }
+      ],
+      "why": "The concierge of Bonta's tower of the orders, in the masters' room (where the order masters of 1901, 1916 and 1918 stand), for «Examen de paso» (1906). Asked about the death mask (34487, 13029 «Localiza la máscara»), she finds it on her list in the store upstairs (28757), open only to an order's highest rank (28758): «Guardián del Conocimiento, Maestro de los Espejismos o Héroe Legendario», the client's alignment ranks 17, 11 and 6, each at minimumAlignment 100. Saying you have it (34485) is 13030, «Anuncia que has alcanzado el mayor rango», and lets you by (28759): the room behind her (213910536) has the stairs to the store (521486). Dofus pour les noobs: «parlez au ou à la Concierge de la tour \"Dire que vous avez le rang nécessaire\". NOTE : Pour continuer la quête, il faut être d'ordre 5 et donc d'alignement 100»."
+    },
+    {
+      "npc": 4055,
+      "map": 215744780,
+      "opening": 28760,
+      "lines": [
+        {
+          "message": 28760,
+          "choices": [
+            { "reply": 34492, "next": 28761, "quest": 1906, "afterObjective": 13028, "beforeObjective": 13029, "completes": 13029, "params": [[30, 13029]] },
+            { "reply": 34492, "next": 28761, "quest": 1906, "afterObjective": 13029, "beforeObjective": 13031 },
+            { "reply": 34488 }
+          ]
+        },
+        {
+          "message": 28761,
+          "choices": [
+            { "reply": 34491, "next": 28762 }
+          ]
+        },
+        {
+          "message": 28762,
+          "choices": [
+            { "reply": 34490, "next": 28763, "quest": 1906, "beforeObjective": 13030, "criterion": "Pr=23|Pr=28|Pr=33", "completes": 13030, "params": [[30, 13030]] },
+            { "reply": 34490, "next": 28763, "quest": 1906, "afterObjective": 13030, "beforeObjective": 13031, "criterion": "Pr=23|Pr=28|Pr=33" },
+            { "reply": 34488 }
+          ]
+        },
+        {
+          "message": 28763,
+          "choices": [
+            { "reply": 34489 }
+          ]
+        }
+      ],
+      "why": "The concierge of Brâkmar's tower of the orders, in the masters' room (where the order masters of 1902 and 1920 stand), before the chest that leads into the store (523231), for «Examen de paso» (1906): the twin of Bonta's. The ranks are «Guardián de las Torturas, Maestro de las Sombras o Héroe del Apocalipsis» (28762), the client's alignment ranks 23, 28 and 33, each at minimumAlignment 100. Dofus pour les noobs: «Pour les Brâkmariens : Entrez dans le coffre derrière le Concierge de la tour»."
+    },
+    {
+      "npc": 2635,
+      "map": 140777472,
+      "opening": 19070,
+      "lines": [
+        {
+          "message": 19070,
+          "choices": [
+            { "reply": 34502, "next": 28768, "quest": 1906, "afterObjective": 13045, "beforeObjective": 13046 },
+            { "reply": 22729, "teleport": 140641537 },
+            { "reply": 22731 }
+          ]
+        },
+        {
+          "message": 28768,
+          "choices": [
+            { "reply": 34501, "next": 28769 }
+          ]
+        },
+        {
+          "message": 28769,
+          "choices": [
+            { "reply": 34500, "quest": 1906, "beforeObjective": 13046, "gives": 19168, "completes": 13046, "params": [[30, 13046]] },
+            { "reply": 34499, "quest": 1906, "beforeObjective": 13046, "gives": 19168, "teleport": 140641537, "completes": 13046, "params": [[30, 13046]] },
+            { "reply": 34500 },
+            { "reply": 34499, "teleport": 140641537 }
+          ]
+        }
+      ],
+      "why": "The whale's spirit, Kidibom, at the exit of the Belly of the Whale. «Se frayer un chemin à travers les déchets digestifs pour sortir» (22729) leaves for the beach outside [-85,-59], 140641537, where the dungeon's keeper stands; «Rester encore un peu» stays. «Examen de paso» (1906), 13046 «Obtén la bendición de un espíritu psicopompo»: Dofus pour les noobs, «À la fin du donjon parlez à l'Esprit de Kidibom \"Demander à l'esprit de bénir le masque mortuaire\"». He agrees, in his drawling voice, to guide you to Onekros' gates (28768, 28769); feeling the mask's energy (34501) leads there, and either last reply is the blessing (19168, «Bendición de Kidibom»)."
+    },
+    {
+      "npc": 4058,
+      "map": 183501836,
+      "opening": 28770,
+      "lines": [
+        {
+          "message": 28770,
+          "choices": [
+            { "reply": 35037, "quest": 1906, "afterObjective": 13046, "beforeObjective": 13048, "teleport": 184685313 },
+            { "reply": 34507, "door": "key" },
+            { "reply": 34510, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "The Endless Day guard at the gate of Ilyzaelle's Lookout [-73,-76]: give him the key (34507) or use the keyring (34510) to go in, as at every keeper's door. «Examen de paso» (1906): Dofus pour les noobs, «Direction l'entrée du donjon d'Ilyzaelle en [-73,-76!]. Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle» -- the king had promised the guard would let you by (28741). The map in front of her, «Herida de Nas Orazal», is 13047."
+    },
+    {
+      "npc": 4057,
+      "map": 184685313,
+      "opening": 28774,
+      "lines": [
+        {
+          "message": 28774,
+          "choices": [
+            { "reply": 34520, "next": 28775, "quest": 1906, "afterObjective": 13047, "beforeObjective": 13048, "completes": 13048, "params": [[30, 13048]] },
+            { "reply": 34512, "teleport": 183501836 }
+          ]
+        },
+        {
+          "message": 28775,
+          "choices": [
+            { "reply": 34519, "next": 28776 }
+          ]
+        },
+        {
+          "message": 28776,
+          "choices": [
+            { "reply": 34512, "teleport": 183501836 }
+          ]
+        }
+      ],
+      "why": "Ilyzaelle, on her watch before Nas Orazal's wound, the last room of her Lookout. «Examen de paso» (1906), 13048: Dofus pour les noobs, «Vous êtes téléporté devant Ilyzaelle, parlez lui \"En savoir plus sur les créature que vous avez combattues\". La quête se termine». The soul burners (28775) and, asked about the Dofus (34519), the kings' Dofus she took from Leorictus (28776). «Quitter le Belvédère» (34512) leaves for the gate, 183501836."
+    },
+    {"npc": 4102, "map": 205261569, "opening": 28764, "_byHand": true, "lines": [{"message": 28764, "choices": [{"reply": 34493, "passage": 4102002}, {"reply": 55030, "next": 42278}, {"reply": 34494}]}, {"message": 42278, "choices": [{"reply": 55028, "passage": 4102001}, {"reply": 55029}]}], "why": "The Grobe ferryman at the Pandala pier [27,-27]. Grobe, the land of the ancestors (28764): «Así es. Vamos pues a la isla de Grobe.» (34493) sails to the island, «Uy, tengo fobia a los no muertos» (34494) stays. «¿Hay otro destino final?» (55030) tells of the abandoned temple off Grobe's coast (42278) and «Embarcar hacia el templo» (55028) sails there, «Rechazar y quedarte aquí» (55029) stays: Dofus pour les noobs («Examen de passage»): «parlez au Nocher de Grobe en lui disant d'abord « S'enquérir d'une autre destination finale », puis il faudra choisir « Embarquer pour le temple »». The atoll of the possessed (64560) and the soul road's lines are other quests', not offered here."},
+    {"npc": 4102, "map": 206831621, "opening": 28765, "_byHand": true, "lines": [{"message": 28765, "choices": [{"reply": 34495, "passage": 4102003}, {"reply": 55033, "next": 42279}, {"reply": 34496}]}, {"message": 42279, "choices": [{"reply": 55031, "passage": 4102004}, {"reply": 55032}]}], "why": "The Grobe ferryman on the island's pier [34,-40]: «¿Listo para el viaje?» (28765), «Embarcar hacia Tierradala» (34495) back to Pandala, «¿Hay otro destino final?» (55033) to the temple (42279, «Embarcar hacia el templo» 55031, «Rechazar y quedarte aquí» 55032), «Quedarte donde estás» (34496). The soul road's lines (55601, 55608) belong to another quest."},
+    {"npc": 4102, "map": 183240203, "opening": 28765, "_byHand": true, "lines": [{"message": 28765, "choices": [{"reply": 34495, "passage": 4102005}, {"reply": 34496}]}], "why": "The Grobe ferryman on the temple's pier: «¿Listo para el viaje?» (28765), «Embarcar hacia Tierradala» (34495) back to Pandala, «Quedarte donde estás» (34496). The temple's maps have no other way out."},
+    {"npc": 4059, "map": 183241227, "opening": 28766, "_byHand": true, "openings": [{"afterElement": -1906001, "message": 28767}], "lines": [{"message": 28766, "choices": [{"reply": 34497}, {"reply": 34498}]}, {"message": 28767, "choices": []}], "why": "The pandawa warrior's ghost before the temple's door (183241227). «Examen de paso» (1906, 13034): Dofus pour les noobs («Examen de passage»): «Montez les escaliers deux fois ... Puis parlez au Fantôme du guerrier pandawa pour le combattre. Un combat se lance, il s'effectue seul ... Une fois le combat terminé, entrez dans le temple et cliquez sur le tombeau de gauche». He twirls his swords and dares the character across the threshold (28766): «Aceptar el combate» (34497) is the fight (npc_fights.json), «Retroceder» (34498) leaves. Once beaten (the mark -1906001) he only wanders like a lost soul (28767)."}
   ]
 }

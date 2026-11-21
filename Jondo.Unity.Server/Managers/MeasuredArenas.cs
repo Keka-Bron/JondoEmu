@@ -22,6 +22,7 @@ namespace Jondo.Unity.Server.Managers
         public const string AuthoredFile = "fights/arenas.json";
 
         private static Dictionary<long, long>? _arenas;
+        private static int _measured;
         private static readonly object _lock = new();
 
         /// <summary>The measured arena of a roleplay map, or zero when none was measured.</summary>
@@ -44,13 +45,23 @@ namespace Jondo.Unity.Server.Managers
             return found;
         }
 
-        /// <summary>How many pairs are written.</summary>
+        /// <summary>How many pairs a capture measured.</summary>
         public static int Count
         {
             get
             {
                 Load();
-                return _arenas!.Count;
+                return _measured;
+            }
+        }
+
+        /// <summary>How many twins are written (<c>twins</c>): the arenas no capture measured.</summary>
+        public static int Twins
+        {
+            get
+            {
+                Load();
+                return _arenas!.Count - _measured;
             }
         }
 
@@ -77,6 +88,18 @@ namespace Jondo.Unity.Server.Managers
                             long map = entry.GetProperty("map").GetInt64();
                             long arena = entry.GetProperty("arena").GetInt64();
                             if (map > 0 && arena > 0) arenas[map] = arena;
+                        }
+                        _measured = arenas.Count;
+                        // A quest room's own board, drawn with the same scenery, where the rule
+                        // takes another: what a capture measured goes first.
+                        if (doc.RootElement.TryGetProperty("twins", out var twins))
+                        {
+                            foreach (var entry in twins.EnumerateArray())
+                            {
+                                long map = entry.GetProperty("map").GetInt64();
+                                long arena = entry.GetProperty("arena").GetInt64();
+                                if (map > 0 && arena > 0) arenas.TryAdd(map, arena);
+                            }
                         }
                     }
                 }

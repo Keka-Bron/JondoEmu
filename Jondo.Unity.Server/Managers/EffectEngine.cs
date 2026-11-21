@@ -2839,6 +2839,11 @@ namespace Jondo.Unity.Server.Managers
                             CaducaEnRonda = efecto.EffectId == ReceivedHealingPercent && efecto.Duration == 0
                                             && efecto.TriggerDuration > 0
                                 ? round + efecto.Delay + efecto.TriggerDuration
+                                // A behaviour spell's row is the monster's for the whole fight, as
+                                // its armed rows are (CaducidadDeLaFila): the dead wabbits' Solidawidad
+                                // (9143) shares every blow between the two, and kept to the next
+                                // round, the second round's blows were not shared.
+                                : efecto.Duration == 0 && caster.Conducta == (spell, grade) ? -1
                                 : Caduca(efecto, round),
                             EmpiezaEnRonda = Empieza(efecto, round),
                         }, combat.SiguienteEmbrujo);
@@ -3108,6 +3113,33 @@ namespace Jondo.Unity.Server.Managers
                     // présente sur une case où devrait apparaître un Dé, ce dernier n'est pas
                     // invoqué» (Dofus pour les noobs). Left to the handler, each came out on the
                     // nearest free cell, off his face.
+
+                    // A summon over a zone, with how many it raises as its value, comes out on the
+                    // zone's free cells, one on each, up to that number. The client's own sheet of
+                    // Pavés (13016: "181 5910" on T1 with value 3 and on Q1 with value 4, the cells of
+                    // each zone) reads «Invoca varios escudos estáticos en zona ... En un objetivo:
+                    // invoca estos escudos en su contacto»; the Bontarian chafer's Terror del Panteón
+                    // (9237, "181 4962" on Q1, value 4) «invoque des chafers à votre càc» (Dofus pour
+                    // les noobs). Aimed at the cell, one came out, and a cross without its centre
+                    // does not even hold that cell. A value of 63 is the whole zone: the Brâkmarian
+                    // chafer's Pared de Huesos (9231, "181 4962" on T63) «invoque une ligne de 9
+                    // chafers», as wide as his crypt. Over the whole map, as many as its value on the
+                    // free cells nearest the aimed one: the Enutrof ghost's Un Tesoro Bien Custodiado
+                    // (9213, "181 5050" on A, value 4, cast on himself) «invoque 4 Gardiens du
+                    // Trésor». A line from the caster keeps its own way, below.
+                    bool todoElMapa = efecto.Forma is Jondo.Unity.World.Maps.Zone.TodoElMapa or Jondo.Unity.World.Maps.Zone.WholeMap;
+                    if (!fijas && EsInvocacion(efecto.EffectId) && efecto.Value > 0 && aimedCell >= 0
+                        && efecto.Tamano >= 1 && (!todoElMapa || efecto.Value < 63)
+                        && efecto.Forma is not (Jondo.Unity.World.Maps.Zone.Punto or Jondo.Unity.World.Maps.Zone.Linea))
+                    {
+                        var libres = CasillasDelEfecto(efecto, caster.CellId, aimedCell)
+                            .Where(cell => LibreYPisable(combat, cell)).Distinct();
+                        if (todoElMapa)
+                            libres = libres.OrderBy(cell => Jondo.Unity.World.Maps.MapGeometry.Distance(aimedCell, cell)).ThenBy(cell => cell);
+                        var enLaZona = libres.Take(efecto.Value >= 63 ? int.MaxValue : efecto.Value).ToList();
+                        if (enLaZona.Count == 0) continue;
+                        dondeVan = enLaZona;
+                    }
 
                     // A summon whose zone is a line from the aimed cell comes out on that line's
                     // first free cell, past whoever stands on the aimed one, and nowhere when there

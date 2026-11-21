@@ -744,15 +744,24 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public IReadOnlyList<int> Cells { get; init; } = Array.Empty<int>();
 
+        /// <summary>
+        /// Only once the character has this element (or mark) among the used ones: the pandawa
+        /// warrior's ghost of «Examen de paso» stops challenging whoever has beaten him and only
+        /// wanders like a lost soul (its fight leaves the mark).
+        /// </summary>
+        public int AfterElement { get; init; }
+
         /// <summary>The line for a character of this class.</summary>
         public long MessageFor(int breed) => ByBreed.TryGetValue(breed, out long line) ? line : Message;
 
         /// <summary>Whether it holds for a character, his quests read through the callbacks.</summary>
         public bool Holds(Func<int, bool> active, Func<int, bool> finished, Func<int, int, bool> onStep,
                           Func<int, int, bool> objectiveDone, Func<int, bool>? canStart = null,
-                          Func<int, bool>? carries = null, Func<string, bool>? meets = null, int cell = -1)
+                          Func<int, bool>? carries = null, Func<string, bool>? meets = null, int cell = -1,
+                          Func<int, bool>? used = null)
         {
             if (Cells.Count > 0 && !Cells.Contains(cell)) return false;
+            if (AfterElement != 0 && (used == null || !used(AfterElement))) return false;
             if (Criterion.Length > 0 && (meets == null || !meets(Criterion))) return false;
             if (CanStart != 0 && (canStart == null || !canStart(CanStart))) return false;
             if (HoldsItem != 0 && (carries == null || !carries(HoldsItem))) return false;
@@ -810,11 +819,12 @@ namespace Jondo.Unity.World.Content
         public DialogueLine? OpeningFor(int breed, Func<int, bool> active, Func<int, bool> finished,
                                         Func<int, int, bool> onStep, Func<int, int, bool> objectiveDone,
                                         Func<int, bool>? canStart = null, Func<int, bool>? carries = null,
-                                        Func<string, bool>? meets = null, int cell = -1)
+                                        Func<string, bool>? meets = null, int cell = -1,
+                                        Func<int, bool>? used = null)
         {
             foreach (var opening in Openings)
             {
-                if (!opening.Holds(active, finished, onStep, objectiveDone, canStart, carries, meets, cell)) continue;
+                if (!opening.Holds(active, finished, onStep, objectiveDone, canStart, carries, meets, cell, used)) continue;
                 long message = opening.MessageFor(breed);
                 if (message == 0) continue;
                 return Line(message) ?? new DialogueLine { Message = message };
@@ -1035,6 +1045,7 @@ namespace Jondo.Unity.World.Content
                 Criterion = entry.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
                             ? criterion.GetString() ?? "" : "",
                 Cells = Numbers(entry, "cells").Select(o => (int)o).ToArray(),
+                AfterElement = (int)Number(entry, "afterElement"),
             };
         }
 
@@ -1083,6 +1094,7 @@ namespace Jondo.Unity.World.Content
             if (opening.HoldsItem != 0) writer.WriteNumber("holds", opening.HoldsItem);
             if (opening.Criterion.Length > 0) writer.WriteString("criterion", opening.Criterion);
             WriteIds(writer, "cells", opening.Cells);
+            if (opening.AfterElement != 0) writer.WriteNumber("afterElement", opening.AfterElement);
             if (opening.ByBreed.Count > 0)
             {
                 writer.WriteStartObject("byBreed");

@@ -992,6 +992,7 @@ namespace Jondo.Unity.Server.Network
             var me = fight.Buscar(session.State.CharacterId);
             if (me == null) return Mal(404, "fighter");
             bool stopAtAllies = Numero(cuerpo, "allies") != 0;
+            long stopAtSummon = Numero(cuerpo, "summon");
 
             var casts = new List<object>();
             var gate = new object();
@@ -1071,6 +1072,15 @@ namespace Jondo.Unity.Server.Network
                         WaitTillItBegins(fight, ally);
                         break;
                     }
+                    // Or at the turn of the summon named ("summon"), to play it by hand: the
+                    // offering of the miaumiau ghost's tomb, walked up to the ghost.
+                    if (stopAtSummon != 0 && leftIt && fight.CurrentFighter is { EsInvocado: true, IsAlive: true } summon
+                        && summon.Id == stopAtSummon && summon.ControlledBy(me.Id))
+                    {
+                        back = true;
+                        WaitTillItBegins(fight, summon);
+                        break;
+                    }
                     // A turn this slot plays and nobody else would -- its summons', a team test's
                     // JondoBots' -- is handed on at once, as their player would, not left to its clock.
                     var current = fight.CurrentFighter;
@@ -1078,7 +1088,11 @@ namespace Jondo.Unity.Server.Network
                         && DriverOf(session, current) is { } driver)
                     {
                         WaitTillItBegins(fight, current);
-                        lines.AddRange(RunAsClient(driver, "jxy", Pb.New().Build()));
+                        // Still its turn: one that died as it began (an offering of the miaumiau
+                        // ghost's tomb, on its timer) has handed it on already, and the pass
+                        // would end the next one's.
+                        if (fight.CurrentFighter == current && current.IsAlive)
+                            lines.AddRange(RunAsClient(driver, "jxy", Pb.New().Build()));
                     }
                 }
             }

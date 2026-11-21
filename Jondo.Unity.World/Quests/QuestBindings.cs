@@ -353,6 +353,15 @@ namespace Jondo.Unity.World.Quests
         public int AfterElement { get; init; }
 
         /// <summary>
+        /// For a «beat» row whose element brings its monsters out: the mark its win notes among the
+        /// character's used elements instead of ticking it («marks»), negative so it never meets an
+        /// element of a map. Pressing the element again with the mark picks the objective up: the
+        /// tombs of «Examen de paso» give their soul dust once their ghost is beaten, «Une fois le
+        /// combat terminé, recliquez de nouveau sur le tombeau» (Dofus pour les noobs).
+        /// </summary>
+        public int Marks { get; init; }
+
+        /// <summary>
         /// The one action of the element that counts, by its name in SkillNamesDataRoot, or zero
         /// for any: the class temples' statues are a way to Astrub and to the gods' territory too,
         /// and only «Rezar» (104) is the prayer of «Protección divina».
@@ -662,6 +671,7 @@ namespace Jondo.Unity.World.Quests
                 Elements = elements,
                 Props = props,
                 AfterElement = Int(row, "afterElement"),
+                Marks = Int(row, "marks"),
                 SkillName = Int(row, "skillName"),
                 ElementItems = elementItems,
                 ElementSays = elementSays,

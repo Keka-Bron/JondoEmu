@@ -150,6 +150,16 @@ namespace Jondo.Unity.Server.Handlers
                     if (binding.Times > 1 && !Quests.CountTowards(run, objective.Id, binding.Times))
                         continue;
 
+                    // A win that only earns it: the mark goes down, and pressing the element
+                    // again picks it up (Quests, «marks»).
+                    if (binding.Marks != 0)
+                    {
+                        if (SessionContext.State.ElementsUsed.Add(binding.Marks))
+                            DatabaseManager.RememberElement(SessionContext.State.CharacterId, binding.Marks);
+                        System.Console.WriteLine($"[Quests] Objective {objective.Id}: won, mark {binding.Marks} noted; its element picks it up.");
+                        continue;
+                    }
+
                     await Quests.TickAsync(session, run.QuestId, objective.Id);
                 }
             }

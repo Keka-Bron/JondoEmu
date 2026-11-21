@@ -109,6 +109,13 @@
       "cell": 231,
       "orientation": 3,
       "measured": "inferred: walking down the Elm Clearing's stairs (its bottom border, cells 536-550) lands at the foot of the tumulus stairs, not mirrored onto the top edge of [-5,17]"
+    },
+    {
+      "map": 183241227,
+      "from": 183239179,
+      "cell": 472,
+      "orientation": 5,
+      "measured": "inferred: up the pandawa temple's second stairs (the lower map's left border, cells 28-112) to their head on the terrace, beside the way down (520014, cell 444), not mirrored onto the terrace's top-right corner (cell 219); Dofus pour les noobs («Examen de passage»): «Montez les escaliers deux fois (attention la seconde fois il faut aller sur la gauche ...)»"
     }
   ]
 }

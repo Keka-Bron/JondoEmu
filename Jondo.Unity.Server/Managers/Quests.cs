@@ -558,6 +558,16 @@ namespace Jondo.Unity.Server.Managers
                 // does the objective (the old stump of «Restauración rápida» and its two milimulous).
                 if (binding.Kind == QuestBindingKind.Beat && binding.SpawnsMonster != 0)
                 {
+                    // Won already, and its element pressed again: what the fight earned is picked
+                    // up («marks»), the soul dust of a tomb of «Examen de paso».
+                    // Ticked here and not closed: closing a row with monsters brings them out again.
+                    if (binding.Marks != 0 && SessionContext.State.ElementsUsed.Contains(binding.Marks))
+                    {
+                        if (!InHand(binding)) continue;
+                        await TickAsync(session, binding.QuestId, binding.ObjectiveId);
+                        moved = true;
+                        break;
+                    }
                     if (await BringOutAsync(session, binding)) { moved = true; break; }
                     continue;
                 }
@@ -1986,7 +1996,8 @@ namespace Jondo.Unity.Server.Managers
                 quest => log.CanStart(quest, out _),
                 item => Equipment.HowMany(item) > 0,
                 criterion => PlayerCriteria.Met(criterion, SessionContext.State.MapId),
-                SessionContext.State.CellId);
+                SessionContext.State.CellId,
+                element => SessionContext.State.ElementsUsed.Contains(element));
             var found = new HashSet<int>();
             var seen = new HashSet<long>();
             var queue = new Queue<Jondo.Unity.World.Content.DialogueLine>();
@@ -2497,6 +2508,18 @@ namespace Jondo.Unity.Server.Managers
         {
             var run = Log?.Run(questId);
             if (run != null) Save(questId, run);
+        }
+
+        /// <summary>
+        /// The test API's «untick»: an objective of the step in hand marked undone again, to play
+        /// it once more after changing how it is done. False when it was not done.
+        /// </summary>
+        internal static bool UntickForTest(int questId, int objectiveId)
+        {
+            var run = Log?.Run(questId);
+            if (run == null || run.Finished || !run.Done.Remove(objectiveId)) return false;
+            Save(questId, run);
+            return true;
         }
 
         private static void Save(int questId, QuestRun run)

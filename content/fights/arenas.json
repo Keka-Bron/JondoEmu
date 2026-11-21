@@ -10,7 +10,12 @@
     "rule, and is read off a capture: the jru that follows the fight's start names the arena,",
     "and the jru that follows its end names the map you are put back on.",
     "",
-    "  { \"map\": 99090957, \"arena\": 99222029, \"measured\": \"...\" }"
+    "  { \"map\": 99090957, \"arena\": 99222029, \"measured\": \"...\" }",
+    "",
+    "«twins»: a quest room with no capture, whose own board is plain to see -- a map at (0,0)",
+    "with the arena flag, next to it in ids and drawn with the same scenery (tools/dibujar_mapa.py)",
+    "-- where the rule takes another: a twin of another subarea, or one with a name. A measured",
+    "arena goes first."
   ],
   "arenas": [
     { "map": 99090957,  "arena": 99222029,  "measured": "4 starts and 5 returns across Clases/Hipermago, Clases/Zurkarak and four Combate captures" },
@@ -20,5 +25,9 @@
     { "map": 241438721, "arena": 241438725, "measured": "the guided tutorial's celestial puch: the capture of the whole tutorial, hqa on 241438721, jru 241438725, and jru 241438721 after the win" },
     { "map": 241439745, "arena": 241439749, "measured": "the guided tutorial's celestial gobball and gobbly: the same capture, jru 241439749 and back to 241439745" },
     { "map": 241441793, "arena": 241441797, "measured": "the guided tutorial's chafers with Master Darmas: the same capture, jru 241441797 and back to 241441793" }
+  ],
+  "twins": [
+    { "map": 183241218, "arena": 183243778, "why": "«Examen de paso» (1906): the ailurophile alchemist's cave under the abandoned house [-54,14] (Oscura Jungla), fought on its candles, cushions and milk bowl; the twin is filed under the fight maps' subarea (1036), so the rule took a jungle hut of the subarea (88607750)" },
+    { "map": 183239170, "arena": 183243776, "why": "«Examen de paso» (1906): the Enutrof temple's coffin room down the ladder [-1,-4]; the twin bears the room's name, «Enutrof Temple», which the rule leaves out, and it took an arena of Amakna's village" }
   ]
 }

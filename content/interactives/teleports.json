@@ -914,6 +914,24 @@
       "toMap": 33818112,
       "toCell": 458,
       "why": "Quest 26 step 3: the grille of the cave at [-2,-6] into its first room (33818112, whose sun 472 comes back here), only while the hill's plate gate stands open. Type -1 and skill 184 as the measured passages. INFERRED landing cell."
-    }
+    },
+    {
+      "map": 175636480,
+      "element": 511181,
+      "cell": 337,
+      "gfx": 55113,
+      "type": 0,
+      "skill": 114,
+      "toMap": 183240192,
+      "toCell": 219,
+      "criterion": "PO=9935",
+      "why": "The broken chest of the cursed pyramid [11,-77] down to the sarcophagus room of «Examen de paso» (1906, 13035): Dofus pour les noobs, «Il faut aller en [11,-77] dans la pyramide. Il vous faudra une corde d'escalade ... Cliquez alors sur le coffre cassé. Puis cliquez sur le sarcophage». The measured passage (2.73 graph), only with the climbing rope (9935), which is not spent."
+    },
+    {"map": 205261569, "element": 4102001, "npc": 4102, "cell": 164, "gfx": 4102001, "type": -1, "skill": 339, "toMap": 183240203, "toCell": 286, "why": "The Grobe ferryman (4102) at the Pandala pier [27,-27] to the abandoned temple off Grobe's coast, «Embarcar hacia el templo» (55028) after «¿Hay otro destino final?» (55030, 42278): Dofus pour les noobs («Examen de passage»), «parlez au Nocher de Grobe en lui disant d'abord « S'enquérir d'une autre destination finale », puis il faudra choisir « Embarquer pour le temple »». Lands on the temple's pier (183240203), beside the moored boat. INFERRED landing cell."},
+    {"map": 205261569, "element": 4102002, "npc": 4102, "cell": 164, "gfx": 4102002, "type": -1, "skill": 339, "toMap": 206831621, "toCell": 411, "why": "The Grobe ferryman (4102) at the Pandala pier [27,-27] to the island of Grobe, «Así es. Vamos pues a la isla de Grobe.» (34493): the pier of [34,-40] (206831621), the one with the same ladder (gfx 43382) as Pandala's. INFERRED landing cell."},
+    {"map": 206831621, "element": 4102003, "npc": 4102, "cell": 425, "gfx": 4102003, "type": -1, "skill": 339, "toMap": 205261569, "toCell": 163, "why": "The Grobe ferryman (4102) on Grobe's pier [34,-40] back to Pandala, «Embarcar hacia Tierradala» (34495): the pier of [27,-27] he sails from. INFERRED landing cell."},
+    {"map": 206831621, "element": 4102004, "npc": 4102, "cell": 425, "gfx": 4102004, "type": -1, "skill": 339, "toMap": 183240203, "toCell": 286, "why": "The Grobe ferryman (4102) on Grobe's pier [34,-40] to the abandoned temple, «Embarcar hacia el templo» (55031) after «¿Hay otro destino final?» (55033, 42279). INFERRED landing cell."},
+    {"map": 183240203, "element": 4102005, "npc": 4102, "cell": 298, "gfx": 4102005, "type": -1, "skill": 339, "toMap": 205261569, "toCell": 163, "why": "The Grobe ferryman (4102) on the temple's pier (183240203) back to Pandala, «Embarcar hacia Tierradala» (34495): the temple's four maps have no other way out. INFERRED landing cell."},
+    {"map": 183241227, "element": 520014, "cell": 444, "gfx": 59171, "type": 0, "skill": 114, "toMap": 183239179, "toCell": 86, "why": "The pandawa temple's upper terrace (183241227) back down its stairs to the landing above the pier (183239179): the stairs' head 520014 (gfx 59171, cell 444), the terrace's only way down (its cells carry no border change; the lower map's left border, cells 28-112, is the way up, «la seconde fois il faut aller sur la gauche», Dofus pour les noobs, «Examen de passage»). The 2.73 graph has no route for it. Type 0 and skill 114 as the temple's other stairs (511062, 520017). INFERRED landing cell, at the head of the lower map's stairs."}
   ]
 }

@@ -562,7 +562,13 @@ namespace Jondo.Unity.Server.Managers
             Action? boost = null;
             foreach (var spell in spells)
             {
-                if (!spell.HasRows || spell == blow.Spell || spell.Offensive) continue;
+                if (spell == blow.Spell || spell.Offensive) continue;
+                // A monster's own buff is weighed by its kind, not row by row, but its rows say
+                // what it raises all the same: the Bontarian chafer's Frenesí Mortal (9236, +100
+                // power for three turns) was worth less per AP than his Estocada, and with the
+                // rows asked for, it never went first and was never cast.
+                var rows = spell.HasRows ? spell.Rows : SpellEffects.De(spell.Id, spell.Grade);
+                if (rows.Count == 0) continue;
                 if (spell.Cost < 0 || spell.Cost + blow.Spell.Cost > monster.CurrentAP) continue;
                 if (monster.Recarga.TryGetValue(spell.Id, out int wait) && wait > 0) continue;
                 monster.LanzadosEsteTurno.TryGetValue(spell.Id, out int thisTurn);
@@ -573,7 +579,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     var target = board.Fighters.FirstOrDefault(f => f.IsAlive && f.CellId == aim) ?? monster;
                     if (!CanCast(board, spell, monster, from, aim, target)) continue;
-                    bool raises = spell.Rows.Any(row =>
+                    bool raises = rows.Any(row =>
                     {
                         var (characteristic, sign) = DatabaseManager.EffectMeta(row.EffectId);
                         return sign > 0 && Boosting.Contains(characteristic) && Timing(row) >= 1
@@ -581,7 +587,10 @@ namespace Jondo.Unity.Server.Managers
                                && !AlreadyHas(monster, spell.Id);
                     });
                     if (!raises) continue;
-                    double value = ValueOfRows(board, spell, monster, from, aim, Foes(board, monster));
+                    double value = spell.HasRows
+                        ? ValueOfRows(board, spell, monster, from, aim, Foes(board, monster))
+                        : Value(spell, monster, target, aim, from, Foes(board, monster),
+                                board.Fighters.Where(f => f.IsAlive && f.TeamId == monster.TeamId).ToList(), board);
                     if (value <= 0) continue;
                     double score = value / Math.Max(1, spell.Cost);
                     if (boost == null || score > boost.Score)
@@ -957,7 +966,10 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Buff > 0 && !onEnemy)
                 value += 10 + spell.Buff * 2 + monster.Level / 10.0;
 
-            if (spell.Summons && target == monster && aim != from)
+            // Cast on itself, a summon comes out round it all the same: the Enutrof ghost's Un
+            // Tesoro Bien Custodiado (9213, range 0) calls his four keepers, and aimed at its own
+            // cell it was worth nothing and never cast.
+            if (spell.Summons && target == monster && (aim != from || spell.OnSelf))
             {
                 // On the side the enemy is on, between them, not behind: a barricade behind its
                 // caster shields him from nothing.
@@ -1393,6 +1405,36 @@ namespace Jondo.Unity.Server.Managers
                         }
                     }
                     if (reached.Count == 0) continue;
+
+                    if (id == EffectSupport.Kill)
+                    {
+                        // Killed outright, whatever shields him (EffectEngine.MataAlObjetivo): a blow
+                        // worth the enemy's whole life. The miaumiau ghost of «Examen de paso» strikes
+                        // from afar and kills whoever stands beside it («os au càc»); weighed as
+                        // nothing, it kept to its claw's range and never came to bite. Its own side's
+                        // -- the bomb its explosion takes, the turret replaced -- go by their own rows.
+                        foreach (var who in reached.Where(w => w.TeamId != monster.TeamId))
+                        {
+                            blows.TryGetValue(who, out double had);
+                            blows[who] = had + who.CurrentHP * p;
+                        }
+                        continue;
+                    }
+
+                    if (id == EffectSupport.DisableState)
+                    {
+                        // A state switched off for a while: an enemy's invulnerability is worth what
+                        // it shields (BuffsWorth). The offering of the miaumiau ghost's tomb walks up
+                        // to the ghost and takes it off; weighed as nothing, it stood where it came out.
+                        var state = SpellStates.Of(row.Value);
+                        if (state == null || !(state.Invulnerable || state.InvulnerableMelee || state.InvulnerableRange)) continue;
+                        foreach (var who in reached.Where(w => w.Buffs.TieneEstado(row.Value)))
+                        {
+                            double worth = 0.6 * PerPointPerTurn(who, 25) * 1000 * p;
+                            value += who.TeamId == monster.TeamId ? -worth : worth;
+                        }
+                        continue;
+                    }
 
                     if (damage)
                     {

@@ -11345,13 +11345,14 @@ namespace Jondo.Unity.Server.Handlers
                     ThroughPortals = (limits.Flags & Managers.SpellLevelFlags.PortalProjectionForbidden) == 0
                                      && !Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.DesactivaUnPortal),
                     Interval = limits.Intervalo,
-                    Utility = (!damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics) || namedAllyStep
+                    Utility = !KillsEnemiesOnly(spell, grade)
+                              && ((!damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics) || namedAllyStep)
                         ? 25 + monster.Level / 10.0 : 0,
                     NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,
                     // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
                     // and so is a monster's that only hides its own side (HidesItsSideOnly).
-                    Rows = Managers.PlayerSpells.Contains(spell) || HidesItsSideOnly(spell, grade)
+                    Rows = Managers.PlayerSpells.Contains(spell) || HidesItsSideOnly(spell, grade) || KillsEnemiesOnly(spell, grade)
                         ? Managers.SpellEffects.De(spell, grade)
                         : Array.Empty<Managers.SpellEffect>(),
                 });
@@ -11373,6 +11374,24 @@ namespace Jondo.Unity.Server.Handlers
         /// its side, and the Blops never cast it. Weighed by its rows instead, each one it hides
         /// is worth a share of his life (MonsterTactics.ValueOfRows).
         /// </summary>
+        /// <summary>
+        /// Whether all a spell does is kill the enemies its zone takes: the tormented spirits'
+        /// Explosión Espiritual (9136, 141 on «A» round the spirit) of «Examen de paso», «les
+        /// esprits OS en mêlée». Weighed as a mechanic it was worth the same with nobody beside
+        /// the spirit, and they spent it on the empty cells round them before walking up; row by
+        /// row it is worth the lives it takes, so they walk up first.
+        /// </summary>
+        internal static bool KillsEnemiesOnly(int spell, int grade)
+        {
+            var working = Managers.SpellEffects.De(spell, grade)
+                .Where(e => !Managers.EffectEngine.EsMarcadorDeGuion(e.EffectId) && !e.ForClientOnly)
+                .ToList();
+            return working.Count > 0
+                   && working.All(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
+                                       && HasMask(e.TargetMask ?? "", "A") && !HasMask(e.TargetMask ?? "", "a")
+                                       && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase));
+        }
+
         internal static bool HidesItsSideOnly(int spell, int grade)
         {
             var working = Managers.SpellEffects.De(spell, grade)

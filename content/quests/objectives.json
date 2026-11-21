@@ -6883,6 +6883,152 @@
    "spends": true,
    "onlyGives": true,
    "why": "«Coloca los tótems y sopla en la caracola» (553826): «Placez vos totems sur chaque piliers» (Dofus pour les noobs, «Une âme en colère»). The pillar 490937 (cell 207, gfx 49603) takes the Tótem del Oeste (16897) and closes nothing: the conch (17074) closes 10070 once no totem is carried (its own criterion PO!16894..16897). INFERRED pairing of pillar and totem, by order of gfx and item id."
+  },
+  {
+   "objective": 13031,
+   "quest": 1906,
+   "kind": "click",
+   "elements": [{"map": 14158860, "element": 511264}, {"map": 215876876, "element": 522279}],
+   "afterObjectives": [13030],
+   "gives": [{"item": 19165, "count": 1}],
+   "why": "«Consigue la máscara mortuoria» (732244): Dofus pour les noobs («Examen de passage»): «À Bonta cliquez sur le carton (attention plusieurs éléments sont cliquables donc cliquez sur le bon)», «à Brâkmar cliquez sur la commode avec les tiroirs». Bonta's is element 511264 (gfx 46520, cell 287) by the cardboard box of the tower's store 14158860, the only one of the store's props in the quest's own run of elements (511260-511281); Brâkmar's, INFERRED, the little chest of drawers 522279 (gfx 702146, cell 343) of its store 215876876. Only once the concierge has heard your rank (13030); it gives the mask (19165)."
+  },
+  {
+   "objective": 13033,
+   "quest": 1906,
+   "kind": "beat",
+   "anyOrder": true,
+   "monsters": [4982, 4983],
+   "map": 183242240,
+   "elements": [{"map": 183242240, "element": 511268}],
+   "spawns": {"monster": 4982, "count": 1, "with": [4983], "attacks": true},
+   "afterObjectives": [13032],
+   "marks": -1906033,
+   "why": "«Recoge polvo de alma de wabbit»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [21,-13] ... Entrez par la porte dans la grande statue wabbit. Cliquez sur la petite statue wabbit, un combat se lance, il peut se faire à 2 maximum. Wabbit décédé ... Black Wabbit décédé». The door is 511178 (99747587 -> 183242240), the little statue 511268 (gfx 38062, cell 385); the win collects the dust. The win only earns the dust (marks): «Le combat terminé, cliquez de nouveau sur la petite statue wabbit», which picks it up."
+  },
+  {
+   "objective": 13034,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183239177, "element": 511269}],
+   "afterElement": -1906001,
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de guerrero pandawa»: Dofus pour les noobs («Examen de passage»): «parlez au Nocher de Grobe en lui disant d'abord « S'enquérir d'une autre destination finale », puis il faudra choisir « Embarquer pour le temple ». Montez les escaliers deux fois ... Puis parlez au Fantôme du guerrier pandawa pour le combattre ... Une fois le combat terminé, entrez dans le temple et cliquez sur le tombeau de gauche». The tomb is 511269 (gfx 13217, cell 339) of the temple 183239177; the ghost's win leaves the mark it asks (npc_fights.json, 4059)."
+  },
+  {
+   "objective": 13035,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183240192, "element": 511270}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de maldito»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [11,-77] dans la pyramide. Il vous faudra une corde d'escalade ... Cliquez alors sur le coffre cassé. Puis cliquez sur le sarcophage». The broken chest 511181 takes the rope (teleports.json) down to 183240192, whose sarcophagus is 511270 (gfx 55398, cell 357)."
+  },
+  {
+   "objective": 13036,
+   "quest": 1906,
+   "kind": "beat",
+   "anyOrder": true,
+   "monster": 4979,
+   "map": 183240205,
+   "elements": [{"map": 183240205, "element": 511271}],
+   "spawns": {"monster": 4979, "count": 1, "attacks": true},
+   "afterObjectives": [13032],
+   "marks": -1906036,
+   "why": "«Recoge polvo de alma de brakmariano torturado»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [-10,35]. Entrez dans la crypte, cliquez sur le tombeau et un combat va se lancer. Il s'effectue seul». The crypt door is 511256 (171445760 -> 183240205), the tomb 511271 (gfx 54174, cell 156); the Brâkmarian chafer (4979). The win only earns the dust (marks): «Une fois le combat terminé, recliquez de nouveau sur le tombeau», and the tomb pressed again picks it up."
+  },
+  {
+   "objective": 13037,
+   "quest": 1906,
+   "kind": "beat",
+   "anyOrder": true,
+   "monster": 4980,
+   "map": 183240198,
+   "elements": [{"map": 183240198, "element": 511272}],
+   "spawns": {"monster": 4980, "count": 1, "attacks": true},
+   "afterObjectives": [13032],
+   "marks": -1906037,
+   "why": "«Recoge polvo de alma de bontariano heroico»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [-20,-61]. Entrez dans la crypte, cliquez sur le tombeau et un combat va se lancer. Il s'effectue seul». The crypt door is 511166 (158859777 -> 183240198), the tomb 511272 (gfx 51708, cell 296); the Bontarian chafer (4980). The win only earns the dust (marks): «Une fois le combat terminé, recliquez de nouveau sur le tombeau», and the tomb pressed again picks it up."
+  },
+  {
+   "objective": 13038,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183242242, "element": 511273}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de servidor de Moon»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [29,7]. Cliquez derrière l'arbre à gauche de la map. Puis cliquez sur la motte de terre devant la tombe». The mound is 511273 (gfx 57407, cell 313) of 183242242, whose way back (511038) lands behind the tree of 156499969."
+  },
+  {
+   "objective": 13039,
+   "quest": 1906,
+   "kind": "beat",
+   "anyOrder": true,
+   "monster": 4981,
+   "map": 183239170,
+   "elements": [{"map": 183239170, "element": 511274}],
+   "spawns": {"monster": 4981, "count": 1, "attacks": true},
+   "afterObjectives": [13032],
+   "marks": -1906039,
+   "why": "«Recoge polvo de alma de anutrof»: Dofus pour les noobs («Examen de passage»): «Il faut aller au temple Enutrof en [-1,-4]. Dans la salle après le dopeul descendez l'échelle et cliquez sur le cercueil. Un combat se lance, il peut se faire à plusieurs». The ladder is 511184 (17048582 -> 183239170), the coffin 511274 (gfx 49534, cell 300); the Enutrof ghost (4981), who calls four treasure keepers. The win only earns the dust (marks): «Une fois le combat terminé, cliquez de nouveau sur le cercueil», which picks it up."
+  },
+  {
+   "objective": 13040,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183240194, "element": 511275}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de goblin minero y vulcanólogo»: Dofus pour les noobs («Examen de passage»): «Il faut aller dans la mine en [-23,21]. Puis allez deux fois à gauche. Enfin entrez dans une salle par la faille du mur. Puis cliquez sur le tonneau à droite». The crack is 511186 (178782214, the Volcano Mine [-26,22] -> 183240194), the barrel 511275 (gfx 60889, cell 361)."
+  },
+  {
+   "objective": 13041,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183240196, "element": 511277}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de porco»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [-2,33]. Descendez par les escaliers en haut à droite de la map. Puis cliquez simplement sur l'autel». The stairs are 511188 (72617987 -> 183240196), the altar 511277 (gfx 52515, cell 346)."
+  },
+  {
+   "objective": 13042,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183239174, "element": 511278}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de cazador de güinos»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [-64,-55] ... la map avant le pnj cliquez sur la faille dans la glace. Puis cliquez sur l'ossement au fond de la salle». The crack is 511191 (55837184 -> 183239174), the bones 511278 (gfx 55956, cell 353)."
+  },
+  {
+   "objective": 13043,
+   "quest": 1906,
+   "kind": "beat",
+   "anyOrder": true,
+   "monster": 4978,
+   "map": 183241218,
+   "elements": [{"map": 183241218, "element": 511279}],
+   "spawns": {"monster": 4978, "count": 1, "attacks": true},
+   "afterObjectives": [13032],
+   "marks": -1906043,
+   "why": "«Recoge polvo de alma de alquimista ailurofílico»: Dofus pour les noobs («Examen de passage»): «Il faut aller en [-54,14]. Entrez dans la maison abandonnée et cliquez sur le coussin bleu ciel. Attention un combat se lance directement : il s'effectue seul». The door is 511185 (63964422 -> 183241218), the cushion 511279 (gfx 60091, cell 342); the miaumiau ghost (4978), invulnerable until its own offering strikes it. The win only earns the dust (marks): «Une fois le combat terminé, cliquez de nouveau sur le coussin bleu ciel», which picks it up."
+  },
+  {
+   "objective": 13044,
+   "quest": 1906,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 183241220, "element": 511280}],
+   "afterObjectives": [13032],
+   "why": "«Recoge polvo de alma de sectario de lo indecible»: Dofus pour les noobs («Examen de passage»): «Il faut aller dans les Abysses en [25,28]. Descendez par la grosse crevasse. Puis cliquez sur le tombeau». The crevasse is 511161 (168558596 -> 183241220), the tomb 511280 (gfx 51632, cell 273)."
+  },
+  {
+   "objective": 13047,
+   "quest": 1906,
+   "kind": "enter",
+   "map": 184685313,
+   "afterObjectives": [13046],
+   "why": "«Herida de Nas Orazal» (732320), the map in front of Ilyzaelle, «Ilyzaelle's Lookout - Erzal's Fissure (exit)», 184685313, where the Endless Day guard sends you (35037). Dofus pour les noobs («Examen de passage»): «Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle»."
   }
 ]
 }

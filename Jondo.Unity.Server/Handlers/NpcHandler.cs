@@ -881,7 +881,8 @@ namespace Jondo.Unity.Server.Handlers
                                    quest => diario != null && diario.CanStart(quest, out _),
                                    item => Managers.Equipment.HowMany(item) > 0,
                                    criterion => Managers.PlayerCriteria.Met(criterion, SessionContext.State.MapId),
-                                   SessionContext.State.CellId));
+                                   SessionContext.State.CellId,
+                                   element => SessionContext.State.ElementsUsed.Contains(element)));
         }
 
         /// <summary>The line of an opening or a push, for this character, with his journal asked.</summary>

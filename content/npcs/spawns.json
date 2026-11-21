@@ -6247,6 +6247,44 @@
       "orientation": 1,
       "criterion": "(Qa=1915&Qo>13185)|Qf=1915",
       "why": "Dardondakal incarnate (4054), the dragon 1915 sends you back to (13186) once his soul has taken flesh (13185, «Ver cómo el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna», 35357). The derived row had no criterion, so he stood in the Ivory Room from the start of «El dragón blanco» (1905): a solid dragon before the bramble was clicked, on top of the ghost once it was, and the click meant for the ghost opened his line instead."
+    },
+    {
+      "map": 213910026,
+      "npc": 4056,
+      "cell": 218,
+      "orientation": 1,
+      "why": "The concierge of Bonta's tower, in the order masters' room (213910026, where the masters of 1901, 1916 and 1918 stand), before the way to the room behind her (521522, cell 163) whose stairs go up to the store (521486 -> 14158860). Dofus pour les noobs («Examen de passage»): «Si vous êtes Bontarien ... Entrez dans la tour par l'entrée supérieure, allez directement à droite» and «Allez dans la salle vers le haut (derrière la concierge) puis empruntez les escaliers». INFERRED cell."
+    },
+    {
+      "map": 215744780,
+      "npc": 4055,
+      "cell": 297,
+      "orientation": 1,
+      "why": "The concierge of Brâkmar's tower, in the order masters' room (215744780, where the masters of 1902 and 1920 stand), in front of the chest that leads into the store (523231, cell 268 -> 215876876). Dofus pour les noobs («Examen de passage»): «Pour les Brâkmariens : Entrez dans le coffre derrière le Concierge de la tour». INFERRED cell."
+    },
+    {
+      "map": 205261569,
+      "npc": 4102,
+      "cell": 164,
+      "orientation": 3
+    },
+    {
+      "map": 206831621,
+      "npc": 4102,
+      "cell": 425,
+      "orientation": 3
+    },
+    {
+      "map": 183240203,
+      "npc": 4102,
+      "cell": 298,
+      "orientation": 1
+    },
+    {
+      "map": 183241227,
+      "npc": 4059,
+      "cell": 342,
+      "orientation": 1
     }
-    ]
+  ]
 }

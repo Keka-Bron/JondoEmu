@@ -29,6 +29,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.DimensionDungeons.Forget();
             Managers.ClosedBorders.Forget();
             Managers.MeasuredArrivals.Forget();
+            Managers.MeasuredArenas.Forget();
             Managers.HarvestDrops.Forget();
             Managers.QuestFightDrops.Forget();
             Managers.LootBoxes.Forget();

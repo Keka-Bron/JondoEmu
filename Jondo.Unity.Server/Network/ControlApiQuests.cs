@@ -354,7 +354,8 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// { quest, op }: a quest's scene set -- "start" it as an NPC hands it over, "finish" it
-        /// whole (a quest another one asks for), "forget" it to play it again.
+        /// whole (a quest another one asks for), "forget" it to play it again; "tick" and
+        /// "untick" one objective of the step in hand.
         /// </summary>
         private static Respuesta TestQuest(string cuerpo)
         {
@@ -382,8 +383,17 @@ namespace Jondo.Unity.Server.Network
                     int objective = (int)Numero(cuerpo, "objective");
                     lines = RunInSession(session, _ => Quests.TickAsync(session, quest, objective));
                     break;
+                case "untick":
+                    // And back: one objective done made undone, to play it again after a change.
+                    int undone = (int)Numero(cuerpo, "objective");
+                    lines = RunInSession(session, _ =>
+                    {
+                        System.Console.WriteLine($"[Quests] Test: objective {undone} of {quest} undone: {Quests.UntickForTest(quest, undone)}.");
+                        return System.Threading.Tasks.Task.CompletedTask;
+                    });
+                    break;
                 default:
-                    return Mal(400, "op: start, finish, forget or tick");
+                    return Mal(400, "op: start, finish, forget, tick or untick");
             }
             var run = log.Run(quest);
             return Bien(new { quest, op, run = run == null ? null : RunOf(log, run), lines = lines.Where(l => l.Contains("[Quest")).ToList() });
