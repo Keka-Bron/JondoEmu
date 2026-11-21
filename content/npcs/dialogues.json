@@ -53581,7 +53581,9 @@
             { "reply": 21037, "next": 17567, "criterion": "PL>79", "beforeQuest": 1504 },
             { "reply": 82829, "next": 60273, "quest": 1504, "beforeObjective": 8466, "criterion": "HA!871" },
             { "reply": 21038, "next": 17569, "quest": 1504, "beforeObjective": 8466, "completesAll": [8466, 8467, 8468, 8469], "gives": 15308, "criterion": "PO=34133&PO=34134&PO=34135&PO=34136" },
-            { "reply": 21041, "next": 17570, "quest": 1504, "afterObjective": 8480, "beforeObjective": 8481, "completes": 8481, "params": [[30, 8481]] }
+            { "reply": 21041, "next": 17570, "quest": 1504, "afterObjective": 8480, "beforeObjective": 8481, "completes": 8481, "params": [[30, 8481]] },
+            { "reply": 21068, "next": 17588, "criterion": "Qf=1504", "beforeQuest": 1505 },
+            { "reply": 21083, "next": 17601, "quest": 1505, "afterObjective": 8487, "beforeObjective": 8488, "completes": 8488, "params": [[30, 8488]] }
           ]
         },
         {
@@ -53612,12 +53614,38 @@
         },
         {
           "message": 17570,
+          "choices": []
+        },
+        {
+          "message": 17588,
           "choices": [
-
+            { "reply": 21067, "next": 17589 }
           ]
+        },
+        {
+          "message": 17589,
+          "choices": [
+            { "reply": 21066, "next": 17590 }
+          ]
+        },
+        {
+          "message": 17590,
+          "choices": [
+            { "reply": 21065, "next": 17591 }
+          ]
+        },
+        {
+          "message": 17591,
+          "choices": [
+            { "reply": 21064, "startsQuest": 1505, "params": [[34, 1505]] }
+          ]
+        },
+        {
+          "message": 17601,
+          "choices": []
         }
       ],
-      "why": "Professor Max Ymillán at the Crisol de los Afortunados [-1,-1], for «Cofrología» (1504). Dofus pour les noobs, «Koffrologie»: «Maximilio ... a besoin d'âme de Koffrefors pour les étudier de plus près. Il vous demande donc de lui donner 1 x Moyenne pierre d'âme ... Il vous a également donné une altération du nom de Super capture». Asked about the dimension's dwellers (21037) he wants cofrefuertes caught (17567); «Aceptar» (21036) starts the quest on «¡Perfecto!» (60142), where a medium soul stone (9687) buys the «Supercaptura» (871) the souls drop under (82556), or later from «¿Cómo puedo capturar...?» (82829, 60273, 82558). The four souls handed over (21038) are 8466-8469 and get the whistle (15308) with his tests (17569). Once Riberico has followed you (8480), «Dejar pasar a Riberico» (21041) is 8481 (17570)."
+      "why": "Professor Max Ymillán at the Crisol de los Afortunados [-1,-1], for «Cofrología» (1504). Dofus pour les noobs, «Koffrologie»: «Maximilio ... a besoin d'âme de Koffrefors pour les étudier de plus près. Il vous demande donc de lui donner 1 x Moyenne pierre d'âme ... Il vous a également donné une altération du nom de Super capture». Asked about the dimension's dwellers (21037) he wants cofrefuertes caught (17567); «Aceptar» (21036) starts the quest on «¡Perfecto!» (60142), where a medium soul stone (9687) buys the «Supercaptura» (871) the souls drop under (82556), or later from «¿Cómo puedo capturar...?» (82829, 60273, 82558). The four souls handed over (21038) are 8466-8469 and get the whistle (15308) with his tests (17569). Once Riberico has followed you (8480), «Dejar pasar a Riberico» (21041) is 8481 (17570). «Tesorfanato» (1505): «¿Por qué ha venido Riberico?» (21068) once «Cofrología» is done: the Cofredía lets him go on with his experiments (17588), a cofrefuerte has run away from the tesorfanato (17589), Mimicandy, a one-off mimicofre (17590), and the plan is to play the desperate at the orphanage's door (17591); «Aceptar» (21064) starts it. Later «¿Qué opinas sobre esta situación?» (21083, 17601) is 8488: «D'après lui il est inutile de prendre des risques envers la collaboration entre la Koffrérie et les Voyageurs Dimensionnels» (Dofus pour les noobs, «Trésorphelinat»)."
     },
     {
       "npc": 2384,
@@ -53749,17 +53777,95 @@
         {
           "message": 17585,
           "choices": [
-            { "reply": 21061, "next": 17586 }
+            { "reply": 21061, "next": 17586 },
+            { "reply": 21081, "next": 17599, "quest": 1505, "afterObjective": 8485, "beforeObjective": 8486, "completes": 8486, "showsNpc": 2389, "criterion": "PO=15310" },
+            { "reply": 21084, "next": 17602, "quest": 1505, "afterObjective": 8488, "beforeObjective": 8489, "completes": 8489, "params": [[30, 8489]] },
+            { "reply": 21094, "next": 17607, "quest": 1505, "afterObjective": 8491, "beforeObjective": 8492, "completes": 8492, "params": [[30, 8492]] }
           ]
         },
         {
           "message": 17586,
+          "choices": []
+        },
+        {
+          "message": 17599,
+          "choices": []
+        },
+        {
+          "message": 17602,
+          "choices": []
+        },
+        {
+          "message": 17607,
+          "choices": []
+        }
+      ],
+      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586). «Tesorfanato» (1505): Mimicandy handed over and his fate asked (21081) is 8486, «Mimikmatti sera jeté aux ordures» (17599); asking to carry out the sentence yourself (21084) is 8489 (17602, «Conduis Mimikmatti jusqu'à la benne à ordures»); telling him it is done (21094) is 8492, the reward (17607) (Dofus pour les noobs, «Trésorphelinat»)."
+    },
+    {
+      "npc": 2390,
+      "map": 129238528,
+      "opening": 17596,
+      "lines": [
+        {
+          "message": 17596,
           "choices": [
-
+            { "reply": 21077, "quest": 1505, "afterObjective": 8483, "beforeObjective": 8484 },
+            { "reply": 21581, "quest": 1505, "afterObjective": 8483, "beforeObjective": 8484 }
           ]
         }
       ],
-      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586)."
+      "why": "The Quesofre that comes out of the coin pile at the tesorfanato's door [-2,-4], for «Tesorfanato» (1505): «Un Koffromage apparait alors sur votre droite. Lancez le combat contre celui-ci en lui parlant» (Dofus pour les noobs, «Trésorphelinat»). «No dejar al quesofre que te coma» (21077) is the fight (npc_fights.json); «Esperar la llegada rápida de refuerzos» (21581) waits for the rest of the group, who are let in by it."
+    },
+    {
+      "npc": 2389,
+      "map": 129238528,
+      "opening": 17597,
+      "lines": [
+        {
+          "message": 17597,
+          "choices": [
+            { "reply": 21079, "next": 17598, "quest": 1505, "beforeObjective": 8485, "criterion": "PO=15309" }
+          ]
+        },
+        {
+          "message": 17598,
+          "choices": [
+            { "reply": 21078, "quest": 1505, "beforeObjective": 8485, "completes": 8485, "gives": 15310, "leaves": true, "criterion": "PO=15309" }
+          ]
+        }
+      ],
+      "why": "Mimicandy at the tesorfanato's door [-2,-4], for «Tesorfanato» (1505): «Parlez à Mimikmatti qui se trouve sur la même map. Tentez de l'amadouer avec le Reblochonchon. Vous obtenez alors Mimikmatti en personnage suiveur» (Dofus pour les noobs, «Trésorphelinat»). With the quesosco (15309) the Quesofre dropped: «Avanzar lentamente enseñándole el quesosco» (21079, 17598), «Darle el quesosco y hacerle una señal para que te siga» (21078) hands it over (8485) and he follows you (15310)."
+    },
+    {
+      "npc": 2389,
+      "map": 131597312,
+      "opening": 17600,
+      "lines": [
+        {
+          "message": 17600,
+          "choices": [
+            { "reply": 21082, "quest": 1505, "afterObjective": 8486, "beforeObjective": 8487, "completes": 8487, "params": [[30, 8487]] },
+            { "reply": 21080, "quest": 1505, "afterObjective": 8489, "beforeObjective": 8491, "gives": 15310, "leaves": true, "criterion": "PO!15310" }
+          ]
+        }
+      ],
+      "why": "Mimicandy at the professor's camp [-1,-1] once handed to Riberico, for «Tesorfanato» (1505): «Parlez maintenant à Mimikmatti afin de réfléchir à une solution moins brusque que la benne à ordure» (Dofus pour les noobs, «Trésorphelinat»): «Pensar en una solución menos radical» (21082) is 8487. Once Riberico lets you carry out the sentence (8489), «Hacerle una señal a Mimicandy para que te siga» (21080) takes him along (15310) to the bin."
+    },
+    {
+      "npc": 2389,
+      "map": 129368579,
+      "opening": 17606,
+      "lines": [
+        {
+          "message": 17606,
+          "choices": [
+            { "reply": 21092, "quest": 1505, "afterObjective": 8490, "beforeObjective": 8491, "takes": 15310, "leaves": true, "completes": 8491, "params": [[30, 8491]] },
+            { "reply": 21093, "quest": 1505, "afterObjective": 8490, "beforeObjective": 8491, "takes": 15310, "leaves": true, "completes": 8491, "params": [[30, 8491]] }
+          ]
+        }
+      ],
+      "why": "Mimicandy beside the bin at [-6,-1], for «Tesorfanato» (1505): «Parlez à Mimikmatti et choisisez de le jeter aux ordures ou bien de le laisser partir (les deux choix fonctionnent)» (Dofus pour les noobs, «Trésorphelinat»). «Tirar a Mimicandy al cubo de la basura» (21092) or «Dejar que Mimicandy se escape y mentir» (21093) is 8491; either way he stops following you."
     }
   ]
 }

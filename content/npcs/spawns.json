@@ -6469,6 +6469,38 @@
       "orientation": 5,
       "criterion": "(Qa=1504&Qo>8480)|Qf=1504",
       "why": "«Cofrología» (1504) and after: Riberico at the professor's camp [-1,-1] once taken there (8480); «Tesorfanato», «El maleficio del cofre» and «El mapa de la verdad» find him there. INFERRED cell, beside the professor."
+    },
+    {
+      "map": 129238528,
+      "npc": 2389,
+      "cell": 75,
+      "orientation": 3,
+      "criterion": "Qa=1505&Qo<8485",
+      "why": "«Tesorfanato» (1505): Mimicandy, the cofrefuerte that ran away from the tesorfanato, at its door [-2,-4] until tamed with the quesosco (8485): «Le Koffrefor vous observe depuis son refuge au milieu des cristaux et des kamas» (17597). INFERRED cell, between the crystals and the gold at the top of the map, where the guide's picture shows him, low enough to be seen whole."
+    },
+    {
+      "map": 129238528,
+      "npc": 2390,
+      "cell": 377,
+      "orientation": 5,
+      "criterion": "Qa=1505&Qo>8483&Qo<8484",
+      "why": "«Tesorfanato» (1505): the Quesofre that comes out once the coin pile (485005, cell 362) is clicked (8483) until beaten (8484): «Un Koffromage apparait alors sur votre droite» (Dofus pour les noobs). INFERRED cell, the open gold below the pile to the right."
+    },
+    {
+      "map": 131597312,
+      "npc": 2389,
+      "cell": 269,
+      "orientation": 1,
+      "criterion": "Qa=1505&Qo>8486&Qo<8491&PO!15310",
+      "why": "«Tesorfanato» (1505): Mimicandy at the professor's camp [-1,-1] once handed to Riberico (8486) until he follows you to the bin. INFERRED cell, two tiles left of Riberico."
+    },
+    {
+      "map": 129368579,
+      "npc": 2389,
+      "cell": 472,
+      "orientation": 1,
+      "criterion": "Qa=1505&Qo>8489&Qo<8491&PO=15310",
+      "why": "«Tesorfanato» (1505): Mimicandy, who followed you, beside the bin (485015, cell 488) at [-6,-1] until thrown in or let go (8491). INFERRED cell, the open floor up and left of the bin: the tiles round it are behind piled gold."
     }
   ]
 }

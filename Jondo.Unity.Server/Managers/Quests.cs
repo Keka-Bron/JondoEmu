@@ -445,7 +445,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (!objective.ConsumesItems) return true;
 
-            bool taken = await Equipment.TakeAsync(stream, objective.ItemId, wanted);
+            // A follower handed over leaves his slot and the character is drawn without him:
+            // Mimicandy given to Riberico («Tesorfanato») kept walking behind the player.
+            bool taken = await QuestFollowers.TakeAsync(stream, objective.ItemId, wanted);
             if (!taken)
             {
                 Console.WriteLine($"[Quests] Could not collect {wanted}x{objective.ItemId} " +

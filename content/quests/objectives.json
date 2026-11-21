@@ -7077,6 +7077,15 @@
    "afterObjectives": [8474],
    "showsNpc": 2385,
    "why": "«Intenta robar una bolsa de kamas»: «Le sac de kamas se trouve en [-2,-1]. Une fois sur la map, cliquez sur le sac remplis de kamas» (Dofus pour les noobs, «Koffrologie»): the sack 484994 (graphic 45335) on cell 402, at the foot of the pillar."
+  },
+  {
+   "objective": 8483,
+   "quest": 1505,
+   "kind": "click",
+   "elements": [{"map": 129238528, "element": 485005}],
+   "afterObjectives": [8482],
+   "showsNpc": 2390,
+   "why": "«Finge que te ahogas en kamas movedizos»: «Une fois sur la map, cliquez sur le tas de pièces. Un Koffromage apparait alors sur votre droite» (Dofus pour les noobs, «Trésorphelinat»): the pile 485005 (graphic 45138) on cell 362, by the last gate, which the guide's picture rings."
   }
 ]
 }
