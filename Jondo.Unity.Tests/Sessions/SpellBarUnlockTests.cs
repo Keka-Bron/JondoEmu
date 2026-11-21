@@ -53,13 +53,15 @@ namespace Jondo.Unity.Tests.Sessions
             using (SessionContext.Push(session))
             {
                 var known = SpellTable.KnownFor(Yopuka, 200, null, NoScrolls).Select(k => k.SpellId).ToList();
+                // The weapon is saved on the bar like a spell; old bars got it once by migration.
+                SpellChoices.PutInBar(0, Jondo.Unity.Server.Network.FightProtocol.Weapon);
                 SpellChoices.PutInBar(1, known[0]);
 
                 SpellChoices.PlaceNewlyUnlocked(Yopuka, 200);
 
                 Assert.All(known, spell => Assert.Contains(spell, SpellChoices.Bar.Values));
-                Assert.Equal(known.Count, SpellChoices.Bar.Count);
-                Assert.DoesNotContain(0, SpellChoices.Bar.Keys);
+                Assert.Equal(known.Count + 1, SpellChoices.Bar.Count);
+                Assert.Equal(Jondo.Unity.Server.Network.FightProtocol.Weapon, SpellChoices.Bar[0]);
             }
         }
 

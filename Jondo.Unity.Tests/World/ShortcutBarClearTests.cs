@@ -53,9 +53,9 @@ namespace Jondo.Unity.Tests.World
 
             // Never written: every known spell, and the fist.
             Assert.Equal(3, FightSpellLayout.Build(known, empty).Bar.Count);
-            // Emptied by the player: only the fist.
+            // Emptied by the player: nothing, not even the fist, which is saved and taken off like a spell.
             var emptied = FightSpellLayout.Build(known, empty, seed: false);
-            Assert.Equal(new[] { Jondo.Unity.Server.Network.FightProtocol.HechizoCuerpoACuerpo }, emptied.Bar.Select(b => b.Spell).ToArray());
+            Assert.Empty(emptied.Bar);
         }
     }
 }
