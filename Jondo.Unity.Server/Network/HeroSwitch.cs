@@ -117,6 +117,16 @@ namespace Jondo.Unity.Server.Network
                 await Achievements.SendListAsync(session);
             }
 
+            // Sync wardrobe, titles, ornaments and outfits to prevent outfit mixing between heroes
+            session.State.IsWardrobeDraftLoaded = false;
+            await WardrobeStateService.Live.SendOwnedAsync(session);
+            await session.SendAsync(ConnectionProtocol.Push(Op.Lxc, ConnectionProtocol.BuildLookChanged(character)));
+
+            // Send spells, spell shortcut bar, and characteristics for the newly active hero
+            await session.SendAsync(SpellMessages.Live.Snapshot(session));
+            await ShortcutBarMessages.Live.SendSpellAsync(session);
+            await session.SendAsync(CharacteristicsMessages.Live.Snapshot(session));
+
             // The one played before back as a hero, where he was in the group's round: the others
             // are in it from the one after the hero taken (Heroes.HandOver). Taking the first hero
             // in hand each time -- the mod's Tab -- goes round them all, not back and forth.
