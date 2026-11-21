@@ -6510,6 +6510,22 @@ namespace Jondo.Unity.Server.Managers
             var fired = rows.Where(row => row.Delay <= 0
                                           && row.Disparadores().Any(t => string.Equals(t, trigger, StringComparison.OrdinalIgnoreCase)))
                             .ToList();
+            return Movers(fired);
+        }
+
+        /// <summary>
+        /// The same split over the rows a hook has armed for one trigger: a monster's behaviour,
+        /// Nileza's among them, goes off through its hook and not as an attitude.
+        /// </summary>
+        public static IReadOnlyList<SpellEffect> SwapsBeforeTheRest(IReadOnlyList<SpellEffect> fired)
+        {
+            if (fired == null || fired.Any(row => row.Probabilidad > 0)) return new List<SpellEffect>();
+            return Movers(fired.Where(row => row.Delay <= 0).ToList());
+        }
+
+        private static IReadOnlyList<SpellEffect> Movers(IReadOnlyList<SpellEffect> fired)
+        {
+            var none = new List<SpellEffect>();
             if (fired.Count < 2) return none;
             var movers = fired.Where(row => EsDeLaFamiliaDeSublanzar(row.EffectId) && row.DiceNum > 0
                                             && SpellEffects.De(row.DiceNum, Math.Max(1, row.DiceSide))

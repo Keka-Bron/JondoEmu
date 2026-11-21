@@ -26,6 +26,20 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
+        public void A_hook_armed_with_both_casts_sends_the_swap_first()
+        {
+            var fired = SpellEffects.De(Cohobation, 1)
+                                    .Where(row => row.Disparadores().Contains(EffectEngine.CuandoMePeganDeLejos))
+                                    .ToList();
+            if (fired.Count < 2) return;
+
+            var first = EffectEngine.SwapsBeforeTheRest(fired);
+
+            Assert.Single(first);
+            Assert.Equal(3566, first[0].DiceNum);
+        }
+
+        [Fact]
         public void Nothing_is_split_for_a_trigger_that_casts_no_swap()
         {
             if (SpellEffects.De(Cohobation, 1).Count == 0) return;

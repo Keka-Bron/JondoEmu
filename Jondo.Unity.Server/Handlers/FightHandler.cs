@@ -7239,10 +7239,21 @@ namespace Jondo.Unity.Server.Handlers
                 // the Reina's phase II, off her threshold, waits on her Pommeau's and Lame's deaths
                 // however many rounds later they come.
                 bool suyoParaSiempre = enganche.CaducaEnRonda < 0 && EsDelBandoDeLosMonstruos(fight, suLanzador);
-                await LanzarPorOrdenAsync(stream, fight, suLanzador, enganche.Hechizo, enganche.Grado, quien,
-                                          quien.CellId, disparador, armadas, enganche.Critico,
-                                          rondaDelEnganche: enganche.PuestoEnRonda, soloAlObjetivo: true,
-                                          conducta: suyoParaSiempre);
+                // What swaps him goes first, and the rest finds him where he went: Nileza's
+                // reflection is drawn around the cell she lands on (EffectEngine.SwapsBeforeTheRest).
+                var swapsFirst = Managers.EffectEngine.SwapsBeforeTheRest(armadas);
+                var tandas = swapsFirst.Count == 0
+                    ? new List<IReadOnlyList<Managers.SpellEffect>> { armadas }
+                    : new List<IReadOnlyList<Managers.SpellEffect>> { swapsFirst, armadas.Where(row => !swapsFirst.Contains(row)).ToList() };
+                for (int t = 0; t < tandas.Count; t++)
+                {
+                    var tanda = tandas[t];
+                    if (t > 0 && !quien.IsAlive) break;
+                    await LanzarPorOrdenAsync(stream, fight, suLanzador, enganche.Hechizo, enganche.Grado, quien,
+                                              quien.CellId, disparador, tanda, enganche.Critico,
+                                              rondaDelEnganche: enganche.PuestoEnRonda, soloAlObjetivo: true,
+                                              conducta: suyoParaSiempre);
+                }
                 return;
             }
             // Once for every time it was hooked in its round (ActiveSpell.Veces), while it is still on.
