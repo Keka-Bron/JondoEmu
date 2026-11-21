@@ -73,7 +73,9 @@ namespace Jondo.Unity.Tests.World
                 using (SessionContext.Push(visitor.Session)) await DreamHandler.SendStateToOwnerAsync(dream);
                 var refresh = Assert.Single(codec.Frames, f => f.Content is InfiniteDreamStateEvent);
                 Assert.Null(refresh.Uid);
-                Assert.Equal(MarkCodec.Token(codec.Frames.IndexOf(refresh) + 1), await Read(host));
+                // The guest's arrival in the room reaches the owner too, encoded on its own; it may
+                // land before the refresh.
+                await ReadToken(host, MarkCodec.Token(codec.Frames.IndexOf(refresh) + 1), "Dream-state refresh did not arrive.");
 
                 Assert.True(await DreamHandler.GuestMayNotFightAsync(visitor.Session));
                 Assert.False(await DreamHandler.GuestMayNotFightAsync(host.Session));
@@ -127,12 +129,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.Null(dreamClear.Uid);
                 int clearIndex = codec.Frames.IndexOf(dreamClear);
                 Assert.Equal(clearIndex + 1, codec.Frames.IndexOf(clear));
-                for (int i = 0; i < 64; i++)
-                {
-                    byte[] packet = await Read(host);
-                    if (packet.SequenceEqual(MarkCodec.Token(clearIndex + 1))) break;
-                    Assert.True(i < 63, "Dream-state clear did not arrive.");
-                }
+                await ReadToken(host, MarkCodec.Token(clearIndex + 1), "Dream-state clear did not arrive.");
                 if (!fail)
                 {
                     Assert.Equal(MarkCodec.Token(codec.Frames.IndexOf(clear) + 1), await Read(host));
@@ -182,6 +179,16 @@ namespace Jondo.Unity.Tests.World
                 Dreams.OlvidarTodo();
                 DreamHandler.ForgetGroups();
             }
+        }
+
+        /// <summary>Reads the owner's packets until the codec's token, past what reached him encoded elsewhere.</summary>
+        private static async Task ReadToken(ClientPipe pipe, byte[] token, string missing)
+        {
+            for (int i = 0; i < 64; i++)
+            {
+                if ((await Read(pipe)).SequenceEqual(token)) return;
+            }
+            Assert.Fail(missing);
         }
 
         private static Task<byte[]> Read(ClientPipe pipe)
