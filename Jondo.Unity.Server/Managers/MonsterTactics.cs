@@ -264,7 +264,7 @@ namespace Jondo.Unity.Server.Managers
             public bool HasRows => Rows.Count > 0;
 
             /// <summary>Whether one of its rows summons -- a double too: it is then aimed at free cells too.</summary>
-            public bool SummonsByRow => Rows.Any(r => EffectEngine.EsInvocacion(r.EffectId) || r.EffectId == EffectEngine.InvocaUnDoble);
+            public bool SummonsByRow => Rows.Any(r => EffectEngine.EsInvocacion(r.EffectId) || EffectEngine.EsDobleDelLanzador(r.EffectId));
 
             /// <summary>Whether one of its rows lays a trap: it is then aimed at the cells the enemy may walk.</summary>
             public bool LaysTraps => Rows.Any(r => r.EffectId == EffectEngine.ColocaUnaTrampa);
@@ -1331,7 +1331,7 @@ namespace Jondo.Unity.Server.Managers
                         continue;
                     }
 
-                    bool twin = id == EffectEngine.InvocaUnDoble;
+                    bool twin = EffectEngine.EsDobleDelLanzador(id);
                     if (EffectEngine.EsInvocacion(id) || twin)
                     {
                         // Put down where it was aimed: a free cell, and the nearer the enemy the

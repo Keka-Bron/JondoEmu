@@ -1997,10 +1997,21 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static readonly HashSet<int> AlSuelo =
             new HashSet<int> { 181, 1008, 1011, 400, 401, 402, 1091, 1165, 2022, EffectSupport.Illusions, 780, 1034, 147, 1101, InvocaUnDoble,
-                               ColocaUnPortal, DesactivaUnPortal };
+                               InvocaUnDobleDelLanzador, ColocaUnPortal, DesactivaUnPortal };
 
         /// <summary>«Invoca un doble del lanzador»: the Sram's Doble and Conspirador.</summary>
         public const int InvocaUnDoble = 180;
+
+        /// <summary>
+        /// The other «Invoca un doble del lanzador» (1189): the Kutulu temple's Shorrokh, whose hit
+        /// (6736) has its victim cast 6735 and bring out a double of himself, and the Ignorancia,
+        /// Visiones Absurdas and Clonabzión spells. Left without a handler, it fell to the generic
+        /// row and stuck an inert 1189 row on every fighter in its circle instead of the double.
+        /// It is the same summon as 180.
+        /// </summary>
+        public const int InvocaUnDobleDelLanzador = 1189;
+
+        public static bool EsDobleDelLanzador(int efecto) => efecto is InvocaUnDoble or InvocaUnDobleDelLanzador;
 
         /// <summary>«Coloca un portal»: see Jondo.Unity.World.Fights.PortalNetwork.</summary>
         public const int ColocaUnPortal = 1181;
@@ -3246,6 +3257,22 @@ namespace Jondo.Unity.Server.Managers
                         line.Reverse();
                         aDonde = line.FirstOrDefault(cell => cell != caster.CellId && (walkable == null || walkable.Contains(cell))
                                                              && EnLaCasilla(combat, cell) == null, -1);
+                        if (aDonde < 0) continue;
+                    }
+                    // Handed to him by somebody else's spell and aimed at a fighter, he lands in
+                    // that fighter's contact, on the free cell nearest him. The Kutulu larva's
+                    // Vacilación del Universo (6752) has every enemy cast its grade 4 at her,
+                    // "4 on C", which brings them all to her contact at her turn start; aimed at
+                    // her own cell, the teleport was refused and nobody ever moved. One already
+                    // in her contact stays where he is.
+                    else if (combat.RootCaster != null && combat.RootCaster != caster && EnLaCasilla(combat, aDonde) != null)
+                    {
+                        int junto = aDonde, desde = caster.CellId;
+                        if (Jondo.Unity.World.Maps.MapGeometry.Distance(junto, desde) <= 1) continue;
+                        aDonde = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(junto)
+                            .Where(cell => cell != desde && LibreYPisable(combat, cell))
+                            .OrderBy(cell => Jondo.Unity.World.Maps.MapGeometry.Distance(cell, desde)).ThenBy(cell => cell)
+                            .DefaultIfEmpty(-1).First();
                         if (aDonde < 0) continue;
                     }
 
@@ -4979,7 +5006,7 @@ namespace Jondo.Unity.Server.Managers
                 };
             }
 
-            if (efecto.EffectId == InvocaUnDoble)
+            if (EsDobleDelLanzador(efecto.EffectId))
             {
                 // A double of the caster on the aimed cell, free and walkable: the Sram's Doble
                 // and Conspirador, "un doble controlable que posee las mismas características
@@ -4987,8 +5014,10 @@ namespace Jondo.Unity.Server.Managers
                 // announces it and does what the spell writes for it ("a,U").
                 if (celdaApuntada < 0 || sobre != quienLanza) return null;
                 // A monster's behaviour (the Doble's Desdoble at the start of the fight) is cast
-                // on the caster's own cell: its double comes out on the nearest free cell.
-                if (celdaApuntada == quienLanza.CellId)
+                // on the caster's own cell, and a cast handed to the victim of a hit (the
+                // Shorrokh's 6736 has him cast 6735) aims wherever the hit landed: the double
+                // comes out on the nearest free cell.
+                if (celdaApuntada == quienLanza.CellId || EnLaCasilla(combate, celdaApuntada) != null)
                 {
                     celdaApuntada = CeldaLibreMasCercana(combate, celdaApuntada, null);
                     if (celdaApuntada < 0 || celdaApuntada == quienLanza.CellId) return null;
