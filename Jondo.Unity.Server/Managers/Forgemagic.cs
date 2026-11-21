@@ -221,6 +221,14 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var e in DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(gid)))
                 {
                     if (e.EffectId == 0) continue;
+                    if (IsCompound(e.EffectId))
+                    {
+                        // Its numbers are no range: the 1175 of a dofus is its spell and that
+                        // spell's grade, in that order. Sorted, a Crimson Dofus came out as spell
+                        // 1 at a grade the size of a spell id, and the client's tooltip broke on it.
+                        lines.Add(new TemplateLine(e.EffectId, e.DiceNum, e.DiceSide, e.Value));
+                        continue;
+                    }
                     int min = e.DiceNum != 0 ? e.DiceNum : e.Value;
                     int max = e.DiceSide != 0 ? e.DiceSide : min;
                     if (max < min) (min, max) = (max, min);
@@ -305,7 +313,18 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Whether two copies of this template can share a stack: nothing in it rolls.</summary>
         public static bool Stacks(Template template)
-            => !Pets.IsPet(template.Gid) && template.Lines.All(l => l.Min == l.Max || InfoOf(l.Effect).IsWeaponDamage);
+            => !Pets.IsPet(template.Gid)
+               && template.Lines.All(l => l.Min == l.Max || InfoOf(l.Effect).IsWeaponDamage || IsCompound(l.Effect));
+
+        /// <summary>
+        /// An effect that carries its numbers as they are -- a dofus's spell and grade, a title, a
+        /// wrapped gift --: no weapon damage, no rolled characteristic. Never rolled nor sorted.
+        /// </summary>
+        internal static bool IsCompound(int effect)
+        {
+            var info = InfoOf(effect);
+            return !info.IsWeaponDamage && !info.UseDice && info.Weight == 0;
+        }
 
         // ─── The rune ───────────────────────────────────────────────────────────────────────
 
