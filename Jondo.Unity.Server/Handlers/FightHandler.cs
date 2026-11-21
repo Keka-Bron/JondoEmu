@@ -9844,8 +9844,23 @@ namespace Jondo.Unity.Server.Handlers
                 // TE, delay 1" kills her at the end of her SECOND turn. Read as a second wait, it
                 // was put off to the next round's first turn and she died before her second one.
                 int givenIn = quien.Buffs.RoundAttitudeGiven(actitud);
-                await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador, quien.CellId, armar: false,
-                                          rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
+                // What swaps him goes first, and the rest finds him where he went: Nileza's
+                // reflection is drawn around the cell she lands on (EffectEngine.SwapsBeforeTheRest).
+                var swapsFirst = Managers.EffectEngine.SwapsBeforeTheRest(actitud, grado, disparador);
+                if (swapsFirst.Count > 0)
+                {
+                    await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador, quien.CellId,
+                                              tirada: swapsFirst, armar: false,
+                                              rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
+                    var rest = Managers.SpellEffects.De(actitud, grado).Where(row => !swapsFirst.Contains(row)).ToList();
+                    if (quien.IsAlive)
+                        await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador, quien.CellId,
+                                                  tirada: rest, armar: false,
+                                                  rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
+                }
+                else
+                    await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador, quien.CellId, armar: false,
+                                              rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
 
                 // And the grades the attitude chains, on their own. It is needed because a chained
                 // grade can bring effects with ITS own trigger: Amarillo Ocre's grade 3 is cast at the

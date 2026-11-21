@@ -6489,6 +6489,38 @@ namespace Jondo.Unity.Server.Managers
             return SpellEffects.De(row.DiceNum, Math.Max(1, row.DiceSide)).Any(child => Teleports(child, depth + 1));
         }
 
+        /// <summary>
+        /// Of the spells one trigger of an attitude casts at once, the ones that change the bearer's
+        /// place: a sub-cast whose spell swaps or teleports. They go off ahead of the others, which
+        /// then take the bearer where he went. Empty when nothing so moves, when everything does,
+        /// or when the grade draws at random (a split would draw its rows twice).
+        /// </summary>
+        /// <remarks>
+        /// Nileza's Cohobation (3545) answers a ranged blow ("DR") with 3587, «renvoie 200% des
+        /// dégâts ... dans une zone cercle de 2PO autour de sa case d'arrivée», then 3566, which
+        /// swaps her with the attacker. Dofus pour les noobs: «Le renvoi de dégâts a toujours lieu
+        /// après l'échange de place du Nileza». In written order the circle was drawn around the
+        /// cell she was leaving.
+        /// </remarks>
+        public static IReadOnlyList<SpellEffect> SwapsBeforeTheRest(int spell, int grade, string trigger)
+        {
+            var none = new List<SpellEffect>();
+            var rows = SpellEffects.De(spell, grade);
+            if (rows.Count == 0 || rows.Any(row => row.Probabilidad > 0)) return none;
+            var fired = rows.Where(row => row.Delay <= 0
+                                          && row.Disparadores().Any(t => string.Equals(t, trigger, StringComparison.OrdinalIgnoreCase)))
+                            .ToList();
+            if (fired.Count < 2) return none;
+            var movers = fired.Where(row => EsDeLaFamiliaDeSublanzar(row.EffectId) && row.DiceNum > 0
+                                            && SpellEffects.De(row.DiceNum, Math.Max(1, row.DiceSide))
+                                                           .Any(child => SwapEffects.Contains(child.EffectId) || Teleports(child, 1)))
+                              .ToList();
+            return movers.Count == 0 || movers.Count == fired.Count ? none : movers;
+        }
+
+        /// <summary>The swaps: the plain one and the forced one.</summary>
+        private static readonly HashSet<int> SwapEffects = new() { 8, IntercambioForzado };
+
         /// <summary>The teleports: the plain one and the symmetric, back-a-cell and swap-or-teleport ones.</summary>
         private static readonly HashSet<int> TeleportEffects = new()
         {
