@@ -80,6 +80,31 @@ namespace Heroes
                 catch (Exception ex) { MelonLogger.Warning($"[Heroes] {ex.Message}"); }
             }
 
+            long nowTicks = Environment.TickCount64;
+            if (_reopenHeroUiTime > 0 && nowTicks >= _reopenHeroUiTime)
+            {
+                _reopenHeroUiTime = 0;
+                if (_openUisToReopen.Count > 0)
+                {
+                    foreach (var uiType in _openUisToReopen.ToList())
+                    {
+                        TriggerMenuSlot(uiType);
+                    }
+                    _openUisToReopen.Clear();
+                }
+                if (_wasAppearanceOpen)
+                {
+                    _reopenAppearanceTime = nowTicks + 200;
+                }
+            }
+
+            if (_reopenAppearanceTime > 0 && nowTicks >= _reopenAppearanceTime)
+            {
+                _reopenAppearanceTime = 0;
+                _wasAppearanceOpen = false;
+                ReopenAppearanceWindow();
+            }
+
             // Asked all along, not only with the window open: the group panel shows the life of
             // the group, and the portraits are fetched ahead of the window's first opening.
             float now = UnityEngine.Time.unscaledTime;
@@ -364,6 +389,196 @@ namespace Heroes
 
         private static long _masterBefore;
         private static bool _toldInventory;
+        private enum HeroUiType
+        {
+            CharacterSheet,
+            Inventory,
+            Spells,
+            Cosmetics
+        }
+
+        private static readonly HashSet<HeroUiType> _openUisToReopen = new HashSet<HeroUiType>();
+        private static long _reopenHeroUiTime;
+        private static bool _wasAppearanceOpen;
+        private static long _reopenAppearanceTime;
+
+        private static void FindOpenFigmaWindows(VisualElement root, List<WindowFigma> list)
+        {
+            if (root == null) return;
+            var wf = root.TryCast<WindowFigma>();
+            if (wf != null)
+            {
+                if (wf.panel != null && wf.resolvedStyle.display != DisplayStyle.None && wf.resolvedStyle.visibility == Visibility.Visible)
+                {
+                    list.Add(wf);
+                }
+                return;
+            }
+            for (int i = 0; i < Kids(root); i++)
+            {
+                FindOpenFigmaWindows(Kid(root, i), list);
+            }
+        }
+
+        private static void RecordAndCloseOpenHeroUis()
+        {
+            _openUisToReopen.Clear();
+            _wasAppearanceOpen = false;
+            try
+            {
+                var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+                var openWindows = new List<WindowFigma>();
+                for (int i = 0; i < documents.Length; i++)
+                {
+                    var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                    if (root != null) FindOpenFigmaWindows(root, openWindows);
+                }
+
+                foreach (var wf in openWindows)
+                {
+                    string name = wf.name ?? "";
+                    string shortcut = wf.shortcutValue ?? "";
+                    HeroUiType? detected = null;
+
+                    if (name.IndexOf("Appearance", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        detected = HeroUiType.Cosmetics;
+                        _wasAppearanceOpen = true;
+                    }
+                    else if (name.IndexOf("StatSheet", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("CharacterSheet", StringComparison.OrdinalIgnoreCase) >= 0 || shortcut == "C")
+                        detected = HeroUiType.CharacterSheet;
+                    else if (name.IndexOf("Cosmetic", StringComparison.OrdinalIgnoreCase) >= 0 || shortcut == "O")
+                        detected = HeroUiType.Cosmetics;
+                    else if (name.IndexOf("Equipment", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Inventory", StringComparison.OrdinalIgnoreCase) >= 0 || shortcut == "I")
+                        detected = HeroUiType.Inventory;
+                    else if (name.IndexOf("PlayerSpell", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Spell", StringComparison.OrdinalIgnoreCase) >= 0 || shortcut == "S")
+                        detected = HeroUiType.Spells;
+
+                    if (detected.HasValue)
+                    {
+                        _openUisToReopen.Add(detected.Value);
+                        try
+                        {
+                            wf.closeButton?.InvokeSimulateSingleClick(null);
+                            MelonLogger.Msg($"[Heroes] Auto-refresh: closed open UI {detected.Value} on hero switch.");
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] Error detecting open UIs: {ex.Message}");
+            }
+        }
+
+        private static void ReopenAppearanceWindow()
+        {
+            try
+            {
+                var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+                for (int i = 0; i < documents.Length; i++)
+                {
+                    var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                    if (root == null) continue;
+                    var btnApp = root.Q<DofusButtonCustom>("btnAppearance");
+                    if (btnApp != null)
+                    {
+                        btnApp.InvokeSimulateSingleClick(null);
+                        MelonLogger.Msg("[Heroes] Auto-refresh: reopened Appearance window on hero switch.");
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] Error reopening appearance window: {ex.Message}");
+            }
+        }
+
+        private static bool MatchSlotUi(Il2CppCore.UILogic.Components.Slots.Slot slot, HeroUiType type)
+        {
+            if (slot == null) return false;
+            string tooltip = slot.tooltip ?? "";
+            string img = slot.imageUrl ?? "";
+            string name = slot.name ?? "";
+
+            switch (type)
+            {
+                case HeroUiType.CharacterSheet:
+                    return tooltip.Contains("(C)") || tooltip.IndexOf("caracter", StringComparison.OrdinalIgnoreCase) >= 0
+                           || tooltip.IndexOf("character", StringComparison.OrdinalIgnoreCase) >= 0
+                           || img.IndexOf("character", StringComparison.OrdinalIgnoreCase) >= 0
+                           || name.IndexOf("character", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                case HeroUiType.Inventory:
+                    return tooltip.Contains("(I)") || tooltip.IndexOf("invent", StringComparison.OrdinalIgnoreCase) >= 0
+                           || img.IndexOf("inventory", StringComparison.OrdinalIgnoreCase) >= 0
+                           || name.IndexOf("inventory", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                case HeroUiType.Spells:
+                    return tooltip.Contains("(S)") || tooltip.IndexOf("hechizo", StringComparison.OrdinalIgnoreCase) >= 0
+                           || tooltip.IndexOf("spell", StringComparison.OrdinalIgnoreCase) >= 0
+                           || tooltip.IndexOf("sort", StringComparison.OrdinalIgnoreCase) >= 0
+                           || img.IndexOf("spell", StringComparison.OrdinalIgnoreCase) >= 0
+                           || name.IndexOf("spell", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                case HeroUiType.Cosmetics:
+                    return tooltip.Contains("(O)") || tooltip.IndexOf("cosmetic", StringComparison.OrdinalIgnoreCase) >= 0
+                           || tooltip.IndexOf("apariencia", StringComparison.OrdinalIgnoreCase) >= 0
+                           || tooltip.IndexOf("atuendo", StringComparison.OrdinalIgnoreCase) >= 0
+                           || img.IndexOf("cosmetic", StringComparison.OrdinalIgnoreCase) >= 0
+                           || name.IndexOf("cosmetic", StringComparison.OrdinalIgnoreCase) >= 0
+                           || img.IndexOf("appearance", StringComparison.OrdinalIgnoreCase) >= 0
+                           || name.IndexOf("appearance", StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+            return false;
+        }
+
+        private static void TriggerMenuSlot(HeroUiType type)
+        {
+            try
+            {
+                var documents = UnityEngine.Object.FindObjectsOfType(Il2CppType.Of<UIDocument>());
+                var grids = new List<VisualElement>();
+                for (int i = 0; i < documents.Length; i++)
+                {
+                    var root = documents[i]?.TryCast<UIDocument>()?.rootVisualElement;
+                    if (root != null) GridsUnder(root, grids);
+                }
+                grids = grids.Where(g => g.panel != null && g.resolvedStyle.display != DisplayStyle.None
+                                         && g.resolvedStyle.visibility == Visibility.Visible && g.worldBound.width > 4f).ToList();
+                var main = grids.FirstOrDefault(g => g.name == "gd_btnUis");
+                var additional = grids.FirstOrDefault(g => g.name == "gd_additionalBtns");
+
+                var slotList = new List<Il2CppCore.UILogic.Components.Slots.Slot>();
+                void CollectSlots(VisualElement grid)
+                {
+                    if (grid == null) return;
+                    for (int i = 0; i < Kids(grid); i++)
+                    {
+                        var s = Kid(grid, i).TryCast<Il2CppCore.UILogic.Components.Slots.Slot>();
+                        if (s != null) slotList.Add(s);
+                    }
+                }
+                CollectSlots(main);
+                CollectSlots(additional);
+
+                foreach (var s in slotList)
+                {
+                    if (MatchSlotUi(s, type))
+                    {
+                        s.OnClick(null);
+                        MelonLogger.Msg($"[Heroes] Auto-refresh: reopened UI {type} via menu slot.");
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] Error reopening UI {type}: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// The character played has changed (a switch): the game's windows left open through it
@@ -380,6 +595,16 @@ namespace Heroes
             if (id == 0) return;
             bool changed = _masterBefore != 0 && _masterBefore != id;
             _masterBefore = id;
+            if (changed)
+            {
+                RecordAndCloseOpenHeroUis();
+                _reopenHeroUiTime = Environment.TickCount64 + 250;
+                try
+                {
+                    Type.GetType("JondoFix.ColorPalettePatch, JondoFix")?.GetMethod("OnCharacterChanged")?.Invoke(null, null);
+                }
+                catch { }
+            }
             if (!changed || look.Length == 0 || _displayers == null || _entities == null) return;
 
             var found = new List<Il2CppCore.UILogic.EntityDisplay.EntityDisplayer>();
