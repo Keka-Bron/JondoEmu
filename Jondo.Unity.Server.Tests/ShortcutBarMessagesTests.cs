@@ -8,7 +8,7 @@ namespace Jondo.Unity.Server.Tests;
 public sealed class ShortcutBarMessagesTests
 {
     [Fact]
-    public void Saved_spell_slots_keep_duplicates_order_and_selected_melee_zero_and_only_remember_non_weapon_entries()
+    public void Saved_spell_slots_keep_duplicates_order_and_persists_weapon_entry()
     {
         var own = new Recipient();
         var backend = new Backend(own.Session) { Layout = [(0, 0), (3, 71_001), (8, 71_001), (12, 71_002)] };
@@ -19,14 +19,14 @@ public sealed class ShortcutBarMessagesTests
         Assert.Equal(new[] { 0, 3, 8, 12 }, bar.Shortcuts.Select(shortcut => shortcut.SlotId));
         Assert.Equal(new[] { 0, 71_001, 71_001, 71_002 }, bar.Shortcuts.Select(shortcut =>
             Assert.IsType<ShortcutCaseShortcutSpell>(shortcut.ShortcutCase).Value.SpellId));
-        Assert.Equal(new[] { (3, 71_001), (8, 71_001), (12, 71_002) }, backend.Remembered);
+        Assert.Equal(new[] { (0, 0), (3, 71_001), (8, 71_001), (12, 71_002) }, backend.Remembered);
         Assert.Equal(new[] { "mutation", "layout", "remember" }, backend.Reads);
     }
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void Never_written_bars_seed_known_spells_and_deliberately_cleared_bars_keep_only_melee(bool seed)
+    public void Never_written_bars_seed_known_spells_and_deliberately_cleared_bars_remain_empty(bool seed)
     {
         var own = new Recipient();
         var backend = new Backend(own.Session)
@@ -37,9 +37,9 @@ public sealed class ShortcutBarMessagesTests
 
         var bar = new ShortcutBarMessages(backend).SpellBar(own.Session);
 
-        Assert.Equal(seed ? new[] { 0, 71_001, 71_002 } : [0], bar.Shortcuts.Select(shortcut =>
+        Assert.Equal(seed ? new[] { 0, 71_001, 71_002 } : Array.Empty<int>(), bar.Shortcuts.Select(shortcut =>
             Assert.IsType<ShortcutCaseShortcutSpell>(shortcut.ShortcutCase).Value.SpellId));
-        Assert.Equal(seed ? 2 : 0, backend.Remembered.Count);
+        Assert.Equal(seed ? 3 : 0, backend.Remembered.Count);
     }
 
     [Fact]
@@ -54,8 +54,8 @@ public sealed class ShortcutBarMessagesTests
 
         var bar = new ShortcutBarMessages(backend).SpellBar(own.Session);
 
-        Assert.Equal(new[] { 0, 7, 9, 11 }, bar.Shortcuts.Select(shortcut => shortcut.SlotId));
-        Assert.Equal(new[] { 0, 71_002, 71_002, 72_001 }, bar.Shortcuts.Select(shortcut =>
+        Assert.Equal(new[] { 7, 9, 11 }, bar.Shortcuts.Select(shortcut => shortcut.SlotId));
+        Assert.Equal(new[] { 71_002, 71_002, 72_001 }, bar.Shortcuts.Select(shortcut =>
             Assert.IsType<ShortcutCaseShortcutSpell>(shortcut.ShortcutCase).Value.SpellId));
     }
 

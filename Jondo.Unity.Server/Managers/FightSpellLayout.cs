@@ -37,17 +37,17 @@ namespace Jondo.Unity.Server.Managers
             // What a level-up unlocked goes on the saved bar before it is drawn.
             SpellChoices.PlaceNewlyUnlocked(breed, level);
 
-            var conocidos = new List<SpellTable.KnownSpell>(
+            var knownSpells = new List<SpellTable.KnownSpell>(
                 SpellTable.KnownFor(breed, level, SpellChoices.Chosen,
                                     LearnedSpells.For(Network.SessionContext.State.CharacterId, accountId)));
 
             if (AdminSpells.Para(accountId))
             {
                 foreach (var (spell, grade) in AdminSpells.Granted)
-                    conocidos.Add(new SpellTable.KnownSpell(spell, spell, grade));
+                    knownSpells.Add(new SpellTable.KnownSpell(spell, spell, grade));
             }
 
-            return Build(conocidos, SpellChoices.Bar, neverWritten);
+            return Build(knownSpells, SpellChoices.Bar, neverWritten);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Jondo.Unity.Server.Managers
                                    IReadOnlyDictionary<int, int> savedBar, bool? seed = null)
         {
             var layout = new Layout();
-            var available = new HashSet<int>();
+            var available = new HashSet<int> { Network.FightProtocol.Weapon };
             foreach (var spell in known)
             {
                 layout.Spells.Add((spell.SpellId, spell.Grade));
@@ -136,10 +136,18 @@ namespace Jondo.Unity.Server.Managers
                 placedSpells.Add(saved.Value);
             }
 
-            // First session only: seed free slots with known spells. Slot zero stays clear for the
-            // weapon — in 37 of the 51 captured bars it is empty for that reason.
+            // First session only: seed free slots with known spells and place weapon attack.
             if (seed ?? (savedBar == null || savedBar.Count == 0))
             {
+                if (!placedSpells.Contains(Network.FightProtocol.Weapon))
+                {
+                    int weaponSlot = 0;
+                    while (occupiedSlots.Contains(weaponSlot)) weaponSlot++;
+                    layout.Bar.Add((weaponSlot, Network.FightProtocol.Weapon));
+                    occupiedSlots.Add(weaponSlot);
+                    placedSpells.Add(Network.FightProtocol.Weapon);
+                }
+
                 int next = 1;
                 foreach (var spell in layout.Spells)
                 {
@@ -153,18 +161,6 @@ namespace Jondo.Unity.Server.Managers
                     next++;
                 }
             }
-
-            // The melee, in the first free slot and ALWAYS. It is in the 13 player bars of the
-            // captures, including the tutorial character's, who carries not a single item: the
-            // slot is the fist's and does not depend on having a weapon.
-            //
-            // With no cap, which is how it was before this class. Cutting at SlotCount left it out
-            // when the forty slots were taken, and then the player goes into the fight unable to
-            // throw a punch. The captured bar goes up to 48, so there is plenty of room above the
-            // forty that fill themselves.
-            int weaponSlot = 0;
-            while (occupiedSlots.Contains(weaponSlot)) weaponSlot++;
-            layout.Bar.Add((weaponSlot, Network.FightProtocol.HechizoCuerpoACuerpo));
 
             layout.Bar.Sort((left, right) => left.Slot.CompareTo(right.Slot));
             return layout;

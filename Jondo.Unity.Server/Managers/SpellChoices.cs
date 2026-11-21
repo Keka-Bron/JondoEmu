@@ -97,36 +97,36 @@ namespace Jondo.Unity.Server.Managers
             return slots;
         }
 
-        /// <summary>Remembers which bar slot a spell ended up in. Zero clears the slot.</summary>
+        /// <summary>Remembers which bar slot a spell ended up in.</summary>
         public static void PutInBar(int slot, int spellId)
         {
-            if (spellId == 0)
-            {
-                BarStore.Remove(slot);
-                Write("DELETE FROM CharacterSpellBar WHERE CharacterId = $c AND Slot = $t;",
-                      ("$t", slot));
-                return;
-            }
-
             BarStore[slot] = spellId;
             Write("INSERT INTO CharacterSpellBar (CharacterId, Slot, SpellId) VALUES ($c, $t, $s) " +
                   "ON CONFLICT(CharacterId, Slot) DO UPDATE SET SpellId = $s;",
                   ("$t", slot), ("$s", spellId));
         }
 
-        /// <summary>What spell sits in a bar slot, or zero when the slot is empty.</summary>
-        public static int SpellInSlot(int slot)
-            => BarStore.TryGetValue(slot, out int spell) ? spell : 0;
+        /// <summary>Removes a spell from a bar slot.</summary>
+        public static void RemoveFromBar(int slot)
+        {
+            BarStore.Remove(slot);
+            Write("DELETE FROM CharacterSpellBar WHERE CharacterId = $c AND Slot = $t;",
+                  ("$t", slot));
+        }
+
+        /// <summary>What spell sits in a bar slot, or null when the slot is empty.</summary>
+        public static int? SpellInSlot(int slot)
+            => BarStore.TryGetValue(slot, out int spell) ? spell : null;
 
         /// <summary>Swaps the contents of two bar slots. Either side may be empty.</summary>
         public static void SwapBarSlots(int left, int right)
         {
             if (left == right) return;
 
-            int spellLeft = SpellInSlot(left);
-            int spellRight = SpellInSlot(right);
-            PutInBar(left, spellRight);
-            PutInBar(right, spellLeft);
+            bool hasLeft = BarStore.TryGetValue(left, out int spellLeft);
+            bool hasRight = BarStore.TryGetValue(right, out int spellRight);
+            if (hasLeft) PutInBar(right, spellLeft); else RemoveFromBar(right);
+            if (hasRight) PutInBar(left, spellRight); else RemoveFromBar(left);
         }
 
         /// <summary>
@@ -203,10 +203,10 @@ namespace Jondo.Unity.Server.Managers
                   ("$l", level));
         }
 
-        /// <summary>The first slot of the bar with nothing in it, past slot zero, which is the weapon's.</summary>
+        /// <summary>The first slot of the bar with nothing in it.</summary>
         private static int FirstFreeSlot()
         {
-            for (int slot = 1; slot < FightSpellLayout.SlotCount; slot++)
+            for (int slot = 0; slot < FightSpellLayout.SlotCount; slot++)
                 if (!BarStore.ContainsKey(slot)) return slot;
             return -1;
         }

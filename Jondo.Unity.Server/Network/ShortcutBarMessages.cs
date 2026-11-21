@@ -24,7 +24,7 @@ internal sealed class ShortcutBarMessages(IShortcutBarBackend backend)
             return new(mutation.Select((spell, slot) => Spell(slot, spell)).ToArray(), ShortcutBar.Spell);
 
         var layout = backend.SpellLayout(session).ToArray();
-        backend.RememberBar(session, layout.Where(entry => entry.Spell != FightProtocol.HechizoCuerpoACuerpo).ToArray());
+        backend.RememberBar(session, layout);
         return new(layout.Select(entry => Spell(entry.Slot, entry.Spell)).ToArray(), ShortcutBar.Spell);
     }
 

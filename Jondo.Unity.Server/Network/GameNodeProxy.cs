@@ -1855,8 +1855,16 @@ namespace Jondo.Unity.Server.Network
                     }
                 }
 
-                Managers.SpellChoices.PutInBar(slot, spellId);
-                return !hasSpell || spellId == 0 ? slot : -1;
+                if (hasSpell)
+                {
+                    Managers.SpellChoices.PutInBar(slot, spellId);
+                    return -1;
+                }
+                else
+                {
+                    Managers.SpellChoices.RemoveFromBar(slot);
+                    return slot;
+                }
             }
             catch (Exception ex)
             {
@@ -1892,7 +1900,7 @@ namespace Jondo.Unity.Server.Network
                 }
                 if (bar != ConnectionProtocol.SpellBar) return;
 
-                Managers.SpellChoices.PutInBar(slot, 0);
+                Managers.SpellChoices.RemoveFromBar(slot);
                 await WriteShortcutRemovedAsync(stream, slot);
             }
             catch (Exception ex)
@@ -1940,15 +1948,15 @@ namespace Jondo.Unity.Server.Network
 
         private static async Task WriteShortcutSlotAsync(NetworkStream stream, int slot)
         {
-            int spell = Managers.SpellChoices.SpellInSlot(slot);
-            if (spell == 0)
+            int? spell = Managers.SpellChoices.SpellInSlot(slot);
+            if (spell == null)
             {
                 await WriteShortcutRemovedAsync(stream, slot);
                 return;
             }
 
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                ConnectionProtocol.Push(Op.Ivk, ConnectionProtocol.BuildShortcutChanged(slot, spell)));
+                ConnectionProtocol.Push(Op.Ivk, ConnectionProtocol.BuildShortcutChanged(slot, spell.Value)));
         }
 
         private static async Task WriteShortcutRemovedAsync(NetworkStream stream, int slot)
