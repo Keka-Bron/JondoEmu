@@ -2617,7 +2617,9 @@ namespace Jondo.Unity.Server.Network
         private const int GradoDelCuerpoACuerpo = 1;
 
         /// <summary>Melee is spell ZERO, "Puñetazo".</summary>
+        /// <remarks>Note: Upstream protocol names this HechizoCuerpoACuerpo.</remarks>
         public const int HechizoCuerpoACuerpo = 0;
+        public const int Weapon = HechizoCuerpoACuerpo;
 
         /// <param name="conArma">
         /// Whether it carries the melee entry. The PLAYERS' bars carry it, all 27
