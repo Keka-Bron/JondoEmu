@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Handlers;
@@ -81,6 +82,48 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.True(cuerola.CurrentHP > 3000, "no heal");
             Assert.Contains(cuerola.Buffs.Puestos, r => r.EffectId == PlusDamage && r.HechizoOrigen == Exhalacion);
+        }
+
+        /// <summary>
+        /// Galuchat, Klim's behaviour, gives the players Peau lisse «pour 2 tours» as the fight
+        /// begins: «au tour 3, il sera effectif uniquement à partir du monstre qui joue son tour
+        /// après le Klime». It lives Klim's turn of round 3 and falls at the next turn start; it
+        /// fell after his second, and the monsters after him made the players Pacifist in round 2.
+        /// </summary>
+        [Fact]
+        public async Task Peau_lisse_from_the_start_lives_through_Klim_s_third_turn()
+        {
+            const int Klim = 3384, Galuchat = 3485, PeauLisse = 152;
+            if (SpellEffects.De(Galuchat, 1).Count == 0) return;
+            var fight = new FightInstance(1, 1);
+            var me = Person(10, 100);
+            me.Initiative = 5000;
+            var before = Monster(-2, Cuereno, 400);
+            before.Initiative = 3000;
+            var klim = Monster(-1, Klim, 300, 19000);
+            klim.Initiative = 2000;
+            klim.Conducta = (Galuchat, 1);
+            var after = Monster(-3, Cuerola, 420);
+            after.Initiative = 1000;
+            fight.AddPlayer(me);
+            foreach (var m in new[] { before, klim, after }) fight.AddMonster(m);
+            fight.StartFight();
+            await FightHandler.LanzarLaConductaAsync(null, fight, klim);
+            fight.CloseTheStart();
+            Assert.True(me.Buffs.TieneEstado(PeauLisse));
+
+            // Round 1 is under way with my turn; each next turn start is swept as the fight sweeps it.
+            var seen = new List<(int Round, long Who, bool Has)>();
+            for (int i = 0; i < 12 && fight.RoundNumber <= 4; i++)
+            {
+                var next = fight.NextTurn();
+                FightHandler.TurnStartSweep(fight, next);
+                seen.Add((fight.RoundNumber, next.Id, me.Buffs.TieneEstado(PeauLisse)));
+            }
+
+            Assert.Contains((2, after.Id, true), seen);               // round 2 whole
+            Assert.Contains((3, klim.Id, true), seen);                // Klim's own third turn start
+            Assert.Contains((3, after.Id, false), seen);              // from the monster after him
         }
 
         /// <summary>

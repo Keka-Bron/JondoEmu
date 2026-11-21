@@ -3413,6 +3413,8 @@ namespace Jondo.Unity.Server.Handlers
                     // A dimension dungeon's timeline shows its waves from the first turn.
                     await FirstDimensionWaveAsync(fight);
 
+                    // What was put so far was put as the fight began (AguantaSuTurno).
+                    fight.CloseTheStart();
                     await AskToConfirmAsync(stream, fight);
                 }
             }
@@ -4622,6 +4624,14 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (embrujo.Quien != quienEmpieza.Id || embrujo.Pendiente) continue;
                 bool sinceHisLastTurn = embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno;
+                // Put as the fight began, before anybody's turn, the row counts its rounds whole and
+                // lives its caster's turn of the last one, whatever his place in the order. Klim's
+                // Galuchat gives the players Peau lisse «pour 2 tours» at the start, and «au tour 3,
+                // il sera effectif uniquement à partir du monstre qui joue son tour après le Klime»
+                // (Dofus pour les noobs, «Salons privés de Klime»). Counted as put in the first
+                // round before his turn, it fell after his second turn: the monsters after him made
+                // the players Pacifist in round 2.
+                bool putAtTheStart = embrujo.Numero <= fight.LastBuffOfTheStart;
 
                 // Put in this round before his turn -- a glyph of his at the start of a turn
                 // ahead of his -- the row lives his turn of this round as its first. Counted from
@@ -4631,7 +4641,7 @@ namespace Jondo.Unity.Server.Handlers
                 // noobs, «Antre du Dragon Cochon»). Not a row put at this turn's own start: a
                 // delayed one coming on as his turn opens the round -- Precipitación's «-3 PA» to
                 // the ally, in the ally's next turn -- is his, of this turn.
-                if (sinceHisLastTurn && !embrujo.CountsHisTurnThisRound
+                if (sinceHisLastTurn && !putAtTheStart && !embrujo.CountsHisTurnThisRound
                     && embrujo.Numero > fight.LastBuffBeforeThisRound
                     && embrujo.Numero <= fight.LastBuffBeforeThisTurn
                     && embrujo.EmpiezaEnRonda == fight.RoundNumber
@@ -4642,7 +4652,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
 
                 if (embrujo.CaducaEnRonda == fight.RoundNumber
-                    && (embrujo.CountsHisTurnThisRound
+                    && (embrujo.CountsHisTurnThisRound || putAtTheStart
                         || (quienEmpieza.UltimoEmbrujoDeSuTurno >= 0 && sinceHisLastTurn)))
                     embrujo.CaeAlAcabarSuTurno = true;
             }

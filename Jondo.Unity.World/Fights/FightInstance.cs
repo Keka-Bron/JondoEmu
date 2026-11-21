@@ -400,6 +400,15 @@ namespace Jondo.Unity.World.Fights
         public int LastBuffBeforeThisRound { get; private set; }
 
         /// <summary>
+        /// The number the last buff put as the fight began had got: the rows of its passives,
+        /// attitudes and behaviour spells, before anybody's first turn. Zero until the start is over.
+        /// </summary>
+        public int LastBuffOfTheStart { get; private set; }
+
+        /// <summary>The fight's start is over: what was put so far was put before its first turn.</summary>
+        public void CloseTheStart() => LastBuffOfTheStart = _ultimoEmbrujo;
+
+        /// <summary>
         /// The number the last buff had got when this turn began: the later ones were put at its
         /// start or in it, the earlier ones in the turns before.
         /// </summary>
