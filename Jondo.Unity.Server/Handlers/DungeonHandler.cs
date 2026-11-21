@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
@@ -199,7 +200,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // His heroes follow him in: a way in for each of them, or nobody goes (DungeonHeroes.cs).
-            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now) is not { } heroWays) return false;
+            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now, state.OpenDialogueNpcId) is not { } heroWays) return false;
 
             if (uid != 0)
             {
@@ -229,6 +230,18 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await TellAsync(stream, CommandTexts.Get("dungeon.missing_item"));
                 return false;
+            }
+
+            // A hero who went in on a key handed one to the guardian too: Tassa's «the laboratory's
+            // key» is his as it is his master's -- whoever's bag it came out of, as a key is the
+            // group's (DungeonHeroes). Not one who went in by his keyring, as for the master.
+            var keyed = heroWays.Where(w => w.PaidBy != 0).Select(w => w.Hero.CharacterId).ToHashSet();
+            int keyItem = item != 0 ? item : dungeon.Required.Select(r => r.Item).FirstOrDefault();
+            if (keyed.Count > 0 && keyItem != 0)
+            {
+                int guardian = state.OpenDialogueNpcId;
+                await Heroes.ShareQuestActionAsync(hero => Managers.Quests.OnKeyHandedOverAsync(hero, guardian, keyItem),
+                    participates: hero => keyed.Contains(hero.CharacterId));
             }
 
             // The guardian's window is closed before anybody is moved. The client does not close it

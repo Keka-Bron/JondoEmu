@@ -63,6 +63,41 @@ public sealed class QuestStateTests
         Assert.Empty(ambient.Codec.Frames);
     }
 
+    [Fact]
+    public async Task A_switch_makes_the_box_shown_the_new_ones_without_sending_a_quest_twice()
+    {
+        // The box shows 81_002 and 81_007 of the one played before (71_009); the one played now
+        // follows 81_002 and 81_001, and has 81_002 and 81_001 under way, not 81_007.
+        var backend = new Backend();
+        backend.Before.AddRange([81_002, 81_007]);
+        backend.Tracker.AddRange([81_002, 81_001, 81_009]);
+        var target = new Recipient();
+
+        await new QuestStateService(backend).SendSwitchedJournalAsync(target.Session, 71_009);
+
+        var frames = target.Codec.Frames.Select(frame => frame.Content).ToList();
+        Assert.Equal(81_007, Assert.IsType<QuestValidatedEvent>(frames[0]).QuestId);
+        Assert.IsType<QuestsEvent>(frames[1]);
+        Assert.Equal(81_002, Assert.IsType<QuestStepInformationEvent>(frames[2]).Information.QuestId);
+        Assert.Equal(new[] { 81_001 }, Assert.IsType<QuestsFollowedEvent>(frames[3]).Quests.Select(quest => quest.QuestId));
+        Assert.Equal(4, frames.Count);
+        Assert.Equal(new[] { 81_002, 81_001 }, backend.Tracker);
+    }
+
+    [Fact]
+    public async Task A_switch_follows_what_the_box_shows_and_the_new_one_has_under_way()
+    {
+        var backend = new Backend();
+        backend.Before.AddRange([81_001]);
+        var target = new Recipient();
+
+        await new QuestStateService(backend).SendSwitchedJournalAsync(target.Session, 71_009);
+
+        Assert.Equal(new[] { 81_001 }, backend.Tracker);
+        Assert.Empty(Assert.IsType<QuestsFollowedEvent>(target.Codec.Frames[^1].Content).Quests);
+        Assert.DoesNotContain(target.Codec.Frames, frame => frame.Content is QuestValidatedEvent);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -221,7 +256,9 @@ public sealed class QuestStateTests
             Call($"journal:{session.CharacterId}");
             return !Available ? null : QuestMessages.Journal(Empty ? [] : [QuestMessages.Active(81_002, 82_003, Objectives, Done), QuestMessages.Active(81_001, 82_001, [], [])], Empty ? [] : [81_004]);
         }
-        public IReadOnlyList<int> Followed(long characterId) { Call($"followed:{characterId}"); return Tracker; }
+        internal readonly List<int> Before = [];
+        public IReadOnlyList<int> Followed(long characterId) { Call($"followed:{characterId}"); return characterId == 71_009 ? Before : Tracker; }
+        public void Follow(long characterId, int questId) { Call($"follow:{characterId}:{questId}"); Tracker.Add(questId); }
         public void Unfollow(long characterId, int questId) { Call($"unfollow:{characterId}:{questId}"); Tracker.Remove(questId); }
         public NpcsMapQuestStatusUpdateEvent? Marks(GameSession session, long mapId)
         {

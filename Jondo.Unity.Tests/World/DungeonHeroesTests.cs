@@ -38,6 +38,31 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(2, plan[3]);
         }
 
+        /// <summary>
+        /// A hero whose quest wants the key handed to the guardian (Tassa's laboratory) gives one
+        /// rather than use his keyring -- his own, else the group's --, and uses the keyring only when
+        /// the group has none left. He went in by his keyring with his key in his bag, and his quest
+        /// stayed behind his master's (2026-11-21, through the MCP).
+        /// </summary>
+        [Fact]
+        public void A_hero_whose_quest_wants_the_key_gives_one_rather_than_use_his_keyring()
+        {
+            var own = DungeonHandler.PlanForHeroes(M(1, 0), new[] { new DungeonHandler.Member(2, true, 1, WantsKey: true) }, out int missing);
+            Assert.Equal(0, missing);
+            Assert.Equal(2, own![2]);
+
+            var masters = DungeonHandler.PlanForHeroes(M(1, 1), new[] { new DungeonHandler.Member(2, true, 0, WantsKey: true) }, out missing);
+            Assert.Equal(1, masters![2]);
+
+            var none = DungeonHandler.PlanForHeroes(M(1, 0), new[] { new DungeonHandler.Member(2, true, 0, WantsKey: true) }, out missing);
+            Assert.Equal(0, missing);
+            Assert.Equal(0, none![2]);
+
+            // Without a keyring and with no key in the group he is short, as anybody.
+            Assert.Null(DungeonHandler.PlanForHeroes(M(1, 0), new[] { new DungeonHandler.Member(2, false, 0, WantsKey: true) }, out missing));
+            Assert.Equal(1, missing);
+        }
+
         [Fact]
         public void Short_of_keys_nobody_goes_in_and_the_shortfall_is_counted()
         {

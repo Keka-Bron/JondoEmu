@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -67,6 +68,7 @@ namespace Heroes
                 : "[Heroes] No session token from the launcher: the hero mode stays asleep.");
             if (_token.Length > 0) WatchActionBar();
             if (_token.Length > 0) WatchPortraits();
+            if (_token.Length > 0) InstallEscapeGuard();
         }
 
         public override void OnUpdate()
@@ -98,6 +100,11 @@ namespace Heroes
             }
             try { WatchPreview(); } catch { }
             if (_reframe.Count > 0) { try { Reframe(); } catch { } }
+            if (_escapePressed)
+            {
+                _escapePressed = false;
+                CloseTopmost();
+            }
             if (ShortcutPressed())
             {
                 if (_window != null) Close();
@@ -4402,6 +4409,87 @@ namespace Heroes
             foreach (string name in new[] { "GetPointerDown", "IsPointerDown", "GetPointerUp", "GetSecondaryDown", "IsSecondaryDown",
                                             "GetSecondaryUp", "GetTertiaryDown", "IsTertiaryDown", "GetTertiaryUp" })
                 Patch(name, noButton);
+        }
+
+        // ─── Escape is the window's ──────────────────────────────────────────────────────
+
+        /// <summary>An Escape the windows took this frame, for <see cref="OnUpdate"/> to close the top one.</summary>
+        private static volatile bool _escapePressed;
+
+        /// <summary>Whether Escape was down in the keyboard's last event: a press is its going down.</summary>
+        private static bool _escapeDown;
+
+        /// <summary>Whether one of the mod's windows is open, for Escape to close it.</summary>
+        private static bool AnyWindowOpen => _window != null || _sheet != null || _creationWindow != null || _alert != null;
+
+        /// <summary>
+        /// Escape closes the mod's window on top, as it closes the game's own (dagostin, 2026-11-21).
+        /// The windows are none of the game's: Escape went past them to the game, which opened its
+        /// pause menu over them and left them open whatever was pressed. While one is open the
+        /// keyboard's events that hold Escape down are taken out of the Input System before the game
+        /// reads them (InputEventPtr.handled), and the mod closes its window itself. Measured with
+        /// the MCP's client on 2026-11-21: Escape opened the pause menu over the window, now it closes it.
+        /// </summary>
+        private static void InstallEscapeGuard()
+        {
+            try
+            {
+                var listener = DelegateSupport.ConvertDelegate<Il2CppSystem.Action<UnityEngine.InputSystem.LowLevel.InputEventPtr, UnityEngine.InputSystem.InputDevice>>(
+                    new Action<UnityEngine.InputSystem.LowLevel.InputEventPtr, UnityEngine.InputSystem.InputDevice>(OnInputEvent));
+                UnityEngine.InputSystem.InputSystem.onEvent += listener;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Heroes] Escape not guarded: {ex.Message}");
+            }
+        }
+
+        private static readonly int StateEvent = FourCC("STAT"), KeyboardState = FourCC("KEYS");
+
+        private static int FourCC(string s) => (s[0] << 24) | (s[1] << 16) | (s[2] << 8) | s[3];
+
+        /// <summary>
+        /// One of the Input System's events: a keyboard's state with Escape down is the windows'.
+        /// </summary>
+        /// <remarks>
+        /// What the converted delegate is handed is not the InputEventPtr but where it is kept: read
+        /// as it came, the event's type was garbage («must be a StateEvent ... but is a 0"}d»), and
+        /// once dereferenced it is the «STAT» the keyboard sent. The event is read raw, as JondoFix's
+        /// TestInput writes it: the header, «KEYS» at 20 and one bit a key from 24; «handled» is the
+        /// high bit of the event's id at 16 (InputEvent.kHandledMask), which keeps it from the game.
+        /// </remarks>
+        private static unsafe void OnInputEvent(UnityEngine.InputSystem.LowLevel.InputEventPtr input, UnityEngine.InputSystem.InputDevice device)
+        {
+            try
+            {
+                var keyboard = UnityEngine.InputSystem.Keyboard.current;
+                if (keyboard == null || device == null || device.deviceId != keyboard.deviceId) return;
+                IntPtr held = (IntPtr)input.ToPointer();
+                if (held == IntPtr.Zero) return;
+                IntPtr e = Marshal.ReadIntPtr(held);
+                if (e == IntPtr.Zero || Marshal.ReadInt32(e) != StateEvent || Marshal.ReadInt32(e, 20) != KeyboardState) return;
+                int key = (int)UnityEngine.InputSystem.Key.Escape;
+                bool down = (Marshal.ReadByte(e, 24 + key / 8) & (1 << (key % 8))) != 0;
+                bool pressed = down && !_escapeDown;
+                _escapeDown = down;
+                if (!down || !AnyWindowOpen) return;
+                Marshal.WriteInt32(e, 16, Marshal.ReadInt32(e, 16) | unchecked((int)0x80000000));
+                if (pressed) _escapePressed = true;
+            }
+            catch { }
+        }
+
+        /// <summary>The mod's window on top closed: the creation screen, a hero's sheet, the quest alert, the window.</summary>
+        private static void CloseTopmost()
+        {
+            if (_creationWindow != null) CloseNativeCreation();
+            else if (_sheet != null) CloseSheet();
+            else if (_alert != null) CloseQuestAlert();
+            else if (_window != null)
+            {
+                if (_creating) StopCreation();
+                else Close();
+            }
         }
 
         public static void SayOverUi(ref bool __result)

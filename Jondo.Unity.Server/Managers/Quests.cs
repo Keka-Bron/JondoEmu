@@ -1289,7 +1289,9 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (!used.Contains(element)) { all = false; break; }
                     }
-                    if (all) await CloseAsync(session, binding);
+                    // Read beside him by the heroes who followed him from one to the next: they have
+                    // no client to open the statues with, and stayed behind at each.
+                    if (all) await CloseSharedAsync(session, binding);
                 }
             }
         }
@@ -1313,7 +1315,18 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Read || binding.ItemId != itemId) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
-                    await CloseAsync(session, binding);
+                    if (!await CloseAsync(session, binding)) continue;
+                    // And by the heroes beside him who carry the book too, each his own copy: as the
+                    // recipe of Incarnam's cake (ReadingItemHandler).
+                    int stepId = run.StepId;
+                    await Heroes.ShareQuestActionAsync(async hero =>
+                    {
+                        if (Equipment.HowMany(itemId) > 0 && SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
+                            await CloseAsync(hero, binding);
+                    },
+                    quests: new[] { binding.QuestId },
+                    explain: hero => Equipment.HowMany(itemId) > 0 ? null
+                        : new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, itemId, 1));
                 }
             }
         }
@@ -1329,9 +1342,20 @@ namespace Jondo.Unity.Server.Managers
         public static async Task OnKeyHandedOverAsync(GameSession session, int npcId, int itemId)
         {
             using var context = SessionContext.Push(session);
+            if (KeyObjective(npcId, itemId) is { } awaited) await TickAsync(session, awaited.QuestId, awaited.ObjectiveId);
+        }
+
+        /// <summary>
+        /// Whether a quest of whoever is in session waits for that key to be handed to that guardian:
+        /// a hero who has it goes in on a key rather than by his keyring (DungeonHeroes).
+        /// </summary>
+        internal static bool AwaitsKey(int npcId, int itemId) => KeyObjective(npcId, itemId) != null;
+
+        private static (int QuestId, int ObjectiveId)? KeyObjective(int npcId, int itemId)
+        {
             var log = Log;
-            if (log == null || _book == null || npcId == 0 || itemId == 0) return;
-            foreach (var run in new List<QuestRun>(log.Doing()))
+            if (log == null || _book == null || npcId == 0 || itemId == 0) return null;
+            foreach (var run in log.Doing())
             {
                 var step = _book.Step(run.StepId);
                 if (step == null) continue;
@@ -1339,10 +1363,10 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (objective.NpcId != npcId || objective.ItemId != itemId || !objective.ConsumesItems) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
-                    await TickAsync(session, run.QuestId, objective.Id);
-                    return;
+                    return (run.QuestId, objective.Id);
                 }
             }
+            return null;
         }
 
         /// <summary>
@@ -2222,6 +2246,10 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static Task SendJournalAsync(GameSession session, bool box = false)
             => QuestStateService.Live.SendJournalAsync(session, box);
+
+        /// <summary>The journal of a hero just taken in hand, the box the one played before left made his.</summary>
+        public static Task SendSwitchedJournalAsync(GameSession session, long before)
+            => QuestStateService.Live.SendSwitchedJournalAsync(session, before);
 
         internal static Game.QuestsEvent? JournalSnapshot(GameSession session)
         {

@@ -112,7 +112,7 @@ namespace Jondo.Unity.Server.Network
             // showing the journal and the achievements of the one played before until the next login.
             if (!reload)
             {
-                await Quests.SendJournalAsync(session, box: true);
+                await Quests.SendSwitchedJournalAsync(session, masterId);
                 await Quests.SendMarksAsync(session, map);
                 await Achievements.SendListAsync(session);
             }

@@ -56,10 +56,35 @@ namespace Jondo.Unity.Server.Handlers
 
             // And the objective it validates, when the quest is in hand: reading the recipe.
             foreach (var effect in effects.Where(e => e.EffectId == ObjectiveEffect && e.Value != 0))
-                await Quests.CompleteByReplyAsync(session, 0, effect.Value);
+            {
+                if (await Quests.CompleteByReplyAsync(session, 0, effect.Value))
+                    await ShareReadingAsync(item.Template, effect.Value);
+            }
             // Or the one a binding ties to reading this book (content/quests/objectives.json).
             await Quests.OnItemReadAsync(session, item.Template);
             return true;
+        }
+
+        /// <summary>
+        /// The heroes beside him read it with him, each his own copy: the objective done for whoever
+        /// shares quests and has the book in his bag too. The cake of the recipe asks for its reading
+        /// to be crafted («Qa=1637&amp;Qo&gt;9805»), and a hero who was given the recipe with the
+        /// quest but had not opened it himself was told nothing came out of the ingredients.
+        /// </summary>
+        private static async Task ShareReadingAsync(int template, int objectiveId)
+        {
+            var book = Quests.Book;
+            var objective = book?.Objective(objectiveId);
+            var step = objective == null ? null : book!.Step(objective.StepId);
+            if (step == null) return;
+            await Heroes.ShareQuestActionAsync(async hero =>
+            {
+                if (Equipment.HowMany(template) > 0 && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _))
+                    await Quests.CompleteByReplyAsync(hero, step.QuestId, objectiveId);
+            },
+            quests: new[] { step.QuestId },
+            explain: hero => Equipment.HowMany(template) > 0 ? null
+                : new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, template, 1));
         }
 
         /// <summary>A document opened (kkt { f2 }), its close button awaited.</summary>
