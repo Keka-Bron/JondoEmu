@@ -50,7 +50,9 @@
     "text works as long as the tree agrees with itself.",
     "",
     "  mutation      the reply gives this mutation item after its teleport (the Orbalantir's).",
-    "  endsMutation  the reply takes the player's mutation away after its teleport."
+    "  endsMutation  the reply takes the player's mutation away after its teleport.",
+    "  givesAlteration  the reply puts this alteration on the player (Max Ymillán's «Supercaptura»).",
+    "  alsoLeaves    other NPCs of the map who go with the one spoken to (the dummy that was Riberico)."
   ],
   "dialogues": [
     {
@@ -53567,6 +53569,197 @@
         }
       ],
       "why": "Archon Khebesto in the Hall of Judgment, on the pulpit right of the scales, for «El Reino Gris» (1907) and «Golpe en Anutropía» (1908). Dofus pour les noobs: «Parlez à l'Archonte Kebesto qui vous annoncera que pour rencontrer la Reine il faut faire l'offrande d'une relique à la Nécropole. La quête se termine et vous débloquez la suivante : Casse en Enutrosor»; the guide's screenshot has his first reply, «Dire que vous n'êtes pas là pour cette raison» (34745). He finds your request for an audience (28972), the law of the relic (34744, 28973); «Es un asunto importante» (34743) is 13057, and asking how to get it (34742) starts 1908 on its step dialog, a precious Enutrosor chest to destroy (28975). During 1908, the same words (34746, 28976)."
+    },
+    {
+      "npc": 2342,
+      "map": 0,
+      "opening": 17478,
+      "lines": [
+        {
+          "message": 17478,
+          "choices": [
+            { "reply": 21037, "next": 17567, "criterion": "PL>79", "beforeQuest": 1504 },
+            { "reply": 82829, "next": 60273, "quest": 1504, "beforeObjective": 8466, "criterion": "HA!871" },
+            { "reply": 21038, "next": 17569, "quest": 1504, "beforeObjective": 8466, "completesAll": [8466, 8467, 8468, 8469], "gives": 15308, "criterion": "PO=34133&PO=34134&PO=34135&PO=34136" },
+            { "reply": 21041, "next": 17570, "quest": 1504, "afterObjective": 8480, "beforeObjective": 8481, "completes": 8481, "params": [[30, 8481]] }
+          ]
+        },
+        {
+          "message": 17567,
+          "choices": [
+            { "reply": 21036, "next": 60142, "startsQuest": 1504, "params": [[34, 1504]] }
+          ]
+        },
+        {
+          "message": 60142,
+          "choices": [
+            { "reply": 82556, "takes": 9687, "holds": 9687, "givesAlteration": 871 },
+            { "reply": 82557 }
+          ]
+        },
+        {
+          "message": 60273,
+          "choices": [
+            { "reply": 82558, "takes": 9687, "holds": 9687, "givesAlteration": 871 },
+            { "reply": 82831 }
+          ]
+        },
+        {
+          "message": 17569,
+          "choices": [
+            { "reply": 21036 }
+          ]
+        },
+        {
+          "message": 17570,
+          "choices": [
+
+          ]
+        }
+      ],
+      "why": "Professor Max Ymillán at the Crisol de los Afortunados [-1,-1], for «Cofrología» (1504). Dofus pour les noobs, «Koffrologie»: «Maximilio ... a besoin d'âme de Koffrefors pour les étudier de plus près. Il vous demande donc de lui donner 1 x Moyenne pierre d'âme ... Il vous a également donné une altération du nom de Super capture». Asked about the dimension's dwellers (21037) he wants cofrefuertes caught (17567); «Aceptar» (21036) starts the quest on «¡Perfecto!» (60142), where a medium soul stone (9687) buys the «Supercaptura» (871) the souls drop under (82556), or later from «¿Cómo puedo capturar...?» (82829, 60273, 82558). The four souls handed over (21038) are 8466-8469 and get the whistle (15308) with his tests (17569). Once Riberico has followed you (8480), «Dejar pasar a Riberico» (21041) is 8481 (17570)."
+    },
+    {
+      "npc": 2384,
+      "map": 129238017,
+      "opening": 17572,
+      "lines": [
+        {
+          "message": 17572,
+          "choices": [
+            { "reply": 21043, "quest": 1504, "afterObjective": 8471, "beforeObjective": 8472, "showsNpc": 2387, "leaves": true, "completes": 8472, "params": [[30, 8472]] }
+          ]
+        }
+      ],
+      "why": "The antesoro the whistle calls at [-3,-3], for «Cofrología» (1504): «Un Trésantène se montre alors. Parlez lui afin de le caresser» (Dofus pour les noobs, «Koffrologie»). «Acariciar al antesoro» (21043) is 8472: it goes, and the professor's krosmoglob comes in."
+    },
+    {
+      "npc": 2387,
+      "map": 129238017,
+      "opening": 17573,
+      "lines": [
+        {
+          "message": 17573,
+          "choices": [
+            { "reply": 21045, "next": 17574, "quest": 1504, "afterObjective": 8472, "beforeObjective": 8473 }
+          ]
+        },
+        {
+          "message": 17574,
+          "choices": [
+            { "reply": 21044, "quest": 1504, "beforeObjective": 8473, "leaves": true, "completes": 8473, "params": [[30, 8473]] }
+          ]
+        }
+      ],
+      "why": "The professor's krosmoglob after the whistle test at [-3,-3], for «Cofrología» (1504): «Parlez lui afin de lui faire part des résultats de son sifflet. Il vous demande ensuite de faire semblant de voler un sac de kamas» (Dofus pour les noobs, «Koffrologie»). «Describir lo que ha pasado» (21045, 17574), «Ir hasta allí» (21044) is 8473."
+    },
+    {
+      "npc": 2387,
+      "map": 129238531,
+      "opening": 17573,
+      "lines": [
+        {
+          "message": 17573,
+          "choices": [
+            { "reply": 21048, "next": 17576, "quest": 1504, "afterObjective": 8476, "beforeObjective": 8477 }
+          ]
+        },
+        {
+          "message": 17576,
+          "choices": [
+            { "reply": 21047, "quest": 1504, "beforeObjective": 8477, "leaves": true, "completes": 8477, "params": [[30, 8477]] }
+          ]
+        }
+      ],
+      "why": "The professor's krosmoglob after the kamas bag at [-2,-1], for «Cofrología» (1504): «Parlez lui afin de lui faire part des événements. Il vous demande maintenant d'attaquer un mannequin d'Enutrofor» (Dofus pour les noobs, «Koffrologie»). «Describir lo que ha pasado» (21048, 17576), «Ir hasta allí» (21047) is 8477."
+    },
+    {
+      "npc": 2385,
+      "map": 129238531,
+      "opening": 17575,
+      "lines": [
+        {
+          "message": 17575,
+          "choices": [
+            { "reply": 21046, "quest": 1504, "afterObjective": 8475, "beforeObjective": 8476, "showsNpc": 2387, "leaves": true, "completes": 8476, "params": [[30, 8476]] }
+          ]
+        }
+      ],
+      "why": "The berserkofre that guards the kamas bag at [-2,-1], for «Cofrología» (1504): «Un Berserkoffre apparait alors à votre droite. Parlez lui puis éloignez vous du sac» (Dofus pour les noobs, «Koffrologie»). «Alejarte de la bolsa de kamas» (21046) is 8476: it goes, and the krosmoglob comes in."
+    },
+    {
+      "npc": 2415,
+      "map": 129238019,
+      "opening": 17578,
+      "lines": [
+        {
+          "message": 17578,
+          "choices": [
+            { "reply": 21051, "quest": 1504, "afterObjective": 8477, "beforeObjective": 8478, "showsNpc": 2386, "completes": 8478, "params": [[30, 8478]] }
+          ]
+        }
+      ],
+      "why": "The divinutrof dummy the professor set up at [-3,-1], for «Cofrología» (1504): «Parlez au Mannequin Enutrofor pour l'attaquer (il n'y aura aucun combat mais le combat vous sera décrit dans le dialogue avec les pnj)» (Dofus pour les noobs, «Koffrologie»). «Atacar al maniquí» (21051) is 8478, and a sacurador comes to heal it."
+    },
+    {
+      "npc": 2386,
+      "map": 129238019,
+      "opening": 17584,
+      "lines": [
+        {
+          "message": 17584,
+          "choices": [
+            { "reply": 21060, "quest": 1504, "afterObjective": 8478, "beforeObjective": 8479, "showsNpc": 2388, "leaves": true, "alsoLeaves": [2415], "completes": 8479, "params": [[30, 8479]] }
+          ]
+        }
+      ],
+      "why": "The sacurador that heals the dummy at [-3,-1], for «Cofrología» (1504): «un Boursoin fait sont apparition pour soigner le mannequin d'Enutrofor. Parlez lui pour le laisser tranquille» (Dofus pour les noobs, «Koffrologie»). «Dejar al sacurador tranquilo» (21060) is 8479; it goes, and the dummy is Riberico."
+    },
+    {
+      "npc": 2388,
+      "map": 129238019,
+      "opening": 17580,
+      "lines": [
+        {
+          "message": 17580,
+          "choices": [
+            { "reply": 21055, "next": 17581, "quest": 1504, "afterObjective": 8479, "beforeObjective": 8480 }
+          ]
+        },
+        {
+          "message": 17581,
+          "choices": [
+            { "reply": 21061, "next": 17586 }
+          ]
+        },
+        {
+          "message": 17586,
+          "choices": [
+            { "reply": 21054, "quest": 1504, "beforeObjective": 8480, "leaves": true, "completes": 8480, "params": [[30, 8480]] }
+          ]
+        }
+      ],
+      "why": "Riberico, the dummy at [-3,-1] once the sacurador is gone, for «Cofrología» (1504): «Reparlez au mannequin qui s'est transformé en Ribériche. Il veux que vous le présentiez au scientifique» (Dofus pour les noobs, «Koffrologie»). Who he is (21055, 17581), the Cofredía (21061, 17586); «Acompañar a Riberico frente al profesor» (21054) is 8480, and he goes to the professor's camp."
+    },
+    {
+      "npc": 2388,
+      "map": 131597312,
+      "opening": 17585,
+      "lines": [
+        {
+          "message": 17585,
+          "choices": [
+            { "reply": 21061, "next": 17586 }
+          ]
+        },
+        {
+          "message": 17586,
+          "choices": [
+
+          ]
+        }
+      ],
+      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586)."
     }
   ]
 }

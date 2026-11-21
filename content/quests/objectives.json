@@ -7060,6 +7060,23 @@
    "monsters": [5005],
    "map": 185077248,
    "why": "«Espera a que regrese el alguacil» (732379): while the bailiff is away the Mane curioso (5005) brings Hyrkul's message and attacks; the bailiff is back once she is beaten. Dofus pour les noobs: «N'acceptant pas votre refus, la Mâne curieux vous agresse ... Une fois le combat terminé, reparlez à l'Huissier de la Citadelle»."
+  },
+  {
+   "objective": 8471,
+   "quest": 1504,
+   "kind": "use",
+   "afterObjectives": [8470],
+   "showsNpc": 2384,
+   "why": "«Utiliza el silbato de cofrefuerte»: the professor's whistle (15308) used at [-3,-3] (its effect 30 is this objective, its own condition the map), which calls an antesoro: «Une fois sur cette map, utilisez le sifflet ... Un Trésantène se montre alors» (Dofus pour les noobs, «Koffrologie»)."
+  },
+  {
+   "objective": 8475,
+   "quest": 1504,
+   "kind": "click",
+   "elements": [{"map": 129238531, "element": 484994}],
+   "afterObjectives": [8474],
+   "showsNpc": 2385,
+   "why": "«Intenta robar una bolsa de kamas»: «Le sac de kamas se trouve en [-2,-1]. Une fois sur la map, cliquez sur le sac remplis de kamas» (Dofus pour les noobs, «Koffrologie»): the sack 484994 (graphic 45335) on cell 402, at the foot of the pillar."
   }
 ]
 }

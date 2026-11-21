@@ -6384,6 +6384,91 @@
       "cell": 164,
       "orientation": 3,
       "why": "«El Reino Gris» (1907) and «Golpe en Anutropía» (1908): archon Khebesto on the pulpit right of the scales, where the guide's screenshot shows him over the judgment ring (Dofus pour les noobs, «Le pays gris»); 164 is one of the hall's lone walkable pulpit cells. The derived placement had him in the middle of the ring (412)."
+    },
+    {
+      "map": 129238017,
+      "npc": 2384,
+      "cell": 272,
+      "remove": true,
+      "why": "«Cofrología» (1504): the whistle's antesoro stood here for good from the derived layer, beside the one the quest calls up; it comes and goes with its step instead (below)."
+    },
+    {
+      "map": 129238531,
+      "npc": 2385,
+      "cell": 287,
+      "remove": true,
+      "why": "«Cofrología» (1504): the kamas bag's berserkofre stood here for good from the derived layer, beside the one the quest calls up; it comes and goes with its step instead (below)."
+    },
+    {
+      "map": 129238019,
+      "npc": 2386,
+      "cell": 287,
+      "remove": true,
+      "why": "«Cofrología» (1504): the dummy's sacurador stood here for good from the derived layer, beside the one the quest calls up; it comes and goes with its step instead (below)."
+    },
+    {
+      "map": 129238017,
+      "npc": 2384,
+      "cell": 388,
+      "orientation": 5,
+      "criterion": "Qa=1504&Qo>8471&Qo<8472",
+      "why": "«Cofrología» (1504): the antesoro the professor's whistle calls at [-3,-3] (8471) until petted (8472). INFERRED cell, the open tiles right of the pillars."
+    },
+    {
+      "map": 129238017,
+      "npc": 2387,
+      "cell": 402,
+      "orientation": 5,
+      "criterion": "Qa=1504&Qo>8472&Qo<8473",
+      "why": "«Cofrología» (1504): the professor's krosmoglob at [-3,-3] after the antesoro is petted (8472) until told the results (8473). INFERRED cell."
+    },
+    {
+      "map": 129238531,
+      "npc": 2385,
+      "cell": 431,
+      "orientation": 5,
+      "criterion": "Qa=1504&Qo>8475&Qo<8476",
+      "why": "«Cofrología» (1504): the berserkofre that rises on the right of the kamas bag (484994, cell 402) at [-2,-1] once it is touched (8475) until you step away (8476): «Un Berserkoffre apparait alors à votre droite» (Dofus pour les noobs). INFERRED cell: right of the bag stands only piled gold (403, 404, 416), so the open tile below it to the right."
+    },
+    {
+      "map": 129238531,
+      "npc": 2387,
+      "cell": 429,
+      "orientation": 5,
+      "criterion": "Qa=1504&Qo>8476&Qo<8477",
+      "why": "«Cofrología» (1504): the professor's krosmoglob at [-2,-1] after the berserkofre (8476) until told (8477). INFERRED cell, the open tile below the bag, beside whoever touched it."
+    },
+    {
+      "map": 129238019,
+      "npc": 2415,
+      "cell": 384,
+      "orientation": 3,
+      "criterion": "Qa=1504&Qo>8477&Qo<8479",
+      "why": "«Cofrología» (1504): the divinutrof dummy the professor set up at [-3,-1] (17576) until the sacurador is sent away and it shows itself as Riberico (8479). INFERRED cell, the open gold in the middle of the map."
+    },
+    {
+      "map": 129238019,
+      "npc": 2386,
+      "cell": 386,
+      "orientation": 5,
+      "criterion": "Qa=1504&Qo>8478&Qo<8479",
+      "why": "«Cofrología» (1504): the sacurador that heals the dummy at [-3,-1] (8478) until left alone (8479). INFERRED cell, beside the dummy."
+    },
+    {
+      "map": 129238019,
+      "npc": 2388,
+      "cell": 385,
+      "orientation": 3,
+      "criterion": "Qa=1504&Qo>8479&Qo<8480",
+      "why": "«Cofrología» (1504): Riberico, who was the dummy, at [-3,-1] (8479) until he follows you to the professor (8480). INFERRED cell, beside where the dummy stood."
+    },
+    {
+      "map": 131597312,
+      "npc": 2388,
+      "cell": 271,
+      "orientation": 5,
+      "criterion": "(Qa=1504&Qo>8480)|Qf=1504",
+      "why": "«Cofrología» (1504) and after: Riberico at the professor's camp [-1,-1] once taken there (8480); «Tesorfanato», «El maleficio del cofre» and «El mapa de la verdad» find him there. INFERRED cell, beside the professor."
     }
   ]
 }

@@ -260,6 +260,12 @@ namespace Jondo.Unity.World.Content
         public bool EndsMutation { get; init; }
 
         /// <summary>
+        /// The alteration this reply puts on the player, or zero: Max Ymillán's «Supercaptura» (871)
+        /// for a medium soul stone, which lets the Crisol's cofrefuertes drop their souls.
+        /// </summary>
+        public int GivesAlteration { get; init; }
+
+        /// <summary>
         /// The phoenix's map when the reply kills the player into a soul, or zero: Warko Linch's brew
         /// in «El cementerio primitivo», which leaves him in the primitive cemetery to find its phoenix
         /// (Managers.Phantoms). Applied with the reply's map change.
@@ -429,6 +435,13 @@ namespace Jondo.Unity.World.Content
         /// blades of «Cabeza de turco», drawn out together by Nibe Lula's diuretic.
         /// </summary>
         public IReadOnlyList<int> AlsoShows { get; init; } = Array.Empty<int>();
+
+        /// <summary>
+        /// Other NPCs of the map who go with the one spoken to as the window shuts («alsoLeaves»):
+        /// the divinutrof dummy of «Cofrología», which was Riberico all along, gone when the
+        /// sacurador is left alone. Their placements' criteria keep them gone afterwards.
+        /// </summary>
+        public IReadOnlyList<int> AlsoLeaves { get; init; } = Array.Empty<int>();
 
         /// <summary>
         /// More objectives of <see cref="Quest"/> this reply does, beside <see cref="Completes"/>:
@@ -1238,11 +1251,13 @@ namespace Jondo.Unity.World.Content
                             Trades = (int)Number(choice, "trade"),
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
+                            GivesAlteration = (int)Number(choice, "givesAlteration"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             ThenLine = Number(choice, "thenLine"),
                             Completes = (int)Number(choice, "completes"),
                             ShowsNpc = (int)Number(choice, "showsNpc"),
                             AlsoShows = Numbers(choice, "alsoShows").Select(o => (int)o).ToArray(),
+                            AlsoLeaves = Numbers(choice, "alsoLeaves").Select(o => (int)o).ToArray(),
                             CompletesAll = Numbers(choice, "completesAll").Select(o => (int)o).ToArray(),
                             Gives = (int)Number(choice, "gives"),
                             MinLevel = (int)Number(choice, "minLevel"),
@@ -1470,6 +1485,7 @@ namespace Jondo.Unity.World.Content
                                 if (choice.TradeCount != 1) writer.WriteNumber("tradeCount", choice.TradeCount);
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
+                            if (choice.GivesAlteration != 0) writer.WriteNumber("givesAlteration", choice.GivesAlteration);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.ThenLine != 0) writer.WriteNumber("thenLine", choice.ThenLine);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);
@@ -1478,6 +1494,12 @@ namespace Jondo.Unity.World.Content
                             {
                                 writer.WriteStartArray("alsoShows");
                                 foreach (int npc in choice.AlsoShows) writer.WriteNumberValue(npc);
+                                writer.WriteEndArray();
+                            }
+                            if (choice.AlsoLeaves.Count > 0)
+                            {
+                                writer.WriteStartArray("alsoLeaves");
+                                foreach (int npc in choice.AlsoLeaves) writer.WriteNumberValue(npc);
                                 writer.WriteEndArray();
                             }
                             if (choice.CompletesAll.Count > 0)

@@ -1690,6 +1690,10 @@ namespace Jondo.Unity.Server.Handlers
                     await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
             }
 
+            // The alteration the reply puts on: Max Ymillán's «Supercaptura» for a medium soul stone.
+            if (elegidaAhora != null && elegidaAhora.GivesAlteration != 0 && !sinPagar)
+                await AlterationHandler.GainAsync(stream, elegidaAhora.GivesAlteration);
+
             // What the reply prints in the chat: the orbalantir's visions, its figures turned wrong.
             if (elegidaAhora != null && elegidaAhora.Says != 0 && !sinPagar)
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
@@ -1810,11 +1814,16 @@ namespace Jondo.Unity.Server.Handlers
 
             // The NPC goes from the map as the window shuts («leaves»): the larva caught. Only for
             // this character, as the mark the reply left only hides it from him.
-            if (elegidaAhora is { Leaves: true } && spokenOn == SessionContext.State.MapId)
+            // And whoever goes with him («alsoLeaves»): the dummy the sacurador was healing.
+            if (elegidaAhora != null && spokenOn == SessionContext.State.MapId)
             {
-                var gone = Npcs.Of(spokenOn).FirstOrDefault(s => s.NpcId == spokenTo);
-                if (gone != null)
-                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(gone.ContextualId));
+                var going = (elegidaAhora.Leaves ? new[] { spokenTo } : Array.Empty<int>()).Concat(elegidaAhora.AlsoLeaves);
+                foreach (int npc in going)
+                {
+                    var gone = Npcs.Of(spokenOn).FirstOrDefault(s => s.NpcId == npc);
+                    if (gone != null)
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(gone.ContextualId));
+                }
             }
 
             if (completesAfterClosing != 0

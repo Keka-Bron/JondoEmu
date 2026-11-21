@@ -6840,7 +6840,7 @@ namespace Jondo.Unity.Server.Handlers
         /// "952 on his invulnerability, then the blow, then 406": dealt before the 952, the blow
         /// landed on an invulnerable boss and nothing could ever hurt him.
         /// </summary>
-        private static async Task LanzarPorOrdenAsync(NetworkStream stream, FightInstance fight, Fighter caster,
+        internal static async Task LanzarPorOrdenAsync(NetworkStream stream, FightInstance fight, Fighter caster,
                                                       int hechizo, int grado, Fighter objetivo, int celda,
                                                       string disparador, IReadOnlyList<Managers.SpellEffect> filas,
                                                       bool critico = false, int rondaDelEnganche = -1,
@@ -6852,6 +6852,12 @@ namespace Jondo.Unity.Server.Handlers
                    && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase))
                    && !Managers.EffectEngine.IsDelayedBlow(f, disparador);
 
+            // Who stood on the aimed cell when the spell went off. A row before the blows that
+            // moves him does not make the blows miss: they land where he went, as after a
+            // teleport (TeleportsFirstAsync). The Crisol's Berserkofre's «Daemp» is "push 2,
+            // -100 power, 26 to 30 fire": the power came off him and the fire hit the empty cell.
+            bool targetOnTheCell = objetivo != null && objetivo.CellId == celda;
+
             int i = 0;
             while (i < filas.Count)
             {
@@ -6861,7 +6867,8 @@ namespace Jondo.Unity.Server.Handlers
 
                 if (golpes)
                 {
-                    await HurtAsync(stream, fight, caster, hechizo, grado, objetivo, celda, critico, tirada: tanda,
+                    int blowsAt = targetOnTheCell && objetivo.IsAlive && objetivo.CellId != celda ? objetivo.CellId : celda;
+                    await HurtAsync(stream, fight, caster, hechizo, grado, objetivo, blowsAt, critico, tirada: tanda,
                                     disparador: disparador, soloAlObjetivo: soloAlObjetivo);
                 }
                 else

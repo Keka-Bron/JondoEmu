@@ -61,6 +61,23 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(line.Choice(20653)!.Leaves);
         }
 
+        [Fact]
+        public void Those_who_go_with_the_npc_and_the_alteration_a_reply_puts_on_survive_saving()
+        {
+            NpcDialogueContent.Save(_path, new[]
+            {
+                Tree(2386, 17584, Line(17584, new DialogueChoice { Reply = 21060, Leaves = true, AlsoLeaves = new[] { 2415 } })),
+                Tree(2342, 60142, Line(60142, new DialogueChoice { Reply = 82556, GivesAlteration = 871 }, Choice(82557))),
+            });
+            var trees = NpcDialogueContent.Load(_path);
+            var sacurador = NpcDialogueContent.For(trees, 2386, 0)!.Line(17584)!.Choice(21060)!;
+            Assert.Equal(new[] { 2415 }, sacurador.AlsoLeaves);
+            var max = NpcDialogueContent.For(trees, 2342, 0)!.Line(60142)!;
+            Assert.Equal(871, max.Choice(82556)!.GivesAlteration);
+            Assert.Equal(0, max.Choice(82557)!.GivesAlteration);
+            Assert.Empty(max.Choice(82557)!.AlsoLeaves);
+        }
+
         // ─── Round trip ───────────────────────────────────────────────────────────
 
         [Fact]

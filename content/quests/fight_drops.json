@@ -101,6 +101,34 @@
       ],
       "criterion": "Qa=2170&Qo=16730&PO!23052",
       "why": "«Claro como el aguardiente» (2170): the bucket's fight against the three kuapas leaves the Agua clara (23052) (Dofus pour les noobs: click the bucket, a fight alone, then bring the water to Arumichi)."
+    },
+    {
+      "item": 34134,
+      "percent": 100,
+      "monsters": [3663],
+      "criterion": "HA=871&PT=413&Qa=1504&Qo<8466&PO!34134",
+      "why": "The sacurador's soul. «Cofrología» (1504): the professor's «Supercaptura» (871) lets the Crisol's cofrefuertes drop their souls: «Bien que vous dropez la pierre d'âme pleine du monstre directement, il faut quand même posséder le sort de capture d'âmes» (Dofus pour les noobs). The client's own row asks «Qo<N&Qo!N» -- not done and not pending --, which never holds while the objective is to do; this one asks it not done."
+    },
+    {
+      "item": 34135,
+      "percent": 100,
+      "monsters": [3664],
+      "criterion": "HA=871&PT=413&Qa=1504&Qo<8467&PO!34135",
+      "why": "The mimicofre's soul. «Cofrología» (1504): the professor's «Supercaptura» (871) lets the Crisol's cofrefuertes drop their souls: «Bien que vous dropez la pierre d'âme pleine du monstre directement, il faut quand même posséder le sort de capture d'âmes» (Dofus pour les noobs). The client's own row asks «Qo<N&Qo!N» -- not done and not pending --, which never holds while the objective is to do; this one asks it not done."
+    },
+    {
+      "item": 34136,
+      "percent": 100,
+      "monsters": [3665],
+      "criterion": "HA=871&PT=413&Qa=1504&Qo<8468&PO!34136",
+      "why": "The antesoro's soul. «Cofrología» (1504): the professor's «Supercaptura» (871) lets the Crisol's cofrefuertes drop their souls: «Bien que vous dropez la pierre d'âme pleine du monstre directement, il faut quand même posséder le sort de capture d'âmes» (Dofus pour les noobs). The client's own row asks «Qo<N&Qo!N» -- not done and not pending --, which never holds while the objective is to do; this one asks it not done."
+    },
+    {
+      "item": 34133,
+      "percent": 100,
+      "monsters": [3666],
+      "criterion": "HA=871&PT=413&Qa=1504&Qo<8469&PO!34133",
+      "why": "The berserkofre's soul. «Cofrología» (1504): the professor's «Supercaptura» (871) lets the Crisol's cofrefuertes drop their souls: «Bien que vous dropez la pierre d'âme pleine du monstre directement, il faut quand même posséder le sort de capture d'âmes» (Dofus pour les noobs). The client's own row asks «Qo<N&Qo!N» -- not done and not pending --, which never holds while the objective is to do; this one asks it not done."
     }
   ]
 }
