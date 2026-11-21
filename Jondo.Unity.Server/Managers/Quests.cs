@@ -2210,6 +2210,10 @@ namespace Jondo.Unity.Server.Managers
         public static Task SendJournalAsync(GameSession session, bool box = false)
             => QuestStateService.Live.SendJournalAsync(session, box);
 
+        /// <summary>The journal of a hero just taken in hand, the box the one played before left made his.</summary>
+        public static Task SendSwitchedJournalAsync(GameSession session, long before)
+            => QuestStateService.Live.SendSwitchedJournalAsync(session, before);
+
         internal static Game.QuestsEvent? JournalSnapshot(GameSession session)
         {
             using var context = SessionContext.Push(session);

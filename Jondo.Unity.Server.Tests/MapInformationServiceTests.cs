@@ -216,6 +216,7 @@ public sealed class MapInformationServiceTests
     {
         public QuestsEvent? Journal(GameSession session) => throw new InvalidOperationException("Map replies do not resend the journal.");
         public IReadOnlyList<int> Followed(long characterId) => throw new InvalidOperationException("Map replies do not read the tracker.");
+        public void Follow(long characterId, int questId) => throw new InvalidOperationException("Map replies do not follow quests.");
         public void Unfollow(long characterId, int questId) => throw new InvalidOperationException("Map replies do not clean the tracker.");
         public NpcsMapQuestStatusUpdateEvent? Marks(GameSession session, long mapId)
         {
