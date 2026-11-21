@@ -61,7 +61,9 @@ namespace Jondo.Unity.World.Fights
             float left = Math.Max(0f, 1f - targetResPct * 0.01f);
             damage = (int)MathF.Floor(damage * left);
 
-            return Math.Max(1, damage);
+            // Nothing at 100 % resistance or with a reduction above the blow: the official game shows «-0»,
+            // and the client's preview draws 0 (the range is not floored at one). Never a heal.
+            return Math.Max(0, damage);
         }
 
         /// <summary>

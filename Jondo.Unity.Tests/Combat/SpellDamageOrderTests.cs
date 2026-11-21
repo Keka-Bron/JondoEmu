@@ -59,8 +59,16 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(45, Blow(20, flat: 10, weaponPercent: 50));
         }
 
-        /// <summary>A value times a percentage floors the float product (ra.fay).</summary>
-        [Theory]
+        /// <summary>At 100 % resistance, or with a reduction above the blow, nothing gets through: «-0», never a heal.</summary>
+        [Fact]
+        public void Full_resistance_or_a_bigger_reduction_lets_nothing_through()
+        {
+            Assert.Equal(0, Blow(100, resistance: 100));
+            Assert.Equal(0, Blow(100, resistance: 150));
+            Assert.Equal(0, Blow(30, reduction: 50));
+        }
+
+        /// <summary>A value times a percentage floors the float product (ra.fay).</summary>        [Theory]
         [InlineData(10, 110, 11)]
         [InlineData(99, 115, 113)]
         [InlineData(7, 50, 3)]
