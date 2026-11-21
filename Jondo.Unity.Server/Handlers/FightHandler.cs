@@ -6902,7 +6902,13 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else
                 {
-                    await AplicarEfectosAsync(stream, fight, caster, hechizo, grado, objetivo, disparador, celda,
+                    // So do the rows after a swap that took him off it: Vientraumatismo's "swap, then
+                    // Pesante on the target" put the state on the empty-of-foes cell the caster now holds.
+                    // What goes on the ground -- a mark, a summon -- stays on the aimed cell.
+                    bool follows = targetOnTheCell && objetivo.IsAlive && objetivo.CellId != celda
+                                   && !tanda.Any(f => Managers.EffectEngine.VaAlSuelo(f.EffectId));
+                    await AplicarEfectosAsync(stream, fight, caster, hechizo, grado, objetivo, disparador,
+                                              follows ? objetivo.CellId : celda,
                                               critico, tirada: tanda, rondaDelEnganche: rondaDelEnganche,
                                               soloAlObjetivo: soloAlObjetivo, conducta: conducta);
                 }
