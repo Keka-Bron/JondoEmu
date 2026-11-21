@@ -808,6 +808,15 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         internal static bool Roams(int monster) => monster != PunchingBag && !WantedPosters.Is(monster);
 
+        /// <summary>
+        /// The subarea roster entries that may stand in a generated group: only living templates
+        /// that pass <see cref="Roams"/>. An empty result means the subarea has nothing to spawn;
+        /// callers must skip it, never retry with the unfiltered roster.
+        /// </summary>
+        internal static List<int> RoamingRoster(
+            IEnumerable<int> roster, IReadOnlyDictionary<int, MonsterData> monsters)
+            => roster.Where(id => monsters.ContainsKey(id) && Roams(id)).ToList();
+
         /// <summary>Who lives in each subarea: <c>Subareas.Monsters</c>, a JSON <c>{"Array":[...]}</c>.</summary>
         internal static Dictionary<int, List<int>> LoadSubareaRosters(SqliteConnection connection)
         {

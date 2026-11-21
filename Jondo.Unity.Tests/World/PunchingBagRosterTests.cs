@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
@@ -26,6 +27,20 @@ namespace Jondo.Unity.Tests.World
             Assert.DoesNotContain(MobSpawnManager.PunchingBag, amakna);
             Assert.All(rosters.Values, roster => Assert.DoesNotContain(MobSpawnManager.PunchingBag, roster));
             Assert.False(MobSpawnManager.Roams(MobSpawnManager.PunchingBag));
+        }
+
+        [Fact]
+        public void A_roster_holding_only_the_punching_bag_is_skipped_not_rebuilt_from_the_unfiltered_list()
+        {
+            var monsters = new Dictionary<int, MobSpawnManager.MonsterData>
+            {
+                [MobSpawnManager.PunchingBag] = new() { Id = MobSpawnManager.PunchingBag },
+            };
+
+            var eligible = MobSpawnManager.RoamingRoster(
+                new[] { MobSpawnManager.PunchingBag }, monsters);
+
+            Assert.Empty(eligible);
         }
     }
 }
