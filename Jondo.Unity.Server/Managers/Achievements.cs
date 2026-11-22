@@ -402,6 +402,10 @@ namespace Jondo.Unity.Server.Managers
             return CheckAsync(session, book.WaitingOn(AchievementCatalogue.JobKey));
         }
 
+        /// <summary>Whether a challenge group is at least the character's own level.</summary>
+        internal static bool HighLevelChallengeGroup(int groupLevel, int characterLevel)
+            => groupLevel >= characterLevel;
+
         /// <summary>
         /// A fight is over. The monsters beaten are counted — all of them for <c>EM</c>, and again
         /// for <c>Ef</c> when a challenge was won — and the achievements that count them are set
@@ -416,8 +420,9 @@ namespace Jondo.Unity.Server.Managers
         /// <param name="monsters">Monster template to how many of it were beaten. Summons left out.</param>
         /// <param name="inDungeon">Whether the fight was in a dungeon room, for <c>EM&gt;id,0,d</c>.</param>
         /// <param name="challengesWon">The challenges validated in this fight.</param>
+        /// <param name="groupAtLeastPlayerLevel">Whether the challenged group's level is at least the character's.</param>
         public static void AfterFight(IReadOnlyDictionary<int, int> monsters, bool inDungeon,
-                                      IReadOnlyCollection<int> challengesWon)
+                                      IReadOnlyCollection<int> challengesWon, bool groupAtLeastPlayerLevel)
         {
             var book = _book;
             var state = SessionContext.State;
@@ -444,8 +449,9 @@ namespace Jondo.Unity.Server.Managers
                 state.AchievementsPending.UnionWith(book.WaitingOn("EH", challenge));
             }
 
-            // And the challenges won, all told (EA, «Retador milenario») and in dungeons (Ea).
-            if (challengesWon.Count > 0)
+            // And the challenges won against groups at least as strong as the character: both
+            // counters, EA («With Hands Tied») and Ea (its dungeon counterpart), require that.
+            if (challengesWon.Count > 0 && groupAtLeastPlayerLevel)
             {
                 SetTally("EA", 0, Tally("EA", 0) + challengesWon.Count);
                 state.AchievementsPending.UnionWith(book.WaitingOn("EA"));

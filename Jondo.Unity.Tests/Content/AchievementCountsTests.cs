@@ -21,6 +21,14 @@ namespace Jondo.Unity.Tests.Content
         private static CriterionVerdict Judge(string criterion) => QuestCriterion.Judge(criterion, new Achievements.CharacterFacts());
 
         [Fact]
+        public void A_challenge_group_counts_as_high_level_only_at_or_above_the_character()
+        {
+            Assert.True(Achievements.HighLevelChallengeGroup(200, 200));
+            Assert.True(Achievements.HighLevelChallengeGroup(201, 200));
+            Assert.False(Achievements.HighLevelChallengeGroup(199, 200));
+        }
+
+        [Fact]
         public void The_tallies_answer_their_criteria()
         {
             var session = GameSession.SinSocket();

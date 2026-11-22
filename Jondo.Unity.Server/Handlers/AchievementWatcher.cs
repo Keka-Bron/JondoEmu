@@ -42,8 +42,10 @@ namespace Jondo.Unity.Server.Handlers
 
             if (beaten.Count == 0) return;
 
+            bool atLeastPlayerLevel = Achievements.HighLevelChallengeGroup(
+                ChallengeHandler.GroupLevel(fight), SessionContext.State.CharacterLevel);
             Achievements.AfterFight(beaten, DungeonManager.IsRoom(fight.RoleplayMapId),
-                                    ChallengeWatcher.WonIn(fight));
+                                    ChallengeWatcher.WonIn(fight), atLeastPlayerLevel);
         }
 
         /// <summary>
