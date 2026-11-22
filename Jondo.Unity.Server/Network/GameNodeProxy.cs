@@ -1544,8 +1544,7 @@ namespace Jondo.Unity.Server.Network
                     // The party window's automatic entry and automatic ready.
                     await FightHandler.AutoOptionAsync(stream, payload, payloadStr);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Jzy))
-                         || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
+                else if (payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
@@ -1737,6 +1736,10 @@ namespace Jondo.Unity.Server.Network
                 // The last ready can enter the still August-only fight-start burst.
                 case Game.FightReadyRequest ready when UsesLegacyRouting:
                     await FightHandler.HandleReadyAsync(session, ready);
+                    break;
+                // Placement can flush a pending fight end; that burst is still August-only.
+                case Game.FightPlacementPositionRequest placement when UsesLegacyRouting:
+                    await FightHandler.HandlePlacementPositionAsync(session, placement);
                     break;
                 default:
                     return GameEntryResult.Unhandled;

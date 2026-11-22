@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using static Jondo.Protocol.NetworkMessage;
@@ -35,8 +35,8 @@ namespace Jondo.Unity.Server.Handlers
         /// moved. <c>jzz</c>, empty, is «ui.fight.swapPositionRequestError».
         /// </para>
         /// <para>
-        /// kad's f1 and f4 are two more int32 the client never reads. INFERRED: the two cells, the
-        /// requester's then the requested's, as the old game's offer carried them. An ally nobody
+        /// The typed offer omits the two unmapped int32s formerly populated with cells.
+        /// Native use is indeterminate. An ally nobody
         /// plays -- a JondoBot, a monster of one's side -- has nobody to ask, and swaps at once
         /// (INFERRED).
         /// </para>
@@ -55,8 +55,8 @@ namespace Jondo.Unity.Server.Handlers
 
             int request = Interlocked.Increment(ref _lastSwap);
             _swaps[(fight.FightId, request)] = (requester.Id, requested.Id);
-            await ToTheTwoAsync(fight, requester.Id, requested.Id, ConnectionProtocol.Push(Op.Kad,
-                Network.FightProtocol.BuildSwapOffer(request, requester.Id, requester.CellId, requested.Id, requested.CellId)));
+            await ToTheTwoAsync(fight, requester.Id, requested.Id,
+                new Game.FightPlacementSwapPositionsOfferEvent(requested.Id, request, requester.Id));
             Program.LogDebug($"[Fight] {requester.Id} asks {requested.Id} to swap cells (request {request}).");
         }
 
@@ -102,8 +102,7 @@ namespace Jondo.Unity.Server.Handlers
                 || (swap.Requested != me && swap.Requester != me)) return;
 
             if (!_swaps.TryRemove((fight.FightId, request), out _)) return;
-            await ToTheTwoAsync(fight, swap.Requester, swap.Requested, ConnectionProtocol.Push(Op.Kac,
-                Network.FightProtocol.BuildSwapRefused(me, request)));
+            await ToTheTwoAsync(fight, swap.Requester, swap.Requested, new Game.FightPlacementSwapPositionsCancelledEvent(me, request));
             Program.LogDebug($"[Fight] {me} turns down the swap {request}.");
         }
 
@@ -114,10 +113,7 @@ namespace Jondo.Unity.Server.Handlers
             ForgetSwapsOf(fight, one.Id);
             ForgetSwapsOf(fight, other.Id);
 
-            var spots = new List<(int, int, long)>();
-            foreach (var fighter in fight.Azul) spots.Add((fighter.CellId, FacingOf(fight, fighter), fighter.Id));
-            foreach (var fighter in fight.Rojo) spots.Add((fighter.CellId, FacingOf(fight, fighter), fighter.Id));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk, Network.FightProtocol.BuildFightersPlaced(spots)));
+            await SendPlacementDispositionsAsync(fight);
             Program.LogDebug($"[Fight] {one.Id} and {other.Id} swap cells: {one.CellId} and {other.CellId}.");
         }
 
@@ -140,11 +136,15 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        private static async Task ToTheTwoAsync(FightInstance fight, long one, long other, byte[] frame)
+        private static Task SendPlacementDispositionsAsync(FightInstance fight)
+            => ATodosAsync(fight, new Game.EntitiesDispositionEvent(fight.Todos.Select(f =>
+                new Game.EntityDisposition(f.CellId, MapActorMessages.Facing(FacingOf(fight, f)), f.Id, null)).ToArray()));
+
+        private static async Task ToTheTwoAsync(FightInstance fight, long one, long other, Game.GameEvent message)
         {
             foreach (var session in Publico(fight).Where(s => s.State.CharacterId == one || s.State.CharacterId == other))
             {
-                try { await session.SendAsync(frame); }
+                try { await session.SendAsync(message); }
                 catch (System.Exception ex) { Program.LogDebug($"[Fight] Could not write to {session.Id}: {ex.Message}"); }
             }
         }

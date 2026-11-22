@@ -494,6 +494,15 @@ session codecs before placement ends. The placement deadline uses the same typed
 event for remaining players. The `3.8.1.2` dispatcher leaves the request unhandled
 until the fight-start burst it can trigger is typed as well.
 
+`FightPlacementPositionRequest` uses the same session and fight turns. After flushing a
+pending end, it only changes cells during placement. It carries an entity and a cell;
+ongoing combat walks use `MapMovementRequest`. A move or completed swap broadcasts
+`EntitiesDispositionEvent` with both teams' positions and facings to fighters and spectators.
+A connected ally's swap offer goes only to requester and target. Its reviewed fields are
+the two fighter IDs and the request ID; the historical writer's inferred cell values
+(August `kad` tags 1 and 4) have indeterminate client use and are omitted. The beta
+dispatcher leaves the placement request unhandled while pending-end delivery is August-only.
+
 ### Shared map/fight presence and reconnection opening
 
 `FightHandler` directly constructs map fight flags, counts, incremental teams,

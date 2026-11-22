@@ -2474,27 +2474,6 @@ namespace Jondo.Unity.Server.Network
         // ─── Taking a place ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// Which cell the player wants to move to during placement (jzy).
-        ///
-        ///   f1: who        f2: the cell
-        /// </summary>
-        public static (long Fighter, int Cell) ReadPlacementMove(byte[] payload)
-        {
-            byte[]? jzy = ConnectionProtocol.ReadPayload(payload, Op.Jzy);
-            if (jzy == null) return (0, 0);
-
-            long fighter = 0;
-            int cell = 0;
-            foreach (var field in ProtoMessage.Parse(jzy).Fields)
-            {
-                if (field.WireType != 0) continue;
-                if (field.FieldNumber == 1) fighter = field.VarIntValue;
-                else if (field.FieldNumber == 2) cell = (int)field.VarIntValue;
-            }
-            return (fighter, cell);
-        }
-
-        /// <summary>
         /// Who is on which cell (kmk).
         ///
         ///   f2 (repeated) { f1: cell, f2: orientation, f3: who }
@@ -2521,17 +2500,6 @@ namespace Jondo.Unity.Server.Network
             => BuildFightersPlaced(new[] { (cell, orientation, fighter) });
 
         // ─── Swapping cells with an ally ────────────────────────────────────────
-
-        /// <summary>
-        /// A swap asked for (kad): f2 the one asked, f3 the request, f5 who asks, read so by the
-        /// client's placement frame (fjw); f1 and f4 the two cells, which it does not read (INFERRED).
-        /// </summary>
-        public static byte[] BuildSwapOffer(int request, long requester, int requesterCell, long requested, int requestedCell)
-            => Pb.New().VarIfNotZero(1, requesterCell).Var(2, requested).Var(3, request)
-                       .VarIfNotZero(4, requestedCell).Var(5, requester).Build();
-
-        /// <summary>A swap turned down (kac): f1 who did, f2 the request.</summary>
-        public static byte[] BuildSwapRefused(long who, int request) => Pb.New().Var(1, who).Var(2, request).Build();
 
         /// <summary>The request a kap or a kav answers: f1.</summary>
         public static int ReadSwapRequest(byte[] payload, string opcode)

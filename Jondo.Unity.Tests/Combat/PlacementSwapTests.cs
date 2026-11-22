@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Jondo.Protocol;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Tests.Economy;
@@ -40,9 +41,13 @@ namespace Jondo.Unity.Tests.Combat
         private static long Field(byte[] body, int number)
             => ProtoMessage.Parse(body).Fields.First(f => f.FieldNumber == number).VarIntValue;
 
-        private static Task Ask(ClientPipe pipe, long ally, int cell)
-            => FightHandler.HandleFightMessageAsync(pipe.ToClient,
-                ConnectionProtocol.Push(Op.Jzy, Pb.New().Var(1, ally).Var(2, cell).Build()), Op.Uri(Op.Jzy));
+        private static async Task Ask(ClientPipe pipe, long ally, int cell)
+        {
+            pipe.Session.State.IsInFight = true;
+            using var turn = await pipe.Session.EnterTurnAsync();
+            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchTypedAsync(pipe.Session,
+                new(new FightPlacementPositionRequest(ally, cell), 0), new GameEntryService(pipe.Session, new GameEntryBackend())));
+        }
 
         [Fact]
         public async Task The_ally_asked_accepts_and_both_change_places()

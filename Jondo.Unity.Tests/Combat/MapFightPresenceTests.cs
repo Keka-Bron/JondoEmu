@@ -18,10 +18,13 @@ public sealed class MapFightPresenceTests
     private const long Map = 91_968_001, Arena = 91_968_002, Id = 7_968_001, Person = 9_968_000_001;
     private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
 
-    private static async Task<GameEntryResult> DispatchReady(GameSession session, bool ready)
+    private static Task<GameEntryResult> DispatchReady(GameSession session, bool ready)
+        => DispatchPlacement(session, new FightReadyRequest(ready));
+
+    private static async Task<GameEntryResult> DispatchPlacement(GameSession session, GameRequest request)
     {
         using var turn = await session.EnterTurnAsync();
-        return await GameNodeProxy.DispatchTypedAsync(session, new(new FightReadyRequest(ready), -1),
+        return await GameNodeProxy.DispatchTypedAsync(session, new(request, -1),
             new GameEntryService(session, new GameEntryBackend()));
     }
 
@@ -33,11 +36,81 @@ public sealed class MapFightPresenceTests
         using var player = new Recipient(Person, Arena, Id);
         player.Session.State.IsInFight = true;
         Assert.Equal(GameEntryResult.Unhandled, await DispatchReady(player.Session, true));
+        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person, 271)));
         Assert.False(fixture.Fight.Buscar(Person).IsReady);
         Assert.Equal(FightState.Placement, fixture.Fight.State);
         Assert.Empty(player.Sequence);
     }
 #else
+    [Fact]
+    public async Task Placement_position_offers_privately_then_broadcasts_actual_cells_to_the_board()
+    {
+        using var fixture = new FightFixture();
+        var fight = fixture.Fight;
+        fight.BluePlacementCells.AddRange([284, 285, 271]);
+        fight.Buscar(Person).CellId = 284;
+        fight.Azul.Add(new() { Id = Person + 1, CellId = 285, CurrentHP = 100 });
+        fight.Rojo[0].CellId = 270;
+        fight.Rojo[1].CellId = 269;
+        using var player = new Recipient(Person, Arena, Id);
+        using var ally = new Recipient(Person + 1, Arena, Id);
+        using var spectator = new Recipient(Person + 2, Arena, Id);
+        spectator.Session.State.SpectatingFightId = Id;
+        var spectators = (ConcurrentDictionary<long, ConcurrentDictionary<long, byte>>)typeof(FightHandler)
+            .GetField("_spectators", PrivateStatic)!.GetValue(null)!;
+        spectators[Id] = new([new(Person + 2, 0)]);
+        using var bystander = new Recipient(Person + 3, Map);
+        player.Session.State.IsInFight = true;
+
+        Assert.Equal(GameEntryResult.Handled, await DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person + 1, 285)));
+        var offer = Assert.IsType<FightPlacementSwapPositionsOfferEvent>(Assert.Single(player.Sequence));
+        Assert.True(offer.RequestId > 0);
+        Assert.Equal(new FightPlacementSwapPositionsOfferEvent(Person + 1, offer.RequestId, Person), Assert.Single(ally.Sequence));
+        Assert.Empty(spectator.Sequence);
+        Assert.Equal(284, fight.Buscar(Person).CellId);
+
+        Assert.Equal(GameEntryResult.Handled, await DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person, 271)));
+        Assert.Equal(271, fight.Buscar(Person).CellId);
+        foreach (var recipient in new[] { player, ally, spectator })
+        {
+            var positions = Assert.IsType<EntitiesDispositionEvent>(recipient.Sequence.Last()).Added;
+            Assert.Equal(new EntityDisposition(271, Direction.NorthWest, Person, null), positions[0]);
+            Assert.Equal(new long?[] { Person, Person + 1, -1, -2 }, positions.Select(p => p.EntityId));
+            Assert.Equal(new int?[] { 271, 285, 270, 269 }, positions.Select(p => p.CellId));
+            Assert.All(recipient.Delivered, f => Assert.Null(f.Uid));
+        }
+        Assert.Empty(bystander.Sequence);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Queued_placement_position_is_discarded_if_the_player_leaves_or_combat_starts(bool leaves)
+    {
+        using var fixture = new FightFixture();
+        var fight = fixture.Fight;
+        var actor = fight.Buscar(Person);
+        actor.CellId = 300;
+        actor.MaxMP = actor.CurrentMP = 3;
+        fight.BluePlacementCells.Add(314);
+        using var player = new Recipient(Person, Arena, Id);
+        player.Session.State.IsInFight = true;
+        await fight.Turno.WaitAsync();
+        Task<GameEntryResult> queued;
+        try
+        {
+            queued = DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person, 314));
+            Assert.False(queued.IsCompleted);
+            if (leaves) Assert.True(fight.Azul.Remove(actor));
+            else fight.StartFight();
+        }
+        finally { fight.Turno.Release(); }
+        Assert.Equal(GameEntryResult.Handled, await queued.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.Equal(300, actor.CellId);
+        Assert.Equal(3, actor.CurrentMP);
+        Assert.Empty(player.Sequence);
+    }
+
     [Theory]
     [InlineData("left")]
     [InlineData("gone")]

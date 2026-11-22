@@ -2386,18 +2386,7 @@ namespace Jondo.Unity.Server.Handlers
             if (fight != null && !payloadStr.Contains(Op.Uri(Op.Jti)))
                 await FinishPendingFightAsync(fight);
 
-            if (payloadStr.Contains(Op.Uri(Op.Jzy)))
-            {
-                if (fight != null && fight.State == Jondo.Unity.World.Fights.FightState.Ongoing)
-                {
-                    await HandleCombatMoveRequest(stream, payload);
-                }
-                else
-                {
-                    await HandlePlacementCellChangeRequest(stream, payload);
-                }
-            }
-            else if (payloadStr.Contains("type.ankama.com/jwz"))
+            if (payloadStr.Contains("type.ankama.com/jwz"))
             {
                 // "Got the jxh": until this arrives, the turn does not start.
                 await ConfirmAsync(stream);
@@ -3221,19 +3210,18 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        private static async Task HandlePlacementCellChangeRequest(NetworkStream stream, byte[] payload)
-        {
-            var fight = GetCurrentFight();
-            if (fight == null) return;
+        internal static Task HandlePlacementPositionAsync(GameSession session, Jondo.Unity.Protocol.Game.FightPlacementPositionRequest request)
+            => InPlacementTurnAsync(session, fight => ChangePlacementCellAsync(session, fight, request));
 
-            // The client sends jzy, not jyz: the three letters were transposed in the old code, so
-            // the branch was never entered.
-            var (who, newCell) = Network.FightProtocol.ReadPlacementMove(payload);
+        private static async Task ChangePlacementCellAsync(GameSession session, FightInstance fight,
+            Jondo.Unity.Protocol.Game.FightPlacementPositionRequest request)
+        {
+            var (who, newCell) = request;
             if (newCell == 0) return;
 
             // On whichever team. It was only looked for on blue, so in a challenge the challenged
             // player could not reposition: his request fell here without a word.
-            var player = fight.Buscar(GameState.CharacterId);
+            var player = fight.Buscar(session.CharacterId);
             if (player == null) return;
 
             // An ally named, by his menu's «Cambiar de sitio», or the cell of one picked: a swap.
@@ -3259,7 +3247,7 @@ namespace Jondo.Unity.Server.Handlers
             int oldCell = player.CellId;
             if (oldCell == newCell) return;
 
-            fight.ChangePlacementCell(GameState.CharacterId, newCell);
+            fight.ChangePlacementCell(player.Id, newCell);
             if (player.CellId == newCell) ForgetSwapsOf(fight, player.Id);
 
             // The kmk says WHERE EACH ONE IS; it is not "this cell is freed". Everybody's position is
@@ -3271,23 +3259,15 @@ namespace Jondo.Unity.Server.Handlers
             // had a single monster and it was exactly on that cell, so both readings fitted the same
             // bytes. Sent as "nobody", the client understood that monster -1 moved to the cell the
             // player had just left, and a piwi could be seen chasing him around the board.
-            var spots = new List<(int, int, long)>();
-            foreach (var other in fight.Azul) spots.Add((other.CellId, FacingOf(fight, other), other.Id));
-            foreach (var other in fight.Rojo) spots.Add((other.CellId, FacingOf(fight, other), other.Id));
-
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk,
-                Network.FightProtocol.BuildFightersPlaced(spots)));
+            await SendPlacementDispositionsAsync(fight);
 
             Program.LogDebug($"[Fight] The player moves to cell {newCell} (coming from {oldCell}).");
         }
 
-        // NOTE: HandleCombatMovementRequest used to live here, an old version of combat movement
-        // that echoed the client's compressed path back without expanding it and tacked on a kkz
-        // that forced the position. That is what caused the teleporting. It was removed so it can
-        // no longer compete with HandleCombatMoveRequest (the two names differed by a single
-        // letter and the routing kept picking the wrong one).
+        internal static Task HandleReadyAsync(GameSession session, Jondo.Unity.Protocol.Game.FightReadyRequest request)
+            => InPlacementTurnAsync(session, fight => request.IsReady ? DeclareReadyAsync(fight, session.CharacterId) : Task.CompletedTask);
 
-        internal static async Task HandleReadyAsync(GameSession session, Jondo.Unity.Protocol.Game.FightReadyRequest request)
+        private static async Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action)
         {
             if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld || !session.State.IsInFight) return;
             long characterId = session.CharacterId;
@@ -3299,8 +3279,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (!session.State.IsInFight || session.CharacterId != characterId ||
                     FightById(fight.FightId) != fight || !IsParticipant(fight, characterId)) return;
                 using var context = SessionContext.Push(session); // Legacy end/start handlers still read player state.
-                if (await FinishPendingFightAsync(fight) || !request.IsReady) return;
-                await DeclareReadyAsync(fight, characterId);
+                if (await FinishPendingFightAsync(fight) || fight.State != FightState.Placement) return;
+                await action(fight);
             });
         }
 
@@ -14219,113 +14199,6 @@ namespace Jondo.Unity.Server.Handlers
         // The number matters to the client rather than only to us: it reads it out of the cast
         // packet (f7.f5) and compares it against the spell's limit to grey the icon out.
 
-        private static async Task HandleCombatMoveRequest(NetworkStream stream, byte[] payload)
-        {
-            var fight = GetCurrentFight();
-            if (fight == null) return;
-            var current = fight.CurrentFighter;
-            if (current == null || !current.ControlledBy(GameState.CharacterId)) return;
-
-            // WARNING: this is NOT how one walks in a fight, even if the name suggests so.
-            //
-            // Walking in a fight is the jrw, and WalkAsync handles it. Measured on the capture
-            // «combate contra 4 poutchs nivel 25»: the client sends jrw fourteen times and jzy ONCE,
-            // the one for placing itself before starting. This function is only reached with a jzy
-            // when the fight is already under way, and the client does not send that.
-            //
-            // It looked for «jyz» -- the z and the y swapped, the same slip that had already appeared
-            // in HandlePlacementCellChangeRequest -- and since ExtractMessagePayload compares the whole
-            // url exactly, it always returned null. The letters are corrected and it is left: it costs
-            // nothing and fixed it does not fool the next one to read it. What must NOT be done is to
-            // take it for the movement handler, which is exactly what misled the audit.
-            var inner = ExtractMessagePayload(payload, Op.Uri(Op.Jzy));
-            if (inner == null) inner = ExtractMessagePayload(payload, Op.Uri(Op.Joi));
-
-            var vertices = new List<int>();
-            if (inner != null)
-            {
-                try
-                {
-                    var msg = ProtoMessage.Parse(inner);
-                    foreach (var f in msg.Fields)
-                    {
-                        if (f.FieldNumber == 3)
-                        {
-                            if (f.WireType == 0)
-                            {
-                                int val = (int)f.VarIntValue;
-                                vertices.Add(val % 4096);
-                            }
-                            else if (f.WireType == 2)
-                            {
-                                int pos = 0;
-                                while (pos < f.BytesValue.Length)
-                                {
-                                    int val = (int)ReadVarInt(f.BytesValue, ref pos);
-                                    vertices.Add(val % 4096);
-                                }
-                            }
-                        }
-                    }
-                }
-                catch { }
-            }
-
-            if (vertices.Count == 0) return;
-
-            // COMBAT walkability, not the one in map_walkable_cells.json: that one trims the map
-            // borders (it was generated to place mobs in roleplay) and left out the arena's outer
-            // ring, which you can perfectly well walk on during a fight.
-            var arenaWalkable = MapManager.GetFightWalkable(fight.ArenaMapId);
-            var expandedPath = MapGeometry.ExpandPath(vertices, arenaWalkable);
-
-            if (expandedPath.Count <= 1) return;
-
-            int steps = Math.Min(expandedPath.Count - 1, current.CurrentMP);
-            var actualPath = expandedPath.Take(steps + 1).ToList();
-
-            current.AccumulatedMpLoss += steps;
-            current.CurrentMP -= steps;
-            current.CellId = actualPath.Last();
-
-            Program.LogDebug($"[FightHandler] Combat move for Player #{current.Id}: {actualPath.Count} cells to cell {current.CellId} (used {steps} MP, {current.CurrentMP} MP left).");
-
-            var jud4Start = new ProtoMessage();
-            jud4Start.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 4 });
-            jud4Start.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = current.Id });
-            await ATodosAsync(fight, BuildGameNodePacket("type.ankama.com/jud", jud4Start.ToByteArray()));
-
-            await ATodosAsync(fight, BuildJooMovementPacket(current.Id, actualPath));
-
-            var jud3 = new ProtoMessage();
-            jud3.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 3 });
-            jud3.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = current.Id });
-            await ATodosAsync(fight, BuildGameNodePacket("type.ankama.com/jud", jud3.ToByteArray()));
-
-            await ATodosAsync(fight, BuildJvmPacket(current.Id, 23, -current.AccumulatedMpLoss, current.MaxMP));
-
-            var juc3 = new ProtoMessage();
-            juc3.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 3 });
-            juc3.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = current.Id });
-            juc3.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 1 });
-            await ATodosAsync(fight, BuildGameNodePacket("type.ankama.com/juc", juc3.ToByteArray()));
-
-            var jtxMsg = new ProtoMessage();
-            var f6Sub = new ProtoMessage();
-            f6Sub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = current.Id });
-            f6Sub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = -steps });
-            jtxMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 2, BytesValue = f6Sub.ToByteArray() });
-            jtxMsg.Fields.Add(new ProtoField { FieldNumber = 13, WireType = 0, VarIntValue = 129 });
-            jtxMsg.Fields.Add(new ProtoField { FieldNumber = 29, WireType = 0, VarIntValue = current.Id });
-            await ATodosAsync(fight, BuildGameNodePacket("type.ankama.com/jtx", jtxMsg.ToByteArray()));
-
-            var juc4End = new ProtoMessage();
-            juc4End.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 4 });
-            juc4End.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = current.Id });
-            juc4End.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 1 });
-            await ATodosAsync(fight, BuildGameNodePacket("type.ankama.com/juc", juc4End.ToByteArray()));
-        }
-
         // =========================================================================
         // PACKET BUILDERS AND SENDERS (100% Organic Protobuf Construction)
         // =========================================================================
@@ -15006,22 +14879,5 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        // =========================================================================
-        // HELPERS
-        // =========================================================================
-
-        private static uint ReadVarInt(byte[] data, ref int pos)
-        {
-            uint value = 0;
-            int shift = 0;
-            while (pos < data.Length)
-            {
-                byte b = data[pos++];
-                value |= (uint)(b & 0x7F) << shift;
-                if ((b & 0x80) == 0) break;
-                shift += 7;
-            }
-            return value;
-        }
     }
 }
