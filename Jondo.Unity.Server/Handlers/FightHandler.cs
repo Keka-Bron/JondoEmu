@@ -9161,18 +9161,23 @@ namespace Jondo.Unity.Server.Handlers
                     // A swap is ONE frame for the two: jwe 8 with the caster's old cell, the
                     // other and his old cell. Measured on Jugarreta and Impostura; two slides
                     // was what we sent.
+                    // The one who swaps is the row's caster, who is not always the spell's: Moon's
+                    // 28956 has the player end his turn casting a 2017, and the totem it picks
+                    // casts the swap back at him. Named by the spell's caster, the frame read
+                    // "the player swaps with himself" and the totem stayed where it was on screen.
+                    var swapper = c.Tambien ?? quienLanza;
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildSwap(quienLanza.Id, c.CasillaDesdeDelOtro,
+                        Network.FightProtocol.BuildSwap(swapper.Id, c.CasillaDesdeDelOtro,
                                                         c.Sobre.Id, c.CasillaDesde)));
-                    Program.LogDebug($"[Fight] {quienLanza.Id} and {c.Sobre.Id} swap " +
+                    Program.LogDebug($"[Fight] {swapper.Id} and {c.Sobre.Id} swap " +
                                      $"{c.CasillaDesdeDelOtro} and {c.CasillaDesde}.");
                     movidos.Add(c.Sobre);
                     movidos.Add(c.Tambien);
                     // Moved by a swap (MS), both of them; and the caster moved somebody else (PO).
-                    Disparo(c.Sobre, Managers.EffectEngine.AlSerIntercambiado, quienLanza);
-                    Disparo(c.Tambien, Managers.EffectEngine.AlSerIntercambiado, quienLanza);
-                    Disparo(c.Sobre, Managers.EffectEngine.AlSerMovido, quienLanza);
-                    Disparo(quienLanza, Managers.EffectEngine.AlDesplazarAOtro, c.Sobre);
+                    Disparo(c.Sobre, Managers.EffectEngine.AlSerIntercambiado, swapper);
+                    Disparo(c.Tambien, Managers.EffectEngine.AlSerIntercambiado, swapper);
+                    Disparo(c.Sobre, Managers.EffectEngine.AlSerMovido, swapper);
+                    Disparo(swapper, Managers.EffectEngine.AlDesplazarAOtro, c.Sobre);
                     await RefreshPortalsAsync(fight);
                     continue;
                 }

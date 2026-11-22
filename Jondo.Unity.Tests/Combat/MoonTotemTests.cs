@@ -13,7 +13,7 @@ namespace Jondo.Unity.Tests.Combat
     public class MoonTotemTests
     {
         private const long MoonRoom = 239601165;
-        private const int TotemCall = 28952;
+        private const int TotemCall = 28952, Glyph = 28954, SwapCall = 28956, FirstMoonState = 5243;
 
         private static (FightInstance fight, Fighter mask) Board()
         {
@@ -47,6 +47,55 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(rows.Select(r => r.CeldasFijas[0]).OrderBy(c => c),
                          totems.Select(o => o.CasillaDeLaInvocacion).OrderBy(c => c));
             Assert.DoesNotContain(totems, o => o.CasillaDeLaInvocacion == mask.CellId);
+        }
+    
+        [Fact]
+        public void A_totem_on_its_glyph_gives_Moon_a_state()
+        {
+            if (SpellEffects.De(Glyph, 1).Count == 0) return;   // no data
+            var (fight, mask) = Board();
+            var moon = new Fighter
+            {
+                Id = -1, TeamId = 1, CellId = 300, IsMonster = true, MonsterId = 7802, Level = 220,
+                MaxHP = 20000, CurrentHP = 20000, MaxAP = 12, CurrentAP = 12,
+            };
+            var totem = new Fighter
+            {
+                Id = -6, TeamId = 1, CellId = 147, IsMonster = true, MonsterId = 7804, Level = 100,
+                MaxHP = 500, CurrentHP = 500, MaxAP = 6, CurrentAP = 6, Invocador = -5,
+            };
+            fight.AddMonster(moon);
+            fight.AddMonster(totem);
+
+            // The red glyph's 28954-1 has its totem cast 28954-5, whose 792 has Moon cast 28955 on
+            // himself: the first of his four stacked states.
+            var cast = EffectEngine.Resolver(fight, mask, Glyph, 1, totem, EffectEngine.AlLanzar,
+                                             fight.RoundNumber, celdaApuntada: totem.CellId);
+            Assert.Contains(cast, o => o.Sobre == moon && o.Efecto.EffectId == 950 && o.Efecto.Value == FirstMoonState);
+        }
+    
+        [Fact]
+        public void At_the_end_of_his_turn_the_player_swaps_with_a_totem()
+        {
+            if (SpellEffects.De(SwapCall, 4).Count == 0) return;   // no data
+            var (fight, mask) = Board();
+            var totem = new Fighter
+            {
+                Id = -6, TeamId = 1, CellId = 147, IsMonster = true, MonsterId = 7804, Level = 100,
+                MaxHP = 500, CurrentHP = 500, MaxAP = 6, CurrentAP = 6, Invocador = -5,
+            };
+            fight.AddMonster(totem);
+            var player = fight.Todos.First(f => f.Id == 10);
+
+            // Moon's 28956 hangs a "TE" 28956-4 on each player; it picks a totem, which casts the
+            // swap back. The swap's other party is the totem, and the frame is sent in its name.
+            var cast = EffectEngine.Resolver(fight, player, SwapCall, 4, player, EffectEngine.AlLanzar,
+                                             fight.RoundNumber, celdaApuntada: player.CellId);
+            var swap = Assert.Single(cast, o => o.Efecto.EffectId == 8);
+            Assert.Same(player, swap.Sobre);
+            Assert.Same(totem, swap.Tambien);
+            Assert.Equal(145, totem.CellId);
+            Assert.Equal(147, player.CellId);
         }
     }
 }
