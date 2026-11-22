@@ -825,17 +825,19 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         public bool SetFighterReady(long fighterId, bool clockRanOut = false)
         {
-            var f = Buscar(fighterId);
-            if (f != null) f.IsReady = true;
+            if (!MarkFighterReady(fighterId, clockRanOut)) return false;
+            CancelPlacementTimer();
+            StartFight();
+            return true;
+        }
 
-            if (DefendingAllianceId != 0 && !clockRanOut) return false;
-            if (Todos.All(p => p.IsMonster || p.EsInvocado || p.IsReady))
-            {
-                CancelPlacementTimer();
-                StartFight();
-                return true;
-            }
-            return false;
+        /// <summary>Record readiness without starting: the server announces every ready before opening the fight.</summary>
+        public bool MarkFighterReady(long fighterId, bool clockRanOut = false)
+        {
+            var f = Buscar(fighterId);
+            if (f == null) return false;
+            f.IsReady = true;
+            return (DefendingAllianceId == 0 || clockRanOut) && Todos.All(p => p.IsMonster || p.EsInvocado || p.IsReady);
         }
 
         // ═══════════════════════════════════════════════════════════════════

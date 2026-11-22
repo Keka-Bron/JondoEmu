@@ -78,8 +78,6 @@ namespace Jondo.Unity.Server.Network
                 }
             }
 
-            Same(failures, Op.Kah, "0881f092cbdd081801", FightProtocol.BuildReadyAck(fighter));
-
             // A cast, byte by byte. What matters here is the inner f7: the spell goes
             // in TWO numbers, 25188 (the spell) and 63926 (its grade), and f8 is one and is not
             // the spell. When this was sent wrong, the client drew a punch.

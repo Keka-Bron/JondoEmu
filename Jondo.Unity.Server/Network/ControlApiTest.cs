@@ -528,7 +528,7 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The ops a harness may send in the character's name, and the handler each goes to.</summary>
         private static readonly HashSet<string> FightOps = new()
         {
-            Op.Jwh, Op.Jwn, "jxy", "jwz", Op.Kaq, Op.Jzy,
+            Op.Jwh, Op.Jwn, "jxy", "jwz", Op.Jzy,
         };
 
         /// <summary>A client frame as the client wraps it: { f2 { f1 Any { f1 uri, f2 body }, f2 -1 } }.</summary>
@@ -561,6 +561,9 @@ namespace Jondo.Unity.Server.Network
                         // Movement uses the same typed boundary as the socket loop.
                         if (op == Op.Jrw || op == Op.Jqk)
                             await MovementDispatch.TryHandleAsync(session, GameNodeProxy.DecodeRequest(session, frame));
+                        else if (op == Op.Kaq)
+                            await GameNodeProxy.DispatchTypedAsync(session, GameNodeProxy.DecodeRequest(session, frame),
+                                new GameEntryService(session, new GameEntryBackend()));
                         // kme: giving the fight up, so that a harness closing its client leaves no fight behind.
                         else if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hqa) await FightHandler.AttackAsync(stream, frame);

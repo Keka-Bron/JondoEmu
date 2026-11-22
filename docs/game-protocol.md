@@ -479,6 +479,21 @@ The direct map path applies the documented omission policy to indeterminate
 alliance-emblem tag 4 and haven-bag tag 3; it does not claim lossless reproduction of
 those former raw values. See [the map construction policy](populated-unmapped-fields.md#map-snapshot-construction-policy).
 
+### Fight placement readiness
+
+On the default Game profile, `FightReadyRequest` runs under the requesting session's
+turn and then the fight turn. The handler resolves the fight from the session's character
+before waiting. Under the fight turn it checks that the same instance is still registered
+and the character is still on a team and has not left. A stale ready is discarded, even
+if the character has since joined a new fight. The placement deadline likewise keeps
+its original fight and owner; if the opener leaves, the deadline still serves the remaining players.
+A false request does not withdraw readiness. A leader's
+click announces the leader first, then any party members readied with them. Each
+`FightHumanReadyStateEvent` goes to the fighters and spectators through their own
+session codecs before placement ends. The placement deadline uses the same typed
+event for remaining players. The `3.8.1.2` dispatcher leaves the request unhandled
+until the fight-start burst it can trigger is typed as well.
+
 ### Shared map/fight presence and reconnection opening
 
 `FightHandler` directly constructs map fight flags, counts, incremental teams,

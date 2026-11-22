@@ -80,16 +80,6 @@ namespace Jondo.Unity.Tests.Combat
         //  Rule 2: what is broadcast cannot depend on who is looking
         // ═══════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// The broadcasts that MAY read GameState, and why.
-        /// </summary>
-        /// <remarks>
-        /// The kah says who has just declared himself ready. It runs in the context of whoever pressed, so
-        /// that GameState.CharacterId is the frame's SUBJECT and not whoever receives it: the frame
-        /// is the same for both and broadcasting it is right.
-        /// </remarks>
-        private static readonly string[] Permitidas = { "Op.Kah" };
-
         [Fact]
         public void Lo_que_se_difunde_no_se_construye_desde_una_sesion()
         {
@@ -104,7 +94,6 @@ namespace Jondo.Unity.Tests.Combat
             foreach (var (numero, llamada) in Difusiones(Motor()))
             {
                 if (!llamada.Contains("GameState")) continue;
-                if (Permitidas.Any(llamada.Contains)) continue;
 
                 malas.Add($"  line {numero}: {llamada.Split('\n')[0].Trim()}");
             }

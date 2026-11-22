@@ -18,6 +18,131 @@ public sealed class MapFightPresenceTests
     private const long Map = 91_968_001, Arena = 91_968_002, Id = 7_968_001, Person = 9_968_000_001;
     private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
 
+    private static async Task<GameEntryResult> DispatchReady(GameSession session, bool ready)
+    {
+        using var turn = await session.EnterTurnAsync();
+        return await GameNodeProxy.DispatchTypedAsync(session, new(new FightReadyRequest(ready), -1),
+            new GameEntryService(session, new GameEntryBackend()));
+    }
+
+#if JONDO_PROTOCOL_3_8_1_2
+    [Fact]
+    public async Task Placement_ready_does_not_enter_the_legacy_start_burst_on_beta()
+    {
+        using var fixture = new FightFixture();
+        using var player = new Recipient(Person, Arena, Id);
+        player.Session.State.IsInFight = true;
+        Assert.Equal(GameEntryResult.Unhandled, await DispatchReady(player.Session, true));
+        Assert.False(fixture.Fight.Buscar(Person).IsReady);
+        Assert.Equal(FightState.Placement, fixture.Fight.State);
+        Assert.Empty(player.Sequence);
+    }
+#else
+    [Theory]
+    [InlineData("left")]
+    [InlineData("gone")]
+    [InlineData("replaced")]
+    public async Task Queued_ready_cannot_follow_a_character_to_another_fight(string change)
+    {
+        using var first = new FightFixture();
+        using var player = new Recipient(Person, Arena, Id);
+        player.Session.State.IsInFight = true;
+        var oldFighter = first.Fight.Buscar(Person);
+        // Hold A's turn until the request has selected A and is waiting to enter it.
+        Task<GameEntryResult> queued;
+        FightFixture next;
+        await first.Fight.Turno.WaitAsync();
+        try
+        {
+            queued = DispatchReady(player.Session, true);
+            Assert.False(queued.IsCompleted);
+            if (change == "left") Assert.True(first.Fight.Azul.Remove(oldFighter));
+            else if (change == "gone") first.Fight.Gone.Add(Person);
+            else first.Unregister(); // Same id, different instance; old roster still intact.
+            next = new FightFixture(id: change == "replaced" ? Id : Id + 1);
+            player.Session.State.FightId = next.Fight.FightId;
+        }
+        finally { first.Fight.Turno.Release(); }
+
+        using (next)
+        {
+            Assert.Equal(GameEntryResult.Handled, await queued.WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.False(oldFighter.IsReady);
+            Assert.False(next.Fight.Buscar(Person).IsReady);
+            Assert.Equal(FightState.Placement, first.Fight.State);
+            Assert.Equal(FightState.Placement, next.Fight.State);
+            Assert.Empty(player.Sequence);
+        }
+    }
+
+    [Theory]
+    [InlineData("click")]
+    [InlineData("party")]
+    [InlineData("deadline")]
+    public async Task Placement_ready_reaches_both_players_and_spectator_before_a_single_start(string trigger)
+    {
+        using var fixture = new FightFixture();
+        var fight = fixture.Fight;
+        fight.Azul.Add(new() { Id = Person + 1, CurrentHP = 100, Name = "Follower" });
+        var leaderCodec = new RecordingCodec();
+        var followerCodec = new RecordingCodec();
+        await using var leader = await ClientPipe.OpenAsync(Person + 100, Person, Arena, codec: leaderCodec);
+        await using var follower = await ClientPipe.OpenAsync(Person + 101, Person + 1, Arena, codec: followerCodec);
+        foreach (var session in new[] { leader.Session, follower.Session })
+        {
+            session.State.IsInFight = true;
+            session.State.FightId = Id;
+        }
+        using var watcher = new Recipient(Person + 2, Arena, Id);
+        watcher.Session.State.SpectatingFightId = Id;
+        var spectators = (ConcurrentDictionary<long, ConcurrentDictionary<long, byte>>)typeof(FightHandler)
+            .GetField("_spectators", PrivateStatic)!.GetValue(null)!;
+        spectators[Id] = new([new(Person + 2, 0)]);
+        using var bystander = new Recipient(Person + 3, Map);
+        var codecs = new[] { leaderCodec, followerCodec, watcher.Codec };
+        var phases = new List<FightState>();
+        foreach (var codec in codecs)
+            codec.OnEncode = frame => { if (frame.Content is FightHumanReadyStateEvent) phases.Add(fight.State); };
+
+        var party = Parties.Create(Person);
+        try
+        {
+            Parties.Invite(party, Person + 1, Person);
+            Parties.Accept(party, Person + 1);
+            FightHandler.SetAutoOptions(Person + 1, join: false, ready: trigger == "party");
+            Assert.Equal(GameEntryResult.Handled, await DispatchReady(leader.Session, false));
+            Assert.False(fight.Buscar(Person).IsReady);
+            Assert.All(codecs, c => Assert.Empty(c.Frames));
+
+            Assert.Equal(GameEntryResult.Handled, await DispatchReady(leader.Session, true));
+            if (trigger != "party")
+            {
+                Assert.Equal(FightState.Placement, fight.State);
+                Assert.All(codecs, c => Assert.Equal(new FightHumanReadyStateEvent(Person, true), Assert.Single(c.Frames).Content));
+                if (trigger == "click") Assert.Equal(GameEntryResult.Handled, await DispatchReady(follower.Session, true));
+                else
+                {
+                    using var turn = await leader.Session.EnterTurnAsync();
+                    using var context = SessionContext.Push(leader.Session);
+                    await FightHandler.InTurnAsync(fight, () => Invoke("StartWhoeverIsLeftAsync", fight));
+                }
+            }
+            Assert.Equal(FightState.Ongoing, fight.State);
+            Assert.Equal(GameEntryResult.Handled, await DispatchReady(leader.Session, true));
+            Assert.All(codecs, c => Assert.Equal(new GameFrame[] {
+                new(new FightHumanReadyStateEvent(Person, true)), new(new FightHumanReadyStateEvent(Person + 1, true)) },
+                c.Frames.Where(f => f.Content is FightHumanReadyStateEvent)));
+            Assert.Equal(Enumerable.Repeat(FightState.Placement, 6), phases);
+            Assert.Equal(new RemoveChallengeEvent((int)Id), Assert.Single(bystander.Codec.Frames).Content);
+        }
+        finally
+        {
+            FightHandler.SetAutoOptions(Person + 1, join: false, ready: false);
+            Parties.Dissolve(party);
+        }
+    }
+#endif
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -300,28 +425,30 @@ public sealed class MapFightPresenceTests
     {
         private readonly ConcurrentDictionary<long, FightInstance> _active = (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
             .GetField("_activeFights", PrivateStatic)!.GetValue(null)!;
-        internal FightInstance Fight { get; } = new(Id, Map, Arena) { DefenderLeaderId = -20002 };
-        internal FightFixture(bool collector = false)
+        internal FightInstance Fight { get; }
+        internal FightFixture(bool collector = false, long id = Id)
         {
+            Fight = new(id, Map, Arena) { DefenderLeaderId = -20002 };
             Fight.Azul.Add(new() { Id = Person, Name = "Leader", Level = 253, CurrentHP = 100 });
             Fight.Rojo.Add(new() { Id = -1, IsMonster = true, MonsterId = 492, GradeIndex = 5,
                 TaxCollectorFirstName = collector ? 35 : 0, TaxCollectorLastName = collector ? 109 : 0, CurrentHP = 100 });
             Fight.Rojo.Add(new() { Id = collector ? Person + 9 : -2, Name = "Defender", Level = 199,
                 IsMonster = !collector, MonsterId = 148, GradeIndex = 2, CurrentHP = 75 });
             if (collector) Fight.TaxCollectorUuid = "collector-id";
-            Assert.True(_active.TryAdd(Id, Fight));
+            Assert.True(_active.TryAdd(id, Fight));
         }
+        internal void Unregister() => _active.TryRemove(new KeyValuePair<long, FightInstance>(Fight.FightId, Fight));
         public void Dispose()
         {
             Fight.CancelPlacementTimer();
             Fight.CancelTurnTimer();
-            _active.TryRemove(Id, out _);
+            Unregister();
             var ledger = typeof(FightHandler).GetField("_onTheMap", PrivateStatic)!.GetValue(null)!;
             ledger.GetType().GetMethod("TryRemove", [typeof(long), ledger.GetType().GetGenericArguments()[1].MakeByRefType()])!
-                .Invoke(ledger, [Id, null]);
+                .Invoke(ledger, [Fight.FightId, null]);
             var spectators = (ConcurrentDictionary<long, ConcurrentDictionary<long, byte>>)typeof(FightHandler)
                 .GetField("_spectators", PrivateStatic)!.GetValue(null)!;
-            spectators.TryRemove(Id, out _);
+            spectators.TryRemove(Fight.FightId, out _);
         }
     }
 
@@ -368,10 +495,12 @@ public sealed class MapFightPresenceTests
     private sealed class RecordingCodec : IGameCodec
     {
         internal List<GameFrame> Frames { get; } = [];
+        internal Action<GameFrame>? OnEncode { get; set; }
         internal bool Fail;
         internal int FailAt;
         public byte[] Encode(GameFrame frame)
         {
+            OnEncode?.Invoke(frame);
             Frames.Add(frame);
             if (Fail || FailAt == Frames.Count) throw new IOException("codec failed");
             return [0x71];

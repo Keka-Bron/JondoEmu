@@ -1544,7 +1544,7 @@ namespace Jondo.Unity.Server.Network
                     // The party window's automatic entry and automatic ready.
                     await FightHandler.AutoOptionAsync(stream, payload, payloadStr);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Jzy)) || payloadStr.Contains(Op.Uri(Op.Kaq))
+                else if (payloadStr.Contains(Op.Uri(Op.Jzy))
                          || payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
@@ -1733,6 +1733,10 @@ namespace Jondo.Unity.Server.Network
                 case Game.MapMovementRequest or Game.MapMovementCancelRequest
                     or Game.MapMovementConfirmRequest or Game.MapChangeRequest:
                     await MovementDispatch.TryHandleAsync(session, frame, entryService.OnMapChange);
+                    break;
+                // The last ready can enter the still August-only fight-start burst.
+                case Game.FightReadyRequest ready when UsesLegacyRouting:
+                    await FightHandler.HandleReadyAsync(session, ready);
                     break;
                 default:
                     return GameEntryResult.Unhandled;

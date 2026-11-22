@@ -2541,16 +2541,6 @@ namespace Jondo.Unity.Server.Network
             return (int)(ProtoMessage.Parse(body).Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0)?.VarIntValue ?? 0);
         }
 
-        // ─── Ready ──────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// The ready button (kaq).
-        ///
-        ///   f1: 1
-        ///
-        /// Returns whether the player declares himself ready. In the captures it always arrives with 1; zero
-        /// would be withdrawing ready, but that is not measured.
-        /// </summary>
         /// <summary>A jxy's "IsAfk" (f1): the client passing the turn on its own, its player idle.</summary>
         public static bool ReadIdlePass(byte[] payload)
         {
@@ -2558,18 +2548,6 @@ namespace Jondo.Unity.Server.Network
             if (jxy == null) return false;
             foreach (var field in ProtoMessage.Parse(jxy).Fields)
                 if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue != 0;
-            return false;
-        }
-
-        public static bool ReadReady(byte[] payload)
-        {
-            byte[]? kaq = ConnectionProtocol.ReadPayload(payload, Op.Kaq);
-            if (kaq == null) return false;
-
-            foreach (var field in ProtoMessage.Parse(kaq).Fields)
-            {
-                if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue != 0;
-            }
             return false;
         }
 
@@ -2604,16 +2582,6 @@ namespace Jondo.Unity.Server.Network
             if (accepted) hpv.Var(3, 1);
             return hpv.Var(4, targetId).Build();
         }
-
-        /// <summary>
-        /// Ready acknowledged (kah).
-        ///
-        ///   f1: who        f3: 1
-        ///
-        /// f2 does not appear in any of the captures.
-        /// </summary>
-        public static byte[] BuildReadyAck(long fighterId, bool ready = true)
-            => Pb.New().Var(1, fighterId).Var(3, ready ? 1 : 0).Build();
 
         // ─── The spell bar ──────────────────────────────────────────────────────
 

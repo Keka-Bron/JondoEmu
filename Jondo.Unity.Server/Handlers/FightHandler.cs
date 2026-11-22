@@ -303,7 +303,7 @@ namespace Jondo.Unity.Server.Handlers
             // The place to store the timer already existed -- FightInstance.PlacementTimerCts -- and
             // CancelPlacementTimer() is called from four places, but NOBODY ever assigned it: a null
             // was being cancelled. That was the missing half.
-            StartPlacementCountdown(stream, fight, fight.Reglas.RelojDeColocacion * 100);
+            StartPlacementCountdown(SessionContext.Current, fight, fight.Reglas.RelojDeColocacion * 100);
 
             // And now the rest of the world: his side and theirs before his board, the swords for
             // the map, the ilh for his party and the members who follow him in. See FightJoin.cs.
@@ -317,10 +317,9 @@ namespace Jondo.Unity.Server.Handlers
         /// kaa -- and a challenge has none, so the deadline becomes a parameter and whoever wants no
         /// clock simply does not call it.
         /// </remarks>
-        private static void StartPlacementCountdown(NetworkStream stream, FightInstance fight,
-                                                    int timeoutMs)
+        private static void StartPlacementCountdown(GameSession owner, FightInstance fight, int timeoutMs)
         {
-            long currentFightId = fight.FightId;
+            long characterId = owner.CharacterId;
             var cuentaAtras = new System.Threading.CancellationTokenSource();
             fight.CancelPlacementTimer();
             fight.PlacementTimerCts = cuentaAtras;
@@ -336,32 +335,26 @@ namespace Jondo.Unity.Server.Handlers
 
                 // The same locks the turn clock and what comes from the client use. Without them,
                 // pressing «ready» right as the deadline ran out started the fight twice.
-                var turno = MiTurno();
-                await turno.WaitAsync();
                 try
                 {
-                    // By its id: the one who opened it may have left the placement since, and his
-                    // session no longer has a fight to find.
-                    var f = FightById(currentFightId);
-                    if (f == null || f.FightId != currentFightId) return;
-                    await InTurnAsync(f, async () =>
+                    using var turn = await owner.EnterTurnAsync();
+                    using var context = SessionContext.Push(owner);
+                    await InTurnAsync(fight, async () =>
                     {
-                        if (f.State != Jondo.Unity.World.Fights.FightState.Placement) return;
+                        if (fight.PlacementTimerCts != cuentaAtras || FightById(fight.FightId) != fight ||
+                            fight.State != Jondo.Unity.World.Fights.FightState.Placement) return;
 
-                        Program.LogDebug($"[Fight] Placement time ran out for fight #{currentFightId}.");
-                        if (GetCurrentFight() == f) await HandleTurnReady(stream, Array.Empty<byte>());
+                        Program.LogDebug($"[Fight] Placement time ran out for fight #{fight.FightId}.");
+                        if (owner.CharacterId == characterId && IsParticipant(fight, characterId))
+                            await DeclareReadyAsync(fight, characterId);
 
                         // Whoever came in later and has not pressed ready is not waited for either.
-                        await StartWhoeverIsLeftAsync(f);
+                        await StartWhoeverIsLeftAsync(fight);
                     });
                 }
                 catch (Exception ex)
                 {
                     Program.LogDebug($"[Fight] The placement countdown choked: {ex.Message}");
-                }
-                finally
-                {
-                    turno.Release();
                 }
             });
         }
@@ -676,11 +669,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 foreach (var (sesion, _) in todos)
                 {
-                    using (SessionContext.Push(sesion))
-                    {
-                        StartPlacementCountdown(sesion.Stream, fight,
-                            fight.Reglas.RelojDeColocacion * 100);
-                    }
+                    StartPlacementCountdown(sesion, fight, fight.Reglas.RelojDeColocacion * 100);
                 }
             }
 
@@ -2408,10 +2397,6 @@ namespace Jondo.Unity.Server.Handlers
                     await HandlePlacementCellChangeRequest(stream, payload);
                 }
             }
-            else if (payloadStr.Contains(Op.Uri(Op.Kaq)))
-            {
-                if (Network.FightProtocol.ReadReady(payload)) await HandleTurnReady(stream, payload);
-            }
             else if (payloadStr.Contains("type.ankama.com/jwz"))
             {
                 // "Got the jxh": until this arrives, the turn does not start.
@@ -3302,10 +3287,29 @@ namespace Jondo.Unity.Server.Handlers
         // no longer compete with HandleCombatMoveRequest (the two names differed by a single
         // letter and the routing kept picking the wrong one).
 
-        private static async Task HandleTurnReady(NetworkStream stream, byte[] payload)
+        internal static async Task HandleReadyAsync(GameSession session, Jondo.Unity.Protocol.Game.FightReadyRequest request)
         {
-            var fight = GetCurrentFight();
+            if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld || !session.State.IsInFight) return;
+            long characterId = session.CharacterId;
+            var fight = FightOf(characterId);
             if (fight == null) return;
+            await InTurnAsync(fight, async () =>
+            {
+                // The request belongs to this instance even if the character joined another fight while waiting.
+                if (!session.State.IsInFight || session.CharacterId != characterId ||
+                    FightById(fight.FightId) != fight || !IsParticipant(fight, characterId)) return;
+                using var context = SessionContext.Push(session); // Legacy end/start handlers still read player state.
+                if (await FinishPendingFightAsync(fight) || !request.IsReady) return;
+                await DeclareReadyAsync(fight, characterId);
+            });
+        }
+
+        private static bool IsParticipant(FightInstance fight, long characterId)
+            => !fight.Gone.Contains(characterId) && fight.EquipoDe(characterId) >= 0;
+
+        // Called under the fight turn, including when the placement clock readies the opener.
+        private static async Task DeclareReadyAsync(FightInstance fight, long characterId)
+        {
             if (fight.State != Jondo.Unity.World.Fights.FightState.Placement)
             {
                 Program.LogDebug("[Fight] A ready (kaq) with the fight already going; ignored.");
@@ -3317,8 +3321,8 @@ namespace Jondo.Unity.Server.Handlers
             // The members of his party with the automatic ready on are ready with him, BEFORE
             // the count of who is ready is made: fight 488 of the follow capture starts on the
             // leader's click with both kah side by side. See ReadyAlongWith in FightJoin.cs.
-            var alongWith = ReadyAlongWith(fight, GameState.CharacterId);
-            bool allReady = fight.SetFighterReady(GameState.CharacterId);
+            var alongWith = ReadyAlongWith(fight, characterId);
+            bool allReady = fight.MarkFighterReady(characterId);
 
             // No lqg + lqt here any more. That pair used to go out at every fight start as "the
             // switch that stops the client from regenerating life". Measured across the 400
@@ -3338,12 +3342,10 @@ namespace Jondo.Unity.Server.Handlers
             // To EVERYBODY, not just whoever pressed it. The kah is what draws the two crossed swords
             // over the portrait, and since it was sent only through the socket of whoever declared
             // himself ready, the other never found out: on his screen the rival was still unmarked.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kah,
-                Network.FightProtocol.BuildReadyAck(GameState.CharacterId)));
+            await ATodosAsync(fight, new Jondo.Unity.Protocol.Game.FightHumanReadyStateEvent(characterId, true));
             foreach (long otro in alongWith)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kah,
-                    Network.FightProtocol.BuildReadyAck(otro)));
+                await ATodosAsync(fight, new Jondo.Unity.Protocol.Game.FightHumanReadyStateEvent(otro, true));
             }
 
             if (allReady) await StartFightAsync(fight);
@@ -3365,8 +3367,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task StartFightAsync(FightInstance fight)
         {
-            // Once per fight. SetFighterReady has usually started the fight part already, and two
-            // readies at the same instant asked for this twice: the opening burst went out twice.
+            // Once per fight, whether started by a ready, the placement clock or another caller.
             if (!fight.TryClaimStart()) return;
             if (fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) fight.StartFight();
             fight.CancelPlacementTimer();
