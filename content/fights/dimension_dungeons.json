@@ -38,6 +38,13 @@
         { "turns": 4, "monsters": [6469, 6469, 6468, 6471] },
         { "turns": 5, "monsters": [6469, 6470, 6467, 6467] }
       ],
-      "why": "Dofus pour les noobs («Mémoire d'Orukam»): not one of the Twelve's, but in the Dragon's dimension, so it is fought like theirs with only three waves, in a single fight. It writes them out for four people: King Imagami with Imorok, Imafugo and Imetsu (6468, 6471, 6470: «beside»); then Imiyama, Imiyama, Imorok and Imafugo in 4 turns; then Imiyama, Imetsu, Imushin and Imushin in 5 more. One more monster per fighter past four (modular), drawn here from the wave's own. Newcomers are invulnerable for their first turn; the page gives no life cut for the later waves (every monster has a 13 500 life bonus instead), so they come whole." }
+      "why": "Dofus pour les noobs («Mémoire d'Orukam»): not one of the Twelve's, but in the Dragon's dimension, so it is fought like theirs with only three waves, in a single fight. It writes them out for four people: King Imagami with Imorok, Imafugo and Imetsu (6468, 6471, 6470: «beside»); then Imiyama, Imiyama, Imorok and Imafugo in 4 turns; then Imiyama, Imetsu, Imushin and Imushin in 5 more. One more monster per fighter past four (modular), drawn here from the wave's own. Newcomers are invulnerable for their first turn; the page gives no life cut for the later waves (every monster has a 13 500 life bonus instead), so they come whole." },
+    { "dungeon": 134, "name": "Recuerdo de Imagiro", "dimension": "Dragon", "beside": [6477, 6474, 6476],
+      "lifePercentFromSecondWave": 100,
+      "waves": [
+        { "turns": 4, "monsters": [6477, 6475, 6475, 6474] },
+        { "turns": 5, "monsters": [6476, 6473, 6473, 6475] }
+      ],
+      "why": "Dofus pour les noobs («Souvenir d'Imagiro»): like the Memoria de Orukam, a single fight of three waves in the Dragon's dimension. For four people: Queen Amirukam with Fugokam, Rokoram and Tsunam (6477, 6474, 6476: «beside»); then Fugokam, Mabram, Mabram and Rokoram in 4 turns; then Tsunam, Shinlam, Shinlam and Mabram in 5 more. One more monster per fighter past four, drawn from the wave's own. Every monster has a 13 500 life bonus instead of a life cut, so the later waves come whole." }
   ]
 }

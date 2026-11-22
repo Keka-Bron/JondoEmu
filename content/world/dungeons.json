@@ -445,5 +445,46 @@
       ]
     },
     "why": "One fight, in three waves, on The Rock (Dofus pour les noobs, «Mémoire d'Orukam»: «un unique combat de 3 vagues»). The catalogue also lists The Voyage (211550208) as a room after it, so the keeper sent people there first and the boss room was not the last: its fight was a plain one of eight. The room's group is the waves' own monsters: King Imagami, then Imorok, Imafugo and Imetsu, as the first wave is written, and Imiyama and Imushin for more people."
+  },
+  "134": {
+    "name": "Recuerdo de Imagiro",
+    "minLevel": 190,
+    "optimalLevel": 200,
+    "difficulty": 4,
+    "entrance": 210765572,
+    "exit": 211552256,
+    "rooms": [
+      211813376
+    ],
+    "bosses": [
+      6478
+    ],
+    "keyring": 0,
+    "required": [
+      [
+        23951,
+        1
+      ]
+    ],
+    "achievements": [
+      3090,
+      3091,
+      6260,
+      3093,
+      3092,
+      6020
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "roster": {
+      "211813376": [
+        6477,
+        6474,
+        6476,
+        6475,
+        6473
+      ]
+    },
+    "why": "One fight, in three waves (Dofus pour les noobs, «Souvenir d'Imagiro»: a single room, as in every dungeon of the divine dimensions). The catalogue lists a second map (211812352) that is the dimension's travel point, as The Voyage is for the Memoria de Orukam, so the keeper sent people there first and the fight was split in two. The boss room is the one where the quest asks for Queen Amirukam; its group is the waves' own monsters: the Queen, then Fugokam, Rokoram and Tsunam, as the first wave is written, and Mabram and Shinlam for more people."
   }
 }

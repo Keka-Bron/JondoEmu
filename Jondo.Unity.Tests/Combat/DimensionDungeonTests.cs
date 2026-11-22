@@ -247,5 +247,38 @@ namespace Jondo.Unity.Tests.Combat
             DimensionDungeons.Forget();
             Assert.True(DimensionDungeons.FightsInWaves(TheRock));
         }
+
+        /// <summary>The Recuerdo de Imagiro, also in the Dragon's dimension: one room, in waves.</summary>
+        private const long QueensRoom = 211813376, ItsTravelPoint = 211812352;
+        private const int Imagiro = 134, Amirukam = 6478, Shinlam = 6473, Rokoram = 6474, Mabram = 6475,
+                          Tsunam = 6476, Fugokam = 6477;
+
+        /// <summary>Its two later waves, in 4 and then 5 turns, as written, with no life cut.</summary>
+        [Fact]
+        public void The_memory_of_Imagiro_sends_its_own_written_waves()
+        {
+            DimensionDungeons.Forget();
+            var group = new List<MobSpawnManager.MobMember>
+            {
+                Member(Amirukam, 3), Member(Fugokam, 3), Member(Rokoram, 3), Member(Tsunam, 3),
+            };
+
+            var waves = DimensionDungeons.Plan(group, new[] { Amirukam }, 4, seed: 5, dungeon: Imagiro);
+
+            Assert.Equal(new[] { 4, 5 }, waves.Select(w => w.Turns));
+            Assert.Equal(new[] { Fugokam, Mabram, Mabram, Rokoram }, waves[0].Monsters.Select(m => m.Monster));
+            Assert.Equal(new[] { Tsunam, Shinlam, Shinlam, Mabram }, waves[1].Monsters.Select(m => m.Monster));
+            Assert.All(waves.SelectMany(w => w.Monsters), m => Assert.Equal(3, m.Grade));
+            Assert.Equal(100, DimensionDungeons.Current.LifePercentFor(Imagiro));
+        }
+
+        /// <summary>Its fight is in the Queen's room; the dimension's travel point is not a room of it.</summary>
+        [Fact]
+        public void The_memory_of_Imagiro_is_one_room_fought_in_waves()
+        {
+            DimensionDungeons.Forget();
+            Assert.True(DimensionDungeons.FightsInWaves(QueensRoom));
+            Assert.False(DimensionDungeons.FightsInWaves(ItsTravelPoint));
+        }
     }
 }
