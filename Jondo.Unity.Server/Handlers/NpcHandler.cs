@@ -1711,6 +1711,13 @@ namespace Jondo.Unity.Server.Handlers
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(Managers.InfoMessages.Info, elegidaAhora.Says)));
 
+            // Where the reply points the compass (effect 509): the flag on the world map, the same lsd
+            // a compass of the bag sends (CompassItemHandler).
+            if (elegidaAhora != null && elegidaAhora.Compass.Count >= 2 && !sinPagar)
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push("lsd",
+                    CompassItemHandler.BuildCompass(elegidaAhora.Compass.Count > 2 ? elegidaAhora.Compass[2] : CompassItemHandler.PlainCompass,
+                                                    elegidaAhora.Compass[0], elegidaAhora.Compass[1])));
+
             // A wrong reply the NPC sulks at: Gorco's cauldron.
             if (elegidaAhora != null && elegidaAhora.Sulks > 0)
                 Managers.NpcSulks.Start(SessionContext.State.CharacterId, SessionContext.State.OpenDialogueNpcId, elegidaAhora.Sulks);
@@ -1838,6 +1845,13 @@ namespace Jondo.Unity.Server.Handlers
                     if (gone != null)
                         await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.BuildActorRemoved(gone.ContextualId));
                 }
+            }
+
+            // «Dar uma olhada no que ele tem a oferecer.»: the window shut, the shop opens.
+            if (elegidaAhora is { OpensShop: true } && spokenOn == SessionContext.State.MapId)
+            {
+                var seller = Npcs.Of(spokenOn).FirstOrDefault(s => s.NpcId == spokenTo);
+                if (seller != null) await OpenShopAsync(stream, seller);
             }
 
             if (completesAfterClosing != 0
