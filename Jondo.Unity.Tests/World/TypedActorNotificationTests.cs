@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Jondo.Unity.Tests.World;
 
-[Collection("MapManager")]
+[Collection("npc tables")]
 public sealed class TypedActorNotificationTests
 {
     private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;

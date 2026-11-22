@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Jondo.Unity.Tests.Combat;
 
-[Collection("MapManager")]
+[Collection("npc tables")]
 public sealed class MapFightPresenceTests
 {
     private const long Map = 91_968_001, Arena = 91_968_002, Id = 7_968_001, Person = 9_968_000_001;
