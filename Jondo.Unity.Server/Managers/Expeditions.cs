@@ -44,6 +44,10 @@ namespace Jondo.Unity.Server.Managers
                                     long Thanks);
 
         private const string SelectWording = "Seleccionar la expedición ";
+        // The client says «exploración» for one of them: «Seleccionar la exploración de audacia de
+        // la Cervecería del Rey Dazahk.» Skipped, that expedition had no way in, and every one
+        // after it took the confirmation of the one before.
+        private const string SelectWordingVariant = "Seleccionar la exploración ";
         private const string BeginWording = "Comenzar la expedición.";
         private const string ResumeWording = "Retomar la expedición donde la dejaste.";
         private const string OtherWording = "Seleccionar otra expedición.";
@@ -127,7 +131,7 @@ namespace Jondo.Unity.Server.Managers
                 else if (text == ResumeWording) resume = id;
                 else if (text == OtherWording) other = id;
                 else if (text == ReturnYesWording) yes = id;
-                else if (text.StartsWith(SelectWording, StringComparison.Ordinal))
+                else if (SelectPrefixLength(text) > 0)
                 {
                     string? key = SelectionKey(text);
                     long confirm = group < confirms.Count ? confirms[group] : 0;
@@ -166,11 +170,20 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
+        /// <summary>How long the "select" opening of a reply is, or 0 for any other reply.</summary>
+        private static int SelectPrefixLength(string text)
+        {
+            if (text.StartsWith(SelectWording, StringComparison.Ordinal)) return SelectWording.Length;
+            if (text.StartsWith(SelectWordingVariant, StringComparison.Ordinal)) return SelectWordingVariant.Length;
+            return 0;
+        }
+
         /// <summary>«Seleccionar la expedición de audacia de la Cueva de Bworker.» -> "audacia|cueva de bworker".</summary>
         internal static string? SelectionKey(string text)
         {
-            if (!text.StartsWith(SelectWording, StringComparison.Ordinal)) return null;
-            string rest = text.Substring(SelectWording.Length).TrimEnd('.', ' ');
+            int prefix = SelectPrefixLength(text);
+            if (prefix <= 0) return null;
+            string rest = text.Substring(prefix).TrimEnd('.', ' ');
             string family = "";
             foreach (string f in new[] { "audacia", "bravura" })
             {

@@ -114,6 +114,7 @@ namespace Jondo.Unity.Tests.World
         [InlineData("Seleccionar la expedición de los Bosques.", "|bosques")]
         [InlineData("Seleccionar la expedición de audacia de la Cueva de Bworker.", "audacia|cueva de bworker")]
         [InlineData("Seleccionar la expedición de bravura del Tofullinero Real.", "bravura|tofullinero real")]
+        [InlineData("Seleccionar la exploración de audacia de la Cervecería del Rey Dazahk.", "audacia|cervecería del rey dazahk")]
         public void The_selection_names_family_and_dungeon(string text, string key)
             => Assert.Equal(key, Expeditions.SelectionKey(text));
 
@@ -157,6 +158,7 @@ namespace Jondo.Unity.Tests.World
             var ids = Expeditions.Offers.Select(o => o.DungeonId).ToHashSet();
             Assert.Contains(167, ids);
             Assert.Contains(205, ids);
+            Assert.Contains(184, ids);   // «Seleccionar la exploración ...» in the client
             Assert.True(ids.Count >= 50, $"only {ids.Count} expeditions matched");
             Assert.Equal(ids.Count, Expeditions.Offers.Count);
             Assert.DoesNotContain(144, ids);
