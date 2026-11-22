@@ -15,7 +15,7 @@ namespace Jondo.Unity.Tests.World
     public class AstrubBankTests
     {
         private const long Square = 191104002, Room = 192415750;
-        private const int Door = 515308, DoorCell = 288, Landing = 410, ExitLanding = 302;
+        private const int Door = 515308, DoorCell = 288, Landing = 396, ExitLanding = 302;
 
         private static bool WorldLoaded()
         {

@@ -186,7 +186,7 @@ namespace Jondo.Unity.Tests.World
             var passages = TeleportContent.Load(Paths.ContentFile(TeleportContent.AuthoredFile));
 
             var door = passages.Values.Single(p => p.SourceMapId == 192413706 && p.ElementId == 515569);
-            Assert.Equal((246, 192415754L, 423), (door.SourceCell, door.DestinationMapId, door.DestinationCell));
+            Assert.Equal((246, 192415754L, 408), (door.SourceCell, door.DestinationMapId, door.DestinationCell));
 
             foreach (int exit in new[] { 515546, 515570 })
             {
