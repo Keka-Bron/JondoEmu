@@ -9673,6 +9673,25 @@ namespace Jondo.Unity.Server.Handlers
         /// Each one goes in its own sequence, with the capture's shape: jto, the cast's jwe and whatever
         /// jxm come out, and jwi.
         /// </summary>
+        /// <summary>
+        /// The rows waiting on a delay when the fight has not had a turn yet are brought a round
+        /// forward: the engine dates a delay from the round it is cast in (EffectEngine.Pendiente),
+        /// which before the first turn is the round whose turns have not been played.
+        /// </summary>
+        internal static void CountDelaysFromTheFirstTurn(FightInstance fight)
+        {
+            foreach (var quien in TodosLosCombatientes(fight))
+            {
+                if (quien == null) continue;
+                foreach (var waiting in quien.Buffs.Puestos)
+                {
+                    if (!waiting.Pendiente || waiting.EmpiezaEnRonda <= fight.RoundNumber) continue;
+                    waiting.EmpiezaEnRonda--;
+                    if (waiting.CaducaEnRonda > 0) waiting.CaducaEnRonda--;
+                }
+            }
+        }
+
         private static async Task CascadaDePasivosAsync(NetworkStream stream, FightInstance fight)
         {
             // Where each one stood when the fight began, for effect 784.
@@ -9730,6 +9749,13 @@ namespace Jondo.Unity.Server.Handlers
                 // And a monster's behaviour spell.
                 if (quien.Conducta.Spell != 0) await LanzarLaConductaAsync(stream, fight, quien);
             }
+
+            // A delay counts its caster's turns, and what is cast before the first turn has every
+            // turn of the fight still ahead: a delay of one goes off at his first turn, not his
+            // second. Conde Kontatrás's clock starts on Alternancia (odd turns: a hit moves the
+            // attacker) and hangs Medio Tiempo a turn later; counted from round one + 1, round two
+            // still moved the attacker, where the guide has the Count move on even turns.
+            CountDelaysFromTheFirstTurn(fight);
 
             // And what a raid's guardian lays on the board: the Guardián's glyphs.
             await Managers.GuildRaidGuardians.OnFightStartedAsync(stream, fight);

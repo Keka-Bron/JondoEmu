@@ -121,6 +121,26 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// Cast before the first turn, the even turn's wait counts his first turn: Medio Tiempo
+        /// comes at his round-one turn, so a hit in round two moves the Count, as the guide has it.
+        /// </summary>
+        [Fact]
+        public void Cast_before_the_first_turn_the_even_turn_comes_at_his_first_turn()
+        {
+            var fight = new FightInstance(1, 1);
+            var count = Count(300);
+            fight.AddMonster(count); fight.AddPlayer(Person(10, 0, 330));
+
+            EffectEngine.Resolver(fight, count, Carrillon, 1, count, EffectEngine.AlLanzar, fight.RoundNumber, celdaApuntada: count.CellId);
+            FightHandler.CountDelaysFromTheFirstTurn(fight);
+
+            var waiting = Assert.Single(count.Buffs.Puestos, b => b.Pendiente);
+            Assert.Equal(MedioTiempo, waiting.Dado);
+            Assert.Equal(fight.RoundNumber, waiting.EmpiezaEnRonda);
+            Assert.Single(EffectEngine.ActivateDuePending(fight, fight.RoundNumber));
+        }
+
+        /// <summary>
         /// An even-turn hit with somebody on the mirror cell: the Count and that one swap -- a
         /// telefrag -- the Count's invulnerability is switched off, and the one swapped gets +100
         /// damage. Nobody dies: nobody swapped with a summon.
