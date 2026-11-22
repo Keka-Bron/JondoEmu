@@ -57,6 +57,19 @@ namespace Jondo.Unity.World.Content
 
         public string InsteadWhen { get; init; }
 
+        /// <summary>
+        /// The information message said when <see cref="Criterion"/> does not hold, or zero for the
+        /// generic refusal («refusal»): Astrub's holes for the shrunk say 449 on the official server,
+        /// the same as every other way in for the small; Bonta's stair for the highest ranks, 811.
+        /// </summary>
+        public int Refusal { get; init; }
+
+        /// <summary>
+        /// The refusal's message type («refusalType»), as the official server sent it: 449 came as an
+        /// error (1), Bonta's 811 as information (0, the default). Measured 2026-11-21.
+        /// </summary>
+        public int RefusalType { get; init; }
+
         public override string ToString()
             => $"{SourceMapId}/{ElementId} → {DestinationMapId}@{DestinationCell}";
     }
@@ -150,6 +163,8 @@ namespace Jondo.Unity.World.Content
                         InsteadCell = (int)Long(entry, "insteadToCell"),
                         InsteadWhen = entry.TryGetProperty("insteadWhen", out var instead) &&
                                       instead.ValueKind == JsonValueKind.String ? instead.GetString() ?? "" : "",
+                        Refusal = (int)Long(entry, "refusal"),
+                        RefusalType = (int)Long(entry, "refusalType"),
                     }, from);
                 }
             }
@@ -252,6 +267,8 @@ namespace Jondo.Unity.World.Content
                         writer.WriteNumber("insteadToCell", passage.InsteadCell);
                         writer.WriteString("insteadWhen", passage.InsteadWhen ?? "");
                     }
+                    if (passage.Refusal != 0) writer.WriteNumber("refusal", passage.Refusal);
+                    if (passage.RefusalType != 0) writer.WriteNumber("refusalType", passage.RefusalType);
                     writer.WriteEndObject();
                 }
 

@@ -42,6 +42,12 @@ namespace Jondo.Unity.Server.Managers
 
         public string InsteadWhen { get; init; } = "";
 
+        /// <summary>The information message said when the criterion does not hold; zero for the generic one.</summary>
+        public int Refusal { get; init; }
+
+        /// <summary>The refusal's message type: 0 information, 1 error (449 of the holes).</summary>
+        public int RefusalType { get; init; }
+
         /// <summary>
         /// The next floor passage on the same cell, tried when this one's <see cref="Criterion"/>
         /// does not hold; null for none. One cell can lead to a different map for each quest that
@@ -536,6 +542,8 @@ namespace Jondo.Unity.Server.Managers
                     InsteadMapId = passage.InsteadMapId,
                     InsteadCellId = passage.InsteadCell,
                     InsteadWhen = passage.InsteadWhen ?? "",
+                    Refusal = passage.Refusal,
+                    RefusalType = passage.RefusalType,
                     SourceVersion = "Jondo Studio",
                     Confidence = "authored",
                 };
@@ -602,6 +610,9 @@ namespace Jondo.Unity.Server.Managers
                 if (byElement.ContainsKey((route.SourceMapId, route.ElementId))) continue;
                 if (MapManager.GetMapInfo(route.DestinationMapId) == null) continue;
                 if (Interactives.ByElementId(route.SourceMapId, route.ElementId).Id == 0) continue;
+                // The hall's own zaap is no door: Bonta's 540446 (217055492) was paired, inferred, with
+                // the street, where the official server opens the zaap list on it (type 16, skill 114).
+                if (Interactives.ZaapElements(route.SourceMapId).Any(z => z.Id == route.ElementId)) continue;
                 byElement[(route.SourceMapId, route.ElementId)] = route;
                 if (!byMap.TryGetValue(route.SourceMapId, out var list))
                     byMap.Add(route.SourceMapId, list = new List<InteractiveTeleport>());

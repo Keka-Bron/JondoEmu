@@ -81,8 +81,10 @@ namespace Jondo.Unity.Server.Handlers
             if (route.Criterion.Length > 0 && !Managers.ItemCriteria.Holds(route.Criterion))
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                    ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildInfoMessage(
-                        Managers.InfoMessages.Warning, Managers.ItemCriteria.RefusalOf(route.Criterion))));
+                    ConnectionProtocol.Push(Op.Lqn, route.Refusal != 0
+                        ? ConnectionProtocol.BuildInfoMessage(route.RefusalType, route.Refusal)
+                        : ConnectionProtocol.BuildInfoMessage(
+                            Managers.InfoMessages.Warning, Managers.ItemCriteria.RefusalOf(route.Criterion))));
                 Console.WriteLine($"[Teleport] Element {elementId} on {sourceMapId}: «{route.Criterion}» not met.");
                 await RefuseAsync(stream, elementId, skillId, route.SourceCellId, route.InteractiveType);
                 return;
