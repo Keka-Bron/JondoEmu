@@ -1,0 +1,17 @@
+{
+  "_comment": [
+    "Bosses whose grade follows how many characters fight them (Managers.MonsterPartyGrades). Their grades",
+    "share one level and differ only in life, and a guide gives the life for each party size. Without a",
+    "row here a dungeon boss fights at the grade its room was composed with.",
+    "",
+    "  monster   the monster template",
+    "  from      the party size that fights its first grade, and every smaller one; each character more",
+    "            takes it one grade up, to its last"
+  ],
+  "grades": [
+    {
+      "monster": 4967, "from": 4,
+      "why": "Ilyzaelle's grades are 42000, 46000, 51000, 55000 and 60000 life at level 220, and her guide gives the same tiers: «4 personnage ou moins : 42 000 PV. 5 personnages : 46 000 PV» up to «8 personnages : 60 000 PV» (Dofus pour les noobs, «Belvédère d'Ilyzaelle»). She fought a player alone at 60000."
+    }
+  ]
+}

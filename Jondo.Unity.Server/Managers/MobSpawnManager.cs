@@ -870,11 +870,23 @@ namespace Jondo.Unity.Server.Managers
         /// Who of a group comes into a fight: all of an ordinary group; of a dungeon room's, the
         /// first <c>clamp(fighters, 4, 8)</c> -- four for a player alone, one more each from the
         /// fifth, as the jss's alternatives say; never fewer than its <see cref="MobGroup.Leaders"/>.
+        /// A boss of <see cref="MonsterPartyGrades"/> comes at the grade of that many fighters.
         /// </summary>
         public static List<MobMember> MembersFor(MobGroup group, int fighters)
             => !group.Modular
                 ? group.Members
-                : group.Members.Take(Math.Max(group.Leaders, Math.Clamp(fighters, DungeonMinimum, DungeonGroupSize))).ToList();
+                : group.Members.Take(Math.Max(group.Leaders, Math.Clamp(fighters, DungeonMinimum, DungeonGroupSize)))
+                    .Select(member => ForParty(member, fighters)).ToList();
+
+        /// <summary>The member as it fights a party of <paramref name="fighters"/>: itself, unless its grade follows the party.</summary>
+        private static MobMember ForParty(MobMember member, int fighters)
+        {
+            if (member.Monster == null
+                || MonsterPartyGrades.GradeFor(member.Monster.Id, fighters, member.Monster.Grades.Count) is not int grade
+                || grade == member.GradeIndex)
+                return member;
+            return new MobMember { Monster = member.Monster, GradeIndex = grade, Level = member.Monster.Grades[grade].Level };
+        }
 
 
         /// <summary>

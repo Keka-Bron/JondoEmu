@@ -97,7 +97,7 @@ internal static class MapActorMessages
             ? Enumerable.Range(MobSpawnManager.DungeonMinimum,
                 Math.Max(0, Math.Min(members.Length, MobSpawnManager.DungeonGroupSize) - MobSpawnManager.DungeonMinimum + 1))
                 .DistinctBy(size => Math.Max(size, Math.Min(group.Leaders, members.Length)))
-                .Select(size => new MonstersInGroupAlternativeInformation(members.Take(Math.Max(size, Math.Min(group.Leaders, members.Length))).Select(member => Member(member, false)).ToArray(),
+                .Select(size => new MonstersInGroupAlternativeInformation(MobSpawnManager.MembersFor(group, size).Select(member => Member(member, false)).ToArray(),
                     size == MobSpawnManager.DungeonMinimum ? 1 : size)).ToArray()
             : [];
         return Roleplay(group.MobId, group.CellId, group.Orientation,

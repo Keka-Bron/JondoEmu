@@ -44,6 +44,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.IdolRules.Forget();
             Managers.IdolRules.Load();
             Managers.MonsterSummonCaps.Reload();
+            Managers.MonsterPartyGrades.Reload();
             Managers.Readables.Forget();
             Managers.InteractiveWays.Forget();
             Managers.TeleportManager.Initialize();
