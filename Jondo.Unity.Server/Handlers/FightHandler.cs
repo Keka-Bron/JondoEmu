@@ -11740,6 +11740,18 @@ namespace Jondo.Unity.Server.Handlers
         /// same aimed at himself as at the ally beside the enemy, and he spent it on himself every
         /// turn; row by row the swap moves him, and what he casts from there is weighed.
         /// </summary>
+        /// <summary>
+        /// A monster's cast counts against whoever stands on the aimed cell, himself included: the
+        /// Jalató's Salivazo (29402, range 0, once per target) is aimed at his own cell, and left
+        /// uncounted it went off four times a turn. A player's cast counts the same way (CastAsync).
+        /// </summary>
+        internal static void CountCastOn(Fighter caster, int spell, Fighter? target)
+        {
+            if (target == null) return;
+            caster.LanzadosPorObjetivo.TryGetValue((spell, target.Id), out int onIt);
+            caster.LanzadosPorObjetivo[(spell, target.Id)] = onIt + 1;
+        }
+
         internal static bool SwapsWithItsSide(int spell, int grade)
             => Managers.SpellEffects.De(spell, grade)
                 .Any(e => e.EffectId == 1101 && !e.ForClientOnly && NamesItsSideOnly(e.TargetMask ?? "")
@@ -12011,11 +12023,7 @@ namespace Jondo.Unity.Server.Handlers
 
             monster.LanzadosEsteTurno.TryGetValue(spell, out int esteTurno);
             monster.LanzadosEsteTurno[spell] = esteTurno + 1;
-            if (objetivo != null && objetivo.Id != monster.Id)
-            {
-                monster.LanzadosPorObjetivo.TryGetValue((spell, objetivo.Id), out int sobreEse);
-                monster.LanzadosPorObjetivo[(spell, objetivo.Id)] = sobreEse + 1;
-            }
+            CountCastOn(monster, spell, objetivo);
             var limitesDelMonstruo = LimitesDeGrado(spell, monsterGrade);
             int intervalo = limitesDelMonstruo.Intervalo;
             if (intervalo > 0) monster.Recarga[spell] = intervalo;
