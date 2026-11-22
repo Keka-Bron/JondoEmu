@@ -11,7 +11,9 @@ namespace Jondo.Unity.Tests.World
     public sealed class WantedPosterBoardTests
     {
         [Theory]
-        [InlineData(192413706, 516014, 61)]    // Astrub's militia: Padgref Demoël
+        [InlineData(192413706, 516014, 100)]   // Astrub's militia, measured on the official server
+        [InlineData(192413706, 516005, 67)]    // (2026-11-20, each of the eleven clicked): Armyna,
+        [InlineData(192413706, 516013, 61)]    // Qil Bil, Nondome Dula
         [InlineData(95686149, 484126, 365)]    // Amakna castle, first room: Ali Grothor
         [InlineData(95687173, 488238, 410)]    // Amakna castle, second room: Tyranne la Terrible
         [InlineData(121899010, 483922, 368)]   // the Justiciers' base: Amy, top left
@@ -21,8 +23,12 @@ namespace Jondo.Unity.Tests.World
         [InlineData(170133504, 509179, 473)]   // Sufokia: the Homard Medali, at the top
         [InlineData(173938178, 509666, 481)]   // Saharach: the Khepricorne, right wall
         [InlineData(234751491, 539149, 686)]   // Osavora: Ganos
-        [InlineData(217449476, 522395, 452)]   // Bonta's militia: Sam Sagaz
-        [InlineData(216663298, 522373, 452)]   // Brâkmar's militia: Sam Sagaz
+        [InlineData(217449476, 522395, 456)]   // Bonta's militia, measured (2026-11-21, every poster
+        [InlineData(217449476, 522397, 453)]   // clicked: 17 of the 19 were crossed): Nonô o Wobot,
+        [InlineData(217449476, 523690, 454)]   // Mestre Bolota, Ladi Nosbago
+        [InlineData(216663298, 522373, 452)]   // Brâkmar's militia, measured (2026-11-21, every poster
+        [InlineData(216663298, 522377, 514)]   // clicked: 18 of the 19 were crossed): Sam Sagaz
+        [InlineData(216663298, 523662, 453)]
         [InlineData(137363456, 485515, 385)]   // Srambad, measured: Gein
         public void Each_board_s_poster_opens_its_criminal(long map, int element, int document)
         {
