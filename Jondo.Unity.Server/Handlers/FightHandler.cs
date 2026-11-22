@@ -11366,7 +11366,7 @@ namespace Jondo.Unity.Server.Handlers
                     }
                     planned++;
                 }
-                else action = Managers.MonsterTactics.Next(board, monster, usable);
+                else action = Managers.MonsterTactics.Next(board, monster, usable, spells.FindAll(s => !Allowed(s)));
                 if (action == null) break;
 
                 if (action.Path.Count > 1 && !await MonsterWalkAsync(stream, fight, monster, new List<int>(action.Path)))

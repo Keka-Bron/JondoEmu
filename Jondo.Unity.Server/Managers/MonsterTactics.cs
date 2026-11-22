@@ -208,6 +208,26 @@ namespace Jondo.Unity.Server.Managers
                                          && SwitchesByRows(SpellEffects.De(r.DiceNum, Math.Max(1, r.DiceSide)), depth + 1))));
 
             /// <summary>
+            /// The states the spell puts on its caster, by its rows or by what they cast on him:
+            /// Guerra's Bravoure (15249) leaves her Brave (1567).
+            /// </summary>
+            public IReadOnlyCollection<int> CasterStates => _casterStates ??= CasterStatesByRows(Rows, 0).ToHashSet();
+
+            private HashSet<int>? _casterStates;
+
+            private static IEnumerable<int> CasterStatesByRows(IEnumerable<SpellEffect> rows, int depth)
+            {
+                foreach (var r in rows)
+                {
+                    if (r.ForClientOnly || !OnCaster(r)) continue;
+                    if (r.EffectId == EffectSupport.AddState && r.Value != 0) yield return r.Value;
+                    else if (depth < SubCastDepth && EffectEngine.EsDeLaFamiliaDeSublanzar(r.EffectId) && r.DiceNum > 0)
+                        foreach (int state in CasterStatesByRows(SpellEffects.De(r.DiceNum, Math.Max(1, r.DiceSide)), depth + 1))
+                            yield return state;
+                }
+            }
+
+            /// <summary>
             /// Whether the spell puts or takes a state on the caster's own creatures, by its rows or
             /// by what they cast: the Steamer's Evolución, its turret's states II and III. What it is
             /// worth is what the creature does after it, on its turn and to its summoner.
@@ -406,8 +426,16 @@ namespace Jondo.Unity.Server.Managers
         private const double WalkPenalty = 0.06;
 
         /// <summary>The next thing worth doing, or null when there is none.</summary>
-        public static Action? Next(Board board, Fighter monster, IReadOnlyList<Spell> spells)
+        /// <param name="locked">The monster's spells its states do not allow now, for <see cref="OpenerBefore"/>.</param>
+        public static Action? Next(Board board, Fighter monster, IReadOnlyList<Spell> spells,
+                                   IReadOnlyList<Spell>? locked = null)
         {
+            if (locked is { Count: > 0 })
+            {
+                var opener = OpenerBefore(board, monster, spells, locked);
+                if (opener != null) return opener;
+            }
+
             Action? best = null;
             foreach (var option in Options(board, monster, spells))
                 if (best == null || option.Score > best.Score) best = option;
@@ -539,6 +567,27 @@ namespace Jondo.Unity.Server.Managers
                 }
             }
             return options.Values.ToList();
+        }
+
+        /// <summary>
+        /// A spell that puts on the monster a state its locked blows ask for, cast before them --
+        /// or null. Guerra's Bravoure (15249) leaves her Brave (1567), and only then has she
+        /// Lynchage and Impact; weighed blow by blow it was worth less than the Martirio it closes,
+        /// and she never cast it.
+        /// </summary>
+        private static Action? OpenerBefore(Board board, Fighter monster, IReadOnlyList<Spell> spells,
+                                            IReadOnlyList<Spell> locked)
+        {
+            Action? best = null;
+            foreach (var spell in spells)
+            {
+                var states = spell.CasterStates.Where(state => !monster.Buffs.TieneEstado(state)).ToHashSet();
+                if (states.Count == 0) continue;
+                if (!locked.Any(l => l.Offensive && SpellCriteria.Allows(monster, l.Id, l.Grade, states.Contains))) continue;
+                foreach (var option in Options(board, monster, new[] { spell }, movers: true))
+                    if (best == null || option.Score > best.Score) best = option;
+            }
+            return best;
         }
 
         /// <summary>
