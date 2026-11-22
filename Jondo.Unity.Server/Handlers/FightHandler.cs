@@ -8530,6 +8530,10 @@ namespace Jondo.Unity.Server.Handlers
                                     await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
                                 }
                             }
+                            // A monster's rune is spent by setting it off.
+                            foreach (var glifo in runas.Where(g => g.Cuando == Jondo.Unity.World.Fights.Disparo.AlActivarse))
+                                glifo.Gastado = true;
+                            foreach (var caido in fight.BarrerLosGlifos()) await MarcaQuitadaAsync(fight, caido);
                             continue;
                         }
 
@@ -10493,7 +10497,10 @@ namespace Jondo.Unity.Server.Handlers
                         await EngancheAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
                     fight.TriggeringAttacker = antes;
                 }
-                await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, lejos <= 1, sacadoDelDado,
+                // Its triggers go off with nothing taken: a share "of the damage suffered" is a
+                // share of nothing. Capitan Meno heals by all a player suffers (6795's 2020), and
+                // handed the die's roll here he healed off every blow on a player in state 56.
+                await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, lejos <= 1, 0,
                                                deHechizo: spell != 0);
                 return;
             }

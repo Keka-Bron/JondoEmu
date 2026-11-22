@@ -1557,6 +1557,18 @@ namespace Jondo.Unity.Server.Managers
         private const int Runa = 2022;
 
         /// <summary>
+        /// Whether a spell that lays runes also sets them off in one of its grades: Capitan Meno's
+        /// 6804 lays them in grades 1-5 and its "792 grade 6" sets them all off (2023) at once.
+        /// Such runes are there to be set off, not stepped on.
+        /// </summary>
+        private static bool SetsOffItsOwnRunes(int hechizo)
+        {
+            for (int grado = 1; grado <= 12; grado++)
+                if (SpellEffects.De(hechizo, grado).Any(e => e.EffectId == ActivaLasRunas)) return true;
+            return false;
+        }
+
+        /// <summary>
         /// «Devuelve #1 PA» (120): the points in the bearer's hand, told as the real server tells
         /// them -- the AP sheet, then "jwe 120 f20{f1=N f2=who}" in the caster's name: 117 of them
         /// in 35 captures, Neutral's at frame 11 of "usar neutral en portales". 163 spells carry
@@ -4934,6 +4946,8 @@ namespace Jondo.Unity.Server.Managers
                     Trampa => Jondo.Unity.World.Fights.Disparo.AlPisar,
                     GlifoDeInicioDeTurno => Jondo.Unity.World.Fights.Disparo.AlEmpezarElTurno,
                     GlifoDeFinDeTurno => Jondo.Unity.World.Fights.Disparo.AlAcabarElTurno,
+                    Runa when !PlayerSpells.Contains(hechizo) && SetsOffItsOwnRunes(hechizo)
+                        => Jondo.Unity.World.Fights.Disparo.AlActivarse,
                     _ => Jondo.Unity.World.Fights.Disparo.AlPisarYAlEmpezar,
                 };
 

@@ -23,6 +23,13 @@ namespace Jondo.Unity.World.Fights
         /// not one 306 or 307 names one; what they do arrives right behind the 1091 itself.
         /// </summary>
         AlPonerse,
+
+        /// <summary>
+        /// Only when a spell sets it off (2023), and spent by it: a monster's rune. Capitan Meno's
+        /// summoning runes (6804) are laid and set off in the same cast; fired again at the turn
+        /// start of each monster they had brought, they brought five more every time.
+        /// </summary>
+        AlActivarse,
     }
 
     /// <summary>
@@ -115,7 +122,7 @@ namespace Jondo.Unity.World.Fights
         public int ZoneSize { get; set; }
 
         /// <summary>The trap is spent; the glyph stays until it expires.</summary>
-        public bool SeGastaAlDispararse => Cuando == Disparo.AlPisar;
+        public bool SeGastaAlDispararse => Cuando is Disparo.AlPisar or Disparo.AlActivarse;
 
         public bool Cubre(int casilla) => Casillas.Contains(casilla);
 
