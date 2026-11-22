@@ -131,7 +131,13 @@ namespace Jondo.Unity.Server.Managers
             {
                 switch (learned)
                 {
-                    case AsRange: return (AsRange, diceSide != 0 ? diceSide : diceNum, diceNum, 0);
+                    case AsRange:
+                        // A rolled range still carries its dice (max in DiceSide, min in DiceNum).
+                        // A fixed one arrives resolved, with the number in Value and both dice at
+                        // zero -- 2822 on Thanatena's Judgement, for example. Sending zeroes as
+                        // the max and min is what drew its first damage line as 0.
+                        if (diceNum == 0 && diceSide == 0) return (AsRange, value, value, 0);
+                        return (AsRange, diceSide != 0 ? diceSide : diceNum, diceNum, 0);
                     case AsDice: return (AsDice, value, diceNum, diceSide);
                     case AsNumber: return (AsNumber, OnlyNonZero(value, diceNum, diceSide), 0, 0);
                     // A date the item carries in seconds -- «Recibido el» (805), stamped when it is
