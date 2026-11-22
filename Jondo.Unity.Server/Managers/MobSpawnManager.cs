@@ -22,6 +22,37 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The banned maps, kept so that the repopulator respects them too.</summary>
         private static HashSet<long> _vetados = new HashSet<long>();
 
+        /// <summary>Incarnam's maps (area 45), where group sizes follow the measured spread.</summary>
+        private static HashSet<long> _incarnam = new HashSet<long>();
+
+        /// <summary>
+        /// A group's size in Incarnam, by the official server: 76 groups over 20 maps (packet captures
+        /// of the official server, 2026-11-17 to 11-20, every group a map's contents listed) were 43 of
+        /// one monster, 23 of two, 9 of three and 1 of four. The seeding drew 1 to 8 evenly, which is
+        /// what filled Incarnam with crowds. <paramref name="roll"/> is 0..75.
+        /// </summary>
+        internal static int IncarnamGroupSize(int roll) => roll < 43 ? 1 : roll < 66 ? 2 : roll < 75 ? 3 : 4;
+        internal const int IncarnamGroupRolls = 76;
+
+        internal static HashSet<long> LoadIncarnam(SqliteConnection connection)
+        {
+            var maps = new HashSet<long>();
+            try
+            {
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT m.Id FROM MapTemplates m JOIN SubAreaTemplates s " +
+                                  "ON s.Id = json_extract(m.Data, '$.subAreaId') " +
+                                  "WHERE json_extract(s.Data, '$.areaId') = 45;";
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) maps.Add(reader.GetInt64(0));
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[MobSpawnManager] Could not read Incarnam's maps: {ex.Message}");
+            }
+            return maps;
+        }
+
         /// <summary>
         /// The maps where a monster is NOT placed, however much the table has them.
         ///
@@ -130,6 +161,11 @@ namespace Jondo.Unity.Server.Managers
             {
                 Program.LogDebug($"[MobSpawnManager] Could not read the arenas: {ex.Message}");
             }
+
+            // NOT a rule: MapInformationFlags.CapabilityAllowMonsterRespawn (1 << 13). In one
+            // official capture of Incarnam (2026-11-17) the 3 maps without the bit were empty, but
+            // the Incarnam mine (subarea 778) lacks it on every map and is full of Aminite groups on
+            // the official server. Do not veto by it.
 
             // And the dungeon rules over everything else.
             vetados.ExceptWith(salas);
@@ -335,6 +371,8 @@ namespace Jondo.Unity.Server.Managers
             // And where a monster is NOT placed however much the table says so.
             _vetados = MapasSinMonstruos(connection);
             var vetados = _vetados;
+            _incarnam = LoadIncarnam(connection);
+            int incarnamTrimmed = 0;
 
             var cmdMapMobs = connection.CreateCommand();
             cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs ORDER BY MapId, MobId;";
@@ -416,6 +454,18 @@ namespace Jondo.Unity.Server.Managers
                     // stay, is no group.
                     if (group.Members.Count == 0) continue;
 
+                    // Incarnam's groups to the measured sizes. Drawn from the group's id, not from
+                    // Random, so a map looks the same after a restart; the leader (first) stays.
+                    if (_incarnam.Contains(mapId))
+                    {
+                        int size = IncarnamGroupSize(new Random(unchecked((int)mobId)).Next(IncarnamGroupRolls));
+                        if (group.Members.Count > size)
+                        {
+                            group.Members.RemoveRange(size, group.Members.Count - size);
+                            incarnamTrimmed++;
+                        }
+                    }
+
                     if (!_mapMobs.ContainsKey(mapId))
                         _mapMobs[mapId] = new List<MobGroup>();
                     _mapMobs[mapId].Add(group);
@@ -455,6 +505,7 @@ namespace Jondo.Unity.Server.Managers
                 Console.WriteLine($"[MobSpawnManager] {bajoTecho} groups discarded for being indoors, " +
                                   $"on top of a zaap or on an arena; {vetados.Count} maps vetoed.");
             }
+            Console.WriteLine($"[MobSpawnManager] {incarnamTrimmed} Incarnam groups cut to the official sizes (1-4).");
             Console.WriteLine($"[MobSpawnManager] Group ids handed out down to {menor}; " +
                               "the ones spawned on the fly carry on below.");
             Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
@@ -1123,7 +1174,9 @@ namespace Jondo.Unity.Server.Managers
                 CanRoam = true,
             };
 
-            int groupSize = _rand.Next(1, 9); // 1 to 8 monsters, just like in Dofus
+            int groupSize = _incarnam.Contains(mapId)
+                ? IncarnamGroupSize(_rand.Next(IncarnamGroupRolls))   // measured on the official server
+                : _rand.Next(1, 9);                   // 1 to 8 elsewhere: not measured yet
             var ids = new List<int>(groupSize);
             for (int m = 0; m < groupSize; m++) ids.Add(availableMonsters[_rand.Next(availableMonsters.Count)]);
 
