@@ -405,5 +405,45 @@
     "autoGroup": 1,
     "door": 1,
     "why": "Klime's private room in the order its maps name it: First, Second and Third Room, the Annex, the Fourth Room and Klime's own. The catalogue's partial names put the Annex after the Fourth Room and gave it a fight. Dofus pour les noobs, «Salons privés de Klime»: «Entre la salle 3 et la salle 4, vous arrivez dans une salle annexe sans monstres. Il sera nécessaire de trouver un passage secret pour pouvoir accéder à la salle 4 : Activez simplement le chandelier le plus proche» (content/interactives/teleports.json)."
+  },
+  "133": {
+    "name": "Memoria de Orukam",
+    "minLevel": 190,
+    "optimalLevel": 200,
+    "difficulty": 4,
+    "entrance": 210633732,
+    "exit": 211552256,
+    "rooms": [
+      211551232
+    ],
+    "bosses": [
+      6472
+    ],
+    "keyring": 0,
+    "required": [
+      [
+        23950,
+        1
+      ]
+    ],
+    "achievements": [
+      3083,
+      3084,
+      6259,
+      3086,
+      3085
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "roster": {
+      "211551232": [
+        6468,
+        6471,
+        6470,
+        6469,
+        6467
+      ]
+    },
+    "why": "One fight, in three waves, on The Rock (Dofus pour les noobs, «Mémoire d'Orukam»: «un unique combat de 3 vagues»). The catalogue also lists The Voyage (211550208) as a room after it, so the keeper sent people there first and the boss room was not the last: its fight was a plain one of eight. The room's group is the waves' own monsters: King Imagami, then Imorok, Imafugo and Imetsu, as the first wave is written, and Imiyama and Imushin for more people."
   }
 }

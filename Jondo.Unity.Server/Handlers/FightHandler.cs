@@ -3675,6 +3675,11 @@ namespace Jondo.Unity.Server.Handlers
             // answers, only the first does the work: see ConfirmAsync.
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh,
                 Network.FightProtocol.BuildConfirmTurn(deQuien != 0 ? deQuien : next.Id)));
+
+            // And if no client answers at all, the turn still opens: after a summon its player
+            // drives had passed its turn, the client sent no jwz and the fight stood still for good.
+            if (stream != null)
+                AwaitTheOthers(stream, fight, next.Id, NobodyConfirmedWaitMs, "No client confirmed");
         }
 
         /// <summary>
@@ -3830,6 +3835,12 @@ namespace Jondo.Unity.Server.Handlers
         private const int ConfirmationWaitMs = 10_000;
 
         /// <summary>
+        /// How long a turn waits when no client has confirmed it at all: longer, as a client may
+        /// still be playing out the last turn's blows, but not for ever.
+        /// </summary>
+        private const int NobodyConfirmedWaitMs = 20_000;
+
+        /// <summary>
         /// The people whose clients confirm the turns: those of the fight connected to it.
         /// </summary>
         private static IEnumerable<long> AwaitedConfirmations(FightInstance fight)
@@ -3843,7 +3854,8 @@ namespace Jondo.Unity.Server.Handlers
         /// The turn waits for the clients still drawing; if they have not answered in
         /// <see cref="ConfirmationWaitMs"/>, it opens all the same, under the same locks as a jwz.
         /// </summary>
-        private static void AwaitTheOthers(NetworkStream stream, FightInstance fight, long fighterId)
+        private static void AwaitTheOthers(NetworkStream stream, FightInstance fight, long fighterId,
+                                           int waitMs = ConfirmationWaitMs, string who = "Not every client")
         {
             long deQueCombate = fight.FightId;
             int ronda = fight.RoundNumber;
@@ -3851,7 +3863,7 @@ namespace Jondo.Unity.Server.Handlers
 
             _ = Task.Run(async () =>
             {
-                await Task.Delay(ConfirmationWaitMs);
+                await Task.Delay(waitMs);
 
                 var turno = MiTurno();
                 await turno.WaitAsync();
@@ -3865,8 +3877,8 @@ namespace Jondo.Unity.Server.Handlers
                         if (ahora.CurrentFighter?.Id != fighterId || ahora.RoundNumber != ronda || ahora.TurnSlot != hueco) return;
                         if (!ahora.TurnAwaitingConfirmation) return;
 
-                        Program.LogDebug($"[Fight] Not every client confirmed the turn of {fighterId} in " +
-                                         $"{ConfirmationWaitMs / 1000} s; it opens without them.");
+                        Program.LogDebug($"[Fight] {who} confirmed the turn of {fighterId} in " +
+                                         $"{waitMs / 1000} s; it opens without them.");
                         await ConfirmAsync(stream, everyoneAnswered: true);
                     });
                 }
@@ -12065,14 +12077,14 @@ namespace Jondo.Unity.Server.Handlers
 
             int size = MobSpawnManager.MembersFor(where.Group, fight.PeopleIn(FightInstance.Azules)).Count;
             var once = dungeon.Bosses.Concat(Managers.DimensionDungeons.BesideTheBoss(dungeon.Id)).ToList();
-            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, once, size, fight.FightId);
+            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, once, size, fight.FightId, dungeon.Id);
             if (waves.Count == 0) return;
 
             var rules = Managers.DimensionDungeons.Current;
             fight.TimedWaves.AddRange(waves);
             fight.NextWaveRound = FirstRound + waves[0].Turns;
             fight.WaveArrivalState = rules.ArrivalState;
-            fight.WaveLifePercent = rules.LifePercentFromSecondWave;
+            fight.WaveLifePercent = rules.LifePercentFor(dungeon.Id);
             Program.LogDebug($"[Dungeon] Fight #{fight.FightId} in {dungeon.Name}: {waves.Count} more wave(s) " +
                              $"of {size}, every {waves[0].Turns} turns.");
         }
@@ -12432,6 +12444,7 @@ namespace Jondo.Unity.Server.Handlers
                     Network.FightProtocol.BuildConfirmTurn(whose.Id)));
             }
             fight.FinPendiente = esperarAcuse != 0 ? esperarAcuse : FightInstance.WaitsForTheJwz;
+            EndsAnywayAfterAWhile(fight);
             Program.LogDebug($"[Fight] It ended on {whose.Id}'s turn; the ending waits for the client " +
                              (esperarAcuse != 0 ? $"to acknowledge action {esperarAcuse} or answer the jxh."
                                                 : "to answer the jxh (jwz)."));
@@ -12439,6 +12452,40 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>What is sent when the fight really ends.</summary>
+        /// <summary>How long a finished fight waits for its clients' answer before it ends all the same.</summary>
+        private const int EndingWaitMs = 20_000;
+
+        /// <summary>
+        /// A finished fight waits for the client to play out its last blows (jti or jwz), and
+        /// anything else the client sends shows it at once. A client that sends nothing more -- one
+        /// that froze, or went back to the character screen, which drops the wait -- left the fight
+        /// open for good, and its group "already being fought" for everybody else.
+        /// </summary>
+        private static void EndsAnywayAfterAWhile(FightInstance fight)
+        {
+            long id = fight.FightId;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(EndingWaitMs);
+                if (!_activeFights.TryGetValue(id, out var still) || !ReferenceEquals(still, fight)) return;
+                try
+                {
+                    await InTurnAsync(fight, async () =>
+                    {
+                        if (!_activeFights.TryGetValue(id, out var now) || !ReferenceEquals(now, fight)) return;
+                        Program.LogDebug($"[Fight] Fight #{id} ended {EndingWaitMs / 1000} s ago and no client " +
+                                         "answered; it is shown all the same.");
+                        fight.FinPendiente = 0;
+                        await EndFightAsync(fight);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Program.LogDebug($"[Fight] Ending fight #{id} without its clients choked: {ex.Message}");
+                }
+            });
+        }
+
         private static async Task EndFightAsync(FightInstance fight)
         {
             // Who wins is a fact of the fight; «I won» depends on which side you were on. Against

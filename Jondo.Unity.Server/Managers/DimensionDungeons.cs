@@ -29,7 +29,22 @@ namespace Jondo.Unity.Server.Managers
         {
             public static readonly Rules None = new(0, 0, 0, 100, new HashSet<int>(),
                                                     new Dictionary<int, IReadOnlyList<int>>());
+
+            /// <summary>The dungeons that write their own later waves («waves» on their row).</summary>
+            public IReadOnlyDictionary<int, Own> Owns { get; init; } = new Dictionary<int, Own>();
+
+            /// <summary>The life a dungeon's later waves come with: its own, or the rules'.</summary>
+            public int LifePercentFor(int dungeon)
+                => Owns.TryGetValue(dungeon, out var own) && own.LifePercent is int life ? life : LifePercentFromSecondWave;
         }
+
+        /// <summary>
+        /// A dungeon that is not one of the Twelve's but is fought the same way, with waves of its
+        /// own: the Memoria de Orukam, in the Dragon's dimension, has three, each written out.
+        /// </summary>
+        /// <param name="Waves">The waves after the first, in order: the turns before each and who comes.</param>
+        /// <param name="LifePercent">The life its later waves come with, when it is not the rules'.</param>
+        public sealed record Own(IReadOnlyList<(int Turns, IReadOnlyList<int> Monsters)> Waves, int? LifePercent);
 
         /// <summary>
         /// The monsters a dimension dungeon's boss starts the fight with («beside»): King Nidas's
@@ -70,12 +85,19 @@ namespace Jondo.Unity.Server.Managers
         /// never come back, nor what came beside them (<see cref="BesideTheBoss"/>, in
         /// <paramref name="bosses"/> too). Each comes <see cref="Rules.EveryTurns"/> turns after the one before.
         /// </summary>
+        /// <remarks>
+        /// A dungeon that writes its own waves (<see cref="Own"/>) gets those instead: each as
+        /// written, then, for more people than it names, drawn again from its own monsters; each
+        /// monster at its grade in the group, or else at the group's.
+        /// </remarks>
         public static List<FightInstance.TimedWave> Plan(IReadOnlyList<MobSpawnManager.MobMember> group,
-                                                         IReadOnlyCollection<int> bosses, int size, long seed)
+                                                         IReadOnlyCollection<int> bosses, int size, long seed,
+                                                         int dungeon = 0)
         {
             var rules = Current;
             var waves = new List<FightInstance.TimedWave>();
             if (rules.Waves < 2 || size <= 0) return waves;
+            if (rules.Owns.TryGetValue(dungeon, out var own)) return Written(own, group, bosses, size, seed);
 
             var kinds = group.Where(m => m.Monster != null && !bosses.Contains(m.Monster.Id))
                              .GroupBy(m => m.Monster!.Id)
@@ -95,6 +117,31 @@ namespace Jondo.Unity.Server.Managers
                 }
                 while (members.Count < size) members.Add(kinds[dice.Next(kinds.Count)]);
                 waves.Add(new FightInstance.TimedWave(Math.Max(1, rules.EveryTurns), members));
+            }
+            return waves;
+        }
+
+        private static List<FightInstance.TimedWave> Written(Own own, IReadOnlyList<MobSpawnManager.MobMember> group,
+                                                             IReadOnlyCollection<int> bosses, int size, long seed)
+        {
+            var grades = group.Where(m => m.Monster != null)
+                              .GroupBy(m => m.Monster!.Id).ToDictionary(g => g.Key, g => g.First().GradeIndex);
+            int common = group.Where(m => m.Monster != null && !bosses.Contains(m.Monster.Id))
+                              .GroupBy(m => m.GradeIndex).OrderByDescending(g => g.Count()).ThenByDescending(g => g.Key)
+                              .Select(g => g.Key).DefaultIfEmpty(0).First();
+            int GradeOf(int monster) => grades.TryGetValue(monster, out int grade) ? grade : common;
+
+            var dice = new Random(unchecked((int)(seed ^ (seed >> 32))));
+            var waves = new List<FightInstance.TimedWave>();
+            foreach (var (turns, monsters) in own.Waves)
+            {
+                var members = monsters.Take(size).Select(m => (m, GradeOf(m))).ToList();
+                while (members.Count < size)
+                {
+                    int m = monsters[dice.Next(monsters.Count)];
+                    members.Add((m, GradeOf(m)));
+                }
+                waves.Add(new FightInstance.TimedWave(Math.Max(1, turns), members));
             }
             return waves;
         }
@@ -120,6 +167,7 @@ namespace Jondo.Unity.Server.Managers
                         var root = doc.RootElement;
                         var dungeons = new HashSet<int>();
                         var beside = new Dictionary<int, IReadOnlyList<int>>();
+                        var owns = new Dictionary<int, Own>();
                         if (root.TryGetProperty("dungeons", out var list) && list.ValueKind == JsonValueKind.Array)
                             foreach (var row in list.EnumerateArray())
                             {
@@ -131,9 +179,11 @@ namespace Jondo.Unity.Server.Managers
                                                        .Select(m => m.GetInt32()).Distinct().ToList();
                                     if (monsters.Count > 0) beside[id.GetInt32()] = monsters;
                                 }
+                                if (OwnOf(row) is Own written) owns[id.GetInt32()] = written;
                             }
                         rules = new Rules(Int(root, "waves", 0), Int(root, "everyTurns", 0), Int(root, "arrivalState", 0),
-                                          Int(root, "lifePercentFromSecondWave", 100), dungeons, beside);
+                                          Int(root, "lifePercentFromSecondWave", 100), dungeons, beside)
+                                { Owns = owns };
                     }
                 }
                 catch (Exception ex)
@@ -142,6 +192,25 @@ namespace Jondo.Unity.Server.Managers
                 }
                 _rules = rules;
             }
+        }
+
+        /// <summary>A row's own waves: «waves» [{ turns, monsters [id...] }] and «lifePercentFromSecondWave».</summary>
+        private static Own? OwnOf(JsonElement row)
+        {
+            if (!row.TryGetProperty("waves", out var list) || list.ValueKind != JsonValueKind.Array) return null;
+            var waves = new List<(int, IReadOnlyList<int>)>();
+            foreach (var wave in list.EnumerateArray())
+            {
+                if (wave.ValueKind != JsonValueKind.Object || !wave.TryGetProperty("monsters", out var who)
+                    || who.ValueKind != JsonValueKind.Array) continue;
+                var monsters = who.EnumerateArray().Where(m => m.TryGetInt32(out int v) && v > 0)
+                                  .Select(m => m.GetInt32()).ToList();
+                if (monsters.Count > 0) waves.Add((Int(wave, "turns", 5), monsters));
+            }
+            if (waves.Count == 0) return null;
+            int? life = row.TryGetProperty("lifePercentFromSecondWave", out var l) && l.ValueKind == JsonValueKind.Number
+                ? l.GetInt32() : null;
+            return new Own(waves, life);
         }
 
         private static int Int(JsonElement root, string name, int otherwise)

@@ -31,6 +31,13 @@
     { "dungeon": 95, "name": "Reto de Miauvizor", "dimension": "Ecaflipus" },
     { "dungeon": 163, "name": "Puesto de Control del Bzupervibzor", "dimension": "Osavora" },
     { "dungeon": 164, "name": "Coto del Venerable", "dimension": "Osavora" },
-    { "dungeon": 165, "name": "Altar de la Despedazadora", "dimension": "Osavora" }
+    { "dungeon": 165, "name": "Altar de la Despedazadora", "dimension": "Osavora" },
+    { "dungeon": 133, "name": "Memoria de Orukam", "dimension": "Dragon", "beside": [6468, 6471, 6470],
+      "lifePercentFromSecondWave": 100,
+      "waves": [
+        { "turns": 4, "monsters": [6469, 6469, 6468, 6471] },
+        { "turns": 5, "monsters": [6469, 6470, 6467, 6467] }
+      ],
+      "why": "Dofus pour les noobs («Mémoire d'Orukam»): not one of the Twelve's, but in the Dragon's dimension, so it is fought like theirs with only three waves, in a single fight. It writes them out for four people: King Imagami with Imorok, Imafugo and Imetsu (6468, 6471, 6470: «beside»); then Imiyama, Imiyama, Imorok and Imafugo in 4 turns; then Imiyama, Imetsu, Imushin and Imushin in 5 more. One more monster per fighter past four (modular), drawn here from the wave's own. Newcomers are invulnerable for their first turn; the page gives no life cut for the later waves (every monster has a 13 500 life bonus instead), so they come whole." }
   ]
 }

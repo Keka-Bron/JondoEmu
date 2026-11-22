@@ -207,5 +207,45 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(4, waves.Count);
             Assert.All(waves, w => Assert.DoesNotContain(w.Monsters, m => m.Monster is Nidas or Bobolsa));
         }
+
+        /// <summary>The Memoria de Orukam, in the Dragon's dimension: one room, fought in waves.</summary>
+        private const long TheRock = 211551232;
+        private const int Orukam = 133, Imagami = 6472, Imushin = 6467, Imorok = 6468, Imiyama = 6469,
+                          Imetsu = 6470, Imafugo = 6471;
+
+        /// <summary>
+        /// Its two later waves are the ones it writes, in 4 and then 5 turns, with no life cut;
+        /// for more people, drawn again from each wave's own monsters, at the group's grade.
+        /// </summary>
+        [Fact]
+        public void The_memory_of_Orukam_sends_its_own_written_waves()
+        {
+            DimensionDungeons.Forget();
+            var group = new List<MobSpawnManager.MobMember>
+            {
+                Member(Imagami, 4), Member(Imorok, 4), Member(Imafugo, 4), Member(Imetsu, 4),
+            };
+
+            var waves = DimensionDungeons.Plan(group, new[] { Imagami }, 4, seed: 11, dungeon: Orukam);
+
+            Assert.Equal(new[] { 4, 5 }, waves.Select(w => w.Turns));
+            Assert.Equal(new[] { Imiyama, Imiyama, Imorok, Imafugo }, waves[0].Monsters.Select(m => m.Monster));
+            Assert.Equal(new[] { Imiyama, Imetsu, Imushin, Imushin }, waves[1].Monsters.Select(m => m.Monster));
+            Assert.All(waves.SelectMany(w => w.Monsters), m => Assert.Equal(4, m.Grade));
+            Assert.Equal(100, DimensionDungeons.Current.LifePercentFor(Orukam));
+            Assert.Equal(75, DimensionDungeons.Current.LifePercentFor(81));
+
+            var six = DimensionDungeons.Plan(group, new[] { Imagami }, 6, seed: 11, dungeon: Orukam);
+            Assert.All(six, w => Assert.Equal(6, w.Monsters.Count));
+            Assert.All(six[1].Monsters.Skip(4), m => Assert.Contains(m.Monster, new[] { Imiyama, Imetsu, Imushin }));
+        }
+
+        /// <summary>Its single room, The Rock, is the last one and fights in waves.</summary>
+        [Fact]
+        public void The_memory_of_Orukam_is_one_room_fought_in_waves()
+        {
+            DimensionDungeons.Forget();
+            Assert.True(DimensionDungeons.FightsInWaves(TheRock));
+        }
     }
 }
