@@ -488,5 +488,41 @@
       ]
     },
     "why": "One fight, in three waves (Dofus pour les noobs, «Souvenir d'Imagiro»: a single room, as in every dungeon of the divine dimensions). The catalogue lists a second map (211812352) that is the dimension's travel point, as The Voyage is for the Memoria de Orukam, so the keeper sent people there first and the fight was split in two. The boss room is the one where the quest asks for Queen Amirukam; its group is the waves' own monsters: the Queen, then Fugokam, Rokoram and Tsunam, as the first wave is written, and Mabram and Shinlam for more people."
+  },
+  "140": {
+    "name": "Cámara de los Maleficios",
+    "minLevel": 190,
+    "optimalLevel": 200,
+    "difficulty": 4,
+    "entrance": 224660233,
+    "exit": 224660233,
+    "rooms": [
+      223870976,
+      223872000,
+      223873024,
+      223874048,
+      223875072
+    ],
+    "bosses": [
+      7210
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        27404,
+        1
+      ]
+    ],
+    "achievements": [
+      5809,
+      5810,
+      6263,
+      5812,
+      5811,
+      6005
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (223875074, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   }
 }

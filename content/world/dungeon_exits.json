@@ -397,6 +397,17 @@
       "npc": 0,
       "replies": [],
       "why": "King Nidas's palace (dungeon 76) has a single room, and its winners stay in it: «Une fois le donjon terminé, ne sortez pas tout de suite, et parlez au Coffret précieux pour l'attaquer» (Dofus pour les noobs, «Casse en Enutrosor», quest 1908). The room is the dungeon's own map, so the map panel's «Salir de la mazmorra» is the way out. The room being the boss room, the winners keep the cell they fought from (FightHandler: no move when the room is the one they are in)."
+    },
+    {
+      "dungeon": 140,
+      "bossRoom": 223875072,
+      "room": 223875074,
+      "cell": 282,
+      "npc": 6946,
+      "replies": [
+        73343
+      ],
+      "why": "The Cámara de los Maleficios: after the boss the winners are in the «Salida» room, where NPC 6946 offers to leave; the reply leaves the dungeon through its way out, the entrance map."
     }
   ]
 }
