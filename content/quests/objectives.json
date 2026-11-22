@@ -3069,8 +3069,8 @@
    "objective": 4846,
    "quest": 762,
    "kind": "read",
-   "elements": [{"map": 183765000, "element": 511679}],
-   "why": "«Lee el libro del templo»: the temple book (readables.json), element 511679 on 183765000."
+   "elements": [{"map": 183765006, "element": 511678}],
+   "why": "«Lee el libro del templo»: the book about the god (readables.json), element 511678 on 183765006. The client's own objective places it on map 183765006 (questobjectives 4846, mapId), not on 183765000 where the lore book stands; 511678 is that map's only element with the god books' drawing (29642, the lore books' being 29641)."
   },
   {
    "objective": 4886,
