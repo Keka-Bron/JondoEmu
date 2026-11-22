@@ -3453,6 +3453,37 @@ namespace Jondo.Unity.Server.Managers
                     if (efecto.DiceNum <= 0) continue;
                     if (depth >= HondoMaximo) continue;
 
+                    // A 2960 over fixed cells casts its child at each of those cells, empty or not:
+                    // Cara Oculta's 28952 names four cells and on each the child summons one of
+                    // Moon's coloured totems (7804-7807). Aimed at the parent's cell and waiting
+                    // for someone on the named cells, the totems never came out, and Moon, whose
+                    // 200% resistances only drop once they have been pushed onto their glyphs,
+                    // could not be hurt.
+                    if (efecto.EffectId == 2960 && efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0)
+                    {
+                        if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
+                        bool anyone = efecto.TargetMask.Split(',').All(t => t is "a" or "A" || t.StartsWith("*"));
+                        var reached = new HashSet<Fighter>(
+                            AQuien(combat, caster, target, efecto, aimedCell, estadosAlEmpezar, celdasAlEmpezar,
+                                   soloAlObjetivo: soloAlObjetivo).Where(f => f != null && f.IsAlive));
+                        foreach (int cell in efecto.CeldasFijas)
+                        {
+                            var on = EnLaCasilla(combat, cell);
+                            if (on != null ? !reached.Contains(on) : !anyone) continue;
+                            if (efecto.Delay > 0 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase))
+                            {
+                                fuera.Add(Pendiente(combat, caster, caster, spell, grade, efecto, round,
+                                                    castCell: cell, critico: critical));
+                                continue;
+                            }
+                            fuera.AddRange(Resolver(combat, caster, efecto.DiceNum, Math.Max(1, efecto.DiceSide),
+                                                    on, AlLanzar, round, depth + 1, cell, critico: critical,
+                                                    nearestChainBudget: nearestChainBudget,
+                                                    bombasYaEstalladas: bombasYaEstalladas));
+                        }
+                        continue;
+                    }
+
                     var candidatos = new List<Fighter>();
                     foreach (var quien in AQuien(combat, caster, target, efecto, aimedCell,
                                                  estadosAlEmpezar, celdasAlEmpezar, soloAlObjetivo: soloAlObjetivo))
