@@ -346,186 +346,191 @@ namespace Jondo.Unity.Server.Managers
 
             LoadMonsterData(connection);
 
-            _mapMobs.Clear();
-            _fromTable.Clear();
-            _placedByFile.Clear();
-            _erasedByFile.Clear();
-
-            // Load MapMobs from SQLite database
-            // Who is an archmonster, who is a wanted monster, and where each one belongs. It has to
-            // be known before the groups are read, because they are thinned as they come in.
-            Archimonsters.Initialize(connection);
-
-            // And who is wanted: the criminals come out of the groups as they are read, and are
-            // put back one to a zone (PlaceCriminals).
-            WantedPosters.Load();
-            WantedMonsters.Initialize(connection);
-
-            // And the monsters their maps hold one of: swapped out of the groups as they are read,
-            // and placed in one of their maps' groups when the first map is loaded (PlaceUniques).
-            UniqueMonsters.Load();
-
-            // Who lives in each subarea, which is who a dungeon room is made of.
-            _subareaRosters = LoadSubareaRosters(connection);
-
-            // And where a monster is NOT placed however much the table says so.
-            _vetados = MapasSinMonstruos(connection);
-            var vetados = _vetados;
-            _incarnam = LoadIncarnam(connection);
-            int incarnamTrimmed = 0;
-
-            var cmdMapMobs = connection.CreateCommand();
-            cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs ORDER BY MapId, MobId;";
-            int count = 0;
-            int archmonsters = 0;
-            int criminals = 0;
-            int wanted = 0;
-            int uniques = 0;
-            int bajoTecho = 0;
-            using (var reader = cmdMapMobs.ExecuteReader())
+            // Under the lock: a map loading meanwhile walks these tables (PlaceCriminals), and a
+            // table changed under its foreach throws «Collection was modified».
+            lock (_candado)
             {
-                while (reader.Read())
+                _mapMobs.Clear();
+                _fromTable.Clear();
+                _placedByFile.Clear();
+                _erasedByFile.Clear();
+
+                // Load MapMobs from SQLite database
+                // Who is an archmonster, who is a wanted monster, and where each one belongs. It has to
+                // be known before the groups are read, because they are thinned as they come in.
+                Archimonsters.Initialize(connection);
+
+                // And who is wanted: the criminals come out of the groups as they are read, and are
+                // put back one to a zone (PlaceCriminals).
+                WantedPosters.Load();
+                WantedMonsters.Initialize(connection);
+
+                // And the monsters their maps hold one of: swapped out of the groups as they are read,
+                // and placed in one of their maps' groups when the first map is loaded (PlaceUniques).
+                UniqueMonsters.Load();
+
+                // Who lives in each subarea, which is who a dungeon room is made of.
+                _subareaRosters = LoadSubareaRosters(connection);
+
+                // And where a monster is NOT placed however much the table says so.
+                _vetados = MapasSinMonstruos(connection);
+                var vetados = _vetados;
+                _incarnam = LoadIncarnam(connection);
+                int incarnamTrimmed = 0;
+
+                var cmdMapMobs = connection.CreateCommand();
+                cmdMapMobs.CommandText = "SELECT MapId, MobId, CellId, MembersJson FROM MapMobs ORDER BY MapId, MobId;";
+                int count = 0;
+                int archmonsters = 0;
+                int criminals = 0;
+                int wanted = 0;
+                int uniques = 0;
+                int bajoTecho = 0;
+                using (var reader = cmdMapMobs.ExecuteReader())
                 {
-                    long mapId = reader.GetInt64(0);
+                    while (reader.Read())
+                    {
+                        long mapId = reader.GetInt64(0);
 
-                    // Not in a house, not in a bank, not in a shop, not on top of a zaap, not on an arena.
-                    if (vetados.Contains(mapId)) { bajoTecho++; continue; }
+                        // Not in a house, not in a bank, not in a shop, not on top of a zaap, not on an arena.
+                        if (vetados.Contains(mapId)) { bajoTecho++; continue; }
 
-                    long mobId = reader.GetInt64(1);
-                    int cellId = reader.GetInt32(2);
-                    string membersJson = reader.GetString(3);
+                        long mobId = reader.GetInt64(1);
+                        int cellId = reader.GetInt32(2);
+                        string membersJson = reader.GetString(3);
 
-                    var group = new MobGroup {
-                        MobId = mobId,
-                        CellId = cellId,
-                        CanRoam = true
-                    };
+                        var group = new MobGroup {
+                            MobId = mobId,
+                            CellId = cellId,
+                            CanRoam = true
+                        };
 
-                    try {
-                        using var doc = System.Text.Json.JsonDocument.Parse(membersJson);
-                        if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
-                        {
-                            var ids = new List<int>();
-                            var grades = new List<int>();
-                            var levels = new List<int>();
-                            foreach(var m in doc.RootElement.EnumerateArray()) {
-                                ids.Add(m.GetProperty("id").GetInt32());
-                                grades.Add(m.GetProperty("grade").GetInt32());
-                                levels.Add(m.GetProperty("level").GetInt32());
-                            }
+                        try {
+                            using var doc = System.Text.Json.JsonDocument.Parse(membersJson);
+                            if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            {
+                                var ids = new List<int>();
+                                var grades = new List<int>();
+                                var levels = new List<int>();
+                                foreach(var m in doc.RootElement.EnumerateArray()) {
+                                    ids.Add(m.GetProperty("id").GetInt32());
+                                    grades.Add(m.GetProperty("grade").GetInt32());
+                                    levels.Add(m.GetProperty("level").GetInt32());
+                                }
 
-                            // The database ships four groups in ten holding an archmonster, up to
-                            // eight in one group. This thins them to the rules — one per group,
-                            // one per map, one in ten, and one of each per zone — swapping the
-                            // ones that do not stay for the ordinary monster they are the rare
-                            // version of, so the group keeps its size.
-                            if (Archimonsters.Thin(mapId, mobId, ids) != 0) archmonsters++;
+                                // The database ships four groups in ten holding an archmonster, up to
+                                // eight in one group. This thins them to the rules — one per group,
+                                // one per map, one in ten, and one of each per zone — swapping the
+                                // ones that do not stay for the ordinary monster they are the rare
+                                // version of, so the group keeps its size.
+                                if (Archimonsters.Thin(mapId, mobId, ids) != 0) archmonsters++;
 
-                            // The wanted monsters come in 6.352 groups. Same rules; the ones that
-                            // do not stay have no ordinary version and are taken out (id 0).
-                            if (WantedMonsters.Thin(mapId, mobId, ids) != 0) wanted++;
+                                // The wanted monsters come in 6.352 groups. Same rules; the ones that
+                                // do not stay have no ordinary version and are taken out (id 0).
+                                if (WantedMonsters.Thin(mapId, mobId, ids) != 0) wanted++;
 
-                            // The library's three unique monsters are in almost every group of
-                            // its rooms, up to four times in one: each stands in a single group,
-                            // which PlaceUniques chooses.
-                            uniques += UniqueMonsters.Strip(ids);
+                                // The library's three unique monsters are in almost every group of
+                                // its rooms, up to four times in one: each stands in a single group,
+                                // which PlaceUniques chooses.
+                                uniques += UniqueMonsters.Strip(ids);
 
-                            for (int i = 0; i < ids.Count; i++) {
-                                // A wanted criminal stands in one group of his zone, not in the
-                                // 6,352 the database puts him in.
-                                if (WantedPosters.Is(ids[i])) { criminals++; continue; }
-                                if (_monsters.TryGetValue(ids[i], out var mData)) {
-                                    // Same as above: the database stores grades the
-                                    // client does not accept, and they have to be trimmed here too.
-                                    int grade = Math.Clamp(grades[i], 0, MobMember.MaxGradesPerMonster - 1);
-                                    group.Members.Add(new MobMember {
-                                        Monster = mData,
-                                        GradeIndex = grade,
-                                        Level = grade == grades[i] || grade >= mData.Grades.Count
-                                            ? levels[i]
-                                            : mData.Grades[grade].Level
-                                    });
+                                for (int i = 0; i < ids.Count; i++) {
+                                    // A wanted criminal stands in one group of his zone, not in the
+                                    // 6,352 the database puts him in.
+                                    if (WantedPosters.Is(ids[i])) { criminals++; continue; }
+                                    if (_monsters.TryGetValue(ids[i], out var mData)) {
+                                        // Same as above: the database stores grades the
+                                        // client does not accept, and they have to be trimmed here too.
+                                        int grade = Math.Clamp(grades[i], 0, MobMember.MaxGradesPerMonster - 1);
+                                        group.Members.Add(new MobMember {
+                                            Monster = mData,
+                                            GradeIndex = grade,
+                                            Level = grade == grades[i] || grade >= mData.Grades.Count
+                                                ? levels[i]
+                                                : mData.Grades[grade].Level
+                                        });
+                                    }
                                 }
                             }
-                        }
-                    } catch {}
+                        } catch {}
 
-                    // A group that was only its criminal, or only wanted monsters that did not get to
-                    // stay, is no group.
-                    if (group.Members.Count == 0) continue;
+                        // A group that was only its criminal, or only wanted monsters that did not get to
+                        // stay, is no group.
+                        if (group.Members.Count == 0) continue;
 
-                    // Incarnam's groups to the measured sizes. Drawn from the group's id, not from
-                    // Random, so a map looks the same after a restart; the leader (first) stays.
-                    if (_incarnam.Contains(mapId))
-                    {
-                        int size = IncarnamGroupSize(new Random(unchecked((int)mobId)).Next(IncarnamGroupRolls));
-                        if (group.Members.Count > size)
+                        // Incarnam's groups to the measured sizes. Drawn from the group's id, not from
+                        // Random, so a map looks the same after a restart; the leader (first) stays.
+                        if (_incarnam.Contains(mapId))
                         {
-                            group.Members.RemoveRange(size, group.Members.Count - size);
-                            incarnamTrimmed++;
+                            int size = IncarnamGroupSize(new Random(unchecked((int)mobId)).Next(IncarnamGroupRolls));
+                            if (group.Members.Count > size)
+                            {
+                                group.Members.RemoveRange(size, group.Members.Count - size);
+                                incarnamTrimmed++;
+                            }
                         }
+
+                        if (!_mapMobs.ContainsKey(mapId))
+                            _mapMobs[mapId] = new List<MobGroup>();
+                        _mapMobs[mapId].Add(group);
+                        _fromTable.Add(group.MobId);
+                        count++;
                     }
-
-                    if (!_mapMobs.ContainsKey(mapId))
-                        _mapMobs[mapId] = new List<MobGroup>();
-                    _mapMobs[mapId].Add(group);
-                    _fromTable.Add(group.MobId);
-                    count++;
                 }
-            }
 
-            // The dungeon bosses, before what is written by hand so that a person can
-            // move them or remove them.
-            int jefes = ComposeDungeonRooms();
+                // The dungeon bosses, before what is written by hand so that a person can
+                // move them or remove them.
+                int jefes = ComposeDungeonRooms();
 
-            // And whatever a person has decided, on top of everything before.
-            var deLaMano = AplicarLosEscritos(LoadWritten(WrittenFile), running: false);
+                // And whatever a person has decided, on top of everything before.
+                var deLaMano = AplicarLosEscritos(LoadWritten(WrittenFile), running: false);
 
-            // What every map had once loaded, to put a map back as it was (RestoreMap).
-            lock (_candado) _asLoaded = _mapMobs.ToDictionary(kv => kv.Key, kv => kv.Value.Select(CloneOf).ToList());
+                // What every map had once loaded, to put a map back as it was (RestoreMap).
+                lock (_candado) _asLoaded = _mapMobs.ToDictionary(kv => kv.Key, kv => kv.Value.Select(CloneOf).ToList());
 
-            // The written groups bring their id set from the seeding. The dispenser has to
-            // step below the lowest of all of them before handing out its first one, or the
-            // first group generated on the fly would take a number already taken on another
-            // map —and then GetMobGroupById would return the wrong one—. The hand-placed ones
-            // count the same: their ids start at -2,000,000 and are the lowest of all.
-            long menor = ActorIds.PrimerMonstruo;
-            foreach (var lista in _mapMobs.Values)
-            {
-                foreach (var grupo in lista)
+                // The written groups bring their id set from the seeding. The dispenser has to
+                // step below the lowest of all of them before handing out its first one, or the
+                // first group generated on the fly would take a number already taken on another
+                // map —and then GetMobGroupById would return the wrong one—. The hand-placed ones
+                // count the same: their ids start at -2,000,000 and are the lowest of all.
+                long menor = ActorIds.PrimerMonstruo;
+                foreach (var lista in _mapMobs.Values)
                 {
-                    if (grupo.MobId < menor) menor = grupo.MobId;
+                    foreach (var grupo in lista)
+                    {
+                        if (grupo.MobId < menor) menor = grupo.MobId;
+                    }
                 }
-            }
-            ActorIds.ReservarMonstruosHasta(menor);
+                ActorIds.ReservarMonstruosHasta(menor);
 
-            Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
-            if (bajoTecho > 0)
-            {
-                Console.WriteLine($"[MobSpawnManager] {bajoTecho} groups discarded for being indoors, " +
-                                  $"on top of a zaap or on an arena; {vetados.Count} maps vetoed.");
-            }
-            Console.WriteLine($"[MobSpawnManager] {incarnamTrimmed} Incarnam groups cut to the official sizes (1-4).");
-            Console.WriteLine($"[MobSpawnManager] Group ids handed out down to {menor}; " +
-                              "the ones spawned on the fly carry on below.");
-            Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
-                              $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
-            Console.WriteLine($"[MobSpawnManager] {criminals} wanted criminals taken out of the groups; " +
-                              "each comes back in one group of its zone when the first map is loaded.");
-            Console.WriteLine($"[MobSpawnManager] {wanted} groups keep a wanted monster " +
-                              $"({100.0 * wanted / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
-            if (uniques > 0)
-            {
-                Console.WriteLine($"[MobSpawnManager] {uniques} unique monster(s) swapped for their ordinary version; " +
-                                  "each stands in one group of its maps once the first map is loaded.");
-            }
-            // The two numbers separately, not the subtraction. With one group placed and another removed the
-            // subtraction gives zero and the line does not come out, which is exactly the start where it is most needed
-            // to see that content/ has touched something.
-            if (deLaMano.Puestos != 0 || deLaMano.Quitados != 0)
-            {
-                Console.WriteLine($"[MobSpawnManager] From content/: {deLaMano.Puestos} group(s) " +
-                                  $"placed by hand and {deLaMano.Quitados} removed.");
+                Console.WriteLine($"[MobSpawnManager] Loaded {count} persistent mobs across {_mapMobs.Count} maps from database.");
+                if (bajoTecho > 0)
+                {
+                    Console.WriteLine($"[MobSpawnManager] {bajoTecho} groups discarded for being indoors, " +
+                                      $"on top of a zaap or on an arena; {vetados.Count} maps vetoed.");
+                }
+                Console.WriteLine($"[MobSpawnManager] {incarnamTrimmed} Incarnam groups cut to the official sizes (1-4).");
+                Console.WriteLine($"[MobSpawnManager] Group ids handed out down to {menor}; " +
+                                  "the ones spawned on the fly carry on below.");
+                Console.WriteLine($"[MobSpawnManager] {archmonsters} groups keep an archmonster " +
+                                  $"({100.0 * archmonsters / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
+                Console.WriteLine($"[MobSpawnManager] {criminals} wanted criminals taken out of the groups; " +
+                                  "each comes back in one group of its zone when the first map is loaded.");
+                Console.WriteLine($"[MobSpawnManager] {wanted} groups keep a wanted monster " +
+                                  $"({100.0 * wanted / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
+                if (uniques > 0)
+                {
+                    Console.WriteLine($"[MobSpawnManager] {uniques} unique monster(s) swapped for their ordinary version; " +
+                                      "each stands in one group of its maps once the first map is loaded.");
+                }
+                // The two numbers separately, not the subtraction. With one group placed and another removed the
+                // subtraction gives zero and the line does not come out, which is exactly the start where it is most needed
+                // to see that content/ has touched something.
+                if (deLaMano.Puestos != 0 || deLaMano.Quitados != 0)
+                {
+                    Console.WriteLine($"[MobSpawnManager] From content/: {deLaMano.Puestos} group(s) " +
+                                      $"placed by hand and {deLaMano.Quitados} removed.");
+                }
             }
             _initialized = true;
         }
