@@ -20,6 +20,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.NpcDialogues.Reload();
             Managers.Npcs.Initialize();
             Managers.DungeonDoor.Initialize();
+            Managers.Expeditions.Initialize();
             Managers.Bankers.Initialize();
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();

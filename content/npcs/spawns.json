@@ -6903,6 +6903,41 @@
       "cell": 289,
       "orientation": 3,
       "why": "Gladis Hadora, the koliseo's token seller, behind the counter of the amphitheatre's treasure room [-13,-29], facing the customers' carpet. No placement source had her, so the room stood empty and the Kolichas had nowhere to go (her shop: content/npcs/shops.json)."
+    },
+    {
+      "map": 91889155,
+      "npc": 7860,
+      "cell": 361,
+      "orientation": 1,
+      "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Sufokia guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
+    },
+    {
+      "map": 207627266,
+      "npc": 7860,
+      "cell": 423,
+      "orientation": 1,
+      "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Pandala guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
+    },
+    {
+      "map": 54526212,
+      "npc": 7860,
+      "cell": 385,
+      "orientation": 1,
+      "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Frigost guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
+    },
+    {
+      "map": 99093249,
+      "npc": 7860,
+      "cell": 354,
+      "orientation": 1,
+      "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Amakna guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
+    },
+    {
+      "map": 83889162,
+      "npc": 7860,
+      "cell": 191,
+      "orientation": 1,
+      "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Astrub guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
     }
   ]
 }

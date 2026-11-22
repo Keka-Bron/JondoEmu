@@ -678,6 +678,7 @@ namespace Jondo.Unity.Server
                 createKeyring.ExecuteNonQuery();
 
                 DungeonProgress.EnsureTable(worldConnection);
+                Expeditions.EnsureTable(worldConnection);
 
                 // The interactives this character has ever used.
                 //

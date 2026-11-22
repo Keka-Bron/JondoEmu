@@ -381,10 +381,10 @@ namespace Jondo.Unity.Server.Handlers
             DungeonProgress.SetRoom(characterId, dungeon, won ? DungeonManager.NextRoom(dungeon, room) : room);
             if (won) return 0;
 
-            long entrance = dungeon.EntranceMapId;
+            long entrance = Expeditions.IsExpedition(dungeon.Id) ? 0 : dungeon.EntranceMapId;
             if (entrance != 0 && !DungeonManager.IsRoom(entrance) && MapManager.GetMapInfo(entrance) != null)
                 return entrance;
-            long exit = DungeonManager.WayOut(dungeon);
+            long exit = Expeditions.WayOut(dungeon, characterId);
             return DungeonManager.IsRoom(exit) ? 0 : exit;
         }
 
@@ -415,7 +415,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // The last room. Out through the exit, which for most of them is the door they came
             // in by.
-            return (DungeonManager.WayOut(dungeon), TeleportHandler.MapCentre);
+            return (Expeditions.WayOut(dungeon, SessionContext.State.CharacterId), TeleportHandler.MapCentre);
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Jondo.Unity.Server.Handlers
             var dungeon = DungeonManager.OfRoom(SessionContext.State.MapId);
             if (dungeon == null && DungeonExitRooms.At(SessionContext.State.MapId) is { } room)
                 dungeon = DungeonManager.Get(room.Dungeon);
-            long exit = dungeon == null ? 0 : DungeonManager.WayOut(dungeon);
+            long exit = dungeon == null ? 0 : Expeditions.WayOut(dungeon, SessionContext.State.CharacterId);
             if (exit == 0) return false;
             return await TeleportHandler.ToMapAsync(stream, exit) >= 0;
         }
@@ -620,7 +620,7 @@ namespace Jondo.Unity.Server.Handlers
                 ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildNotice($"<color=#FF0000><b>{text}</b></color>")));
 
-        private static Task WarnAsync(NetworkStream stream, int messageId)
+        internal static Task WarnAsync(NetworkStream stream, int messageId)
             => Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, messageId)));

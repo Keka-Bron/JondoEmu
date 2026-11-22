@@ -213,6 +213,8 @@ namespace Jondo.Unity.Server
             // After the NPCs on purpose: it reads their templates to know with which reply
             // each guardian offers the bundle and with which the key.
             Managers.DungeonDoor.Initialize();
+            // Elmer's expeditions: his template and the catalogue, both read by now.
+            Managers.Expeditions.Initialize();
             // Behind the NPCs too, and for the same reason: the bankers are found in their templates.
             Managers.Bankers.Initialize();
             Managers.NpcShops.Initialize();

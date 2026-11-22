@@ -231,6 +231,18 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // Elmer Zenario: the guild expeditions he sends a guild into (ExpeditionHandler).
+            if (ExpeditionHandler.Owns(npc.NpcId))
+            {
+                await session.SendAsync(new Game.NpcDialogCreationEvent(mapId, checked((int)npc.ContextualId)));
+                var (question, replies) = ExpeditionHandler.Opening(SessionContext.State.CharacterId);
+                SessionContext.State.OpenDialogueNpcId = npc.NpcId;
+                SessionContext.State.OpenDialogueMapId = mapId;
+                SessionContext.State.OpenDialogueMessage = question;
+                await PreguntarAsync(session, question, replies);
+                return;
+            }
+
             // Chantal Inea's oath and Morry Gann's way back to neutral: what they offer is the
             // character's side, fee and last change (AlignmentHandler).
             if (AlignmentHandler.Owns(npc.NpcId))
@@ -1428,6 +1440,21 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 SessionContext.State.OpenDialogueMessage = sentence;
                     await PreguntarAsync(session, sentence, choices);
+                return;
+            }
+
+            // Elmer Zenario's expeditions (ExpeditionHandler).
+            if (ExpeditionHandler.Owns(SessionContext.State.OpenDialogueNpcId))
+            {
+                var (question, replies) = await ExpeditionHandler.ReplyAsync(stream, reply);
+                if (question == ExpeditionHandler.Done) return;
+                if (question == 0)
+                {
+                    await CloseAsync(session);
+                    return;
+                }
+                SessionContext.State.OpenDialogueMessage = question;
+                await PreguntarAsync(session, question, replies);
                 return;
             }
 

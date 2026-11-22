@@ -14473,7 +14473,15 @@
     -29,
     37
    ],
-   "spawns": []
+   "spawns": [
+    {
+     "npc": 7860,
+     "cell": 397,
+     "orientation": 1,
+     "name": "Elmer Zenario",
+     "kept": "authored in Jondo: the guild expeditions' NPC, not shown to the capturing character (he visits the halls between expedition seasons)"
+    }
+   ]
   },
   {
    "map": 214696960,
@@ -15433,7 +15441,15 @@
     -35,
     -61
    ],
-   "spawns": []
+   "spawns": [
+    {
+     "npc": 7860,
+     "cell": 355,
+     "orientation": 1,
+     "name": "Elmer Zenario",
+     "kept": "authored in Jondo: the guild expeditions' NPC, not shown to the capturing character (he visits the halls between expedition seasons)"
+    }
+   ]
   },
   {
    "map": 217056256,
