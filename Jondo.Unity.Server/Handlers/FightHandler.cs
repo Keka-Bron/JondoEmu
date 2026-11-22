@@ -10025,6 +10025,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// Whether a blow counts as one for what waits on being hit by an enemy (DBE). One the
+        /// resistances swallow whole still does: the Minotauroro starts at 100% in every element,
+        /// and his Choque, waiting on that very blow, is what takes 10% off them each time. Only a
+        /// blow that was worth something and came to nothing on the way (a shield) is left out.
+        /// </summary>
+        internal static bool IsABlow(int applied, int computed, bool byAnEnemy)
+            => byAnEnemy && (applied > 0 || computed <= 0);
+
+        /// <summary>
         /// The triggers of a blow, on both ends of it. On the one hit: damage at all (D), of the
         /// blow's element (DN DE DF DW DA), from his own side (DBA), in melee (DCAC). On the one
         /// who hit: the damage he dealt, by element (CDN CDE CDF CDW CDA) and in melee (CDM) --
@@ -10786,7 +10795,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // He has been hit, and the attitudes look at that: it is half of the Ochre Dofus rule.
-            if (aplicado > 0 && caster.TeamId != target.TeamId) target.LeHanPegado = true;
+            if (IsABlow(aplicado, damage, caster.TeamId != target.TeamId)) target.LeHanPegado = true;
 
             // f14 is THE EFFECT NUMBER, not an element code: 91 is water steal, 96 water damage, 99
             // fire damage... It was nailed at 91, so every hit was announced as water steal
