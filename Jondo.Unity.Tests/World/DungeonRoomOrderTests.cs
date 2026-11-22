@@ -180,6 +180,27 @@ namespace Jondo.Unity.Tests.World
         }
 
         /// <summary>
+        /// The memories of Orukam and Imagiro are written over the catalogue, and their keepers
+        /// still let people in with the key: without the door they only answered «No.».
+        /// </summary>
+        [Theory]
+        [InlineData(133, 210633732L)]
+        [InlineData(134, 210765572L)]
+        public void The_dragon_memories_keep_their_keeper_s_door(int number, long entrance)
+        {
+            if (!File.Exists(Paths.DungeonsJson)) return;
+
+            DungeonManager.Initialize();
+            if (!DungeonManager.IsLoaded) return;
+
+            var memory = DungeonManager.Get(number);
+            Assert.NotNull(memory);
+            Assert.True(memory!.Authored);
+            Assert.True(memory.KeepsADoor);
+            Assert.Same(memory, DungeonManager.AtEntrance(entrance));
+        }
+
+        /// <summary>
         /// Lord Crow's library as Ankama remade it: written over the catalogue's dungeon 3, its
         /// sixteen rooms walked freely, Virgil at the First Room's door, Capsálocke in the annexe
         /// with his own companions and the Master in his throne room with the library's three.
