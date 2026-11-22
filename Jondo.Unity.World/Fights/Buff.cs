@@ -387,17 +387,24 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>
         /// Arms rows of a spell on this fighter, in their caster's name: added to the hook that
-        /// caster already has here with that spell, or a new one. Lasts the longest of the two.
+        /// caster already has here with that spell at that grade, or a new one. Lasts the longest
+        /// of the two.
         /// </summary>
+        /// <remarks>
+        /// One hook per grade: its rows are read off its own grade. Dazahk's behaviour 10346 arms
+        /// its grade-1 "TE" and "TB" rows, then its "TB" casts grade 3, whose "M" and "PMD" rows
+        /// were folded into the same hook and turned it to grade 3 -- the "TE" row that counts his
+        /// Nimpatience was no longer found, and he never got it.
+        /// </remarks>
         /// <param name="fallsAtItsCastersTurn">See <see cref="ActiveSpell.FallsAtItsCastersTurn"/>.</param>
         public void ArmarFilas(int hechizo, int grado, int caducaEnRonda, long lanzador, int puestoEnRonda,
                                IEnumerable<int> filas, bool critico = false, bool fallsAtItsCastersTurn = false)
         {
-            var ya = ActiveSpells.FirstOrDefault(e => e.Filas != null && e.Hechizo == hechizo && e.Lanzador == lanzador);
+            var ya = ActiveSpells.FirstOrDefault(e => e.Filas != null && e.Hechizo == hechizo && e.Grado == grado
+                                                     && e.Lanzador == lanzador);
             if (ya != null)
             {
                 foreach (int fila in filas) ya.Filas.Add(fila);
-                ya.Grado = grado;
                 if (ya.CaducaEnRonda >= 0)
                 {
                     if (caducaEnRonda < 0) ya.CaducaEnRonda = -1;
