@@ -251,6 +251,14 @@ namespace Jondo.Unity.World.Content
         public bool Leaves { get; init; }
 
         /// <summary>
+        /// True when the reply opens the NPC's shop as the conversation closes («shop»): Fifi de
+        /// Lificha's «Dar uma olhada no que ele tem a oferecer.» and Tokageko's «Resolver dar uma
+        /// olhada na loja desse mercenário.», measured on the official server (packet capture,
+        /// 2026-11-20): the dialogue closes, then the shop opens.
+        /// </summary>
+        public bool OpensShop { get; init; }
+
+        /// <summary>
         /// The mutation item this reply gives, or zero: the Orbalantir de Meriana's «Pensar en Dark
         /// Vlad y tocar las escamas.» takes the player to the epic fight and mutates him (15019).
         /// </summary>
@@ -305,6 +313,15 @@ namespace Jondo.Unity.World.Content
         /// réminiscence»), and nothing in a conversation said anything in the chat before.
         /// </summary>
         public int Says { get; init; }
+
+        /// <summary>
+        /// Where the reply points the compass («compass»: x, y and the flag's type), or empty. Measured
+        /// on the official server (packet capture, 2026-11-21): Noh Vomundo's «Agradecer as informações e ir
+        /// embora.» (69204) and the travellers' Krosmoglob's «Apontar a bússola em direção à torre
+        /// mesmo assim.» (21485), effect 509 «Posiciona a bússola» on the line, answer with the flag at
+        /// [-3,10] and [-24,-22], type 4, and nothing else.
+        /// </summary>
+        public IReadOnlyList<int> Compass { get; init; } = Array.Empty<int>();
 
         /// <summary>
         /// Minutes the NPC refuses to talk after this reply, or zero: a wrong step at Gorco's
@@ -1242,6 +1259,8 @@ namespace Jondo.Unity.World.Content
                                          && favor.ValueKind == JsonValueKind.True,
                             Leaves = choice.TryGetProperty("leaves", out var leaves)
                                      && leaves.ValueKind == JsonValueKind.True,
+                            OpensShop = choice.TryGetProperty("shop", out var shop)
+                                        && shop.ValueKind == JsonValueKind.True,
                             ReturnsHome = choice.TryGetProperty("teleportBack", out var back)
                                           && back.ValueKind == JsonValueKind.True,
                             AfterQuest = choice.TryGetProperty("afterQuest", out var after)
@@ -1285,6 +1304,7 @@ namespace Jondo.Unity.World.Content
                             AlsoGives = Numbers(choice, "alsoGives").Select(o => (int)o).ToArray(),
                             GivesKamas = Number(choice, "givesKamas"),
                             Says = (int)Number(choice, "says"),
+                            Compass = Numbers(choice, "compass").Select(o => (int)o).ToArray(),
                             Sulks = (int)Number(choice, "sulks"),
                             Criterion = choice.TryGetProperty("criterion", out var crit) && crit.ValueKind == JsonValueKind.String
                                         ? crit.GetString() ?? "" : "",
@@ -1449,6 +1469,7 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
                             if (choice.DreamFavor) writer.WriteBoolean("dreamFavor", true);
                             if (choice.Leaves) writer.WriteBoolean("leaves", true);
+                            if (choice.OpensShop) writer.WriteBoolean("shop", true);
                             if (choice.Parameters.Count > 0)
                             {
                                 writer.WriteStartArray("params");
@@ -1543,6 +1564,12 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesKamas != 0) writer.WriteNumber("givesKamas", choice.GivesKamas);
                             if (choice.Says != 0) writer.WriteNumber("says", choice.Says);
+                            if (choice.Compass.Count > 0)
+                            {
+                                writer.WriteStartArray("compass");
+                                foreach (int c in choice.Compass) writer.WriteNumberValue(c);
+                                writer.WriteEndArray();
+                            }
                             if (choice.Sulks != 0) writer.WriteNumber("sulks", choice.Sulks);
                             if (choice.Criterion.Length > 0) writer.WriteString("criterion", choice.Criterion);
                             if (choice.Door.Length > 0) writer.WriteString("door", choice.Door);
