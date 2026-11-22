@@ -314,7 +314,8 @@ namespace Jondo.Unity.Server.Managers
                 Paths.WorldNpcsJson,
                 Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.AuthoredFile),
                 Console.WriteLine,
-                Paths.WorldNpcsDerivedJson);
+                Paths.WorldNpcsDerivedJson,
+                Paths.ContentFile(Jondo.Unity.World.Content.NpcSpawnContent.OfficialFile));
 
             if (spawns.Count == 0)
             {

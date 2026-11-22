@@ -91,6 +91,13 @@ namespace Jondo.Unity.World.Content
         /// <summary>The authored file, relative to the content root.</summary>
         public const string AuthoredFile = "npcs/spawns.json";
 
+        /// <summary>
+        /// What the OFFICIAL server shows on the maps somebody walked through with a packet capture
+        /// running: every NPC its map contents listed, with cell and facing. Read last: on those
+        /// maps it is the whole truth.
+        /// </summary>
+        public const string OfficialFile = "npcs/official.json";
+
         /// <summary>Facing south-east, which is what a placement with no orientation gets.</summary>
         private const int DefaultOrientation = 1;
 
@@ -107,7 +114,8 @@ namespace Jondo.Unity.World.Content
         /// </remarks>
         public static ContentStore<NpcSpawnKey, NpcSpawn> Load(string? measuredPath, string? authoredPath,
                                                                Action<string>? report = null,
-                                                               string? derivedPath = null)
+                                                               string? derivedPath = null,
+                                                               string? officialPath = null)
         {
             var store = new ContentStore<NpcSpawnKey, NpcSpawn>();
 
@@ -116,7 +124,65 @@ namespace Jondo.Unity.World.Content
             ReadDerived(store, derivedPath, report);
             ReadMeasured(store, measuredPath, report);
             ReadAuthored(store, authoredPath, report);
+            // This one DOES depend on coming last: it replaces whole maps.
+            ReadOfficial(store, officialPath, report);
             return store;
+        }
+
+        /// <summary>
+        /// <c>{"maps":[{"map":id,"spawns":[{"npc","cell","orientation","criterion"?}]}]}</c>.
+        /// Every placement on a listed map that the list does not hold is taken out; the listed
+        /// ones are put exactly as given. The generator keeps the quest-gated NPCs the capturing
+        /// character could not see, so a list is complete as written.
+        /// </summary>
+        private static void ReadOfficial(ContentStore<NpcSpawnKey, NpcSpawn> store, string? path,
+                                         Action<string>? report)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+
+            var from = Origin.Authored(Path.GetFileName(path));
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("maps", out var maps)) return;
+
+                foreach (var map in maps.EnumerateArray())
+                {
+                    long mapId = Long(map, "map");
+                    if (mapId == 0 || !map.TryGetProperty("spawns", out var list)) continue;
+
+                    var wanted = new Dictionary<NpcSpawnKey, NpcSpawn>();
+                    foreach (var entry in list.EnumerateArray())
+                    {
+                        int npcId = (int)Long(entry, "npc");
+                        int cell = (int)Long(entry, "cell");
+                        if (npcId == 0) continue;
+                        wanted[new NpcSpawnKey(mapId, npcId, cell)] = new NpcSpawn
+                        {
+                            MapId = mapId,
+                            NpcId = npcId,
+                            Cell = cell,
+                            Orientation = entry.TryGetProperty("orientation", out var o) && o.TryGetInt32(out int f)
+                                ? f : DefaultOrientation,
+                            Criterion = entry.TryGetProperty("criterion", out var shown) && shown.ValueKind == JsonValueKind.String
+                                ? shown.GetString() ?? ""
+                                : "",
+                        };
+                    }
+
+                    var there = new List<NpcSpawnKey>();
+                    foreach (var (key, _) in store.Rows)
+                    {
+                        if (key.MapId == mapId && !wanted.ContainsKey(key)) there.Add(key);
+                    }
+                    foreach (var key in there) store.Erase(key, from);
+                    foreach (var (key, spawn) in wanted) store.Override(key, spawn, from);
+                }
+            }
+            catch (Exception ex)
+            {
+                report?.Invoke($"[Content] {Path.GetFileName(path)} is unreadable: {ex.Message}");
+            }
         }
 
         /// <summary>

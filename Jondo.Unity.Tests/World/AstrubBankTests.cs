@@ -75,8 +75,9 @@ namespace Jondo.Unity.Tests.World
 
             var orroha = Assert.Single(spawns, s => s.NpcId == 520);
             var alEtsop = Assert.Single(spawns, s => s.NpcId == 522);
-            Assert.Equal((273, 3), (orroha.Cell, orroha.Orientation));
-            Assert.Equal((317, 3), (alEtsop.Cell, alEtsop.Orientation));
+            // Where the official server shows them (packet capture, 2026-11-20; content/npcs/official.json).
+            Assert.Equal((259, 3), (orroha.Cell, orroha.Orientation));
+            Assert.Equal((302, 3), (alEtsop.Cell, alEtsop.Orientation));
             // Each one next to the counter, which is not walkable.
             var floor = MapManager.WalkableCells.ContainsKey(Room) ? MapManager.WalkableCells[Room] : null;
             if (floor != null)

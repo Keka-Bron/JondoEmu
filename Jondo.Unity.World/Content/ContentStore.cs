@@ -89,6 +89,22 @@ namespace Jondo.Unity.World.Content
             _rows.Remove(key);
         }
 
+        /// <summary>
+        /// Sets a row whatever was there, erasures included. Authored only: it is how a layer
+        /// measured on the official server replaces what the guessed and hand-written ones said.
+        /// </summary>
+        public void Override(TKey key, TValue value, Origin from)
+        {
+            if (from.Layer != ContentLayer.Authored)
+            {
+                throw new InvalidOperationException(
+                    $"Only the authored layer can override rows; this came from {from.Layer}.");
+            }
+
+            _erased.Remove(key);
+            _rows[key] = new Sourced<TValue>(value, from);
+        }
+
         public bool TryGet(TKey key, out Sourced<TValue> row) => _rows.TryGetValue(key, out row);
 
         public bool Contains(TKey key) => _rows.ContainsKey(key);
