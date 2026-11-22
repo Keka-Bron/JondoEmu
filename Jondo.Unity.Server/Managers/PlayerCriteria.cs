@@ -70,7 +70,8 @@ namespace Jondo.Unity.Server.Managers
                                   () => SessionContext.Actual is { IsAuthenticated: true } session
                                       && DatabaseManager.TryGetAccountRole(session.AccountId, out int role)
                                           ? role >= Jondo.Unity.Launcher.Roles.Administrador
-                                          : null);
+                                          : null,
+                                  KoliseoLeague: () => KoliseoLadder.HighestLeague(state.CharacterId, state.CharacterLevel));
             return condition => Resolve(condition, facts);
         }
 
@@ -124,7 +125,8 @@ namespace Jondo.Unity.Server.Managers
                                               Func<int, bool?>? OccupiedEquipmentSlot = null,
                                               Func<bool?>? EmptyEquipment = null,
                                               Func<int, int, bool?>? LiveMonsterInSubarea = null,
-                                              Func<bool?>? IsAdministrator = null);
+                                              Func<bool?>? IsAdministrator = null,
+                                              Func<int>? KoliseoLeague = null);
 
         internal static Answer Resolve(Condition condition, Facts facts)
         {
@@ -152,6 +154,16 @@ namespace Jondo.Unity.Server.Managers
                 case "PT": return facts.State == null || !ReferenceEquals(facts.State, SessionContext.State)
                     ? Answer.Unknown
                     : Truth(ItemCriteria.KnowsSpell((int)value), op);
+
+                // His Koliseo league, the highest this season in 1v1, 2v2 or 3v3, against a league id
+                // (datos/koliseo_ligas), both compared by rank: Glad Yator's «League > Silver III».
+                // Ours, for the server's own shop conditions: no client criterion names a league.
+                case "KL":
+                {
+                    int wanted = KoliseoLeagues.Rank((int)value);
+                    if (facts.KoliseoLeague == null || wanted < 0) return Answer.Unknown;
+                    return Compare(KoliseoLeagues.Rank(facts.KoliseoLeague()), op, wanted);
+                }
 
                 // The kamas he carries: Abel Bobel's «Llorar.» is for whoever cannot pay his 3000.
                 case "PK": return facts.State == null ? Answer.Unknown : Compare(facts.State.Kamas, op, value);

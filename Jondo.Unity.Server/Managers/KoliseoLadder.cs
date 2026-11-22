@@ -122,6 +122,17 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The highest league a character holds or held this season in 1v1, 2v2 or 3v3 (not on the
+        /// JondoBot card), or <see cref="KoliseoLeagues.None"/>: what a «League &gt; Silver III»
+        /// condition asks of him (PlayerCriteria «KL»).
+        /// </summary>
+        public static int HighestLeague(long characterId, int level)
+            => AllOf(characterId, level)
+                   .Where(s => s.Mode != Handlers.KoliseoHandler.JondoBotMode)
+                   .Aggregate(KoliseoLeagues.None,
+                              (best, s) => KoliseoLeagues.Higher(best, KoliseoLeagues.Higher(s.League, s.BestLeague)));
+
+        /// <summary>
         /// Every character placed in a mode this season, with a league: who the ladder window's Koliseo
         /// tab ranks (Ladders.Koliseo).
         /// </summary>
