@@ -127,6 +127,55 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// «Pour retirer l'état Invulnérable de Klime, il faut qu'il subisse des dommages de poussées
+        /// indirects [...] impossible de lui retirer son état Invulnérable avant le début du tour 3»:
+        /// Galuchat's 952 waits on PPD with a delay of two rounds. A fighter pushed into him lifts it
+        /// from round 3 and not before.
+        /// </summary>
+        [Fact]
+        public async Task Someone_pushed_into_Klim_lifts_his_invulnerability_from_round_3()
+        {
+            const int Klim = 3384, Galuchat = 3485, Invulnerable = 56;
+            if (SpellEffects.De(Galuchat, 1).Count == 0) return;
+            int pusherCell = 288;
+            int pushedCell = MapGeometry.GetNeighbors(pusherCell).First();
+            int behind = MapGeometry.GetNeighbors(pushedCell)
+                                    .First(c => c != pusherCell && MapGeometry.Distance(pusherCell, c) == 2);
+
+            var fight = new FightInstance(1, 1);
+            var me = Person(10, pushedCell);
+            me.Initiative = 5000;
+            var friend = Person(11, pusherCell);
+            friend.Initiative = 4000;
+            var klim = Monster(-1, Klim, behind, 19000);
+            klim.Initiative = 2000;
+            klim.Conducta = (Galuchat, 1);
+            fight.AddPlayer(me);
+            fight.AddPlayer(friend);
+            fight.AddMonster(klim);
+            fight.StartFight();
+            await FightHandler.LanzarLaConductaAsync(null, fight, klim);
+            fight.CloseTheStart();
+            Assert.True(klim.Buffs.TieneEstado(Invulnerable));
+
+            Task Push() => FightHandler.AplicarEfectosAsync(null, fight, friend, 1, 1, me, EffectEngine.AlLanzar, me.CellId,
+                tirada: new[] { new SpellEffect { EffectId = 5, DiceNum = 3, TargetMask = "a,A", Triggers = "I" } });
+
+            await Push();
+            Assert.Equal(pushedCell, me.CellId);                       // he crashed where he stood
+            Assert.True(klim.Buffs.TieneEstado(Invulnerable));         // round 1: too soon
+
+            for (int i = 0; i < 12 && fight.RoundNumber < 3; i++)
+                FightHandler.TurnStartSweep(fight, fight.NextTurn());
+            Assert.Equal(3, fight.RoundNumber);
+            Assert.True(klim.Buffs.TieneEstado(Invulnerable));
+
+            me.CellId = pushedCell; friend.CellId = pusherCell; klim.CellId = behind;
+            await Push();
+            Assert.False(klim.Buffs.TieneEstado(Invulnerable));
+        }
+
+        /// <summary>
         /// «Si un des monstres est achevé, les deux glyphes qu'il a posé disparaissent»: his
         /// Carcassetagne glyphs go the moment he falls, not at the next turn start.
         /// </summary>
