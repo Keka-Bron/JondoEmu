@@ -63,6 +63,78 @@
       "type": 13,
       "skills": [415],
       "why": "Harmonie Daule's idol bench in her camp beside the Amakna church [6,3]: «Pour cela il faut se rendre en [6,3], là où une Huppermage spécialisée dans les idoles s'est installée. Il faudra crafter chaque idole nécessaire pour la quête. Pour cela il faut utiliser l'atelier spécial prévu à cet effet en [6,3] «Fabriquer une Idole»» (Dofus pour les noobs, «La bénédiction de Viti»); her own «Puedes fabricarlo usando mi mesa de trabajo» (55758). Skill 415 «Fabricar un ídolo» makes the thirteen idols, each one only while its quest asks for it (craftFeasibleCriterion «Qa=1660&PO!28444»). The element is the table of idols at cell 238, the only element of the map with no known type (gfx 49573). INFERRED type: 13, the plain workbench's."
+    },
+    {
+      "map": 192937988,
+      "element": 515516,
+      "gfx": 15369,
+      "type": 90,
+      "skills": [23],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 90 and skill 23 «Preparar uma poção»; Jondo offered nothing on it."
+    },
+    {
+      "map": 192937988,
+      "element": 515520,
+      "gfx": 15369,
+      "type": 90,
+      "skills": [23],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 90 and skill 23 «Preparar uma poção»; Jondo offered nothing on it."
+    },
+    {
+      "map": 99353612,
+      "element": 474697,
+      "gfx": 9794,
+      "type": 27,
+      "skills": [32],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 27 and skill 32 «Fundir»; Jondo offered nothing on it."
+    },
+    {
+      "map": 99353612,
+      "element": 474698,
+      "gfx": 9794,
+      "type": 27,
+      "skills": [32],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 27 and skill 32 «Fundir»; Jondo offered nothing on it."
+    },
+    {
+      "map": 99353612,
+      "element": 474696,
+      "gfx": 9795,
+      "type": 41,
+      "skills": [48],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 41 and skill 48 «Polir uma pedra»; Jondo offered nothing on it."
+    },
+    {
+      "map": 192940040,
+      "element": 518018,
+      "gfx": 65158,
+      "type": 12,
+      "skills": [380],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 12 and skill 380 «Criar um Prismaradita»; Jondo offered nothing on it."
+    },
+    {
+      "map": 217320454,
+      "element": 521662,
+      "gfx": 259750,
+      "type": -1,
+      "skills": [22],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type -1 and skill 22 «Descascar»; Jondo offered nothing on it."
+    },
+    {
+      "map": 217320454,
+      "element": 521732,
+      "gfx": 259750,
+      "type": -1,
+      "skills": [22],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type -1 and skill 22 «Descascar»; Jondo offered nothing on it."
+    },
+    {
+      "map": 216663042,
+      "element": 522413,
+      "gfx": 304158,
+      "type": 49,
+      "skills": [22],
+      "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 49 and skill 22 «Descascar»; Jondo offered nothing on it."
     }
   ]
 }
