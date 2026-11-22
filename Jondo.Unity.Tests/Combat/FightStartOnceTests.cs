@@ -16,6 +16,7 @@ namespace Jondo.Unity.Tests.Combat
     /// the board before the first turn -- the attitudes cast, the raids' glyphs, the turn asked for --
     /// happens once, after both bursts, so neither sees it twice nor before his own kai.
     /// </summary>
+    [Collection("MapManager")]   // map 188744196: its fight notices reached FightJoinTests run in parallel
     public class FightStartOnceTests
     {
         /// <summary>An attitude that only puts a state on its caster (56), so casting it has nothing else to do.</summary>

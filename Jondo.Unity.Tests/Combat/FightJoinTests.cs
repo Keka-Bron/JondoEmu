@@ -29,6 +29,7 @@ namespace Jondo.Unity.Tests.Combat
     ///   J  Mazmorras/mazmorra de los jalatós completa (a kay turned down, fight 4368)
     ///   Z  Clases/Zobal/zobal-hechizos normales (Fighter1's fight 3331 seen from the map)
     /// </remarks>
+    [Collection("MapManager")]   // shares map 188744196 with FightStartOnceTests and the placement tests
     public class FightJoinTests
     {
         private const long PartyLeader = 290000000003;
