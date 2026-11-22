@@ -90,10 +90,14 @@ namespace Jondo.Unity.Server.Managers
         private static readonly object _lock = new();
         private static readonly Dictionary<long, DateTime> _openUntil = new();
 
-        /// <summary>For a content reload: read the file again.</summary>
+        /// <summary>For a content reload: read the file again, and forget the gates left open.</summary>
         public static void Forget()
         {
-            lock (_lock) _gates = null;
+            lock (_lock)
+            {
+                _gates = null;
+                _openUntil.Clear();
+            }
         }
 
         public static Gate? On(long mapId) => Load().TryGetValue(mapId, out var gate) ? gate : null;
@@ -142,12 +146,29 @@ namespace Jondo.Unity.Server.Managers
 
             if (standing.Count < gate.Plates.Length) return;
 
+            await OpenAsync(gate, $"{string.Join(", ", standing.Values)} on its plates");
+        }
+
+        /// <summary>
+        /// Opens a gate without asking for its plates: the staff's way past a gate that wants a
+        /// group. False when the map has no gate, or its gate is already open.
+        /// </summary>
+        public static async Task<bool> ForceOpenAsync(long mapId, string? by = null)
+        {
+            if (On(mapId) is not { } gate) return false;
+            return await OpenAsync(gate, by == null ? "forced open by staff" : $"forced open by {by}");
+        }
+
+        /// <summary>Claims the open window once, then shows and announces it and schedules its close.</summary>
+        private static async Task<bool> OpenAsync(Gate gate, string cause)
+        {
             lock (_lock)
             {
-                if (_openUntil.TryGetValue(mapId, out var until) && until > DateTime.UtcNow) return;
-                _openUntil[mapId] = DateTime.UtcNow + gate.OpenFor;
+                if (_openUntil.TryGetValue(gate.MapId, out var until) && until > DateTime.UtcNow) return false;
+                _openUntil[gate.MapId] = DateTime.UtcNow + gate.OpenFor;
             }
-            Console.WriteLine($"[PlateGates] The gate of {mapId} opens: {string.Join(", ", standing.Values)} on its plates.");
+
+            Console.WriteLine($"[PlateGates] The gate of {gate.MapId} opens: {cause}.");
             await ShowAsync(gate, open: true);
             if (gate.Announce is { } announce)
             {
@@ -156,6 +177,7 @@ namespace Jondo.Unity.Server.Managers
                     if (session.Stream != null) await session.SendAsync(said);
             }
             _ = ShutLaterAsync(gate);
+            return true;
         }
 
         private static async Task ShutLaterAsync(Gate gate)
