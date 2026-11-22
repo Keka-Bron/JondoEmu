@@ -1702,6 +1702,10 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.GivesAlteration != 0 && !sinPagar)
                 await AlterationHandler.GainAsync(stream, elegidaAhora.GivesAlteration);
 
+            // The spell the reply teaches for good: the Sadida priestess's Nécronyx.
+            if (elegidaAhora != null && elegidaAhora.TeachesSpell != 0 && !sinPagar)
+                await SpellItemHandler.TeachAsync(stream, elegidaAhora.TeachesSpell);
+
             // What the reply prints in the chat: the orbalantir's visions, its figures turned wrong.
             if (elegidaAhora != null && elegidaAhora.Says != 0 && !sinPagar)
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,

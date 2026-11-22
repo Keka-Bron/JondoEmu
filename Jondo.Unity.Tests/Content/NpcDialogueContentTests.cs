@@ -78,6 +78,18 @@ namespace Jondo.Unity.Tests.Content
             Assert.Empty(max.Choice(82557)!.AlsoLeaves);
         }
 
+        [Fact]
+        public void The_spell_a_reply_teaches_survives_saving()
+        {
+            NpcDialogueContent.Save(_path, new[]
+            {
+                Tree(4210, 1, Line(1, new DialogueChoice { Reply = 2, TeachesSpell = 9348 }, Choice(3))),
+            });
+            var line = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 4210, 0)!.Line(1)!;
+            Assert.Equal(9348, line.Choice(2)!.TeachesSpell);
+            Assert.Equal(0, line.Choice(3)!.TeachesSpell);
+        }
+
         // ─── Round trip ───────────────────────────────────────────────────────────
 
         [Fact]

@@ -266,6 +266,13 @@ namespace Jondo.Unity.World.Content
         public int GivesAlteration { get; init; }
 
         /// <summary>
+        /// The spell this reply teaches for good, or zero: the Sadida priestess's Nécronyx (9348) at
+        /// the end of «L'arme fatale», whose envoûtement "Retournez voir la prêtresse de Sadida [...]
+        /// pour le dissiper et apprendre l'envoûtement de façon définitive" (item 19395).
+        /// </summary>
+        public int TeachesSpell { get; init; }
+
+        /// <summary>
         /// The phoenix's map when the reply kills the player into a soul, or zero: Warko Linch's brew
         /// in «El cementerio primitivo», which leaves him in the primitive cemetery to find its phoenix
         /// (Managers.Phantoms). Applied with the reply's map change.
@@ -1252,6 +1259,7 @@ namespace Jondo.Unity.World.Content
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
                             GivesAlteration = (int)Number(choice, "givesAlteration"),
+                            TeachesSpell = (int)Number(choice, "teaches"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             ThenLine = Number(choice, "thenLine"),
                             Completes = (int)Number(choice, "completes"),
@@ -1486,6 +1494,7 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.GivesAlteration != 0) writer.WriteNumber("givesAlteration", choice.GivesAlteration);
+                            if (choice.TeachesSpell != 0) writer.WriteNumber("teaches", choice.TeachesSpell);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.ThenLine != 0) writer.WriteNumber("thenLine", choice.ThenLine);
                             if (choice.Completes != 0) writer.WriteNumber("completes", choice.Completes);

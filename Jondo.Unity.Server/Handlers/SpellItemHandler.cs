@@ -58,16 +58,32 @@ namespace Jondo.Unity.Server.Handlers
             if (!await ItemUseHandler.CriterionHoldsAsync(stream, item)) return true;
 
             if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, item.Uid, weigh: false)) return true;
-            LearnedSpells.Learn(me.CharacterId, spell);
-            SpellChoices.PlaceLearned(me.Breed, me.CharacterLevel, spell);
-
-            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
-            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
-                ConnectionProtocol.BuildSystemMessage(InfoMessages.SpellLearned, spell.ToString())));
+            await LearnAsync(stream, spell);
             await ItemUseHandler.WeighAsync(stream);
 
             Console.WriteLine($"[Items] {me.CharacterName} learns spell {spell} from scroll {item.Template}.");
             return true;
+        }
+
+        /// <summary>
+        /// A spell an NPC teaches for good (a dialogue reply's "teaches"); nothing when it is already
+        /// known, so a reply said twice teaches it once.
+        /// </summary>
+        public static async Task TeachAsync(NetworkStream stream, int spell)
+        {
+            if (LearnedSpells.Holds(LearnedSpells.OfSession(), spell)) return;
+            await LearnAsync(stream, spell);
+            Console.WriteLine($"[Npcs] {SessionContext.State.CharacterName} is taught spell {spell}.");
+        }
+
+        private static async Task LearnAsync(NetworkStream stream, int spell)
+        {
+            var me = SessionContext.State;
+            LearnedSpells.Learn(me.CharacterId, spell);
+            SpellChoices.PlaceLearned(me.Breed, me.CharacterLevel, spell);
+            await SpellHandler.SendSpellsAndBarAsync(SessionContext.Current);
+            await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                ConnectionProtocol.BuildSystemMessage(InfoMessages.SpellLearned, spell.ToString())));
         }
 
         private static Task WriteAsync(NetworkStream stream, byte[] frame)

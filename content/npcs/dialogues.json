@@ -52,6 +52,7 @@
     "  mutation      the reply gives this mutation item after its teleport (the Orbalantir's).",
     "  endsMutation  the reply takes the player's mutation away after its teleport.",
     "  givesAlteration  the reply puts this alteration on the player (Max Ymillán's «Supercaptura»).",
+    "  teaches       the reply teaches this spell for good (the Sadida priestess's Nécronyx).",
     "  alsoLeaves    other NPCs of the map who go with the one spoken to (the dummy that was Riberico)."
   ],
   "dialogues": [
