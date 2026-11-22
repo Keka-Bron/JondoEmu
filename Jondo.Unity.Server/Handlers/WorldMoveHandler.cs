@@ -553,12 +553,29 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The cell an arrival keeps: fight-walkable alone is not enough when roleplay data
+        /// exists. A border cell can be fight-walkable but outside the roleplay set, and landing
+        /// there strands the character away from the interior -- the southern edge of 90706177
+        /// does this. If no roleplay data exists, keep the old fight-cell behaviour.
+        /// </summary>
+        internal static int ChooseLandingCell(
+            int arrival, IReadOnlyCollection<int>? fightWalkable,
+            IReadOnlyCollection<int>? roleplayWalkable, Func<int, int> nearestRoleplay)
+        {
+            if (fightWalkable == null) return arrival;
+            if (!fightWalkable.Contains(arrival)) return nearestRoleplay(arrival);
+            if (roleplayWalkable != null && !roleplayWalkable.Contains(arrival))
+                return nearestRoleplay(arrival);
+            return arrival;
+        }
+
+        /// <summary>
         /// The cell on the other side, checked against the map.
         ///
-        /// The check is against the fight walkability and not against map_walkable_cells.json:
-        /// that file trims the borders on purpose so that monsters do not spawn on them, and the
-        /// border is precisely where somebody arriving from the next map lands. Asking it would
-        /// drag every arrival several cells inland.
+        /// Fight walkability decides first, because the border is where somebody arriving from
+        /// the next map lands. Roleplay walkability then rejects a cell that exists only in the
+        /// fight set: those are the trimmed borders, and landing on one can strand the character
+        /// away from the interior.
         /// </summary>
         private static int Landing(long map, int cell, Way way)
         {
@@ -573,12 +590,15 @@ namespace Jondo.Unity.Server.Handlers
 
             if (arrival < 0 || arrival > 559) arrival = cell;
 
-            var walkable = MapManager.GetFightWalkable(map);
-            if (walkable == null || walkable.Contains(arrival)) return arrival;
+            var fightWalkable = MapManager.GetFightWalkable(map);
+            if (fightWalkable == null) return arrival;
 
-            int nearest = MapManager.GetNearestWalkableCell(map, arrival);
-            Console.WriteLine($"[Move] Cell {arrival} of map {map} cannot be stood on; {nearest} instead.");
-            return nearest;
+            MapManager.WalkableCells.TryGetValue(map, out var roleplayWalkable);
+            int landing = ChooseLandingCell(arrival, fightWalkable, roleplayWalkable,
+                                            cell => MapManager.GetNearestWalkableCell(map, cell));
+            if (landing != arrival)
+                Console.WriteLine($"[Move] Cell {arrival} of map {map} cannot be stood on; {landing} instead.");
+            return landing;
         }
 
         /// <summary>The way as BorderPassages writes it.</summary>
