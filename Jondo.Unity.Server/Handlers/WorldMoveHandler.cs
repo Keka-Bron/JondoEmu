@@ -553,29 +553,50 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The cell an arrival keeps: fight-walkable alone is not enough when roleplay data
-        /// exists. A border cell can be fight-walkable but outside the roleplay set, and landing
-        /// there strands the character away from the interior -- the southern edge of 90706177
-        /// does this. If no roleplay data exists, keep the old fight-cell behaviour.
+        /// The cell an arrival keeps. Fight walkability decides first: the roleplay set trims
+        /// every border on purpose (no border cell of any map is in it, the band is 3 to 6 cells
+        /// deep) and the border is precisely where somebody arriving from the next map lands.
+        /// A fight-walkable arrival is kept while a fight-walkable path leads from it into the
+        /// roleplay set; only one cut off from it -- the southern edge of 90706177, about a
+        /// thousand border cells over all the maps -- strands the character, and that one goes
+        /// to the nearest roleplay cell. Without roleplay data, the old fight-cell behaviour.
         /// </summary>
         internal static int ChooseLandingCell(
             int arrival, IReadOnlyCollection<int>? fightWalkable,
-            IReadOnlyCollection<int>? roleplayWalkable, Func<int, int> nearestRoleplay)
+            IReadOnlyCollection<int>? roleplayWalkable, Func<int, int> nearestRoleplay,
+            Func<int, IEnumerable<int>>? neighbours = null)
         {
             if (fightWalkable == null) return arrival;
             if (!fightWalkable.Contains(arrival)) return nearestRoleplay(arrival);
-            if (roleplayWalkable != null && !roleplayWalkable.Contains(arrival))
-                return nearestRoleplay(arrival);
-            return arrival;
+            if (roleplayWalkable == null || roleplayWalkable.Count == 0) return arrival;
+            return ReachesTheInterior(arrival, fightWalkable, roleplayWalkable,
+                                      neighbours ?? Jondo.Unity.World.Maps.MapGeometry.GetNeighbors)
+                ? arrival : nearestRoleplay(arrival);
+        }
+
+        /// <summary>Whether a walk over fight-walkable cells leads from the cell into the roleplay set.</summary>
+        private static bool ReachesTheInterior(int start, IReadOnlyCollection<int> fightWalkable,
+                                               IReadOnlyCollection<int> roleplayWalkable,
+                                               Func<int, IEnumerable<int>> neighbours)
+        {
+            var seen = new HashSet<int> { start };
+            var queue = new Queue<int>();
+            queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                int cell = queue.Dequeue();
+                if (roleplayWalkable.Contains(cell)) return true;
+                foreach (int next in neighbours(cell))
+                    if (fightWalkable.Contains(next) && seen.Add(next)) queue.Enqueue(next);
+            }
+            return false;
         }
 
         /// <summary>
         /// The cell on the other side, checked against the map.
         ///
         /// Fight walkability decides first, because the border is where somebody arriving from
-        /// the next map lands. Roleplay walkability then rejects a cell that exists only in the
-        /// fight set: those are the trimmed borders, and landing on one can strand the character
-        /// away from the interior.
+        /// the next map lands; see <see cref="ChooseLandingCell"/> for the stranded borders.
         /// </summary>
         private static int Landing(long map, int cell, Way way)
         {

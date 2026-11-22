@@ -18,6 +18,15 @@ namespace Jondo.Unity.Tests.Movement
         }
 
         [Fact]
+        public void A_trimmed_border_cell_with_a_fight_walkable_way_inland_is_kept()
+        {
+            // 555 -> 541 -> 527 walk over fight cells into the roleplay set: an ordinary border.
+            var fight = new HashSet<int> { 555, 541, 527 };
+            var roleplay = new HashSet<int> { 527 };
+            Assert.Equal(555, WorldMoveHandler.ChooseLandingCell(555, fight, roleplay, _ => 527));
+        }
+
+        [Fact]
         public void A_cell_in_both_sets_is_kept()
         {
             Assert.Equal(319, WorldMoveHandler.ChooseLandingCell(319, Fight, Roleplay, _ => 0));
