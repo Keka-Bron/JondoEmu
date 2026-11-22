@@ -11246,13 +11246,17 @@ namespace Jondo.Unity.Server.Handlers
                 // tours (débuffable et cumulable 3 fois)» as it falls, a dispellable 1 that went
                 // the moment it was given.
                 int? porSuMuerte = muerto.LastBuffBeforeHisDeath;
+                // A dead summon's waiting rows go with it whatever their dispellable says: what
+                // it armed never goes off (the Tofu Noroshi's «Chispa», a kill of every enemy
+                // around it two turns on, is stopped by putting the fire out first).
+                bool armadoPorInvocado = muerto.EsInvocado;
                 bool leSobrevive(Jondo.Unity.World.Fights.Buff fila)
-                    => Jondo.Unity.World.Fights.Buffs.OutlivesItsCaster(fila)
-                       || (porSuMuerte is int antes && fila.Numero > antes);
+                    => (porSuMuerte is int antes && fila.Numero > antes)
+                       || (!(fila.Pendiente && armadoPorInvocado) && Jondo.Unity.World.Fights.Buffs.OutlivesItsCaster(fila));
                 foreach (var otro in TodosLosCombatientes(fight).ToList())
                 {
                     if (otro == null || otro == muerto || !otro.IsAlive) continue;
-                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, leSobrevive);
+                    var quitados = otro.Buffs.QuitarLoDe(muerto.Id, leSobrevive, waitingToo: armadoPorInvocado);
                     foreach (var quitado in quitados)
                     {
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,

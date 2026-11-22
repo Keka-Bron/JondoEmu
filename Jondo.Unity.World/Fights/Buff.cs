@@ -435,9 +435,14 @@ namespace Jondo.Unity.World.Fights
         /// The rows that stay all the same: the ones written to outlive their caster's death (see
         /// <see cref="OutlivesItsCaster"/>). Without it, every row of his goes.
         /// </param>
-        public List<Buff> QuitarLoDe(long quien, Func<Buff, bool> outlivesHim = null)
+        /// <param name="waitingToo">
+        /// The rows still waiting on their delay go as well. A summon's death takes what it had
+        /// armed with it: the Tofu Noroshi's «Chispa» kills every enemy around it two turns on,
+        /// and killing the fire first is how that is stopped.
+        /// </param>
+        public List<Buff> QuitarLoDe(long quien, Func<Buff, bool> outlivesHim = null, bool waitingToo = false)
         {
-            bool goes(Buff e) => e.Quien == quien && !e.Pendiente && (outlivesHim == null || !outlivesHim(e));
+            bool goes(Buff e) => e.Quien == quien && (waitingToo || !e.Pendiente) && (outlivesHim == null || !outlivesHim(e));
             var quitados = _puestos.FindAll(goes);
             _puestos.RemoveAll(goes);
             SeVan(quitados);

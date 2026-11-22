@@ -203,5 +203,39 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(new[] { row }, atHisTurn);
             Assert.Equal(0, me.Buffs.De(Fighter.CaracteristicaDePuntosDeAccion, 3));
         }
+
+        /// <summary>
+        /// The Tofu Noroshi's «Chispa» (29255) arms a kill of every enemy around it for two turns
+        /// on, dispellable 3. Putting the fire out first is the way to stop it: a dead summon's
+        /// waiting rows go with it, while a row of its that is already on stays where written.
+        /// </summary>
+        [Fact]
+        public async System.Threading.Tasks.Task A_dead_summons_waiting_kill_goes_with_it()
+        {
+            var fight = new FightInstance(1, 1);
+            var hero = Person(10, 0, 300);
+            var royal = Person(20, 1, 304);
+            var fire = Person(21, 1, 305);
+            fire.Invocador = royal.Id;
+            fight.AddPlayer(hero); fight.AddMonster(royal); fight.AddMonster(fire);
+
+            hero.Buffs.Poner(new Buff
+            {
+                EffectId = 141, HechizoOrigen = 29255, NivelOrigen = 1, Quien = fire.Id, Pendiente = true,
+                Disparador = EffectEngine.Esperando, Dispellable = 3,
+                EmpiezaEnRonda = fight.RoundNumber + 2, CaducaEnRonda = fight.RoundNumber + 2,
+            }, fight.SiguienteEmbrujo);
+            hero.Buffs.Poner(new Buff
+            {
+                EffectId = 111, Caracteristica = Fighter.CaracteristicaDePuntosDeAccion, Cuanto = -1,
+                Quien = fire.Id, Dispellable = 3, EmpiezaEnRonda = 1, CaducaEnRonda = 9,
+            }, fight.SiguienteEmbrujo);
+
+            fire.CurrentHP = 0;
+            await Jondo.Unity.Server.Handlers.FightHandler.CaenSusInvocadosAsync(null, fight, fire);
+
+            Assert.DoesNotContain(hero.Buffs.Puestos, b => b.Pendiente);
+            Assert.Contains(hero.Buffs.Puestos, b => b.EffectId == 111 && b.Quien == fire.Id);
+        }
     }
 }
