@@ -36,7 +36,9 @@ namespace Jondo.Unity.Server.Managers
         /// They are not decorative variants: each city uses its own, and with only one 36 of the 67
         /// were left out.
         /// </summary>
-        private static readonly HashSet<int> Graphics = new() { 8438, 46529, 63081, 260022 };
+        // 29506 is Amakna's (the village and the farms around it, five maps): the official server offers
+        // «Vasculhar» (153) on it (map contents in packet captures, 2026-11-21).
+        private static readonly HashSet<int> Graphics = new() { 8438, 46529, 63081, 260022, 29506 };
 
         private static readonly Dictionary<long, List<Interactives.Element>> _byMap = new();
 
