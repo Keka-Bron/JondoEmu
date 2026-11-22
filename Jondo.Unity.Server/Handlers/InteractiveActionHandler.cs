@@ -119,6 +119,32 @@ namespace Jondo.Unity.Server.Handlers
             // The day's room's altar: the offering's prayer.
             if (await AlmanaxOfferingHandler.OnAltarUsedAsync(stream, mapId, elementId)) return;
 
+            // Something that only speaks (InteractiveMessages): a tombstone's epitaph, a statue, the
+            // hourglass that sends you back out. After the quests, which take the element first when
+            // it is one of their objectives; as the official server does it: in use, then the message.
+            var said = InteractiveMessages.Of(mapId, elementId);
+            if (said != null)
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iwn,
+                    ConnectionProtocol.BuildElementInUse(elementId, said.Skill, SessionContext.State.CharacterId)));
+                if (said.Message != 0)
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                        ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, said.Message,
+                            InteractiveMessages.Fill(said, SessionContext.State.CharacterName, DateTimeOffset.Now))));
+                if (said.Opens != 0)
+                {
+                    await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iwf,
+                        ConnectionProtocol.BuildElementState(said.OpensCell, said.Opens, said.OpensState)));
+                    if (said.Frees.Length + said.Blocks.Length > 0)
+                        await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
+                            ConnectionProtocol.Push(Op.Jqx, Obstacles(said.Frees, said.Blocks)));
+                    if (said.ClosesAfter > 0) _ = ShutLaterAsync(session, mapId, said);
+                }
+                Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId} says {said.Message}.");
+                if (said.ToMap != 0) await TeleportHandler.ToMapAsync(stream, said.ToMap, said.ToCell);
+                return;
+            }
+
             if (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId,
                                                    out var interactive, out var action))
             {
@@ -267,6 +293,36 @@ namespace Jondo.Unity.Server.Handlers
                     break;
                 default:
                     throw new InvalidOperationException($"Unhandled interactive action: {action.Kind}.");
+            }
+        }
+        /// <summary>jrg { f1: state, f2: cell } per cell, walkable being zero and left out (PlateGates).</summary>
+        private static byte[] Obstacles(int[] walkable, int[] blocked)
+        {
+            var list = Pb.New();
+            foreach (int cell in walkable) list.Msg(1, Pb.New().Var(2, cell));
+            foreach (int cell in blocked) list.Msg(1, Pb.New().Var(1, 1).Var(2, cell));
+            return list.Build();
+        }
+
+        /// <summary>
+        /// The opened element shuts again after its seconds (InteractiveMessages.Said.ClosesAfter): its
+        /// state back to zero and the cells it had freed blocked, for whoever is still on the map --
+        /// the hidden door 471367 back to state 0 and cell 277 blocked, ten seconds after the piano, on
+        /// the official server.
+        /// </summary>
+        private static async Task ShutLaterAsync(GameSession session, long mapId, InteractiveMessages.Said said)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(said.ClosesAfter));
+                if (session.State.MapId != mapId) return;
+                await session.SendAsync(ConnectionProtocol.Push(Op.Iwf,
+                    ConnectionProtocol.BuildElementState(said.OpensCell, said.Opens, 0)));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jqx, Obstacles(said.Blocks, said.Frees)));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[InteractiveMessages] Shutting {said.Opens} on {mapId}: {ex.Message}");
             }
         }
     }

@@ -46,6 +46,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.MonsterSummonCaps.Reload();
             Managers.MonsterPartyGrades.Reload();
             Managers.Readables.Forget();
+            Managers.InteractiveMessages.Forget();
             Managers.InteractiveWays.Forget();
             Managers.TeleportManager.Initialize();
             // The stations written by hand in content/interactives/workshops.json, before the registry
