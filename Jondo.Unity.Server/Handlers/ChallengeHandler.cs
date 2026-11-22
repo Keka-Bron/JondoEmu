@@ -62,7 +62,7 @@ namespace Jondo.Unity.Server.Handlers
         /// monsters' levels. That explains why none comes up against a poutch, which is what happens in
         /// the four poutch captures: not one kxa, not one kwx.
         /// </summary>
-        private static int GroupLevel(FightInstance fight)
+        internal static int GroupLevel(FightInstance fight)
         {
             int total = 0;
             foreach (var bicho in fight.Rojo) total += bicho.Level;
