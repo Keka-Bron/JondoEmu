@@ -220,6 +220,9 @@ namespace Jondo.Unity.Server.Handlers
             // In the Gigalodón's abyss, the darkness of the floor makes its monsters stronger.
             Managers.GuildRaidDarkness.Boost(fight, GameState.CharacterId);
 
+            // In an Audacia or Bravura expedition, the guardian holds his modifier from the start.
+            Managers.ExpeditionModifiers.OnFightCreated(fight);
+
             // The Santuario's guardians are fought by four players at most; its corridor alone,
             // its monsters with their protectors' bonuses, and its tower by eight.
             Managers.GuildRaidGuardians.OnFightCreated(fight);
@@ -10384,7 +10387,7 @@ namespace Jondo.Unity.Server.Handlers
             return caster;
         }
 
-        private static async Task UnGolpeAsync(NetworkStream stream, FightInstance fight,
+        internal static async Task UnGolpeAsync(NetworkStream stream, FightInstance fight,
                                                Fighter caster, int spell,
                                                Managers.SpellEffect efecto, int elemento,
                                                Fighter target, int sacadoDelDado, int lejosDelCentro,

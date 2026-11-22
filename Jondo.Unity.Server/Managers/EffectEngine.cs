@@ -5607,7 +5607,11 @@ namespace Jondo.Unity.Server.Managers
                 // It leaves with nothing ONLY if there is no damage either: when the pushed one has not
                 // a single free cell he does not move, but he takes the whole blow. Measured: in that
                 // case the real server does not send the displacement, only the damage.
-                if (empujon.ToCell == desde && colision <= 0) return null;
+                if (empujon.ToCell == desde && colision <= 0)
+                {
+                    Program.LogDebug($"[Fight] Spell {hechizo} effect {efecto.EffectId} cannot move {sobre.Id} from cell {desde}: the way is blocked.");
+                    return null;
+                }
 
                 return new Outcome
                 {

@@ -1,0 +1,258 @@
+{
+  "_": [
+    "The guardian's modifier in a guild expedition of Audacia (166-185) or Bravura (186-205).",
+    "",
+    "It is a plain spell the boss holds from the start, not an idol. Each boss has two in the",
+    "client's spells: adminName 'Initial <boss> Expedition 1 - Fun' (icon 14947, state 3501",
+    "'Expedicion de Audacia') and '... - Hard' (icon 14948, state 3500 'Expedicion de Bravura');",
+    "their first grade puts the state and chains the rest through 792. Nothing in the data ties a",
+    "dungeon to its spell but the boss's name in the adminName, so the pairs are written here:",
+    "the normal dungeon's boss (datos/dungeons.json) matched to the adminName by its French name.",
+    "Merkator's, read against Dofus pour les noobs: Audacia shares the damage among the monsters",
+    "and adds 2% final damage per hit; Bravura keeps him invulnerable and gives 1 MP each time",
+    "he becomes vulnerable. War has two Hard spells with the same effects (23910, 24252): the",
+    "later one is taken. The plain expeditions (143-162) have no modifier."
+  ],
+  "modifiers": [
+    {
+      "dungeon": 166,
+      "boss": 478,
+      "spell": 23916,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 167,
+      "boss": 827,
+      "spell": 23918,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 168,
+      "boss": 2942,
+      "spell": 23923,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 169,
+      "boss": 3384,
+      "spell": 23932,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 170,
+      "boss": 3391,
+      "spell": 23928,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 171,
+      "boss": 3416,
+      "spell": 23927,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 172,
+      "boss": 3534,
+      "spell": 23926,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 173,
+      "boss": 3564,
+      "spell": 23924,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 174,
+      "boss": 3556,
+      "spell": 23921,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 175,
+      "boss": 3651,
+      "spell": 23917,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 176,
+      "boss": 3752,
+      "spell": 23919,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 177,
+      "boss": 3828,
+      "spell": 23935,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 178,
+      "boss": 3849,
+      "spell": 23922,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 179,
+      "boss": 4460,
+      "spell": 23938,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 180,
+      "boss": 4453,
+      "spell": 23937,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 181,
+      "boss": 4444,
+      "spell": 23939,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 182,
+      "boss": 4967,
+      "spell": 23945,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 183,
+      "boss": 5100,
+      "spell": 23940,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 184,
+      "boss": 5319,
+      "spell": 23942,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 185,
+      "boss": 6014,
+      "spell": 23950,
+      "kind": "audacia"
+    },
+    {
+      "dungeon": 186,
+      "boss": 478,
+      "spell": 23877,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 187,
+      "boss": 6014,
+      "spell": 24252,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 188,
+      "boss": 5319,
+      "spell": 23903,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 189,
+      "boss": 5100,
+      "spell": 23901,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 190,
+      "boss": 4967,
+      "spell": 23905,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 191,
+      "boss": 4444,
+      "spell": 23900,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 192,
+      "boss": 4453,
+      "spell": 23898,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 193,
+      "boss": 4460,
+      "spell": 23899,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 194,
+      "boss": 3849,
+      "spell": 23883,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 195,
+      "boss": 3828,
+      "spell": 23896,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 196,
+      "boss": 3752,
+      "spell": 23880,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 197,
+      "boss": 3651,
+      "spell": 23878,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 198,
+      "boss": 3556,
+      "spell": 23882,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 199,
+      "boss": 3564,
+      "spell": 23885,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 200,
+      "boss": 3534,
+      "spell": 23887,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 201,
+      "boss": 3416,
+      "spell": 23888,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 202,
+      "boss": 3391,
+      "spell": 23889,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 203,
+      "boss": 3384,
+      "spell": 23893,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 204,
+      "boss": 2942,
+      "spell": 23884,
+      "kind": "bravura"
+    },
+    {
+      "dungeon": 205,
+      "boss": 827,
+      "spell": 23879,
+      "kind": "bravura"
+    }
+  ]
+}
