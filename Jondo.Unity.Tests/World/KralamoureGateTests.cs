@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Xunit;
@@ -52,6 +53,25 @@ namespace Jondo.Unity.Tests.World
             if (!TeleportManager.TryGet(Lair, Gate, out var route)) return;   // no content
 
             Assert.Equal(FirstRoom, route.DestinationMapId);
+        }
+
+        [Fact]
+        public async Task Staff_can_force_the_gate_open_without_its_plate()
+        {
+            PlateGates.Forget();
+            if (PlateGates.On(Lair) == null) return;   // no content
+
+            try
+            {
+                Assert.True(await PlateGates.ForceOpenAsync(Lair, "test"));
+                Assert.True(PlateGates.IsOpen(Lair));
+                Assert.True(PlateGates.MayPass(Lair, Gate));
+                Assert.False(await PlateGates.ForceOpenAsync(Lair, "test"));
+            }
+            finally
+            {
+                PlateGates.Forget();
+            }
         }
 
         [Fact]

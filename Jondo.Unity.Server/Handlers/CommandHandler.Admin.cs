@@ -188,6 +188,7 @@ namespace Jondo.Unity.Server.Handlers
                 case ".stats": await StatsAsync(stream, rest, channel); break;
                 case ".spawn": await SpawnAsync(stream, rest, channel); break;
                 case ".remove": await RemoveAsync(stream, rest, channel); break;
+                case ".gate": await GateAsync(stream, rest, channel); break;
                 case ".gift": await GiftAsync(stream, rest, channel); break;
             }
         }
@@ -295,6 +296,32 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var group in groups.Take(15))
                 await NotifyAsync(stream, T("mapinfo.group", group.MobId, group.Cell,
                     string.Join(", ", group.Members.Select(m => $"{m.MonsterId}:{m.Grade}"))), channel, 0);
+        }
+
+        /// <summary>".gate open": opens the plate gate of the map under the staff's feet, if it has one.</summary>
+        private static async Task GateAsync(NetworkStream stream, string rest, int channel)
+        {
+            string action = FirstWord(rest, out _).ToLowerInvariant();
+            if (action != "open")
+            {
+                await NotifyAsync(stream, Usage(".gate"), channel, 0);
+                return;
+            }
+
+            long mapId = GameState.MapId;
+            if (PlateGates.On(mapId) == null)
+            {
+                await NotifyAsync(stream, T("gate.none"), channel, 0);
+                return;
+            }
+
+            if (!await PlateGates.ForceOpenAsync(mapId, GameState.CharacterName))
+            {
+                await NotifyAsync(stream, T("gate.already_open"), channel, 0);
+                return;
+            }
+
+            await NotifyAsync(stream, T("gate.opened"), channel, 0);
         }
 
         // ─── Moving ─────────────────────────────────────────────────────────────

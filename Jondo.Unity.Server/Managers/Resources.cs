@@ -88,6 +88,26 @@ namespace Jondo.Unity.Server.Managers
         }
 
         private static readonly Dictionary<int, Kind> _byGfx = new();
+
+        /// <summary>
+        /// What one element is, where its drawing does not say it: «porElemento» { map { element { tipo,
+        /// habilidad, oficio, objeto, nivel } } }. One drawing can be several resources -- every
+        /// freshwater fishing spot is drawing 1018, and the official server declares each its own fish
+        /// (Gobião 75/124, Truta 74/125, Carpa Diem 79/127...) -- so a drawing's kind is only the
+        /// default. Written from what the official server declared for each element on the maps that
+        /// packet captures of it entered (2026-11): type and gathering skill as declared; job, item and
+        /// level from the client's skills table for that skill.
+        /// </summary>
+        private static readonly Dictionary<(long, int), Kind> _byElementKind = new();
+
+        private static Kind KindOf(JsonElement v) => new()
+        {
+            Type = v.GetProperty("tipo").GetInt32(),
+            SkillId = v.GetProperty("habilidad").GetInt32(),
+            JobId = v.TryGetProperty("oficio", out var j) ? j.GetInt32() : 0,
+            ItemId = v.TryGetProperty("objeto", out var i) ? i.GetInt32() : 0,
+            LevelMin = v.TryGetProperty("nivel", out var n) ? n.GetInt32() : 1,
+        };
         private static readonly Dictionary<long, List<Resource>> _byMap = new();
         private static readonly Dictionary<(long, int), Resource> _byElement = new();
 
@@ -102,6 +122,7 @@ namespace Jondo.Unity.Server.Managers
         public static void Initialize()
         {
             _byGfx.Clear();
+            _byElementKind.Clear();
             _byMap.Clear();
             _byElement.Clear();
             _spent.Clear();
@@ -123,15 +144,17 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var entry in list.EnumerateObject())
                 {
                     if (!int.TryParse(entry.Name, out int gfx)) continue;
-                    var v = entry.Value;
-                    _byGfx[gfx] = new Kind
+                    _byGfx[gfx] = KindOf(entry.Value);
+                }
+                if (doc.RootElement.TryGetProperty("porElemento", out var perElement))
+                {
+                    foreach (var map in perElement.EnumerateObject())
                     {
-                        Type = v.GetProperty("tipo").GetInt32(),
-                        SkillId = v.GetProperty("habilidad").GetInt32(),
-                        JobId = v.TryGetProperty("oficio", out var j) ? j.GetInt32() : 0,
-                        ItemId = v.TryGetProperty("objeto", out var i) ? i.GetInt32() : 0,
-                        LevelMin = v.TryGetProperty("nivel", out var n) ? n.GetInt32() : 1,
-                    };
+                        if (!long.TryParse(map.Name, out long mapId)) continue;
+                        foreach (var element in map.Value.EnumerateObject())
+                            if (int.TryParse(element.Name, out int elementId))
+                                _byElementKind[(mapId, elementId)] = KindOf(element.Value);
+                    }
                 }
             }
             catch (Exception ex)
@@ -146,7 +169,8 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var element in Interactives.ElementsOf(mapId))
                 {
                     if (element.Cell == 0) continue;
-                    if (!_byGfx.TryGetValue(element.Gfx, out var kind)) continue;
+                    if (!_byElementKind.TryGetValue((mapId, element.Id), out var kind)
+                        && !_byGfx.TryGetValue(element.Gfx, out kind)) continue;
                     // A passage hung off it makes it a door, whatever its graphic says: the GM
                     // island's chest, 479462, has the placeholder graphic 682 every olivioleta
                     // tree has, and as a tree it asked for woodcutting 90 to be opened.

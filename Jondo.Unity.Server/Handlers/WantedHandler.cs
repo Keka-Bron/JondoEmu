@@ -99,8 +99,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// What a jailer offers on being spoken to, before his own replies: «Livrer X.» for each
-        /// criminal carried that is his to take here, and «When were they last seen?» to whoever is
-        /// after one of his.
+        /// criminal carried that is his to take here, and «When were they last seen?» always.
         /// </summary>
         public static long[] OpeningReplies(int npc, long mapId)
         {
@@ -108,15 +107,17 @@ namespace Jondo.Unity.Server.Handlers
             if (jailer == null || Quests.Log is not { } log) return Array.Empty<long>();
 
             var replies = new List<long>();
-            bool after = false;
             foreach (var criminal in WantedPosters.HandedTo(npc))
             {
                 var report = criminal.To(npc)!;
                 if (Carries(log, criminal) && report.Deliver != 0 && (criminal.Map == 0 || criminal.Map == mapId))
                     replies.Add(report.Deliver);
-                if (Wants(log, criminal) && report.Pay != 0) after = true;
             }
-            if (after) replies.Add(jailer.Ask);
+            // Offered to everybody: the official Astrub jailer asked «Perguntar quando os procurados
+            // foram vistos pela última vez.» of a character with no wanted quest (2026-11-20), and his
+            // second answer then had only «Manter seus kamas e ir embora.». Bribes() keeps the 500
+            // kamas replies to whoever is after one.
+            replies.Add(jailer.Ask);
             return replies.ToArray();
         }
 

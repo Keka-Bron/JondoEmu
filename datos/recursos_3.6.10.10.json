@@ -2,7 +2,8 @@
  "_comentario": [
   "Grafico -> recurso recolectable, cruzando las capturas con el catalogo del cliente.",
   "tipo y habilidad los manda el servidor en el jss; oficio, objeto y nivel salen de",
-  "skills.json (gatheredRessourceItem). Ver tools/recursos_recoleccion.py."
+  "skills.json (gatheredRessourceItem). Ver tools/recursos_recoleccion.py.",
+  "porElemento: mapa -> elemento -> recurso, lo que el servidor oficial declara para cada elemento en los mapas que entraron las capturas de paquetes (2026-11), donde el grafico no basta: cada punto de pesca de agua dulce es el grafico 1018 y cada uno tiene su pez. Gana sobre el grafico."
  ],
  "recursos": {
   "2204": {
@@ -553,6 +554,6702 @@
    "nivel": 1,
    "visto": 36,
    "discrepa": false
+  }
+ },
+ "porElemento": {
+  "153358344": {
+   "537896": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499410": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499376": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499374": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499372": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537895": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153358342": {
+   "499415": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499414": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499412": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499411": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537889": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537890": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537891": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537892": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153357318": {
+   "499383": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499382": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499315": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537885": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537886": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537887": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "499384": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153358338": {
+   "488346": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488345": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488344": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153358336": {
+   "537876": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488347": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "498683": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537877": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "498682": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537878": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "498681": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537879": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153357314": {
+   "537880": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537882": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537883": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537884": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488333": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488332": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488331": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "153357312": {
+   "488341": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488340": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488339": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488338": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "488337": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537871": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "537872": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "189792259": {
+   "515603": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "515602": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "189792771": {
+   "515604": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "515603": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "189793283": {
+   "515604": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "189793280": {
+   "515622": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "515621": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "189792768": {
+   "515621": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "515622": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "515593": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "515594": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "189792256": {
+   "515594": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "515593": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "189792769": {
+   "515606": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "188745218": {
+   "514982": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514980": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514979": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514978": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514986": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514987": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514991": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514992": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "189793798": {
+   "515597": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "189794310": {
+   "515597": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190055427": {
+   "515919": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190055425": {
+   "515921": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190055424": {
+   "515943": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515948": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515947": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515946": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515945": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515944": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515921": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190054912": {
+   "515937": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515936": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515935": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515934": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515933": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515945": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515902": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515903": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190054400": {
+   "515905": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515904": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515903": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515902": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515935": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515937": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190054401": {
+   "515929": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515922": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190054402": {
+   "515922": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190054914": {
+   "515922": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190054913": {
+   "515922": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515929": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "193332225": {
+   "515758": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515759": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "190580736": {
+   "513782": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "513726": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190580737": {
+   "513782": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190580741": {
+   "512644": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512643": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512640": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512637": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190580229": {
+   "519082": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "519081": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512664": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512668": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "190581764": {
+   "514519": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514523": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514522": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514521": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514520": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514496": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514498": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514536": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190582276": {
+   "514499": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514498": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514497": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514496": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514495": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514494": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514493": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514492": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514491": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514520": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514521": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514519": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514522": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190581765": {
+   "514545": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514544": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514543": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514542": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514541": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514540": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514539": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514538": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514537": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514536": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514500": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514501": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514502": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514524": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514512": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190581766": {
+   "514503": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514502": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514501": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514500": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514511": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514510": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514509": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514508": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514507": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514506": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514505": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514504": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514524": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514525": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514526": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514527": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514531": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190581254": {
+   "514532": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514531": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514530": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514529": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514528": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514527": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514526": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "514525": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514524": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514502": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514509": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514510": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190581253": {
+   "514512": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514544": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514502": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514524": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "512640": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512637": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190581248": {
+   "513741": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190582786": {
+   "514516": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514515": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514514": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "514513": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190582785": {
+   "514535": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514534": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514533": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190582784": {
+   "514518": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "514517": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "193200646": {
+   "515642": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515643": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515719": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "190055942": {
+   "519079": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190055937": {
+   "515925": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515924": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515923": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515926": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515921": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056449": {
+   "515927": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515926": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515928": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515925": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056450": {
+   "515911": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515910": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515930": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "519153": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515931": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515938": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056962": {
+   "519076": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "519153": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515932": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515931": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515930": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515938": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515910": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515911": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190056961": {
+   "515920": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190056451": {
+   "515942": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515941": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "519077": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515940": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515939": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515938": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056452": {
+   "519078": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515950": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515949": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515912": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "190056453": {
+   "515917": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515916": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515915": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515914": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515913": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515912": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515906": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056454": {
+   "519079": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515909": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515908": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "515907": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "515906": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "190056455": {
+   "515918": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "519080": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "193200643": {
+   "515752": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193200130": {
+   "515629": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515630": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515749": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515750": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515751": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515628": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515636": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515500": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "193200131": {
+   "515751": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515750": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515749": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515630": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515629": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515752": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516402": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516401": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515628": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515636": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515500": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515761": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "188484108": {
+   "516081": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "516080": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516079": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516078": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "188484106": {
+   "516071": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "516070": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "516073": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516072": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "188484104": {
+   "516400": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516076": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516075": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   }
+  },
+  "188486154": {
+   "516083": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516082": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "188485128": {
+   "516069": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "516068": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516067": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193200129": {
+   "515755": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515756": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193331713": {
+   "515760": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515759": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515758": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515757": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515756": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515755": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193331714": {
+   "515629": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515630": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515628": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515636": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515637": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515638": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515500": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "193331715": {
+   "515639": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515638": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515637": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515636": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515761": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515500": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515628": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515640": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515629": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515630": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "516401": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "516402": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193331716": {
+   "515744": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515627": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "193332227": {
+   "515639": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515640": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "193332228": {
+   "515744": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515627": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "188744706": {
+   "514992": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514991": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514988": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514987": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514986": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514985": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514978": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514980": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514982": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514979": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "188744194": {
+   "514958": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514957": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514956": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514952": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514945": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "188743682": {
+   "514945": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514944": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514956": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514957": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514958": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "188744193": {
+   "514966": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514964": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514961": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514952": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514944": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514945": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514968": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514969": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514971": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514974": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514975": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "188743681": {
+   "514975": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514974": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514973": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514971": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514969": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514968": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514961": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514964": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514944": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514945": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "190579715": {
+   "513735": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190579717": {
+   "512676": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512673": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512668": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512664": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "519082": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "519081": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "513698": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190579205": {
+   "513698": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512676": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "190578694": {
+   "512722": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512720": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512719": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512717": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512716": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512714": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190710278": {
+   "514560": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "514559": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514558": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "514557": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "512720": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "512719": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190579203": {
+   "513729": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190578691": {
+   "513729": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "188482052": {
+   "515895": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515894": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "516398": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515901": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515900": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515899": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515896": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "188483076": {
+   "515885": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "516397": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515884": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515893": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515891": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515890": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515889": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515888": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "188484100": {
+   "515986": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515984": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515983": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "516399": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "101713409": {
+   "494215": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494213": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494212": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494211": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494209": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494217": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494216": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101713411": {
+   "494455": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494454": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494463": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494462": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494458": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494457": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494456": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "101713413": {
+   "494247": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494245": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494255": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494252": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494251": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494249": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494263": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494260": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494259": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494258": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494256": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494266": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494265": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494264": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "101712387": {
+   "494231": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494230": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494229": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494236": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494234": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494233": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101713415": {
+   "494311": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494310": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494308": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494307": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494306": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494305": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494304": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494303": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494312": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101714439": {
+   "494423": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494422": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494431": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494430": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494427": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494425": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494424": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101715463": {
+   "494400": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494391": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494399": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494398": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494396": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494394": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494393": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494392": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "101715461": {
+   "494208": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494207": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494206": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494204": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494201": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "101716487": {
+   "494407": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494405": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494404": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494402": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494410": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494409": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494408": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101717512": {
+   "494279": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494275": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494272": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494287": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494286": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494285": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494284": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494283": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494282": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494281": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494291": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494290": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494288": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494269": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494268": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "101716489": {
+   "494411": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494421": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494420": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494419": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494417": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494416": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101715465": {
+   "494383": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494382": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494381": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494380": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494390": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494389": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494388": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494385": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494384": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "193332229": {
+   "516187": {
+    "tipo": 37,
+    "habilidad": 28,
+    "oficio": 24,
+    "objeto": 443,
+    "nivel": 60
+   },
+   "515744": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515627": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515716": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515745": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515717": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "534712": {
+    "tipo": 37,
+    "habilidad": 28,
+    "oficio": 24,
+    "objeto": 443,
+    "nivel": 60
+   },
+   "515746": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   }
+  },
+  "193331718": {
+   "515715": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "193331717": {
+   "534712": {
+    "tipo": 37,
+    "habilidad": 28,
+    "oficio": 24,
+    "objeto": 443,
+    "nivel": 60
+   },
+   "515717": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515716": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515748": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515747": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515746": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515745": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515744": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515627": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "534711": {
+    "tipo": 37,
+    "habilidad": 28,
+    "oficio": 24,
+    "objeto": 443,
+    "nivel": 60
+   },
+   "516187": {
+    "tipo": 37,
+    "habilidad": 28,
+    "oficio": 24,
+    "objeto": 443,
+    "nivel": 60
+   }
+  },
+  "193200134": {
+   "515719": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515715": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515762": {
+    "tipo": 55,
+    "habilidad": 26,
+    "oficio": 24,
+    "objeto": 442,
+    "nivel": 40
+   },
+   "515643": {
+    "tipo": 53,
+    "habilidad": 25,
+    "oficio": 24,
+    "objeto": 441,
+    "nivel": 20
+   },
+   "515642": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "515641": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "190580227": {
+   "513735": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190580225": {
+   "513782": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "190580224": {
+   "513726": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "513782": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101715467": {
+   "494535": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494534": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494533": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494532": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494531": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494540": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494539": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494538": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494537": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494536": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "101715469": {
+   "494373": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494372": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494371": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494370": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494379": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494377": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494376": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "101715471": {
+   "494530": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494529": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494528": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494524": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494523": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "101715473": {
+   "494487": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494486": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494492": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494491": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494489": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494488": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "101715475": {
+   "494519": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494517": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494515": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494514": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494513": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494512": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494520": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "101715477": {
+   "494340": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494339": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494338": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494337": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494336": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "476076": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494335": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494334": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494333": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494332": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "101714453": {
+   "494438": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "494435": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "494440": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "3845": {
+   "459797": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "68551683": {
+   "492189": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492515": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492516": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492517": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "68419585": {
+   "492483": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   },
+   "492482": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "492481": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "459243": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "68420097": {
+   "492257": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492252": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "492595": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "459243": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492483": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   }
+  },
+  "68420098": {
+   "492599": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492597": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492595": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "459243": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "459244": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   }
+  },
+  "68419586": {
+   "459249": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "459248": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "459247": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "459246": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "459245": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "459244": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   },
+   "459243": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "68419587": {
+   "492471": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492473": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492472": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492295": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492296": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "68419588": {
+   "492530": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   }
+  },
+  "68419589": {
+   "492486": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492267": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492268": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "68419590": {
+   "492247": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492245": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "492244": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492243": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492242": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492241": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492240": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492250": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "492337": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492380": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492383": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "492621": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492623": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492486": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492491": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "68419591": {
+   "492623": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492621": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492380": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492383": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88082200": {
+   "502465": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493193": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88081177": {
+   "502475": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493527": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88080666": {
+   "493719": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493720": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "185863685": {
+   "511523": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "511522": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "97255955": {
+   "472053": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "472052": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "472051": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "472050": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   },
+   "472049": {
+    "tipo": 17,
+    "habilidad": 24,
+    "oficio": 24,
+    "objeto": 312,
+    "nivel": 1
+   }
+  },
+  "88213272": {
+   "493151": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493150": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493149": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88212757": {
+   "493624": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88212245": {
+   "493625": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493624": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88082197": {
+   "493735": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "68420104": {
+   "492343": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "502437": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492340": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492344": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88082709": {
+   "493735": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "121767936": {
+   "484179": {
+    "tipo": 54,
+    "habilidad": 56,
+    "oficio": 24,
+    "objeto": 445,
+    "nivel": 80
+   }
+  },
+  "88083204": {
+   "493590": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493589": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88083203": {
+   "493826": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88083715": {
+   "493826": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88085252": {
+   "493865": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493864": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "502487": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "502472": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493492": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493493": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88084740": {
+   "493493": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493492": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493491": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493489": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493488": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "502473": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "502472": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493318": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88084741": {
+   "493671": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493679": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "519087": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493678": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493677": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493651": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493650": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493649": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493648": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "502480": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493658": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493657": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493488": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "502472": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493489": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493318": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493685": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493686": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493688": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493691": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493692": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88084229": {
+   "493686": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493685": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493692": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493691": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493690": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493689": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493688": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493648": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493650": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493671": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493488": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493489": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493318": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493594": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493595": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493596": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88084228": {
+   "493318": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493488": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493489": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493491": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "502473": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88083716": {
+   "493589": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88083717": {
+   "493596": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493595": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493594": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493689": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493690": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88083718": {
+   "493783": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493765": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493780": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493761": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493760": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493774": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493770": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493768": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88083719": {
+   "493443": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493441": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493439": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493438": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493760": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88083720": {
+   "493557": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493562": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493561": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493560": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88083721": {
+   "493870": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493869": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493868": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493348": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88084234": {
+   "493696": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493694": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493421": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88084233": {
+   "493350": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493348": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493346": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493345": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493868": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493869": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493870": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88084746": {
+   "493421": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493420": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493694": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88084747": {
+   "493565": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493563": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493334": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493335": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493420": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88085259": {
+   "493335": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493334": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493332": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493331": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493516": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493565": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88085771": {
+   "493516": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493332": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88085770": {
+   "493447": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493445": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493455": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493453": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493452": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493462": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493458": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493457": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "493456": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493627": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493631": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "498464": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493633": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "88086283": {
+   "493751": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493749": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "502489": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "502479": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "88086795": {
+   "493598": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "493749": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88086792": {
+   "498455": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "498454": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "498453": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493146": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "493295": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "493297": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   }
+  },
+  "88086791": {
+   "493146": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "82314753": {
+   "492678": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   },
+   "492677": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494747": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "494966": {
+    "tipo": 273,
+    "habilidad": 327,
+    "oficio": 36,
+    "objeto": 16469,
+    "nivel": 180
+   }
+  },
+  "82315265": {
+   "494750": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "492677": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492678": {
+    "tipo": 76,
+    "habilidad": 126,
+    "oficio": 36,
+    "objeto": 603,
+    "nivel": 40
+   }
+  },
+  "82314241": {
+   "492679": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "494966": {
+    "tipo": 273,
+    "habilidad": 327,
+    "oficio": 36,
+    "objeto": 16469,
+    "nivel": 180
+   },
+   "494747": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "492676": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "82313729": {
+   "492676": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492679": {
+    "tipo": 74,
+    "habilidad": 125,
+    "oficio": 36,
+    "objeto": 1844,
+    "nivel": 20
+   },
+   "492680": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492681": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "82313217": {
+   "494748": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "492681": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "492680": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "82313216": {
+   "494967": {
+    "tipo": 273,
+    "habilidad": 327,
+    "oficio": 36,
+    "objeto": 16469,
+    "nivel": 180
+   },
+   "494752": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "492683": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   },
+   "489801": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82313728": {
+   "489802": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "489801": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "494752": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82313985": {
+   "489799": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "489800": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82313986": {
+   "494753": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82314498": {
+   "494749": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "494753": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82314497": {
+   "489800": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82315009": {
+   "494751": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   },
+   "492682": {
+    "tipo": 79,
+    "habilidad": 127,
+    "oficio": 36,
+    "objeto": 1794,
+    "nivel": 60
+   }
+  },
+  "83100164": {
+   "494755": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "82314240": {
+   "489803": {
+    "tipo": 258,
+    "habilidad": 305,
+    "oficio": 26,
+    "objeto": 16389,
+    "nivel": 180
+   }
+  },
+  "68423176": {
+   "492334": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492333": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492330": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "492329": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492346": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   }
+  },
+  "217317380": {
+   "521749": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "217320454": {
+   "521750": {
+    "tipo": -1,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "216530950": {
+   "523910": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523909": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523963": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523912": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "216663046": {
+   "523908": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523907": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523906": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523964": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "216664070": {
+   "523904": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "216663042": {
+   "522412": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   },
+   "523913": {
+    "tipo": 48,
+    "habilidad": 42,
+    "oficio": 1,
+    "objeto": 537,
+    "nivel": 1
+   }
+  },
+  "90705410": {
+   "494091": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "493989": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "68422662": {
+   "492631": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492642": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "459053": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   },
+   "492637": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "492634": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   }
+  },
+  "90702849": {
+   "493969": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "493967": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "95422468": {
+   "494182": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494181": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494179": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494178": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494177": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494175": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "95420418": {
+   "494164": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494163": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494162": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494160": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "90704385": {
+   "493991": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "541292": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "493993": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494018": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "90704386": {
+   "493961": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "493986": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494003": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494005": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494006": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   }
+  },
+  "95420420": {
+   "494159": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494158": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494157": {
+    "tipo": 81,
+    "habilidad": 131,
+    "oficio": 36,
+    "objeto": 1805,
+    "nivel": 70
+   },
+   "494156": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494154": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494153": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "90704899": {
+   "493910": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "493915": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "493914": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "493913": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494049": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494051": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "95421442": {
+   "494103": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494102": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494101": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   },
+   "494100": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494107": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494106": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494105": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "494104": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "115081729": {
+   "481532": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "481531": {
+    "tipo": 77,
+    "habilidad": 129,
+    "oficio": 36,
+    "objeto": 1757,
+    "nivel": 30
+   },
+   "481530": {
+    "tipo": 78,
+    "habilidad": 130,
+    "oficio": 36,
+    "objeto": 1750,
+    "nivel": 50
+   },
+   "491546": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
+  },
+  "115082753": {
+   "481535": {
+    "tipo": 71,
+    "habilidad": 128,
+    "oficio": 36,
+    "objeto": 598,
+    "nivel": 10
+   }
   }
  }
 }

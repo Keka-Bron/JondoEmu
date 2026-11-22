@@ -26755,23 +26755,6 @@
    "modeloInferido": true
   },
   {
-   "mapa": 212863494,
-   "elemento": 523128,
-   "casilla": 326,
-   "gfx": 67987,
-   "interior": 212339722,
-   "subzona": 978,
-   "origen": "residencia",
-   "casa": 423,
-   "nombre": "Casa grande de Brakmar",
-   "precio": 2500000,
-   "habitaciones": 3,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
    "mapa": 212864000,
    "elemento": 522137,
    "casilla": 322,
@@ -28213,23 +28196,6 @@
    "nombre": "Casa pequeña de Brakmar",
    "precio": 1500000,
    "habitaciones": 2,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
-   "mapa": 219546624,
-   "elemento": 523106,
-   "casilla": 229,
-   "gfx": 67953,
-   "interior": 212339722,
-   "subzona": 982,
-   "origen": "residencia",
-   "casa": 428,
-   "nombre": "Casa mediana de Brakmar",
-   "precio": 2000000,
-   "habitaciones": 3,
    "instancias": [
     1
    ],
