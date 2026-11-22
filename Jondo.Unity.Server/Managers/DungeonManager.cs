@@ -198,6 +198,7 @@ namespace Jondo.Unity.Server.Managers
         private static bool Fill()
         {
             if (!Read()) return false;
+            GiveExpeditionsTheirBosses();
             int reordenadas = OrderRooms();
             Store();
 
@@ -210,6 +211,92 @@ namespace Jondo.Unity.Server.Managers
             Console.WriteLine($"[DungeonManager] {_byId.Count} dungeons, {rooms} rooms, " +
                               $"{_byRoom.Count} maps that are one.");
             return true;
+        }
+
+        /// <summary>
+        /// The bosses of the expeditions, which the catalogue gives none: each boss of the dungeon
+        /// the expedition is named after, as the monster of the expedition's own rooms that bears
+        /// his name -- Cocabulia 854 is 7906 in his expedition, the Tofu Real 382 is 7852, and the
+        /// Bravura and Audacia expeditions bring the base boss himself.
+        /// </summary>
+        /// <remarks>
+        /// With no boss, no room was the boss room: the boss was one more monster of the rooms'
+        /// groups, and a player alone, who fights the first four of eight, never met him.
+        /// </remarks>
+        private static void GiveExpeditionsTheirBosses()
+        {
+            var bases = _byId.Values.Where(d => d.Bosses.Count > 0 && Expeditions.CatalogueKey(d.Name) == null)
+                             .GroupBy(d => d.Name.Trim().ToLowerInvariant())
+                             .ToDictionary(g => g.Key, g => g.OrderBy(d => d.Id).First());
+            var waiting = new List<(Dungeon Expedition, Dungeon Base)>();
+            foreach (var dungeon in _byId.Values)
+            {
+                if (dungeon.Bosses.Count > 0 || dungeon.Rooms.Count == 0) continue;
+                string? key = Expeditions.CatalogueKey(dungeon.Name);
+                if (key == null || !bases.TryGetValue(key.Substring(key.IndexOf('|') + 1), out var named)) continue;
+                waiting.Add((dungeon, named));
+            }
+            if (waiting.Count == 0) return;
+
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                var names = new Dictionary<int, string?>();
+                string? NameOf(int monster)
+                {
+                    if (names.TryGetValue(monster, out var known)) return known;
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT t.Text FROM Monsters m JOIN Translations t ON t.Key = m.NameId WHERE m.Id = $id;";
+                    command.Parameters.AddWithValue("$id", monster);
+                    return names[monster] = command.ExecuteScalar() as string;
+                }
+                List<int> RosterOf(long map)
+                {
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT s.Monsters FROM MapSubareas m JOIN Subareas s ON s.Id = m.SubAreaId WHERE m.MapId = $map;";
+                    command.Parameters.AddWithValue("$map", map);
+                    if (command.ExecuteScalar() is not string json) return new List<int>();
+                    using var doc = JsonDocument.Parse(json);
+                    var array = doc.RootElement.ValueKind == JsonValueKind.Object &&
+                                doc.RootElement.TryGetProperty("Array", out var inner) ? inner : doc.RootElement;
+                    return array.ValueKind != JsonValueKind.Array ? new List<int>()
+                         : array.EnumerateArray().Where(m => m.TryGetInt32(out _)).Select(m => m.GetInt32()).ToList();
+                }
+
+                int given = 0;
+                foreach (var (expedition, named) in waiting)
+                {
+                    var own = expedition.Rooms.SelectMany(RosterOf).Distinct().ToList();
+                    var bosses = BossesOfTheExpedition(named.Bosses, own, NameOf);
+                    if (bosses.Count == 0) continue;
+                    expedition.Bosses.AddRange(bosses);
+                    given++;
+                }
+                Console.WriteLine($"[DungeonManager] {given} expedition(s) took the bosses of the dungeon they are named after.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DungeonManager] Could not give the expeditions their bosses: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// For each boss of the base dungeon, the first of the expedition's own monsters with his
+        /// name; a boss none of them is named after is left out.
+        /// </summary>
+        internal static List<int> BossesOfTheExpedition(IEnumerable<int> baseBosses, IReadOnlyList<int> own,
+                                                        Func<int, string?> nameOf)
+        {
+            var bosses = new List<int>();
+            foreach (int boss in baseBosses)
+            {
+                string? name = nameOf(boss);
+                if (string.IsNullOrEmpty(name)) continue;
+                int match = own.FirstOrDefault(m => !bosses.Contains(m) && nameOf(m) == name);
+                if (match != 0) bosses.Add(match);
+            }
+            return bosses;
         }
 
         /// <summary>

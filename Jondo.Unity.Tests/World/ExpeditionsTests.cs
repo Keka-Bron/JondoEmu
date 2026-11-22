@@ -125,6 +125,20 @@ namespace Jondo.Unity.Tests.World
         [InlineData("Dimensión - Ecaflipus", null)]
         public void Only_expeditions_have_a_catalogue_key(string name, string? key)
             => Assert.Equal(key, Expeditions.CatalogueKey(name));
+
+        [Fact]
+        public void An_expedition_takes_the_monster_of_its_rooms_named_like_the_base_boss()
+        {
+            var names = new System.Collections.Generic.Dictionary<int, string>
+            {
+                [854] = "Cocabulia", [7906] = "Cocabulia", [7901] = "Coco Moreno", [3] = "Otro",
+            };
+            string? NameOf(int m) => names.TryGetValue(m, out var n) ? n : null;
+
+            Assert.Equal(new[] { 7906 }, DungeonManager.BossesOfTheExpedition(new[] { 854 }, new[] { 7901, 7906 }, NameOf));
+            Assert.Equal(new[] { 854 }, DungeonManager.BossesOfTheExpedition(new[] { 854 }, new[] { 854, 7901 }, NameOf));
+            Assert.Empty(DungeonManager.BossesOfTheExpedition(new[] { 854 }, new[] { 7901, 3 }, NameOf));
+        }
     }
 
     /// <summary>Elmer's groups against the real catalogue, and where he stands.</summary>
@@ -155,6 +169,19 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(59796, talk.Which);
             Assert.Equal(81985, talk.WhichExpeditions);
             Assert.Equal(new long[] { 60064, 60065, 60066, 60067 }, talk.Explanation);
+        }
+
+        [Fact]
+        public void Each_expedition_has_the_boss_of_its_base_dungeon_in_its_last_room()
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            DungeonManager.Initialize();
+            if (!DungeonManager.IsLoaded || DungeonManager.Get(147) is not { } cocabulia) return;   // no world base
+
+            Assert.Equal(new[] { 7906 }, cocabulia.Bosses);
+            Assert.Equal(new[] { 7852 }, DungeonManager.Get(143)!.Bosses);
+            Assert.Equal(new[] { 478 }, DungeonManager.Get(186)!.Bosses);
+            Assert.True(DungeonManager.IsBoss(7906));
         }
 
         [Theory]
