@@ -6896,6 +6896,13 @@
       "orientation": 7,
       "criterion": "Qa=2486&Qo>18927&Qo<18928",
       "why": "Juju, god of the great forests, in the haunted temple (62921728) from 18927 until the gods leave (18928). INFERRED cell."
+    },
+    {
+      "map": 81789952,
+      "npc": 1511,
+      "cell": 289,
+      "orientation": 3,
+      "why": "Gladis Hadora, the koliseo's token seller, behind the counter of the amphitheatre's treasure room [-13,-29], facing the customers' carpet. No placement source had her, so the room stood empty and the Kolichas had nowhere to go (her shop: content/npcs/shops.json)."
     }
   ]
 }

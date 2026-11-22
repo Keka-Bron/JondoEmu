@@ -1680,6 +1680,17 @@
         {"gid": 12773, "price": 2000}
       ],
       "why": "Liam Nesswiltee: catalogue and kama prices transcribed from https://dofuswiki.fandom.com/wiki/Liam_Nesswiltee. Community wiki source; current official stock has not been verified."
+    },
+    {
+      "npc": 1511,
+      "currency": 12736,
+      "items": [
+        {"gid": 12737, "price": 10},
+        {"gid": 12738, "price": 100},
+        {"gid": 29444, "price": 500},
+        {"gid": 12740, "price": 1000}
+      ],
+      "why": "Gladis Hadora, the koliseo's token seller (buy action 11 in the client's data), in the back room of the koliseo amphitheatre [-13,-29]. The four pebbles for Kolichas (12736), the koliseo's victory token: crimson (50), gleaming (100), radiant (150) and ember (195) at 10, 100, 500 and 1000, the values the official forum gives for the level 50, 100, 150 and 200 pebbles. Only the pebbles: the rest of her current stock is not known."
     }
   ]
 }
