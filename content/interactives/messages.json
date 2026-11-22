@@ -1,0 +1,329 @@
+{
+  "_comment": [
+    "Interactives that only say something in the chat when pressed (Managers/InteractiveMessages.cs).",
+    "Measured on the official server: the element in use, then an information message (type 0)",
+    "with its id; toMap/toCell, a map change after it; opens, another element of the map opened",
+    "and the cells it stood in the way of freed. A quest that has the element among its",
+    "objectives takes the click first; this is what it does otherwise.",
+    "Source: official server packet captures, 2026-11-17 to 11-21."
+  ],
+  "messages": [
+    {
+      "map": 190840834,
+      "element": 515589,
+      "message": 601,
+      "what": "Gobalo's tomb (a quest objective too: the quest first)"
+    },
+    {
+      "map": 190841858,
+      "element": 515588,
+      "message": 435,
+      "what": "Snuffles' tomb (a quest objective too: the quest first)"
+    },
+    {
+      "map": 190972421,
+      "element": 515587,
+      "message": 436,
+      "what": "Álgata's tombstone"
+    },
+    {
+      "map": 190842884,
+      "element": 518049,
+      "message": 1162,
+      "what": "Vírgula's tomb"
+    },
+    {
+      "map": 190842369,
+      "element": 516692,
+      "message": 1019,
+      "what": "Flore's tomb (a quest objective too: the quest first)"
+    },
+    {
+      "map": 188743687,
+      "element": 540439,
+      "message": 131,
+      "what": "Hector's tomb"
+    },
+    {
+      "map": 192417794,
+      "element": 537425,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "the mirror"
+    },
+    {
+      "map": 192417794,
+      "element": 537424,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "the mirror"
+    },
+    {
+      "map": 103547392,
+      "element": 479317,
+      "message": 387,
+      "what": "«rolando de rir»"
+    },
+    {
+      "map": 103547392,
+      "element": 479315,
+      "message": 388,
+      "what": "the statue of Ecaflip"
+    },
+    {
+      "map": 103548416,
+      "element": 478449,
+      "message": 385,
+      "toMap": 191102980,
+      "toCell": 373,
+      "what": "the infernal hourglass: back in time, out in the street"
+    },
+    {
+      "map": 192415750,
+      "element": 515346,
+      "message": 348,
+      "what": "in the bank: «pegar esse item me parece uma má ideia»"
+    },
+    {
+      "map": 190841346,
+      "element": 515588,
+      "message": 435,
+      "what": "Snuffles' tomb, from the next map"
+    },
+    {
+      "map": 190841346,
+      "element": 515589,
+      "message": 601,
+      "what": "Gobalo's tomb, from the next map"
+    },
+    {
+      "map": 190842372,
+      "element": 518049,
+      "message": 1162,
+      "what": "Vírgula's tomb, from the next map"
+    },
+    {
+      "map": 190842881,
+      "element": 516692,
+      "message": 1019,
+      "what": "Flore's tomb, from the next map"
+    },
+    {
+      "map": 95685123,
+      "element": 471205,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "a mirror of Amakna castle"
+    },
+    {
+      "map": 95684099,
+      "element": 474012,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "a mirror of Amakna castle"
+    },
+    {
+      "map": 95686147,
+      "element": 474005,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "a mirror of Amakna castle"
+    },
+    {
+      "map": 99357704,
+      "element": 474772,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "a mirror, Amakna village"
+    },
+    {
+      "map": 95684099,
+      "element": 473700,
+      "message": 120,
+      "params": [
+        "hour",
+        "minute"
+      ],
+      "what": "a clock of Amakna castle: «O relógio indica 13:02.»"
+    },
+    {
+      "map": 183763982,
+      "element": 511638,
+      "message": 120,
+      "params": [
+        "hour",
+        "minute"
+      ],
+      "what": "the Xelor temple's clock: «O relógio indica 14:48.»"
+    },
+    {
+      "map": 99091975,
+      "element": 474248,
+      "message": 120,
+      "params": [
+        "hour",
+        "minute"
+      ],
+      "what": "a clock, Amakna village: «O relógio indica 15:07.»"
+    },
+    {
+      "map": 88084738,
+      "element": 466627,
+      "message": 133,
+      "what": "«PIU PIU»"
+    },
+    {
+      "map": 99096071,
+      "element": 509495,
+      "message": 736,
+      "what": "«CUI CUI»"
+    },
+    {
+      "map": 82313216,
+      "element": 463822,
+      "message": 230,
+      "what": "a tombstone: «O Omar me matou.»"
+    },
+    {
+      "map": 82313985,
+      "element": 463824,
+      "message": 215,
+      "what": "RatDog's tombstone"
+    },
+    {
+      "map": 82313985,
+      "element": 463825,
+      "message": 214,
+      "what": "Lichen's tombstone"
+    },
+    {
+      "map": 214696970,
+      "element": 523800,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "pressed on the official server: message 128"
+    },
+    {
+      "map": 214696970,
+      "element": 523801,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "pressed on the official server: message 128"
+    },
+    {
+      "map": 215876610,
+      "element": 522300,
+      "message": 195,
+      "what": "pressed on the official server: message 195"
+    },
+    {
+      "map": 217057290,
+      "element": 521740,
+      "message": 120,
+      "params": [
+        "hour",
+        "minute"
+      ],
+      "what": "pressed on the official server: message 120"
+    },
+    {
+      "map": 217058314,
+      "element": 521739,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "pressed on the official server: message 128"
+    },
+    {
+      "map": 217063428,
+      "element": 523802,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "pressed on the official server: message 128"
+    },
+    {
+      "map": 217063428,
+      "element": 523803,
+      "message": 128,
+      "params": [
+        "name"
+      ],
+      "what": "pressed on the official server: message 128"
+    },
+    {
+      "map": 192675846,
+      "element": 515291,
+      "message": 0,
+      "opens": 515292,
+      "opensCell": 274,
+      "opensState": 1,
+      "frees": [274],
+      "what": "the lever of the secret passage to Piuta Rosa's room"
+    },
+    {
+      "map": 95685123,
+      "element": 471368,
+      "message": 0,
+      "opens": 471367,
+      "opensCell": 291,
+      "opensState": 1,
+      "frees": [277],
+      "closesAfter": 10,
+      "what": "Amakna castle's piano: opens the hidden door to 95686147 for ten seconds"
+    },
+    {
+      "map": 99090955,
+      "element": 474854,
+      "message": 0,
+      "opens": 474909,
+      "opensCell": 271,
+      "opensState": 1,
+      "frees": [298, 313, 312, 326],
+      "blocks": [272, 244, 258, 259],
+      "what": "the lever of 99090955: swings the way across to the door 474855"
+    },
+    {
+      "map": 215744516,
+      "element": 539075,
+      "message": 0,
+      "opens": 523289,
+      "opensCell": 401,
+      "opensState": 1,
+      "frees": [402, 388],
+      "what": "the object of 215744516 in Brakmar that opens 523289 and frees its way"
+    },
+    {
+      "map": 95685123,
+      "element": 471406,
+      "message": 0,
+      "skill": 179,
+      "what": "Amakna castle's lever «Acionar»: offered on the official server; pressed three times, it answered nothing else"
+    },
+    {
+      "map": 99091979,
+      "element": 474861,
+      "message": 0,
+      "skill": 179,
+      "what": "the lever «Acionar» of 99091979: offered on the official server; pressed three times, it answered nothing else"
+    }
+  ]
+}

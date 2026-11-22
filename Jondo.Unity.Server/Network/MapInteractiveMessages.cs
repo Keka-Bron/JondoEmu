@@ -35,6 +35,16 @@ internal static class MapInteractiveMessages
             Add(elementId, binding.SkillId, binding.TypeId);
         foreach (int elementId in Readables.OnMap(mapId))
             Add(elementId, Readables.Skill, Readables.Of(mapId, elementId)?.Type is int own && own != 0 ? own : QuestBinding.DefaultType);
+        // What only speaks when pressed, unless a quest or the registry has declared it already with
+        // something to do. A declaration with no skill enabled -- the registry's decor, like the
+        // Astrub bank's 515346, which the official server offers «Usar» on -- is replaced.
+        foreach (int elementId in InteractiveMessages.OnMap(mapId))
+        {
+            if (elements.Any(e => e.ElementId == elementId && e.EnabledSkills.Count > 0)) continue;
+            elements.RemoveAll(e => e.ElementId == elementId);
+            states.RemoveAll(s => s.ElementId == elementId);
+            Add(elementId, InteractiveMessages.Of(mapId, elementId)?.Skill ?? InteractiveMessages.Skill, QuestBinding.DefaultType);
+        }
         int altar = AlmanaxOfferingHandler.AltarOn(mapId);
         if (altar != 0 && AlmanaxOfferingHandler.MayPray()) Add(altar, QuestBinding.DefaultSkill, QuestBinding.DefaultType);
         return (elements.ToArray(), states.ToArray());

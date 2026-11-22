@@ -222,6 +222,7 @@ namespace Jondo.Unity.Server
             // Ankama's and does not change: it is read once and all the sessions share it.
             Managers.Quests.Load();
             Managers.Readables.Load();
+            Managers.InteractiveMessages.Load();
             Managers.DungeonExitRooms.Load();
             Managers.FightWinAlterations.Load();
             Managers.IdolRules.Load();
