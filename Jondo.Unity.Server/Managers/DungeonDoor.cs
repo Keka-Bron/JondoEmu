@@ -38,6 +38,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>What the client draws for the reply that spends the keyring.</summary>
         public const string KeyringWording = "Utilizar el manojo de llaves";
 
+        /// <summary>
+        /// The keyring as the guardians of the Crocantería, Dios Kao's temple and the Waddictos'
+        /// foundry word it. Their only keyring reply says this, so the keyring never opened them.
+        /// </summary>
+        public static readonly string[] OtherKeyringWordings = { "Enseñarle el manojo de llaves." };
+
         /// <summary>And for the one that hands over the dungeon's own key.</summary>
         public const string KeyWording = "Darle la llave y entrar";
 
@@ -145,6 +151,7 @@ namespace Jondo.Unity.Server.Managers
             _byNpc.Clear();
 
             var keyring = TextKeysSaying(KeyringWording);
+            foreach (string wording in OtherKeyringWordings) keyring.UnionWith(TextKeysSaying(wording));
             var key = TextKeysSaying(KeyWording);
             key.UnionWith(TextKeysSaying(UseKeyWording));
             key.UnionWith(TextKeysSaying(TakeKeyWording));
