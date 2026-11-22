@@ -135,7 +135,8 @@ namespace Jondo.Unity.Tests.World
                     Assert.Equal(MarkCodec.Token(codec.Frames.IndexOf(clear) + 1), await Read(host));
                     await host.Next(Op.Iyb);
                 }
-                Assert.False(host.FromServer.DataAvailable);
+                if (host.FromServer.DataAvailable)
+                    Assert.Fail($"the owner heard {(await host.NextAny()).Opcode} after his dream exit");
                 Assert.Equal(fail, DreamHandler.IsGuest(guest));
                 Assert.Equal(fail ? room.MapaDeLaSala : street, visitor.Session.State.MapId);
                 Assert.Equal(0, codec.Decodes);

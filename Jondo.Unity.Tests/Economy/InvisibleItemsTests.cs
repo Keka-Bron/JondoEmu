@@ -129,7 +129,9 @@ namespace Jondo.Unity.Tests.Economy
             RecyclingTests.ClearBag(Character);
             try
             {
-                await using var pipe = await ClientPipe.OpenAsync(Account, Character, 191105026, "Flag");
+                // A map of its own: the arrivals of the tests running alongside on 191105026
+                // reached this pipe and broke its silence.
+                await using var pipe = await ClientPipe.OpenAsync(Account, Character, 990_100_186, "Flag");
                 using (SessionContext.Push(pipe.Session))
                 {
                     Equipment.LoadFrom(Character);
