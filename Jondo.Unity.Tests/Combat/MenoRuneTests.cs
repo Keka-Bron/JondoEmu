@@ -58,6 +58,37 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
+        public async Task Each_rune_brings_its_monsters_one_a_round()
+        {
+            // Each rune spell (6808, 6812, 6813) summons through five "181" rows with delays 0 to
+            // 4: one monster at once and one at each of his next four turns. All five came at
+            // once, and three runes put fifteen monsters in the room on the second round.
+            var player = Player(250);
+            var boss = Meno(100);
+            var fight = new FightInstance(4460, 990_004_462);
+            fight.AddPlayer(player);
+            fight.AddMonster(boss);
+            player.CellId = 250; boss.CellId = 100;
+            fight.StartFight();
+            while (fight.CurrentFighter != boss) fight.NextTurn();
+
+            await FightHandler.AplicarEfectosAsync(null, fight, boss, SummoningRunes, 1, null,
+                                                   EffectEngine.AlLanzar, 300);
+            int Summoned() => fight.Todos.Count(f => f.IsAlive && f.EsInvocado);
+            var counts = new System.Collections.Generic.List<int> { Summoned() };
+            for (int round = 0; round < 5; round++)
+            {
+                int now = fight.RoundNumber;
+                do fight.NextTurn(); while (fight.CurrentFighter != boss || fight.RoundNumber == now);
+                await FightHandler.ApplyDuePendingAsync(null, fight);
+                counts.Add(Summoned());
+            }
+            // Grade 1 lays 6808 and 6812: one monster from each at once, one from each at each
+            // of his next four turns, and its "792 6804" with delay 5 lays them anew on the sixth.
+            Assert.Equal(new[] { 2, 4, 6, 8, 10, 12 }, counts);
+        }
+
+        [Fact]
         public async Task He_heals_by_what_a_player_suffers_and_by_nothing_off_an_invulnerable_one()
         {
             const int Behaviour = 6793, Invulnerable = 56;

@@ -375,6 +375,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>A waiting blow: its round has come and it is dealt now (see EffectEngine.IsDelayedBlow).</summary>
         public bool Hits => EffectEngine.EsDeDano(Waiting.EffectId);
 
+        /// <summary>A waiting summon: its round has come and the creature comes out now, where it was cast.</summary>
+        public bool Summons => EffectEngine.EsInvocacion(Waiting.EffectId);
+
         /// <summary>
         /// A waiting move back to a cell the target stood on: its round has come and the target
         /// goes now -- El Tiempo Vuela's «a su posición anterior en el siguiente turno».
@@ -3145,6 +3148,18 @@ namespace Jondo.Unity.Server.Managers
                     // Its starred conditions are the caster's, as for any row: an Éclat is only
                     // summoned by an escort that does not already have one (*e968).
                     if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
+
+                    // A summon with a delay comes out when its round comes, where it was cast:
+                    // each of Capitan Meno's runes (6808, 6812, 6813) brings its monsters one a
+                    // round, "181" rows with delays 0 to 4. All at once, three runes filled the
+                    // room with fifteen monsters on the second round.
+                    if (EsInvocacion(efecto.EffectId) && efecto.Delay > 0
+                        && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase))
+                    {
+                        fuera.Add(Pendiente(combat, caster, caster, spell, grade, efecto, round,
+                                            castCell: aimedCell >= 0 ? aimedCell : caster.CellId, critico: critical));
+                        continue;
+                    }
 
                     // A summon on fixed cells, one on each, up to its value when it names one; a
                     // rune on its own. Elsewhere, the aimed cell.
@@ -6467,7 +6482,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (waiting.EffectId != MataAlObjetivo && waiting.EffectId != MarcadorDeGuion
                 && !EsDeLaFamiliaDeSublanzar(waiting.EffectId) && !EsDeDano(waiting.EffectId)
-                && !EsVueltaAtras(waiting.EffectId)
+                && !EsVueltaAtras(waiting.EffectId) && !EsInvocacion(waiting.EffectId)
                 && target.IsAlive)
             {
                 live = target.Buffs.Poner(new Buff

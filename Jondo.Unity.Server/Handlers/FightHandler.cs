@@ -4492,6 +4492,22 @@ namespace Jondo.Unity.Server.Handlers
                             Network.FightProtocol.BuildBuffGone(result.Target.Id, quitado.Numero)));
                     }
                 }
+                else if (result.Summons)
+                {
+                    // The summon's own row, without its wait, cast again where it was cast.
+                    var rows = Managers.SpellEffects.De(waiting.HechizoOrigen, waiting.NivelOrigen);
+                    var row = rows.FirstOrDefault(e => e.EffectUid == waiting.EffectUid && waiting.EffectUid != 0)
+                              ?? rows.FirstOrDefault(e => e.EffectId == waiting.EffectId && e.DiceNum == waiting.Dado);
+                    if (row == null || !caster.IsAlive) continue;
+                    row = row.Copia();
+                    row.Delay = 0;
+                    int where = waiting.PendingCastCell ?? caster.CellId;
+                    Program.LogDebug($"[Fight] The delay is up: {caster.Id} summons {waiting.Dado} on {where}, from spell " +
+                                     $"{waiting.HechizoOrigen}, in round {fight.RoundNumber}.");
+                    await AplicarEfectosAsync(stream, fight, caster, waiting.HechizoOrigen, waiting.NivelOrigen, null,
+                                              Managers.EffectEngine.AlLanzar, celdaApuntada: where,
+                                              tirada: new List<Managers.SpellEffect> { row });
+                }
                 else if (result.Casts)
                 {
                     if (!result.Target.IsAlive) continue;
