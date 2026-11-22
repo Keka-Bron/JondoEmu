@@ -6897,7 +6897,28 @@ namespace Jondo.Unity.Server.Handlers
                 : Managers.SpellEffects.De(enganche.Hechizo, enganche.Grado);
             return lista.Where(f => enganche.Filas.Contains(ClaveDeFila(f))
                                  && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
+                        .Select(f => enganche.CaducaEnRonda >= 0 ? WithoutCasterStates(f) : f)
                         .ToList();
+        }
+
+        /// <summary>
+        /// A row of a hook for some rounds, without the caster's states in its mask: they held when
+        /// it was armed, and that is what they ask. King Dazahk's third Impatience (10346 grade 3)
+        /// arms 10347 under M and PMD for two rounds on "C,*E695", and the same cast swaps 695 for
+        /// 697; read again as he was pushed, the mask found 695 gone, nothing took his resistance
+        /// off, and he could not be killed.
+        /// </summary>
+        private static Managers.SpellEffect WithoutCasterStates(Managers.SpellEffect row)
+        {
+            var parts = (row.TargetMask ?? "").Split(',');
+            var kept = parts.Where(p => !IsCasterState(p.Trim())).ToArray();
+            if (kept.Length == parts.Length) return row;
+            var copy = row.Copia();
+            copy.TargetMask = string.Join(",", kept);
+            return copy;
+
+            static bool IsCasterState(string part)
+                => part.Length > 2 && part[0] == '*' && part[1] is 'E' or 'e' && part.Skip(2).All(char.IsDigit);
         }
 
         /// <summary>
