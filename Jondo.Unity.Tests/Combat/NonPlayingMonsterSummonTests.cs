@@ -64,7 +64,10 @@ namespace Jondo.Unity.Tests.Combat
             var answer = typeof(FightHandler).GetMethod("NonPlayingSummonsAnswerAsync",
                                                         BindingFlags.NonPublic | BindingFlags.Static);
             Assert.NotNull(answer);
-            await (Task)answer.Invoke(null, new object[] { null, fight, jailer, EffectEngine.AlEmpezarElTurno });
+            // The removal is dodgeable (at least 10 % of the time): pin the die so it always lands.
+            EffectEngine.DadoDeRetirada = () => 0.0;
+            try { await (Task)answer.Invoke(null, new object[] { null, fight, jailer, EffectEngine.AlEmpezarElTurno }); }
+            finally { EffectEngine.DadoDeRetiradaPorDefecto(); }
 
             Assert.Contains(foe.Buffs.Puestos, b => b.HechizoOrigen == BrambleBehaviour && b.EffectId == MpRemoval);
         }
