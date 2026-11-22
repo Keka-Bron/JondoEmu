@@ -88,6 +88,25 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// A room is fought on the arena that flags its very placement cells. Kissiphrot's room
+        /// shares little scenery with any arena of its subarea, and the likeness put its fight on
+        /// the fourth room's board, its layout and its name.
+        /// </summary>
+        [Theory]
+        [InlineData(202638336, 202638340)]   // first room
+        [InlineData(202639360, 202639364)]   // second room
+        [InlineData(202640384, 202640388)]   // third room
+        [InlineData(202641408, 202641412)]   // the boss's room
+        public void Each_room_of_Kissiphrot_s_dungeon_fights_on_its_own_board(long room, long board)
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (!MapManager.Maps.ContainsKey(board)) return;   // no data
+
+            Assert.Equal(board, DungeonPlacements.BoardOf(room));
+            Assert.Equal(board, MapManager.ResolveArenaMapId(room));
+        }
+
+        /// <summary>
         /// The Count's rooms are fought on the map six past each, whatever the maps are called: the
         /// Clockmaking Workshop's twin is named the Rhythmetick Room, and only that room was given it
         /// by its name, so the workshop was fought on itself among its clocks and shelves. The
