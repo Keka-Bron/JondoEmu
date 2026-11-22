@@ -278,5 +278,46 @@
     "coste": 20
    }
   ]
+ },
+ "sufokia": {
+  "gfx": 34925,
+  "destinos": [
+   {
+    "mapa": 90704643,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 95424512,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 95424516,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 90706177,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 90708226,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 95422468,
+    "subzona": 32,
+    "tipo": 10,
+    "coste": 20
+   }
+  ]
  }
 }

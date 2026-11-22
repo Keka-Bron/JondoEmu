@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// The zaapis of Bonta and Brakmar: the short transport inside the city.
+    /// The zaapis of Bonta, Brakmar and Sufokia: the short transport inside the city.
     ///
     /// On the outside they work just like a zaap —it is clicked, the server sends the destination list and one
     /// chooses— but they are something else: they cost a fixed 20 kamas, they do not have to be activated and they only lead to
@@ -27,12 +27,11 @@ namespace Jondo.Unity.Server.Managers
     /// is not «the maps where there is one». The server sends it whole on using the element, and that is where
     /// it is taken from, just as the zaaps were done.
     ///
-    /// Only Bonta and Brakmar are there because there are only captures of those two. The other 33 maps with a
-    /// type 106 graphic —34925 and 70914— belong to neither of the two networks: they are the
-    /// Saltadorillo and Frigost transporters, which move the same but have their own
-    /// network. They are left out on purpose until their destinations are taken from the capture there is:
-    /// registering them now would give an element that can be clicked and does nothing, which is worse than not
-    /// having it. Adding them is putting their city in the .json and their graphic in <see cref="GraphicsOf"/>.
+    /// Sufokia is added from the published Quay List: six quays in subarea 32, all using graphic
+    /// 34925. Other maps with that graphic are workshops and are not part of the quay network.
+    /// Frigost's 70914 is still left out: its destinations have not been measured yet, and
+    /// registering it now would give an element that can be clicked and does nothing. Adding a city
+    /// is putting it in the .json and its graphic in <see cref="GraphicsOf"/>.
     /// </summary>
     public static class Zaapis
     {
@@ -146,13 +145,14 @@ namespace Jondo.Unity.Server.Managers
         /// Which graphics each city uses.
         ///
         /// It goes by hand and with the list in front because it is what was measured, not a rule: Bonta uses
-        /// two —70520 and 70521— and Brakmar one. Deducing it from the city's name would be inventing
-        /// a correspondence nobody has checked.
+        /// two —70520 and 70521—, Brakmar one and Sufokia 34925. Deducing it from the city's name would be
+        /// inventing a correspondence nobody has checked.
         /// </summary>
         private static int[] GraphicsOf(string city) => city switch
         {
             "bonta" => new[] { 70520, 70521 },
             "brakmar" => new[] { 304418 },
+            "sufokia" => new[] { 34925 },
             _ => Array.Empty<int>(),
         };
 
