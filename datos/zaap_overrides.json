@@ -13,7 +13,9 @@
     "  530219  gfx 31992  casilla 254   ese dibujo sale en 5 mapas, ninguno de los otros con zaap",
     "",
     "Por descarte queda el 481520. Si al clicarlo no es el zaap naranja, cambia el numero de abajo",
-    "por el del elemento bueno y ya esta: no hay nada mas que tocar."
+    "por el del elemento bueno y ya esta: no hay nada mas que tocar.",
+    "217055492 -> 540446: Bonta's guild hall zaap: the official server declares it type 16 with skill 114 and answered its use with the zaap destination list (packet capture, 2026-11-21); Jondo's guild-hall import had paired it (inferred) as a door to 212731652."
   ],
-  "115083777": 481520
+  "115083777": 481520,
+  "217055492": 540446
 }
