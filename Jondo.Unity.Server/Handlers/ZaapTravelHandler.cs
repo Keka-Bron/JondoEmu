@@ -39,14 +39,17 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// What travelling costs, in kamas.
         ///
-        /// The real server works it out by distance -- in the capture they go from 170 to 1080 and the far
-        /// destinations are the expensive ones -- but the exact formula is in no client data. This one is
-        /// ours, and does the same: the farther, the more it costs, with a floor and a ceiling within the
-        /// range seen in the capture.
+        /// Measured on the official server (2026-11-21, a packet capture of the zaap destination list
+        /// opened from [9,-20]: 32 destinations, each with its price): ten kamas per whole step of the
+        /// straight line between the two maps' world coordinates, floor(√(dx² + dy²)) × 10 -- 29 of the
+        /// 32 exactly (40 to Astrub [5,-18], 890 to Frigost [-78,-41]; no ceiling) -- and the other
+        /// three are Incarnam's, the same plus 1000 (1160, 1200, 1190). The previous formula, the sum of
+        /// |dx| and |dy| capped at 1000, matched 1 of the 32. See ZaapMeasuredCostTests.
         /// </summary>
         private const int MinimumCost = 10;
-        private const int MaximumCost = 1000;
         private const int CostPerStep = 10;
+        private const int IncarnamSurcharge = 1000;
+        private const int IncarnamArea = 45;
 
         /// <summary>
         /// Frigost Island (area 48) is closed below level 50: Captain Ardier refuses the crossing
@@ -367,8 +370,13 @@ namespace Jondo.Unity.Server.Handlers
             var b = MapManager.GetMapInfo(to);
             if (a == null || b == null || from == to) return 0;
 
-            long steps = Math.Abs(a.PosX - b.PosX) + Math.Abs(a.PosY - b.PosY);
-            return Math.Clamp(steps * CostPerStep, MinimumCost, MaximumCost);
+            long dx = a.PosX - b.PosX, dy = a.PosY - b.PosY;
+            long steps = (long)Math.Floor(Math.Sqrt(dx * dx + dy * dy));
+            long cost = Math.Max(steps * CostPerStep, MinimumCost);
+            bool toIncarnam = Interactives.AreaOfSubArea(b.SubAreaId) == IncarnamArea;
+            // Measured only from outside Incarnam; inside it the plain distance is kept (not measured).
+            bool fromIncarnam = Interactives.AreaOfSubArea(a.SubAreaId) == IncarnamArea;
+            return toIncarnam && !fromIncarnam ? cost + IncarnamSurcharge : cost;
         }
     }
 }
