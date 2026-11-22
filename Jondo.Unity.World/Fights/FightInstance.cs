@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -472,6 +472,14 @@ namespace Jondo.Unity.World.Fights
         /// who is nowhere near the aimed cell of the spell that pushes.
         /// </summary>
         public Fighter TriggeringAttacker { get; set; }
+
+        /// <summary>
+        /// The caster of the spell whose "cast this spell" row made the fighter now casting cast,
+        /// for as long as that child resolves; null the rest of the time. The Venerable
+        /// Durmiente's mount (8120) dies and makes him cast 31358 on himself, "a,P,F8047":
+        /// P read from the mount, whose summoner he is.
+        /// </summary>
+        public Fighter ChainedFrom { get; set; }
 
         public FightInstance(long fightId, long mapId, long arenaMapId = 0)
         {

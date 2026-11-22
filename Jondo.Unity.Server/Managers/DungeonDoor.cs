@@ -31,7 +31,9 @@ namespace Jondo.Unity.Server.Managers
     /// above <see cref="Expedition"/>: 29 of them, and not one base-dungeon reply is. Dropping
     /// those leaves 104 of the 119 guardians with exactly one reply of each kind. The other 15
     /// guard several base dungeons at once and the data does not say which reply opens which; they
-    /// get the lowest, and a line in the log saying so.
+    /// get the lowest, and a line in the log saying so. A guardian who only has replies above the
+    /// line -- the keepers of the dungeons that came with that generation, such as the Coto del
+    /// Venerable and the Altar de la Despedida -- keeps them: there is no older one to prefer.
     /// </remarks>
     public static class DungeonDoor
     {
@@ -160,6 +162,8 @@ namespace Jondo.Unity.Server.Managers
             var yes = TextKeysSaying(YesWording + ".");
             yes.UnionWith(TextKeysSaying(YesWording + ","));
             var resume = TextKeysSaying("Retomar % donde % dejaste");
+            // «Retomar la expedición donde la dejaste.» resumes an Expedición, which no door here opens.
+            resume.ExceptWith(TextKeysSaying("Retomar la expedición"));
 
             int ambiguos = 0;
             foreach (var template in Npcs.Templates)
@@ -182,9 +186,10 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         /// <remarks>
         /// Its own method so it can be driven with a real guardian's declared replies in a test
-        /// rather than only through a database. The rule it applies, in order: skip the Expedición
-        /// generation, match the wording, and when a guardian still has more than one -- it guards
-        /// several base dungeons -- take the lowest and say the pick was a guess.
+        /// rather than only through a database. The rule it applies, in order: match the wording,
+        /// prefer the older generation to the Expedición one for each kind of reply, and when a
+        /// guardian still has more than one -- it guards several base dungeons -- take the lowest
+        /// and say the pick was a guess.
         /// </remarks>
         public static Options? Pick(long[] replies, long[] texts,
                                     ISet<long> keyringTexts, ISet<long> keyTexts,
@@ -195,28 +200,41 @@ namespace Jondo.Unity.Server.Managers
             int cuantosManojo = 0, cuantasLlaves = 0;
             var yes = new HashSet<long>();
 
+            // The newer generation counts only for a kind the guardian has no older reply of: the
+            // Coto del Venerable's and the Altar de la Despedida's keepers came with it and say
+            // «Darle la llave y entrar.» only above the line.
+            long newManojo = 0, newLlave = 0, newResume = 0;
+            int newManojos = 0, newLlaves = 0;
+
             int upto = Math.Min(replies?.Length ?? 0, texts?.Length ?? 0);
             for (int i = 0; i < upto; i++)
             {
                 long reply = replies![i];
                 long text = texts![i];
                 if (yesTexts != null && yesTexts.Contains(text)) yes.Add(reply);
-                if (reply >= Expedition) continue;
+                bool newer = reply >= Expedition;
 
-                if (resumeTexts?.Contains(text) == true && (resume == 0 || reply < resume))
-                    resume = reply;
+                if (resumeTexts?.Contains(text) == true)
+                {
+                    if (newer) { if (newResume == 0 || reply < newResume) newResume = reply; }
+                    else if (resume == 0 || reply < resume) resume = reply;
+                }
 
                 if (keyringTexts.Contains(text))
                 {
-                    cuantosManojo++;
-                    if (conManojo == 0 || reply < conManojo) conManojo = reply;
+                    if (newer) { newManojos++; if (newManojo == 0 || reply < newManojo) newManojo = reply; }
+                    else { cuantosManojo++; if (conManojo == 0 || reply < conManojo) conManojo = reply; }
                 }
                 else if (keyTexts.Contains(text))
                 {
-                    cuantasLlaves++;
-                    if (conLlave == 0 || reply < conLlave) conLlave = reply;
+                    if (newer) { newLlaves++; if (newLlave == 0 || reply < newLlave) newLlave = reply; }
+                    else { cuantasLlaves++; if (conLlave == 0 || reply < conLlave) conLlave = reply; }
                 }
             }
+
+            if (conManojo == 0) { conManojo = newManojo; cuantosManojo = newManojos; }
+            if (conLlave == 0) { conLlave = newLlave; cuantasLlaves = newLlaves; }
+            if (resume == 0) resume = newResume;
 
             if (conManojo == 0 && conLlave == 0 && resume == 0) return null;
 

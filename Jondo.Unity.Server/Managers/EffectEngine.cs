@@ -1,4 +1,4 @@
-﻿using Jondo.Unity.World.Combat;
+using Jondo.Unity.World.Combat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -3686,11 +3686,17 @@ namespace Jondo.Unity.Server.Managers
                                 _ => sobre.CellId,
                             };
                         }
-                        fuera.AddRange(Resolver(combat, lanzaElHijo, hecho.HechizoEncadenado,
-                                                hecho.GradoEncadenado, sobre, AlLanzar, round,
-                                                depth + 1, casillaDelHijo, critical,
-                                                nearestChainBudget,
-                                                bombasYaEstalladas: bombasYaEstalladas));
+                        var chainedBefore = combat.ChainedFrom;
+                        combat.ChainedFrom = lanzaElHijo != caster ? caster : null;
+                        try
+                        {
+                            fuera.AddRange(Resolver(combat, lanzaElHijo, hecho.HechizoEncadenado,
+                                                    hecho.GradoEncadenado, sobre, AlLanzar, round,
+                                                    depth + 1, casillaDelHijo, critical,
+                                                    nearestChainBudget,
+                                                    bombasYaEstalladas: bombasYaEstalladas));
+                        }
+                        finally { combat.ChainedFrom = chainedBefore; }
                         var enganche = MarcaDeEnganche(lanzaElHijo, sobre,
                             new SpellEffect { EffectId = efecto.EffectId, DiceNum = hecho.HechizoEncadenado,
                                               DiceSide = hecho.GradoEncadenado, Triggers = AlLanzar });
@@ -4267,7 +4273,11 @@ namespace Jondo.Unity.Server.Managers
                 // "h,P" from a bomb lands on its Tymador. Anybody else is not the caster's, and
                 // let through, he met both of the Eniripsa's ánimo branches, "a,p" for the
                 // characters and "a,P,f7371,f7370" for her summons: the bonus twice, +4 AP.
+                // And a summoner his summon made cast on himself: the Venerable Durmiente's
+                // mount, dying, has him cast 31358 "a,P,F8047" -- P read from the mount.
                 else if (ownSummonsOnly && !(quienLanza.EsInvocado && quien.Id == quienLanza.Invocador)
+                         && !(quien == quienLanza && combate.ChainedFrom is { EsInvocado: true } summon
+                              && summon.Invocador == quien.Id)
                          && !OfTheSameGroup(quienLanza, quien, requiredMonsterTemplates)) vale = false;
                 foreach (int estado in pideEstado) if (!susEstados.Contains(estado)) vale = false;
                 foreach (int estado in pideNoEstado) if (susEstados.Contains(estado)) vale = false;

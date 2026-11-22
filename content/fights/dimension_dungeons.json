@@ -31,7 +31,8 @@
     { "dungeon": 95, "name": "Reto de Miauvizor", "dimension": "Ecaflipus" },
     { "dungeon": 163, "name": "Puesto de Control del Bzupervibzor", "dimension": "Osavora" },
     { "dungeon": 164, "name": "Coto del Venerable", "dimension": "Osavora" },
-    { "dungeon": 165, "name": "Altar de la Despedazadora", "dimension": "Osavora" },
+    { "dungeon": 165, "name": "Altar de la Despedazadora", "dimension": "Osavora", "beside": [8041],
+      "why": "Dofus pour les noobs (Autel de la Dechireuse): at the start of the fight an Altar de la Caza is summoned, invulnerable with 100 000 life; its only spell Repercusion copies every spell the monsters cast and replays it on the nearest entity, and with the season reaction it is what removes the boss's invulnerability. Spells 30936 and 30901 mask on F8041." },
     { "dungeon": 133, "name": "Memoria de Orukam", "dimension": "Dragon", "beside": [6468, 6471, 6470],
       "lifePercentFromSecondWave": 100,
       "waves": [

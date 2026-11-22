@@ -76,6 +76,26 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void A_keeper_with_only_newer_replies_keeps_them()
+        {
+            // The Altar de la Despedida's keeper (7701) came with the newer generation: his resume
+            // and key replies all sit above the line, and dropping them left his door shut.
+            var resumeTexts = new HashSet<long> { 1134612, 1140262 };
+            (long, long)[] keeper =
+            {
+                (79934, 1134612), (79937, 1070584), (80522, 1140262), (80525, 1070584),
+            };
+            var options = DungeonDoor.Pick(keeper.Select(r => r.Item1).ToArray(),
+                                           keeper.Select(r => r.Item2).ToArray(),
+                                           KeyringTexts, KeyTexts, resumeTexts: resumeTexts);
+
+            Assert.NotNull(options);
+            Assert.Equal(79937, options!.Key);
+            Assert.Equal(79934, options.Resume);
+            Assert.Equal(0, options.Keyring);
+        }
+
+        [Fact]
         public void Two_of_the_same_wording_is_not_reported_as_a_clean_pick()
         {
             // Mawy has one of each once the Expedición block is dropped, so this is honest work
