@@ -10422,6 +10422,11 @@ namespace Jondo.Unity.Server.Handlers
                     string alcance = lejos <= 1 ? Managers.EffectEngine.CuandoMePeganDeCerca
                                                 : Managers.EffectEngine.CuandoMePeganDeLejos;
                     await DispararAsync(stream, fight, target, alcance);
+                    // A spell armed to wait on an enemy's blow does go off, attitudes aside:
+                    // Torkelonia's 14078 lets the hitter who carries the glyph's state lift
+                    // her invulnerability, and absorbing the blow never fired it.
+                    if (caster.TeamId != target.TeamId && target.IsAlive)
+                        await EngancheAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
                     fight.TriggeringAttacker = antes;
                 }
                 await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, lejos <= 1, sacadoDelDado,
