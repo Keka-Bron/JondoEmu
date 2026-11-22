@@ -103,6 +103,7 @@ namespace Jondo.Unity.Server.Handlers
                 [".stats"] = "usage.stats",
                 [".spawn"] = "usage.spawn",
                 [".remove"] = "usage.remove",
+                [".gate"] = "usage.gate",
                 [".gift"] = "usage.gift",
             };
 
@@ -167,6 +168,7 @@ namespace Jondo.Unity.Server.Handlers
                 [".stats"] = Roles.GameMaster,
                 [".spawn"] = Roles.GameMaster,
                 [".remove"] = Roles.GameMaster,
+                [".gate"] = Roles.GameMaster,
                 // The server itself: an administrator's. Written out although it is the default.
                 // A gift creates any item on an account, like .item: an administrator's.
                 [".gift"] = Roles.Administrador,

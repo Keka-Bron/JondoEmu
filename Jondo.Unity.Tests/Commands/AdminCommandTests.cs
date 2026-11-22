@@ -94,6 +94,7 @@ namespace Jondo.Unity.Tests.Commands
         [InlineData(".stats")]
         [InlineData(".spawn")]
         [InlineData(".remove")]
+        [InlineData(".gate")]
         [InlineData(".kamas")]
         [InlineData(".level")]
         public void A_game_master_touches_the_character_and_the_map(string command)
