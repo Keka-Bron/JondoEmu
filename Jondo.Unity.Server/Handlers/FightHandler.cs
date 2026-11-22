@@ -11693,8 +11693,10 @@ namespace Jondo.Unity.Server.Handlers
                     NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,
                     // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
-                    // and so is a monster's that only hides its own side (HidesItsSideOnly).
+                    // and so is a monster's that only hides its own side (HidesItsSideOnly), kills
+                    // (KillsEnemiesOnly) or trades places with one of its own (SwapsWithItsSide).
                     Rows = Managers.PlayerSpells.Contains(spell) || HidesItsSideOnly(spell, grade) || KillsEnemiesOnly(spell, grade)
+                           || SwapsWithItsSide(spell, grade)
                         ? Managers.SpellEffects.De(spell, grade)
                         : Array.Empty<Managers.SpellEffect>(),
                 });
@@ -11710,30 +11712,46 @@ namespace Jondo.Unity.Server.Handlers
         private static readonly HashSet<int> BlowsInAPickedElement = new() { 2822, 2828, 2832, 2890 };
 
         /// <summary>
-        /// Whether all a spell does is make invisible others of its caster's side: the Blop's
-        /// Oculta Biblop, its biblops out of sight («Cache Biblop», Dofus pour les noobs). The
-        /// summary weighs a spell of pure mechanics on the caster or on the enemy, never on one of
-        /// its side, and the Blops never cast it. Weighed by its rows instead, each one it hides
-        /// is worth a share of his life (MonsterTactics.ValueOfRows).
-        /// </summary>
-        /// <summary>
         /// Whether all a spell does is kill the enemies its zone takes: the tormented spirits'
         /// Explosión Espiritual (9136, 141 on «A» round the spirit) of «Examen de paso», «les
         /// esprits OS en mêlée». Weighed as a mechanic it was worth the same with nobody beside
         /// the spirit, and they spent it on the empty cells round them before walking up; row by
-        /// row it is worth the lives it takes, so they walk up first.
+        /// row it is worth the lives it takes, so they walk up first. A sub-cast beside the kill
+        /// does not change that: the Hungry Sunflower's Atiborramiento (28837) eats the enemy at
+        /// his contact and casts its second grade, a shield and MP, on himself.
         /// </summary>
         internal static bool KillsEnemiesOnly(int spell, int grade)
         {
             var working = Managers.SpellEffects.De(spell, grade)
                 .Where(e => !Managers.EffectEngine.EsMarcadorDeGuion(e.EffectId) && !e.ForClientOnly)
                 .ToList();
-            return working.Count > 0
-                   && working.All(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
+            bool Kills(Managers.SpellEffect e) => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
                                        && HasMask(e.TargetMask ?? "", "A") && !HasMask(e.TargetMask ?? "", "a")
-                                       && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase));
+                                       && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase);
+            return working.Any(Kills)
+                   && working.All(e => Kills(e) || Managers.EffectEngine.EsDeLaFamiliaDeSublanzar(e.EffectId));
         }
 
+        /// <summary>
+        /// Whether a spell trades the caster's place with one of his own side: the Hungry
+        /// Sunflower's Ecodigestion (28834, 1101 on «a»), «il peut se téléporter vers un allié ou
+        /// échanger sa place avec lui» (Dofus pour les noobs, expeditions season 2), the way he
+        /// reaches the enemy he then eats. The summary weighs it as a mechanic on the caster, the
+        /// same aimed at himself as at the ally beside the enemy, and he spent it on himself every
+        /// turn; row by row the swap moves him, and what he casts from there is weighed.
+        /// </summary>
+        internal static bool SwapsWithItsSide(int spell, int grade)
+            => Managers.SpellEffects.De(spell, grade)
+                .Any(e => e.EffectId == 1101 && !e.ForClientOnly && NamesItsSideOnly(e.TargetMask ?? "")
+                          && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// Whether all a spell does is make invisible others of its caster's side: the Blop's
+        /// Oculta Biblop, its biblops out of sight («Cache Biblop», Dofus pour les noobs). The
+        /// summary weighs a spell of pure mechanics on the caster or on the enemy, never on one of
+        /// its side, and the Blops never cast it. Weighed by its rows instead, each one it hides
+        /// is worth a share of his life (MonsterTactics.ValueOfRows).
+        /// </summary>
         internal static bool HidesItsSideOnly(int spell, int grade)
         {
             var working = Managers.SpellEffects.De(spell, grade)
