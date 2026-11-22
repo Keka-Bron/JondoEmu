@@ -110,7 +110,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
     public async Task<bool> TrySendFightMapAsync(GameSession session, GameRequest request)
     {
         var stream = StreamOf(session);
-        if (request is FightMapRequest or ContextReadyRequest)
+        if (request is FightPingsRequest or ContextReadyRequest)
         {
             // A spectator's client has the arena: the fight as it stands, once.
             if (FightHandler.PendingSpectatorBoard() is { } watched)

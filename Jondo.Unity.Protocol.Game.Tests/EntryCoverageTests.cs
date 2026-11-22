@@ -17,7 +17,7 @@ public sealed class EntryCoverageTests
     {
         foreach (var (alias, request) in new (string, GameRequest)[] {
             ("kwb", new CharacterForceSelectionReadyRequest()),
-            ("ijm", new FightMapRequest()),
+            ("ijm", new FightPingsRequest()),
             ("jew", new GuildWeeklyResetDateRequest()) })
         {
             var decoded = _codec.Decode(CodecTests.Frame(2, alias, [], uid));

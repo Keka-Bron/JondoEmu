@@ -46,8 +46,7 @@ internal sealed class InitialPresentationMessages(
 
     private static EntityLook? Snapshot(EntityLook? value) => value == null ? null : new(
         value.Colors.ToArray(), value.LookType, value.Bones, value.Scales.ToArray(), value.Skins.ToArray(),
-        value.SubEntities.Select(child => new SubEntityInformation(Snapshot(child.SubEntityLook)!,
-            child.BindingPointIndex, child.BindingPointCategory)).ToArray());
+        value.SubEntities.Select(child => child with { SubEntityLook = Snapshot(child.SubEntityLook)! }).ToArray());
 
     // The character's own aura, absent for none: the client reads it as its main aura, the
     // one «Activer automatiquement mon aura de face» shows. Seen in game: without it that

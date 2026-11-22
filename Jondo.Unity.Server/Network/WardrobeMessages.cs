@@ -50,7 +50,7 @@ internal sealed class WardrobeMessages(IWardrobeMessagesBackend backend)
 
     private static EntityLook Copy(EntityLook look) => new(look.Colors.ToArray(), look.LookType, look.Bones,
         look.Scales.ToArray(), look.Skins.ToArray(), look.SubEntities.Select(child =>
-            new SubEntityInformation(Copy(child.SubEntityLook), child.BindingPointIndex, child.BindingPointCategory)).ToArray());
+            child with { SubEntityLook = Copy(child.SubEntityLook) }).ToArray());
 
     /// <summary>Adapter for the still-legacy outfit window/action responses.</summary>
     internal static byte[] Write(Outfit outfit)

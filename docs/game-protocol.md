@@ -1473,6 +1473,14 @@ and intentional member renames explicitly in the models/bindings before importin
 The normal importer validates and publishes the adapted C# mapping. Generated
 conversions are validated by the subsequent build.
 
+Keep Jondo's response bindings for `jyc`, `jqy` and `ltd` (`jxp`, `jrz` and
+`lvq` in 3.8.1.2) when merging Remap exports. Jondo sends the fight list, fight
+details and arena modes with the original request UID; the arena captures also
+show that correlation. Remap's event classification is not used for these three.
+The August `OutfitAuraChangedEvent.AuraEmoteId` binding is locally reviewed and
+must also be preserved. The `FightPingsRequest` name belongs to `ijm`/`ikl`,
+which retain their entry handler; `kaz`/`kbs` are the distinct `FightMapRequest`.
+
 The importer accepts Game's proto3 schema subset (messages, enums, maps, oneofs,
 optional/repeated fields and field attributes). It checks wire references and
 policies before writing, flattens dotted declarations with collision detection,

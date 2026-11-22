@@ -54,7 +54,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         if (frame.Content is not GameRequest request || request is not (IdentificationRequest
             or CharacterListRequest or CharacterSelectionRequest or CharacterFirstSelectionRequest
             or CharacterForceSelectionReadyRequest or SequenceNumberRequest or ContextCreationRequest
-             or ContextReadyRequest or MapInformationRequest or FightMapRequest or PingRequest
+             or ContextReadyRequest or MapInformationRequest or FightPingsRequest or PingRequest
              or ChatChannelSubscriptionRequest or ReloginRequest))
             return GameEntryResult.Unhandled;
         if (frame.Uid is null || !GameEntryDispatch.IsAllowed(session, request)) return GameEntryResult.Close;
@@ -122,7 +122,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
             case ContextReadyRequest ready:
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 return ready.MapId == session.MapId ? GameEntryResult.Handled : GameEntryResult.Close;
-            case FightMapRequest:
+            case FightPingsRequest:
                 // A stale readiness notification has no response, but still belongs to this handler.
                 await backend.TrySendFightMapAsync(session, request);
                 return GameEntryResult.Handled;

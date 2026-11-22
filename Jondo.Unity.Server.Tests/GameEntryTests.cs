@@ -50,7 +50,7 @@ public sealed class GameEntryTests
         GameRequest[] requests = [new IdentificationRequest("ticket", "fr"), new CharacterListRequest(),
             new CharacterSelectionRequest(987654321), new CharacterFirstSelectionRequest(true, 987654321),
             new SequenceNumberRequest(12), new ContextCreationRequest(), new ContextReadyRequest(42),
-            new MapInformationRequest(42), new PingRequest(false), new FightMapRequest(),
+            new MapInformationRequest(42), new PingRequest(false), new FightPingsRequest(),
             new CharacterForceSelectionReadyRequest(), new GuildWeeklyResetDateRequest()];
         foreach (var request in requests)
         {
@@ -85,7 +85,7 @@ public sealed class GameEntryTests
         var identify = new IdentificationRequest(ticket.Value, "en");
         Assert.False(GameEntryDispatch.IsAllowed(first, new CharacterSelectionRequest(42)));
         Assert.False(GameEntryDispatch.IsAllowed(first, new CharacterForceSelectionReadyRequest()));
-        Assert.False(GameEntryDispatch.IsAllowed(first, new FightMapRequest()));
+        Assert.False(GameEntryDispatch.IsAllowed(first, new FightPingsRequest()));
         Assert.True(GameEntryDispatch.BindTicket(first, identify));
         Assert.False(GameEntryDispatch.BindTicket(second, identify));
         Assert.Equal(90_000_001, first.AccountId);
@@ -94,14 +94,14 @@ public sealed class GameEntryTests
         Assert.False(GameEntryDispatch.IsAllowed(first, identify));
         Assert.True(GameEntryDispatch.IsAllowed(first, new CharacterFirstSelectionRequest(false, 42)));
         Assert.True(GameEntryDispatch.IsAllowed(first, new CharacterForceSelectionReadyRequest()));
-        Assert.False(GameEntryDispatch.IsAllowed(first, new FightMapRequest()));
+        Assert.False(GameEntryDispatch.IsAllowed(first, new FightPingsRequest()));
         Assert.False(GameEntryDispatch.IsAllowed(first, new GuildWeeklyResetDateRequest()));
         Assert.False(GameEntryDispatch.IsAllowed(first, new SequenceNumberRequest(1)));
         first.State.CharacterId = 42;
         first.EnterWorld();
         Assert.True(GameEntryDispatch.IsAllowed(first, new SequenceNumberRequest(1)));
         Assert.True(GameEntryDispatch.IsAllowed(first, new MapInformationRequest(42)));
-        Assert.True(GameEntryDispatch.IsAllowed(first, new FightMapRequest()));
+        Assert.True(GameEntryDispatch.IsAllowed(first, new FightPingsRequest()));
         Assert.True(GameEntryDispatch.IsAllowed(first, new GuildWeeklyResetDateRequest()));
         Assert.False(GameEntryDispatch.IsAllowed(first, new CharacterForceSelectionReadyRequest()));
         Assert.False(GameEntryDispatch.IsAllowed(first, new CharacterSelectionRequest(43)));

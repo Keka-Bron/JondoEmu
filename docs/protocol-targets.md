@@ -19,10 +19,10 @@ builders, raw routing and captures still describe the default client. The beta
 server skips requests without a typed handler rather than routing their aliases
 to default-client handlers. The
 November profile has no binding for the tag-storage and configuration events,
-so the typed entry sequence omits them. Character breed and sub-entity binding
-point category are now `int32` fields without reviewed target value tables; they
-remain raw-only and read as absent in the typed projection. Historical database
-shortcut payloads still use their original format.
+so the typed entry sequence omits them. Character breed remains raw-only. The
+sub-entity binding point category is projected as an integer wire value;
+the named category stays unset until a target value table is reviewed.
+Historical database shortcut payloads still use their original format.
 
 To run against the corresponding client catalogues, see [November beta assets](beta-assets.md).
 

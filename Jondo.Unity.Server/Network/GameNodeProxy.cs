@@ -1673,7 +1673,7 @@ namespace Jondo.Unity.Server.Network
                 case Game.IdentificationRequest or Game.CharacterListRequest or Game.CharacterSelectionRequest
                     or Game.CharacterFirstSelectionRequest or Game.CharacterForceSelectionReadyRequest
                     or Game.SequenceNumberRequest or Game.ContextCreationRequest or Game.ContextReadyRequest
-                    or Game.MapInformationRequest or Game.FightMapRequest or Game.PingRequest
+                    or Game.MapInformationRequest or Game.FightPingsRequest or Game.PingRequest
                     or Game.ChatChannelSubscriptionRequest or Game.ReloginRequest:
                     return await entryService.HandleAsync(frame);
                 case Game.CharacterCreationRequest create:

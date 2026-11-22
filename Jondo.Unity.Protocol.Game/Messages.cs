@@ -115,7 +115,14 @@ public sealed record CharacterComplementCaseCharacterRemodelingInformation(Chara
 
 public sealed record CharacterCreationRequest(CharacterRemodelingInformation ModelingInformation) : GameRequest;
 
-public enum CharacterCreationResult { CreateOk, CreateErrorNoReason, CreateErrorInvalidName, CreateErrorTooManyCharacters, CreateErrorNotAllowed, CreateErrorNewPlayerNotAllowed, Fallback6, Fallback7, Fallback8 }
+public enum CharacterCreationResult
+{
+    CreateOk, CreateErrorNoReason, CreateErrorInvalidName, CreateErrorTooManyCharacters, CreateErrorNotAllowed,
+    CreateErrorNewPlayerNotAllowed, Fallback6, Fallback7, Fallback8,
+#if JONDO_PROTOCOL_3_8_1_2
+    Fallback9,
+#endif
+}
 
 public sealed record CharacterCreationResultEvent(NameCompliance Reason, CharacterCreationResult Result) : GameEvent;
 
@@ -223,7 +230,7 @@ public sealed record EntityFighterInformation(long MasterId, string MasterName, 
 
 public sealed record EntityLook(IReadOnlyList<int> Colors, int LookType, int Bones, IReadOnlyList<int> Scales, IReadOnlyList<int> Skins, IReadOnlyList<SubEntityInformation> SubEntities);
 
-public sealed record EntitySpawnCharacter();
+public sealed record EntitySpawnCharacter(string Name);
 
 public sealed record EntitySpawnCompanion();
 
@@ -391,7 +398,7 @@ public sealed record FightActionKill(long TargetId);
 
 public sealed record FightActionLifePointsGain(int Delta, long TargetId);
 
-public sealed record FightActionLifePointsLost(long TargetId, int Loss, int ElementId, int PermanentDamages);
+public sealed record FightActionLifePointsLost(long TargetId, int Loss, int ElementId, int PermanentDamages, int? ShieldLoss);
 
 public sealed record FightActionMarkCells(FightMark Mark);
 
@@ -447,7 +454,7 @@ public abstract record FightActionTargetedAbilityCase;
 public sealed record FightActionTargetedAbilityCaseSpellCast(FightActionSpellCast Value) : FightActionTargetedAbilityCase;
 public sealed record FightActionTargetedAbilityCaseWeaponGenericId(int Value) : FightActionTargetedAbilityCase;
 
-public sealed record FightActionTeleportOnSameMap(int Cell, long TargetId);
+public sealed record FightActionTeleportOnSameMap(int Cell, long TargetId, Direction? Direction);
 
 public sealed record FightActionThrowCharacter(long TargetId, int Cell);
 
@@ -471,7 +478,13 @@ public sealed record FightDamageTakenStatistics(int ObjectDamage, int ErosionTak
 
 public sealed record FightEffectAddedEvent(FightRemovableEffectExtendedInformation Effect) : GameEvent;
 
-public enum FightEffectKind { Unknown0, Unknown1, State, WorldBossPhase, Unknown4, NoFlags, FightLog, Triggered }
+public enum FightEffectKind
+{
+    Unknown0, Unknown1, State, WorldBossPhase, Unknown4, NoFlags, FightLog, Triggered,
+#if JONDO_PROTOCOL_3_8_1_2
+    Unknown8, Unknown9, Unknown10,
+#endif
+}
 
 public sealed record FightEffectRemovedEvent(long TargetId, int EffectUid) : GameEvent;
 
@@ -479,9 +492,33 @@ public sealed record FightEffectsRefreshEvent(IReadOnlyList<FightRemovableEffect
 
 public sealed record FightEndEvent(int? Budget, IReadOnlyList<FightResultListEntry> Results, IReadOnlyList<NamedPartyTeamWithOutcome> NamedPartyTeamsOutcomes, long Duration, int RewardRate, int? Score, int LootShareLimitMalus) : GameEvent;
 
+public sealed record FightExternalInformation(int FightId, FightType FightType, string FightStart,
+    bool FightSpectatorLocked, IReadOnlyList<FightTeamsWithOptions> FightTeamsWithOptions);
+
+public sealed record FightTeamsWithOptions(FightTeamInformation? FightTeam, FightOptionsInformation? FightTeamOptions);
+
+public sealed record RunningFightInformation(ArenaType? ArenaType, FightExternalInformation? FightExternalInformation);
+
+public sealed record FighterLightInformation(Gender Gender, bool Alive, long Id, FighterLightInformationCase FighterInfoCase);
+
+[JsonDerivedType(typeof(FighterLightInformationCaseNone), "None")]
+[JsonDerivedType(typeof(FighterLightInformationCaseTaxCollectorInformation), "TaxCollectorInformation")]
+[JsonDerivedType(typeof(FighterLightInformationCaseNamedInformation), "NamedInformation")]
+[JsonDerivedType(typeof(FighterLightInformationCaseMonsterInformation), "MonsterInformation")]
+public abstract record FighterLightInformationCase;
+public sealed record FighterLightInformationCaseNone() : FighterLightInformationCase;
+public sealed record FighterLightInformationCaseTaxCollectorInformation(FighterTaxCollectorLightInformation Value) : FighterLightInformationCase;
+public sealed record FighterLightInformationCaseNamedInformation(FighterNamedLightInformation Value) : FighterLightInformationCase;
+public sealed record FighterLightInformationCaseMonsterInformation(FighterMonsterLightInformation Value) : FighterLightInformationCase;
+
+public sealed record FighterTaxCollectorLightInformation(int FirstNameId);
+public sealed record FighterNamedLightInformation(string Name);
+public sealed record FighterMonsterLightInformation(int MonsterGid);
+
 public sealed record FightExperienceData(long ExperienceFightDelta, long ExperienceNextLevelFloor, int ReRollExperienceMultiplier, bool ShowExperience, long Experience, long ExperienceLevelFloor, bool ShowExperienceFightDelta);
 
-public sealed record FightFighterInformation(long? FighterId, FightCharacteristics FightCharacteristics, SpawnInformation SpawnInformation, FightFighterInformationCase FighterCase);
+public sealed record FightFighterInformation(long? FighterId, FightCharacteristics FightCharacteristics,
+    SpawnInformation SpawnInformation, FightFighterInformationCase FighterCase, int Wave);
 
 [JsonDerivedType(typeof(FightFighterInformationCaseAiFighter), "AiFighter")]
 [JsonDerivedType(typeof(FightFighterInformationCaseNamedFighter), "NamedFighter")]
@@ -527,9 +564,10 @@ public abstract record FightMapInformationPositionCase;
 public sealed record FightMapInformationPositionCaseAnomaly(MapComplementaryAnomalyInformation Value) : FightMapInformationPositionCase;
 public sealed record FightMapInformationPositionCaseCoords(MapCoordinates Value) : FightMapInformationPositionCase;
 
-public sealed record FightMapRequest() : GameRequest;
+public sealed record FightPingsRequest() : GameRequest;
 
-public sealed record FightMark();
+public sealed record FightMark(IReadOnlyList<FightMarkedCell> Cells, int MarkId, int SpellLevel, int SpellId,
+    int MarkImpactCell, bool Active, long AuthorId);
 
 public sealed record FightMonsterInformation(int CreatureGrade, int MonsterGid, int CreatureLevel);
 
@@ -686,7 +724,8 @@ public abstract record FightTurnEntity;
 public sealed record FightTurnEntityCaseWithAdditionalId(FightTurnWithAdditionalId Value) : FightTurnEntity;
 public sealed record FightTurnEntityCaseWithFlag(FightTurnWithFlag Value) : FightTurnEntity;
 
-public sealed record FightTurnEvent(long CharacterId, int WaitDeciseconds) : GameEvent;
+public sealed record FightTurnEvent(long CharacterId, int WaitDeciseconds, string AdditionalId,
+    int RemainingDeciseconds, int? TurnTimeOverrideDeciseconds, int TurnOrder) : GameEvent;
 
 public sealed record FightTurnFinishRequest(bool IsAfk) : GameRequest;
 
@@ -706,10 +745,12 @@ public sealed record FighterFightStatistics(FightStatisticsFighterInformation? F
 
 public sealed record FighterListEntry(long FighterId, bool Alive, FighterListEntryCase FighterCase);
 
+[JsonDerivedType(typeof(FighterListEntryCaseNone), "None")]
 [JsonDerivedType(typeof(FighterListEntryCaseCharacter), "Character")]
 [JsonDerivedType(typeof(FighterListEntryCaseTaxCollector), "TaxCollector")]
 [JsonDerivedType(typeof(FighterListEntryCaseMutant), "Mutant")]
 public abstract record FighterListEntryCase;
+public sealed record FighterListEntryCaseNone() : FighterListEntryCase;
 public sealed record FighterListEntryCaseCharacter(FightCharacterResult Value) : FighterListEntryCase;
 public sealed record FighterListEntryCaseTaxCollector(FightTaxCollectorResult Value) : FighterListEntryCase;
 public sealed record FighterListEntryCaseMutant(FightMutantResult Value) : FighterListEntryCase;
@@ -906,6 +947,11 @@ public sealed record MapMovementRefusedEvent(int CellX, int CellY) : GameEvent;
 
 public sealed record MapMovementRequest(long MapId, IReadOnlyList<int> KeyCells, bool Cautious) : GameRequest;
 
+public sealed record MapRunningFightsResponse(IReadOnlyList<RunningFightInformation> Fights) : GameResponse;
+
+public sealed record MapRunningFightDetailsResponse(IReadOnlyList<FighterLightInformation> Defenders,
+    IReadOnlyList<FighterLightInformation> Attackers) : GameResponse;
+
 public sealed record MapObstacle(int CellId, MapObstacleState State);
 
 public enum MapObstacleState { ObstacleOpened, ObstacleClosed }
@@ -938,7 +984,8 @@ public sealed record MarketPriceHistoryEntry(int Quantity, long AveragePrice, st
 
 public sealed record MarketPriceHistoryRequest(int ObjectGid) : GameRequest;
 
-public sealed record MarketPriceHistoryResponse(IReadOnlyList<MarketPriceHistoryEntry> HourlyHistory, IReadOnlyList<MarketPriceHistoryEntry> DailyHistory) : GameResponse;
+public sealed record MarketPriceHistoryResponse(IReadOnlyList<MarketPriceHistoryEntry> HourlyHistory,
+    IReadOnlyList<MarketPriceHistoryEntry> DailyHistory, IReadOnlyList<MarketPriceHistoryEntry> YearlyHistory) : GameResponse;
 
 public sealed record Mount();
 
@@ -1185,7 +1232,13 @@ public enum SpellModifierActionType { ActionInvalid, ActionBoost, ActionRemoveBo
 
 public enum SpellModifierType { InvalidModification, Range, Damage, BaseDamage, HealBonus, ApCost, CastInterval, CriticalHitBonus, CastLine, Los, MaxCastPerTurn, MaxCastPerTarget, RangeMax, RangeMin, OccupiedCell, FreeCell, VisibleTarget, PortalFreeCell, PortalProjection, Unknown19, Unknown20 }
 
-public enum SpellType { Unknown0, Unknown1, Unknown2, Unknown3, Unknown4, Unknown5, Unknown6, Unknown7, Unknown8, Unknown9 }
+public enum SpellType
+{
+    Unknown0, Unknown1, Unknown2, Unknown3, Unknown4, Unknown5, Unknown6, Unknown7, Unknown8, Unknown9,
+#if JONDO_PROTOCOL_3_8_1_2
+    Unknown10,
+#endif
+}
 
 public sealed record SpellsEvent(IReadOnlyList<SpellItem> HumanSpells, IReadOnlyList<SpellItem> MutantSpells) : GameEvent;
 
@@ -1201,7 +1254,7 @@ public enum SubEntityBindingPointCategory
 
 public sealed record SubEntityInformation(EntityLook SubEntityLook, int BindingPointIndex,
 #if JONDO_PROTOCOL_3_8_1_2
-    SubEntityBindingPointCategory? BindingPointCategory);
+    SubEntityBindingPointCategory? BindingPointCategory, int BindingPointCategoryValue = 0);
 #else
     SubEntityBindingPointCategory BindingPointCategory);
 #endif
@@ -1304,6 +1357,12 @@ public sealed record ArenaLeagueRanking(int LeagueId, int Rating, int LadderPosi
 public sealed record ArenaRank(ArenaType ArenaType, int BestRating, int BestLeagueId, int FightNeededForLadder, int SeasonVictoryCount, int SeasonFightCount, int DailyVictoryCount, ArenaLeagueRanking? LeagueRanking, int DailyFightCount);
 
 public sealed record ArenaUpdatePlayerInformationEvent(string BanEndDate, IReadOnlyList<ArenaRank> ArenaRanks) : GameEvent;
+
+public sealed record ArenaStateModeResponse(IReadOnlyList<ArenaStateMode> Modes) : GameResponse;
+
+public sealed record ArenaStateMode(ArenaType ArenaType, ArenaStateModeConfiguration? Configuration, bool Enabled);
+
+public sealed record ArenaStateModeConfiguration(bool IsDefault, string Start, string End, int TeamSize);
 
 public sealed record Bonus(int Value, BonusType Type);
 

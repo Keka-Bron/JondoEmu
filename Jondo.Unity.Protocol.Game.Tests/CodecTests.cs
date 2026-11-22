@@ -69,10 +69,10 @@ public sealed class CodecTests
         var stable = _codec.Decode(Frame(2, "kqz", body, 3));
         Assert.Equal(new IdentificationRequest("x", ""), stable.Content);
         Assert.Equal(new byte[] { 0x12, 0x01, (byte)'x' }, _codec.ReadEnvelope(_codec.Encode(stable)).Content.Value.ToByteArray());
-        // Complete schema dispatch also includes types with no semantic binding,
-        // including a C# keyword alias normalized only in the compiled schema.
-        Assert.NotNull(_codec.DecodeRawPayload("int", []));
-        Assert.Throws<GameConversionException>(() => GameBindings.DecodePayload("int", []));
+        // A C# keyword is normalized only in the compiled schema, not in Any dispatch.
+        var request = _codec.Decode(Frame(2, "int", [], 4));
+        Assert.Equal(new GameFrame(new FightAutoJoinDeactivationRequest(), 4), request);
+        Assert.Equal("int", _codec.ReadEnvelope(_codec.Encode(request)).Alias);
     }
 
     [Fact]

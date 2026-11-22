@@ -31,5 +31,5 @@ internal sealed class CharacterListMessages(Func<DbCharacter, EntityLook> look)
 
     private static EntityLook Snapshot(EntityLook value) => new(value.Colors.ToArray(), value.LookType,
         value.Bones, value.Scales.ToArray(), value.Skins.ToArray(), value.SubEntities.Select(child =>
-            new SubEntityInformation(Snapshot(child.SubEntityLook), child.BindingPointIndex, child.BindingPointCategory)).ToArray());
+            child with { SubEntityLook = Snapshot(child.SubEntityLook) }).ToArray());
 }
