@@ -2767,6 +2767,9 @@ namespace Jondo.Unity.Server.Handlers
         /// GlobalCooldown, -1 for the spell's own interval and more than 0 for that many rounds.
         /// Two Fecas cannot both cast Tregua in a row, and a dream spell cast by one of the dream's
         /// people waits for all of them ("tous les sorts ont un intervalle de relance global").
+        /// A monster's lays it on the monsters of its side the same way: Kabaal's Menace Creciente
+        /// (19791, global 3) is one rune for the whole room, then none for three turns. A player's
+        /// leaves the monsters on his side alone, and a monster's the players.
         /// An ally already waiting longer keeps his wait. Returns the allies whose wait changed.
         /// </summary>
         internal static List<Fighter> ApplyGlobalCooldown(FightInstance fight, Fighter caster, int spell, int globalCooldown, int interval)
@@ -2776,7 +2779,7 @@ namespace Jondo.Unity.Server.Handlers
             if (spell == 0 || globalCooldown == 0 || rounds <= 0) return changed;
             foreach (var ally in fight.Aliados(caster.Id))
             {
-                if (ally == null || ally == caster || ally.IsMonster) continue;
+                if (ally == null || ally == caster || ally.IsMonster != caster.IsMonster) continue;
                 if (ally.Recarga.TryGetValue(spell, out int waiting) && waiting >= rounds) continue;
                 ally.Recarga[spell] = rounds;
                 changed.Add(ally);
@@ -4530,8 +4533,11 @@ namespace Jondo.Unity.Server.Handlers
                         // for good -- the Princesa's Aura, cast a round late, every turn start after.
                         bool deSuConducta = waiting.DeConducta
                                             || (caster.Conducta.Spell != 0 && caster.Conducta.Spell == waiting.HechizoOrigen);
+                        // On the parent's cell too: Menace Creciente (19791) lays the arm's rune and,
+                        // a turn later, 19792 sets off the runes round that cell; cast on the caster's
+                        // own cell it found none, and the arm came out only when someone stepped on it.
                         await LanzarPorOrdenAsync(stream, fight, caster, waiting.Dado, Math.Max(1, waiting.Cara),
-                                                  result.Target, result.Target.CellId, Managers.EffectEngine.AlLanzar,
+                                                  aimedAt, aimedCell, Managers.EffectEngine.AlLanzar,
                                                   Managers.EffectEngine.EfectosSorteados(waiting.Dado, Math.Max(1, waiting.Cara), waiting.Critico),
                                                   waiting.Critico, conducta: deSuConducta);
                     }
@@ -11979,8 +11985,10 @@ namespace Jondo.Unity.Server.Handlers
                 monster.LanzadosPorObjetivo.TryGetValue((spell, objetivo.Id), out int sobreEse);
                 monster.LanzadosPorObjetivo[(spell, objetivo.Id)] = sobreEse + 1;
             }
-            int intervalo = LimitesDeGrado(spell, monsterGrade).Intervalo;
+            var limitesDelMonstruo = LimitesDeGrado(spell, monsterGrade);
+            int intervalo = limitesDelMonstruo.Intervalo;
             if (intervalo > 0) monster.Recarga[spell] = intervalo;
+            ApplyGlobalCooldown(fight, monster, spell, limitesDelMonstruo.GlobalCooldown, intervalo);
         }
 
         /// <summary>
