@@ -8709,8 +8709,11 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     // An invulnerable fighter loses none of it either, except to his own spell's cost:
                     // the Verglasseur's Braquage took 75% of an invulnerable fighter's life through
-                    // the state, where every blow of the same fight was cancelled.
-                    if (c.Sobre != (c.Caster ?? quienLanza) && SpellStates.IsInvulnerable(c.Sobre))
+                    // the state, where every blow of the same fight was cancelled. «His own» follows
+                    // the chain back to its root: the Pistiloso's Flojerismo hands its victim a
+                    // disease the victim «casts» on himself, and through that it took a quarter of an
+                    // invulnerable fighter's life twice in one cast.
+                    if (c.Sobre != (c.RootCaster ?? c.Caster ?? quienLanza) && SpellStates.IsInvulnerable(c.Sobre))
                     {
                         Program.LogDebug($"[Fight] {c.Sobre.Id} is invulnerable: effect {c.Efecto.EffectId} " +
                                          $"takes none of its {c.VidaQueSeVa} life.");

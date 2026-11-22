@@ -236,6 +236,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Life that goes without being a hit: the «-N% HP».</summary>
         public int VidaQueSeVa { get; init; }
 
+        /// <summary>
+        /// Who cast the top-level spell this effect comes from, when it differs from
+        /// <see cref="Caster"/>: a sub-spell cast «by» its target (mask C) is still the enemy's blow.
+        /// </summary>
+        public Fighter RootCaster { get; init; }
+
         /// <summary>Life the caster passes to the target.</summary>
         public int VidaTransferida { get; init; }
 
@@ -4922,7 +4928,7 @@ namespace Jondo.Unity.Server.Managers
                 {
                     Sobre = sobre, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
-                    VidaQueSeVa = cuanto,
+                    VidaQueSeVa = cuanto, RootCaster = combate.RootCaster,
                 };
             }
 
@@ -4956,7 +4962,7 @@ namespace Jondo.Unity.Server.Managers
                     Sobre = sobre, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                     Fulmina = false,
-                    VidaQueSeVa = quita,
+                    VidaQueSeVa = quita, RootCaster = combate.RootCaster,
                 };
             }
 
