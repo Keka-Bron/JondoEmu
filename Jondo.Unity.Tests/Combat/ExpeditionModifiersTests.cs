@@ -74,5 +74,33 @@ namespace Jondo.Unity.Tests.Combat
                                                    EffectEngine.AlLanzar, boss.CellId);
             Assert.Contains(AudaciaState, boss.Buffs.Estados);
         }
+
+        [Fact]
+        public async Task Meno_s_monsters_hold_his_Audacia_and_it_mutates_them()
+        {
+            // 23938 names Meno (4460) in its masks: it is written for each of his monsters.
+            var modifier = ExpeditionModifiers.Of(179)!;
+            Assert.True(ExpeditionModifiers.HeldByEveryMonster(modifier));
+            Assert.False(ExpeditionModifiers.HeldByEveryMonster(ExpeditionModifiers.Of(171)!));
+            var boss = Boss(modifier.Boss);
+            var minion = Minion(-2);
+            var fight = new FightInstance(modifier.Boss, 990_000_179);
+            fight.AddMonster(boss);
+            fight.AddMonster(minion);
+
+            Assert.Equal(2, ExpeditionModifiers.Give(fight, modifier, new[] { modifier.Boss }));
+            Assert.Contains(modifier.Spell, minion.Buffs.Actitudes);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, boss, modifier.Spell, 1, boss,
+                                                   EffectEngine.AlLanzar, boss.CellId);
+            await FightHandler.AplicarEfectosAsync(null, fight, minion, modifier.Spell, 1, minion,
+                                                   EffectEngine.AlLanzar, minion.CellId);
+            // Meno alone is in Audacia; his monster cast at him, took 3599, and mutated (3517).
+            Assert.Contains(AudaciaState, boss.Buffs.Estados);
+            Assert.DoesNotContain(AudaciaState, minion.Buffs.Estados);
+            Assert.Contains(3599, minion.Buffs.Estados);
+            Assert.Contains(3517, minion.Buffs.Estados);
+            Assert.DoesNotContain(3517, boss.Buffs.Estados);
+        }
     }
 }

@@ -62,19 +62,43 @@ namespace Jondo.Unity.Server.Managers
             return Give(fight, modifier, dungeon!.Bosses);
         }
 
-        /// <summary>The attitude on each boss of the fight; for the tests too.</summary>
+        /// <summary>
+        /// The attitude on each boss of the fight, or on every monster of it when the spell is
+        /// written for all of them; for the tests too.
+        /// </summary>
         internal static int Give(FightInstance fight, Modifier modifier, IReadOnlyCollection<int> bosses)
         {
+            bool forEveryMonster = HeldByEveryMonster(modifier);
             int given = 0;
             foreach (var monster in fight.Rojo.Where(m => m.IsMonster && !m.EsInvocado))
             {
-                if (monster.MonsterId != modifier.Boss && !bosses.Contains(monster.MonsterId)) continue;
+                if (!forEveryMonster && monster.MonsterId != modifier.Boss && !bosses.Contains(monster.MonsterId)) continue;
                 monster.Buffs.PonerActitud(modifier.Spell);
                 given++;
             }
             if (given > 0)
-                Program.LogDebug($"[Expeditions] {modifier.Kind} on the boss of dungeon {modifier.Dungeon}: spell {modifier.Spell}.");
+                Program.LogDebug($"[Expeditions] {modifier.Kind} of dungeon {modifier.Dungeon} on {given} monster(s): spell {modifier.Spell}.");
             return given;
+        }
+
+        /// <summary>
+        /// Whether the spell's first grade names the boss's template in a mask: then every monster
+        /// of the fight holds it, and the boss's own rows say "F&lt;boss&gt;". Capitan Meno's Audacia
+        /// (23938) is written so: "3501 on C,F4460" is his, "1160 grade 4 on g,F4460" is each of
+        /// his monsters casting at him, which marks that monster with 3599, and its "792 24489"
+        /// then swaps its Mutación Inestable for the Audacia one (invulnerable, +4 MP, half its
+        /// life, dead two turns later). Held by the boss alone, none of that reaches a monster.
+        /// </summary>
+        internal static bool HeldByEveryMonster(Modifier modifier)
+        {
+            string plain = "F" + modifier.Boss, not = "f" + modifier.Boss;
+            foreach (var effect in SpellEffects.De(modifier.Spell, 1))
+                foreach (var part in (effect.TargetMask ?? "").Split(','))
+                {
+                    string t = part.Trim().TrimStart('*');
+                    if (t == plain || t == not) return true;
+                }
+            return false;
         }
 
         /// <summary>For the tests: read the file again.</summary>
