@@ -8664,6 +8664,29 @@ namespace Jondo.Unity.Server.Handlers
                             continue;
                         }
 
+                        // "Activa las trampas": every trap in its zone, whoever laid it, goes off once
+                        // from its centre on whoever stands in it -- the one on its centre first --
+                        // and with nobody in it, it is spent for nothing.
+                        if (c.ActivaSuelo == Managers.EffectEngine.ActivaLasTrampas)
+                        {
+                            var trampas = fight.Glifos.Where(g => !g.Gastado && g.Tipo == Managers.EffectEngine.ColocaUnaTrampa
+                                                                  && (c.CeldasActivadas == null || g.Casillas.Any(c.CeldasActivadas.Contains)))
+                                                      .ToList();
+                            foreach (var trampa in trampas)
+                            {
+                                if (trampa.Gastado) continue;
+                                var encima = TodosLosCombatientes(fight)
+                                    .Where(f => f != null && f.IsAlive && trampa.Cubre(f.CellId))
+                                    .OrderBy(f => f.CellId == trampa.Centro ? 0 : 1).ToList();
+                                if (encima.Count == 0) { trampa.Gastado = true; continue; }
+                                await FireOneGlyphAsync(stream, fight, trampa, encima[0], alPisar: true);
+                                trampa.Gastado = true;
+                            }
+                            var barridas = fight.BarrerLosGlifos();
+                            foreach (var caida in barridas) await MarcaQuitadaAsync(fight, caida);
+                            continue;
+                        }
+
                         // "Activa los glifos": the ones the spell in its value laid (any of his with
                         // none), and not an aura, which only goes off as it is laid. Each goes off once,
                         // on its activator standing in it and from its centre -- Inestabilidad's capture,
@@ -11774,7 +11797,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     string mask = effect.TargetMask ?? "";
                     masks.TryAdd(effect.EffectId, mask);
-                    bool enemies = HasMask(mask, "A"), own = HasMask(mask, "a") || HasMask(mask, "g");
+                    bool enemies = NamesEnemies(mask), own = HasMask(mask, "a") || HasMask(mask, "g");
                     double average = effect.DiceSide > effect.DiceNum ? (effect.DiceNum + effect.DiceSide) / 2.0 : effect.DiceNum;
 
                     if (effect.EffectId >= Jondo.Unity.World.Combat.EffectSupport.FirstDamage &&
@@ -11833,7 +11856,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var stat in data.StatEffects)
                 {
                     string mask = masks.TryGetValue(stat.EffectId, out var m) ? m : "";
-                    bool onEnemies = HasMask(mask, "A");
+                    bool onEnemies = NamesEnemies(mask);
                     if (stat.Value < 0 && onEnemies &&
                         (stat.Characteristic == ActionPointsCharacteristic || stat.Characteristic == MovementPointsCharacteristic))
                         removal += -stat.Value;
@@ -12036,6 +12059,14 @@ namespace Jondo.Unity.Server.Handlers
                 .Any(p => p.Length > 1 && (p[0] == 'E' || p[0] == 'e') && char.IsDigit(p[1]));
             return onEnemies.Count > 0 && onEnemies.All(AsksAState) ? onEnemies : new List<string>();
         }
+
+        /// <summary>
+        /// Whether a mask names the other side's fighters: A, or its characters (H, L) or
+        /// monsters (M) by kind. The Chienchien's Escaramuza (8521) takes 100 MP from "H,M,D,C":
+        /// read for "A" alone it removed nothing, and he never cast it.
+        /// </summary>
+        private static bool NamesEnemies(string mask)
+            => HasMask(mask, "A") || HasMask(mask, "H") || HasMask(mask, "L") || HasMask(mask, "M");
 
         private static bool HasMask(string mask, string who)
         {

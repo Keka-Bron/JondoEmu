@@ -640,6 +640,10 @@ namespace Jondo.Unity.Server.Managers
                 {
                     var target = board.Fighters.FirstOrDefault(f => f.IsAlive && f.CellId == aim) ?? monster;
                     if (!CanCast(board, spell, monster, from, aim, target)) continue;
+                    // Aimed at one of its side, its boosts must reach him, as in Targets: Count
+                    // Razof's Trofeo de Caza (8538) boosts only him ("C") and is aimed at an enemy
+                    // summon; aimed at his own Carghnicero it still gave him +200 power, every turn.
+                    if (target != monster && !spell.Supports(monster, target)) continue;
                     bool raises = rows.Any(row =>
                     {
                         var (characteristic, sign) = DatabaseManager.EffectMeta(row.EffectId);

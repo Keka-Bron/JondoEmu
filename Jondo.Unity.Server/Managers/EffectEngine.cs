@@ -1,4 +1,4 @@
-using Jondo.Unity.World.Combat;
+﻿using Jondo.Unity.World.Combat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,7 +121,7 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>A spell's cooldown on the bearer changed (1036, 1045): his client is told.</summary>
         public bool CambiaLaRecarga { get; init; }
 
-        /// <summary>2023 or 1026: the caster's runes or glyphs go off now.</summary>
+        /// <summary>2023, 1026 or 1025: the caster's runes or glyphs, or the traps of a zone, go off now.</summary>
         public int ActivaSuelo { get; init; }
 
         /// <summary>
@@ -1380,6 +1380,12 @@ namespace Jondo.Unity.Server.Managers
         public const int CambiaDeBando = 3107;
         public const int ActivaLasRunas = 2023;
         public const int ActivaLosGlifos = 1026;
+
+        /// <summary>
+        /// "Activa las trampas": the traps in its zone go off, whoever laid them. The Bobalicor's
+        /// Busca (8504) sets off the Count's camp traps round the one it hunts.
+        /// </summary>
+        public const int ActivaLasTrampas = 1025;
 
         /// <summary>Damage dealt by a summon: DI.</summary>
         public const string DanoDeInvocacion = "DI";
@@ -3899,6 +3905,13 @@ namespace Jondo.Unity.Server.Managers
                 if (CasterQualifies(quienLanza, mascara, estados)) yield return quienLanza;
                 yield break;
             }
+            // Setting the traps of a zone off is the caster's doing too; its mask names whom the
+            // zone is aimed at (Busca's "A"), and the traps go off on whoever stands in them.
+            if (efecto.EffectId == ActivaLasTrampas)
+            {
+                yield return quienLanza;
+                yield break;
+            }
 
             bool alLanzador = false, aLosMios = false, aLosDeEnfrente = false, aLosOtrosAliados = false;
             bool ownSummonsOnly = false, notOwnSummons = false, alInvocador = false;
@@ -4842,7 +4855,8 @@ namespace Jondo.Unity.Server.Managers
 
             // "Activa las runas" (2023) and "Activa los glifos" (1026): the caster's own go off on
             // whoever stands on them, now.
-            if (efecto.EffectId == ActivaLasRunas || efecto.EffectId == ActivaLosGlifos)
+            if (efecto.EffectId == ActivaLasRunas || efecto.EffectId == ActivaLosGlifos
+                || efecto.EffectId == ActivaLasTrampas)
             {
                 return new Outcome
                 {
