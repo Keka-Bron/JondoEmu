@@ -11156,7 +11156,10 @@ namespace Jondo.Unity.Server.Handlers
                 await ActitudesAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
                 await EngancheAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
             }
-            if (aplicado > 0 && !fulmina && target.IsAlive)
+            // A blow the resistances swallow whole still lands, as for DBE above: the Giant
+            // Kralamoure's Kraken waits on a blow of each element he takes behind his 900%.
+            bool golpeTragado = aplicado <= 0 && IsABlow(aplicado, damage, caster.TeamId != target.TeamId);
+            if ((aplicado > 0 || golpeTragado) && !fulmina && target.IsAlive)
             {
                 string alcance = deCerca
                     ? Managers.EffectEngine.CuandoMePeganDeCerca
@@ -11168,7 +11171,7 @@ namespace Jondo.Unity.Server.Handlers
                 // A turn's poison (DTB at the start, DTE at the end) and the maximum life the blow
                 // eroded (VE): what the items that read their bearer's life again wait on -- the
                 // Silver Dofus's and the Burlador de la Muerte's "V|VA|VM|VE|TB|TE|D|H|PD|DTB|DTE|DV".
-                if (turnTrigger is Managers.EffectEngine.AlEmpezarElTurno or Managers.EffectEngine.AlAcabarElTurno && target.IsAlive)
+                if (aplicado > 0 && turnTrigger is Managers.EffectEngine.AlEmpezarElTurno or Managers.EffectEngine.AlAcabarElTurno && target.IsAlive)
                     await DispararAsync(stream, fight, target, "D" + turnTrigger);
                 if (erosionado > 0 && target.IsAlive) await DispararAsync(stream, fight, target, "VE");
             }
