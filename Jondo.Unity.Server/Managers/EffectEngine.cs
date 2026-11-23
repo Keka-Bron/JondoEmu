@@ -167,6 +167,19 @@ namespace Jondo.Unity.Server.Managers
         public Fighter Doble { get; init; }
 
         /// <summary>
+        /// A child cast held back until the creatures summoned before it in the same spell are on
+        /// the board (see <see cref="EffectEngine.HoldBackUntilBorn"/>): the fight casts it, by
+        /// <see cref="HeldCaster"/>, at <see cref="Sobre"/> and <see cref="HeldCell"/>, when it reaches this
+        /// outcome in the order.
+        /// </summary>
+        public bool HeldChild { get; init; }
+        public Fighter HeldCaster { get; init; }
+        public int HeldSpell { get; init; }
+        public int HeldGrade { get; init; }
+        public int HeldCell { get; init; } = -1;
+        public bool HeldCritical { get; init; }
+
+        /// <summary>
         /// The cell the spell that produced this outcome was aimed at, when it was resolved: what a
         /// chained cast's jwe 300 names, though a row of the same cast has moved its target since
         /// -- Estela's sub-cast goes out on 371, where the Selatrop stood, not on the 427 he jumped
@@ -1454,6 +1467,17 @@ namespace Jondo.Unity.Server.Managers
             if (hayPlantilla && !esDeLaPlantilla) return false;
             return !hayLado || loNombra;
         }
+
+        /// <summary>
+        /// Whether a child cast of this spell has to wait for the board: a creature summoned by an
+        /// earlier row of the same resolution is not on it yet -- the fight puts it there once the
+        /// whole list is resolved --, so a child that names it by template or state ("F4279",
+        /// "E334") would find nobody. Rows written for the newborn itself ("U") are done on it as
+        /// it comes and need no waiting.
+        /// </summary>
+        private static bool HoldBackUntilBorn(FightInstance combat, List<Outcome> done, SpellEffect row)
+            => combat.HoldChildrenForBirth && done.Any(o => o.Invoca != 0 || o.Doble != null)
+               && !(row.TargetMask ?? "").Split(',').Any(t => t.Trim() == "U");
 
         /// <summary>Who casts the child and what it aims at, to be able to check it from outside.</summary>
         public static (bool LanzaElCandidato, string Apunta) ComoSublanza(int efecto)
@@ -3656,6 +3680,16 @@ namespace Jondo.Unity.Server.Managers
                             continue;
                         }
 
+                        if (HoldBackUntilBorn(combat, fuera, efecto))
+                        {
+                            fuera.Add(new Outcome
+                            {
+                                Sobre = aQuien ?? candidato, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
+                                HeldCaster = lanzaElHijo, HeldSpell = efecto.DiceNum,
+                                HeldGrade = Math.Max(1, efecto.DiceSide), HeldCell = aQueCasilla, HeldCritical = critical,
+                            });
+                            continue;
+                        }
                         // A critical cast runs its chain on the critical lists: Virtud's
                         // critical shield is 29723's own critical row, 550% for 1100.
                         fuera.AddRange(Resolver(combat, lanzaElHijo, efecto.DiceNum,
@@ -3770,6 +3804,16 @@ namespace Jondo.Unity.Server.Managers
                                 Apunta.ALaCasillaDelPadre => aimedCell >= 0 ? aimedCell : sobre.CellId,
                                 _ => sobre.CellId,
                             };
+                        }
+                        if (HoldBackUntilBorn(combat, fuera, efecto))
+                        {
+                            fuera.Add(new Outcome
+                            {
+                                Sobre = sobre, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
+                                HeldCaster = lanzaElHijo, HeldSpell = hecho.HechizoEncadenado,
+                                HeldGrade = hecho.GradoEncadenado, HeldCell = casillaDelHijo, HeldCritical = critical,
+                            });
+                            continue;
                         }
                         var chainedBefore = combat.ChainedFrom;
                         combat.ChainedFrom = lanzaElHijo != caster ? caster : null;

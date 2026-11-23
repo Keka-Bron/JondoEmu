@@ -7177,8 +7177,15 @@ namespace Jondo.Unity.Server.Handlers
             while (i < filas.Count)
             {
                 bool golpes = EsGolpe(filas[i]);
+                // A run of summons is a run of its own: the rows after it are resolved once the
+                // creatures are on the board, so that they can name them (Piojoporojo's fleas get
+                // their states from a 792 whose mask reads "F<template>"; resolved in the same
+                // pass as the summons, it found nobody).
+                bool invoca = !golpes && Managers.EffectEngine.EsInvocacion(filas[i].EffectId);
                 var tanda = new List<Managers.SpellEffect>();
-                while (i < filas.Count && EsGolpe(filas[i]) == golpes) tanda.Add(filas[i++]);
+                while (i < filas.Count && EsGolpe(filas[i]) == golpes
+                       && (golpes || Managers.EffectEngine.EsInvocacion(filas[i].EffectId) == invoca))
+                    tanda.Add(filas[i++]);
 
                 if (golpes)
                 {
@@ -8597,6 +8604,7 @@ namespace Jondo.Unity.Server.Handlers
             List<Managers.Outcome> consecuencias;
             try
             {
+                fight.HoldChildrenForBirth = true;
                 consecuencias = preparedEffects ?? Managers.EffectEngine.Resolver(fight, quienLanza, hechizo, grado,
                                                                  objetivo, disparador, fight.RoundNumber,
                                                                  hondo: 0,
@@ -8615,6 +8623,7 @@ namespace Jondo.Unity.Server.Handlers
                 Managers.FightInvariants.Choked(fight, hechizo, ex);
                 return;
             }
+            finally { fight.HoldChildrenForBirth = false; }
             if (consecuencias.Count == 0) return;
 
             // If the spell has something pending for later -- effects with a trigger that is not
@@ -8697,6 +8706,19 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var c in consecuencias)
             {
+                // A child held back for the creatures summoned before it: cast now they are born.
+                if (c.HeldChild)
+                {
+                    if (c.HeldCaster is { IsAlive: true })
+                    {
+                        await AnunciarElEncadenadoAsync(fight, c.HeldCaster, c.Sobre ?? c.HeldCaster,
+                                                        c.HeldSpell, c.HeldGrade, c.HeldCell);
+                        await AplicarEfectosAsync(stream, fight, c.HeldCaster, c.HeldSpell, c.HeldGrade,
+                                                  c.Sobre, Managers.EffectEngine.AlLanzar, c.HeldCell,
+                                                  c.HeldCritical, conducta: conducta);
+                    }
+                    continue;
+                }
                 // Forgelance rows are prepared before their damage is applied. A preceding
                 // lethal hit invalidates later rows on that victim: its client sprite is gone.
                 // Remove a prepared buff too; death hooks targeting living fighters still run.

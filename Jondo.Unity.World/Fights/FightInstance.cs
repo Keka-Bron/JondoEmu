@@ -481,6 +481,13 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public Fighter ChainedFrom { get; set; }
 
+        /// <summary>
+        /// Set by the fight while it resolves a cast it is about to apply row by row: a child cast
+        /// written after a summon waits, as a held outcome, until the newborn is on the board.
+        /// Callers that read the outcomes without applying them leave it off and get them inline.
+        /// </summary>
+        public bool HoldChildrenForBirth { get; set; }
+
         public FightInstance(long fightId, long mapId, long arenaMapId = 0)
         {
             FightId = fightId;
