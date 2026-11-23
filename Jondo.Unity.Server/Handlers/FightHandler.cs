@@ -4194,6 +4194,7 @@ namespace Jondo.Unity.Server.Handlers
             // And now the "start of turn" attitudes: this is where the Ochre Dofus checks whether he
             // has been hit since his previous turn.
             await ActitudesAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
+            await ActitudesQueLoVigilanAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
             await EngancheAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
             fighter.LeHanPegado = false;
             await NonPlayingSummonsAnswerAsync(stream, fight, fighter, Managers.EffectEngine.AlEmpezarElTurno);
@@ -10208,6 +10209,17 @@ namespace Jondo.Unity.Server.Handlers
                 // TE, delay 1" kills her at the end of her SECOND turn. Read as a second wait, it
                 // was put off to the next round's first turn and she died before her second one.
                 int givenIn = quien.Buffs.RoundAttitudeGiven(actitud);
+                // Rows that wait on his enemies' turns are theirs (ActitudesQueLoVigilanAsync).
+                if (EsDeTurno(disparador)
+                    && Managers.SpellEffects.De(actitud, grado).Any(VigilaElTurnoDeSusEnemigos))
+                {
+                    var propias = Managers.SpellEffects.De(actitud, grado).Where(row => !VigilaElTurnoDeSusEnemigos(row)).ToList();
+                    if (propias.Count > 0)
+                        await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien, disparador, quien.CellId,
+                                                  tirada: propias, armar: false,
+                                                  rondaDelEnganche: givenIn, delayHoldsBackOnly: givenIn >= 0);
+                    continue;
+                }
                 // What swaps him goes first, and the rest finds him where he went: Nileza's
                 // reflection is drawn around the cell she lands on (EffectEngine.SwapsBeforeTheRest).
                 var swapsFirst = Managers.EffectEngine.SwapsBeforeTheRest(actitud, grado, disparador);
@@ -10313,13 +10325,51 @@ namespace Jondo.Unity.Server.Handlers
         /// put in Pacifista casts its grade 2 at himself and dies. Only the bearer's own attitudes
         /// were asked, and Klim never takes 218 himself, so nobody ever died of it. The row goes
         /// off on the one who changed state and nobody else, as an armed hook would.
+        ///
+        /// A turn trigger too, for a row that names only the bearer's enemies (VigilaElTurnoDeSusEnemigos):
+        /// Toxoliat's Bravura (23880) holds "793 on A under TB", and the guide has it so: «À chaque
+        /// début de tour, les personnages posent un glyphe en zone croix de taille 1 autour d'eux».
+        /// Each player lays his glyph at the start of HIS turn, after the glyphs already there have
+        /// been checked, and has the turn to walk out of it. Fired on the boss's own turn start, the
+        /// glyph went under every player at once and killed each one at his next turn start.
         /// </summary>
         private static async Task ActitudesQueLoVigilanAsync(NetworkStream stream, FightInstance fight,
                                                              Fighter quien, string disparador)
         {
-            if (!disparador.StartsWith("EON", StringComparison.Ordinal)
+            bool deTurno = EsDeTurno(disparador);
+            if (!deTurno
+                && !disparador.StartsWith("EON", StringComparison.Ordinal)
                 && !disparador.StartsWith("EOFF", StringComparison.Ordinal)
                 && disparador != Managers.EffectEngine.AlMorir) return;
+            if (deTurno)
+            {
+                if (!quien.IsAlive) return;
+                await DentroDeUnaSecuenciaAsync(fight, quien,
+                    () => VigilantesAsync(stream, fight, quien, disparador, soloLosDeTurno: true));
+                return;
+            }
+            await VigilantesAsync(stream, fight, quien, disparador, soloLosDeTurno: false);
+        }
+
+        private static bool EsDeTurno(string disparador)
+            => string.Equals(disparador, Managers.EffectEngine.AlEmpezarElTurno, StringComparison.OrdinalIgnoreCase)
+               || string.Equals(disparador, Managers.EffectEngine.AlAcabarElTurno, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// An attitude row on a turn trigger whose mask holds the bearer's enemies and nothing
+        /// else ("A"): a hook on each of them, going off at THEIR turn, not at the bearer's.
+        /// </summary>
+        internal static bool VigilaElTurnoDeSusEnemigos(Managers.SpellEffect fila)
+        {
+            if (!fila.Disparadores().Any(EsDeTurno)) return false;
+            var lados = (fila.TargetMask ?? "").Split(',').Select(t => t.Trim())
+                                               .Where(t => t.Length == 1 && char.IsLetter(t[0])).ToList();
+            return lados.Count > 0 && lados.All(t => t == "A");
+        }
+
+        private static async Task VigilantesAsync(NetworkStream stream, FightInstance fight,
+                                                  Fighter quien, string disparador, bool soloLosDeTurno)
+        {
             foreach (var vigia in fight.Azul.Concat(fight.Rojo).ToList())
             {
                 if (vigia == quien || !vigia.IsAlive || vigia.Buffs.Actitudes.Count == 0) continue;
@@ -10330,6 +10380,7 @@ namespace Jondo.Unity.Server.Handlers
                     var filas = Managers.SpellEffects.De(actitud, grado)
                         .Where(fila => fila.Disparadores().Contains(disparador, StringComparer.OrdinalIgnoreCase)
                                        && !LaMascaraEsDelLanzador(fila.TargetMask)
+                                       && (!soloLosDeTurno || VigilaElTurnoDeSusEnemigos(fila))
                                        && Managers.EffectEngine.CumpleLaMascara(vigia, quien, fila.TargetMask))
                         .ToList();
                     if (filas.Count == 0) continue;
@@ -13693,6 +13744,7 @@ namespace Jondo.Unity.Server.Handlers
             // Whatever the attitudes have to do at the end of the turn. This is where Amarillo Ocre
             // takes off the "I have been hit" state, so that the next turn checks it clean again.
             await ActitudesAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
+            await ActitudesQueLoVigilanAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
             await EngancheAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
             await NonPlayingSummonsAnswerAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
