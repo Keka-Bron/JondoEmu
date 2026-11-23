@@ -140,6 +140,33 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly Options Empty = new Options();
 
+        /// <summary>Every resume reply of each guardian, with the words it says.</summary>
+        private static readonly Dictionary<int, List<(long Reply, string Words)>> _resumesByNpc = new();
+
+        /// <summary>
+        /// The resume reply of this guardian for that dungeon: the one that names it, or the
+        /// guardian's only pick when none does.
+        /// </summary>
+        /// <remarks>
+        /// A guardian who keeps two dungeons has a resume reply for each: Lorkos, at the door of the
+        /// Minotot Room and of the Minotoror's Labyrinth, offered «Retomar el Centro del Laberinto
+        /// del Minotauroro donde lo dejaste» -- the lowest of his -- to resume the Minotot Room.
+        /// </remarks>
+        public static long ResumeFor(int npcId, string? dungeonName)
+        {
+            long any = For(npcId).Resume;
+            if (string.IsNullOrEmpty(dungeonName) || !_resumesByNpc.TryGetValue(npcId, out var all)) return any;
+            return ResumeNaming(all, dungeonName, any);
+        }
+
+        /// <summary>The lowest of those replies whose words name the dungeon, or the fallback.</summary>
+        public static long ResumeNaming(IEnumerable<(long Reply, string Words)> replies, string dungeonName, long fallback)
+        {
+            long named = replies.Where(r => r.Words.Contains(dungeonName, StringComparison.OrdinalIgnoreCase))
+                                .Select(r => r.Reply).DefaultIfEmpty(0).Min();
+            return named != 0 ? named : fallback;
+        }
+
         /// <summary>
         /// Reads the client's text table once and works out each guardian's entry replies.
         /// </summary>
@@ -151,6 +178,7 @@ namespace Jondo.Unity.Server.Managers
         public static void Initialize()
         {
             _byNpc.Clear();
+            _resumesByNpc.Clear();
 
             var keyring = TextKeysSaying(KeyringWording);
             foreach (string wording in OtherKeyringWordings) keyring.UnionWith(TextKeysSaying(wording));
@@ -173,6 +201,13 @@ namespace Jondo.Unity.Server.Managers
 
                 if (options.Ambiguous) ambiguos++;
                 _byNpc[template.Id] = options;
+
+                var resumes = new List<(long Reply, string Words)>();
+                int upto = Math.Min(template.Replies?.Length ?? 0, template.ReplyTexts?.Length ?? 0);
+                for (int i = 0; i < upto; i++)
+                    if (resume.Contains(template.ReplyTexts![i]) && template.Replies![i] < Expedition)
+                        resumes.Add((template.Replies[i], WordsOf(template.ReplyTexts[i])));
+                if (resumes.Count > 1) _resumesByNpc[template.Id] = resumes;
             }
 
             Console.WriteLine($"[Dungeon] {_byNpc.Count} guardians with a door to open" +
@@ -257,6 +292,24 @@ namespace Jondo.Unity.Server.Managers
         /// them. Matching loosely over the game's own table is still exact enough: no other reply
         /// in the game opens with those words.
         /// </remarks>
+        /// <summary>The words of a translation key, or nothing.</summary>
+        private static string WordsOf(long key)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Text FROM Translations WHERE Key = $key;";
+                command.Parameters.AddWithValue("$key", key.ToString());
+                return command.ExecuteScalar() as string ?? "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
         private static HashSet<long> TextKeysSaying(string wording)
         {
             var found = new HashSet<long>();

@@ -277,8 +277,8 @@ namespace Jondo.Unity.Server.Handlers
 
         internal static long ResumeReply(int npcId, long mapId, long characterId)
         {
-            long reply = DungeonDoor.For(npcId).Resume;
             var dungeon = DungeonManager.AtEntrance(mapId);
+            long reply = DungeonDoor.ResumeFor(npcId, dungeon?.Name);
             return reply != 0 && dungeon != null && ResumeRoom(dungeon, characterId) != 0 ? reply : 0;
         }
 
@@ -286,8 +286,9 @@ namespace Jondo.Unity.Server.Handlers
         internal static async Task<bool> TryResumeAsync(NetworkStream stream, long reply)
         {
             var state = SessionContext.State;
-            if (reply == 0 || reply != DungeonDoor.For(state.OpenDialogueNpcId).Resume) return false;
+            if (reply == 0) return false;
             var dungeon = DungeonManager.AtEntrance(state.OpenDialogueMapId);
+            if (reply != DungeonDoor.ResumeFor(state.OpenDialogueNpcId, dungeon?.Name)) return false;
             if (dungeon == null) return false;
             if (state.IsInFight || state.OpenDialogueMapId != state.MapId) return true;
 
