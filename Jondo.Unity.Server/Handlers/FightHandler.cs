@@ -6936,8 +6936,16 @@ namespace Jondo.Unity.Server.Handlers
                 int lastRow = consecuencias.FindLastIndex(c => grupo.Contains(c));
                 if (consecuencias.Skip(lastRow + 1).Any(c => c.Sobre == grupo.Key.Sobre && TakesTheSpellAway(c, grupo.Key.HechizoOrigen)))
                     continue;
+                // A hook for some rounds goes off without the caster's states in its masks
+                // (WithoutCasterStates): they are judged now, and a row whose states did not hold
+                // is not armed. The Crocantería boss's 12291 arms 12292 at the grade of the element
+                // he was hit with, each grade summoning its pepita when he is moved "C,*E1088" (the
+                // first phase), "C,*E1089" (the second)...; a fire hit in the second phase armed
+                // the first grade too, and every push brought out two pepitas.
+                var armables = grupo.Where(c => hasta < 0 || c.CasterConditionsHeld).ToList();
+                if (armables.Count == 0) continue;
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
-                                                 ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
+                                                 ronda, armables.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0
                                                                         && (hasta == byOwnDuration || hasta == byTheRowsLeft));
             }
