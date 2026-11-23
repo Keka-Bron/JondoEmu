@@ -12550,15 +12550,16 @@ namespace Jondo.Unity.Server.Handlers
             if (dungeon == null) return;
 
             int size = MobSpawnManager.MembersFor(where.Group, fight.PeopleIn(FightInstance.Azules)).Count;
-            var once = dungeon.Bosses.Concat(Managers.DimensionDungeons.BesideTheBoss(dungeon.Id)).ToList();
-            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, once, size, fight.FightId, dungeon.Id);
+            int follows = Managers.DimensionDungeons.RulesOf(dungeon);
+            var once = dungeon.Bosses.Concat(Managers.DimensionDungeons.BesideTheBoss(follows)).ToList();
+            var waves = Managers.DimensionDungeons.Plan(where.Group.Members, once, size, fight.FightId, follows);
             if (waves.Count == 0) return;
 
             var rules = Managers.DimensionDungeons.Current;
             fight.TimedWaves.AddRange(waves);
             fight.NextWaveRound = FirstRound + waves[0].Turns;
             fight.WaveArrivalState = rules.ArrivalState;
-            fight.WaveLifePercent = rules.LifePercentFor(dungeon.Id);
+            fight.WaveLifePercent = rules.LifePercentFor(follows);
             Program.LogDebug($"[Dungeon] Fight #{fight.FightId} in {dungeon.Name}: {waves.Count} more wave(s) " +
                              $"of {size}, every {waves[0].Turns} turns.");
         }

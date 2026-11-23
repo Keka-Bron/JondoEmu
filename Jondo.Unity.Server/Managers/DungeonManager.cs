@@ -81,6 +81,12 @@ namespace Jondo.Unity.Server.Managers
             public List<long> Rooms { get; } = new List<long>();
             public List<int> Bosses { get; } = new List<int>();
 
+            /// <summary>
+            /// The dungeon an expedition is named after, whose boss it brings and whose fight it
+            /// follows (<see cref="GiveExpeditionsTheirBosses"/>); 0 for any other dungeon.
+            /// </summary>
+            public int BaseId { get; set; }
+
             /// <summary>Whether the keyring opens it as well as its own key. 107 of the 187.</summary>
             public bool OnKeyring { get; set; }
 
@@ -280,6 +286,7 @@ namespace Jondo.Unity.Server.Managers
                 if (dungeon.Bosses.Count > 0 || dungeon.Rooms.Count == 0) continue;
                 string? key = Expeditions.CatalogueKey(dungeon.Name);
                 if (key == null || !bases.TryGetValue(BaseNameKey(key.Substring(key.IndexOf('|') + 1)), out var named)) continue;
+                dungeon.BaseId = named.Id;
                 waiting.Add((dungeon, named));
             }
             if (waiting.Count == 0) return;

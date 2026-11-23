@@ -710,7 +710,7 @@ namespace Jondo.Unity.Server.Managers
         {
             var quarry = dungeon.Quarry.TryGetValue(room, out var written) ? new List<int>(written) : new List<int>();
             if (bossRoom)
-                foreach (int monster in DimensionDungeons.BesideTheBoss(dungeon.Id))
+                foreach (int monster in DimensionDungeons.BesideTheBoss(DimensionDungeons.RulesOf(dungeon)))
                     if (!quarry.Contains(monster)) quarry.Add(monster);
             return quarry.Count > 0 ? quarry : null;
         }

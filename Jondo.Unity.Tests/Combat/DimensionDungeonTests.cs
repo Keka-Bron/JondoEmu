@@ -82,6 +82,27 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// The expeditions of a dimension dungeon fight in its waves: both Drhossil's Caves
+        /// expeditions (175, 197) follow the Caves' row (79); the Minotot's (167) follows none.
+        /// </summary>
+        [Fact]
+        public void An_expedition_fights_in_the_waves_of_the_dungeon_it_is_named_after()
+        {
+            DimensionDungeons.Forget();
+            DungeonManager.Initialize();
+            if (!DungeonManager.IsLoaded) return;   // no world base
+            foreach (int id in new[] { 175, 197 })
+            {
+                if (!DungeonManager.All.TryGetValue(id, out var expedition) || expedition.Rooms.Count == 0) return;
+                Assert.Equal(79, expedition.BaseId);
+                Assert.Equal(79, DimensionDungeons.RulesOf(expedition));
+                Assert.True(DimensionDungeons.FightsInWaves(expedition.LastRoom));
+            }
+            if (DungeonManager.All.TryGetValue(167, out var minotot) && minotot.Rooms.Count > 0)
+                Assert.False(DimensionDungeons.FightsInWaves(minotot.LastRoom));
+        }
+
+        /// <summary>
         /// A dimension wave comes on with a quarter less life, its monsters under the invulnerable
         /// state, each row told to the board after the arrivals; the end of a newcomer's first turn
         /// takes it away and tells the board.

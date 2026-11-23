@@ -75,8 +75,16 @@ namespace Jondo.Unity.Server.Managers
             var rules = Current;
             if (rules.Waves < 2 || !DungeonManager.IsLoaded) return false;
             var dungeon = DungeonManager.OfRoom(roleplayMapId);
-            return dungeon != null && rules.Dungeons.Contains(dungeon.Id) && dungeon.LastRoom == roleplayMapId;
+            return dungeon != null && rules.Dungeons.Contains(RulesOf(dungeon)) && dungeon.LastRoom == roleplayMapId;
         }
+
+        /// <summary>
+        /// The dungeon whose row a dungeon's fight follows: an expedition follows the one it is
+        /// named after. Gamosaurus on the Bravery Expedition of the Drhossil's Caves: the dungeon
+        /// is done as usual, the Drhossil killed last in the first wave.
+        /// </summary>
+        public static int RulesOf(DungeonManager.Dungeon dungeon)
+            => dungeon.BaseId != 0 ? dungeon.BaseId : dungeon.Id;
 
         /// <summary>
         /// The waves after the first, for a fight against <paramref name="group"/>: one fewer than
