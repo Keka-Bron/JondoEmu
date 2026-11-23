@@ -48,6 +48,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The clock the season is read on. Replaceable for the tests.</summary>
         public static Func<DateTimeOffset> Clock { get; set; } = () => DateTimeOffset.UtcNow;
 
+        /// <summary>Whether a state is one of the three seasons.</summary>
+        public static bool IsSeason(int state) => Array.IndexOf(SeasonStates, state) >= 0;
+
         public static int StateOf(OsavoraSeasons.Season season) => season switch
         {
             OsavoraSeasons.Season.Naissance => NaissanceState,

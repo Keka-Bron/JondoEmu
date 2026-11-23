@@ -6396,6 +6396,13 @@ namespace Jondo.Unity.Server.Handlers
                                           invocado, Managers.EffectEngine.AlLanzar, celda, armar: false);
             }
 
+            // And in Osavora it carries the scene's season, as everybody there does: the season's
+            // spell put it on every fighter («a,A») when the fight began, before this one was
+            // there. The Bzzeggs the Kabombz lay need it: their 31031 casts 31032 when they die, and
+            // its rows cast nothing unless the egg carries a season, so no egg killed by the
+            // Bzzegg Supervisor ever burst and his phase two never came.
+            await LaTemporadaParaElQueLlegaAsync(fight, invocado);
+
             // And if it is a bomb, it is born at Combo I. One, not two: measured in «tymador-explobomba
             // resiliente», where the three bombs get ONE combo the round they come out and TWO
             // every round after. And that one comes out of its own spell: Encendimiento's
@@ -6651,20 +6658,25 @@ namespace Jondo.Unity.Server.Handlers
             await CheckFightOverAsync(stream, fight);
         }
 
-        /// <summary>For the test harness: a state on a fighter as a spell's 950 leaves it, its row told to the board.</summary>
+        /// <summary>
+        /// A state on a fighter as a spell's 950 leaves it, its row told to the board: for the test
+        /// harness, and for the scene's season on whoever comes in late. A negative count of rounds
+        /// is for the whole fight.
+        /// </summary>
         internal static async Task GiveStateAsync(FightInstance fight, Fighter who, int state, int rounds)
         {
             var row = who.Buffs.Poner(new Buff
             {
                 EffectId = Jondo.Unity.World.Combat.EffectSupport.AddState, Estado = state, Cuanto = state, Quien = who.Id,
-                Disparador = Managers.EffectEngine.AlLanzar, CaducaEnRonda = fight.RoundNumber + rounds, EmpiezaEnRonda = fight.RoundNumber,
+                Disparador = Managers.EffectEngine.AlLanzar, CaducaEnRonda = rounds < 0 ? -1 : fight.RoundNumber + rounds,
+                EmpiezaEnRonda = fight.RoundNumber,
             }, fight.SiguienteEmbrujo);
             who.Buffs.PonerEstado(state);
             var (categoria, boost) = DatabaseManager.EffectFamily(row.EffectId);
             await InASequenceAsync(fight, who.Id, () => ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm, Network.FightProtocol.BuildBuff(
                 who.Id, who.Id, row.Numero, row.EffectId, row.EffectUid, state, 0, 0, 0, row.Disparador, row.CaducaEnRonda, 0,
                 Network.FightProtocol.FamiliaDelEmbrujo(row.EffectId, categoria, boost), 1, false))));
-            Program.LogDebug($"[Fight] Harness: state {state} on {who.Id} until round {row.CaducaEnRonda}.");
+            Program.LogDebug($"[Fight] State {state} on {who.Id} until round {row.CaducaEnRonda}.");
         }
 
         /// <summary>For the harness's refreshes: the rows every fighter held the first time the fight was refreshed.</summary>
@@ -7185,6 +7197,14 @@ namespace Jondo.Unity.Server.Handlers
             if (monster == null) return;
             fight.SceneStandIn ??= monster;
             await LanzarLaConductaAsync(stream, fight, monster, (season, 1));
+        }
+
+        /// <summary>The scene's season on a fighter who comes into an Osavora fight once it has begun.</summary>
+        internal static async Task LaTemporadaParaElQueLlegaAsync(FightInstance fight, Fighter quien)
+        {
+            foreach (int estado in fight.SceneStates.Where(Managers.OsavoraFights.IsSeason).ToList())
+                if (quien.IsAlive && !quien.Buffs.TieneEstado(estado))
+                    await GiveStateAsync(fight, quien, estado, -1);
         }
 
         internal static async Task LanzarLaConductaAsync(NetworkStream stream, FightInstance fight, Fighter quien,
