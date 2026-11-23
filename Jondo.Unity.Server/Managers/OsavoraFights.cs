@@ -63,13 +63,24 @@ namespace Jondo.Unity.Server.Managers
             _ => 31052,
         };
 
+        /// <summary>Osavora, the area Osabana and the Bzzegg Supervisor's Checkpoint are in.</summary>
+        public const int Osavora = 96;
+
         /// <summary>
-        /// A fight about to begin: in Osabana, its scene carries today's season. Returns the
-        /// season's spell to cast on everybody, or 0 elsewhere.
+        /// A fight about to begin: anywhere in Osavora, its scene carries today's season. Returns
+        /// the season's spell to cast on everybody, or 0 elsewhere.
         /// </summary>
+        /// <remarks>
+        /// Not only Osabana: the Kabombz (8048-8051) of Bzzkkbz Zowzrbz (1041) and of the
+        /// Bzzegg Supervisor's Checkpoint (1044) start with 31027 grade 1, whose only state is the
+        /// season «[!] Initial Saison» copies from the scene, and their death spell 31028 and the
+        /// Bzzeggs' 31032 cast nothing unless the caster carries a season or 6306 (which only the
+        /// Upset ones' 31278 and grade 3 give). Without a season the boss's phase two, counted on
+        /// those deaths, never came.
+        /// </remarks>
         public static int SetTheScene(FightInstance fight, int subArea)
         {
-            if (subArea != Osabana) return 0;
+            if (subArea != Osabana && Interactives.AreaOfSubArea(subArea) != Osavora) return 0;
             var season = OsavoraSeasons.At(Clock());
             fight.SceneStates.Add(StateOf(season));
             return SpellOf(season);

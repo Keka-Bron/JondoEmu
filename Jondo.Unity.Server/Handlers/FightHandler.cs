@@ -7172,7 +7172,7 @@ namespace Jondo.Unity.Server.Handlers
         /// like any other on the wire, and its triggered rows armed for good on whoever they name.
         /// </summary>
         /// <summary>
-        /// A fight of Osabana: its scene carries the week's season, its first monster stands for the
+        /// A fight in Osavora: its scene carries the week's season, its first monster stands for the
         /// scene -- the rows of the seasons' reactions aim at "Sce" --, and casts on everybody its
         /// «Temporada de …», the way a scene's spell would be (OsavoraFights).
         /// </summary>
