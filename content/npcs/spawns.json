@@ -2797,6 +2797,20 @@
       "why": "D'Arratagnan waiting at the Pantry's door while you go in. INFERRED cell: by Rata Plin."
     },
     {
+      "map": 224137218,
+      "npc": 6807,
+      "cell": 384,
+      "orientation": 3,
+      "why": "Raccooper in his refuge's last room, beaten, who lets the winners out («Leave the Sylvan Refuge.»). He stood nowhere and the room had no way out. INFERRED cell: beside Bentlaittuce (399)."
+    },
+    {
+      "map": 199495682,
+      "npc": 4975,
+      "cell": 370,
+      "orientation": 3,
+      "why": "Lee O'Summerly in «Kharnotaurus's Lair - Exit», who takes the winners out («Leave Kharnotaurus's Lair.»). He stood only at the door and the room had no way out. INFERRED cell."
+    },
+    {
       "map": 218632194,
       "npc": 6612,
       "cell": 247,

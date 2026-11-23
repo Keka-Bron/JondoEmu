@@ -588,5 +588,147 @@
     "lobby": 1,
     "autoGroup": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (225185794, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
+  },
+  "42": {
+    "name": "Despensa de la Rata Blanca",
+    "minLevel": 100,
+    "optimalLevel": 110,
+    "difficulty": 1,
+    "entrance": 216402698,
+    "exit": 216402698,
+    "rooms": [
+      218632192,
+      218631168,
+      218630144,
+      218629120,
+      218628096
+    ],
+    "bosses": [
+      940
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        8439,
+        1
+      ]
+    ],
+    "achievements": [
+      5188,
+      5191,
+      5190,
+      6186,
+      5189
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (218632194, the White Rat's last room), so «Salir de la mazmorra» led back into it. The room after the boss is in content/world/dungeon_exits.json, where the White Rat lets the winners out; the way out is the entrance map she takes them to."
+  },
+  "43": {
+    "name": "Raratonera de la Rata Negra",
+    "minLevel": 100,
+    "optimalLevel": 110,
+    "difficulty": 2,
+    "entrance": 216927751,
+    "exit": 216927751,
+    "rooms": [
+      218894336,
+      218891264,
+      218892288,
+      218893312,
+      218890240
+    ],
+    "bosses": [
+      939
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        8438,
+        1
+      ]
+    ],
+    "achievements": [
+      5194,
+      5197,
+      5196,
+      6187,
+      5195,
+      5982
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (218894338, the Black Rat's last room), so «Salir de la mazmorra» led back into it. The room after the boss is in content/world/dungeon_exits.json, where the Black Rat lets the winners out; the way out is the entrance map she takes them to."
+  },
+  "115": {
+    "name": "Guarida de Karnozor",
+    "minLevel": 90,
+    "optimalLevel": 100,
+    "difficulty": 2,
+    "entrance": 84411905,
+    "exit": 84411905,
+    "rooms": [
+      199491584,
+      199492608,
+      199493632,
+      199494656,
+      199495680
+    ],
+    "bosses": [
+      5819
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        21249,
+        1
+      ]
+    ],
+    "achievements": [
+      2115,
+      2118,
+      6181,
+      2116,
+      2117
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (199495682, «Kharnotaurus's Lair - Exit»), which has no border, no interactive and no NPC, so the winners were shut in. The room after the boss is in content/world/dungeon_exits.json, where Lee O'Summerly offers «Leave Kharnotaurus's Lair.»; the way out is the entrance map, where he keeps the door. INFERRED: the outside map, the catalogue naming no other."
+  },
+  "142": {
+    "name": "Refugio Silvestre",
+    "minLevel": 40,
+    "optimalLevel": 50,
+    "difficulty": 2,
+    "entrance": 223350028,
+    "exit": 223350028,
+    "rooms": [
+      224133120,
+      224134144,
+      224135168,
+      224136192,
+      224137216
+    ],
+    "bosses": [
+      7197
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        27374,
+        1
+      ]
+    ],
+    "achievements": [
+      5911,
+      6163,
+      5912,
+      5914,
+      5913,
+      6022
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (224137218), which has no border, no interactive and no NPC who leads out, so the winners were shut in. The room after the boss is in content/world/dungeon_exits.json, where Raccooper offers «Leave the Sylvan Refuge.»; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   }
 }

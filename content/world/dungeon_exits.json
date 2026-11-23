@@ -15,6 +15,42 @@
   ],
   "exits": [
     {
+      "dungeon": 142,
+      "bossRoom": 224137216,
+      "room": 224137218,
+      "cell": 413,
+      "npc": 6807,
+      "replies": [69096, 72637],
+      "why": "The Sylvan Refuge: after Raccooper the winners are in his refuge's last room (224137218), where he gives up the fight («This fight ends here. I won't risk standing up to you any longer.») and «Leave the Sylvan Refuge.» leaves, as does the quest's «...and leave the Sylvan Refuge.». The room had no border, no interactive and no NPC who leads out. INFERRED cells."
+    },
+    {
+      "dungeon": 115,
+      "bossRoom": 199495680,
+      "room": 199495682,
+      "cell": 398,
+      "npc": 4975,
+      "replies": [47164],
+      "why": "Kharnotaurus's Lair: after Kharnotaurus the winners are in «Kharnotaurus's Lair - Exit» (199495682), where the innkeeper of the door, Lee O'Summerly, takes them out («By my godfathers! What a mess you've made inside!», then «Leave Kharnotaurus's Lair.»). The room had no border, no interactive and no NPC. INFERRED cells."
+    },
+    {
+      "dungeon": 43,
+      "bossRoom": 218894336,
+      "room": 218894338,
+      "cell": 384,
+      "npc": 6614,
+      "replies": [66779, 66802, 66811],
+      "why": "The Moumousetrap: after the Black Rat the winners are in her last room, where she lets them out (her replies already lead to the entrance) and the militiawoman of «Fait comme un rat» stays with her. INFERRED cell: by the Black Rat (356)."
+    },
+    {
+      "dungeon": 42,
+      "bossRoom": 218632192,
+      "room": 218632194,
+      "cell": 272,
+      "npc": 6612,
+      "replies": [66726],
+      "why": "The White Rat's Pantry: after the White Rat the winners are in her last room, where she lets them out («Salir de la mazmorra») and D'Arratagnan waits for them. INFERRED cell: between the two."
+    },
+    {
       "dungeon": 138,
       "bossRoom": 221778432,
       "room": 221778434,

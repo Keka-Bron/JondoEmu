@@ -24858,6 +24858,35 @@
       "why": "D'Arratagnan waiting at the White Rat's Pantry [-34,-59]: «D'Arratagnan te esperará en la entrada»."
     },
     {
+      "npc": 6807,
+      "map": 224137218,
+      "opening": 51493,
+      "lines": [
+        {
+          "message": 51493,
+          "choices": [
+            { "reply": 69096 },
+            { "reply": 69097 }
+          ]
+        }
+      ],
+      "why": "Raccooper after his fight, in the Sylvan Refuge's last room: «This fight ends here. I won't risk standing up to you any longer.», then «Leave the Sylvan Refuge.» (content/world/dungeon_exits.json) or «Stay.»."
+    },
+    {
+      "npc": 4975,
+      "map": 199495682,
+      "opening": 35690,
+      "lines": [
+        {
+          "message": 35690,
+          "choices": [
+            { "reply": 47164 }
+          ]
+        }
+      ],
+      "why": "Lee O'Summerly in «Kharnotaurus's Lair - Exit»: «By my godfathers! What a mess you've made inside!», then «Leave Kharnotaurus's Lair.» (content/world/dungeon_exits.json)."
+    },
+    {
       "npc": 6612,
       "map": 218632194,
       "opening": 50024,
