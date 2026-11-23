@@ -156,6 +156,18 @@ namespace Jondo.Unity.Server.Managers
             public bool NeedsFreeCell { get; init; }
             public bool UtilityOnEnemies { get; init; }
 
+            /// <summary>
+            /// The masks of its mechanics on enemies when every one of them asks the target for a
+            /// state: whom among the enemies it does anything to. The Mirador's spirits' burn
+            /// specials (Combustión Espontánea, 1160 and 951 on «A,E556») only touch one who burns,
+            /// and were cast at an enemy who did not, four AP spent on nothing each turn.
+            /// </summary>
+            public IReadOnlyList<string> UtilityEnemyMasks { get; init; } = Array.Empty<string>();
+
+            /// <summary>Whether its mechanics on enemies do anything to that one (<see cref="UtilityEnemyMasks"/>).</summary>
+            public bool UtilityReachesEnemy(Fighter caster, Fighter enemy)
+                => UtilityEnemyMasks.Count == 0 || UtilityEnemyMasks.Any(mask => EffectEngine.CumpleLaMascara(caster, enemy, mask));
+
             /// <summary>Cast on itself only: range zero.</summary>
             public bool OnSelf => MaxRange <= 0;
 
@@ -1042,7 +1054,7 @@ namespace Jondo.Unity.Server.Managers
                 if (!onEnemy && spell.UtilityReachesOwnSide(monster, target))
                     value += spell.Utility;
             }
-            else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy : target == monster))
+            else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy && spell.UtilityReachesEnemy(monster, target) : target == monster))
                 value += spell.Utility;
 
             return value;

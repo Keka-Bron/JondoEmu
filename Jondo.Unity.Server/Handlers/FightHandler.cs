@@ -11770,6 +11770,7 @@ namespace Jondo.Unity.Server.Handlers
                         ? 25 + monster.Level / 10.0 : 0,
                     NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,
+                    UtilityEnemyMasks = EnemyMasksAskingAState(mechanicMasks),
                     // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
                     // and so is a monster's that only hides its own side (HidesItsSideOnly), kills
                     // (KillsEnemiesOnly) or trades places with one of its own (SwapsWithItsSide).
@@ -11868,6 +11869,18 @@ namespace Jondo.Unity.Server.Handlers
                 own = true;
             }
             return own;
+        }
+
+        /// <summary>
+        /// The masks of a spell's mechanics on enemies («A» or «H»), when each of them asks its
+        /// target for a state or its absence («E556», «e556»); none otherwise.
+        /// </summary>
+        internal static List<string> EnemyMasksAskingAState(IEnumerable<string> mechanicMasks)
+        {
+            var onEnemies = mechanicMasks.Where(m => HasMask(m, "A") || HasMask(m, "H")).Distinct().ToList();
+            bool AsksAState(string mask) => mask.Split(',').Select(p => p.Trim())
+                .Any(p => p.Length > 1 && (p[0] == 'E' || p[0] == 'e') && char.IsDigit(p[1]));
+            return onEnemies.Count > 0 && onEnemies.All(AsksAState) ? onEnemies : new List<string>();
         }
 
         private static bool HasMask(string mask, string who)
