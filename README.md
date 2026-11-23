@@ -809,6 +809,7 @@ Full workings in **`docs/achievements.md`**.
 - ✅ Leave a dungeon, or the haven bag, from the map panel
 - ✅ The monster side grows with each player in the fight, up to eight
 - ✅ Dungeon challenges and their achievements
+- ✅ Played through in the client, room by room and boss mechanics included: **133/187 (71%)**
 
 Full workings in **`docs/dungeons.md`**.
 
