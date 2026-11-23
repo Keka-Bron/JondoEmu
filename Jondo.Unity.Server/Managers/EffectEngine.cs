@@ -315,6 +315,13 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public int? HookUntil { get; init; }
 
+        /// <summary>
+        /// For an armed row: whether its caster's conditions (states, template, life) held at the
+        /// cast. An armed row is kept whatever they say, and a hook for good reads them again when
+        /// it goes off; one for some rounds does not.
+        /// </summary>
+        public bool CasterConditionsHeld { get; init; } = true;
+
         /// <summary>Buffs removed by an effect 406 or by a state being removed.</summary>
         public IReadOnlyList<Buff> BuffsQuitados { get; init; } = Array.Empty<Buff>();
 
@@ -2844,6 +2851,7 @@ namespace Jondo.Unity.Server.Managers
                             Sobre = portador, Caster = caster, Efecto = efecto,
                             HechizoOrigen = spell, NivelOrigen = grade,
                             EnganchePendiente = true, FilaArmada = true,
+                            CasterConditionsHeld = CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar),
                             // A row with no duration that waits on a turn of someone else lives to
                             // that turn, as a class spell's does: the Blopiseta's Bloproyección, cast
                             // as the last of the round, burns "por cada PM utilizado" at the end of

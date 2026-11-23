@@ -6780,16 +6780,39 @@ namespace Jondo.Unity.Server.Handlers
                 // they do: Aguja's poison lasts as its 2328, and the second tick was lost on an
                 // enemy who plays before the Xelor.
                 int byTheRowsLeft = -1;
-                if (hasta >= 0)
+                foreach (var c in consecuencias)
                 {
-                    foreach (var c in consecuencias)
+                    if (c.Buff == null || c.Sobre != grupo.Key.Sobre || c.HechizoOrigen != grupo.Key.HechizoOrigen
+                        || c.NivelOrigen != grupo.Key.NivelOrigen || c.Buff.CaducaEnRonda < 0) continue;
+                    byTheRowsLeft = Math.Max(byTheRowsLeft, c.Buff.CaducaEnRonda);
+                }
+
+                // A behaviour's spell cast again and again by its hooks: King Dazahk's Impatience
+                // (10346) casts its grade 3 at each of his turn starts, and only at its third level
+                // (state 695) does that grade do anything -- MP, damage and state 697 for two rounds,
+                // and 10347 armed under M and PMD on "C,*E695". The same cast takes 695 off (406 on
+                // 10332), so a hook for good, reading the mask again when he was pushed, never went
+                // off, and nothing could get under his resistances. A cast whose conditions held
+                // and that left rows for some rounds hooks for as long as they last, its mask taken
+                // as it was; a later cast that did nothing does not stretch that hook for good.
+                var yaArmado = grupo.Key.Sobre.Buffs.ActiveSpells.FirstOrDefault(
+                    e => e.Filas != null && e.Hechizo == grupo.Key.HechizoOrigen && e.Grado == grupo.Key.NivelOrigen
+                         && e.Lanzador == grupo.Key.Quien);
+                if (deConducta && hasta < 0
+                    && grupo.All(c => c.Efecto != null && c.Efecto.Duration == 0
+                                      && !Managers.EffectEngine.WaitsForeverOnDeath(c.Efecto)))
+                {
+                    bool held = grupo.All(c => c.CasterConditionsHeld);
+                    if (!held && yaArmado is { CaducaEnRonda: >= 0 }) continue;
+                    if (held && byTheRowsLeft >= 0)
                     {
-                        if (c.Buff == null || c.Sobre != grupo.Key.Sobre || c.HechizoOrigen != grupo.Key.HechizoOrigen
-                            || c.NivelOrigen != grupo.Key.NivelOrigen) continue;
-                        hasta = Math.Max(hasta, c.Buff.CaducaEnRonda);
-                        byTheRowsLeft = Math.Max(byTheRowsLeft, c.Buff.CaducaEnRonda);
+                        hasta = Math.Max(ronda + 1, byTheRowsLeft);
+                        foreach (var c in grupo)
+                            if (c.HookUntil is { } targetTurn) hasta = Math.Max(hasta, targetTurn);
+                        if (yaArmado is { CaducaEnRonda: < 0 }) yaArmado.CaducaEnRonda = hasta;
                     }
                 }
+                if (hasta >= 0) hasta = Math.Max(hasta, byTheRowsLeft);
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0
