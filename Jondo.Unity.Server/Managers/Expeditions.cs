@@ -260,7 +260,7 @@ namespace Jondo.Unity.Server.Managers
                             explanation, onward, R("Gracias por la información."));
         }
 
-        private static Dictionary<long, string> TextsOf(IEnumerable<long> keys)
+        internal static Dictionary<long, string> TextsOf(IEnumerable<long> keys)
         {
             var result = new Dictionary<long, string>();
             var wanted = keys.Where(k => k > 0).Distinct().ToList();

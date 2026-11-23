@@ -174,6 +174,30 @@ namespace Jondo.Unity.Tests.World
         }
 
         [Fact]
+        public void Each_expedition_asks_to_enter_the_place_it_names()
+        {
+            // «¿Seguro que quieres entrar en el Mirador de Ilyzaelle?» was asked for the Torre de
+            // Solar: one selection the parser missed shifted every confirmation after it.
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            DungeonManager.Initialize();
+            Npcs.Initialize();
+            Expeditions.Initialize();
+            if (!DungeonManager.IsLoaded || Expeditions.Offers.Count == 0) return;   // no world base
+
+            var elmer = Npcs.TemplateOf(Expeditions.Npc)!;
+            var keyOf = elmer.Messages.Zip(elmer.MessageTexts).ToDictionary(m => m.First, m => m.Second);
+            var texts = Expeditions.TextsOf(keyOf.Values);
+            foreach (var offer in Expeditions.Offers)
+            {
+                string name = DungeonManager.Get(offer.DungeonId)!.Name;
+                string place = name.Substring(name.IndexOf(" - ", System.StringComparison.Ordinal) + 3);
+                string last = place.Split(' ').Last().ToLowerInvariant();
+                string asked = texts.GetValueOrDefault(keyOf.GetValueOrDefault(offer.Confirm), "").ToLowerInvariant();
+                Assert.True(asked.Contains(last), $"{offer.DungeonId} ({place}) asks: {asked}");
+            }
+        }
+
+        [Fact]
         public void Each_expedition_has_the_boss_of_its_base_dungeon_in_its_last_room()
         {
             if (MapManager.Maps.Count == 0) MapManager.Initialize();
