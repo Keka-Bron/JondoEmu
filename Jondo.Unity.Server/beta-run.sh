@@ -16,14 +16,16 @@ if [ -z "${JONDO_CLIENT_EXECUTABLE:-}" ] && [ -x "$CLIENT_INSTALL/Dofus.x64" ]; 
 fi
 cd "$ROOT"
 
-# MSBuild reuses up-to-date outputs and rebuilds changed sources.
+# Keep local build inputs independent of the Git revision, in a profile-specific cache.
 dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj \
     -c Release \
     -r linux-x64 \
     -p:SkipTests=true \
     -p:SkipRootDeploy=true \
     -p:JondoProtocolTarget="$TARGET" \
-    --artifacts-path "$ROOT/host-artifacts" \
+    -p:IncludeSourceRevisionInInformationalVersion=false \
+    -p:EnableSourceLink=false \
+    --artifacts-path "$ROOT/host-artifacts/launcher-local" \
     --output "$PUBLISH_DIR" \
     --nologo
 

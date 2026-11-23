@@ -2,14 +2,17 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ARTIFACTS_DIR="$ROOT/host-artifacts/launcher-local"
 cd "$ROOT"
 
-# MSBuild reuses up-to-date outputs and rebuilds changed sources.
+# Share the launcher cache without letting Git revision metadata invalidate it.
 dotnet publish Jondo.Unity.Server/Jondo.Unity.Server.csproj \
     -c Release \
     -r linux-x64 \
     -p:SkipTests=true \
-    --artifacts-path "$ROOT/host-artifacts" \
+    -p:IncludeSourceRevisionInInformationalVersion=false \
+    -p:EnableSourceLink=false \
+    --artifacts-path "$ARTIFACTS_DIR" \
     --nologo
 
-exec "$ROOT/host-artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server" "$@"
+exec "$ARTIFACTS_DIR/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server" "$@"
