@@ -14,6 +14,7 @@ namespace Jondo.Unity.Tests.Combat
     /// the dying ally's, written undispellable by death (dispellable 3), so they outlive him: every
     /// ally that falls makes the boss stronger.
     /// </summary>
+    [Collection("MapManager")]
     public class SuperGuinoTests
     {
         private const int MorsaguinoReal = 2848;
@@ -79,6 +80,60 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(life + 2000, boss.MaxHP);
             Assert.Equal(2, boss.Buffs.De(Fighter.CaracteristicaDePuntosDeMovimiento, fight.RoundNumber));
         }
+
+        /// <summary>
+        /// Salagüino also casts 2212 on him, «792 2610 under P|MA, trigger duration 63»: pushed or
+        /// pulled at any point of the fight, he casts 2610 (at most every four turns), whose 786
+        /// under D heals whoever hits him by all of the blow until the next round.
+        /// </summary>
+        [Fact]
+        public async Task Pushed_he_heals_whoever_hits_him()
+        {
+            if (!HasData || SpellEffects.De(2212, 1).Count == 0 || SpellEffects.De(2610, 1).Count == 0) return;
+            if (!SpellEffects.De(PushSpell, 1).Any(row => row.EffectId == 5)) return;
+            var (fight, boss, _, character) = await BoardAsync();
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2212);
+
+            int round = fight.RoundNumber;
+            while (fight.RoundNumber < round + 3) fight.NextTurn();
+            boss.Buffs.BarrerEnganches(fight.RoundNumber);
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2212);
+
+            int bossCell = 330;
+            boss.CellId = bossCell;
+            character.CellId = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(bossCell).First();
+            await FightHandler.AplicarEfectosAsync(null, fight, character, PushSpell, 1, boss,
+                                                   EffectEngine.AlLanzar, boss.CellId);
+            Assert.NotEqual(bossCell, boss.CellId);
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+
+            // Hit in the same turn (his shell, state 56, already broken), the hurt attacker gets
+            // the whole blow back as life.
+            boss.Buffs.QuitarEstadoConEmbrujos(56);
+            character.CurrentHP = 1000;
+            int bossLife = boss.CurrentHP;
+            await FightHandler.HurtAsync(null, fight, character, 1, 1, boss, boss.CellId, tirada: new[] { Blow(400) });
+            int blow = bossLife - boss.CurrentHP;
+            Assert.True(blow > 0);
+            Assert.Equal(1000 + blow, character.CurrentHP);
+
+            // And not for good: past his next turn, a hit heals nobody.
+            int now = fight.RoundNumber;
+            while (fight.RoundNumber < now + 2) fight.NextTurn();
+            boss.Buffs.BarrerEnganches(fight.RoundNumber);
+            character.CurrentHP = 1000;
+            bossLife = boss.CurrentHP;
+            await FightHandler.HurtAsync(null, fight, character, 1, 1, boss, boss.CellId, tirada: new[] { Blow(400) });
+            Assert.True(boss.CurrentHP < bossLife);
+            Assert.Equal(1000, character.CurrentHP);
+        }
+
+        private static SpellEffect Blow(int amount) => new()
+        {
+            EffectId = 100, EffectUid = 900100, DiceNum = amount, DiceSide = amount, Element = 0, TargetMask = "a,A",
+        };
+
+        private const int PushSpell = 32426;
 
         /// <summary>
         /// What a monster put that dies with it still goes with it: the rows dispellable by death (2)

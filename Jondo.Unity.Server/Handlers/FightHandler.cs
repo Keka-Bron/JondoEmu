@@ -6823,6 +6823,17 @@ namespace Jondo.Unity.Server.Handlers
         /// is where a buff of the same reaction, shortened by <see cref="AguantaSuTurno"/>, is gone
         /// too -- the Kílerat's poison on a hit, three ticks and not four.
         /// </param>
+        /// <summary>
+        /// Whether a row a behaviour's hook set off listens for its own trigger rounds rather than
+        /// for good: the behaviour's rows are the monster's for the whole fight, but a spell one of
+        /// them casts when it goes off says how long it lasts. Pushed or pulled, the Royal
+        /// Pingwin casts 2610, «786 under D, trigger duration 1» -- whoever hits him is healed by
+        /// the blow until his next turn. Kept for good, one push in round one healed every later
+        /// blow of the fight.
+        /// </summary>
+        private static bool CountsItsRoundsOffATrigger(Managers.SpellEffect fila, bool offATrigger)
+            => offATrigger && fila != null && Managers.EffectEngine.CountsItsTriggerRounds(fila);
+
         internal static void EngancharLoPendiente(List<Managers.Outcome> consecuencias,
                                                   int hechizo, int grado, long lanzador, int ronda,
                                                   bool incluirElPropio = true, bool critico = false,
@@ -6856,7 +6867,8 @@ namespace Jondo.Unity.Server.Handlers
                 int byOwnDuration = -1;
                 foreach (var c in grupo)
                 {
-                    int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda, deConducta);
+                    int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda,
+                                                                       deConducta && !CountsItsRoundsOffATrigger(c.Efecto, offATrigger));
                     if (suya < 0) { hasta = -1; break; }
                     hasta = Math.Max(hasta, suya);
                     // A row's trigger duration is a duration of its own too, when it is a real count
@@ -8614,7 +8626,8 @@ namespace Jondo.Unity.Server.Handlers
                     // Ush Galesh's 6264 casts 6238, which casts 6239, whose 1061 shares every blow
                     // between the two Ush; kept to the next round, the link broke after round one.
                     if (c.FilaEnganchada && c.Buff is { } fila && c.Efecto is { Duration: 0 } efecto
-                        && Managers.EffectEngine.EsFilaQueLeeElGolpe(efecto.EffectId))
+                        && Managers.EffectEngine.EsFilaQueLeeElGolpe(efecto.EffectId)
+                        && !CountsItsRoundsOffATrigger(efecto, !alLanzar))
                         fila.CaducaEnRonda = -1;
                 }
             }
