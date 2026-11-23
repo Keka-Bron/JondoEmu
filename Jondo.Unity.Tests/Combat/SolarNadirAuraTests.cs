@@ -59,5 +59,51 @@ namespace Jondo.Unity.Tests.Combat
             await FightHandler.DispararLosGlifosAsync(null, fight, player, alPisar: true);
             Assert.Equal(once, RangeTaken());
         }
+
+        // Live, Solar lays it again every turn: copies overlap, and one starts his turns in them.
+        [Fact]
+        public async Task Turn_starts_and_overlapping_copies_take_the_range_once()
+        {
+            if (!SpellEffects.De(NadirAura, 2).Any(row => row.EffectId == 116)) return;   // no spell data
+            var fight = new FightInstance(1, 2);
+            var player = new Fighter
+            {
+                Id = 10, CellId = 266, MaxHP = 5000, CurrentHP = 5000, Level = 200,
+                MaxAP = 10, CurrentAP = 10, MaxMP = 5, CurrentMP = 5,
+            };
+            fight.AddPlayer(player);
+            var solar = new Fighter
+            {
+                Id = -1, CellId = 200, MaxHP = 19000, CurrentHP = 19000, Level = 200, IsMonster = true,
+                MonsterId = 1, MaxAP = 10, CurrentAP = 10, MaxMP = 4, CurrentMP = 4,
+            };
+            fight.AddMonster(solar);
+            fight.StartFight();
+            Glifo Lay(int[] cells)
+            {
+                var g = fight.Poner(new Glifo(solar.Id, cells, NadirAura, 2, 0, -1, "A", Disparo.AlPisarYAlEmpezar));
+                g.Tipo = 1091;
+                return g;
+            }
+            Lay(new[] { 266, 253 });
+            Lay(new[] { 266, 225 });
+
+            int RangeTaken() => player.Buffs.De(19, fight.RoundNumber);
+
+            await FightHandler.DispararLosGlifosAsync(null, fight, player, alPisar: true);
+            int once = RangeTaken();
+            Assert.True(once < 0);
+            for (int turn = 0; turn < 3; turn++)
+                await FightHandler.DispararLosGlifosAsync(null, fight, player, alPisar: false);
+            Assert.Equal(once, RangeTaken());
+
+            // Out of the first copy, still in the second: the range stays taken.
+            player.CellId = 225;
+            await FightHandler.DispararLosGlifosAsync(null, fight, player, alPisar: true);
+            Assert.Equal(once, RangeTaken());
+            player.CellId = 400;
+            await FightHandler.DispararLosGlifosAsync(null, fight, player, alPisar: true);
+            Assert.Equal(0, RangeTaken());
+        }
     }
 }

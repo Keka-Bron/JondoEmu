@@ -4979,6 +4979,15 @@ namespace Jondo.Unity.Server.Handlers
         /// What a monster's aura gave a fighter goes when he is no longer on it: the rows of the
         /// aura's spell, and the states they held -- with their EOFF.
         /// </summary>
+        /// <summary>
+        /// Whether the fighter already carries what this monster aura gives: he stands in a copy
+        /// of the same spell he was counted in, and its rows are still on him.
+        /// </summary>
+        private static bool YaDentroDelAura(FightInstance fight, Glifo glifo, Fighter quien)
+            => quien.Buffs.LlevaDelHechizo(glifo.Hechizo)
+               && fight.Glifos.Any(g => EsAuraDeMonstruo(g) && g.Hechizo == glifo.Hechizo
+                                        && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId));
+
         private static async Task SalirDeLasAurasAsync(NetworkStream stream, FightInstance fight, Fighter quien)
         {
             foreach (var aura in fight.Glifos.Where(g => EsAuraDeMonstruo(g)
@@ -4986,6 +4995,10 @@ namespace Jondo.Unity.Server.Handlers
                                                          && !g.Cubre(quien.CellId)).ToList())
             {
                 aura.Dentro.Remove(quien.Id);
+                // Out of one copy but still in another of the same spell: what it gave stays.
+                if (fight.Glifos.Any(g => EsAuraDeMonstruo(g) && g.Hechizo == aura.Hechizo
+                                          && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId)))
+                    continue;
                 var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo);
                 foreach (var quitado in quitados)
                 {
@@ -5038,9 +5051,14 @@ namespace Jondo.Unity.Server.Handlers
                 if (skipWalls && Managers.BombWalls.IsWall(glifo)) continue;
                 if (!GlyphCatches(fight, glifo, quien, byDisplacement)) continue;
                 // A monster's aura gives once to whoever stands in it, not once per cell of it he
-                // walks: Solar's Nadir aura (9439 laying 9443, -4 range with no end of its own)
-                // took 4 more at every step inside it, down to -14, and nothing reached him.
-                if (alPisar && EsAuraDeMonstruo(glifo) && glifo.Dentro.Contains(quien.Id)) continue;
+                // walks, per turn he starts in it, or per copy of it he stands in: Solar's Nadir
+                // aura (9439 laying 9443, -4 range with no end of its own) took 4 more at every
+                // step and every turn start inside it, down to -14, and nothing reached him.
+                if (EsAuraDeMonstruo(glifo) && YaDentroDelAura(fight, glifo, quien))
+                {
+                    glifo.Dentro.Add(quien.Id);
+                    continue;
+                }
 
                 await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar);
                 if (!quien.IsAlive) break;

@@ -725,6 +725,9 @@ namespace Jondo.Unity.World.Fights
         /// away with the state and the +N -- jya 36, 37 AND 38 in the capture -- and a hook
         /// left behind would fire the decay on the rows the recast has just put.
         /// </remarks>
+        /// <summary>Whether any row this spell put is still on the fighter.</summary>
+        public bool LlevaDelHechizo(int hechizo) => _puestos.Exists(e => e.HechizoOrigen == hechizo);
+
         public List<Buff> QuitarDelHechizo(int hechizo)
         {
             var quitados = _puestos.FindAll(e => e.HechizoOrigen == hechizo);
