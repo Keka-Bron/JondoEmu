@@ -20,7 +20,7 @@ namespace Jondo.Unity.Tests.Combat
     [Collection("MapManager")]
     public class BzzeggSupervisorPhaseTests
     {
-        private const int Supervisor = 8052, Kamikabz = 8050, KamikabzEgg = 8055, FirstPhase = 6276, Watching = 6274;
+        private const int Supervisor = 8052, Kamikabz = 8050, KamikabzEgg = 8055, FirstPhase = 6276, LastPhase = 6279, Watching = 6274, Invulnerable = 56, StartingSpell = 31078;
 
         /// <summary>A map of Osabana, its own arena.</summary>
         private const long Osabana = 234618880;
@@ -74,6 +74,30 @@ namespace Jondo.Unity.Tests.Combat
             await FightHandler.AplicarEfectosAsync(null, fight, egg, 31032, 2, egg, EffectEngine.AlLanzar, egg.CellId);
 
             Assert.True(boss.Buffs.TieneEstado(FirstPhase));
+        }
+
+        [Fact]
+        public async Task Four_eggs_burst_next_to_him_take_his_invulnerability_off()
+        {
+            if (!HasData) return;
+            var (fight, boss, layer) = Fight();
+            // His starting spell: invulnerable, and 31079 listening for his fourth phase.
+            boss.Conducta = (StartingSpell, 1);
+            await FightHandler.LanzarLaConductaAsync(null, fight, boss);
+            Assert.True(boss.Buffs.TieneEstado(Invulnerable));
+
+            for (int burst = 0; burst < 4; burst++)
+            {
+                int cell = MapGeometry.GetNeighbors(boss.CellId).First(c => fight.Todos.All(f => f.CellId != c));
+                var egg = await FightHandler.SummonAsync(null, fight, layer, KamikabzEgg, 1, cell);
+                Assert.NotNull(egg);
+                await FightHandler.AplicarEfectosAsync(null, fight, egg, 31032, 2, egg, EffectEngine.AlLanzar, egg.CellId);
+                egg.CurrentHP = 0;
+                egg.CellId = -1;
+            }
+
+            Assert.True(boss.Buffs.TieneEstado(LastPhase));
+            Assert.False(boss.Buffs.TieneEstado(Invulnerable));
         }
     }
 }
