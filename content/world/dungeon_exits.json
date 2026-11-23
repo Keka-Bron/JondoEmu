@@ -389,12 +389,30 @@
     },
     {
       "dungeon": 58,
-      "bossRoom": 59516928,
+      "bossRoom": 59514880,
+      "room": 59516928,
+      "cell": 356,
+      "npc": 1385,
+      "replies": [],
+      "why": "The Snowfoux Den (dungeon 58): after the Fourth Room the players stand in the transition room, where Givrihaltès (1385) lets them choose Tengu Snowfoux alone or Tengu and Fuji Snowfoux (dungeons 9007 and 9008): «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble» (Dofus pour les noobs). The map panel leaves. INFERRED: the Throne Room as that room, and the landing cell in its middle."
+    },
+    {
+      "dungeon": 9007,
+      "bossRoom": 205787160,
       "room": 59518976,
       "cell": 397,
       "npc": 0,
       "replies": [],
-      "why": "Snowfoux Den (dungeon 58): after the Tengu 2967 the winners stand in map 59518976 'Exit to the Petrified Forest', which objective 4144 of «Hace fresco, pero no importa» (623) names; Dofus pour les noobs: «a la fin du combat, cliquez sur l'un des trous présents dans la salle afin de sortir». The hole (element 458461, cell 288) leaves for the forest. Landing cell 397 is the hole's own landing from the Path room. Before this the catalogue's room order put this map second, so a real player passed it before the boss and needed a second run to tick 4144."
+      "why": "After Tengu Snowfoux alone (dungeon 9007) the winners stand in map 59518976 'Exit to the Petrified Forest', which objective 4144 of «Hace fresco, pero no importa» (623) names; Dofus pour les noobs: «a la fin du combat, cliquez sur l'un des trous présents dans la salle afin de sortir». The hole (element 458461, cell 288) leaves for the forest. Landing cell 397 is the hole's own landing from the Path room."
+    },
+    {
+      "dungeon": 9008,
+      "bossRoom": 205916168,
+      "room": 59518976,
+      "cell": 397,
+      "npc": 0,
+      "replies": [],
+      "why": "After Tengu and Fuji Snowfoux (dungeon 9008), the same Exit to the Petrified Forest as after Tengu alone (dungeon 9007): objective 4144 of «Hace fresco, pero no importa» (623) names it, and its hole (element 458461, cell 288) leaves for the forest."
     },
     {
       "dungeon": 125,

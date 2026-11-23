@@ -47327,6 +47327,35 @@
     },
     {
       "npc": 1385,
+      "map": 59516928,
+      "opening": 8988,
+      "lines": [
+        {
+          "message": 8988,
+          "choices": [
+            { "reply": 9092, "next": 13776 },
+            { "reply": 9093, "next": 13777 }
+          ]
+        },
+        {
+          "message": 13776,
+          "choices": [
+            { "reply": 15928, "teleport": 205787160 },
+            { "reply": 15929 }
+          ]
+        },
+        {
+          "message": 13777,
+          "choices": [
+            { "reply": 15930, "teleport": 205916168 },
+            { "reply": 15931 }
+          ]
+        }
+      ],
+      "why": "Givrihaltès in the Snowfoux Den's transition room, after the Fourth Room (dungeon 58): «Rendre hommage à Tengu Givrefoux» (9092) and «Déranger Tengu et Fuji Givrefoux» (9093), each asked again (13776, 13777) before it takes the character into that boss's room (dungeons 9007 and 9008); Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble». 15929 and 15931 wait. INFERRED: which confirmation goes with which question (by their order in the client)."
+    },
+    {
+      "npc": 1385,
       "map": 59510784,
       "opening": 8293,
       "lines": [

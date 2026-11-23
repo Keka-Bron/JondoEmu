@@ -730,5 +730,127 @@
     "lobby": 1,
     "autoGroup": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (224137218), which has no border, no interactive and no NPC who leads out, so the winners were shut in. The room after the boss is in content/world/dungeon_exits.json, where Raccooper offers «Leave the Sylvan Refuge.»; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
+  },
+  "58": {
+    "name": "Guarida de los Gélifux",
+    "minLevel": 160,
+    "optimalLevel": 170,
+    "difficulty": 2,
+    "entrance": 59510784,
+    "exit": 60031488,
+    "rooms": [
+      59511808,
+      59512832,
+      59513856,
+      59514880
+    ],
+    "bosses": [],
+    "keyring": 1,
+    "required": [
+      [
+        11178,
+        1
+      ]
+    ],
+    "achievements": [
+      31,
+      748,
+      538,
+      6218,
+      749,
+      134,
+      544,
+      6219,
+      761,
+      760,
+      5983
+    ],
+    "lobby": 1,
+    "autoGroup": 0,
+    "door": 1,
+    "roster": {
+      "59511808": [
+        2888,
+        2889,
+        2890,
+        2891,
+        2982
+      ],
+      "59512832": [
+        2888,
+        2889,
+        2890,
+        2891,
+        2982
+      ],
+      "59513856": [
+        2888,
+        2889,
+        2890,
+        2891,
+        2982
+      ],
+      "59514880": [
+        2888,
+        2889,
+        2890,
+        2891,
+        2982
+      ]
+    },
+    "why": "The Snowfoux Den as the game has it: its four fight rooms (First to Fourth Room), whose last leads to the transition room where Givrihaltès (1385) offers the two boss fights (dungeons 9007 and 9008, dungeon_exits.json). Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble». The catalogue chained eleven rooms, the Path and the Exit to the Petrified Forest first, and the boss fight always brought Tengu, Fuji, Yomi and Kami together. The rooms are the den's Maho, Soryo, Yokai, Yomi and Kami Snowfoux. The guardian keeps the door at the entrance (key 11178 or the keyring). INFERRED: the Throne Room (59516928) as the transition room, the old boss room the two new Snowfoux Den maps replaced."
+  },
+  "9007": {
+    "name": "Tengu Snowfoux's Room",
+    "minLevel": 160,
+    "optimalLevel": 170,
+    "difficulty": 2,
+    "entrance": 59516928,
+    "exit": 60031488,
+    "rooms": [
+      205787160
+    ],
+    "bosses": [
+      2967
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "alone": {
+      "205787160": [
+        2967,
+        2982,
+        2891,
+        2888
+      ]
+    },
+    "why": "Tengu Snowfoux fought on his own, chosen at Givrihaltès in the Snowfoux Den's transition room (dungeon 58): Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble». The Yomi and the Yokai are there from the start (their weapon hit and push lift his invulnerability), and the Kami with them: «Fuji remplace la Kami Givrefoux dans le combat» in the other fight. The larger of the two Snowfoux Den maps: «La map de Tengu et Fuji Givrefoux est beaucoup plus petite que celle du Tengu solo». Its win leads to the Exit to the Petrified Forest (dungeon_exits.json)."
+  },
+  "9008": {
+    "name": "Tengu and Fuji Snowfoux's Room",
+    "minLevel": 160,
+    "optimalLevel": 170,
+    "difficulty": 2,
+    "entrance": 59516928,
+    "exit": 60031488,
+    "rooms": [
+      205916168
+    ],
+    "bosses": [
+      2967,
+      3234
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "alone": {
+      "205916168": [
+        2967,
+        3234,
+        2891,
+        2888
+      ]
+    },
+    "why": "Tengu and Fuji Snowfoux together, chosen at Givrihaltès in the Snowfoux Den's transition room (dungeon 58): Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble»; «Fuji remplace la Kami Givrefoux dans le combat», on «La map de Tengu et Fuji Givrefoux [...] beaucoup plus petite que celle du Tengu solo», the smaller of the two Snowfoux Den maps. Fuji is 3234, the boss the catalogue lists for the dungeon. Its win leads to the Exit to the Petrified Forest (dungeon_exits.json)."
   }
 }
