@@ -10137,11 +10137,53 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await ActitudesAsync(stream, fight, quien, disparador);
                 await EngancheAsync(stream, fight, quien, disparador);
+                await ActitudesQueLoVigilanAsync(stream, fight, quien, disparador);
             }
             finally
             {
                 fight.TriggerDepth--;
             }
+        }
+
+        /// <summary>
+        /// A state going on or off someone, answered by ANOTHER fighter's attitude whose row waits
+        /// on it and names him: Klim's Bravura (23893) holds "792 on A under EON218", so an enemy
+        /// put in Pacifista casts its grade 2 at himself and dies. Only the bearer's own attitudes
+        /// were asked, and Klim never takes 218 himself, so nobody ever died of it. The row goes
+        /// off on the one who changed state and nobody else, as an armed hook would.
+        /// </summary>
+        private static async Task ActitudesQueLoVigilanAsync(NetworkStream stream, FightInstance fight,
+                                                             Fighter quien, string disparador)
+        {
+            if (!disparador.StartsWith("EON", StringComparison.Ordinal)
+                && !disparador.StartsWith("EOFF", StringComparison.Ordinal)) return;
+            foreach (var vigia in fight.Azul.Concat(fight.Rojo).ToList())
+            {
+                if (vigia == quien || !vigia.IsAlive || vigia.Buffs.Actitudes.Count == 0) continue;
+                foreach (int actitud in vigia.Buffs.Actitudes.ToList())
+                {
+                    if (!quien.IsAlive) return;
+                    int grado = vigia.Buffs.GradoDeActitud(actitud);
+                    var filas = Managers.SpellEffects.De(actitud, grado)
+                        .Where(fila => fila.Disparadores().Contains(disparador, StringComparer.OrdinalIgnoreCase)
+                                       && !LaMascaraEsDelLanzador(fila.TargetMask)
+                                       && Managers.EffectEngine.CumpleLaMascara(vigia, quien, fila.TargetMask))
+                        .ToList();
+                    if (filas.Count == 0) continue;
+                    Program.LogDebug($"[Fight] Attitude {actitud} of {vigia.Id} answers {disparador} on {quien.Id}.");
+                    await AplicarEfectosAsync(stream, fight, vigia, actitud, grado, quien, disparador, quien.CellId,
+                                              tirada: filas, armar: false, soloAlObjetivo: true);
+                }
+            }
+        }
+
+        /// <summary>A mask naming the caster alone ("C", "C,F4460"): his own business, not a watch.</summary>
+        private static bool LaMascaraEsDelLanzador(string mascara)
+        {
+            var lados = (mascara ?? "").Split(',').Select(t => t.Trim())
+                                       .Where(t => t.Length > 0 && !t.StartsWith("*") && char.IsLetter(t[0])
+                                                   && t.Length == 1).ToList();
+            return lados.Count == 0 || lados.All(t => t == "C");
         }
 
         /// <summary>
