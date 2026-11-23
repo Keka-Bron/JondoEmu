@@ -6982,6 +6982,20 @@
       "cell": 191,
       "orientation": 1,
       "why": "Elmer Zenario, who offers the guild expeditions, in the function room of the Astrub guild hall, a few steps from its entrance (his name text: he visits the guild halls)."
+    },
+    {
+      "map": 192937992,
+      "npc": 778,
+      "cell": 340,
+      "remove": true,
+      "why": "Kazy Ingals keeps the Royal Tofu House, whose door is the peasants' workshop [5,6], not the Hungry Sunflower Barn's door map."
+    },
+    {
+      "map": 96338944,
+      "npc": 778,
+      "cell": 345,
+      "orientation": 3,
+      "why": "Kazy Ingals, keeper of the Royal Tofu House, in the peasants' workshop [5,6] next to Kurk Ingals: the dungeon's entrance is that workshop and one talks to her to go in (Dofus pour les noobs, Tofulailler Royal)."
     }
   ]
 }

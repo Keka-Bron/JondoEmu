@@ -78,7 +78,7 @@ namespace Jondo.Unity.Server.Managers
         /// nobody else found a way in.
         /// </summary>
         internal static bool KeepsItsDoor(Spawn spawn)
-            => DungeonManager.AtEntrance(spawn.MapId) != null
+            => DungeonManager.AtEntrance(spawn.MapId, spawn.NpcId) != null
                && (DungeonDoor.For(spawn.NpcId).Asks || Handlers.DungeonHandler.NamesItsDoors(spawn.NpcId, spawn.MapId));
 
         /// <summary>One of an NPC's looks, with what is needed to see it that way.</summary>

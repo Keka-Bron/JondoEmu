@@ -75,7 +75,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public static long[] DoorReplies(int npcId, long mapId)
         {
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, npcId);
             if (dungeon == null || dungeon.FirstRoom == 0) return Array.Empty<long>();
 
             var options = DungeonDoor.For(npcId);
@@ -97,7 +97,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var options = DungeonDoor.For(npcId);
             if (reply == 0 || options.Keyring != reply) return false;
-            return KeyringCannotOpen(mapId);
+            return KeyringCannotOpen(mapId, npcId);
         }
 
         /// <summary>
@@ -105,9 +105,9 @@ namespace Jondo.Unity.Server.Handlers
         /// character of the session: the dungeon is not on it, there is no keyring in the bag, or this
         /// week's free entry is spent. False on a map that is no dungeon's entrance.
         /// </summary>
-        public static bool KeyringCannotOpen(long mapId)
+        public static bool KeyringCannotOpen(long mapId, int npcId = 0)
         {
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, npcId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
 
             return !dungeon.OnKeyring
@@ -125,7 +125,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var options = DungeonDoor.For(npcId);
             if (reply == 0 || options.Key != reply) return false;
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, npcId);
             if (dungeon == null || dungeon.FirstRoom == 0 || dungeon.Required.Count == 0) return false;
 
             return dungeon.Required.All(r => FindInBag(r.Item, r.Count) == 0);
@@ -144,7 +144,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         public static async Task<bool> AtTheDoorAsync(NetworkStream stream, long mapId, long reply = 0, string door = "")
         {
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, SessionContext.State.OpenDialogueNpcId);
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
             // Before the key is spent.
             if (await Managers.Jail.KeepsInAsync(stream)) return false;
@@ -277,7 +277,7 @@ namespace Jondo.Unity.Server.Handlers
 
         internal static long ResumeReply(int npcId, long mapId, long characterId)
         {
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, npcId);
             long reply = DungeonDoor.ResumeFor(npcId, dungeon?.Name);
             return reply != 0 && dungeon != null && ResumeRoom(dungeon, characterId) != 0 ? reply : 0;
         }
@@ -287,7 +287,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var state = SessionContext.State;
             if (reply == 0) return false;
-            var dungeon = DungeonManager.AtEntrance(state.OpenDialogueMapId);
+            var dungeon = DungeonManager.AtEntrance(state.OpenDialogueMapId, state.OpenDialogueNpcId);
             if (reply != DungeonDoor.ResumeFor(state.OpenDialogueNpcId, dungeon?.Name)) return false;
             if (dungeon == null) return false;
             if (state.IsInFight || state.OpenDialogueMapId != state.MapId) return true;
@@ -324,7 +324,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         internal static bool TakesAtTheDoor(int npcId, long mapId, int itemId)
         {
-            var dungeon = DungeonManager.AtEntrance(mapId);
+            var dungeon = DungeonManager.AtEntrance(mapId, npcId);
             if (dungeon == null || dungeon.FirstRoom == 0 || DungeonDoor.For(npcId).Key == 0) return false;
             return dungeon.Required.Any(r => r.Item == itemId);
         }

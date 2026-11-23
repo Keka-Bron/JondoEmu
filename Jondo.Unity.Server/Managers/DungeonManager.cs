@@ -1134,14 +1134,16 @@ namespace Jondo.Unity.Server.Managers
         /// <remarks>
         /// Built lazily rather than kept as a third index because it is asked once per NPC
         /// conversation and there are 187 of them. When two dungeons share an entrance map the
-        /// lowest id wins, the same arbitrary rule <see cref="OfRoom"/> uses and for the same
-        /// reason: nothing in the data says which the player meant.
+        /// lowest id wins, the same arbitrary rule <see cref="OfRoom"/> uses, unless the guardian
+        /// being talked to is given: then the one his door replies name. Kazy Ingals keeps the
+        /// Royal Tofu House in the workshop where Kurk Ingals keeps the Tofu House, and her
+        /// «Darle la llave del Tofullinero Real» opened the Tofu House.
         /// </remarks>
-        public static Dungeon? AtEntrance(long mapId)
+        public static Dungeon? AtEntrance(long mapId, int npcId = 0)
         {
             if (mapId == 0) return null;
 
-            Dungeon? best = null;
+            Dungeon? best = null, named = null;
             foreach (var dungeon in _byId.Values)
             {
                 if (dungeon.EntranceMapId != mapId) continue;
@@ -1150,9 +1152,11 @@ namespace Jondo.Unity.Server.Managers
                 // it keeps one: Lord Crow's library takes its key from Virgil in its first room.
                 if (dungeon.Authored && !dungeon.KeepsADoor) continue;
                 if (best == null || dungeon.Id < best.Id) best = dungeon;
+                if (npcId != 0 && DungeonDoor.Names(npcId, dungeon.Name) && (named == null || dungeon.Id < named.Id))
+                    named = dungeon;
             }
 
-            return best;
+            return named ?? best;
         }
 
         /// <summary>

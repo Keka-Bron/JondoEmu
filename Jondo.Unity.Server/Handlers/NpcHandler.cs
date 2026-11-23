@@ -1023,7 +1023,7 @@ namespace Jondo.Unity.Server.Handlers
             if (choice.Criterion.Length > 0 && !Managers.PlayerCriteria.Met(choice.Criterion, SessionContext.State.MapId)) return false;
             // The keyring's door only while the keyring can open it, as the guardians' own reply.
             if (choice.Door == Jondo.Unity.World.Content.DialogueChoice.KeyringDoor
-                && DungeonHandler.KeyringCannotOpen(SessionContext.State.MapId)) return false;
+                && DungeonHandler.KeyringCannotOpen(SessionContext.State.MapId, SessionContext.State.OpenDialogueNpcId)) return false;
             if (choice.Cells.Count > 0 && !choice.Cells.Contains(SessionContext.State.CellId)) return false;
             if (!choice.MarksAllow(SessionContext.State.ElementsUsed)) return false;
             if (NotItsTurnYet(choice)) return false;

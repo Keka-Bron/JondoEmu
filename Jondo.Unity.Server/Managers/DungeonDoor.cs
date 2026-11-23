@@ -143,6 +143,24 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Every resume reply of each guardian, with the words it says.</summary>
         private static readonly Dictionary<int, List<(long Reply, string Words)>> _resumesByNpc = new();
 
+        /// <summary>The words of each guardian's key and resume replies, below the Expedition ones.</summary>
+        private static readonly Dictionary<int, List<string>> _doorWordsByNpc = new();
+
+        /// <summary>
+        /// Whether one of this guardian's key or resume replies names that dungeon.
+        /// </summary>
+        /// <remarks>
+        /// Two dungeons can share a door map: Kurk Ingals keeps the Tofu House and Kazy Ingals the
+        /// Royal Tofu House, both in the peasants' workshop. What each of them says at the door
+        /// («Darle la llave del Tofullinero Real.», «Retomar la Mazmorra de los Tofus donde la
+        /// dejaste.») is the only thing in the data that tells which door is whose.
+        /// </remarks>
+        public static bool Names(int npcId, string? dungeonName)
+        {
+            if (string.IsNullOrEmpty(dungeonName) || !_doorWordsByNpc.TryGetValue(npcId, out var words)) return false;
+            return words.Any(w => w.Contains(dungeonName, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>
         /// The resume reply of this guardian for that dungeon: the one that names it, or the
         /// guardian's only pick when none does.
@@ -179,6 +197,7 @@ namespace Jondo.Unity.Server.Managers
         {
             _byNpc.Clear();
             _resumesByNpc.Clear();
+            _doorWordsByNpc.Clear();
 
             var keyring = TextKeysSaying(KeyringWording);
             foreach (string wording in OtherKeyringWordings) keyring.UnionWith(TextKeysSaying(wording));
@@ -203,11 +222,20 @@ namespace Jondo.Unity.Server.Managers
                 _byNpc[template.Id] = options;
 
                 var resumes = new List<(long Reply, string Words)>();
+                var doorWords = new List<string>();
                 int upto = Math.Min(template.Replies?.Length ?? 0, template.ReplyTexts?.Length ?? 0);
                 for (int i = 0; i < upto; i++)
-                    if (resume.Contains(template.ReplyTexts![i]) && template.Replies![i] < Expedition)
-                        resumes.Add((template.Replies[i], WordsOf(template.ReplyTexts[i])));
+                {
+                    if (template.Replies![i] >= Expedition) continue;
+                    long text = template.ReplyTexts![i];
+                    bool isResume = resume.Contains(text);
+                    if (!isResume && !key.Contains(text)) continue;
+                    string words = WordsOf(text);
+                    doorWords.Add(words);
+                    if (isResume) resumes.Add((template.Replies[i], words));
+                }
                 if (resumes.Count > 1) _resumesByNpc[template.Id] = resumes;
+                if (doorWords.Count > 0) _doorWordsByNpc[template.Id] = doorWords;
             }
 
             Console.WriteLine($"[Dungeon] {_byNpc.Count} guardians with a door to open" +
