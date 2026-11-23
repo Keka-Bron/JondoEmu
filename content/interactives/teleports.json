@@ -175,6 +175,10 @@
     "client's dungeon data gives as the lair's entrance cell, which this client's map does not walk."
   ],
   "passages": [
+    {"map": 61865984, "element": 458477, "cell": 323, "gfx": 23977, "type": -1, "skill": 184, "toMap": 61998084, "toCell": 220, "why": "Kolosso's Caverns lobby: its four doors, one per element room (content/world/dungeons.json «60» hub). Which door leads where is the client's own floor passage back from each room, which lands on that door's cell; the landing inside is the walkable cell next to that passage."},
+    {"map": 61865984, "element": 458478, "cell": 283, "gfx": 23978, "type": -1, "skill": 184, "toMap": 61998082, "toCell": 232, "why": "Kolosso's Caverns lobby: its four doors, one per element room (content/world/dungeons.json «60» hub). Which door leads where is the client's own floor passage back from each room, which lands on that door's cell; the landing inside is the walkable cell next to that passage."},
+    {"map": 61865984, "element": 458480, "cell": 202, "gfx": 23980, "type": -1, "skill": 184, "toMap": 61998338, "toCell": 107, "why": "Kolosso's Caverns lobby: its four doors, one per element room (content/world/dungeons.json «60» hub). Which door leads where is the client's own floor passage back from each room, which lands on that door's cell; the landing inside is the walkable cell next to that passage."},
+    {"map": 61865984, "element": 458481, "cell": 161, "gfx": 23981, "type": -1, "skill": 184, "toMap": 61998340, "toCell": 170, "why": "Kolosso's Caverns lobby: its four doors, one per element room (content/world/dungeons.json «60» hub). Which door leads where is the client's own floor passage back from each room, which lands on that door's cell; the landing inside is the walkable cell next to that passage."},
     {
       "map": 162056,
       "element": 453562,

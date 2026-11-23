@@ -252,6 +252,9 @@ namespace Jondo.Unity.Server.Handlers
             await NpcHandler.CloseAsync(stream);
 
             Console.WriteLine($"[Dungeon] Enters {dungeon.Name}, room 1 of {dungeon.Rooms.Count}.");
+            // A new run from the door: the rooms around a lobby are all to be won again.
+            DungeonProgress.SetHubWin(state.CharacterId, dungeon, 0);
+            foreach (var way in heroWays) DungeonProgress.SetHubWin(way.Hero.CharacterId, dungeon, 0);
             return await EnterNewRunAsync(stream, dungeon, dungeon.FirstRoom, heroWays);
         }
 
@@ -366,6 +369,11 @@ namespace Jondo.Unity.Server.Handlers
             if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now)) return false;
 
             long to = room != 0 && dungeon.Rooms.Contains(room) ? room : dungeon.FirstRoom;
+            if (to == dungeon.FirstRoom)
+            {
+                DungeonProgress.SetHubWin(state.CharacterId, dungeon, 0);
+                foreach (var way in heroWays) DungeonProgress.SetHubWin(way.Hero.CharacterId, dungeon, 0);
+            }
             Console.WriteLine($"[Dungeon] {state.CharacterName} enters {dungeon.Name} by the search, " +
                               $"room {dungeon.Rooms.IndexOf(to) + 1} of {dungeon.Rooms.Count}.");
             return await EnterNewRunAsync(stream, dungeon, to, heroWays);
@@ -378,7 +386,14 @@ namespace Jondo.Unity.Server.Handlers
             var dungeon = DungeonManager.OfRoom(room);
             if (dungeon == null || (dungeon.Authored && !dungeon.KeepsADoor)) return 0;
 
-            DungeonProgress.SetRoom(characterId, dungeon, won ? DungeonManager.NextRoom(dungeon, room) : room);
+            long next = DungeonManager.NextRoom(dungeon, room);
+            if (won && dungeon.Hub?.AfterAWin(room, DungeonProgress.HubWins(characterId, dungeon)) is { } lobby)
+            {
+                DungeonProgress.SetHubWin(characterId, dungeon, room);
+                next = lobby.Map;
+            }
+            DungeonProgress.SetRoom(characterId, dungeon, won ? next : room);
+            if (won && next == 0) DungeonProgress.SetHubWin(characterId, dungeon, 0);
             if (won) return 0;
 
             long entrance = Expeditions.IsExpedition(dungeon.Id) ? 0 : dungeon.EntranceMapId;
@@ -409,6 +424,11 @@ namespace Jondo.Unity.Server.Handlers
             // winners in a room of their own where an NPC offers the way out (DungeonExitRooms).
             if (DungeonExitRooms.AfterBoss(roomMapId) is { } after && after.Dungeon == dungeon.Id)
                 return (after.MapId, after.Cell);
+
+            // A room around a lobby leads back to it, and the last of them on (Kolosso's Caverns).
+            // RecordFightProgress has already noted this win; the room is counted either way.
+            if (dungeon.Hub?.AfterAWin(roomMapId, DungeonProgress.HubWins(SessionContext.State.CharacterId, dungeon)) is { } lobby)
+                return lobby;
 
             long next = DungeonManager.NextRoom(dungeon, roomMapId);
             if (next != 0) return (next, TeleportHandler.MapCentre);

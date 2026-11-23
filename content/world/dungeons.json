@@ -15,6 +15,34 @@
     "and nobody else (DungeonManager.Dungeon.AloneRooms). «lingering»: the rooms not to stay in, the",
     "curse that warns whoever comes in and the curses earned by the seconds spent there (LingeringRooms)."
   ],
+  "60": {
+    "name": "Cavernas de Tejossus",
+    "minLevel": 180,
+    "optimalLevel": 190,
+    "difficulty": 1,
+    "entrance": 54164293,
+    "exit": 54164807,
+    "rooms": [61865984, 61998084, 61998082, 61998338, 61998340, 61867008, 61868032, 61868034, 61868036],
+    "empty": [61865984, 61867008, 61868032, 61868034],
+    "hub": {
+      "room": 61865984,
+      "rooms": { "61998084": 338, "61998082": 297, "61998338": 216, "61998340": 176 },
+      "then": 61867008
+    },
+    "bosses": [2986, 2992],
+    "keyring": 1,
+    "required": [[11180, 1]],
+    "achievements": [30, 543, 6228, 759],
+    "autoGroup": 1,
+    "door": 1,
+    "roster": {
+      "61998084": [2966, 2884, 2885, 2886],
+      "61998082": [2884],
+      "61998338": [2883],
+      "61998340": [2965]
+    },
+    "why": "Kolosso's Caverns as the game has them. Dofus pour les noobs, «Cavernes du Kolosso»: «vous pouvez effectuer les 4 première salle dans l'ordre que vous voulez, il vous faut réunir les 4 reliques», then «parlez au Professeur Xa pour entrer et traversez les 3 salles vides». The first room is the lobby: its four doors (content/interactives/teleports.json) lead to the Icy, Venomous, Bestial and Pyrotechnic rooms, whose floor passages lead back to it, and a win in each lands next to its door. The Blérices' room has the Blérice, Blérom, Wolvero and Croleur; the other three are mostly Bléroms, Blérauves and Fleuros. The win in the last of the four takes the place of the relics and Professor Xa, who has no spawn in the client: it leads into the Second Room, and the Second, Third and Fourth are walked through by their floor passages to the Kolosso in the Fifth. The catalogue walked First -> Second -> Third -> Fourth -> Fifth with a fight in each and never the four element rooms."
+  },
   "3": {
     "name": "Biblioteca del Maestro Cuerbok",
     "minLevel": 100,

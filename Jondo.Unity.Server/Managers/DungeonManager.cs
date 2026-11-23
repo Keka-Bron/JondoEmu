@@ -38,6 +38,36 @@ namespace Jondo.Unity.Server.Managers
     /// </summary>
     public static class DungeonManager
     {
+        /// <summary>
+        /// A lobby and the rooms around it: Kolosso's Caverns' first room and its four relic
+        /// rooms. Each of those rooms has its door in the lobby, and the lobby leads on to
+        /// <see cref="Then"/> once every one of them is won.
+        /// </summary>
+        public sealed class DungeonHub
+        {
+            public long Room { get; init; }
+
+            /// <summary>Each room around the lobby, with the lobby cell a win in it lands on.</summary>
+            public Dictionary<long, int> Rooms { get; } = new();
+
+            public long Then { get; init; }
+
+            /// <summary>Where in <see cref="Then"/> the last win lands: the map's centre unless written.</summary>
+            public int ThenCell { get; init; } = 280;
+
+            /// <summary>
+            /// Where a win in <paramref name="room"/> leads, given the rooms already won in this
+            /// run: back to the lobby while any room is left, on to <see cref="Then"/> after the
+            /// last. Null for a room that is not around this lobby.
+            /// </summary>
+            public (long Map, int Cell)? AfterAWin(long room, IReadOnlyCollection<long> wonBefore)
+            {
+                if (!Rooms.TryGetValue(room, out int cell)) return null;
+                bool allWon = Rooms.Keys.All(r => r == room || wonBefore.Contains(r));
+                return allWon ? (Then, ThenCell) : (Room, cell);
+            }
+        }
+
         public sealed class Dungeon
         {
             public int Id { get; set; }
@@ -125,6 +155,13 @@ namespace Jondo.Unity.Server.Managers
             /// continuez jusque la prochaine» (Dofus pour les noobs, «Antre du Dragon Cochon»).
             /// </summary>
             public HashSet<long> EmptyRooms { get; } = new();
+
+            /// <summary>
+            /// A hand-written dungeon's lobby (content/world/dungeons.json «hub»), or null. Its rooms
+            /// are fought in any order through the lobby's doors, and a win in one leads back to the
+            /// lobby until all of them are won.
+            /// </summary>
+            public DungeonHub? Hub { get; set; }
 
             /// <summary>
             /// The rooms of a hand-written dungeon whose monsters are fought alone, all of them and
@@ -918,6 +955,21 @@ namespace Jondo.Unity.Server.Managers
                     {
                         foreach (var room in empty.EnumerateArray())
                             if (room.TryGetInt64(out long map)) dungeon.EmptyRooms.Add(map);
+                    }
+
+                    if (authored && entry.Value.TryGetProperty("hub", out var hub) && hub.ValueKind == JsonValueKind.Object)
+                    {
+                        var lobby = new DungeonHub
+                        {
+                            Room = hub.TryGetProperty("room", out var at) && at.TryGetInt64(out long lobbyMap) ? lobbyMap : 0,
+                            Then = hub.TryGetProperty("then", out var next) && next.TryGetInt64(out long thenMap) ? thenMap : 0,
+                            ThenCell = hub.TryGetProperty("thenCell", out var landing) && landing.TryGetInt32(out int thenCell) ? thenCell : 280,
+                        };
+                        if (hub.TryGetProperty("rooms", out var around) && around.ValueKind == JsonValueKind.Object)
+                            foreach (var room in around.EnumerateObject())
+                                if (long.TryParse(room.Name, out long map) && room.Value.TryGetInt32(out int cell))
+                                    lobby.Rooms[map] = cell;
+                        if (lobby.Room != 0 && lobby.Then != 0 && lobby.Rooms.Count > 0) dungeon.Hub = lobby;
                     }
 
                     if (authored && entry.Value.TryGetProperty("alone", out var alone) && alone.ValueKind == JsonValueKind.Object)
