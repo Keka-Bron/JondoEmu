@@ -408,6 +408,17 @@
         73343
       ],
       "why": "The Cámara de los Maleficios: after the boss the winners are in the «Salida» room, where NPC 6946 offers to leave; the reply leaves the dungeon through its way out, the entrance map."
+    },
+    {
+      "dungeon": 141,
+      "bossRoom": 225185792,
+      "room": 225185794,
+      "cell": 398,
+      "npc": 6847,
+      "replies": [
+        69193
+      ],
+      "why": "The Bastión de los Martilloseco: after the boss the winners are in the «Salida» room, where Demena Decobre (6847) offers «Abandonar el bastión.»; the reply leaves the dungeon through its way out, the entrance map."
     }
   ]
 }

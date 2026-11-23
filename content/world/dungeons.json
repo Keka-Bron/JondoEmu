@@ -552,5 +552,41 @@
     "lobby": 1,
     "autoGroup": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (223875074, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
+  },
+  "141": {
+    "name": "Bastión de los Martilloseco",
+    "minLevel": 180,
+    "optimalLevel": 190,
+    "difficulty": 5,
+    "entrance": 225313792,
+    "exit": 225313792,
+    "rooms": [
+      225181696,
+      225182720,
+      225183744,
+      225184768,
+      225185792
+    ],
+    "bosses": [
+      7219
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        27440,
+        1
+      ]
+    ],
+    "achievements": [
+      5821,
+      5825,
+      5822,
+      6233,
+      5823,
+      6004
+    ],
+    "lobby": 1,
+    "autoGroup": 1,
+    "why": "The catalogue's exit is the dungeon's own post-boss room (225185794, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   }
 }
