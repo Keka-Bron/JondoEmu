@@ -6918,6 +6918,30 @@
       "why": "Juju, god of the great forests, in the haunted temple (62921728) from 18927 until the gods leave (18928). INFERRED cell."
     },
     {
+      "map": 188219392,
+      "npc": 4209,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1938&Qo>13472",
+      "why": "The goddess Feca (4209) appears next to her priestess once the talisman is taken (Dofus pour les noobs («La colère des dieux»): «Parlez alors à la Déesse Féca qui vient d'apparaitre»)."
+    },
+    {
+      "map": 188220416,
+      "npc": 4208,
+      "cell": 383,
+      "orientation": 1,
+      "criterion": "Qa=1939|Qf=1939",
+      "why": "The priestess of Sadida (4208) in the gods' territory's forge, there while «El arma letal» (1939) is in hand or done (Dofus pour les noobs («L'arme fatale»): «parlez à la Prêtresse de Sadida»)."
+    },
+    {
+      "map": 188220416,
+      "npc": 4210,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=1939&Qo>13489",
+      "why": "The god Sadida (4210) appears once the priestess finishes the ritual (objective 13489 done) and stays while the quest is in hand (Dofus pour les noobs («L'arme fatale»): «Le Dieu Sadida fait son apparition»)."
+    },
+    {
       "map": 81789952,
       "npc": 1511,
       "cell": 289,

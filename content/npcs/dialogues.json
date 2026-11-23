@@ -16315,7 +16315,9 @@
           "choices": [
             { "reply": 153, "next": 185, "quest": 208, "beforeObjective": 826 },
             { "reply": 10141, "quest": 773, "afterObjective": 4888, "completes": 4889, "params": [[30, 4889]], "next": 9662 },
-            { "reply": 52956, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=4", "next": 40655 }
+            { "reply": 52956, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=4", "next": 40655 },
+            { "reply": 36199, "next": 30094, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36199, "next": 30096, "criterion": "PL<50" }
           ]
         },
         {
@@ -16349,9 +16351,26 @@
           "choices": [
             { "reply": 52953, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30094,
+          "choices": [
+            { "reply": 36195, "next": 30095, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36198 }
+          ]
+        },
+        {
+          "message": 30095,
+          "choices": [
+            { "reply": 36194 }
+          ]
+        },
+        {
+          "message": 30096,
+          "choices": []
         }
       ],
-      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826). And the class temple's devotion: «Faire preuve de son dévouement» (quest 773, objective 4889), then the line about the book. «Protección divina» (2194), for the class-4 temple's own: «Estoy de camino al Bosque Maléfico» (52956), madness to go without protection, train against a dopeul and pray to the statue (40655); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40656); then Trimpize at the forest's edge (40657), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52953) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Rigal Mano Ganchuda, a sram of the rogues' brotherhood in the Sram temple [-4,0]: respected by all (98). «Le Guide du Roublard»: the vilest of beings, the brotherhood (185), its lair surrounded by water in a dangerous place, only the cruellest get in (191: 826). And the class temple's devotion: «Faire preuve de son dévouement» (quest 773, objective 4889), then the line about the book. «Protección divina» (2194), for the class-4 temple's own: «Estoy de camino al Bosque Maléfico» (52956), madness to go without protection, train against a dopeul and pray to the statue (40655); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40656); then Trimpize at the forest's edge (40657), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52953) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36199), the towers' lair (30094), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36195) starts the quest and sends the character to pray before the class statue (30095, «Encontrar la estatua»); under level 50 he is told to wait (30096) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 894,
@@ -18440,7 +18459,9 @@
           "message": 20484,
           "choices": [
             { "reply": 24447, "quest": 772, "afterObjective": 4884, "completes": 4885, "params": [[30, 4885]], "next": 20438 },
-            { "reply": 52928, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=10", "next": 40631 }
+            { "reply": 52928, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=10", "next": 40631 },
+            { "reply": 36157, "next": 30073, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36157, "next": 30075, "criterion": "PL<50" }
           ]
         },
         {
@@ -18470,9 +18491,26 @@
           "choices": [
             { "reply": 52925, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30073,
+          "choices": [
+            { "reply": 36153, "next": 30074, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36156 }
+          ]
+        },
+        {
+          "message": 30074,
+          "choices": [
+            { "reply": 36152 }
+          ]
+        },
+        {
+          "message": 30075,
+          "choices": []
         }
       ],
-      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book. «Protección divina» (2194), for the class-10 temple's own: «Estoy de camino al Bosque Maléfico» (52928), madness to go without protection, train against a dopeul and pray to the statue (40631); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40634); then Trimpize at the forest's edge (40635), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52925) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book. «Protección divina» (2194), for the class-10 temple's own: «Estoy de camino al Bosque Maléfico» (52928), madness to go without protection, train against a dopeul and pray to the statue (40631); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40634); then Trimpize at the forest's edge (40635), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52925) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36157), the towers' lair (30073), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36153) starts the quest and sends the character to pray before the class statue (30074, «Encontrar la estatua»); under level 50 he is told to wait (30075) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 2847,
@@ -27260,7 +27298,9 @@
           "message": 121,
           "choices": [
             { "reply": 10134, "quest": 766, "afterObjective": 4860, "completes": 4861, "params": [[30, 4861]], "next": 9655 },
-            { "reply": 52936, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=1", "next": 40639 }
+            { "reply": 52936, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=1", "next": 40639 },
+            { "reply": 36169, "next": 30079, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36169, "next": 30081, "criterion": "PL<50" }
           ]
         },
         {
@@ -27284,9 +27324,26 @@
           "choices": [
             { "reply": 52933, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30079,
+          "choices": [
+            { "reply": 36165, "next": 30080, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36168 }
+          ]
+        },
+        {
+          "message": 30080,
+          "choices": [
+            { "reply": 36164 }
+          ]
+        },
+        {
+          "message": 30081,
+          "choices": []
         }
       ],
-      "why": "Hugo Bello, master of the class-1 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 766, objective 4861). «Protección divina» (2194), for the class-1 temple's own: «Estoy de camino al Bosque Maléfico» (52936), madness to go without protection, train against a dopeul and pray to the statue (40639); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40640); then Trimpize at the forest's edge (40641), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52933) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Hugo Bello, master of the class-1 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 766, objective 4861). «Protección divina» (2194), for the class-1 temple's own: «Estoy de camino al Bosque Maléfico» (52936), madness to go without protection, train against a dopeul and pray to the statue (40639); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40640); then Trimpize at the forest's edge (40641), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52933) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36169), the towers' lair (30079), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36165) starts the quest and sends the character to pray before the class statue (30080, «Encontrar la estatua»); under level 50 he is told to wait (30081) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 42,
@@ -27299,7 +27356,9 @@
             { "reply": 10136, "quest": 768, "afterObjective": 4868, "completes": 4869, "params": [[30, 4869]], "next": 9657 },
             { "reply": 52977, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=2", "next": 40673 },
             { "reply": 34437, "next": 28716, "quest": 1905, "afterObjective": 13011, "beforeObjective": 13012 },
-            { "reply": 198, "next": 248 }
+            { "reply": 198, "next": 248 },
+            { "reply": 36223, "next": 30106, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36223, "next": 30108, "criterion": "PL<50" }
           ]
         },
         { "message": 9657, "choices": [] },
@@ -27349,9 +27408,26 @@
             { "reply": 34433, "quest": 1905, "beforeObjective": 13012, "completes": 13012, "params": [[30, 13012]] }
           ]
         },
-        { "message": 248, "choices": [] }
+        { "message": 248, "choices": [] },
+        {
+          "message": 30106,
+          "choices": [
+            { "reply": 36219, "next": 30107, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36222 }
+          ]
+        },
+        {
+          "message": 30107,
+          "choices": [
+            { "reply": 36218 }
+          ]
+        },
+        {
+          "message": 30108,
+          "choices": []
+        }
       ],
-      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869). «Protección divina» (2194), for the class-2 temple's own: «Estoy de camino al Bosque Maléfico» (52977), madness to go without protection, train against a dopeul and pray to the statue (40673); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40674); then Trimpize at the forest's edge (40675), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52974) is 16292 (Dofus pour les noobs, «Protection divine»). «El dragón blanco» (1905), objective 13012: «Il faudra vous rendre au temple Osamodas en [8,2] pour questionner Zeurg sur les bougies draconiques « Le questionner à propos des bougies draconiques et de leur utilité »» (Dofus pour les noobs): «¿Qué sabes de las velas dracónicas?, ¿para qué sirven?» (34437) -> the Osamodas light one to call the three great serpents (28716) -> «¿Dónde consigo una vela dracónica?» (34436) -> carve it yourself from wax and a wick, in Astrub's alchemists' workshop (28717) -> «¿Qué materiales hacen falta para fabricar la cera?» (34435) -> 28718, «¿Cómo elaboro la mecha?» (34434) -> 28719, «Partir en busca de los ingredientes» (34433) does 13012. INFERRED: the links between the three."
+      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869). «Protección divina» (2194), for the class-2 temple's own: «Estoy de camino al Bosque Maléfico» (52977), madness to go without protection, train against a dopeul and pray to the statue (40673); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40674); then Trimpize at the forest's edge (40675), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52974) is 16292 (Dofus pour les noobs, «Protection divine»). «El dragón blanco» (1905), objective 13012: «Il faudra vous rendre au temple Osamodas en [8,2] pour questionner Zeurg sur les bougies draconiques « Le questionner à propos des bougies draconiques et de leur utilité »» (Dofus pour les noobs): «¿Qué sabes de las velas dracónicas?, ¿para qué sirven?» (34437) -> the Osamodas light one to call the three great serpents (28716) -> «¿Dónde consigo una vela dracónica?» (34436) -> carve it yourself from wax and a wick, in Astrub's alchemists' workshop (28717) -> «¿Qué materiales hacen falta para fabricar la cera?» (34435) -> 28718, «¿Cómo elaboro la mecha?» (34434) -> 28719, «Partir en busca de los ingredientes» (34433) does 13012. INFERRED: the links between the three. «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36223), the towers' lair (30106), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36219) starts the quest and sends the character to pray before the class statue (30107, «Encontrar la estatua»); under level 50 he is told to wait (30108) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 41,
@@ -27362,7 +27438,9 @@
           "message": 103,
           "choices": [
             { "reply": 10133, "quest": 765, "afterObjective": 4856, "completes": 4857, "params": [[30, 4857]], "next": 9654 },
-            { "reply": 52973, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=3", "next": 40670 }
+            { "reply": 52973, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=3", "next": 40670 },
+            { "reply": 36217, "next": 30103, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36217, "next": 30105, "criterion": "PL<50" }
           ]
         },
         {
@@ -27386,9 +27464,26 @@
           "choices": [
             { "reply": 52970, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30103,
+          "choices": [
+            { "reply": 36213, "next": 30104, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36216 }
+          ]
+        },
+        {
+          "message": 30104,
+          "choices": [
+            { "reply": 36212 }
+          ]
+        },
+        {
+          "message": 30105,
+          "choices": []
         }
       ],
-      "why": "Setag, master of the class-3 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 765, objective 4857). «Protección divina» (2194), for the class-3 temple's own: «Estoy de camino al Bosque Maléfico» (52973), madness to go without protection, train against a dopeul and pray to the statue (40670); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40671); then Trimpize at the forest's edge (40672), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52970) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Setag, master of the class-3 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 765, objective 4857). «Protección divina» (2194), for the class-3 temple's own: «Estoy de camino al Bosque Maléfico» (52973), madness to go without protection, train against a dopeul and pray to the statue (40670); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40671); then Trimpize at the forest's edge (40672), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52970) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36217), the towers' lair (30103), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36213) starts the quest and sends the character to pray before the class statue (30104, «Encontrar la estatua»); under level 50 he is told to wait (30105) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 37,
@@ -27402,7 +27497,9 @@
             { "reply": 29551, "next": 24613, "quest": 1769, "beforeObjective": 11316 },
             { "reply": 52901, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=5", "next": 40614 },
             { "reply": 78, "next": 82 },
-            { "reply": 80, "next": 84 }
+            { "reply": 80, "next": 84 },
+            { "reply": 36127, "next": 30058, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36127, "next": 30060, "criterion": "PL<50" }
           ]
         },
         { "message": 9663, "choices": [] },
@@ -27466,9 +27563,26 @@
           "choices": [
             { "reply": 22883 }
           ]
+        },
+        {
+          "message": 30058,
+          "choices": [
+            { "reply": 36123, "next": 30059, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36126 }
+          ]
+        },
+        {
+          "message": 30059,
+          "choices": [
+            { "reply": 36122 }
+          ]
+        },
+        {
+          "message": 30060,
+          "choices": []
         }
       ],
-      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893). «Lo que el tiempo se llevó» (1769): «Eludir la cuestión y hablarle del problema de Juan Luis Erra», not enough to go on (24613); «Presentarle el esqueleto de baglitch…», offered with the intact skeleton in the bag (18158, the baglitchs' drop while 11316 is pending), a remote time manipulation (24614); «¿Conoces a alguien que sepa más?», Marty Makzap at the Cania lakes zaap (24978); «Gracias, ¡hasta luego!» (11316). He only looks: the skeleton is for Marty. «Protección divina» (2194), for the class-5 temple's own: «Estoy de camino al Bosque Maléfico» (52901), madness to go without protection, train against a dopeul and pray to the statue (40614); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40615); then Trimpize at the forest's edge (40616), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52902) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Amino, master of the class-5 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 774, objective 4893). «Lo que el tiempo se llevó» (1769): «Eludir la cuestión y hablarle del problema de Juan Luis Erra», not enough to go on (24613); «Presentarle el esqueleto de baglitch…», offered with the intact skeleton in the bag (18158, the baglitchs' drop while 11316 is pending), a remote time manipulation (24614); «¿Conoces a alguien que sepa más?», Marty Makzap at the Cania lakes zaap (24978); «Gracias, ¡hasta luego!» (11316). He only looks: the skeleton is for Marty. «Protección divina» (2194), for the class-5 temple's own: «Estoy de camino al Bosque Maléfico» (52901), madness to go without protection, train against a dopeul and pray to the statue (40614); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40615); then Trimpize at the forest's edge (40616), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52902) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36127), the towers' lair (30058), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36123) starts the quest and sends the character to pray before the class statue (30059, «Encontrar la estatua»); under level 50 he is told to wait (30060) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 40,
@@ -27479,7 +27593,9 @@
           "message": 93,
           "choices": [
             { "reply": 10131, "quest": 763, "afterObjective": 4848, "completes": 4849, "params": [[30, 4849]], "next": 9652 },
-            { "reply": 52932, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=6", "next": 40636 }
+            { "reply": 52932, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=6", "next": 40636 },
+            { "reply": 36163, "next": 30076, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36163, "next": 30078, "criterion": "PL<50" }
           ]
         },
         {
@@ -27503,9 +27619,26 @@
           "choices": [
             { "reply": 52929, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30076,
+          "choices": [
+            { "reply": 36159, "next": 30077, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36162 }
+          ]
+        },
+        {
+          "message": 30077,
+          "choices": [
+            { "reply": 36158 }
+          ]
+        },
+        {
+          "message": 30078,
+          "choices": []
         }
       ],
-      "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849). «Protección divina» (2194), for the class-6 temple's own: «Estoy de camino al Bosque Maléfico» (52932), madness to go without protection, train against a dopeul and pray to the statue (40636); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40637); then Trimpize at the forest's edge (40638), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52929) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849). «Protección divina» (2194), for the class-6 temple's own: «Estoy de camino al Bosque Maléfico» (52932), madness to go without protection, train against a dopeul and pray to the statue (40636); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40637); then Trimpize at the forest's edge (40638), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52929) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36163), the towers' lair (30076), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36159) starts the quest and sends the character to pray before the class statue (30077, «Encontrar la estatua»); under level 50 he is told to wait (30078) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 46,
@@ -27516,7 +27649,9 @@
           "message": 91,
           "choices": [
             { "reply": 10132, "quest": 764, "afterObjective": 4852, "completes": 4853, "params": [[30, 4853]], "next": 9653 },
-            { "reply": 52916, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=7", "next": 40623 }
+            { "reply": 52916, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=7", "next": 40623 },
+            { "reply": 36151, "next": 30070, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36151, "next": 30072, "criterion": "PL<50" }
           ]
         },
         {
@@ -27540,9 +27675,26 @@
           "choices": [
             { "reply": 52913, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30070,
+          "choices": [
+            { "reply": 36147, "next": 30071, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36150 }
+          ]
+        },
+        {
+          "message": 30071,
+          "choices": [
+            { "reply": 36146 }
+          ]
+        },
+        {
+          "message": 30072,
+          "choices": []
         }
       ],
-      "why": "Elya Wood, master of the class-7 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 764, objective 4853). «Protección divina» (2194), for the class-7 temple's own: «Estoy de camino al Bosque Maléfico» (52916), madness to go without protection, train against a dopeul and pray to the statue (40623); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40624); then Trimpize at the forest's edge (40625), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52913) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Elya Wood, master of the class-7 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 764, objective 4853). «Protección divina» (2194), for the class-7 temple's own: «Estoy de camino al Bosque Maléfico» (52916), madness to go without protection, train against a dopeul and pray to the statue (40623); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40624); then Trimpize at the forest's edge (40625), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52913) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36151), the towers' lair (30070), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36147) starts the quest and sends the character to pray before the class statue (30071, «Encontrar la estatua»); under level 50 he is told to wait (30072) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 38,
@@ -27557,7 +27709,9 @@
             { "reply": 8709, "quest": 703, "completes": 4556, "params": [[30, 4556]], "next": 8670, "afterObjective": 4555 },
             { "reply": 10135, "quest": 767, "afterObjective": 4864, "completes": 4865, "params": [[30, 4865]], "next": 9656 },
             { "reply": 52963, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=8", "next": 40661 },
-            { "reply": 372, "next": 445 }
+            { "reply": 372, "next": 445 },
+            { "reply": 36211, "next": 30100, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36211, "next": 30102, "criterion": "PL<50" }
           ]
         },
         { "message": 9656, "choices": [] },
@@ -27587,9 +27741,26 @@
           ]
         },
         { "message": 254, "choices": [] },
-        { "message": 445, "choices": [] }
+        { "message": 445, "choices": [] },
+        {
+          "message": 30100,
+          "choices": [
+            { "reply": 36207, "next": 30101, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36210 }
+          ]
+        },
+        {
+          "message": 30101,
+          "choices": [
+            { "reply": 36206 }
+          ]
+        },
+        {
+          "message": 30102,
+          "choices": []
+        }
       ],
-      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865). «¿Dónde se ha ido la 7.ª compañía?» (703, Dofus pour les noobs): «Pedir trabajo» (8700) gets the disappearance of the seventh company in the Sidimote moors (8661) and «Aceptar» (8701) starts it; once the laboratory's way out is reached, «Hacer un informe sobre el albergue Number Anticroist» (8709) closes the report (4556) and the quest (8670). «Protección divina» (2194), for the class-8 temple's own: «Estoy de camino al Bosque Maléfico» (52963), madness to go without protection, train against a dopeul and pray to the statue (40661); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40662); then Trimpize at the forest's edge (40663), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52960) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Rish Claymore, master of the class-8 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 767, objective 4865). «¿Dónde se ha ido la 7.ª compañía?» (703, Dofus pour les noobs): «Pedir trabajo» (8700) gets the disappearance of the seventh company in the Sidimote moors (8661) and «Aceptar» (8701) starts it; once the laboratory's way out is reached, «Hacer un informe sobre el albergue Number Anticroist» (8709) closes the report (4556) and the quest (8670). «Protección divina» (2194), for the class-8 temple's own: «Estoy de camino al Bosque Maléfico» (52963), madness to go without protection, train against a dopeul and pray to the statue (40661); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40662); then Trimpize at the forest's edge (40663), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52960) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36211), the towers' lair (30100), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36207) starts the quest and sends the character to pray before the class statue (30101, «Encontrar la estatua»); under level 50 he is told to wait (30102) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 47,
@@ -27600,7 +27771,9 @@
           "message": 90,
           "choices": [
             { "reply": 10130, "quest": 762, "afterObjective": 4844, "completes": 4845, "params": [[30, 4845]], "next": 9651 },
-            { "reply": 52912, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=9", "next": 40620 }
+            { "reply": 52912, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=9", "next": 40620 },
+            { "reply": 36145, "next": 30067, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36145, "next": 30069, "criterion": "PL<50" }
           ]
         },
         {
@@ -27624,9 +27797,26 @@
           "choices": [
             { "reply": 52909, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30067,
+          "choices": [
+            { "reply": 36141, "next": 30068, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36144 }
+          ]
+        },
+        {
+          "message": 30068,
+          "choices": [
+            { "reply": 36140 }
+          ]
+        },
+        {
+          "message": 30069,
+          "choices": []
         }
       ],
-      "why": "Edrige Valling, master of the class-9 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 762, objective 4845). «Protección divina» (2194), for the class-9 temple's own: «Estoy de camino al Bosque Maléfico» (52912), madness to go without protection, train against a dopeul and pray to the statue (40620); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40621); then Trimpize at the forest's edge (40622), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52909) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Edrige Valling, master of the class-9 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 762, objective 4845). «Protección divina» (2194), for the class-9 temple's own: «Estoy de camino al Bosque Maléfico» (52912), madness to go without protection, train against a dopeul and pray to the statue (40620); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40621); then Trimpize at the forest's edge (40622), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52909) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36145), the towers' lair (30067), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36141) starts the quest and sends the character to pray before the class statue (30068, «Encontrar la estatua»); under level 50 he is told to wait (30069) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 384,
@@ -27637,7 +27827,9 @@
           "message": 1609,
           "choices": [
             { "reply": 10139, "quest": 771, "afterObjective": 4880, "completes": 4881, "params": [[30, 4881]], "next": 9660 },
-            { "reply": 52908, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=11", "next": 40617 }
+            { "reply": 52908, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=11", "next": 40617 },
+            { "reply": 36139, "next": 30064, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36139, "next": 30066, "criterion": "PL<50" }
           ]
         },
         {
@@ -27661,9 +27853,26 @@
           "choices": [
             { "reply": 52905, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30064,
+          "choices": [
+            { "reply": 36135, "next": 30065, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36138 }
+          ]
+        },
+        {
+          "message": 30065,
+          "choices": [
+            { "reply": 36134 }
+          ]
+        },
+        {
+          "message": 30066,
+          "choices": []
         }
       ],
-      "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881). «Protección divina» (2194), for the class-11 temple's own: «Estoy de camino al Bosque Maléfico» (52908), madness to go without protection, train against a dopeul and pray to the statue (40617); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40618); then Trimpize at the forest's edge (40619), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52905) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881). «Protección divina» (2194), for the class-11 temple's own: «Estoy de camino al Bosque Maléfico» (52908), madness to go without protection, train against a dopeul and pray to the statue (40617); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40618); then Trimpize at the forest's edge (40619), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52905) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36139), the towers' lair (30064), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36135) starts the quest and sends the character to pray before the class statue (30065, «Encontrar la estatua»); under level 50 he is told to wait (30066) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 644,
@@ -27674,7 +27883,9 @@
           "message": 2600,
           "choices": [
             { "reply": 10137, "quest": 769, "afterObjective": 4872, "completes": 4873, "params": [[30, 4873]], "next": 9658 },
-            { "reply": 52948, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=12", "next": 40649 }
+            { "reply": 52948, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=12", "next": 40649 },
+            { "reply": 36193, "next": 30091, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36193, "next": 30093, "criterion": "PL<50" }
           ]
         },
         {
@@ -27698,9 +27909,26 @@
           "choices": [
             { "reply": 52945, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30091,
+          "choices": [
+            { "reply": 36189, "next": 30092, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36192 }
+          ]
+        },
+        {
+          "message": 30092,
+          "choices": [
+            { "reply": 36188 }
+          ]
+        },
+        {
+          "message": 30093,
+          "choices": []
         }
       ],
-      "why": "Pandiwan Kenobi, master of the class-12 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 769, objective 4873). «Protección divina» (2194), for the class-12 temple's own: «Estoy de camino al Bosque Maléfico» (52948), madness to go without protection, train against a dopeul and pray to the statue (40649); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40650); then Trimpize at the forest's edge (40651), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52945) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Pandiwan Kenobi, master of the class-12 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 769, objective 4873). «Protección divina» (2194), for the class-12 temple's own: «Estoy de camino al Bosque Maléfico» (52948), madness to go without protection, train against a dopeul and pray to the statue (40649); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40650); then Trimpize at the forest's edge (40651), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52945) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36193), the towers' lair (30091), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36189) starts the quest and sends the character to pray before the class statue (30092, «Encontrar la estatua»); under level 50 he is told to wait (30093) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 1412,
@@ -27712,7 +27940,9 @@
           "choices": [
             { "reply": 10138, "quest": 770, "afterObjective": 4876, "completes": 4877, "params": [[30, 4877]], "next": 9659 },
             { "reply": 52897, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=13", "next": 40611 },
-            { "reply": 8737, "next": 8705 }
+            { "reply": 8737, "next": 8705 },
+            { "reply": 36071, "next": 30019, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36071, "next": 30057, "criterion": "PL<50" }
           ]
         },
         { "message": 9659, "choices": [] },
@@ -27734,9 +27964,25 @@
             { "reply": 52898, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
         },
-        { "message": 8705, "choices": [] }
+        { "message": 8705, "choices": [] },
+        {
+          "message": 30019,
+          "choices": [
+            { "reply": 36070, "next": 30020, "startsQuest": 1938, "params": [[34, 1938]] }
+          ]
+        },
+        {
+          "message": 30020,
+          "choices": [
+            { "reply": 36069 }
+          ]
+        },
+        {
+          "message": 30057,
+          "choices": []
+        }
       ],
-      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877). «Protección divina» (2194), for the class-13 temple's own: «Estoy de camino al Bosque Maléfico» (52897), madness to go without protection, train against a dopeul and pray to the statue (40611); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40612); then Trimpize at the forest's edge (40613), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52898) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877). «Protección divina» (2194), for the class-13 temple's own: «Estoy de camino al Bosque Maléfico» (52897), madness to go without protection, train against a dopeul and pray to the statue (40611); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40612); then Trimpize at the forest's edge (40613), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52898) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36071), the towers' lair (30019), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36070) starts the quest and sends the character to pray before the class statue (30020, «Encontrar la estatua»); under level 50 he is told to wait (30057) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 1429,
@@ -27747,7 +27993,9 @@
           "message": 8759,
           "choices": [
             { "reply": 10143, "quest": 775, "afterObjective": 4896, "completes": 4897, "params": [[30, 4897]], "next": 9664 },
-            { "reply": 52940, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=14", "next": 40642 }
+            { "reply": 52940, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=14", "next": 40642 },
+            { "reply": 36181, "next": 30085, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36181, "next": 30087, "criterion": "PL<50" }
           ]
         },
         {
@@ -27771,9 +28019,26 @@
           "choices": [
             { "reply": 52937, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30085,
+          "choices": [
+            { "reply": 36177, "next": 30086, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36180 }
+          ]
+        },
+        {
+          "message": 30086,
+          "choices": [
+            { "reply": 36176 }
+          ]
+        },
+        {
+          "message": 30087,
+          "choices": []
         }
       ],
-      "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897). «Protección divina» (2194), for the class-14 temple's own: «Estoy de camino al Bosque Maléfico» (52940), madness to go without protection, train against a dopeul and pray to the statue (40642); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40643); then Trimpize at the forest's edge (40644), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52937) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897). «Protección divina» (2194), for the class-14 temple's own: «Estoy de camino al Bosque Maléfico» (52940), madness to go without protection, train against a dopeul and pray to the statue (40642); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40643); then Trimpize at the forest's edge (40644), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52937) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36181), the towers' lair (30085), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36177) starts the quest and sends the character to pray before the class statue (30086, «Encontrar la estatua»); under level 50 he is told to wait (30087) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 1593,
@@ -27785,7 +28050,9 @@
           "choices": [
             { "reply": 13330, "quest": 939, "afterObjective": 5712, "completes": 5713, "params": [[30, 5713]], "next": 11868 },
             { "reply": 52981, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=15", "next": 40676 },
-            { "reply": 29493, "next": 24549, "quest": 1760, "afterObjective": 11260, "beforeObjective": 11261 }
+            { "reply": 29493, "next": 24549, "quest": 1760, "afterObjective": 11260, "beforeObjective": 11261 },
+            { "reply": 36175, "next": 30082, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36175, "next": 30084, "criterion": "PL<50" }
           ]
         },
         {
@@ -27833,9 +28100,26 @@
           "choices": [
             { "reply": 29495, "quest": 1760, "completes": 11261, "params": [[30, 11261]] }
           ]
+        },
+        {
+          "message": 30082,
+          "choices": [
+            { "reply": 36171, "next": 30083, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36174 }
+          ]
+        },
+        {
+          "message": 30083,
+          "choices": [
+            { "reply": 36170 }
+          ]
+        },
+        {
+          "message": 30084,
+          "choices": []
         }
       ],
-      "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713). «Protección divina» (2194), for the class-15 temple's own: «Estoy de camino al Bosque Maléfico» (52981), madness to go without protection, train against a dopeul and pray to the statue (40676); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40677); then Trimpize at the forest's edge (40678), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52978) is 16292 (Dofus pour les noobs, «Protection divine»). Quest 1760 (Dofus pour les noobs («Le héros de Sufokia»)): «Vengo de parte del rey Talas» (29493) after King Talas (11260): 24549 (Lord of the Splashes), 29492, 24550 (the abyssal dofus), 29491, 24551, 29490, 24553 (still being stabilised: the dofus itself comes with the other abyssal quests) and 29495 does 11261. INFERRED: the order of the replies."
+      "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713). «Protección divina» (2194), for the class-15 temple's own: «Estoy de camino al Bosque Maléfico» (52981), madness to go without protection, train against a dopeul and pray to the statue (40676); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40677); then Trimpize at the forest's edge (40678), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52978) is 16292 (Dofus pour les noobs, «Protection divine»). Quest 1760 (Dofus pour les noobs («Le héros de Sufokia»)): «Vengo de parte del rey Talas» (29493) after King Talas (11260): 24549 (Lord of the Splashes), 29492, 24550 (the abyssal dofus), 29491, 24551, 29490, 24553 (still being stabilised: the dofus itself comes with the other abyssal quests) and 29495 does 11261. INFERRED: the order of the replies. «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36175), the towers' lair (30082), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36171) starts the quest and sends the character to pray before the class statue (30083, «Encontrar la estatua»); under level 50 he is told to wait (30084) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 2825,
@@ -27846,7 +28130,9 @@
           "message": 20159,
           "choices": [
             { "reply": 24122, "quest": 1616, "afterObjective": 9506, "completes": 9507, "params": [[30, 9507]], "next": 20165 },
-            { "reply": 52990, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=16", "next": 40683 }
+            { "reply": 52990, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=16", "next": 40683 },
+            { "reply": 36133, "next": 30061, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36133, "next": 30063, "criterion": "PL<50" }
           ]
         },
         {
@@ -27870,9 +28156,26 @@
           "choices": [
             { "reply": 52987, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30061,
+          "choices": [
+            { "reply": 36129, "next": 30062, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36132 }
+          ]
+        },
+        {
+          "message": 30062,
+          "choices": [
+            { "reply": 36128 }
+          ]
+        },
+        {
+          "message": 30063,
+          "choices": []
         }
       ],
-      "why": "Aurelia, master of the class-16 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1616, objective 9507). «Protección divina» (2194), for the class-16 temple's own: «Estoy de camino al Bosque Maléfico» (52990), madness to go without protection, train against a dopeul and pray to the statue (40683); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40684); then Trimpize at the forest's edge (40685), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52987) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Aurelia, master of the class-16 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1616, objective 9507). «Protección divina» (2194), for the class-16 temple's own: «Estoy de camino al Bosque Maléfico» (52990), madness to go without protection, train against a dopeul and pray to the statue (40683); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40684); then Trimpize at the forest's edge (40685), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52987) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36133), the towers' lair (30061), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36129) starts the quest and sends the character to pray before the class statue (30062, «Encontrar la estatua»); under level 50 he is told to wait (30063) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 3052,
@@ -27883,7 +28186,9 @@
           "message": 22302,
           "choices": [
             { "reply": 26854, "quest": 1678, "afterObjective": 10317, "completes": 10318, "params": [[30, 10318]], "next": 22306 },
-            { "reply": 52994, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=17", "next": 40686 }
+            { "reply": 52994, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=17", "next": 40686 },
+            { "reply": 36187, "next": 30088, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36187, "next": 30090, "criterion": "PL<50" }
           ]
         },
         {
@@ -27907,9 +28212,26 @@
           "choices": [
             { "reply": 52991, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30088,
+          "choices": [
+            { "reply": 36183, "next": 30089, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36186 }
+          ]
+        },
+        {
+          "message": 30089,
+          "choices": [
+            { "reply": 36182 }
+          ]
+        },
+        {
+          "message": 30090,
+          "choices": []
         }
       ],
-      "why": "Máiquel Koormoc, master of the class-17 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1678, objective 10318). «Protección divina» (2194), for the class-17 temple's own: «Estoy de camino al Bosque Maléfico» (52994), madness to go without protection, train against a dopeul and pray to the statue (40686); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40687); then Trimpize at the forest's edge (40688), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52991) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Máiquel Koormoc, master of the class-17 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1678, objective 10318). «Protección divina» (2194), for the class-17 temple's own: «Estoy de camino al Bosque Maléfico» (52994), madness to go without protection, train against a dopeul and pray to the statue (40686); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40687); then Trimpize at the forest's edge (40688), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52991) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36187), the towers' lair (30088), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36183) starts the quest and sends the character to pray before the class statue (30089, «Encontrar la estatua»); under level 50 he is told to wait (30090) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 3712,
@@ -27920,7 +28242,9 @@
           "message": 26744,
           "choices": [
             { "reply": 32141, "quest": 1842, "afterObjective": 12174, "completes": 12175, "params": [[30, 12175]], "next": 26748 },
-            { "reply": 53001, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=18", "next": 40692 }
+            { "reply": 53001, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=18", "next": 40692 },
+            { "reply": 36229, "next": 30109, "criterion": "PL>49&Qa!1938&Qf!1938" },
+            { "reply": 36229, "next": 30111, "criterion": "PL<50" }
           ]
         },
         {
@@ -27944,9 +28268,26 @@
           "choices": [
             { "reply": 52998, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
+        },
+        {
+          "message": 30109,
+          "choices": [
+            { "reply": 36225, "next": 30110, "startsQuest": 1938, "params": [[34, 1938]] },
+            { "reply": 36228 }
+          ]
+        },
+        {
+          "message": 30110,
+          "choices": [
+            { "reply": 36224 }
+          ]
+        },
+        {
+          "message": 30111,
+          "choices": []
         }
       ],
-      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»)."
+      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36229), the towers' lair (30109), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36225) starts the quest and sends the character to pray before the class statue (30110, «Encontrar la estatua»); under level 50 he is told to wait (30111) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
     {
       "npc": 6837,
@@ -60978,6 +61319,257 @@
       ],
       "why": "As the official server says it, with no quest under way.",
       "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4197,
+      "map": 0,
+      "opening": 29853,
+      "lines": [
+        {
+          "message": 29853,
+          "choices": [
+            { "reply": 36569, "next": 29854, "quest": 1938, "beforeObjective": 13471 }
+          ]
+        },
+        {
+          "message": 29854,
+          "choices": [
+            { "reply": 36276, "next": 30112 }
+          ]
+        },
+        {
+          "message": 30112,
+          "choices": [
+            { "reply": 36230, "quest": 1938, "completes": 13471, "params": [[30, 13471]] }
+          ]
+        }
+      ],
+      "why": "The Voice of the Twelve (4197) in the gods' territory: «La colère des dieux» (1938), objective 13471: the call to arms (29853, 29854), «Estoy dispuesto a luchar por los Doce.» (36276) and the way to the priestess of Feca (30112, «Ir a ver a la sacerdotisa.» 36230) (Dofus pour les noobs («La colère des dieux»): «Parlez alors à La Voix des Douze pour lui demander l'accès aux zones des Trépamorts»)."
+    },
+    {
+      "npc": 4207,
+      "map": 0,
+      "opening": 30113,
+      "lines": [
+        {
+          "message": 30113,
+          "choices": [
+            { "reply": 36235, "next": 30114, "quest": 1938, "afterObjective": 13471, "beforeObjective": 13472 }
+          ]
+        },
+        {
+          "message": 30114,
+          "choices": [
+            { "reply": 36234, "next": 30115 }
+          ]
+        },
+        {
+          "message": 30115,
+          "choices": [
+            { "reply": 36232, "quest": 1938, "completes": 13472, "params": [[30, 13472]] },
+            { "reply": 36233 }
+          ]
+        }
+      ],
+      "why": "The priestess of Feca (4207): «La colère des dieux» (1938), objective 13472: «Me envía la voz de los Doce.» (36235), «Todo listo.» (36234) and the talisman, «Dudar un instante y agarrar el talismán.» (36232), whose line (30115) holds the way back out, «Cambiar de opinión y renunciar.» (36233) (Dofus pour les noobs («La colère des dieux»): «Hésiter un bref instant, puis prendre le talisman»)."
+    },
+    {
+      "npc": 4209,
+      "map": 0,
+      "opening": 30116,
+      "lines": [
+        {
+          "message": 30116,
+          "choices": [
+            { "reply": 36239, "next": 30117, "quest": 1938, "afterObjective": 13472, "beforeObjective": 13490 }
+          ]
+        },
+        {
+          "message": 30117,
+          "choices": [
+            { "reply": 36238, "next": 30118 }
+          ]
+        },
+        {
+          "message": 30118,
+          "choices": [
+            { "reply": 36236, "quest": 1938, "completes": 13490, "params": [[30, 13490]] },
+            { "reply": 36237, "next": 30119, "quest": 1938, "completes": 13490, "params": [[30, 13490]] }
+          ]
+        },
+        {
+          "message": 30119,
+          "choices": []
+        }
+      ],
+      "why": "The goddess Feca (4209): «La colère des dieux» (1938), objective 13490 and the end of the quest: her words (30116-30118) and «Inclinarte de nuevo e ir en busca del herrero.» (36236), or «Inclinarte de nuevo y marcharte.» (36237) with her last warning (30119) (Dofus pour les noobs («La colère des dieux»): «Parlez alors à la Déesse Féca ... vous donnera alors la possibilité de franchir les frontières»)."
+    },
+    {
+      "npc": 4199,
+      "map": 0,
+      "opening": 29862,
+      "lines": [
+        {
+          "message": 29862,
+          "choices": [
+            { "reply": 36243, "next": 30120, "criterion": "Qf=1938&PL>179&Qa!1939&Qf!1939", "beforeQuest": 1939 },
+            { "reply": 36248, "next": 30123, "quest": 1939, "afterObjective": 13473, "beforeObjective": 13474, "completes": 13474, "params": [[30, 13474]] }
+          ]
+        },
+        {
+          "message": 30120,
+          "choices": [
+            { "reply": 36242, "next": 30121 }
+          ]
+        },
+        {
+          "message": 30121,
+          "choices": [
+            { "reply": 36241, "next": 30122, "startsQuest": 1939, "params": [[34, 1939]] }
+          ]
+        },
+        {
+          "message": 30122,
+          "choices": [
+            { "reply": 36240 }
+          ]
+        },
+        {
+          "message": 30123,
+          "choices": [
+            { "reply": 36244, "next": 30124 }
+          ]
+        },
+        {
+          "message": 30124,
+          "choices": [
+            { "reply": 36247, "next": 30125 },
+            { "reply": 36245, "next": 30127 }
+          ]
+        },
+        {
+          "message": 30127,
+          "choices": [
+            { "reply": 36247, "next": 30125 }
+          ]
+        },
+        {
+          "message": 30125,
+          "choices": [
+            { "reply": 36246, "next": 30126, "gives": 19516 }
+          ]
+        },
+        {
+          "message": 30126,
+          "choices": []
+        }
+      ],
+      "why": "Gobanos (4199) in the gods' territory's forge: «El arma letal» (1939). «Me envía la diosa Feca.» (36243) from level 180 after «La cólera de los dioses», the necronyx's story (30120), «¿Deseas aprenderlo?» (30121, «Así es.» 36241 starts the quest) and the raw block asked for (30122, «Ir a Cania.» 36240). Objective 13474: «Darle el bloque de necrónix bruto.» (36248) and his hammering (30123-30125, 30127: «Seguir las instrucciones de Gobanos.» 36244, «Alejarte.» 36247, «Contar las baldosas...» 36245, «Esperar a que haya terminado.» 36246), which leaves the struck necronyx (19516) in the bag for the priestess (30126: «Llévaselo a la sacerdotisa de Sadida») (Dofus pour les noobs («L'arme fatale»))."
+    },
+    {
+      "npc": 4208,
+      "map": 0,
+      "opening": 30128,
+      "lines": [
+        {
+          "message": 30128,
+          "choices": [
+            { "reply": 36251, "next": 30129, "quest": 1939, "afterObjective": 13474, "beforeObjective": 13475 },
+            { "reply": 36252, "next": 30131, "quest": 1939, "afterObjective": 13475, "beforeObjective": 13484, "completes": 13476, "completesAll": [13476, 13477, 13478, 13479, 13480, 13481, 13482, 13483], "params": [[30, 13476]] },
+            { "reply": 36264, "next": 30141, "quest": 1939, "afterObjective": 13484, "beforeObjective": 13489 },
+            { "reply": 36265, "next": 30142, "quest": 1939, "afterObjective": 13488, "beforeObjective": 13489, "completes": 13489, "params": [[30, 13489]] }
+          ]
+        },
+        {
+          "message": 30129,
+          "choices": [
+            { "reply": 36250, "next": 30130 }
+          ]
+        },
+        {
+          "message": 30130,
+          "choices": [
+            { "reply": 36249, "quest": 1939, "completes": 13475, "params": [[30, 13475]] }
+          ]
+        },
+        {
+          "message": 30131,
+          "choices": [
+            { "reply": 36258, "next": 30132 }
+          ]
+        },
+        {
+          "message": 30132,
+          "choices": [
+            { "reply": 36256, "next": 30133 }
+          ]
+        },
+        {
+          "message": 30133,
+          "choices": [
+            { "reply": 36257, "next": 30134 }
+          ]
+        },
+        {
+          "message": 30134,
+          "choices": [
+            { "reply": 36255, "next": 30135 }
+          ]
+        },
+        {
+          "message": 30135,
+          "choices": [
+            { "reply": 36254, "next": 30136 }
+          ]
+        },
+        {
+          "message": 30136,
+          "choices": [
+            { "reply": 36253, "quest": 1939, "beforeObjective": 13484 }
+          ]
+        },
+        {
+          "message": 30141,
+          "choices": []
+        },
+        {
+          "message": 30142,
+          "choices": [
+            { "reply": 36267, "next": 30143 }
+          ]
+        },
+        {
+          "message": 30143,
+          "choices": []
+        }
+      ],
+      "why": "The priestess of Sadida (4208): «El arma letal» (1939). Objective 13475: «Enseñarle el trozo de necrónix golpeado.» (36251), the spell's offer (30129, «Confirmar.» 36250) and the list of components (30130, «Tomar nota de los componentes y marcharte.» 36249). The components (13476-13483) go with «Darle los componentes necesarios para el ritual del necrónix.» (36252), then the doll's sewing, her needle and the hunger of the doll (30131-30136) up to «Ir de caza para alimentar la muñeca.» (36253, objective 13484). «¿Cómo va la fabricación de la muñeca de embrujo?» (36264) repeats the hunger (30141) while the sacrifices are due; with all four eaten, «Parece que la muñeca ha saciado su hambre.» (36265, objective 13489) and the last spell (30142, «Todo listo.» 36267 -> 30143) bring the god (Dofus pour les noobs («L'arme fatale»)). The hand-over reply (36252) names 13476, the first of the bring objectives, as the one it does: the engine offers it only once that one is revealed and the others follow as it marks them."
+    },
+    {
+      "npc": 4210,
+      "map": 0,
+      "opening": 30144,
+      "lines": [
+        {
+          "message": 30144,
+          "choices": [
+            { "reply": 36272, "next": 30145 }
+          ]
+        },
+        {
+          "message": 30145,
+          "choices": [
+            { "reply": 36271, "next": 30146 }
+          ]
+        },
+        {
+          "message": 30146,
+          "choices": [
+            { "reply": 36270, "quest": 1939, "completes": 13491, "params": [[30, 13491]], "teaches": 9348 }
+          ]
+        }
+      ],
+      "why": "The god Sadida (4210): «El arma letal» (1939), objective 13491 and the end of the quest: «Inclinarte ante el dios Sadida.» (36272), his words (30144, 30145), «Sentir la energía del embrujo del necrónix.» (36271) and the oath, «Juro que combatiré a los mediomuertos hasta que no me quede aliento.» (36270), which teaches Necronyx (9348) for good (Dofus pour les noobs («L'arme fatale»): «Le Dieu Sadida fait son apparition et vous obtenez alors le sort permanent Necronyx»)."
     }
   ]
 }

@@ -7333,6 +7333,59 @@
    "spends": true,
    "showsNpc": 7145,
    "why": "«Purifica el templo encantado»: the Esencia de silvespíritu (28488, crafted by an alchemist of level 180 once 18924 is done: its craftFeasibleCriterion «PZ=1&(Qo>18924|Qf=2486)») poured on the ring of white mushrooms round the pedestal of the haunted temple (62921728, element 535045 on cell 300; the client names the action «Verter una esencia de silvespíritu», 1051410); the forest gods come. Dofus pour les noobs («Les derniers d'entre nous»): «examinez les petits champignons blancs qui forment un cercle autour du piédestal central … cliquez de nouveau sur les champignons blancs … « Verser une essence de Sylvesprit ». Quatre petits Dieux font leur apparition». INFERRED: which of the temple's two elements (535045 on 300, 534775 on 343) is the ring."
+  },
+  {
+   "objective": 13470,
+   "quest": 1938,
+   "kind": "click",
+   "skillName": 48,
+   "elements": [{"map": 17048580, "element": 511714}, {"map": 67113984, "element": 511872}, {"map": 69208322, "element": 511874}, {"map": 96470786, "element": 511873}, {"map": 148638211, "element": 511869}, {"map": 163056642, "element": 511870}, {"map": 177213440, "element": 511871}, {"map": 183762950, "element": 511845}, {"map": 183762954, "element": 511844}, {"map": 183763970, "element": 511686}, {"map": 183763976, "element": 511867}, {"map": 183764998, "element": 511839}, {"map": 183765000, "element": 511680}, {"map": 183766022, "element": 511683}, {"map": 183767046, "element": 511855}, {"map": 183767048, "element": 515179}, {"map": 183768070, "element": 511862}, {"map": 183768072, "element": 511859}, {"map": 183769094, "element": 528958}, {"map": 226493953, "element": 529200}],
+   "why": "«Reza delante de la estatua del templo para entrar en el territorio de los dioses» (739926): «Hacia el territorio de los dioses» (SkillNamesDataRoot 48) on the statue of a class temple, offered by content/interactives/ways.json with the quest in hand (Dofus pour les noobs («La colère des dieux»): «Pénétrez au plus profond de votre temple pour vous rendre devant votre statue de classe et allez Vers le Domaine des dieux»)."
+  },
+  {
+   "objective": 13473,
+   "quest": 1939,
+   "kind": "click",
+   "elements": [{"map": 186908932, "element": 511912}],
+   "gives": [{"item": 19396, "count": 1}],
+   "why": "«Consigue un bloque de necrónix bruto» (740087): the rock on the shattered tower's map [-10,-31] (element 511912, cell 374, the only one there); Gobanos: «lo encontrarás en los alrededores de la torre quebrada, cerca de la sierra de Cania» (30122) and Dofus pour les noobs («L'arme fatale»): «en cliquant sur la pierre»."
+  },
+  {
+   "objective": 13484,
+   "quest": 1939,
+   "kind": "reply",
+   "replies": [36253],
+   "afterObjectives": [13483],
+   "gives": [{"item": 19397, "count": 1}],
+   "why": "«Termina la confección de la muñeca sacrificándote» (740094): the priestess's sewing and the drop of blood, ended on «Ir de caza para alimentar la muñeca.» (36253), which hands over the necronyx doll (19397) to feed (Dofus pour les noobs («L'arme fatale»): «Elle vous donnera une poupée»)."
+  },
+  {
+   "objective": 13485,
+   "quest": 1939,
+   "kind": "use",
+   "afterObjectives": [13484],
+   "why": "«Sacrifica a armadutinados para la muñeca de necrónix» (740097): the sacrifice item 19517, used (its effect 30 is this objective, its own condition Qo=13485) (Dofus pour les noobs («L'arme fatale»): «double-cliquer dessus afin de nourrir la poupée»)."
+  },
+  {
+   "objective": 13486,
+   "quest": 1939,
+   "kind": "use",
+   "afterObjectives": [13484],
+   "why": "«Sacrifica a ghuls para la muñeca de necrónix» (740099): the sacrifice item 19518, used (effect 30, condition Qo=13486)."
+  },
+  {
+   "objective": 13487,
+   "quest": 1939,
+   "kind": "use",
+   "afterObjectives": [13484],
+   "why": "«Sacrifica a malditos para la muñeca de necrónix» (740100): the sacrifice item 19520, used (effect 30, condition Qo=13487)."
+  },
+  {
+   "objective": 13488,
+   "quest": 1939,
+   "kind": "use",
+   "afterObjectives": [13484],
+   "why": "«Sacrifica a quemaalmas para la muñeca de necrónix» (740101): the sacrifice item 19519, used (effect 30, condition Qo=13488)."
   }
 ]
 }
