@@ -503,6 +503,14 @@ the two fighter IDs and the request ID; the historical writer's inferred cell va
 (August `kad` tags 1 and 4) have indeterminate client use and are omitted. The beta
 dispatcher leaves the placement request unhandled while pending-end delivery is August-only.
 
+`FightPlacementSwapPositionsAcceptRequest` and `FightPlacementSwapPositionsCancelRequest`
+answer an offer by request ID under the same session and fight turns. Only the target
+can accept; either party can cancel. A failed accept sends `FightPlacementSwapPositionsErrorEvent`
+only to the caller. An invalid cancel is silent. Neither consumes another pair's offer.
+A successful cancel sends `FightPlacementSwapPositionsCancelledEvent` only to the pair;
+a successful accept broadcasts the new positions. Answers do not flush a pending fight end.
+Both remain unhandled on beta while offer creation is disabled there.
+
 ### Shared map/fight presence and reconnection opening
 
 `FightHandler` directly constructs map fight flags, counts, incremental teams,

@@ -88,6 +88,9 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         public SemaphoreSlim Turno { get; } = new SemaphoreSlim(1, 1);
 
+        /// <summary>Placement offers by request ID. Access only under this instance's fight turn.</summary>
+        public Dictionary<int, (long Requester, long Requested)> PlacementSwaps { get; } = new();
+
         private int _arrancado;
 
         /// <summary>
@@ -1483,6 +1486,7 @@ namespace Jondo.Unity.World.Fights
         public void StartFight()
         {
             CancelPlacementTimer();
+            PlacementSwaps.Clear();
             State = FightState.Ongoing;
             StartedAt = DateTime.UtcNow;
             if (TurnOrder.Count == 0)

@@ -2499,16 +2499,6 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildFighterPlaced(int cell, int orientation, long fighter)
             => BuildFightersPlaced(new[] { (cell, orientation, fighter) });
 
-        // ─── Swapping cells with an ally ────────────────────────────────────────
-
-        /// <summary>The request a kap or a kav answers: f1.</summary>
-        public static int ReadSwapRequest(byte[] payload, string opcode)
-        {
-            byte[]? body = ConnectionProtocol.ReadPayload(payload, opcode);
-            if (body == null) return 0;
-            return (int)(ProtoMessage.Parse(body).Fields.FirstOrDefault(f => f.FieldNumber == 1 && f.WireType == 0)?.VarIntValue ?? 0);
-        }
-
         /// <summary>A jxy's "IsAfk" (f1): the client passing the turn on its own, its player idle.</summary>
         public static bool ReadIdlePass(byte[] payload)
         {

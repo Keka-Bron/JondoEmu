@@ -13,7 +13,7 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat;
 
 [Collection("npc tables")]
-public sealed class MapFightPresenceTests
+public sealed partial class MapFightPresenceTests
 {
     private const long Map = 91_968_001, Arena = 91_968_002, Id = 7_968_001, Person = 9_968_000_001;
     private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
@@ -30,13 +30,15 @@ public sealed class MapFightPresenceTests
 
 #if JONDO_PROTOCOL_3_8_1_2
     [Fact]
-    public async Task Placement_ready_does_not_enter_the_legacy_start_burst_on_beta()
+    public async Task Placement_requests_remain_unhandled_on_beta()
     {
         using var fixture = new FightFixture();
         using var player = new Recipient(Person, Arena, Id);
         player.Session.State.IsInFight = true;
         Assert.Equal(GameEntryResult.Unhandled, await DispatchReady(player.Session, true));
         Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person, 271)));
+        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementSwapPositionsAcceptRequest(1)));
+        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementSwapPositionsCancelRequest(1)));
         Assert.False(fixture.Fight.Buscar(Person).IsReady);
         Assert.Equal(FightState.Placement, fixture.Fight.State);
         Assert.Empty(player.Sequence);

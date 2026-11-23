@@ -298,9 +298,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri(Op.Jhz)) await GuildHandler.ReEmblemAsync(stream, payload);
                 // The alignment tab's PvP switch.
                 else if (payloadStr == Op.Uri("hnu")) await AlignmentHandler.PvpAsync(stream, payload);
-                // A swap of cells with an ally during the placement, accepted or refused.
-                else if (payloadStr == Op.Uri(Op.Kap)) await FightHandler.AcceptSwapAsync(stream, payload);
-                else if (payloadStr == Op.Uri(Op.Kav)) await FightHandler.RefuseSwapAsync(stream, payload);
                 // A player's card («Mostrar perfil»).
                 else if (payloadStr == Op.Uri("kxh")) await PlayerCardHandler.ShowAsync(stream, payload);
                 else if (payloadStr == Op.Uri("lag")) await PlayerCardHandler.TabAsync(stream, payload);
@@ -1740,6 +1737,13 @@ namespace Jondo.Unity.Server.Network
                 // Placement can flush a pending fight end; that burst is still August-only.
                 case Game.FightPlacementPositionRequest placement when UsesLegacyRouting:
                     await FightHandler.HandlePlacementPositionAsync(session, placement);
+                    break;
+                // Enable answers on the same profiles that can create placement offers.
+                case Game.FightPlacementSwapPositionsAcceptRequest accept when UsesLegacyRouting:
+                    await FightHandler.AcceptSwapAsync(session, accept);
+                    break;
+                case Game.FightPlacementSwapPositionsCancelRequest cancel when UsesLegacyRouting:
+                    await FightHandler.CancelSwapAsync(session, cancel);
                     break;
                 default:
                     return GameEntryResult.Unhandled;

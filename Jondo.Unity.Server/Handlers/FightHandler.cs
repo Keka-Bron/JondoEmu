@@ -3267,7 +3267,8 @@ namespace Jondo.Unity.Server.Handlers
         internal static Task HandleReadyAsync(GameSession session, Jondo.Unity.Protocol.Game.FightReadyRequest request)
             => InPlacementTurnAsync(session, fight => request.IsReady ? DeclareReadyAsync(fight, session.CharacterId) : Task.CompletedTask);
 
-        private static async Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action)
+        private static async Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action,
+            bool finishPendingFight = true)
         {
             if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld || !session.State.IsInFight) return;
             long characterId = session.CharacterId;
@@ -3279,7 +3280,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (!session.State.IsInFight || session.CharacterId != characterId ||
                     FightById(fight.FightId) != fight || !IsParticipant(fight, characterId)) return;
                 using var context = SessionContext.Push(session); // Legacy end/start handlers still read player state.
-                if (await FinishPendingFightAsync(fight) || fight.State != FightState.Placement) return;
+                if (fight.FinPendiente != 0)
+                {
+                    if (finishPendingFight) await FinishPendingFightAsync(fight);
+                    return;
+                }
+                if (fight.State != FightState.Placement) return;
                 await action(fight);
             });
         }

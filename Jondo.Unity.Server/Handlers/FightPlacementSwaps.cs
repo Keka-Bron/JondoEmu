@@ -1,20 +1,14 @@
-using System.Collections.Concurrent;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
 using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
-using static Jondo.Protocol.NetworkMessage;
 
 namespace Jondo.Unity.Server.Handlers
 {
     public static partial class FightHandler
     {
-        /// <summary>The swaps asked for and not yet answered: by fight and request, who asked whom.</summary>
-        private static readonly ConcurrentDictionary<(long Fight, int Request), (long Requester, long Requested)> _swaps = new();
         private static int _lastSwap;
 
         /// <summary>
@@ -43,7 +37,6 @@ namespace Jondo.Unity.Server.Handlers
         /// </remarks>
         private static async Task OfferSwapAsync(FightInstance fight, Fighter requester, Fighter requested)
         {
-            ForgetStaleSwaps();
             if (requested.IsMonster || requested.IsBot || SessionRegistry.FindByCharacter(requested.Id) == null)
             {
                 await SwapCellsAsync(fight, requester, requested);
@@ -51,60 +44,46 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // One request between the two at a time: asking again is the same request.
-            if (_swaps.Any(s => s.Key.Fight == fight.FightId && s.Value == (requester.Id, requested.Id))) return;
+            if (fight.PlacementSwaps.ContainsValue((requester.Id, requested.Id))) return;
 
             int request = Interlocked.Increment(ref _lastSwap);
-            _swaps[(fight.FightId, request)] = (requester.Id, requested.Id);
+            fight.PlacementSwaps.Add(request, (requester.Id, requested.Id));
             await ToTheTwoAsync(fight, requester.Id, requested.Id,
                 new Game.FightPlacementSwapPositionsOfferEvent(requested.Id, request, requester.Id));
             Program.LogDebug($"[Fight] {requester.Id} asks {requested.Id} to swap cells (request {request}).");
         }
 
         /// <summary>The swap accepted (kap { 1 request }): only the one asked can.</summary>
-        public static async Task AcceptSwapAsync(NetworkStream stream, byte[] payload)
+        internal static async Task AcceptSwapAsync(GameSession session, Game.FightPlacementSwapPositionsAcceptRequest request)
         {
-            long me = SessionContext.State.CharacterId;
-            var fight = FightOf(me);
-            int request = Network.FightProtocol.ReadSwapRequest(payload, Op.Kap);
-            if (fight == null)
+            bool accepted = false;
+            await InPlacementTurnAsync(session, async fight =>
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzz, System.Array.Empty<byte>()));
-                return;
-            }
-
-            await InTurnAsync(fight, async () =>
-            {
-                if (!_swaps.TryRemove((fight.FightId, request), out var swap) || swap.Requested != me)
-                {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzz, System.Array.Empty<byte>()));
-                    return;
-                }
+                if (!fight.PlacementSwaps.TryGetValue(request.RequestId, out var swap) || swap.Requested != session.CharacterId
+                    || !IsParticipant(fight, swap.Requester)) return;
 
                 var requester = fight.Buscar(swap.Requester);
                 var requested = fight.Buscar(swap.Requested);
-                if (fight.State != FightState.Placement || requester == null || requested == null
-                    || !requester.IsAlive || !requested.IsAlive || requester.TeamId != requested.TeamId)
-                {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzz, System.Array.Empty<byte>()));
-                    return;
-                }
+                if (requester == null || requested == null || !requester.IsAlive || !requested.IsAlive
+                    || requester.TeamId != requested.TeamId) return;
+                // Swapping clears all offers involving either fighter, including this one.
                 await SwapCellsAsync(fight, requester, requested);
-            });
+                accepted = true;
+            }, finishPendingFight: false);
+            if (!accepted) await session.SendAsync(new Game.FightPlacementSwapPositionsErrorEvent());
         }
 
         /// <summary>The swap refused, or withdrawn by whoever asked (kav { 1 request }).</summary>
-        public static async Task RefuseSwapAsync(NetworkStream stream, byte[] payload)
-        {
-            long me = SessionContext.State.CharacterId;
-            var fight = FightOf(me);
-            int request = Network.FightProtocol.ReadSwapRequest(payload, Op.Kav);
-            if (fight == null || !_swaps.TryGetValue((fight.FightId, request), out var swap)
-                || (swap.Requested != me && swap.Requester != me)) return;
+        internal static Task CancelSwapAsync(GameSession session, Game.FightPlacementSwapPositionsCancelRequest request)
+            => InPlacementTurnAsync(session, async fight =>
+            {
+                long me = session.CharacterId;
+                if (!fight.PlacementSwaps.TryGetValue(request.RequestId, out var swap)
+                    || (swap.Requested != me && swap.Requester != me)) return;
 
-            if (!_swaps.TryRemove((fight.FightId, request), out _)) return;
-            await ToTheTwoAsync(fight, swap.Requester, swap.Requested, new Game.FightPlacementSwapPositionsCancelledEvent(me, request));
-            Program.LogDebug($"[Fight] {me} turns down the swap {request}.");
-        }
+                fight.PlacementSwaps.Remove(request.RequestId);
+                await ToTheTwoAsync(fight, swap.Requester, swap.Requested, new Game.FightPlacementSwapPositionsCancelledEvent(me, request.RequestId));
+            }, finishPendingFight: false);
 
         /// <summary>The two change places, and everybody is told where everybody stands.</summary>
         private static async Task SwapCellsAsync(FightInstance fight, Fighter one, Fighter other)
@@ -120,20 +99,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>A fighter moved: his requests go, as the client drops them on the kmk.</summary>
         private static void ForgetSwapsOf(FightInstance fight, long fighter)
         {
-            foreach (var key in _swaps.Where(s => s.Key.Fight == fight.FightId
-                                                  && (s.Value.Requester == fighter || s.Value.Requested == fighter))
-                                      .Select(s => s.Key).ToList())
-                _swaps.TryRemove(key, out _);
-        }
-
-        /// <summary>Requests of fights that are no longer placing, or no longer are.</summary>
-        private static void ForgetStaleSwaps()
-        {
-            foreach (var key in _swaps.Keys.ToList())
-            {
-                var fight = _activeFights.TryGetValue(key.Fight, out var f) ? f : null;
-                if (fight == null || fight.State != FightState.Placement) _swaps.TryRemove(key, out _);
-            }
+            foreach (var key in fight.PlacementSwaps.Where(s => s.Value.Requester == fighter || s.Value.Requested == fighter)
+                                       .Select(s => s.Key).ToList())
+                fight.PlacementSwaps.Remove(key);
         }
 
         private static Task SendPlacementDispositionsAsync(FightInstance fight)
