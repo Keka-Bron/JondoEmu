@@ -1196,10 +1196,19 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>Where the dungeon lets you out. Falls back to the entrance, which is where
         /// most of them put you: in 152 of the 187 the two are the same map.</summary>
+        /// <remarks>
+        /// Three catalogue exits are maps the world data does not have (Crocabulia's Lair,
+        /// Koolich Cavern, Royal Tofu House): the teleport refused them and the winners stayed in
+        /// the boss room with «Salir de la mazmorra» doing nothing. Those leave by the entrance.
+        /// </remarks>
         public static long WayOut(Dungeon dungeon)
         {
             if (dungeon == null) return 0;
-            return dungeon.ExitMapId != 0 ? dungeon.ExitMapId : dungeon.EntranceMapId;
+            long exit = dungeon.ExitMapId;
+            if (exit != 0 && MapManager.Maps.Count > 0 && MapManager.GetMapInfo(exit) == null
+                && MapManager.GetMapInfo(dungeon.EntranceMapId) != null)
+                exit = 0;
+            return exit != 0 ? exit : dungeon.EntranceMapId;
         }
 
         private static string Text(JsonElement e, string name)
