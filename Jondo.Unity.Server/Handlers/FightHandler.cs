@@ -8607,7 +8607,16 @@ namespace Jondo.Unity.Server.Handlers
             if (conducta)
             {
                 foreach (var c in consecuencias)
+                {
                     if (c.Buff is { Pendiente: true } espera) espera.DeConducta = true;
+                    // A row that reads the blows, left by a spell the behaviour chained, is the
+                    // monster's for the whole fight like the behaviour's own (EffectEngine): the
+                    // Ush Galesh's 6264 casts 6238, which casts 6239, whose 1061 shares every blow
+                    // between the two Ush; kept to the next round, the link broke after round one.
+                    if (c.FilaEnganchada && c.Buff is { } fila && c.Efecto is { Duration: 0 } efecto
+                        && Managers.EffectEngine.EsFilaQueLeeElGolpe(efecto.EffectId))
+                        fila.CaducaEnRonda = -1;
+                }
             }
 
             EngancharLoPendiente(consecuencias, hechizo, grado, quienLanza.Id, fight.RoundNumber,

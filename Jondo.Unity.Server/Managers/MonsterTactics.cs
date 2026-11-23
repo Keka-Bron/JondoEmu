@@ -982,7 +982,9 @@ namespace Jondo.Unity.Server.Managers
 
         private static bool CanCast(Board board, Spell spell, Fighter monster, int from, int aim, Fighter target)
         {
-            if (spell.OnSelf) return aim == from;
+            // A spell cast on the caster's own cell that needs that cell free can never be cast by
+            // hand: such spells only fire from other spells' rows (the red Ush's 6238).
+            if (spell.OnSelf) return aim == from && !spell.NeedsFreeCell;
             if (!spell.HasRows && spell.Summons && target == monster && aim != from)
                 return board.Walkable(aim) && !board.Occupied(aim)
                        && MapGeometry.Distance(from, aim) >= spell.MinRange
