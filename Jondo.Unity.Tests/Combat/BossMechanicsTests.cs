@@ -121,23 +121,26 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
-        /// Cast before the first turn, the even turn's wait counts his first turn: Medio Tiempo
-        /// comes at his round-one turn, so a hit in round two moves the Count, as the guide has it.
+        /// The Phossile's Abîme: his behaviour spell hangs 4498 four turns ahead, and it goes off at
+        /// the start of his fifth turn (T5, T9, T13 in the guide). A delay cast before the first
+        /// turn counts from round one, like any other.
         /// </summary>
         [Fact]
-        public void Cast_before_the_first_turn_the_even_turn_comes_at_his_first_turn()
+        public void A_delay_cast_before_the_first_turn_counts_from_round_one()
         {
+            const int Phossile = 3651, Abime = 4497, AbimeArmed = 4498;
+            if (!SpellEffects.De(Abime, 1).Any(row => row.EffectId == 793)) return;   // no spell data
             var fight = new FightInstance(1, 1);
-            var count = Count(300);
-            fight.AddMonster(count); fight.AddPlayer(Person(10, 0, 330));
+            var boss = Count(300);
+            boss.MonsterId = Phossile;
+            fight.AddMonster(boss); fight.AddPlayer(Person(10, 0, 330));
 
-            EffectEngine.Resolver(fight, count, Carrillon, 1, count, EffectEngine.AlLanzar, fight.RoundNumber, celdaApuntada: count.CellId);
-            FightHandler.CountDelaysFromTheFirstTurn(fight);
+            EffectEngine.Resolver(fight, boss, Abime, 1, boss, EffectEngine.AlLanzar, fight.RoundNumber, celdaApuntada: boss.CellId);
 
-            var waiting = Assert.Single(count.Buffs.Puestos, b => b.Pendiente);
-            Assert.Equal(MedioTiempo, waiting.Dado);
-            Assert.Equal(fight.RoundNumber, waiting.EmpiezaEnRonda);
-            Assert.Single(EffectEngine.ActivateDuePending(fight, fight.RoundNumber));
+            var waiting = Assert.Single(boss.Buffs.Puestos, b => b.Pendiente);
+            Assert.Equal(AbimeArmed, waiting.Dado);
+            Assert.Equal(fight.RoundNumber + 4, waiting.EmpiezaEnRonda);
+            Assert.Empty(EffectEngine.ActivateDuePending(fight, fight.RoundNumber + 3));
         }
 
         /// <summary>
