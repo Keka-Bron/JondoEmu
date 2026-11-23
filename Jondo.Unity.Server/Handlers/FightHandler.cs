@@ -6900,6 +6900,14 @@ namespace Jondo.Unity.Server.Handlers
                     }
                 }
                 if (hasta >= 0) hasta = Math.Max(hasta, byTheRowsLeft);
+                // Taken off again later in the same cast: the rows are armed once the cast is
+                // done, so a 406 on that spell further down -- from a child, by somebody else --
+                // found nothing to take. The Bworker's Hunt (8676) gives him 3 MP at his next
+                // turn start and casts its grade 2 back from every enemy at his side, whose 406
+                // takes the Hunt away: at their contact he does not get the MP.
+                int lastRow = consecuencias.FindLastIndex(c => grupo.Contains(c));
+                if (consecuencias.Skip(lastRow + 1).Any(c => c.Sobre == grupo.Key.Sobre && TakesTheSpellAway(c, grupo.Key.HechizoOrigen)))
+                    continue;
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, grupo.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0
@@ -6997,6 +7005,11 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>The key an armed row is held by: its effect uid, or its place when it has none.</summary>
         private static int ClaveDeFila(Managers.SpellEffect fila) => Managers.EffectEngine.ArmedRowKey(fila);
+
+        /// <summary>Whether this outcome is a 406 taking <paramref name="spell"/>'s effects off its bearer.</summary>
+        private static bool TakesTheSpellAway(Managers.Outcome c, int spell)
+            => c.Efecto is { } row && row.EffectId == Jondo.Unity.World.Combat.EffectSupport.RemoveSpellEffects
+               && (row.Value != 0 ? row.Value : row.DiceNum) == spell;
 
         /// <summary>The rows of an armed hook that wait on this trigger.</summary>
         private static List<Managers.SpellEffect> FilasArmadas(Jondo.Unity.World.Fights.Buffs.ActiveSpell enganche,
