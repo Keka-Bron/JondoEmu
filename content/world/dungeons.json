@@ -551,6 +551,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (223875074, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   },
   "141": {
@@ -587,6 +588,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (225185794, «Salida»), so leaving it led back into it and no one got out. The room after the boss is in content/world/dungeon_exits.json; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   },
   "42": {
@@ -597,11 +599,11 @@
     "entrance": 216402698,
     "exit": 216402698,
     "rooms": [
-      218632192,
-      218631168,
-      218630144,
+      218628096,
       218629120,
-      218628096
+      218630144,
+      218631168,
+      218632192
     ],
     "bosses": [
       940
@@ -622,6 +624,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (218632194, the White Rat's last room), so «Salir de la mazmorra» led back into it. The room after the boss is in content/world/dungeon_exits.json, where the White Rat lets the winners out; the way out is the entrance map she takes them to."
   },
   "43": {
@@ -632,11 +635,11 @@
     "entrance": 216927751,
     "exit": 216927751,
     "rooms": [
-      218894336,
+      218890240,
       218891264,
       218892288,
       218893312,
-      218890240
+      218894336
     ],
     "bosses": [
       939
@@ -658,6 +661,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (218894338, the Black Rat's last room), so «Salir de la mazmorra» led back into it. The room after the boss is in content/world/dungeon_exits.json, where the Black Rat lets the winners out; the way out is the entrance map she takes them to."
   },
   "115": {
@@ -693,6 +697,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (199495682, «Kharnotaurus's Lair - Exit»), which has no border, no interactive and no NPC, so the winners were shut in. The room after the boss is in content/world/dungeon_exits.json, where Lee O'Summerly offers «Leave Kharnotaurus's Lair.»; the way out is the entrance map, where he keeps the door. INFERRED: the outside map, the catalogue naming no other."
   },
   "142": {
@@ -729,6 +734,7 @@
     ],
     "lobby": 1,
     "autoGroup": 1,
+    "door": 1,
     "why": "The catalogue's exit is the dungeon's own post-boss room (224137218), which has no border, no interactive and no NPC who leads out, so the winners were shut in. The room after the boss is in content/world/dungeon_exits.json, where Raccooper offers «Leave the Sylvan Refuge.»; the way out is the entrance map. INFERRED: the outside map, the catalogue naming no other."
   },
   "58": {
