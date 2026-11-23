@@ -7005,10 +7005,29 @@ namespace Jondo.Unity.Server.Handlers
             var lista = enganche.Critico
                 ? Managers.EffectEngine.EfectosDeLaTirada(enganche.Hechizo, enganche.Grado, true)
                 : Managers.SpellEffects.De(enganche.Hechizo, enganche.Grado);
+            bool turnTrigger = string.Equals(disparador, Managers.EffectEngine.AlEmpezarElTurno, StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(disparador, Managers.EffectEngine.AlAcabarElTurno, StringComparison.OrdinalIgnoreCase);
             return lista.Where(f => enganche.Filas.Contains(ClaveDeFila(f))
                                  && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
                         .Select(f => enganche.CaducaEnRonda >= 0 ? WithoutCasterStates(f) : f)
+                        .Select(f => turnTrigger ? WithoutTheAttacker(f) : f)
                         .ToList();
+        }
+
+        /// <summary>
+        /// A row armed on the one who hit, going off at a turn's start or end, without its O: it
+        /// named the attacker when it was armed, and he is the bearer now. Toxoliat's Toxmosis
+        /// (4796) casts 4795 on whoever hits him, and its per-MP poison (1137 on "A,O" under TE)
+        /// looked for an attacker at the end of that turn, found none, and never bit.
+        /// </summary>
+        private static Managers.SpellEffect WithoutTheAttacker(Managers.SpellEffect row)
+        {
+            var parts = (row.TargetMask ?? "").Split(',');
+            var kept = parts.Where(p => p.Trim() != "O").ToArray();
+            if (kept.Length == parts.Length) return row;
+            var copy = row.Copia();
+            copy.TargetMask = string.Join(",", kept);
+            return copy;
         }
 
         /// <summary>
