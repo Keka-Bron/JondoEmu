@@ -4994,6 +4994,29 @@ namespace Jondo.Unity.Server.Handlers
                && fight.Glifos.Any(g => EsAuraDeMonstruo(g) && g.Hechizo == glifo.Hechizo
                                         && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId));
 
+        /// <summary>
+        /// A monster's aura gives at once to whoever already stands in it as it is laid, not only
+        /// to one who steps in or starts a turn there. Qu'Tan lays his (3941) under himself at the
+        /// end of his turn: its state 168 is what lets a fallen portal lift his invulnerability,
+        /// and as he never stepped in, he never had it and could not be hurt.
+        /// </summary>
+        private static async Task AuraOnThoseAlreadyInItAsync(NetworkStream stream, FightInstance fight,
+                                                              Glifo glifo)
+        {
+            var dentro = TodosLosCombatientes(fight)
+                .Where(f => f != null && f.IsAlive && glifo.Cubre(f.CellId)).ToList();
+            foreach (var quien in dentro)
+            {
+                if (!quien.IsAlive || glifo.Gastado || !GlyphCatches(fight, glifo, quien, false)) continue;
+                if (YaDentroDelAura(fight, glifo, quien))
+                {
+                    glifo.Dentro.Add(quien.Id);
+                    continue;
+                }
+                await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar: false);
+            }
+        }
+
         private static async Task SalirDeLasAurasAsync(NetworkStream stream, FightInstance fight, Fighter quien)
         {
             foreach (var aura in fight.Glifos.Where(g => EsAuraDeMonstruo(g)
@@ -8784,6 +8807,8 @@ namespace Jondo.Unity.Server.Handlers
                     if (glyph.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse && !holmgang
                         && (!lanceAura || glyph.Grado == 3))
                         await ApplyTheLaidAuraAsync(stream, fight, dueno, glyph);
+                    else if (EsAuraDeMonstruo(glyph))
+                        await AuraOnThoseAlreadyInItAsync(stream, fight, glyph);
                     continue;
                 }
 

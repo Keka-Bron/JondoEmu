@@ -65,6 +65,7 @@ namespace Jondo.Unity.Tests.Combat
                                                               && c != player.CellId);
             sombra.CellId = outside;
             silueta.CellId = inside;
+            await FightHandler.DispararLosGlifosAsync(null, fight, sombra, alPisar: true);
             await FightHandler.DispararLosGlifosAsync(null, fight, silueta, alPisar: true);
             Assert.True(silueta.Buffs.TieneEstado(Light));
             Assert.False(sombra.Buffs.TieneEstado(Light));
