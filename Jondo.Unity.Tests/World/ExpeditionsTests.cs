@@ -208,6 +208,16 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(new[] { 7852 }, DungeonManager.Get(143)!.Bosses);
             Assert.Equal(new[] { 478 }, DungeonManager.Get(186)!.Bosses);
             Assert.True(DungeonManager.IsBoss(7906));
+            // «Sala de Minotot» is named after «Sala del Minotot»: the Minotot is their boss.
+            Assert.Contains(827, DungeonManager.Get(167)!.Bosses);
+            Assert.Contains(827, DungeonManager.Get(205)!.Bosses);
+        }
+
+        [Fact]
+        public void An_expedition_finds_its_base_dungeon_whatever_the_articles()
+        {
+            Assert.Equal(DungeonManager.BaseNameKey("Sala del Minotot"), DungeonManager.BaseNameKey("sala de Minotot "));
+            Assert.NotEqual(DungeonManager.BaseNameKey("Sala del Minotot"), DungeonManager.BaseNameKey("Gruta de Kanígrula"));
         }
 
         [Theory]

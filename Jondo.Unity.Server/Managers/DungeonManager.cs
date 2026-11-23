@@ -260,17 +260,26 @@ namespace Jondo.Unity.Server.Managers
         /// With no boss, no room was the boss room: the boss was one more monster of the rooms'
         /// groups, and a player alone, who fights the first four of eight, never met him.
         /// </remarks>
+        /// <summary>
+        /// A dungeon's name as an expedition names it: lower case, without the articles. The
+        /// Minotot's expeditions are «Sala de Minotot», his dungeon «Sala del Minotot».
+        /// </summary>
+        internal static string BaseNameKey(string name)
+            => string.Join(' ', name.Trim().ToLowerInvariant()
+                                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                    .Where(w => w is not ("de" or "del" or "la" or "el" or "los" or "las")));
+
         private static void GiveExpeditionsTheirBosses()
         {
             var bases = _byId.Values.Where(d => d.Bosses.Count > 0 && Expeditions.CatalogueKey(d.Name) == null)
-                             .GroupBy(d => d.Name.Trim().ToLowerInvariant())
+                             .GroupBy(d => BaseNameKey(d.Name))
                              .ToDictionary(g => g.Key, g => g.OrderBy(d => d.Id).First());
             var waiting = new List<(Dungeon Expedition, Dungeon Base)>();
             foreach (var dungeon in _byId.Values)
             {
                 if (dungeon.Bosses.Count > 0 || dungeon.Rooms.Count == 0) continue;
                 string? key = Expeditions.CatalogueKey(dungeon.Name);
-                if (key == null || !bases.TryGetValue(key.Substring(key.IndexOf('|') + 1), out var named)) continue;
+                if (key == null || !bases.TryGetValue(BaseNameKey(key.Substring(key.IndexOf('|') + 1)), out var named)) continue;
                 waiting.Add((dungeon, named));
             }
             if (waiting.Count == 0) return;
