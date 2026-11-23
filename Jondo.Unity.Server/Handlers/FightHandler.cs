@@ -206,7 +206,7 @@ namespace Jondo.Unity.Server.Handlers
                 long monFighterId = monsterSeqId--;
                 int monCellId = (fight.RedPlacementCells.Count > redIdx)
                     ? fight.RedPlacementCells[redIdx++]
-                    : fight.RedPlacementCells.FirstOrDefault();
+                    : CasillaDeColocacionSobrante(fight, fight.RedPlacementCells.FirstOrDefault());
 
                 fight.AddMonster(BuildMonsterFighter(member, monFighterId, monCellId));
             }
@@ -8057,6 +8057,30 @@ namespace Jondo.Unity.Server.Handlers
                     InfoMessages.SummonLimitReached,
                     limit.ToString(System.Globalization.CultureInfo.InvariantCulture)));
             return sendAsync(packet);
+        }
+
+        /// <summary>
+        /// Where a monster starts once his side's flagged cells have run out: the nearest cell to
+        /// them the fight can step on, nobody stands on, and the other side does not start on.
+        /// Some boards flag fewer cells than the room sends monsters (the Ugah temple's fourth
+        /// room flags two a side), and every monster past them used to start on the first one.
+        /// </summary>
+        internal static int CasillaDeColocacionSobrante(FightInstance fight, int desde)
+        {
+            var vistas = new HashSet<int> { desde };
+            var cola = new Queue<int>();
+            foreach (int roja in fight.RedPlacementCells) if (vistas.Add(roja)) cola.Enqueue(roja);
+            cola.Enqueue(desde);
+            while (cola.Count > 0)
+            {
+                int casilla = cola.Dequeue();
+                if (MapGeometry.IsValid(casilla) && !Occupied(fight, casilla)
+                    && !fight.BluePlacementCells.Contains(casilla) && PisableEnCombate(fight, casilla))
+                    return casilla;
+                foreach (int vecina in MapGeometry.GetNeighbors(casilla))
+                    if (vistas.Count < 560 && vistas.Add(vecina)) cola.Enqueue(vecina);
+            }
+            return desde;
         }
 
         /// <summary>

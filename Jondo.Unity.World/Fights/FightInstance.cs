@@ -617,7 +617,11 @@ namespace Jondo.Unity.World.Fights
         public void AddMonster(Fighter monster)
         {
             monster.TeamId = 1;
-            if (RedPlacementCells.Count > 0)
+            // Past the flagged cells, a cell of his own the caller found for him stays his;
+            // cycling through them again would start two monsters on one cell.
+            bool ownCell = Rojo.Count >= RedPlacementCells.Count && monster.CellId > 0
+                           && !Rojo.Any(f => f.CellId == monster.CellId);
+            if (RedPlacementCells.Count > 0 && !ownCell)
                 monster.CellId = RedPlacementCells[Rojo.Count % RedPlacementCells.Count];
             Rojo.Add(monster);
             UpdateTurnOrder();
