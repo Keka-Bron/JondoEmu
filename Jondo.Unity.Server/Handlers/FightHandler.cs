@@ -2706,6 +2706,10 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await ActitudesAsync(stream, fight, quien, Managers.EffectEngine.AlMorir);
                 await EngancheAsync(stream, fight, quien, Managers.EffectEngine.AlMorir);
+                // And another fighter's attitude that waits on this one's death: Grohlum's
+                // Bravura (23884) holds "792 on g under X", so a fallen ally of hers casts its
+                // grade 2 and takes the enemies lined up with it.
+                if (quien.IsAlive) await ActitudesQueLoVigilanAsync(stream, fight, quien, Managers.EffectEngine.AlMorir);
                 // And the death by this kind of blow: "D|XD" is how the data writes "on a blow,
                 // the last one too" -- Perfusion's heal, the Xelor sphere's riposte (DS|XDS).
                 if (fight.GolpeMortal is { } clases)
@@ -10233,7 +10237,8 @@ namespace Jondo.Unity.Server.Handlers
                                                              Fighter quien, string disparador)
         {
             if (!disparador.StartsWith("EON", StringComparison.Ordinal)
-                && !disparador.StartsWith("EOFF", StringComparison.Ordinal)) return;
+                && !disparador.StartsWith("EOFF", StringComparison.Ordinal)
+                && disparador != Managers.EffectEngine.AlMorir) return;
             foreach (var vigia in fight.Azul.Concat(fight.Rojo).ToList())
             {
                 if (vigia == quien || !vigia.IsAlive || vigia.Buffs.Actitudes.Count == 0) continue;
