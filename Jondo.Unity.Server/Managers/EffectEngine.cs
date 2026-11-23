@@ -3876,8 +3876,9 @@ namespace Jondo.Unity.Server.Managers
         /// Whether a row of <paramref name="quienLanza"/>'s, aimed at <paramref name="quien"/>'s own
         /// cell, names him -- his side, his kind, his states, as the mask reads them.
         /// </summary>
-        internal static bool LeNombra(FightInstance combate, Fighter quienLanza, Fighter quien, SpellEffect efecto)
-            => AQuien(combate, quienLanza, quien, efecto, quien.CellId).Contains(quien);
+        internal static bool LeNombra(FightInstance combate, Fighter quienLanza, Fighter quien, SpellEffect efecto,
+                                      int desde = -1)
+            => AQuien(combate, quienLanza, quien, efecto, desde >= 0 ? desde : quien.CellId).Contains(quien);
 
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
                                                    Fighter objetivo, SpellEffect efecto,

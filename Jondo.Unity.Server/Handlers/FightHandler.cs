@@ -4136,7 +4136,7 @@ namespace Jondo.Unity.Server.Handlers
             // Without firing the newborn ones: whoever is starting the turn eats them anyway on
             // the line below, and with the 307 that belongs to them instead of the 306.
             await ReconciliarLosMurosAsync(stream, fight, fireOnBirth: false);
-            await QuitarLosGlifosCaducadosAsync(fight, fighter);
+            await QuitarLosGlifosCaducadosAsync(fight, fighter, stream);
             fight.StatesBeforeTheSweep = statesBeforeTheSweep;
             try { await DispararLosGlifosAsync(stream, fight, fighter, alPisar: false); }
             finally { fight.StatesBeforeTheSweep = null; }
@@ -4942,7 +4942,8 @@ namespace Jondo.Unity.Server.Handlers
         /// buffs' jwi, before the next jto --, the 3.6 client swallowed them: a Feca's glyphs
         /// dropped on the server and stayed painted on the board for the rest of the fight.
         /// </remarks>
-        internal static async Task QuitarLosGlifosCaducadosAsync(FightInstance fight, Fighter quienEmpieza)
+        internal static async Task QuitarLosGlifosCaducadosAsync(FightInstance fight, Fighter quienEmpieza,
+                                                                NetworkStream stream = null)
         {
             bool EsSuTiempo(Jondo.Unity.World.Fights.Glifo g)
             {
@@ -4966,6 +4967,7 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quienEmpieza.Id,
                                                        Network.FightProtocol.ActionSequence)));
+            await AurasQueCaenAsync(stream, fight, caidos);
         }
 
         /// <summary>The aura glyph effect: given while one stands in it.</summary>
@@ -4994,25 +4996,50 @@ namespace Jondo.Unity.Server.Handlers
                                                          && g.Dentro.Contains(quien.Id)
                                                          && !g.Cubre(quien.CellId)).ToList())
             {
-                aura.Dentro.Remove(quien.Id);
-                // Out of one copy but still in another of the same spell: what it gave stays.
-                if (fight.Glifos.Any(g => EsAuraDeMonstruo(g) && g.Hechizo == aura.Hechizo
-                                          && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId)))
-                    continue;
-                var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo);
-                foreach (var quitado in quitados)
-                {
-                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
-                        Network.FightProtocol.BuildBuffGone(quien.Id, quitado.Numero)));
-                }
-                foreach (int estado in quitados.Where(q => q.Estado != 0 && q.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState)
-                                               .Select(q => q.Estado).Distinct())
-                {
-                    if (!quien.Buffs.TieneEstado(estado))
-                        await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlQuitarseElEstado(estado));
-                }
-                Program.LogDebug($"[Fight] {quien.Id} leaves aura {aura.Id}: {quitados.Count} buff(s) removed.");
+                await FueraDelAuraAsync(stream, fight, aura, quien);
             }
+        }
+
+        /// <summary>
+        /// A monster aura that drops takes back what it gave to whoever stood in it: the
+        /// Globiluz's glyph lasts a round, and the light it gave Sombra's Silueta went on after
+        /// it, so Sombra stayed open with no glyph on the board.
+        /// </summary>
+        private static async Task AurasQueCaenAsync(NetworkStream stream, FightInstance fight,
+                                                    IEnumerable<Jondo.Unity.World.Fights.Glifo> caidos)
+        {
+            foreach (var aura in caidos.Where(EsAuraDeMonstruo).ToList())
+            {
+                foreach (long id in aura.Dentro.ToList())
+                {
+                    var quien = fight.Buscar(id);
+                    if (quien != null && quien.IsAlive) await FueraDelAuraAsync(stream, fight, aura, quien);
+                }
+                aura.Dentro.Clear();
+            }
+        }
+
+        private static async Task FueraDelAuraAsync(NetworkStream stream, FightInstance fight,
+                                                    Jondo.Unity.World.Fights.Glifo aura, Fighter quien)
+        {
+            aura.Dentro.Remove(quien.Id);
+            // Out of one copy but still in another of the same spell: what it gave stays.
+            if (fight.Glifos.Any(g => g != aura && EsAuraDeMonstruo(g) && g.Hechizo == aura.Hechizo
+                                      && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId)))
+                return;
+            var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo);
+            foreach (var quitado in quitados)
+            {
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
+                    Network.FightProtocol.BuildBuffGone(quien.Id, quitado.Numero)));
+            }
+            foreach (int estado in quitados.Where(q => q.Estado != 0 && q.EffectId == Jondo.Unity.World.Combat.EffectSupport.AddState)
+                                           .Select(q => q.Estado).Distinct())
+            {
+                if (!quien.Buffs.TieneEstado(estado))
+                    await DispararAsync(stream, fight, quien, Managers.EffectEngine.AlQuitarseElEstado(estado));
+            }
+            Program.LogDebug($"[Fight] {quien.Id} leaves aura {aura.Id}: {quitados.Count} buff(s) removed.");
         }
 
         /// <summary>
@@ -5066,6 +5093,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var caidos = fight.BarrerLosGlifos();
             foreach (var caido in caidos) await MarcaQuitadaAsync(fight, caido);
+            await AurasQueCaenAsync(stream, fight, caidos);
             if (caidos.Count > 0)
             {
                 Program.LogDebug($"[Fight] {caidos.Count} glyph(s) swept away.");
@@ -5383,6 +5411,16 @@ namespace Jondo.Unity.Server.Handlers
                 // 354-355) and no 3620 reaches the Xelor, whose own trigger of it sends him back and
                 // puts the 3620 that keeps it from going off again (frames 101-122).
                 bool soloElQueCae = EsGlifoDeTurnoDeClase(glifo) || EsGlifoDeTurnoConSuForma(glifo);
+                // A monster's aura gives to whoever is in it, judged from the glyph's centre: the
+                // Globiluz's light (4105) is a ring of 1-3 round him. Thrown round the Silueta who
+                // stepped in, it missed her -- a ring leaves its centre out -- lit Sombra standing
+                // outside, closed him again and was never taken back.
+                int desde = -1;
+                if (EsAuraDeMonstruo(glifo))
+                {
+                    soloElQueCae = true;
+                    desde = glifo.Centro >= 0 ? glifo.Centro : -1;
+                }
                 // Set off by its owner (Trashumancia, Posicion Defensiva), a glyph that hurts goes off
                 // over its ground: "danos inmediatos a todos los enemigos en su interior". Cast on the
                 // Feca alone it hurt the Feca, and nobody inside. A glyph that only moves (the
@@ -5394,7 +5432,7 @@ namespace Jondo.Unity.Server.Handlers
                 // And a monster's takes him only through the rows whose mask names him: a Blop that
                 // ends his turn on his fellow's Blifo is no enemy of it, and does not burn.
                 if (soloElQueCae && !EsGlifoDeTurnoDeClase(glifo))
-                    tirada = tirada.Where(f => Managers.EffectEngine.LeNombra(fight, dueno, quien, f)).ToList();
+                    tirada = tirada.Where(f => Managers.EffectEngine.LeNombra(fight, dueno, quien, f, desde)).ToList();
 
                 await HurtAsync(stream, fight, dueno, glifo.Hechizo, glifo.Grado, quien,
                                 celdaApuntada: celda, tirada: tirada, soloAlObjetivo: soloElQueCae);
@@ -8515,6 +8553,11 @@ namespace Jondo.Unity.Server.Handlers
             // and then the order stops making sense.
             var movidos = new List<Fighter>();
 
+            // The creatures this cast has brought out, row by row: a spell that writes the same
+            // summon twice over different zones and no draw (Sombra's 4104, a Globilum on X9 and
+            // again on X5-10) gives the second as the fallback of the first, not as a second one.
+            var nacidos = new List<(int Hechizo, int Grado, int Plantilla, int Forma, int Tamano, int Minimo)>();
+
             foreach (var c in consecuencias)
             {
                 // Forgelance rows are prepared before their damage is applied. A preceding
@@ -8615,7 +8658,9 @@ namespace Jondo.Unity.Server.Handlers
                             // A monster's rune is spent by setting it off.
                             foreach (var glifo in runas.Where(g => g.Cuando == Jondo.Unity.World.Fights.Disparo.AlActivarse))
                                 glifo.Gastado = true;
-                            foreach (var caido in fight.BarrerLosGlifos()) await MarcaQuitadaAsync(fight, caido);
+                            var barridos = fight.BarrerLosGlifos();
+                            foreach (var caido in barridos) await MarcaQuitadaAsync(fight, caido);
+                            await AurasQueCaenAsync(stream, fight, barridos);
                             continue;
                         }
 
@@ -9113,10 +9158,18 @@ namespace Jondo.Unity.Server.Handlers
                         Program.LogDebug($"[Fight] {invoca.Id} summons {c.Invoca} on cell {aimedForIt}, which is taken: nothing is born.");
                         continue;
                     }
+                    if (c.Efecto.EffectId == 181 && nacidos.Any(n => (n.Hechizo, n.Grado, n.Plantilla) == (c.HechizoOrigen, c.NivelOrigen, c.Invoca)
+                                                && (n.Forma, n.Tamano, n.Minimo) != (c.Efecto.Forma, c.Efecto.Tamano, c.Efecto.TamanoMinimo)))
+                    {
+                        Program.LogDebug($"[Fight] {invoca.Id} summons {c.Invoca} again over another zone: the first row's is the one born.");
+                        continue;
+                    }
                     var nuevo = await InvocarAsync(stream, fight, invoca, c.Invoca,
                                                    GradoDeLaInvocacion(c, hechizo, grado),
                                                    c.CasillaDeLaInvocacion >= 0 ? c.CasillaDeLaInvocacion : celdaApuntada,
                                                    c.Efecto.EffectId);
+                    if (nuevo != null) nacidos.Add((c.HechizoOrigen, c.NivelOrigen, c.Invoca, c.Efecto.Forma,
+                                                    c.Efecto.Tamano, c.Efecto.TamanoMinimo));
                     if (nuevo != null) ChallengeWatcher.PuppetSummoned(fight, nuevo, invoca);
                     await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo);
                     if (nuevo != null) await RevisarLosRecuentosAsync(stream, fight);
@@ -9149,6 +9202,7 @@ namespace Jondo.Unity.Server.Handlers
                         if (g.Grado == 2 && Managers.ForgelanceCombat.IsAura(fight, g))
                             await SyncLanceProtectionAsync(stream, fight, fight.Buscar(g.Dueno));
                     }
+                    await AurasQueCaenAsync(stream, fight, c.GlifosQuitados);
                     Program.LogDebug($"[Fight] {quienLanza.Id} dispels {c.GlifosQuitados.Count} glyph(s) of {c.Sobre.Id}.");
                     continue;
                 }
@@ -11471,6 +11525,7 @@ namespace Jondo.Unity.Server.Handlers
                     {
                         foreach (var glifo in suyos) await MarcaQuitadaAsync(fight, glifo);
                     });
+                    await AurasQueCaenAsync(stream, fight, suyos);
                     Program.LogDebug($"[Fight] The {suyos.Count} glyph(s) of {muerto.Id} go with him.");
                 }
             }
