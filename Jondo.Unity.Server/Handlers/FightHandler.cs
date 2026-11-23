@@ -10013,8 +10013,13 @@ namespace Jondo.Unity.Server.Handlers
                     if (Network.ControlApi.TestKey.Length > 0
                         && Managers.SpellEffects.De(actitud, grado).Any(e => e.Triggers.Split('|').Contains(Managers.EffectEngine.AlLanzar)))
                         Program.LogDebug($"[Fight] Attitude {actitud} of {quien.Id} answers {Managers.EffectEngine.AlLanzar}.");
+                    // A monster's attitude is his for the whole fight, like his behaviour, and so
+                    // is what it hooks on others: the Minotot's Audacia (23918) hands each enemy
+                    // player a turn-end hook that swaps him with the nearest Tofu, and kept to the
+                    // next round it was gone before the Tofus came.
                     await AplicarEfectosAsync(stream, fight, quien, actitud, grado, quien,
-                                              Managers.EffectEngine.AlLanzar, quien.CellId, armar: false);
+                                              Managers.EffectEngine.AlLanzar, quien.CellId, armar: false,
+                                              conducta: EsDelBandoDeLosMonstruos(fight, quien));
 
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                         Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
