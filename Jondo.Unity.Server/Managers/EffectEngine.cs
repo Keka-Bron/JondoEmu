@@ -518,7 +518,7 @@ namespace Jondo.Unity.Server.Managers
                 case ModoDeDano.VidaDelLanzador: return VidaDeLaQueSale(efecto.EffectId, lanzador) * dado / 100;
                 case ModoDeDano.Fijo: return dado;
                 case ModoDeDano.VidaDelObjetivo: return Math.Max(0, objetivo.CurrentHP) * dado / 100;
-                case ModoDeDano.DanoSufrido: return Math.Max(0, combate.DanoDelDisparo) * dado / 100;
+                case ModoDeDano.DanoSufrido: return Math.Max(0, combate.DanoInicialDelDisparo ?? combate.DanoDelDisparo) * dado / 100;
                 case ModoDeDano.PorPuntos:
                     // Spent from what his turn started with (Fighter.MPAtTurnStart), not from the
                     // maximum: a point taken off him before it was never used.

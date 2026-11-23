@@ -1237,6 +1237,12 @@ namespace Jondo.Unity.World.Fights
         public int DanoDelDisparo { get; set; }
 
         /// <summary>
+        /// The same blow before an invulnerability took it all: what "% de los daños iniciales
+        /// sufridos" (1123-1128) reads. Null, and <see cref="DanoDelDisparo"/> stands, unless a shield ate it.
+        /// </summary>
+        public int? DanoInicialDelDisparo { get; set; }
+
+        /// <summary>
         /// What «Castigo» (788) has already given each fighter in a round, by (fighter, round):
         /// the blows he takes add to it until the effect's cap for the round.
         /// </summary>

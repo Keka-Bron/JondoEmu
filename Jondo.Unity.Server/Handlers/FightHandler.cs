@@ -10163,10 +10163,13 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static async Task DispararLosDelGolpeAsync(NetworkStream stream, FightInstance fight,
                                                            Fighter caster, Fighter target, int elemento, bool deCerca,
-                                                           int dano = 0, bool deHechizo = false)
+                                                           int dano = 0, bool deHechizo = false,
+                                                           int inicial = -1)
         {
             var antes = fight.TriggeringAttacker;
             var danoAntes = fight.DanoDelDisparo;
+            var inicialAntes = fight.DanoInicialDelDisparo;
+            fight.DanoInicialDelDisparo = inicial < 0 ? null : inicial;
             var elementoAntes = fight.ElementoDelDisparo;
             fight.TriggeringAttacker = caster;
             fight.DanoDelDisparo = dano;
@@ -10201,6 +10204,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             fight.TriggeringAttacker = antes;
             fight.DanoDelDisparo = danoAntes;
+            fight.DanoInicialDelDisparo = inicialAntes;
             fight.ElementoDelDisparo = elementoAntes;
         }
 
@@ -10554,39 +10558,6 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            if (!fulmina && Managers.SpellStates.ShieldsFromBlow(target, lejos))
-            {
-                await ChallengeWatcher.CountMaxiluboHitAsync(stream, fight, caster, target);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId, target.Id, 0, elemento)));
-                Program.LogDebug($"[Fight] {target.Id} is invulnerable: effect {efecto.EffectId} " +
-                                 $"of spell {spell} takes nothing from it.");
-
-                // But it is still a blow, and what waits on being hit goes off: Conde Kontatrás
-                // is invulnerable for the whole fight, and being HIT is what throws him on an even
-                // turn and lifts it -- the guide's "every hit on him". Not the "hit by an enemy"
-                // of the attitudes (DBE), which the Influencia capture shows untouched.
-                {
-                    var antes = fight.TriggeringAttacker;
-                    fight.TriggeringAttacker = caster;
-                    string alcance = lejos <= 1 ? Managers.EffectEngine.CuandoMePeganDeCerca
-                                                : Managers.EffectEngine.CuandoMePeganDeLejos;
-                    await DispararAsync(stream, fight, target, alcance);
-                    // A spell armed to wait on an enemy's blow does go off, attitudes aside:
-                    // Torkelonia's 14078 lets the hitter who carries the glyph's state lift
-                    // her invulnerability, and absorbing the blow never fired it.
-                    if (caster.TeamId != target.TeamId && target.IsAlive)
-                        await EngancheAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
-                    fight.TriggeringAttacker = antes;
-                }
-                // Its triggers go off with nothing taken: a share "of the damage suffered" is a
-                // share of nothing. Capitan Meno heals by all a player suffers (6795's 2020), and
-                // handed the die's roll here he healed off every blow on a player in state 56.
-                await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, lejos <= 1, 0,
-                                               deHechizo: spell != 0);
-                return;
-            }
-
             // What came out of the die, rolled once for the whole cast -- turned to its
             // bottom or its top by a 781 on the caster or a 782 on the target, and scaled by the
             // MP he has left for the "% PM restantes" blows (EffectEngine).
@@ -10814,6 +10785,44 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
+            // INVULNERABLE, now that the blow is worked out (see the state's note above): the
+            // damage it would have done is what its "initial damage" triggers read.
+            if (!fulmina && Managers.SpellStates.ShieldsFromBlow(target, lejos))
+            {
+                await ChallengeWatcher.CountMaxiluboHitAsync(stream, fight, caster, target);
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                    Network.FightProtocol.BuildDamage(caster.Id, efecto.EffectId, target.Id, 0, elemento)));
+                Program.LogDebug($"[Fight] {target.Id} is invulnerable: effect {efecto.EffectId} " +
+                                 $"of spell {spell} takes nothing from it.");
+
+                // But it is still a blow, and what waits on being hit goes off: Conde Kontatrás
+                // is invulnerable for the whole fight, and being HIT is what throws him on an even
+                // turn and lifts it -- the guide's "every hit on him". Not the "hit by an enemy"
+                // of the attitudes (DBE), which the Influencia capture shows untouched.
+                {
+                    var antes = fight.TriggeringAttacker;
+                    fight.TriggeringAttacker = caster;
+                    string alcance = lejos <= 1 ? Managers.EffectEngine.CuandoMePeganDeCerca
+                                                : Managers.EffectEngine.CuandoMePeganDeLejos;
+                    await DispararAsync(stream, fight, target, alcance);
+                    // A spell armed to wait on an enemy's blow does go off, attitudes aside:
+                    // Torkelonia's 14078 lets the hitter who carries the glyph's state lift
+                    // her invulnerability, and absorbing the blow never fired it.
+                    if (caster.TeamId != target.TeamId && target.IsAlive)
+                        await EngancheAsync(stream, fight, target, Managers.EffectEngine.CuandoMePegan);
+                    fight.TriggeringAttacker = antes;
+                }
+                // Its triggers go off with nothing taken: a share "of the damage suffered" is a
+                // share of nothing. Capitan Meno heals by all a player suffers (6795's 2020), and
+                // handed the die's roll here he healed off every blow on a player in state 56.
+                // But "% de los daños INICIALES sufridos" (1123-1128) is the blow before the
+                // shield: the Krobes' Disyunción (4935) throws twice what an invulnerable Krobe
+                // was dealt at the Malamibe, the one way to hurt it.
+                await DispararLosDelGolpeAsync(stream, fight, caster, target, elemento, lejos <= 1, 0,
+                                               deHechizo: spell != 0, inicial: damage);
+                return;
+            }
+
             // «Comparte los daños» (1061): the blow cut in equal shares among the fighters one
             // cast linked, each his own, what does not divide staying on the one hit. INFERRED,
             // see EffectEngine.ComparteLosDanos.
@@ -10987,8 +10996,10 @@ namespace Jondo.Unity.Server.Handlers
             // its number from the fight's blow. Only DispararLosDelGolpeAsync set it, after them,
             // so the hit it returned was always 0.
             var danoDelDisparoAntes = fight.DanoDelDisparo;
+            var inicialDelDisparoAntes = fight.DanoInicialDelDisparo;
             var elementoDelDisparoAntes = fight.ElementoDelDisparo;
             fight.DanoDelDisparo = damage;
+            fight.DanoInicialDelDisparo = null;
             fight.ElementoDelDisparo = elemento;
             fight.TriggeringAttacker = caster;
             if (target.LeHanPegado)
@@ -11027,6 +11038,7 @@ namespace Jondo.Unity.Server.Handlers
             }
             fight.TriggeringAttacker = null;
             fight.DanoDelDisparo = danoDelDisparoAntes;
+            fight.DanoInicialDelDisparo = inicialDelDisparoAntes;
             fight.ElementoDelDisparo = elementoDelDisparoAntes;
 
             Program.LogDebug($"[Fight] {aplicado} damage to {target.Id} (computed {damage}); " +
