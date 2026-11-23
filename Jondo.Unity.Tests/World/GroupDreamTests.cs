@@ -30,8 +30,9 @@ namespace Jondo.Unity.Tests.World
         public async Task A_dream_exit_clears_the_interface_in_order_without_replaying_it_on_later_loads(Exit exit)
         {
             // A street of its own: 191105026 is where most tests stand, and the arrivals of those
-            // running alongside reached the owner once he was back on it.
-            const long owner = 900_000_000_011, guest = 900_000_000_012, street = 191105024;
+            // running alongside reached the owner once he was back on it. [5,-19] would not do
+            // either: the readable tests open a board there.
+            const long owner = 900_000_000_011, guest = 900_000_000_012, street = 191106050;
             if (!MapManager.WalkableCells.ContainsKey(Jail.MapId)) MapManager.Initialize();
             Interactives.Initialize();
             Dreams.OlvidarTodo();
@@ -152,7 +153,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public async Task A_no_leaves_the_member_where_he_is()
         {
-            const long owner = 900_000_000_021, guest = 900_000_000_022, street = 191105024;
+            const long owner = 900_000_000_021, guest = 900_000_000_022, street = 191106050;
             Interactives.Initialize();
             Dreams.OlvidarTodo();
             DreamHandler.ForgetGroups();
