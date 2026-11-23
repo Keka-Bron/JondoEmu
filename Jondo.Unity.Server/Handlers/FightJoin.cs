@@ -936,7 +936,7 @@ namespace Jondo.Unity.Server.Handlers
         /// capture, frames 37-43: jxa, then the way back as at the end of a fight -- kml, kmp,
         /// ktz, jru, lqu -- and his client asks for the map. What the others get is not measured:
         /// the kar and jzu of a monster taken off (dungeon 140) and his side's kae, the map the
-        /// same kae and his figure back. A fight left with nobody is dropped.
+        /// same kae and his figure back. If his departure defeats his side, everyone gets the normal result instead.
         /// </summary>
         internal static async Task LeavePlacementAsync(NetworkStream stream, FightInstance fight)
         {
@@ -945,6 +945,13 @@ namespace Jondo.Unity.Server.Handlers
             bool left;
             lock (fight) left = fight.LeavePlacement(me);
             if (!left) return;
+
+            if (fight.State == FightState.Ended)
+            {
+                await SwordsGoneAsync(fight);
+                await EndFightAsync(fight);
+                return;
+            }
 
             var suyo = SessionContext.State;
             suyo.IsInFight = false;

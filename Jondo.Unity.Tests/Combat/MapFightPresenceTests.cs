@@ -378,14 +378,12 @@ public sealed partial class MapFightPresenceTests
         finally { spectators.TryRemove(Id, out _); }
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Placement_departure_keeps_board_removals_separate_from_roleplay_flags_and_teams(bool lastPlayer)
+    [Fact]
+    public async Task Placement_departure_keeps_board_removals_separate_from_roleplay_flags_and_teams()
     {
         using var fixture = new FightFixture();
         var fight = fixture.Fight;
-        if (!lastPlayer) fight.Azul.Add(new() { Id = Person + 5, Name = "Remaining", CurrentHP = 100 });
+        fight.Azul.Add(new() { Id = Person + 5, Name = "Remaining", CurrentHP = 100 });
         await using var own = await ClientPipe.OpenAsync(Person + 1_000_000_000, Person, Arena);
         own.Session.State.FightId = Id;
         own.Session.State.IsInFight = true;
@@ -401,21 +399,67 @@ public sealed partial class MapFightPresenceTests
         Assert.Equal(new[] { "jxa", "kml", "kmp", "ktz", "jru", "lqu" }, (await own.Take(6)).Select(packet => packet.Opcode));
         Assert.Equal(0, own.Session.State.FightId);
         Assert.Equal(Map, own.Session.MapId);
-        if (lastPlayer)
+        Assert.Equal(FightState.Placement, fight.State);
+        Assert.Collection(remaining.Sequence,
+            entry => Assert.Equal("kar", entry),
+            entry => Assert.Equal(new ContextRemoveElementEvent(Person), entry),
+            entry => Assert.Equal(new FightTeamRemoveMemberEvent((int)Id, Team.Challenger, Person), entry),
+            entry => Assert.Equal("jzu", entry),
+            entry => Assert.Equal(Person + 5, Assert.IsType<FightTeamUpdateEvent>(entry).Team.LeaderId));
+        Assert.IsType<FightTeamUpdateEvent>(Assert.Single(peer.Codec.Frames).Content);
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public async Task Last_fighter_forfeiting_in_placement_settles_both_sides(bool duel, bool redForfeits)
+    {
+        using var fixture = new FightFixture();
+        var fight = fixture.Fight;
+        long quitter = redForfeits ? Person + 1 : Person;
+        await using var blue = await ClientPipe.OpenAsync(Person + 1_000_000_000, Person, Arena);
+        await using var red = duel ? await ClientPipe.OpenAsync(Person + 1_000_000_001, Person + 1, Arena) : null;
+        if (duel)
         {
-            Assert.Equal(new GamePayload[] { new RemoveChallengeEvent((int)Id), new MapFightCountEvent(0) },
-                peer.Codec.Frames.Select(frame => frame.Content));
-            Assert.Empty(remaining.Sequence);
+            fight.Reglas = FightRules.Desafio;
+            fight.Rojo.Clear();
+            fight.Rojo.Add(new() { Id = Person + 1, Level = 50, CurrentHP = 100 });
         }
         else
         {
-            Assert.Collection(remaining.Sequence,
-                entry => Assert.Equal("kar", entry),
-                entry => Assert.Equal(new ContextRemoveElementEvent(Person), entry),
-                entry => Assert.Equal(new FightTeamRemoveMemberEvent((int)Id, Team.Challenger, Person), entry),
-                entry => Assert.Equal("jzu", entry),
-                entry => Assert.Equal(Person + 5, Assert.IsType<FightTeamUpdateEvent>(entry).Team.LeaderId));
-            Assert.IsType<FightTeamUpdateEvent>(Assert.Single(peer.Codec.Frames).Content);
+            // The quitter's companion goes with them; it cannot keep placement open on its own.
+            fight.Azul.Add(new() { Id = -3, IsMonster = true, CompanionId = 1, DrivenBy = Person, CurrentHP = 50 });
+        }
+        var expected = fight.Todos.Select(f => (f.Id, Outcome: fight.EquipoDe(f.Id) == fight.EquipoDe(quitter)
+            ? FightOutcome.ResultLost : FightOutcome.ResultVictory)).ToArray();
+        var clients = red == null ? new[] { blue } : new[] { blue, red };
+        foreach (var client in clients)
+        {
+            client.Session.State.FightId = Id;
+            client.Session.State.IsInFight = true;
+            client.Session.State.RoleplayMapId = Map;
+        }
+        using var peer = new Recipient(Person + 2, Map);
+        var leaving = clients.Single(c => c.Session.CharacterId == quitter);
+        using (SessionContext.Push(leaving.Session))
+        using (await leaving.Session.EnterTurnAsync())
+            await FightHandler.InTurnAsync(fight, () => FightHandler.AbandonAsync(leaving.ToClient));
+
+        Assert.Equal(FightState.Ended, fight.State);
+        Assert.Equal(redForfeits ? FightInstance.Azules : FightInstance.Rojos, fight.WinnerTeamId);
+        Assert.Null(FightHandler.FightById(Id));
+        Assert.Equal(new GamePayload[] { new RemoveChallengeEvent((int)Id), new MapFightCountEvent(0) },
+            peer.Codec.Frames.Select(frame => frame.Content));
+        foreach (var client in clients)
+        {
+            Assert.False(client.Session.State.IsInFight);
+            Assert.Equal(0, client.Session.State.FightId);
+            byte[] frame;
+            do { frame = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(client.FromServer).WaitAsync(TimeSpan.FromSeconds(5)); }
+            while (ConnectionProtocol.ReadOpcode(frame) != "jyg");
+            var results = Assert.IsType<FightEndEvent>(new GameCodec().Decode(frame).Content).Results;
+            Assert.Equal(expected, results.Select(r => (r.Fighter.FighterId, r.Outcome)));
         }
     }
 

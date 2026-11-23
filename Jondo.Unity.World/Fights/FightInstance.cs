@@ -973,13 +973,23 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
-        /// Takes a person out during the placement: he leaves, the fight goes on without him.
+        /// Removes a participant during placement, or ends the fight if their side cannot continue.
         /// </summary>
         public bool LeavePlacement(long fighterId)
         {
             if (State != FightState.Placement) return false;
             var who = Buscar(fighterId);
             if (who == null || who.IsMonster) return false;
+
+            var side = Bando(EquipoDe(fighterId));
+            if (!side.Any(f => f != who && f.IsAlive && !f.EsInvocado &&
+                               !(f.IsCompanion && f.DrivenBy == fighterId)))
+            {
+                // Keep the forfeiting side on the roster for settlement and both clients' result rows.
+                foreach (var fighter in side) fighter.CurrentHP = 0;
+                CheckFightEnd();
+                return true;
+            }
 
             Azul.Remove(who);
             Rojo.Remove(who);
