@@ -3285,8 +3285,10 @@ namespace Jondo.Unity.Server.Managers
                     if (!CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)) continue;
                     // Made to cast it by somebody else's spell -- the Steamer's Asistencia has the
                     // ally cast the teleport that brings him over --, he is being moved: an
-                    // Indesplazable one stays where he is.
-                    if (combat.RootCaster != null && combat.RootCaster != caster && NoSeDejaMover(caster)) continue;
+                    // Indesplazable one stays where he is. Not a Pesante one, who only cannot
+                    // trade places: Nagate's Hors de ma vue (16826) puts the Pesanteur on whoever
+                    // stands on her islet and then sends him off it, and nobody ever left.
+                    if (combat.RootCaster != null && combat.RootCaster != caster && NoSeDejaLlevar(caster)) continue;
 
                     // Rempotage's sub-cast is cast by the doll towards its owner. Mode 63
                     // picks the first free cell from that owner towards the doll, rather
