@@ -2754,7 +2754,12 @@ namespace Jondo.Unity.Server.Managers
             combat.CarriedAtCast = (caster.Id, caster.Carrying);
 
             // A monster spell's triggered rows are armed at its cast; a player's keep their hooks.
-            bool armaSusFilas = combat.SinArmar == 0 && !PlayerSpells.Contains(spell)
+            // An attitude answering a trigger arms none of its own -- they stand already -- but
+            // what it casts arms its rows still: the Protozorreur's Infection sets off 4971 on
+            // him, and its "792 4970 on TE" is what lifts the count to his death at the first
+            // turn he ends out of the state. Left unarmed, the count ran out however he fought.
+            bool armaSusFilas = (combat.SinArmar == 0 || depth > 0 && !caster.Buffs.Actitudes.Contains(spell))
+                                && !PlayerSpells.Contains(spell)
                                 && string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase);
             if (nearestChainBudget < 0)
                 nearestChainBudget = Todos(combat).Count(fighter => fighter != null && fighter.IsAlive);
@@ -4951,6 +4956,17 @@ namespace Jondo.Unity.Server.Managers
                 if (efecto.EffectId == Trampa
                     && combate.Glifos.Any(g => !g.Gastado && g.Tipo == Trampa && g.Dueno == quienLanza.Id
                                                && g.HechizoQueLoPuso == hechizo && g.Centro == celdaApuntada))
+                    return null;
+
+                // So is a monster's glyph laid again on the spot where its own still lies: the
+                // Protozorreur lays his Infection (4968 -> 4966) under every character who takes
+                // damage, and each blow of a round piled one more on the same cell -- twenty in
+                // three rounds, every one of them going off on whoever stood there.
+                int caducaElGlifo = Caduca(efecto, ronda);
+                if (efecto.EffectId == GlifoCorriente && !PlayerSpells.Contains(hechizo)
+                    && combate.Glifos.Any(g => !g.Gastado && g.Tipo == GlifoCorriente && g.Dueno == quienLanza.Id
+                                               && g.HechizoQueLoPuso == hechizo && g.Centro == celdaApuntada
+                                               && (g.CaducaEnRonda < 0 || caducaElGlifo >= 0 && g.CaducaEnRonda >= caducaElGlifo)))
                     return null;
 
                 var huella = CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada);
