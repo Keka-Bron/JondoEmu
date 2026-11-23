@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
-using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.World.Fights;
-using static Jondo.Protocol.NetworkMessage;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -79,7 +77,7 @@ namespace Jondo.Unity.Server.Handlers
         /// How many have to be chosen (kxa). The real server sends it TWICE with the same number,
         /// so this is called twice from placement.
         /// </summary>
-        public static async Task SendCountAsync(NetworkStream stream, FightInstance fight,
+        internal static async Task SendCountAsync(GameSession session, FightInstance fight,
                                                 bool primeraVez = false)
         {
             if (!Any(fight)) return;
@@ -90,14 +88,8 @@ namespace Jondo.Unity.Server.Handlers
                 Managers.Almanax.ForFight(fight.RoleplayMapId, fight.Rojo.Where(m => m.IsMonster).Select(m => m.MonsterId),
                                           Array.Empty<int>(), DungeonManager.IsRoom(fight.RoleplayMapId)));
             fight.ChallengesToPick = NormalCount + Math.Min(1, extra);
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kxa,
-                Network.FightProtocol.BuildChallengeCount(fight.ChallengesToPick)));
-
-            // And right after the FIRST kxa, an empty kwk. It shows up six times in the captures, always
-            // without a payload and always in this same spot, between the first kxa and the first jxg.
-            // What it says is unknown -- it is empty, there is nothing to read --, but it is the only thing
-            // the real server sends there and it was missing here.
-            if (primeraVez) await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwk));
+            await session.SendAsync(new Game.ChallengeNumberEvent(fight.ChallengesToPick));
+            if (primeraVez) await session.SendAsync(new Game.ChallengeModSelectedEvent(Game.ChallengeMod.Choice));
         }
 
         /// <summary>
@@ -107,12 +99,11 @@ namespace Jondo.Unity.Server.Handlers
         /// opened the selector with two challenges already on screen, they were swapped for two others
         /// in front of his eyes. The real server keeps the one that was not chosen.
         /// </summary>
-        public static async Task OpenAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task OpenAsync(GameSession session, FightInstance fight)
         {
             if (!fight.ChallengesPending) return;
 
             // If there is already a pair on the table, the same one is sent again.
-            var lista = new List<byte[]>();
             var nombres = new List<Challenges.Challenge>();
 
             if (fight.ChallengesOffered.Count > 0)
@@ -122,7 +113,6 @@ namespace Jondo.Unity.Server.Handlers
                     var reto = Challenges.Get(id);
                     if (reto == null) continue;
                     nombres.Add(reto);
-                    lista.Add(Network.FightProtocol.BuildChallenge(reto.Id, reto.Percent));
                 }
             }
             else
@@ -135,14 +125,13 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     fight.ChallengesOffered.Add(reto.Id);
                     nombres.Add(reto);
-                    lista.Add(Network.FightProtocol.BuildChallenge(reto.Id, reto.Percent));
                 }
             }
 
-            if (lista.Count == 0) return;
+            if (nombres.Count == 0) return;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwx,
-                Network.FightProtocol.BuildChallengeList(lista)));
+            await session.SendAsync(new Game.ChallengeProposalEvent(FightProtocol.ChallengeTimer,
+                nombres.Select(c => Information(c.Id, c.Percent)).ToArray()));
 
             Console.WriteLine($"[Challenges] {Names(nombres)} offered in fight #{fight.FightId}.");
         }
@@ -151,12 +140,8 @@ namespace Jondo.Unity.Server.Handlers
         /// The player marks a candidate (kwv). Nothing is answered: in the captures the server stays
         /// silent. Only which one is noted, to know what to lock in when he validates.
         /// </summary>
-        public static void Mark(FightInstance fight, byte[] payload)
+        internal static void Mark(FightInstance fight, int id)
         {
-            byte[]? kwv = ConnectionProtocol.ReadPayload(payload, Op.Kwv);
-            if (kwv == null) return;
-
-            int id = (int)VarField(kwv, 1);
             if (id != 0 && fight.ChallengesOffered.Contains(id)) fight.ChallengeMarked = id;
         }
 
@@ -165,18 +150,14 @@ namespace Jondo.Unity.Server.Handlers
         /// there are still challenges to choose, another list follows with the next pair, which is
         /// exactly what the real server does in a dungeon.
         /// </summary>
-        public static async Task ValidateAsync(NetworkStream stream, FightInstance fight, byte[] payload)
+        internal static async Task ValidateAsync(GameSession session, FightInstance fight, int id)
         {
-            byte[]? kwj = ConnectionProtocol.ReadPayload(payload, Op.Kwj);
-            if (kwj == null) return;
-
-            int id = (int)VarField(kwj, 1);
             if (id == 0) id = fight.ChallengeMarked;
             if (id == 0 || !fight.ChallengesOffered.Contains(id)) return;
 
-            await FixAsync(stream, fight, id);
+            await FixAsync(session, fight, id);
 
-            if (fight.ChallengesPending) await OpenAsync(stream, fight);
+            if (fight.ChallengesPending) await OpenAsync(session, fight);
         }
 
         /// <summary>
@@ -189,14 +170,8 @@ namespace Jondo.Unity.Server.Handlers
         /// a proposal is open the client greys out the lock, the spectator eye and the party lock: the
         /// leader could never close the fight in placement.
         /// </summary>
-        public static async Task SettingsAsync(NetworkStream stream, byte[] payload)
-        {
-            byte[]? kwo = ConnectionProtocol.ReadPayload(payload, Op.Kwo);
-            if (kwo == null) return;
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwn,
-                Network.FightProtocol.BuildChallengeSettings(VarField(kwo, 1))));
-        }
+        internal static Task SettingsAsync(GameSession session, Game.ChallengeBonusChoiceRequest request)
+            => session.SendAsync(new Game.ChallengeBonusChoiceSelectedEvent(request.ChallengeBonus));
 
         /// <summary>
         /// The player has pressed ready and there are challenges left unchosen: the server fills them
@@ -205,23 +180,23 @@ namespace Jondo.Unity.Server.Handlers
         ///
         /// It goes BEFORE the kai, which is the cut between placement and the fight.
         /// </summary>
-        public static async Task FillAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task FillAsync(GameSession session, FightInstance fight)
         {
             // Whatever was marked without being validated counts: the player chose it, he just did not
             // get to press the button before declaring himself ready.
             if (fight.ChallengeMarked != 0 && fight.ChallengesPending)
             {
-                await FixAsync(stream, fight, fight.ChallengeMarked);
+                await FixAsync(session, fight, fight.ChallengeMarked);
             }
 
             while (fight.ChallengesPending)
             {
                 var pareja = Challenges.Pair(GroupLevel(fight), FixedIds(fight), _dado);
                 if (pareja.Count == 0) break;
-                await FixAsync(stream, fight, pareja[0].Id);
+                await FixAsync(session, fight, pareja[0].Id);
             }
 
-            await ImposeAsync(stream, fight);
+            await ImposeAsync(session, fight);
         }
 
         /// <summary>
@@ -240,7 +215,7 @@ namespace Jondo.Unity.Server.Handlers
         /// them does not get them again. And only the ones the watcher can judge and that fit the party
         /// there is -- no "Dúo" for three -- are imposed: <see cref="Challenges.Imposed"/> decides.
         /// </summary>
-        private static async Task ImposeAsync(NetworkStream stream, FightInstance fight)
+        private static async Task ImposeAsync(GameSession session, FightInstance fight)
         {
             // Only in the boss room. These are the challenges with an achievement behind them, the reward
             // for having done the whole dungeon, and they came out in every room because the only thing
@@ -266,7 +241,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var uno in fight.Azul) if (!uno.EsInvocado) players++;
             foreach (var uno in fight.Rojo) if (!uno.EsInvocado) monsterCount++;
 
-            var cumplidos = DatabaseManager.LoadChallengesDone(GameState.CharacterId);
+            var cumplidos = DatabaseManager.LoadChallengesDone(session.CharacterId);
             var puestos = Challenges.Imposed(bichos, cumplidos, players, monsterCount);
             if (puestos.Count == 0) return;
 
@@ -276,9 +251,7 @@ namespace Jondo.Unity.Server.Handlers
                 // One fight, one list: the party's second player is sent the same challenge, but
                 // it is not written down twice.
                 if (Array.IndexOf(alreadyFixed, reto.Id) < 0) fight.ChallengesFixed.Add((reto.Id, 0));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kww,
-                    Network.FightProtocol.BuildChallengeChosen(
-                        Network.FightProtocol.BuildChallenge(reto.Id, 0))));
+                await session.SendAsync(new Game.ChallengeAddEvent(Information(reto.Id, 0)));
             }
 
             Console.WriteLine($"[Challenges] The place imposes {puestos.Count} more challenge(s) in " +
@@ -286,18 +259,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The final list (kwu). It goes between the kai and the jyy.</summary>
-        public static async Task SendFinalListAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task SendFinalListAsync(GameSession session, FightInstance fight)
         {
             if (fight.ChallengesFixed.Count == 0) return;
 
-            var lista = new List<byte[]>();
-            foreach (var (id, percent) in fight.ChallengesFixed)
-            {
-                lista.Add(Network.FightProtocol.BuildChallenge(id, percent));
-            }
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwu,
-                Network.FightProtocol.BuildChallengeFinalList(lista)));
+            await session.SendAsync(new Game.ChallengeListEvent(fight.ChallengesFixed.Select(c => Information(c.Id, c.Percent)).ToArray()));
 
             Console.WriteLine($"[Challenges] Fight #{fight.FightId} is fought with " +
                               $"{Fixed(fight)}.");
@@ -305,7 +271,10 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Pieces ─────────────────────────────────────────────────────────────
 
-        private static async Task FixAsync(NetworkStream stream, FightInstance fight, int id)
+        private static Game.ChallengeInformation Information(int id, int percent)
+            => new(percent, id, [], percent, Game.ChallengeState.InProgress);
+
+        private static async Task FixAsync(GameSession session, FightInstance fight, int id)
         {
             var reto = Challenges.Get(id);
             if (reto == null) return;
@@ -314,9 +283,7 @@ namespace Jondo.Unity.Server.Handlers
             fight.ChallengesOffered.Clear();
             fight.ChallengeMarked = 0;
 
-            byte[] ldd = Network.FightProtocol.BuildChallenge(id, reto.Percent);
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kww,
-                Network.FightProtocol.BuildChallengeChosen(ldd)));
+            await session.SendAsync(new Game.ChallengeAddEvent(Information(id, reto.Percent)));
         }
 
         private static int[] FixedIds(FightInstance fight)
@@ -343,13 +310,5 @@ namespace Jondo.Unity.Server.Handlers
             return string.Join(" and ", trozos);
         }
 
-        private static long VarField(byte[] payload, int number)
-        {
-            foreach (var field in ProtoMessage.Parse(payload).Fields)
-            {
-                if (field.FieldNumber == number && field.WireType == 0) return field.VarIntValue;
-            }
-            return 0;
-        }
     }
 }

@@ -109,26 +109,25 @@ internal sealed class GameEntryBackend : IGameEntryBackend
 
     public async Task<bool> TrySendFightMapAsync(GameSession session, GameRequest request)
     {
-        var stream = StreamOf(session);
         if (request is FightPingsRequest or ContextReadyRequest)
         {
             // A spectator's client has the arena: the fight as it stands, once.
             if (FightHandler.PendingSpectatorBoard() is { } watched)
             {
-                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(stream, watched));
+                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(StreamOf(session), watched));
                 return true;
             }
             // Back into a fight already running: the board as it is now, once. Placement
             // goes through preparation below, from scratch, as the capture does.
             if (FightHandler.PendingResume() is { } resumed)
             {
-                await FightHandler.InTurnAsync(resumed, () => FightHandler.ResumeForOneAsync(stream, resumed));
+                await FightHandler.InTurnAsync(resumed, () => FightHandler.ResumeForOneAsync(StreamOf(session), resumed));
                 return true;
             }
         }
 
         if ((request is MapInformationRequest or ContextReadyRequest)
-            && FightHandler.PendingPreparation() is { } prepared)
+            && FightHandler.PendingPreparation(session) is { } prepared)
         {
             long requestedMap = request switch
             {
@@ -154,10 +153,13 @@ internal sealed class GameEntryBackend : IGameEntryBackend
             // ijm and kmv and nothing else, and kmv was on the list of messages ignored without
             // a word. That is why the fight appeared in the server log and on screen
             // nothing happened.
+            long character = session.CharacterId;
             await FightHandler.InTurnAsync(prepared, async () =>
             {
-                await FightHandler.SendPreparationAsync(stream, prepared);
+                if (session.CharacterId != character || FightHandler.PendingPreparation(session) != prepared) return;
+                await FightHandler.SendPreparationAsync(session, prepared);
                 await session.SendAsync(new AreaFightModifierUpdateEvent([]));
+                prepared.MarkPrepared(character);
             });
             return true;
         }

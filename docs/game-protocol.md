@@ -479,9 +479,43 @@ The direct map path applies the documented omission policy to indeterminate
 alliance-emblem tag 4 and haven-bag tag 3; it does not claim lossless reproduction of
 those former raw values. See [the map construction policy](populated-unmapped-fields.md#map-snapshot-construction-policy).
 
-### Fight placement readiness
+### Fight entry and placement
 
-On the default Game profile, `FightReadyRequest` runs under the requesting session's
+Both profiles route `AttackMonsterRequest` by the monster group's contextual ID on the
+attacker's current map. A successful attack starts fight entry directly. Only movement
+confirmation receives a correlated `MapMovementConfirmedResponse` (August `jsq`).
+
+For monster-fight openers and each duelist, `SendFightEntryAsync` sends the entering
+character's orientation and removes the defender from that client's roleplay map.
+A joiner skips that prefix. Everyone then receives context destroy, Fight context
+creation, current arena map, server time, life update, and their own known zaaps, in
+that order. The life update still uses the legacy writer to preserve HP and regeneration
+ticks. Board preparation follows the client's map request; it is not part of this opening.
+Both profiles use the same routes.
+
+For a participant in placement, `ContextReadyRequest` or `MapInformationRequest` for the
+arena sends the board only to that session. After taking the fight turn the handler
+rechecks the instance, character, team, phase and prior delivery. It marks the character
+prepared only after the final area modifier has been sent. A late surface-map request
+does not spend the board. Spectator and ongoing-fight resume requests take precedence.
+
+The board sends one disposition per fighter, then fight pings, announcement and join
+countdown. Each `FightFighterShowEvent` describes the fighter being drawn: position,
+look, team, characteristics and named, monster, collector or companion identity. Placement
+cells, the recipient's team, options, turn order, effects, and arena map information
+follow. The arena uses its roleplay map's coordinates when available. The typed announcement
+and join summary omit August `kam` tag 3 and `kaa` tags 2/3. The
+[populated-field inventory](populated-unmapped-fields.md#fight-placement-announcement-and-join-summary)
+records the values Jondo wrote and the limits of the native-use evidence.
+
+Eligible fights send the challenge count before appearances and again after the placement
+cells; only the first count includes `ChallengeModSelectedEvent`. The bonus setting is
+echoed privately. `ChallengeReadyRequest` opens the proposal and reuses the offered pair;
+selection marks a candidate silently, and validation adds it. Unfilled slots are completed
+at fight start, when the final challenge list is sent. Hover and mode notifications stay
+silent. These selection messages use the recipient's codec on both profiles.
+
+`FightReadyRequest` runs under the requesting session's
 turn and then the fight turn. The handler resolves the fight from the session's character
 before waiting. Under the fight turn it checks that the same instance is still registered
 and the character is still on a team and has not left. A stale ready is discarded, even
@@ -491,8 +525,7 @@ A false request does not withdraw readiness. A leader's
 click announces the leader first, then any party members readied with them. Each
 `FightHumanReadyStateEvent` goes to the fighters and spectators through their own
 session codecs before placement ends. The placement deadline uses the same typed
-event for remaining players. The `3.8.1.2` dispatcher leaves the request unhandled
-until the fight-start burst it can trigger is typed as well.
+event for remaining players.
 
 `FightPlacementPositionRequest` uses the same session and fight turns. After flushing a
 pending end, it only changes cells during placement. It carries an entity and a cell;
@@ -500,8 +533,7 @@ ongoing combat walks use `MapMovementRequest`. A move or completed swap broadcas
 `EntitiesDispositionEvent` with both teams' positions and facings to fighters and spectators.
 A connected ally's swap offer goes only to requester and target. Its reviewed fields are
 the two fighter IDs and the request ID; the historical writer's inferred cell values
-(August `kad` tags 1 and 4) have indeterminate client use and are omitted. The beta
-dispatcher leaves the placement request unhandled while pending-end delivery is August-only.
+(August `kad` tags 1 and 4) have indeterminate client use and are omitted.
 
 `FightPlacementSwapPositionsAcceptRequest` and `FightPlacementSwapPositionsCancelRequest`
 answer an offer by request ID under the same session and fight turns. Only the target
@@ -509,7 +541,6 @@ can accept; either party can cancel. A failed accept sends `FightPlacementSwapPo
 only to the caller. An invalid cancel is silent. Neither consumes another pair's offer.
 A successful cancel sends `FightPlacementSwapPositionsCancelledEvent` only to the pair;
 a successful accept broadcasts the new positions. Answers do not flush a pending fight end.
-Both remain unhandled on beta while offer creation is disabled there.
 
 ### Shared map/fight presence and reconnection opening
 

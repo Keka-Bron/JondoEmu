@@ -116,7 +116,6 @@ namespace Jondo.Unity.Tests.Combat
         /// the start, the return to a fight in progress, the end and the map resend. The <c>Send…</c> are pieces of those same
         /// bursts. The last two are loose cases with their reason:
         ///
-        ///   AttackAsync                   its jsq is the map change permission of the attacker
         ///   HandleFightOptionToggle       the panel's switches; NOT MEASURED whether the rival sees them
         ///   AnnounceAppearanceAsync       does not receive the fight; it has to be passed to broadcast
         ///   RefreshPlayerSpellBarAsync    the spell bar belongs to whoever looks at it
@@ -127,7 +126,7 @@ namespace Jondo.Unity.Tests.Combat
             "ResumeForOneAsync", "TerminarParaUnoAsync", "HandleFightMapLoad", "ResendFightMapBurst3",
             "SendFighterShow", "SendFightStarting", "SendTurnList",
             "SendPlacementTurnStart", "SendPlacementPositionsList",
-            "RefreshPlayerSpellBarAsync", "AttackAsync",
+            "RefreshPlayerSpellBarAsync",
             "HandleFightOptionToggleRequest", "AnnounceAppearanceAsync",
             // FightJoin.cs: the jqz behind the jss of the one loading a map, the answer to the
             // party window's switch of the one who clicked it, and the way back of the one who

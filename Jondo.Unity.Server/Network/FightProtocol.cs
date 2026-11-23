@@ -53,28 +53,6 @@ namespace Jondo.Unity.Server.Network
         // ─── Starting ───────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Which monster group the client attacks (hqa).
-        ///
-        ///   f1: the group's contextual id, negative
-        ///
-        /// Returns zero if the message brings no group.
-        /// </summary>
-        public static long ReadFightRequest(byte[] payload)
-        {
-            byte[]? hqa = ConnectionProtocol.ReadPayload(payload, Op.Hqa);
-            if (hqa == null) return 0;
-
-            foreach (var field in ProtoMessage.Parse(hqa).Fields)
-            {
-                if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue;
-            }
-            return 0;
-        }
-
-        /// <summary>Attack acknowledged (jsq). It goes empty.</summary>
-        public static byte[] BuildFightAccepted() => Array.Empty<byte>();
-
-        /// <summary>
         /// "The coming map is a fight one" (kmp).
         ///
         /// This is THE mark, and it goes inside the map change, before loading it. It is what makes
@@ -91,16 +69,6 @@ namespace Jondo.Unity.Server.Network
         /// to belong to. What is seen then is the board drawn and nothing on it.
         /// </summary>
         public static byte[] BuildFightMapComing() => Pb.New().Var(1, 1).Build();
-
-        /// <summary>
-        /// Who is going to be fought (kmu), at the start of loading the tactical map.
-        ///
-        ///   f2: the group's contextual id, the same negative the kam will carry later
-        ///
-        /// Checked in four captures against monsters: the kmu's number and the kam.f3's are
-        /// the same.
-        /// </summary>
-        public static byte[] BuildFightAgainst(long defender) => Pb.New().Var(2, defender).Build();
 
         /// <summary>End of the preparation batch (jwq). It also goes empty.</summary>
         public static byte[] BuildPlacementDone() => Array.Empty<byte>();

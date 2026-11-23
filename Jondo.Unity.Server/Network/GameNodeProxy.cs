@@ -1509,12 +1509,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Hqa)))
-                {
-                    // Attacking a monster group. It is what the real client sends on
-                    // starting a fight: it carries the group's contextual id.
-                    await FightHandler.AttackAsync(stream, payload);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Jrv)))
                 {
                     // The spectator window's list of the map's fights.
@@ -1547,20 +1541,8 @@ namespace Jondo.Unity.Server.Network
                          || payloadStr.Contains(Op.Uri(Op.Jti))
                          || payloadStr.Contains(Op.Uri(Op.Kme))
                          || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp))
-                         || payloadStr.Contains(Op.Uri(Op.Hoy))
-                         || payloadStr.Contains(Op.Uri(Op.Kwr)) || payloadStr.Contains(Op.Uri(Op.Kwj))
-                         || payloadStr.Contains(Op.Uri(Op.Kwv)) || payloadStr.Contains(Op.Uri(Op.Kwi))
-                         || payloadStr.Contains(Op.Uri(Op.Kwo)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
+                         || payloadStr.Contains(Op.Uri(Op.Hoy)))
                 {
-                    // Placing, declaring ready, the fight options and the CHALLENGES. The others
-                    // that were here —jxx, jyk, jyz, jza, jwe, jrb, jub, jxw— either do not exist in
-                    // 3.6.10.10 or are sent by the server, not the client.
-                    //
-                    // The six challenge ones were handled inside the fight handler but not
-                    // here, so they did not arrive: this door is a closed list. The symptom was
-                    // that the accept-challenge button did nothing and that on starting the fight
-                    // a challenge different from the two offered came out, because the choosing kwv
-                    // got lost on the way and the server ended up filling the gap on its own.
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
@@ -1730,19 +1712,24 @@ namespace Jondo.Unity.Server.Network
                     or Game.MapMovementConfirmRequest or Game.MapChangeRequest:
                     await MovementDispatch.TryHandleAsync(session, frame, entryService.OnMapChange);
                     break;
-                // The last ready can enter the still August-only fight-start burst.
-                case Game.FightReadyRequest ready when UsesLegacyRouting:
+                case Game.AttackMonsterRequest attack:
+                    await FightHandler.AttackAsync(session, attack);
+                    break;
+                case Game.ChallengeReadyRequest or Game.ChallengeSelectionRequest or Game.ChallengeValidateRequest or Game.ChallengeBonusChoiceRequest:
+                    await FightHandler.HandleChallengeAsync(session, (Game.GameRequest)frame.Content);
+                    break;
+                case Game.ChallengeModSelectRequest or Game.ChallengeTargetsRequest:
+                    break; // Placement panel mode and hover notifications have no reply.
+                case Game.FightReadyRequest ready:
                     await FightHandler.HandleReadyAsync(session, ready);
                     break;
-                // Placement can flush a pending fight end; that burst is still August-only.
-                case Game.FightPlacementPositionRequest placement when UsesLegacyRouting:
+                case Game.FightPlacementPositionRequest placement:
                     await FightHandler.HandlePlacementPositionAsync(session, placement);
                     break;
-                // Enable answers on the same profiles that can create placement offers.
-                case Game.FightPlacementSwapPositionsAcceptRequest accept when UsesLegacyRouting:
+                case Game.FightPlacementSwapPositionsAcceptRequest accept:
                     await FightHandler.AcceptSwapAsync(session, accept);
                     break;
-                case Game.FightPlacementSwapPositionsCancelRequest cancel when UsesLegacyRouting:
+                case Game.FightPlacementSwapPositionsCancelRequest cancel:
                     await FightHandler.CancelSwapAsync(session, cancel);
                     break;
                 default:

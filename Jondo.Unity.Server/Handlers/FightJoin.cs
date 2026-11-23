@@ -231,7 +231,14 @@ namespace Jondo.Unity.Server.Handlers
         private static Game.FightCommonInformation MapSnapshotOf(FightInstance fight, bool withDefenders)
         {
             _onTheMap.TryGetValue(fight.FightId, out var where);
-            var type = fight.Reglas.TipoDelKam switch
+            return new(checked((int)fight.FightId), FightTypeOf(fight),
+                [TeamSnapshotOf(fight, FightInstance.Azules, true), TeamSnapshotOf(fight, FightInstance.Rojos, withDefenders)],
+                [where?.AttackersFlag ?? 0, where?.DefendersFlag ?? 0],
+                [new(false, fight.OptionOn(FightInstance.Azules, FightInstance.OptionPartyOnly), false, false),
+                 new(false, fight.OptionOn(FightInstance.Rojos, FightInstance.OptionPartyOnly), false, false)]);
+        }
+
+        private static Game.FightType FightTypeOf(FightInstance fight) => fight.Reglas.TipoDelKam switch
             {
                 0 => Game.FightType.Challenge, 1 => Game.FightType.Aggression, 2 => Game.FightType.PvMa,
                 3 => Game.FightType.MxvM, 4 => Game.FightType.PvM, 5 => Game.FightType.PvT,
@@ -239,12 +246,6 @@ namespace Jondo.Unity.Server.Handlers
                 9 => Game.FightType.PvPr, 10 => Game.FightType.Breach,
                 _ => throw new InvalidOperationException($"Unsupported map fight type {fight.Reglas.TipoDelKam}."),
             };
-            return new(checked((int)fight.FightId), type,
-                [TeamSnapshotOf(fight, FightInstance.Azules, true), TeamSnapshotOf(fight, FightInstance.Rojos, withDefenders)],
-                [where?.AttackersFlag ?? 0, where?.DefendersFlag ?? 0],
-                [new(false, fight.OptionOn(FightInstance.Azules, FightInstance.OptionPartyOnly), false, false),
-                 new(false, fight.OptionOn(FightInstance.Rojos, FightInstance.OptionPartyOnly), false, false)]);
-        }
 
         internal static Game.FightTeamInformation TeamSnapshotOf(FightInstance fight, int team, bool withMembers,
             IEnumerable<Fighter>? selectedMembers = null)
@@ -613,7 +614,7 @@ namespace Jondo.Unity.Server.Handlers
                 fight.ForgetPreparation(me);
                 _joinAfterWalk.TryRemove(me, out _);
 
-                if (who.Stream != null) await SendFightEntryAsync(who.Stream, fight, joining: true);
+                await SendFightEntryAsync(who, fight, joining: true);
             }
 
             // Where he stands, with the side he faces: the enemies first and him last, as every
@@ -625,19 +626,17 @@ namespace Jondo.Unity.Server.Handlers
 
             if (fight.Reglas.HayRetos)
             {
-                await ACadaUnoAsync(fight, sesion => sesion.Stream == null
-                    ? Task.CompletedTask
-                    : ChallengeHandler.SendCountAsync(sesion.Stream, fight, primeraVez: true));
+                await ACadaUnoAsync(fight, sesion => ChallengeHandler.SendCountAsync(sesion, fight, primeraVez: true));
             }
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, BuildPlayerAppearance(fight, fighter)));
+            await ATodosAsync(fight, PlacementAppearance(fight, fighter));
 
             // His companion after him, placed and drawn as he is.
             if (companion != null)
             {
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk,
                     Network.FightProtocol.BuildFighterPlaced(companion.CellId, FacingOf(fight, companion), companion.Id)));
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, CreatureFighter(fight, companion)));
+                await ATodosAsync(fight, PlacementAppearance(fight, companion));
             }
 
             // The carousel behind him -- unless a dungeon's monsters are rebuilt, which send one
@@ -724,12 +723,7 @@ namespace Jondo.Unity.Server.Handlers
                     Network.FightProtocol.BuildFightersPlaced(PlacedFacing(fight, monster)));
                 await ATodosAsync(fight, placed);
                 await ATodosAsync(fight, placed);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg,
-                    Network.FightProtocol.BuildFighter(
-                        monster.CellId, FacingOf(fight, monster), monster.Id, PlacementSheetOf(monster),
-                        MonsterLook(monster),
-                        IdentityOf(monster),
-                        isMonster: true)));
+                await ATodosAsync(fight, PlacementAppearance(fight, monster));
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzu,
                     TeamsOf(fight)));
             }

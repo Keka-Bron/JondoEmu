@@ -186,6 +186,9 @@ namespace Jondo.Unity.Server.Managers
         /// big, and on its mount, as big too.
         /// </summary>
         public static byte[] LookOf(Spec spec, bool onFoot = false)
+            => CharacterLookBuilder.WriteLook(SemanticLookOf(spec, onFoot)).Build();
+
+        private static Jondo.Unity.Protocol.Game.EntityLook SemanticLookOf(Spec spec, bool onFoot = false)
         {
             long bones;
             List<long> skins, colors, scales;
@@ -238,7 +241,7 @@ namespace Jondo.Unity.Server.Managers
                 Skin = spec.RidesAppearance.Skin,
                 Colors = spec.RidesAppearance.Colors,
             };
-            return CharacterLookBuilder.Composed(bones, skins, colors, scales, rides, appearance);
+            return CharacterLookBuilder.Compose(bones, skins, colors, scales, rides, appearance);
         }
 
         private static readonly ConcurrentDictionary<long, Spec> _alive = new();
@@ -320,9 +323,15 @@ namespace Jondo.Unity.Server.Managers
         public static List<(int Spell, int Grade)> SpellsOf(Spec spec)
             => SpellTable.KnownFor(spec.Breed, Level, spec.Choices).Select(k => (k.SpellId, k.Grade)).ToList();
 
+        // The queued spec can be forgotten before this fight stops showing its fighter.
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, Jondo.Unity.Protocol.Game.EntityLook> FighterLooks = new();
+        internal static Jondo.Unity.Protocol.Game.EntityLook? PlacementLook(Fighter fighter)
+            => FighterLooks.TryGetValue(fighter, out var look) ? look : null;
+
         /// <summary>The JondoBot as a fighter, full of life and points, ready from the start.</summary>
         public static Fighter BuildFighter(Spec spec)
         {
+            var look = SemanticLookOf(spec);
             var fighter = new Fighter
             {
                 Id = spec.Id,
@@ -352,9 +361,10 @@ namespace Jondo.Unity.Server.Managers
                 IsMonster = false,
                 IsBot = true,
                 IsReady = true,
-                BotLook = LookOf(spec),
+                BotLook = CharacterLookBuilder.WriteLook(look).Build(),
                 BotLookOnFoot = LookOf(spec, onFoot: true),
             };
+            FighterLooks.Add(fighter, look);
 
             // The rest of the sheet as a character's is filled: flee and tackle a tenth of agility,
             // and the erosion every fighter starts with.

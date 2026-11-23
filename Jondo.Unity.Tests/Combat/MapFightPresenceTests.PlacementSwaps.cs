@@ -1,4 +1,3 @@
-#if !JONDO_PROTOCOL_3_8_1_2
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
@@ -130,4 +129,3 @@ public sealed partial class MapFightPresenceTests
         Assert.Equal((314, 300), board.Cells);
     }
 }
-#endif

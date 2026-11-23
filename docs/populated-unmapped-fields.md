@@ -195,6 +195,23 @@ no compatibility path is introduced for them. Other rows retain historical produ
 and native findings for their feature scopes. Builder labels such as `Arena` and
 `Level` do not independently prove protocol semantics.
 
+### Fight placement: announcement and join summary
+
+**Code evidence:** Before the participant placement board was migrated, its
+[raw builders](../Jondo.Unity.Server/Network/FightProtocol.cs) populated the
+following fields on Game profile `3.6.10.10` (also used by `3.6.10.11`):
+
+| Owner / field | Historical Jondo write | August property ID |
+|---|---|---|
+| FightStartingEvent / `kam`, tag **3**, int64 | `BuildFightAnnounced` wrote `fight.DefenderLeaderId` on every placement announcement. For a monster fight, this was the group's contextual ID. | `199577` |
+| FightJoinEvent / `kaa`, tag **2**, bool | `BuildDuelSummary` wrote `true` for duels. `BuildFightSummary` omitted the tag for timed placement. | `199527` |
+| FightJoinEvent / `kaa`, tag **3**, bool | Both `BuildDuelSummary` and `BuildFightSummary` wrote `true`. | `199528` |
+
+**Current policy:** The typed participant board omits all three fields. The
+`jondo-11-08-2026` native audit found no use witness for any of them, but caller
+coverage was incomplete. Their client use is **indeterminate**; the audit does
+not establish that omitting the historical values is harmless.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

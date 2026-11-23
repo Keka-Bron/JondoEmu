@@ -28,22 +28,46 @@ public sealed partial class MapFightPresenceTests
             new GameEntryService(session, new GameEntryBackend()));
     }
 
-#if JONDO_PROTOCOL_3_8_1_2
-    [Fact]
-    public async Task Placement_requests_remain_unhandled_on_beta()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Fight_map_opening_is_private_and_joiners_skip_the_roleplay_prefix(bool joining)
     {
         using var fixture = new FightFixture();
-        using var player = new Recipient(Person, Arena, Id);
-        player.Session.State.IsInFight = true;
-        Assert.Equal(GameEntryResult.Unhandled, await DispatchReady(player.Session, true));
-        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementPositionRequest(Person, 271)));
-        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementSwapPositionsAcceptRequest(1)));
-        Assert.Equal(GameEntryResult.Unhandled, await DispatchPlacement(player.Session, new FightPlacementSwapPositionsCancelRequest(1)));
-        Assert.False(fixture.Fight.Buscar(Person).IsReady);
-        Assert.Equal(FightState.Placement, fixture.Fight.State);
+        var fight = fixture.Fight;
+        using var challenger = new Recipient(Person, Arena, Id);
+        using var challenged = new Recipient(Person + 1, Arena, Id);
+        fight.DefenderLeaderId = challenged.Session.CharacterId;
+        fight.Rojo.Add(new() { Id = challenged.Session.CharacterId, CurrentHP = 23, MaxHP = 42 });
+        using var ambient = SessionContext.Push(challenger.Session);
+        await FightHandler.SendFightEntryAsync(challenged.Session, fight, joining);
+        Assert.Empty(challenger.Sequence);
+
+        var sequence = challenged.Sequence.AsEnumerable();
+        if (!joining)
+        {
+            Assert.Equal(new MapChangeOrientationEvent(challenged.Session.CharacterId, Direction.East), challenged.Sequence[0]);
+            Assert.Equal(new ContextRemoveElementEvent(fight.DefenderLeaderId), challenged.Sequence[1]);
+            sequence = sequence.Skip(2);
+        }
+        Assert.Collection(sequence,
+            e => Assert.IsType<ContextDestroyEvent>(e),
+            e => Assert.Equal(new ContextCreationEvent(GameContext.Fight), e),
+            e => Assert.Equal(new MapCurrentEvent(Arena), e),
+            e => Assert.IsType<TimeEvent>(e),
+            e => Assert.Equal("kuq", e), // Existing life update between clock and environment.
+            e => Assert.IsType<ZaapKnownListEvent>(e));
+        Assert.All(challenged.Delivered, frame => Assert.Null(frame.Uid));
+    }
+
+    [Fact]
+    public async Task Attack_with_an_unknown_group_is_handled_without_entering_a_fight()
+    {
+        using var player = new Recipient(Person, Map);
+        Assert.Equal(GameEntryResult.Handled, await DispatchPlacement(player.Session, new AttackMonsterRequest(-123456)));
+        Assert.False(player.Session.State.IsInFight);
         Assert.Empty(player.Sequence);
     }
-#else
     [Fact]
     public async Task Placement_position_offers_privately_then_broadcasts_actual_cells_to_the_board()
     {
@@ -216,7 +240,6 @@ public sealed partial class MapFightPresenceTests
             Parties.Dissolve(party);
         }
     }
-#endif
 
     [Theory]
     [InlineData(false)]

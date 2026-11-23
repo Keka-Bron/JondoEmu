@@ -14,6 +14,7 @@ using Jondo.Unity.World.Maps;
 using static Jondo.Unity.Server.Network.NetworkEnvelope;
 using static Jondo.Protocol.NetworkMessage;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -288,7 +289,7 @@ namespace Jondo.Unity.Server.Handlers
             // buying, collecting kamas, raising characteristics -- writes it anyway, and since the end of
             // the fight is not done yet, the character stays trapped in the arena. That is why
             // <see cref="LeaveFight"/> sends him back, and the exit to the menu calls it.
-            await SendFightEntryAsync(stream, fight);
+            await SendFightEntryAsync(SessionContext.Current, fight);
 
             // When the placement countdown runs out it starts all the same. The client keeps it by
             // itself -- the real server sends not one timer between the cells and the ready button --
@@ -447,14 +448,14 @@ namespace Jondo.Unity.Server.Handlers
         /// It is there so that a fight's jrh is answered with placement instead of with the map's
         /// normal jss.
         /// </summary>
-        public static FightInstance? PendingPreparation()
+        internal static FightInstance? PendingPreparation(GameSession session)
         {
-            var fight = GetCurrentFight();
-            if (fight == null) return null;
+            var fight = FightById(session.State.FightId);
+            if (!session.State.IsInFight || fight == null || !IsParticipant(fight, session.CharacterId)) return null;
 
             // Per fighter: in a challenge there are two clients asking for theirs, and one already
             // having placement says nothing about the other.
-            if (fight.HasPrepared(Network.SessionContext.State.CharacterId)) return null;
+            if (fight.HasPrepared(session.CharacterId)) return null;
 
             return fight.State == Jondo.Unity.World.Fights.FightState.Placement ? fight : null;
         }
@@ -638,15 +639,9 @@ namespace Jondo.Unity.Server.Handlers
 
             _activeFights[fightId] = fight;
 
-            // And the entry, to each through his socket and from his context: the first frame
-            // names whoever leaves the map, so sending both from here would take the same one out twice.
+            // Each duelist receives their own transition off the roleplay map.
             foreach (var (sesion, _) in todos)
-            {
-                using (SessionContext.Push(sesion))
-                {
-                    await SendFightEntryAsync(sesion.Stream, fight);
-                }
-            }
+                await SendFightEntryAsync(sesion, fight);
 
             // Both sides with their person before the board, as both views of the challenge
             // show (frames 30-31 of «aceptar desafio», 31-32 of «enviar desafio»), and the swords
@@ -1045,7 +1040,7 @@ namespace Jondo.Unity.Server.Handlers
             BuiltFrom.AddOrUpdate(fighter, new PlacementSheet(now, attitudes));
 
             // And everybody in the fight sees him again with it, as when he came in.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxg, BuildPlayerAppearance(fight, fighter)));
+            await ATodosAsync(fight, PlacementAppearance(fight, fighter));
             Program.LogDebug($"[Fight] {fighter.Name}'s sheet changed while placing: {fighter.MaxHP} life, " +
                              $"{fighter.MaxAP} AP, {fighter.MaxMP} MP, strength {fighter.Strength}, " +
                              $"intelligence {fighter.Intelligence}, chance {fighter.Chance}, agility {fighter.Agility}.");
@@ -1055,10 +1050,8 @@ namespace Jondo.Unity.Server.Handlers
         /// ONE player's entry into the fight: he leaves the roleplay map and loads the arena's.
         /// </summary>
         /// <remarks>
-        /// It was inside InitiateFightFromMobCollision, written for the only one fighting. In a
-        /// challenge two fight, each on his socket and with his state, so it has to be possible to send
-        /// it twice -- and to send it from each one's context, because the first frame names WHO leaves
-        /// the map.
+        /// Both duelists receive this opening: the orientation, life and known zaaps belong to
+        /// the recipient, even when the other duelist initiated the fight.
         ///
         /// The order is not for show. The kmp with f1 at one goes BEFORE telling it to load the map:
         /// it is what makes the client ask for the fight with an ijm instead of asking for an ordinary
@@ -1070,81 +1063,49 @@ namespace Jondo.Unity.Server.Handlers
         /// combate de otra persona» frames 1-7 and the follow capture 143-151 -- whose entry
         /// starts straight at the kml.
         /// </param>
-        public static async Task SendFightEntryAsync(NetworkStream stream, FightInstance fight,
+        internal static async Task SendFightEntryAsync(GameSession session, FightInstance fight,
                                                      bool joining = false)
         {
             if (!joining)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.BuildActorLeft(GameState.CharacterId));
-
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmu,
-                    Network.FightProtocol.BuildFightAgainst(fight.DefenderLeaderId)));
+                await session.SendAsync(new Game.MapChangeOrientationEvent(session.CharacterId, Game.Direction.East));
+                await session.SendAsync(new Game.ContextRemoveElementEvent(fight.DefenderLeaderId));
             }
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp,
-                Network.FightProtocol.BuildFightMapComing()));
-
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(fight.MapId));
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
+            await session.SendAsync(new Game.ContextDestroyEvent());
+            await session.SendAsync(new Game.ContextCreationEvent(Game.GameContext.Fight));
+            await session.SendAsync(new Game.MapCurrentEvent(fight.MapId));
+            await session.SendAsync(ServerTimeMessages.Snapshot());
 
             // Regeneration ends. The real server puts the kuq right here, between the lqu and
             // the lva of the tactical map, 83 times out of 97, and it is what stops the counter
             // the world entry started: without it this client kept adding one point every half
             // second to its own bar all through the fight, which no 97 could hold down for
             // long. Life is the fighter's, or the sheet's when the fight has not built him yet.
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildRegenerationEnded(
-                LifeAtFightEntry(fight),
-                ConnectionProtocol.RegenerationTicksSince(Network.SessionContext.State.RegenerationStartedUtc,
-                                                          DateTime.UtcNow),
-                MaxLifeAtFightEntry(fight)));
+            // UpdateLifePointsEvent does not yet map the HP or regeneration fields.
+            var fighter = fight.Buscar(session.CharacterId);
+            int maxLife = fighter?.MaxHP ?? session.Combat.GetPlayerMaxHp();
+            await session.SendAsync(ConnectionProtocol.BuildRegenerationEnded(fighter?.CurrentHP ?? maxLife,
+                ConnectionProtocol.RegenerationTicksSince(session.State.RegenerationStartedUtc, DateTime.UtcNow), maxLife));
 
-            await Network.EntryEnvironmentMessages.Live.SendKnownAsync(Network.SessionContext.Current);
+            await EntryEnvironmentMessages.Live.SendKnownAsync(session);
 
             Program.LogDebug($"[Fight] Fight #{fight.FightId} on map {fight.MapId}. " +
                              "Waiting for the client to ask for the actors.");
         }
 
-        /// <summary>The life the kuq reports for whoever is entering: his fighter's, else full.</summary>
-        private static int LifeAtFightEntry(FightInstance fight)
-            => fight.Buscar(GameState.CharacterId)?.CurrentHP ?? SessionContext.Current.Combat.GetPlayerMaxHp();
-
-        private static int MaxLifeAtFightEntry(FightInstance fight)
-            => fight.Buscar(GameState.CharacterId)?.MaxHP ?? SessionContext.Current.Combat.GetPlayerMaxHp();
-
         /// <summary>
-        /// The fight's placement, as the real server sends it.
-        ///
-        ///   jxg   one per fighter
-        ///   kba   the blue cells and the red ones
-        ///   jzu   who is on each team
-        ///   jwq   empty
-        ///   jrk   the map where the fight takes place
-        ///
-        /// It is measured from the fifteen fight captures; the shapes and their byte-by-byte check
-        /// against the capture live in <see cref="Network.FightProtocol"/>.
-        ///
-        /// During placement the enemy side travels entirely as -1: the real server does not hand out
-        /// identifiers to the monsters until the fight really starts. Here it is done the same even
-        /// though they already exist inside, because it is what the client expects to see.
+        /// Sends the placement board privately, under the loading session's turn and the fight turn.
         /// </summary>
-        public static async Task SendPreparationAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task SendPreparationAsync(GameSession session, FightInstance fight)
         {
-            fight.MarkPrepared(GameState.CharacterId);
 
             // Before anything else, where each one is. In the capture eight kmk come one after another
             // -- one per fighter -- right after loading the map and BEFORE the fight is announced. They
             // are what put people on the board; without them the client has a fight with fighters who
             // are on no cell.
-            foreach (var fighter in fight.Azul)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
-                    Network.FightProtocol.BuildFighterPlaced(fighter.CellId, FacingOf(fight, fighter), fighter.Id)));
-            }
-            foreach (var fighter in fight.Rojo)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
-                    Network.FightProtocol.BuildFighterPlaced(fighter.CellId, FacingOf(fight, fighter), fighter.Id)));
-            }
+            foreach (var fighter in fight.Todos)
+                await session.SendAsync(new Game.EntitiesDispositionEvent([new(fighter.CellId,
+                    MapActorMessages.Facing(FacingOf(fight, fighter)), fighter.Id, null)]));
 
             // How many challenges are chosen in this fight. It goes here, after the kmk and before the
             // first jxg, which is where the real server puts it; and it goes TWICE, with the same
@@ -1152,30 +1113,25 @@ namespace Jondo.Unity.Server.Handlers
             // the first one.
             // Challenges are about fighting monsters: they give a bonus on their loot. In a challenge
             // between players there is no loot to multiply, and the capture does not carry a single one.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendCountAsync(stream, fight, primeraVez: true);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendCountAsync(session, fight, primeraVez: true);
 
             // First of all, telling it THERE IS A FIGHT HERE. Without the kam the client has no fight
             // to hang what comes after on, and it can be seen blowing up in its own log when the jwq
             // reaches it, walking a list of fighters that does not exist. With the tactical map already
             // loaded and nothing drawn on it, which is exactly what used to happen.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ijq,
-                Network.FightProtocol.BuildMapReady()));
+            await session.SendAsync(new Game.FightPingsEvent(new Dictionary<int, int>(), new Dictionary<long, int>()));
 
             // A challenge is announced differently, and this is measured in «enviar desafio y el otro
             // acepta»: its kam arrives «f3=challenged f5=id f6=challenger», WITHOUT a type and without
             // a list of monsters, because there are none in front.
             var monsters = fight.Reglas.EnfrenteHayMonstruos && fight.TaxCollectorUuid == null
-                ? fight.Rojo.ConvertAll(f => (long)f.MonsterId)
-                : new List<long>();
+                ? fight.Rojo.Where(f => f.IsMonster).Select(f => f.MonsterId).ToArray() : [];
             // The f6 is who OPENED the fight, whoever receives it: the follower of the follow
             // capture gets Leader there (frame 162), the joiner of the sword capture Duel (17),
             // and in the challenge both views name the challenger. It was the receiver, which was
             // right only for the one who attacked.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kam,
-                Network.FightProtocol.BuildFightAnnounced(
-                    fight.Reglas.TipoDelKam,
-                    fight.DefenderLeaderId, monsters,
-                    fight.FightId, fight.ChallengerLeaderId)));
+            var type = FightTypeOf(fight);
+            await session.SendAsync(new Game.FightStartingEvent(false, type, monsters, checked((int)fight.FightId), fight.ChallengerLeaderId));
 
             // And its kaa is six bytes with no countdown. In a challenge there is no placement clock:
             // it is not hidden, the real server simply sends none -- the fight starts when both press
@@ -1185,12 +1141,9 @@ namespace Jondo.Unity.Server.Handlers
             // And the countdown is what is LEFT of it: 442 for the follower 0.7 s in, 403 for the
             // fourth player of the dungeon capture 4.6 s in. Whoever comes in late must not be
             // shown a full placement the server will not wait for.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kaa,
-                fight.Reglas.KaaConCuentaAtras
-                    ? Network.FightProtocol.BuildFightSummary(fight.Reglas.TipoDelKam,
-                          Math.Max(1, fight.PlacementDecisecondsLeft(fight.Reglas.RelojDeColocacion,
-                                                                     DateTime.UtcNow)))
-                    : Network.FightProtocol.BuildDuelSummary()));
+            int timeLeft = fight.Reglas.KaaConCuentaAtras
+                ? Math.Max(1, fight.PlacementDecisecondsLeft(fight.Reglas.RelojDeColocacion, DateTime.UtcNow)) : 0;
+            await session.SendAsync(new Game.FightJoinEvent(false, true, timeLeft, type));
 
             // Each with HIS look, read from his own sheet.
             //
@@ -1201,50 +1154,17 @@ namespace Jondo.Unity.Server.Handlers
             // on blue -- but in a challenge, from the challenged player's client, the challenger was drawn
             // with the challenged player's breed, sex and head. In a three against three koliseo it would
             // be the three teammates cloned.
-            foreach (var fighter in fight.Azul)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
-                    fighter.IsMonster
-                        ? Network.FightProtocol.BuildFighter(
-                              fighter.CellId, FacingOf(fight, fighter), fighter.Id,
-                              PlacementSheetOf(fighter), MonsterLook(fighter),
-                              IdentityOf(fighter),
-                              isMonster: true, team: fighter.IsCompanion ? fighter.TeamId : null,
-                              companion: fighter.IsCompanion)
-                        : BuildPlayerAppearance(fight, fighter)));
-            }
+            foreach (var fighter in fight.Todos)
+                await session.SendAsync(PlacementAppearance(fight, fighter));
 
-            foreach (var fighter in fight.Rojo)
-            {
-                // There can be a person in front. Announcing him as a creature is what made the client
-                // draw the rival with a «???» and no bar of anything: it got a monster identity with id
-                // zero, which does not exist in its table.
-                if (!fighter.IsMonster)
-                {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
-                        BuildPlayerAppearance(fight, fighter)));
-                    continue;
-                }
-
-                // Each with its own negative identifier, not all with the same: against four poutchs
-                // the real server hands out -1, -2, -3 and -4.
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
-                    Network.FightProtocol.BuildFighter(
-                        fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
-                        MonsterLook(fighter),
-                        IdentityOf(fighter),
-                        isMonster: true)));
-            }
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kba,
-                Network.FightProtocol.BuildPlacementCells(
-                    fight.BluePlacementCells.ConvertAll(c => (long)c),
-                    fight.RedPlacementCells.ConvertAll(c => (long)c))));
+            int miBando = fight.EquipoDe(session.CharacterId);
+            await session.SendAsync(new Game.FightPlacementPossiblePositionsEvent(
+                new(fight.BluePlacementCells.ToArray(), fight.RedPlacementCells.ToArray()), TeamIdentity(miBando)));
 
             // And again how many challenges, with the same number. It is not a slip of the capture:
             // the real server sends it twice, here and before the kaa, in the seven captures that have
             // challenges.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendCountAsync(stream, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendCountAsync(session, fight);
 
             // After the cells, which is where the capture puts them: who is in the fight and the four
             // options.
@@ -1255,13 +1175,7 @@ namespace Jondo.Unity.Server.Handlers
             // koliseo. The member lists travel in the kae BEFORE the board (AfterFightOpenedAsync
             // and the join), which is what the two per-person kae here were standing in for: with
             // a party on one side they named a second leader for it.
-            int miBando = fight.EquipoDe(GameState.CharacterId);
-            if (miBando >= 0)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kae,
-                    FightJoinProtocol.BuildTeamUpdate(TeamOnMap(fight, miBando, withMembers: false),
-                                                      fight.FightId)));
-            }
+            await session.SendAsync(TeamUpdate(fight, miBando, withMembers: false));
 
             // Each side's options with their state, the attackers' and, when the other side is
             // people, theirs too: both challenge captures show the kau with f1 = 1 (frames 29, 43).
@@ -1270,19 +1184,16 @@ namespace Jondo.Unity.Server.Handlers
             {
                 foreach (int option in Network.FightProtocol.FightOptions)
                 {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kau,
-                        Network.FightProtocol.BuildFightOption(side, option, fight.OptionOn(side, option), fight.FightId)));
+                    await session.SendAsync(OptionUpdate(fight, side, option, fight.OptionOn(side, option)));
                 }
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
-                TeamsOf(fight)));
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq,
-                Network.FightProtocol.BuildPlacementDone()));
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
-                FightMapOf(fight)));
+            await session.SendAsync(new Game.FightTurnListEvent(CarouselOrder(fight)
+                .Select(id => new Game.FightTurnEntityCaseWithFlag(new(false, id))).ToArray()));
+            await session.SendAsync(new Game.FightEffectsRefreshEvent([]));
+            var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
+            await session.SendAsync(new Game.FightMapInformation(place?.SubAreaId ?? 0, fight.MapId,
+                new Game.FightMapInformationPositionCaseCoords(new(place?.PosX ?? 0, place?.PosY ?? 0))));
 
             // The list of challenges does NOT go here: the client asks for it (kwr) when the player
             // presses READY with challenges still to choose. See ChallengeHandler.SettingsAsync.
@@ -2437,34 +2348,6 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await HandleFightOptionToggleRequest(stream, payload);
             }
-            // The challenges. Four of the five carry no answer: the real server stays silent at
-            // the kwv and the kwi, and only answers the kwr with the list and the kwj with the
-            // locked-in challenge. See Handlers.ChallengeHandler.
-            else if (payloadStr.Contains(Op.Uri(Op.Kwr)))
-            {
-                if (fight != null) await ChallengeHandler.OpenAsync(stream, fight);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Kwj)))
-            {
-                if (fight != null) await ChallengeHandler.ValidateAsync(stream, fight, payload);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Kwv)))
-            {
-                // Marking a candidate. CAREFUL: the first one to arrive is not a click of the player,
-                // but the preselection the client makes by itself two milliseconds after receiving the
-                // list. That is why marking locks in NOTHING: the kwj is needed.
-                if (fight != null) ChallengeHandler.Mark(fight, payload);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Kwo)))
-            {
-                await ChallengeHandler.SettingsAsync(stream, payload);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Kwi)) || payloadStr.Contains(Op.Uri(Op.Kxb)))
-            {
-                // Hovering over a challenge and the other panel setting. They carry no answer in any
-                // of the 305 captures; they are picked up so that they do not show in the log as
-                // unhandled packets.
-            }
         }
 
         /// <summary>
@@ -2472,17 +2355,19 @@ namespace Jondo.Unity.Server.Handlers
         ///
         ///   f1: the group's contextual id, the same negative it travels with in the jss
         ///
-        /// The server answers with an empty jsq and starts placement.
+        /// A successful attack opens placement directly.
         /// </summary>
-        public static async Task AttackAsync(NetworkStream stream, byte[] payload)
+        internal static async Task AttackAsync(GameSession session, Game.AttackMonsterRequest request)
         {
-            long groupId = Network.FightProtocol.ReadFightRequest(payload);
-            if (groupId == 0) return;
-            if (await DreamHandler.GuestMayNotFightAsync(SessionContext.Current)) return;
-            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
-            if (PhantomHandler.CannotFight(GameState.CharacterId)) return;
+            long groupId = request.MonsterGroupId;
+            if (groupId == 0 || !session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld
+                || session.State.IsInFight || session.State.SpectatingFightId != 0) return;
+            using var context = SessionContext.Push(session); // Legacy hunt checks and fight creation.
+            if (await DreamHandler.GuestMayNotFightAsync(session)) return;
+            if (await Managers.HeadHunts.HoldsAsync(session.Stream, Managers.HeadHunts.Hold.Fight)) return;
+            if (PhantomHandler.CannotFight(session.CharacterId)) return;
 
-            long here = GameState.MapId;
+            long here = session.MapId;
             var group = MobSpawnManager.GetMobsForMap(here).Find(g => g.MobId == groupId);
             if (group == null)
             {
@@ -2497,10 +2382,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jsq,
-                Network.FightProtocol.BuildFightAccepted()));
-
-            await InitiateFightFromMobCollision(stream, group, here, groupId);
+            await InitiateFightFromMobCollision(session.Stream, group, here, groupId);
         }
 
         private static async Task HandleFightOptionToggleRequest(NetworkStream stream, byte[] payload)
@@ -3147,7 +3029,7 @@ namespace Jondo.Unity.Server.Handlers
                                                            announced.Round, announced.Carried)));
             }
 
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(stream, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(SessionContext.Current, fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
                 Network.FightProtocol.BuildRound(fight.RoundNumber)));
@@ -3266,6 +3148,19 @@ namespace Jondo.Unity.Server.Handlers
 
         internal static Task HandleReadyAsync(GameSession session, Jondo.Unity.Protocol.Game.FightReadyRequest request)
             => InPlacementTurnAsync(session, fight => request.IsReady ? DeclareReadyAsync(fight, session.CharacterId) : Task.CompletedTask);
+
+        internal static Task HandleChallengeAsync(GameSession session, Game.GameRequest request)
+            => InPlacementTurnAsync(session, async fight =>
+            {
+                if (!fight.Reglas.HayRetos) return;
+                switch (request)
+                {
+                    case Game.ChallengeReadyRequest: await ChallengeHandler.OpenAsync(session, fight); break;
+                    case Game.ChallengeSelectionRequest select: ChallengeHandler.Mark(fight, select.ChallengeId); break;
+                    case Game.ChallengeValidateRequest validate: await ChallengeHandler.ValidateAsync(session, fight, validate.ChallengeId); break;
+                    case Game.ChallengeBonusChoiceRequest bonus: await ChallengeHandler.SettingsAsync(session, bonus); break;
+                }
+            });
 
         private static async Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action,
             bool finishPendingFight = true)
@@ -3454,13 +3349,13 @@ namespace Jondo.Unity.Server.Handlers
             // challenge between players there is no loot to multiply, and none was offered in the
             // placement phase -- filling them in here is where the challenge that appeared on its own
             // at the start of the fight came from.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.FillAsync(stream, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.FillAsync(SessionContext.Current, fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kai,
                 Network.FightProtocol.BuildFightBegins()));
 
             // And the final list, which goes between the kai and the jyy.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(stream, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(SessionContext.Current, fight);
 
             // The spells fought with are the SAME the character has outside the fight, and with the
             // same guts: the usual hms carries f1 { f1: grade, f3: spell, f4: 1 } and the jyy repeats
