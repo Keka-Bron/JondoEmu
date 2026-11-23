@@ -6907,10 +6907,13 @@ namespace Jondo.Unity.Server.Handlers
                 // off, and nothing could get under his resistances. A cast whose conditions held
                 // and that left rows for some rounds hooks for as long as they last, its mask taken
                 // as it was; a later cast that did nothing does not stretch that hook for good.
+                // Only a cast off a hook: the behaviour's own first cast is for good whatever it
+                // leaves for a round. Funoroshi's 16760 puts 1883 on him until round two, and every
+                // turn-end hook of his -- the barrels' black glyphs -- fell with it.
                 var yaArmado = grupo.Key.Sobre.Buffs.ActiveSpells.FirstOrDefault(
                     e => e.Filas != null && e.Hechizo == grupo.Key.HechizoOrigen && e.Grado == grupo.Key.NivelOrigen
                          && e.Lanzador == grupo.Key.Quien);
-                if (deConducta && hasta < 0
+                if (deConducta && offATrigger && hasta < 0
                     && grupo.All(c => c.Efecto != null && c.Efecto.Duration == 0
                                       && !Managers.EffectEngine.WaitsForeverOnDeath(c.Efecto)))
                 {

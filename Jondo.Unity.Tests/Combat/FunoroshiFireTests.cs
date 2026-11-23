@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Handlers;
@@ -18,6 +19,7 @@ namespace Jondo.Unity.Tests.Combat
     {
         private const int Funoroshi = 6249, Behaviour = 16760, ExtinguisherGift = 16815;
         private const int PutOutTheFires = 1881, LessRange = 16785;
+        private const int BarrelBehaviour = 16891, FirstBlackGlyph = 16805;
         private const int Fire = 6248, FireBehaviour = 16860, PutOut = 16864, FireIsOut = 1902, Invulnerable = 56;
 
         private static bool HasData => SpellEffects.De(Behaviour, 1).Any(row => row.DiceNum == LessRange);
@@ -122,6 +124,46 @@ namespace Jondo.Unity.Tests.Combat
             await FightHandler.DispararAsync(null, fight, boss, EffectEngine.AlEmpezarElTurno);
 
             Assert.Equal(!everyFire, boss.Buffs.TieneEstado(Invulnerable));
+        }
+
+        /// <summary>
+        /// At every turn end of his, the barrels lay black glyphs: the first barrel (6309) from
+        /// his first turn, the second from his second, and so on (16892 grades 1 to 4, «792 under
+        /// TE» with delays 0 to 3, for good). Only the first one, once, was ever laid.
+        /// </summary>
+        [Fact]
+        public async Task Every_turn_end_of_his_the_barrels_lay_their_black_glyphs()
+        {
+            if (!HasData) return;
+            var (fight, boss, _) = Board();
+            var barrels = new List<Fighter>();
+            for (int i = 0; i < 4; i++)
+            {
+                var barrel = new Fighter
+                {
+                    Id = -13 - i, CellId = 400 + 2 * i, MaxHP = 3100, CurrentHP = 3100, Level = 200, IsMonster = true,
+                    MonsterId = 6309 + i, SummonCost = 1, Conducta = (BarrelBehaviour, i + 1),
+                };
+                fight.Invocar(barrel, boss);
+                await FightHandler.LanzarLaConductaAsync(null, fight, barrel);
+                barrels.Add(barrel);
+            }
+            boss.Conducta = (Behaviour, 1);
+            await FightHandler.LanzarLaConductaAsync(null, fight, boss);
+
+            // Each barrel lays its own: 16805 for the first, 16806 for the second...
+            bool IsBlack(Glifo g) => g.Hechizo >= FirstBlackGlyph && g.Hechizo < FirstBlackGlyph + 4;
+            for (int turn = 1; turn <= 5; turn++)
+            {
+                await FightHandler.DispararAsync(null, fight, boss, EffectEngine.AlAcabarElTurno);
+                var laid = barrels.Select(b => fight.Glifos.Count(g => g.Dueno == b.Id && IsBlack(g))).ToList();
+                Assert.True(laid.SequenceEqual(Enumerable.Range(0, 4).Select(i => turn > i ? 1 : 0)),
+                            $"turn {turn}: {string.Join(",", laid)}");
+                fight.Glifos.RemoveAll(IsBlack);
+                int round = fight.RoundNumber;
+                while (fight.RoundNumber == round) fight.NextTurn();
+                foreach (var f in fight.Todos) f.Buffs.BarrerEnganches(fight.RoundNumber);
+            }
         }
     }
 }
