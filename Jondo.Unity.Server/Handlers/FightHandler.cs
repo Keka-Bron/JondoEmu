@@ -5037,6 +5037,10 @@ namespace Jondo.Unity.Server.Handlers
                 // charge. Firing them again here would charge the last cell twice.
                 if (skipWalls && Managers.BombWalls.IsWall(glifo)) continue;
                 if (!GlyphCatches(fight, glifo, quien, byDisplacement)) continue;
+                // A monster's aura gives once to whoever stands in it, not once per cell of it he
+                // walks: Solar's Nadir aura (9439 laying 9443, -4 range with no end of its own)
+                // took 4 more at every step inside it, down to -14, and nothing reached him.
+                if (alPisar && EsAuraDeMonstruo(glifo) && glifo.Dentro.Contains(quien.Id)) continue;
 
                 await FireOneGlyphAsync(stream, fight, glifo, quien, alPisar);
                 if (!quien.IsAlive) break;
