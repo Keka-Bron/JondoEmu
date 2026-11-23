@@ -12098,6 +12098,9 @@ namespace Jondo.Unity.Server.Handlers
                     UtilityOwnSideMasks = utilityOwnSideMasks,
                     Summons = summons,
                     NeedsFreeCell = limits.NeedFreeCell,
+                    BlowsUpOnTimer = limits.EsperaInicial > 0
+                                     && Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
+                                                                                       && (e.TargetMask ?? "").Split(',').Any(m => m.Trim() == "C")),
                     RangeBoostable = (limits.Flags & Managers.SpellLevelFlags.RangeCanBeBoosted) != 0,
                     ThroughPortals = (limits.Flags & Managers.SpellLevelFlags.PortalProjectionForbidden) == 0
                                      && !Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.DesactivaUnPortal),

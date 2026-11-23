@@ -154,6 +154,14 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The level asks for a free cell: a leap lands NEXT to its target, never on him.</summary>
             public bool NeedsFreeCell { get; init; }
+
+            /// <summary>
+            /// Whether it kills its own caster and is born waiting: a timed blow-up, cast as soon as
+            /// it may, whoever it reaches. The Puñeta's Piquete (2601) waits four turns and then hurts
+            /// whoever stands eight cells or more from it; weighed by the enemies it reached, it was
+            /// worth nothing with the player beside it, and the Puñeta never went off.
+            /// </summary>
+            public bool BlowsUpOnTimer { get; init; }
             public bool UtilityOnEnemies { get; init; }
 
             /// <summary>
@@ -566,6 +574,8 @@ namespace Jondo.Unity.Server.Managers
                         bool leaves = movers && spell.Moves;
                         // A creature of its own tended: only one of its own, the turret it evolves.
                         bool tends = movers && spell.Tends && target != monster && target.TeamId == monster.TeamId && target.EsInvocado;
+                        // A timed blow-up goes off whoever it reaches, worth a little so the turn's plan takes it.
+                        if (value <= 0 && spell.BlowsUpOnTimer) value = TimerWorth;
                         if (value <= 0 && !leaves && !(movers && (spell.Switches || spell.LaysPortals)) && !tends) continue;
 
                         double score = value / Math.Max(1, spell.Cost) * walk;
@@ -740,6 +750,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>What ending the turn out of every enemy's sight is worth, in cells of distance.</summary>
         private const int HiddenWorth = 2;
+
+        /// <summary>What a timed blow-up (<see cref="Spell.BlowsUpOnTimer"/>) is worth when it reaches nobody.</summary>
+        private const int TimerWorth = 1;
 
         /// <summary>Steps counted for a cell no walk leads to from any enemy: behind every reachable one.</summary>
         private const int UnreachableSteps = 1000;
