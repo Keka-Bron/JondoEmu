@@ -11961,7 +11961,7 @@ namespace Jondo.Unity.Server.Handlers
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
                 bool hooks = false, hooksOnEnemies = false, doesSomethingAtOnce = false;
                 int zone = 0, removal = 0, buff = 0;
-                Managers.SpellEffect? zoneRow = null;
+                Managers.SpellEffect? zoneRow = null, healZoneRow = null;
                 double heal = 0, pickedDamage = 0;
                 var masks = new Dictionary<int, string>();
                 var mechanicMasks = new List<string>();
@@ -11992,7 +11992,11 @@ namespace Jondo.Unity.Server.Handlers
                         pickedDamage = Math.Max(pickedDamage, average);
                     }
                     else if (effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.FireHeal)
+                    {
                         heal = Math.Max(heal, average);
+                        if (effect.Forma != 'P' && (healZoneRow == null || effect.Tamano > healZoneRow.Tamano))
+                            healZoneRow = effect;
+                    }
                     else if (effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.HealPercent)
                         heal = Math.Max(heal, monster.MaxHP * average / 100.0);
                     else if (Managers.EffectEngine.EsInvocacion(effect.EffectId))
@@ -12103,6 +12107,7 @@ namespace Jondo.Unity.Server.Handlers
                     ZoneRow = zoneRow,
                     HurtsAllies = hurtsAllies,
                     Heal = heal,
+                    HealZoneRow = healZoneRow,
                     Removal = removal,
                     Buff = buff,
                     SupportMasks = supportMasks,

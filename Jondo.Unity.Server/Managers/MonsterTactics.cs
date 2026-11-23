@@ -83,6 +83,13 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Life given back to one of its side.</summary>
             public double Heal { get; init; }
 
+            /// <summary>
+            /// The heal's row when it reaches a zone, for whom it gives back life to: the Famished
+            /// Doll's 712 heals her whole side from her own cell (a circle of 63). Weighed by her
+            /// own missing life alone, it was worth nothing and never cast. Null for one cell.
+            /// </summary>
+            public SpellEffect? HealZoneRow { get; init; }
+
             /// <summary>AP and MP taken from an enemy.</summary>
             public int Removal { get; init; }
 
@@ -1034,7 +1041,21 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Removal > 0 && onEnemy && (target.CurrentAP > 0 || target.CurrentMP > 0))
                 value += spell.Removal * (20 + target.Level / 4.0);
 
-            if (spell.Heal > 0 && !onEnemy)
+            if (spell.Heal > 0 && !onEnemy && spell.HealZoneRow != null)
+            {
+                // A heal over a zone gives back life to every one of its side it reaches and names.
+                var cells = EffectEngine.CasillasDelEfecto(spell.HealZoneRow, from, aim);
+                string mask = spell.HealZoneRow.TargetMask ?? "";
+                foreach (var own in allies.Append(monster).Distinct())
+                {
+                    if (!own.IsAlive || !cells.Contains(own == monster ? from : own.CellId)) continue;
+                    if (mask.Length > 0 && !EffectEngine.CumpleLaMascara(monster, own, mask)) continue;
+                    int missing = own.MaxHP - own.CurrentHP;
+                    if (missing * 10 >= own.MaxHP)
+                        value += Math.Min(spell.Heal, missing) * (own.CurrentHP * 2 < own.MaxHP ? 1.5 : 1.0);
+                }
+            }
+            else if (spell.Heal > 0 && !onEnemy)
             {
                 int missing = target.MaxHP - target.CurrentHP;
                 if (missing * 10 >= target.MaxHP)
