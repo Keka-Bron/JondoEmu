@@ -384,9 +384,19 @@ namespace Jondo.Unity.Server.Handlers
         internal static long RecordFightProgress(long characterId, long room, bool won)
         {
             var dungeon = DungeonManager.OfRoom(room);
-            if (dungeon == null || (dungeon.Authored && !dungeon.KeepsADoor)) return 0;
+            if (dungeon == null) return 0;
+
+            // A boss room chosen in another dungeon's transition room belongs to that run: a win ends
+            // it, a defeat keeps the choice to make again and sends the party back to its door.
+            if (DungeonManager.ChosenFrom(dungeon) is { } run)
+            {
+                DungeonProgress.SetRoom(characterId, run, won ? 0 : dungeon.EntranceMapId);
+                return won ? 0 : WayBackAfterADefeat(run, characterId);
+            }
+            if (dungeon.Authored && !dungeon.KeepsADoor) return 0;
 
             long next = DungeonManager.NextRoom(dungeon, room);
+            if (won && next == 0) next = DungeonManager.ChoiceRoom(dungeon);
             if (won && dungeon.Hub?.AfterAWin(room, DungeonProgress.HubWins(characterId, dungeon)) is { } lobby)
             {
                 DungeonProgress.SetHubWin(characterId, dungeon, room);
@@ -395,7 +405,11 @@ namespace Jondo.Unity.Server.Handlers
             DungeonProgress.SetRoom(characterId, dungeon, won ? next : room);
             if (won && next == 0) DungeonProgress.SetHubWin(characterId, dungeon, 0);
             if (won) return 0;
+            return WayBackAfterADefeat(dungeon, characterId);
+        }
 
+        private static long WayBackAfterADefeat(DungeonManager.Dungeon dungeon, long characterId)
+        {
             long entrance = Expeditions.IsExpedition(dungeon.Id) ? 0 : dungeon.EntranceMapId;
             if (entrance != 0 && !DungeonManager.IsRoom(entrance) && MapManager.GetMapInfo(entrance) != null)
                 return entrance;

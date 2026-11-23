@@ -75,6 +75,11 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>A room the checkpoint can hold: one of the dungeon's rooms, or the room after its
+        /// last one where the party chooses its boss.</summary>
+        private static bool Holds(DungeonManager.Dungeon dungeon, long room) =>
+            dungeon.Rooms.Contains(room) || room == DungeonManager.ChoiceRoom(dungeon);
+
         internal static long SavedRoom(long characterId, DungeonManager.Dungeon dungeon)
         {
             try
@@ -86,7 +91,7 @@ namespace Jondo.Unity.Server.Managers
                                       "WHERE CharacterId = $character AND DungeonId = $dungeon;";
                 command.Parameters.AddWithValue("$character", characterId);
                 command.Parameters.AddWithValue("$dungeon", dungeon.Id);
-                return command.ExecuteScalar() is long room && dungeon.Rooms.Contains(room) ? room : 0;
+                return command.ExecuteScalar() is long room && Holds(dungeon, room) ? room : 0;
             }
             catch (SqliteException ex)
             {
@@ -97,7 +102,7 @@ namespace Jondo.Unity.Server.Managers
 
         internal static void SetRoom(long characterId, DungeonManager.Dungeon dungeon, long room)
         {
-            if (characterId <= 0 || (room != 0 && !dungeon.Rooms.Contains(room))) return;
+            if (characterId <= 0 || (room != 0 && !Holds(dungeon, room))) return;
 
             try
             {

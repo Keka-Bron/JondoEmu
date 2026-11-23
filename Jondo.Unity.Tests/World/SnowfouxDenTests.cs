@@ -48,6 +48,28 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
+        /// <summary>
+        /// The run goes on through the transition room: the den's checkpoint can hold it, so Resume
+        /// takes the party back to Givrihaltès, and a defeat against either boss sends the party to
+        /// the den's door with the choice still to make.
+        /// </summary>
+        [Fact]
+        public void The_boss_rooms_keep_the_dens_checkpoint_and_a_defeat_goes_back_to_its_door()
+        {
+            Load();
+            var den = DungeonManager.Get(58)!;
+            Assert.Equal(Transition, DungeonManager.ChoiceRoom(den));
+            foreach (var room in new[] { TenguRoom, TenguFujiRoom })
+            {
+                var boss = DungeonManager.OfRoom(room)!;
+                Assert.Same(den, DungeonManager.ChosenFrom(boss));
+                Assert.Equal(0, DungeonManager.ChoiceRoom(boss));
+                Assert.Equal(Entrance, DungeonHandler.RecordFightProgress(0, room, won: false));
+                Assert.Equal(0, DungeonHandler.RecordFightProgress(0, room, won: true));
+            }
+            Assert.Null(DungeonManager.ChosenFrom(den));
+        }
+
         /// <summary>«Fuji remplace la Kami Givrefoux dans le combat» (Dofus pour les noobs).</summary>
         [Fact]
         public void Tengu_comes_with_the_kami_and_fuji_takes_her_place()

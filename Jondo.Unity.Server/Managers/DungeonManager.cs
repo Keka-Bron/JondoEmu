@@ -1140,6 +1140,26 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
+        /// The room a win in the dungeon's last room leaves the party in to choose its boss, when that
+        /// choice is the way into other dungeons (the Snowfoux Den's transition room, from which
+        /// Givrihaltès takes the party to Tengu alone or to Tengu and Fuji); 0 for any other dungeon.
+        /// </summary>
+        /// <remarks>The run goes on there, so it is a room the dungeon's checkpoint can hold.</remarks>
+        public static long ChoiceRoom(Dungeon dungeon)
+        {
+            if (dungeon == null || dungeon.LastRoom == 0) return 0;
+            if (DungeonExitRooms.AfterBoss(dungeon.LastRoom) is not { } after || after.Dungeon != dungeon.Id) return 0;
+            return _byId.Values.Any(other => other.Id != dungeon.Id && other.EntranceMapId == after.MapId) ? after.MapId : 0;
+        }
+
+        /// <summary>The dungeon whose <see cref="ChoiceRoom"/> is this one's way in, or null.</summary>
+        public static Dungeon? ChosenFrom(Dungeon dungeon)
+        {
+            if (dungeon == null || dungeon.EntranceMapId == 0) return null;
+            return _byId.Values.FirstOrDefault(other => other.Id != dungeon.Id && ChoiceRoom(other) == dungeon.EntranceMapId);
+        }
+
+        /// <summary>
         /// The room after this one, or 0 when this is the boss room (or unknown). Hubs and Exit
         /// maps that trail the catalogue after the boss are not walked into after a win.
         /// </summary>
