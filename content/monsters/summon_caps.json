@@ -11,6 +11,10 @@
     {
       "monster": 289, "cap": 1,
       "why": "Master Cuerbok's Invocación de Cuerbok (629, once a turn): «Invoque un Corbac. Il ne peut y avoir qu'un seul Corbac invoqué sur le terrain [...] Si ce Corbac est éliminé, il peut en réinvoquer un directement au tour suivant» (Dofus pour les noobs, «Bibliothèque du Maître Corbac»). The crow (281) costs 1."
+    },
+    {
+      "monster": 1159, "cap": 6,
+      "why": "The Grand Ugah's Héchame un Amanita (1265, once a turn from his second): «Invoque aléatoirement un des monstres de la zone. Il peut y avoir jusqu'à 6 invocations» (Dofus pour les noobs, «Temple du Grand Ougah»). His six summonable monsters (1153-1158) cost 1 each."
     }
   ]
 }
