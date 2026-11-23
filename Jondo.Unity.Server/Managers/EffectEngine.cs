@@ -5618,6 +5618,12 @@ namespace Jondo.Unity.Server.Managers
                 bool alLanzador = efecto.EffectId == Retroceder || efecto.EffectId == Avanzar;
                 if (alLanzador)
                 {
+                    // Cast at his own cell by a hook, what he moves away from or towards is the
+                    // one the mask names: the Tanukis' 16707, "A,O" under DM and DR, steps them
+                    // back from whoever hit them in melee and forward to whoever hit them from
+                    // range. Judged from their own cell, it had no direction and they never moved.
+                    if (centroDelEmpuje == quienLanza.CellId && sobre != quienLanza && !hastaLaCasilla)
+                        centroDelEmpuje = sobre.CellId;
                     sobre = quienLanza;
                     if (efecto.EffectId == Avanzar) cuantas = -cuantas;
                 }

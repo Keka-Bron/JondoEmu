@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -40,9 +41,14 @@ namespace Jondo.Unity.Tests.Combat
             fight.AddMonster(ally);
             fight.StartFight();
 
-            await FightHandler.AplicarEfectosAsync(null, fight, caster, spell, 1, caster,
-                                                   EffectEngine.AlLanzar, ally.CellId);
+            await FightHandler.LanzarPorOrdenAsync(null, fight, caster, spell, 1, ally, ally.CellId,
+                                                   EffectEngine.AlLanzar, SpellEffects.De(spell, 1).ToList());
+            Assert.Equal(3000, ally.CurrentHP);
 
+            // The same blow at the player does land.
+            await FightHandler.LanzarPorOrdenAsync(null, fight, caster, spell, 1, player, player.CellId,
+                                                   EffectEngine.AlLanzar, SpellEffects.De(spell, 1).ToList());
+            Assert.True(player.CurrentHP < 5000);
             Assert.Equal(3000, ally.CurrentHP);
         }
     }
