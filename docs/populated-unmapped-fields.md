@@ -212,6 +212,17 @@ following fields on Game profile `3.6.10.10` (also used by `3.6.10.11`):
 coverage was incomplete. Their client use is **indeterminate**; the audit does
 not establish that omitting the historical values is harmless.
 
+### Fight join refusal
+
+**Capture and code:** In the August dungeon party-search capture, frame 856,
+`FightChallengeJoinRefuseEvent` (`jxs`) carries the named fighter's ID in tag 1
+(`int64`, property `199219`) and the party restriction reason in tag 2 (16).
+`FightJoinProtocol.BuildJoinRefused` wrote both. The typed path sends only the
+reviewed `TeamLimitedByMainCharacter` reason to the requester. Omitting the ID
+changes outbound behavior: `jondo-11-08-2026` found no native use witness, but
+caller coverage is incomplete, so client use is indeterminate. These tag and
+property numbers are not evidence for the beta profile.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

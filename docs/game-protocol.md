@@ -542,6 +542,21 @@ only to the caller. An invalid cancel is silent. Neither consumes another pair's
 A successful cancel sends `FightPlacementSwapPositionsCancelledEvent` only to the pair;
 a successful accept broadcasts the new positions. Answers do not flush a pending fight end.
 
+On both profiles, `FightJoinRequest` names the fight and the fighter whose side
+to join. With no fighter it asks to spectate an ongoing fight. Admission is
+rechecked under the original fight's turn: a queued request cannot take a
+filled slot or join a replacement fight. A party-only refusal is private (see
+[the field omission](populated-unmapped-fields.md#fight-join-refusal)). Join,
+departure, companion and dungeon regrowth updates send typed dispositions,
+appearances, member removals and placement turn lists to the board.
+
+`FightOptionToggleRequest` is leader-only; the map hears the option change only
+during placement. The four party auto-join/auto-ready switches reply privately
+with the original signed UID. `ContextQuitRequest` sends a spectator home or
+acts on the participant's fight. A nonterminal placement departure redraws the
+remaining roster. A terminal forfeit settles the normal win and loss; settlement
+and ongoing combat still use their existing send paths.
+
 ### Shared map/fight presence and reconnection opening
 
 `FightHandler` directly constructs map fight flags, counts, incremental teams,

@@ -21,10 +21,10 @@ public sealed partial class MapFightPresenceTests
     private static Task<GameEntryResult> DispatchReady(GameSession session, bool ready)
         => DispatchPlacement(session, new FightReadyRequest(ready));
 
-    private static async Task<GameEntryResult> DispatchPlacement(GameSession session, GameRequest request)
+    private static async Task<GameEntryResult> DispatchPlacement(GameSession session, GameRequest request, int uid = -1)
     {
         using var turn = await session.EnterTurnAsync();
-        return await GameNodeProxy.DispatchTypedAsync(session, new(request, -1),
+        return await GameNodeProxy.DispatchTypedAsync(session, new(request, uid),
             new GameEntryService(session, new GameEntryBackend()));
     }
 
@@ -391,20 +391,22 @@ public sealed partial class MapFightPresenceTests
         own.Session.State.RoleplayCellId = 312;
         using var remaining = new Recipient(Person + 5, Arena, Id);
         using var peer = new Recipient(Person + 1, Map);
-        using (SessionContext.Push(own.Session))
-        using (await own.Session.EnterTurnAsync())
         using (await remaining.Session.EnterTurnAsync())
-            await FightHandler.InTurnAsync(fight, () => FightHandler.LeavePlacementAsync(own.ToClient, fight))
+            await DispatchPlacement(own.Session, new ContextQuitRequest())
                 .WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(new[] { "jxa", "kml", "kmp", "ktz", "jru", "lqu" }, (await own.Take(6)).Select(packet => packet.Opcode));
+        Assert.Collection(await ReadEvents(own, 6),
+            e => Assert.IsType<FightEndKickedEvent>(e), e => Assert.IsType<ContextDestroyEvent>(e),
+            e => Assert.Equal(new ContextCreationEvent(GameContext.RolePlay), e),
+            e => Assert.IsType<LifePointsRegenBeginEvent>(e), e => Assert.Equal(new MapCurrentEvent(Map), e),
+            e => Assert.IsType<TimeEvent>(e));
         Assert.Equal(0, own.Session.State.FightId);
         Assert.Equal(Map, own.Session.MapId);
         Assert.Equal(FightState.Placement, fight.State);
         Assert.Collection(remaining.Sequence,
-            entry => Assert.Equal("kar", entry),
+            entry => Assert.Equal(new FightLeaveEvent(Person), entry),
             entry => Assert.Equal(new ContextRemoveElementEvent(Person), entry),
             entry => Assert.Equal(new FightTeamRemoveMemberEvent((int)Id, Team.Challenger, Person), entry),
-            entry => Assert.Equal("jzu", entry),
+            entry => Assert.IsType<FightTurnListEvent>(entry),
             entry => Assert.Equal(Person + 5, Assert.IsType<FightTeamUpdateEvent>(entry).Team.LeaderId));
         Assert.IsType<FightTeamUpdateEvent>(Assert.Single(peer.Codec.Frames).Content);
     }
@@ -442,9 +444,7 @@ public sealed partial class MapFightPresenceTests
         }
         using var peer = new Recipient(Person + 2, Map);
         var leaving = clients.Single(c => c.Session.CharacterId == quitter);
-        using (SessionContext.Push(leaving.Session))
-        using (await leaving.Session.EnterTurnAsync())
-            await FightHandler.InTurnAsync(fight, () => FightHandler.AbandonAsync(leaving.ToClient));
+        await DispatchPlacement(leaving.Session, new ContextQuitRequest());
 
         Assert.Equal(FightState.Ended, fight.State);
         Assert.Equal(redForfeits ? FightInstance.Azules : FightInstance.Rojos, fight.WinnerTeamId);
@@ -491,9 +491,8 @@ public sealed partial class MapFightPresenceTests
         try
         {
             using (SessionContext.Push(elsewhere.Session))
-            using (await own.Session.EnterTurnAsync())
             using (await peer.Session.EnterTurnAsync())
-                await FightHandler.WatchFromTheMapAsync(own.Session, Id).WaitAsync(TimeSpan.FromSeconds(5));
+                await DispatchPlacement(own.Session, new FightJoinRequest(0, (int)Id)).WaitAsync(TimeSpan.FromSeconds(5));
             var removal = new GameCodec().Decode(Assert.Single(peer.Raw));
             Assert.Equal(new ContextRemoveElementEvent(Person + 7), removal.Content);
             Assert.Null(removal.Uid);
@@ -505,7 +504,15 @@ public sealed partial class MapFightPresenceTests
             Assert.Equal(Id, own.Session.State.SpectatingFightId);
             Assert.Equal(Map, own.Session.State.RoleplayMapId);
             Assert.Equal(Arena, own.Session.MapId);
-            Assert.Equal(new[] { "kml", "kmp", "jru", "lqu" }, (await own.Take(4)).Select(packet => packet.Opcode));
+            Assert.Collection(await ReadEvents(own, 4), e => Assert.IsType<ContextDestroyEvent>(e),
+                e => Assert.Equal(new ContextCreationEvent(GameContext.Fight), e),
+                e => Assert.Equal(new MapCurrentEvent(Arena), e), e => Assert.IsType<TimeEvent>(e));
+            await DispatchPlacement(own.Session, new ContextQuitRequest());
+            Assert.Collection(await ReadEvents(own, 5), e => Assert.IsType<FightEndKickedEvent>(e),
+                e => Assert.IsType<ContextDestroyEvent>(e), e => Assert.Equal(new ContextCreationEvent(GameContext.RolePlay), e),
+                e => Assert.Equal(new MapCurrentEvent(Map), e), e => Assert.IsType<TimeEvent>(e));
+            Assert.Equal(0, own.Session.State.SpectatingFightId);
+            Assert.Equal(FightState.Ongoing, fixture.Fight.State);
         }
         finally { FightHandler.ForgetSpectator(own.Session); }
     }
@@ -560,6 +567,18 @@ public sealed partial class MapFightPresenceTests
 
     private static IReadOnlyList<FightTeamMemberInformation> Members(FightTeamInformation team)
         => Assert.IsType<FightTeamInformationCaseMembers>(team.TeamInformationCase).Value.Members;
+    private static async Task<List<GameEvent>> ReadEvents(ClientPipe client, int count)
+    {
+        var events = new List<GameEvent>();
+        for (int i = 0; i < count; i++)
+        {
+            var bytes = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(client.FromServer).WaitAsync(TimeSpan.FromSeconds(5));
+            var frame = new GameCodec().Decode(bytes);
+            Assert.Null(frame.Uid);
+            events.Add(Assert.IsAssignableFrom<GameEvent>(frame.Content));
+        }
+        return events;
+    }
     private static Task Invoke(string method, params object?[] args)
         => (Task)typeof(FightHandler).GetMethod(method, PrivateStatic)!.Invoke(null, args)!;
 

@@ -220,7 +220,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var other = SessionRegistry.FindByCharacter(target);
                     if (other == null) return;
-                    using (SessionContext.Push(other)) await FightHandler.LeavePlacementAsync(other.Stream, fight);
+                    using (SessionContext.Push(other)) await FightHandler.LeavePlacementAsync(fight);
                     Program.LogDebug($"[AllianceFights] {me.CharacterName} takes the place of {target} in fight #{fightId}.");
                 }
                 await DefendAsync(stream, session, fight, fightId, defence, alliance);
@@ -242,7 +242,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (!_open.ContainsKey(fightId) || fight.State != FightState.Placement
                     || fight.EquipoDe(me) != FightInstance.Rojos)
                     return;
-                await FightHandler.LeavePlacementAsync(stream, fight);
+                await FightHandler.LeavePlacementAsync(fight);
             });
         }
 

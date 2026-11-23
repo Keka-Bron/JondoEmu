@@ -131,7 +131,7 @@ namespace Jondo.Unity.Tests.Combat
             // FightJoin.cs: the jqz behind the jss of the one loading a map, the answer to the
             // party window's switch of the one who clicked it, and the way back of the one who
             // leaves the placement -- all three are one person's own view.
-            "SendFightCountAsync", "AutoOptionAsync", "LeavePlacementAsync",
+            "SendFightCountAsync",
             // The test harness's fresh turn: the caster's own cooldowns, to his own client.
             "FreshTurnStepsAsync",
         };

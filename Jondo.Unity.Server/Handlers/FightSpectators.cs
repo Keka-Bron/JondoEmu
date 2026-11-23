@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
@@ -70,10 +71,6 @@ namespace Jondo.Unity.Server.Handlers
             return null;
         }
 
-        /// <summary>The kay without a fighter: the map's fight, watched.</summary>
-        internal static Task WatchFromTheMapAsync(GameSession me, long fightId)
-            => WatchAsync(me, FightById(fightId), fromTheMap: true);
-
         /// <summary>
         /// kal { f2 the character }: the fight that character is in, watched from wherever one
         /// stands -- the lists that offer it are the friends', the guild's and the alliance's.
@@ -111,10 +108,10 @@ namespace Jondo.Unity.Server.Handlers
             state.FightId = fight.FightId;
             state.MapId = fight.MapId;
 
-            await me.SendAsync(ConnectionProtocol.Push(Op.Kml));
-            await me.SendAsync(ConnectionProtocol.Push(Op.Kmp, FightProtocol.BuildFightMapComing()));
-            await me.SendAsync(ConnectionProtocol.BuildLoadMap(fight.MapId));
-            await me.SendAsync(ConnectionProtocol.BuildMapClock());
+            await me.SendAsync(new Game.ContextDestroyEvent());
+            await me.SendAsync(new Game.ContextCreationEvent(Game.GameContext.Fight));
+            await me.SendAsync(new Game.MapCurrentEvent(fight.MapId));
+            await me.SendAsync(ServerTimeMessages.Snapshot());
             Program.LogDebug($"[Fight] {state.CharacterName} watches fight #{fight.FightId}.");
         }
 
@@ -214,17 +211,22 @@ namespace Jondo.Unity.Server.Handlers
                 state.FightId = 0;
                 BackToRoleplayMap();
 
-                await me.SendAsync(ConnectionProtocol.Push(Op.Jxa, FightJoinProtocol.BuildLeftFight()));
-                await me.SendAsync(ConnectionProtocol.Push(Op.Kml));
-                await me.SendAsync(ConnectionProtocol.Push(Op.Kmp));
-                await me.SendAsync(ConnectionProtocol.BuildLoadMap(state.MapId));
-                await me.SendAsync(ConnectionProtocol.BuildMapClock());
+                await SendLeaveContextAsync(me);
+                await me.SendAsync(new Game.MapCurrentEvent(state.MapId));
+                await me.SendAsync(ServerTimeMessages.Snapshot());
                 await BackOnTheMapAsync(me);
                 Program.LogDebug($"[Fight] {state.CharacterName} stops watching fight #{fightId}.");
             }
         }
 
         // ─── The spectator window's lists ───────────────────────────────────────
+
+        private static async Task SendLeaveContextAsync(GameSession session)
+        {
+            await session.SendAsync(new Game.FightEndKickedEvent());
+            await session.SendAsync(new Game.ContextDestroyEvent());
+            await session.SendAsync(new Game.ContextCreationEvent(Game.GameContext.RolePlay));
+        }
 
         /// <summary>
         /// The map's fights (jrv → jyc), as SpectatorUi lists them: each with its kind, its start,

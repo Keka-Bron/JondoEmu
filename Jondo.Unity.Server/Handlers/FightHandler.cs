@@ -1104,8 +1104,7 @@ namespace Jondo.Unity.Server.Handlers
             // are what put people on the board; without them the client has a fight with fighters who
             // are on no cell.
             foreach (var fighter in fight.Todos)
-                await session.SendAsync(new Game.EntitiesDispositionEvent([new(fighter.CellId,
-                    MapActorMessages.Facing(FacingOf(fight, fighter)), fighter.Id, null)]));
+                await session.SendAsync(new Game.EntitiesDispositionEvent([PlacementSpot(fight, fighter)]));
 
             // How many challenges are chosen in this fight. It goes here, after the kmk and before the
             // first jxg, which is where the real server puts it; and it goes TWICE, with the same
@@ -1188,8 +1187,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            await session.SendAsync(new Game.FightTurnListEvent(CarouselOrder(fight)
-                .Select(id => new Game.FightTurnEntityCaseWithFlag(new(false, id))).ToArray()));
+            await session.SendAsync(PlacementTurnList(fight));
             await session.SendAsync(new Game.FightEffectsRefreshEvent([]));
             var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
             await session.SendAsync(new Game.FightMapInformation(place?.SubAreaId ?? 0, fight.MapId,
@@ -2331,10 +2329,6 @@ namespace Jondo.Unity.Server.Handlers
                 // unlocks the end-of-fight screen when the last hit left it waiting.
                 await AcuseAsync(stream, payload);
             }
-            else if (payloadStr.Contains(Op.Uri(Op.Kme)))
-            {
-                await AbandonAsync(stream);
-            }
             else if (payloadStr.Contains(Op.Uri(Op.Ltf)))
             {
                 // The Koliseo's surrender window, and the team's vote to give up (KoliseoSurrender).
@@ -3162,8 +3156,19 @@ namespace Jondo.Unity.Server.Handlers
                 }
             });
 
-        private static async Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action,
+        private static Task InPlacementTurnAsync(GameSession session, Func<FightInstance, Task> action,
             bool finishPendingFight = true)
+            => InParticipantTurnAsync(session, async fight =>
+            {
+                if (fight.FinPendiente != 0)
+                {
+                    if (finishPendingFight) await FinishPendingFightAsync(fight);
+                    return;
+                }
+                if (fight.State == FightState.Placement) await action(fight);
+            });
+
+        private static async Task InParticipantTurnAsync(GameSession session, Func<FightInstance, Task> action)
         {
             if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld || !session.State.IsInFight) return;
             long characterId = session.CharacterId;
@@ -3172,15 +3177,9 @@ namespace Jondo.Unity.Server.Handlers
             await InTurnAsync(fight, async () =>
             {
                 // The request belongs to this instance even if the character joined another fight while waiting.
-                if (!session.State.IsInFight || session.CharacterId != characterId ||
+                if (!session.IsInWorld || !session.State.IsInFight || session.CharacterId != characterId || session.State.FightId != fight.FightId ||
                     FightById(fight.FightId) != fight || !IsParticipant(fight, characterId)) return;
                 using var context = SessionContext.Push(session); // Legacy end/start handlers still read player state.
-                if (fight.FinPendiente != 0)
-                {
-                    if (finishPendingFight) await FinishPendingFightAsync(fight);
-                    return;
-                }
-                if (fight.State != FightState.Placement) return;
                 await action(fight);
             });
         }
@@ -12944,19 +12943,13 @@ namespace Jondo.Unity.Server.Handlers
         /// a sequence of kind 5, a jxh follows, and the result screen waits for the acknowledgement
         /// rather than cutting through an unfinished cast.
         /// </summary>
-        public static async Task AbandonAsync(NetworkStream stream)
+        private static async Task AbandonAsync(NetworkStream stream, FightInstance fight)
         {
-            var fight = GetCurrentFight();
-            if (fight == null)
-            {
-                Program.LogDebug("[Fight] Ignored kme because the session has no active fight.");
-                return;
-            }
             // Leaving during the placement is captured now: «meterse en combate de otra persona
             // haciendo click en la espadita y luego abandonar para salirse», frames 50-55.
             if (fight.State == FightState.Placement)
             {
-                await LeavePlacementAsync(stream, fight);
+                await LeavePlacementAsync(fight);
                 return;
             }
             if (fight.State != FightState.Ongoing)

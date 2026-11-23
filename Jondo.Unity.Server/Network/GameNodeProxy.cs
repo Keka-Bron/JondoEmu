@@ -224,11 +224,6 @@ namespace Jondo.Unity.Server.Network
                     // And its answer: with f2 it accepts, without it it declines.
                     await ChallengeDuelHandler.AnswerAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kme)) && SessionContext.State.SpectatingFightId != 0)
-                {
-                    // «Abandonar el modo espectador»: home, as at the fight's end.
-                    await FightHandler.StopWatchingAsync(SessionContext.Current);
-                }
                 // ─── 3.6.10.10 world messages. The joi/jos/jpp branches further down belong to
                 // an earlier version of the protocol and this client never sends them.
                 else if (payloadStr.Contains("type.ankama.com/hir"))
@@ -1217,11 +1212,6 @@ namespace Jondo.Unity.Server.Network
                         && !await HouseHandler.KamasAsync(stream))
                         await TradeHandler.KamasAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Jzx)))
-                {
-                    // A side's fight option switched: no spectators, party only, closed, help.
-                    await FightHandler.FightOptionAsync(stream, payload);
-                }
                 else if (payloadStr.Contains(Op.Uri(Op.Keu)))
                 {
                     // Asking another player to trade.
@@ -1524,22 +1514,10 @@ namespace Jondo.Unity.Server.Network
                     // Watching a friend's, a guild mate's or an alliance mate's fight.
                     await FightHandler.WatchCharacterAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kay)))
-                {
-                    // Into somebody else's fight during its placement: the swords on the map or
-                    // the party window.
-                    await FightHandler.JoinRequestAsync(stream, payload);
-                }
-                else if (FightHandler.IsAutoOptionRequest(payloadStr))
-                {
-                    // The party window's automatic entry and automatic ready.
-                    await FightHandler.AutoOptionAsync(stream, payload, payloadStr);
-                }
                 else if (payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
-                         || payloadStr.Contains(Op.Uri(Op.Kme))
                          || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp))
                          || payloadStr.Contains(Op.Uri(Op.Hoy)))
                 {
@@ -1714,6 +1692,19 @@ namespace Jondo.Unity.Server.Network
                     break;
                 case Game.AttackMonsterRequest attack:
                     await FightHandler.AttackAsync(session, attack);
+                    break;
+                case Game.FightJoinRequest join:
+                    await FightHandler.JoinRequestAsync(session, join);
+                    break;
+                case Game.ContextQuitRequest:
+                    await FightHandler.QuitAsync(session);
+                    break;
+                case Game.FightOptionToggleRequest option:
+                    await FightHandler.FightOptionAsync(session, option);
+                    break;
+                case Game.FightAutoJoinActivationRequest or Game.FightAutoJoinDeactivationRequest
+                    or Game.FightAutoReadyActivationRequest or Game.FightAutoReadyDeactivationRequest:
+                    await FightHandler.AutoOptionAsync(session, (Game.GameRequest)frame.Content, frame.Uid.Value);
                     break;
                 case Game.ChallengeReadyRequest or Game.ChallengeSelectionRequest or Game.ChallengeValidateRequest or Game.ChallengeBonusChoiceRequest:
                     await FightHandler.HandleChallengeAsync(session, (Game.GameRequest)frame.Content);

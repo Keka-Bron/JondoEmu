@@ -27,8 +27,8 @@ public sealed class TypedCombatMovementTests
     private static ConcurrentDictionary<long, FightInstance> Active =>
         (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
             .GetField("_activeFights", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
-    private static ConcurrentDictionary<long, (long FightId, int Team)> PendingJoins =>
-        (ConcurrentDictionary<long, (long FightId, int Team)>)typeof(FightHandler)
+    private static ConcurrentDictionary<long, (FightInstance Fight, int Team)> PendingJoins =>
+        (ConcurrentDictionary<long, (FightInstance Fight, int Team)>)typeof(FightHandler)
             .GetField("_joinAfterWalk", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
 
     // Independent wire construction exercises both protobuf representations of repeated key cells.
@@ -162,7 +162,7 @@ public sealed class TypedCombatMovementTests
         state.PendingMovementMapId = state.MapId;
         state.PendingMovementCellId = state.CellId;
         fight.Fight.FinPendiente = FightInstance.WaitsForTheJwz;
-        PendingJoins[state.CharacterId] = (fight.Fight.FightId, FightInstance.Azules);
+        PendingJoins[state.CharacterId] = (fight.Fight, FightInstance.Azules);
         pipe.Start(Codec.Encode(new(new MapMovementConfirmRequest(), 0)));
         await pipe.Send(Codec.Encode(new(new MapMovementCancelRequest(fight.Path[^1]), -1)));
         await pipe.Send(Codec.Encode(new(new MapChangeRequest(154010884, false), 2)));
@@ -200,7 +200,7 @@ public sealed class TypedCombatMovementTests
         state.FightId = 0;
         state.PendingMovementMapId = state.MapId;
         state.PendingMovementCellId = state.CellId;
-        PendingJoins[state.CharacterId] = (fight.Fight.FightId, FightInstance.Azules);
+        PendingJoins[state.CharacterId] = (fight.Fight, FightInstance.Azules);
         pipe.Start(Codec.Encode(new(new MapMovementConfirmRequest(), -19)));
         var frames = await pipe.DrainToBarrier();
 

@@ -561,11 +561,10 @@ namespace Jondo.Unity.Server.Network
                         // Movement uses the same typed boundary as the socket loop.
                         if (op == Op.Jrw || op == Op.Jqk)
                             await MovementDispatch.TryHandleAsync(session, GameNodeProxy.DecodeRequest(session, frame));
-                        else if (op == Op.Kaq || op == Op.Jzy || op == Op.Hqa)
+                         else if (op == Op.Kaq || op == Op.Jzy || op == Op.Hqa || op == Op.Kme)
                             await GameNodeProxy.DispatchTypedAsync(session, GameNodeProxy.DecodeRequest(session, frame),
                                 new GameEntryService(session, new GameEntryBackend()));
-                        // kme: giving the fight up, so that a harness closing its client leaves no fight behind.
-                        else if (FightOps.Contains(op) || op == Op.Kme) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
+                         else if (FightOps.Contains(op)) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hmt) await SpellHandler.HandleVariantAsync(stream, frame);
                         // A workshop's recipe chosen and crafted, as the craft window sends them: a
                         // quest's «Fabricar» objective played without dragging items about the screen.

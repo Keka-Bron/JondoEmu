@@ -109,7 +109,7 @@ namespace Jondo.Unity.Server.Handlers
         private static readonly ConcurrentDictionary<long, bool> _autoReady = new();
 
         /// <summary>Members to put in a fight as soon as their walk ends: character -> (fight, side).</summary>
-        private static readonly ConcurrentDictionary<long, (long FightId, int Team)> _joinAfterWalk = new();
+        private static readonly ConcurrentDictionary<long, (FightInstance Fight, int Team)> _joinAfterWalk = new();
 
         // ─── Looking fights up ──────────────────────────────────────────────────
 
@@ -389,19 +389,16 @@ namespace Jondo.Unity.Server.Handlers
         /// told to the fight and to the map. Closing it says lqn 95 ("0802" and "105f" in the poutch
         /// capture, 124, and the perceptor one, 69); the other switches say nothing measured.
         /// </summary>
-        public static async Task FightOptionAsync(NetworkStream stream, byte[] payload)
+        internal static Task FightOptionAsync(GameSession session, Game.FightOptionToggleRequest request)
         {
-            byte[]? jzx = ConnectionProtocol.ReadPayload(payload, Op.Jzx);
-            if (jzx == null) return;
-            int option = 0;
-            foreach (var f in ProtoMessage.Parse(jzx).Fields)
-                if (f.FieldNumber == 1 && f.WireType == 0) option = (int)f.VarIntValue;
-            if (option is < 0 or > 3) return;
-
-            long me = GameState.CharacterId;
-            var fight = FightOf(me);
-            if (fight == null) return;
-            await InTurnAsync(fight, () => SwitchOptionAsync(fight, me, option));
+            int option = request.Option switch
+            {
+                Game.FightOption.Unknown0 => 0, Game.FightOption.Unknown1 => 1,
+                Game.FightOption.Unknown2 => 2, Game.FightOption.Unknown3 => 3, _ => -1,
+            };
+            return option < 0 ? Task.CompletedTask : InParticipantTurnAsync(session, fight =>
+                fight.State is FightState.Placement or FightState.Ongoing
+                    ? SwitchOptionAsync(fight, session.CharacterId, option) : Task.CompletedTask);
         }
 
         private static async Task SwitchOptionAsync(FightInstance fight, long me, int option)
@@ -417,7 +414,7 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.State == FightState.Placement) await ToTheMapAsync(fight, kau);
             if (option == FightInstance.OptionClosed && on)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Lqn, ConnectionProtocol.BuildSystemMessage(ClosedMessage)));
+                await ATodosAsync(fight, new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage, ClosedMessage, []));
             }
             // No spectators: those watching go home.
             if (option == FightInstance.OptionSecret && on) await SpectatorsOutAsync(fight);
@@ -483,51 +480,46 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The client asks to come into a fight (kay): the swords clicked on the map, or the
-        /// party window. A refusal is only answered when its reason is measured -- see
-        /// <see cref="FightJoinProtocol.BuildJoinRefused"/> -- and nothing this server refuses
-        /// for has one, so the client simply stays where it is.
+        /// party window. Only the party restriction has a measured refusal notification.
         /// </summary>
-        public static async Task JoinRequestAsync(NetworkStream stream, byte[] payload)
+        internal static async Task JoinRequestAsync(GameSession me, Game.FightJoinRequest request)
         {
-            var (named, fightId) = FightJoinProtocol.ReadJoinRequest(payload);
-            var me = SessionContext.Current;
+            if (!me.IsAuthenticated || !me.HasCharacter || !me.IsInWorld) return;
+            var (named, fightId) = request;
             var fight = FightById(fightId);
-
-            // No fighter named: the map's fight list asks to watch it.
-            if (named == 0)
-            {
-                if (fight != null) await InTurnAsync(fight, () => WatchFromTheMapAsync(me, fightId));
-                return;
-            }
-
-            // A hunt's prey joins nobody's fight.
-            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Fight)) return;
+            if (fight == null) return;
+            long character = me.CharacterId;
+            using var context = SessionContext.Push(me);
 
             // The check and the join under the fight's turn: two coming in for its last place at
             // once both found it free.
-            if (fight != null) await InTurnAsync(fight, () => JoinCheckedAsync(me, fight, named, fightId));
-            else await JoinCheckedAsync(me, null, named, fightId);
+            await InTurnAsync(fight, async () =>
+            {
+                if (FightById(fightId) != fight || !me.IsInWorld || me.CharacterId != character || me.State.SpectatingFightId != 0) return;
+                if (named == 0) await WatchAsync(me, fight, fromTheMap: true);
+                else if (!await Managers.HeadHunts.HoldsAsync(me.Stream, Managers.HeadHunts.Hold.Fight))
+                    await JoinCheckedAsync(me, fight, named);
+            });
         }
 
-        private static async Task JoinCheckedAsync(GameSession me, FightInstance? fight, long named, long fightId)
+        private static async Task JoinCheckedAsync(GameSession me, FightInstance fight, long named)
         {
             string? why = WhyNotJoin(fight, named, me.State, out int team);
-            if (why == null && !MayJoinSide(fight!, team, me.CharacterId))
+            if (why == null && !MayJoinSide(fight, team, me.CharacterId))
             {
                 // The one refusal with a measured answer: jxs { f1: whom he asked for, f2: 16 },
                 // at J 856, the side restricted to its party.
-                await me.SendAsync(ConnectionProtocol.Push(Op.Jxs,
-                    FightJoinProtocol.BuildJoinRefused(named, FightJoinProtocol.RefusedPartyOnly)));
+                await me.SendAsync(new Game.FightChallengeJoinRefuseEvent(Game.FighterRefusedReason.TeamLimitedByMainCharacter));
                 why = "the side is restricted to its party";
             }
             if (why != null)
             {
-                Program.LogDebug($"[Fight] {me.State.CharacterName} does not join fight #{fightId} " +
+                Program.LogDebug($"[Fight] {me.State.CharacterName} does not join fight #{fight.FightId} " +
                                  $"(asked for the side of {named}): {why}.");
                 return;
             }
 
-            await JoinFightAsync(me, fight!, team, followingLeader: false);
+            await JoinFightAsync(me, fight, team, followingLeader: false);
         }
 
         /// <summary>
@@ -619,8 +611,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // Where he stands, with the side he faces: the enemies first and him last, as every
             // kmk of a placement move is (follow 152, dungeon 135, challenge 51).
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk,
-                Network.FightProtocol.BuildFightersPlaced(PlacedFacing(fight, fighter))));
+            await ATodosAsync(fight, PlacedFacing(fight, fighter));
 
             await ATodosAsync(fight, TeamUpdate(fight, team, withMembers: true));
 
@@ -634,8 +625,7 @@ namespace Jondo.Unity.Server.Handlers
             // His companion after him, placed and drawn as he is.
             if (companion != null)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kmk,
-                    Network.FightProtocol.BuildFighterPlaced(companion.CellId, FacingOf(fight, companion), companion.Id)));
+                await ATodosAsync(fight, new Game.EntitiesDispositionEvent([PlacementSpot(fight, companion)]));
                 await ATodosAsync(fight, PlacementAppearance(fight, companion));
             }
 
@@ -645,8 +635,7 @@ namespace Jondo.Unity.Server.Handlers
             var regrown = await RegrowMonstersAsync(fight);
             if (regrown.Added.Count == 0)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzu,
-                    TeamsOf(fight)));
+                await ATodosAsync(fight, PlacementTurnList(fight));
             }
 
             await ToTheMapAsync(fight, new Game.ContextRemoveElementEvent(fighter.Id));
@@ -663,17 +652,17 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// A fighter's kmk entry after the ones of the side he faces, whose facing turns to him.
         /// </summary>
-        private static List<(int Cell, int Orientation, long Fighter)> PlacedFacing(FightInstance fight, Fighter who)
+        private static Game.EntitiesDispositionEvent PlacedFacing(FightInstance fight, Fighter who)
         {
-            var spots = new List<(int, int, long)>();
-            foreach (var enemy in fight.Enemigos(who.Id).ToList())
-            {
-                if (!enemy.IsAlive || enemy.EsInvocado) continue;
-                spots.Add((enemy.CellId, FacingOf(fight, enemy), enemy.Id));
-            }
-            spots.Add((who.CellId, FacingOf(fight, who), who.Id));
-            return spots;
+            return new(fight.Enemigos(who.Id).Where(enemy => enemy.IsAlive && !enemy.EsInvocado)
+                .Append(who).Select(f => PlacementSpot(fight, f)).ToArray());
         }
+
+        private static Game.EntityDisposition PlacementSpot(FightInstance fight, Fighter f)
+            => new(f.CellId, MapActorMessages.Facing(FacingOf(fight, f)), f.Id, null);
+
+        private static Game.FightTurnListEvent PlacementTurnList(FightInstance fight)
+            => new(CarouselOrder(fight).Select(id => new Game.FightTurnEntityCaseWithFlag(new(false, id))).ToArray());
 
         // ─── A dungeon's monster side follows the number of people ──────────────
 
@@ -712,20 +701,18 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var gone in removed)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kar, FightJoinProtocol.BuildFighterRemoved(gone.Id)));
+                await ATodosAsync(fight, new Game.FightLeaveEvent(gone.Id));
                 await ATodosAsync(fight, new Game.ContextRemoveElementEvent(gone.Id));
                 await ATodosAsync(fight, new Game.FightTeamRemoveMemberEvent(checked((int)fight.FightId), Game.Team.Defender, gone.Id));
             }
 
             foreach (var monster in added)
             {
-                byte[] placed = ConnectionProtocol.Push(Op.Kmk,
-                    Network.FightProtocol.BuildFightersPlaced(PlacedFacing(fight, monster)));
+                var placed = PlacedFacing(fight, monster);
                 await ATodosAsync(fight, placed);
                 await ATodosAsync(fight, placed);
                 await ATodosAsync(fight, PlacementAppearance(fight, monster));
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzu,
-                    TeamsOf(fight)));
+                await ATodosAsync(fight, PlacementTurnList(fight));
             }
 
             Program.LogDebug($"[Dungeon] Fight #{fight.FightId} now has {added.Count} monsters " +
@@ -782,7 +769,7 @@ namespace Jondo.Unity.Server.Handlers
                 // Walking: in when the walk ends, as fight 487 of the capture.
                 if (session.State.PendingMovementMapId != 0)
                 {
-                    _joinAfterWalk[member] = (fight.FightId, fight.EquipoDe(person.Id));
+                    _joinAfterWalk[member] = (fight, fight.EquipoDe(person.Id));
                     Program.LogDebug($"[Party] {session.State.CharacterName} joins fight " +
                                      $"#{fight.FightId} when his walk ends.");
                     continue;
@@ -857,30 +844,30 @@ namespace Jondo.Unity.Server.Handlers
             if (ready) _autoReady[characterId] = true; else _autoReady.TryRemove(characterId, out _);
         }
 
-        /// <summary>Whether a frame is one of the four switches of the party window.</summary>
-        public static bool IsAutoOptionRequest(string payloadStr)
-            => payloadStr.Contains(Op.Uri(Op.Ilf)) || payloadStr.Contains(Op.Uri(Op.Int))
-               || payloadStr.Contains(Op.Uri(Op.Ikr)) || payloadStr.Contains(Op.Uri(Op.Inp));
-
         /// <summary>
         /// The four switches, each answered on root 3 with its empty response, as the follow
         /// capture does (frames 8-9, 203-208, 482-483, 996-1001).
         /// </summary>
-        public static async Task AutoOptionAsync(NetworkStream stream, byte[] payload, string payloadStr)
+        internal static Task AutoOptionAsync(GameSession session, Game.GameRequest request, int uid)
         {
-            long me = SessionContext.State.CharacterId;
-            long request = ConnectionProtocol.RequestId(payload);
-            string answer;
-
-            if (payloadStr.Contains(Op.Uri(Op.Ilf))) { _autoJoin[me] = true; answer = Op.Ikm; }
-            else if (payloadStr.Contains(Op.Uri(Op.Int))) { _autoJoin.TryRemove(me, out _); answer = Op.Ilv; }
-            else if (payloadStr.Contains(Op.Uri(Op.Ikr))) { _autoReady[me] = true; answer = Op.Inn; }
-            else if (payloadStr.Contains(Op.Uri(Op.Inp))) { _autoReady.TryRemove(me, out _); answer = Op.Ilr; }
-            else return;
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Answer(answer, null, request));
-            Program.LogDebug($"[Party] {SessionContext.State.CharacterName}: automatic entry " +
-                             $"{(AutoJoinOn(me) ? "on" : "off")}, automatic ready {(AutoReadyOn(me) ? "on" : "off")}.");
+            if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld) return Task.CompletedTask;
+            long me = session.CharacterId;
+            switch (request)
+            {
+                case Game.FightAutoJoinActivationRequest:
+                    _autoJoin[me] = true;
+                    return session.SendAsync(new Game.FightAutoJoinActivationResponse(), uid);
+                case Game.FightAutoJoinDeactivationRequest:
+                    _autoJoin.TryRemove(me, out _);
+                    return session.SendAsync(new Game.FightAutoJoinDeactivationResponse(), uid);
+                case Game.FightAutoReadyActivationRequest:
+                    _autoReady[me] = true;
+                    return session.SendAsync(new Game.FightAutoReadyActivationResponse(), uid);
+                case Game.FightAutoReadyDeactivationRequest:
+                    _autoReady.TryRemove(me, out _);
+                    return session.SendAsync(new Game.FightAutoReadyDeactivationResponse(), uid);
+                default: throw new ArgumentOutOfRangeException(nameof(request));
+            }
         }
 
         /// <summary>
@@ -892,11 +879,10 @@ namespace Jondo.Unity.Server.Handlers
             var me = SessionContext.Current;
             if (!_joinAfterWalk.TryRemove(me.State.CharacterId, out var pending)) return;
 
-            var fight = FightById(pending.FightId);
-            if (fight == null) return;
+            var fight = pending.Fight;
             await InTurnAsync(fight, async () =>
             {
-                if (WhyNotFollow(fight, me.State) != null) return;
+                if (FightById(fight.FightId) != fight || WhyNotFollow(fight, me.State) != null) return;
                 if (fight.CanJoin(pending.Team, CapOf(fight)) != FightInstance.JoinRefusal.None) return;
                 await JoinFightAsync(me, fight, pending.Team, followingLeader: true);
             });
@@ -931,6 +917,26 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── Leaving from the placement ─────────────────────────────────────────
 
+        internal static async Task QuitAsync(GameSession session)
+        {
+            if (!session.IsAuthenticated || !session.HasCharacter || !session.IsInWorld) return;
+            long id = session.State.SpectatingFightId;
+            if (id != 0)
+            {
+                var watched = FightById(id);
+                if (watched == null) await StopWatchingAsync(session);
+                else await InTurnAsync(watched, async () =>
+                {
+                    if (session.State.SpectatingFightId == id && FightById(id) == watched) await StopWatchingAsync(session);
+                });
+                return;
+            }
+            await InParticipantTurnAsync(session, async fight =>
+            {
+                if (!await FinishPendingFightAsync(fight)) await AbandonAsync(session.Stream, fight);
+            });
+        }
+
         /// <summary>
         /// A person leaves during the placement (kme). What he gets is measured in the sword
         /// capture, frames 37-43: jxa, then the way back as at the end of a fight -- kml, kmp,
@@ -938,7 +944,7 @@ namespace Jondo.Unity.Server.Handlers
         /// the kar and jzu of a monster taken off (dungeon 140) and his side's kae, the map the
         /// same kae and his figure back. If his departure defeats his side, everyone gets the normal result instead.
         /// </summary>
-        internal static async Task LeavePlacementAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task LeavePlacementAsync(FightInstance fight)
         {
             long me = GameState.CharacterId;
             int team = fight.EquipoDe(me);
@@ -962,13 +968,12 @@ namespace Jondo.Unity.Server.Handlers
             if (suyo.RoleplayMapId != 0) BackToRoleplayMap();
             else suyo.MapId = back;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxa, FightJoinProtocol.BuildLeftFight()));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kml));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmp));
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildRegenerationStarted(ConnectionProtocol.RegenerationRateNow()));
+            var session = SessionContext.Current;
+            await SendLeaveContextAsync(session);
+            await session.SendAsync(new Game.LifePointsRegenBeginEvent(ConnectionProtocol.RegenerationRateNow()));
             suyo.RegenerationStartedUtc = DateTime.UtcNow;
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildLoadMap(suyo.MapId));
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildMapClock());
+            await session.SendAsync(new Game.MapCurrentEvent(suyo.MapId));
+            await session.SendAsync(ServerTimeMessages.Snapshot());
 
             Program.LogDebug($"[Fight] {suyo.CharacterName} leaves fight #{fight.FightId} " +
                              "during its placement.");
@@ -1005,12 +1010,11 @@ namespace Jondo.Unity.Server.Handlers
             }
             foreach (long fighter in gone)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Kar, FightJoinProtocol.BuildFighterRemoved(fighter)));
+                await ATodosAsync(fight, new Game.FightLeaveEvent(fighter));
                 await ATodosAsync(fight, new Game.ContextRemoveElementEvent(fighter));
                 await ATodosAsync(fight, new Game.FightTeamRemoveMemberEvent(checked((int)fight.FightId), TeamIdentity(team), fighter));
             }
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzu,
-                TeamsOf(fight)));
+            await ATodosAsync(fight, PlacementTurnList(fight));
 
             if (team >= 0 && fight.PeopleIn(team) > 0)
             {
@@ -1028,9 +1032,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>The swords go when the placement is over (Zobal 2650-2651, jalatós 857).</summary>
         private static async Task SwordsGoneAsync(FightInstance fight)
         {
-            foreach (var pending in _joinAfterWalk.Where(p => p.Value.FightId == fight.FightId).ToList())
+            foreach (var pending in _joinAfterWalk.Where(p => p.Value.Fight == fight).ToList())
             {
-                _joinAfterWalk.TryRemove(pending.Key, out _);
+                _joinAfterWalk.TryRemove(pending);
             }
 
             await ToTheMapAsync(fight, new Game.RemoveChallengeEvent(checked((int)fight.FightId)));

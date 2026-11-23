@@ -562,16 +562,5 @@ namespace Jondo.Unity.Tests.Combat
             }
         }
 
-        /// <summary>The four switches of the party window, and nothing else, go to the handler.</summary>
-        [Fact]
-        public void The_party_switches_are_recognised()
-        {
-            foreach (string op in new[] { Op.Ilf, Op.Int, Op.Ikr, Op.Inp })
-            {
-                Assert.True(FightHandler.IsAutoOptionRequest(Op.Uri(op)));
-            }
-            Assert.False(FightHandler.IsAutoOptionRequest(Op.Uri(Op.Kay)));
-            Assert.False(FightHandler.IsAutoOptionRequest(Op.Uri(Op.Ino)));
-        }
     }
 }
