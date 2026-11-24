@@ -4346,6 +4346,61 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// A monster that a 2027 row of its own side's spell hands to the other side: Dramak's
+        /// Pantins (3483), whose «Manipulado por otro» (30668) lays state 2130 and «Toma el control
+        /// de la entidad» on them at their threshold, so that a player walks one up to Dramak and
+        /// casts its Desenlace (30669), which strips his invulnerability. The AI played it before:
+        /// it cast Desenlace on the player and died. It goes to the nearest person of the other side
+        /// (<see cref="SeizerOf"/>); while the row lasts he plays it as
+        /// an ally of his (<see cref="PlayAsHero"/>), its bar and its turns his, and when the row
+        /// ends the monster plays on its own again.
+        /// </summary>
+        internal static async Task SeizeWhatAFoeTookAsync(FightInstance fight)
+        {
+            foreach (var monster in TodosLosCombatientes(fight).ToList())
+            {
+                if (monster == null || !monster.IsMonster) continue;
+                var summoner = monster.EsInvocado ? fight.Buscar(monster.Invocador) : null;
+                var row = monster.Buffs.Puestos.FirstOrDefault(b => b.EffectId == Jondo.Unity.World.Combat.EffectSupport.TakesControl && !b.Pendiente);
+                bool taken = monster.IsAlive && row != null && summoner is not { IsMonster: false };
+                if (!taken)
+                {
+                    if (!monster.SeizedByAFoe) continue;
+                    monster.SeizedByAFoe = false;
+                    monster.DrivenBy = 0;
+                    monster.IsPlayedAlly = false;
+                    Program.LogDebug($"[Fight] {monster.Id} plays on its own again.");
+                    continue;
+                }
+                if (monster.SeizedByAFoe || monster.IsPlayedAlly) continue;
+
+                long foe = SeizerOf(fight, monster);
+                var session = foe != 0 ? SessionRegistry.FindByCharacter(foe) : null;
+                if (session == null) continue;
+                PlayAsHero(monster, foe);
+                monster.SeizedByAFoe = true;
+                // Not the spell that laid the row: it is what its threshold casts, not a move of his.
+                monster.HechizosDeInvocado = monster.HechizosDeInvocado.Where(h => h.Spell != row!.HechizoOrigen).ToList();
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jxc,
+                    Network.FightProtocol.BuildCooldowns(monster.Id, RecargasDe(monster))));
+                await session.SendAsync(ConnectionProtocol.Push(Op.Jyy, PlayedAllyBar(monster, foe)));
+                Program.LogDebug($"[Fight] {monster.Id} is played by a foe now: its bar goes to him.");
+            }
+        }
+
+        /// <summary>
+        /// Who plays a monster its side handed over (<see cref="SeizeWhatAFoeTookAsync"/>): the
+        /// person of the other side standing nearest to it, «le personnage le plus proche du Pantin
+        /// prend son contrôle» (Dofus pour les noobs, «Théâtre de Dramak»); zero when none is left.
+        /// </summary>
+        internal static long SeizerOf(FightInstance fight, Fighter monster)
+            => TodosLosCombatientes(fight)
+                .Where(f => f is { IsMonster: false, IsBot: false, EsInvocado: false, IsPlayedAlly: false }
+                            && f.IsAlive && f.TeamId != monster.TeamId)
+                .OrderBy(f => Jondo.Unity.World.Maps.MapGeometry.Distance(f.CellId, monster.CellId))
+                .FirstOrDefault()?.Id ?? 0;
+
+        /// <summary>
         /// Hands a summon that has become its owner's in the fight -- a turret reaching Evolución
         /// III (Fighter.ControlledFromState), a «maîtrisable» one Dominio de Invocaciones hands
         /// over -- to his client, once: its cooldowns and its bar
@@ -4356,6 +4411,8 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static async Task HandOverWhatBecameHisAsync(FightInstance fight)
         {
+            await SeizeWhatAFoeTookAsync(fight);
+
             foreach (var summon in TodosLosCombatientes(fight))
             {
                 // And a «maîtrisable» summon, which Dominio de Invocaciones hands over after it is

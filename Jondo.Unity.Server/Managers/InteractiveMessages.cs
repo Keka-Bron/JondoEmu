@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -37,10 +38,12 @@ namespace Jondo.Unity.Server.Managers
         /// until the opened element shuts again and its cells are blocked back (Amakna castle's piano:
         /// the door 471367 opened at 943.384 s and shut at 953.384 s, the capture's clock). <c>Skill</c>:
         /// the option it is declared with, «Usar» 184 or «Acionar» 179 (the levers, whose staging
-        /// MapStagings plays).
+        /// MapStagings plays). <c>Order</c>: its place in a row of levers pulled in turn, zero for
+        /// none -- what it opens and where it sends only happen when the whole row is pulled in order
+        /// (<see cref="Pull"/>).
         /// </remarks>
         public sealed record Said(int Message, long ToMap, int ToCell, int Opens, int OpensCell, int OpensState,
-                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill);
+                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill, int Order = 0);
 
         /// <summary>
         /// The message's parameters, by name, as the official server filled them (2026-11-21):
@@ -117,7 +120,8 @@ namespace Jondo.Unity.Server.Managers
                     fresh[(map, element)] = new Said(message, Number(row, "toMap"), (int)Number(row, "toCell"),
                                                      opens, (int)Number(row, "opensCell"), (int)Number(row, "opensState"),
                                                      frees.ToArray(), names.ToArray(), blocks.ToArray(),
-                                                     (int)Number(row, "closesAfter"), skill == 0 ? Skill : skill);
+                                                     (int)Number(row, "closesAfter"), skill == 0 ? Skill : skill,
+                                                     (int)Number(row, "order"));
                 }
                 Console.WriteLine($"[InteractiveMessages] {fresh.Count} interactives that say something.");
             }
@@ -132,6 +136,33 @@ namespace Jondo.Unity.Server.Managers
         {
             Ensure();
             return _byElement.TryGetValue((mapId, elementId), out var said) ? said : null;
+        }
+
+        private static readonly ConcurrentDictionary<(long Character, long Map), int> _pulled = new();
+
+        /// <summary>
+        /// One lever of an ordered row pulled by a character: true when it completes the row. The
+        /// right next one moves him on, the first one starts him over, any other one undoes the row:
+        /// the five levers of the third room of Dramak's Theatre, red, purple, orange, yellow and
+        /// green, open the secret passage backstage (Dofus pour les noobs, «Théâtre de Dramak»).
+        /// </summary>
+        public static bool Pull(long characterId, long mapId, Said said)
+        {
+            if (said.Order <= 0) return true;
+            Ensure();
+            int last = 0;
+            foreach (var ((map, _), other) in _byElement)
+                if (map == mapId && other.Order > last) last = other.Order;
+            var key = (characterId, mapId);
+            _pulled.TryGetValue(key, out int done);
+            done = said.Order == done + 1 ? said.Order : said.Order == 1 ? 1 : 0;
+            if (done >= last)
+            {
+                _pulled.TryRemove(key, out _);
+                return true;
+            }
+            _pulled[key] = done;
+            return false;
         }
 
         public static IEnumerable<int> OnMap(long mapId)

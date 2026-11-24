@@ -1817,6 +1817,12 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // An emote taught by the reply («teachesEmote»): Shaca's juggling, backstage at Dramak's
+            // Theatre, learnt as the character follows her instructions. Learning one he already has
+            // does nothing.
+            if (elegidaAhora is { TeachesEmote: > 0 })
+                await Managers.Emotes.LearnAsync(session, elegidaAhora.TeachesEmote);
+
             // Does this answer move the player? It goes BEFORE following the conversation because an
             // answer that teleports ends it: in the capture the server sends the kld and right after
             // the jru, without another sentence in between.

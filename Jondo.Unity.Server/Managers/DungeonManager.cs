@@ -195,9 +195,12 @@ namespace Jondo.Unity.Server.Managers
         /// nobody else (wiki-dofus, Dofus pour les noobs); composed like the others, he came with
         /// seven of his lair's monsters. The Tynril's Laboratory (51): its four Tynrils «ne sont pas
         /// accompagnés d'autres monstres du donjon» (Dofus pour les noobs); a team of five or more
-        /// found the dungeon's other monsters with them. Nothing in the client's data says it.
+        /// found the dungeon's other monsters with them. Dramak's Theatre (72): the Puppet Master
+        /// fights with the five Marionettes he summons, and turns vulnerable «une fois que les 5
+        /// Marionnettes ont été éliminées et qu'il est seul sur le terrain» (Dofus pour les noobs,
+        /// «Théâtre de Dramak»). Nothing in the client's data says it.
         /// </summary>
-        public static readonly int[] BossFightsAlone = { 31, 51 };
+        public static readonly int[] BossFightsAlone = { 31, 51, 72 };
 
         /// <summary>
         /// The dungeons as one set: <see cref="Initialize"/> fills a new one on its own thread and

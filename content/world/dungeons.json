@@ -882,6 +882,7 @@
     "bosses": [
       670
     ],
+    "bossAlone": 1,
     "keyring": 1,
     "required": [
       [
@@ -898,7 +899,7 @@
     ],
     "autoGroup": 1,
     "door": 1,
-    "why": "Koolich Cavern in the order its corridors walk: the First and Second Room, then Koolich's Lair through the Second Room's right-hand corridor (its First to Sixth Room, where the Boufcouls are), out of its Sixth Room into the Cavern's Third Room, and the Fourth and Fifth, Koolich's own. The catalogue's names gave two First Rooms and the Lair was never reached; the Exit is the post-boss room (dungeon_exits.json), not a fight."
+    "why": "Koolich Cavern in the order its corridors walk: the First and Second Room, then Koolich's Lair through the Second Room's right-hand corridor (its First to Sixth Room, where the Boufcouls are), out of its Sixth Room into the Cavern's Third Room, and the Fourth and Fifth, Koolich's own. The catalogue's names gave two First Rooms and the Lair was never reached; the Exit is the post-boss room (dungeon_exits.json), not a fight. Koolich is fought alone, with only the Gobballs he summons (Dofus pour les noobs, «Caverne du Koulosse»): the koalaks of his subarea were standing beside him."
   },
   "15": {
     "name": "Guarida del Maxilubo",

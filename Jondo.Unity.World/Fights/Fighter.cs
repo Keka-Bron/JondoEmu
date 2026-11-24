@@ -445,6 +445,13 @@ namespace Jondo.Unity.World.Fights
         public bool HandedToOwner { get; set; }
 
         /// <summary>
+        /// Whether a monster is played by a foe for now: a 2027 row laid by its own side's spell
+        /// hands it to a player of the other side (FightHandler.SeizeWhatAFoeTookAsync), who plays
+        /// it through <see cref="DrivenBy"/> until the row ends.
+        /// </summary>
+        public bool SeizedByAFoe { get; set; }
+
+        /// <summary>
         /// The character this fighter is the double of (effect 180), or zero: his look and his
         /// identity are what the double shows.
         /// </summary>

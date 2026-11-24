@@ -131,7 +131,9 @@ namespace Jondo.Unity.Server.Handlers
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                         ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, said.Message,
                             InteractiveMessages.Fill(said, SessionContext.State.CharacterName, DateTimeOffset.Now))));
-                if (said.Opens != 0)
+                // A lever of an ordered row opens and sends only when the row is complete.
+                bool complete = InteractiveMessages.Pull(SessionContext.State.CharacterId, mapId, said);
+                if (said.Opens != 0 && complete)
                 {
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iwf,
                         ConnectionProtocol.BuildElementState(said.OpensCell, said.Opens, said.OpensState)));
@@ -141,7 +143,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (said.ClosesAfter > 0) _ = ShutLaterAsync(session, mapId, said);
                 }
                 Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId} says {said.Message}.");
-                if (said.ToMap != 0) await TeleportHandler.ToMapAsync(stream, said.ToMap, said.ToCell);
+                if (said.ToMap != 0 && complete) await TeleportHandler.ToMapAsync(stream, said.ToMap, said.ToCell);
                 return;
             }
 

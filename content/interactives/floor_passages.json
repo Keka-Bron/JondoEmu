@@ -49,6 +49,20 @@
   ],
   "passages": [
     {
+      "map": 118228992,
+      "cell": 299,
+      "toMap": 118229250,
+      "toCell": 473,
+      "why": "Dramak's Theatre, third room: the arch at the back of the stage (482983), walkable once its five levers are pulled in order (messages.json), into Backstage 1 beside its own way back (cell 487)."
+    },
+    {
+      "map": 118229250,
+      "cell": 487,
+      "toMap": 118228992,
+      "toCell": 314,
+      "why": "Backstage 1 back to the third room of Dramak's Theatre: the 2.73 graph's passage, with its landing moved from 299, the arch, which is not floor until its levers are pulled, to 314, the floor cell in front of it."
+    },
+    {
       "map": 105120002,
       "cell": 333,
       "toMap": 105119744,

@@ -324,6 +324,50 @@
       "message": 0,
       "skill": 179,
       "what": "the lever «Acionar» of 99091979: offered on the official server; pressed three times, it answered nothing else"
+    },
+    {
+      "map": 118228992,
+      "element": 482974,
+      "message": 0,
+      "skill": 179,
+      "order": 1,
+      "what": "Dramak's Theatre, third room: lever 1 of 5 (red, left of the middle, cell 397) of the row that opens the arch backstage."
+    },
+    {
+      "map": 118228992,
+      "element": 482973,
+      "message": 0,
+      "skill": 179,
+      "order": 2,
+      "what": "Dramak's Theatre, third room: lever 2 of 5 (purple, far left, cell 451) of the row that opens the arch backstage."
+    },
+    {
+      "map": 118228992,
+      "element": 482976,
+      "message": 0,
+      "skill": 179,
+      "order": 3,
+      "what": "Dramak's Theatre, third room: lever 3 of 5 (orange, top right, cell 289) of the row that opens the arch backstage."
+    },
+    {
+      "map": 118228992,
+      "element": 482975,
+      "message": 0,
+      "skill": 179,
+      "order": 4,
+      "what": "Dramak's Theatre, third room: lever 4 of 5 (yellow, in the middle, cell 329) of the row that opens the arch backstage."
+    },
+    {
+      "map": 118228992,
+      "element": 482977,
+      "message": 0,
+      "skill": 179,
+      "order": 5,
+      "opens": 482983,
+      "opensCell": 299,
+      "opensState": 1,
+      "frees": [299],
+      "what": "Dramak's Theatre, third room: lever 5 of 5 (green, bottom right, cell 458). Pulled last after the other four in order it opens the arch at the back of the stage, 482983 on cell 299, whose floor leads backstage (floor_passages.json). Dofus pour les noobs, «Théâtre de Dramak»: red, purple, orange, yellow, green. The arch's open state is not measured; 1 as the other levers'."
     }
   ]
 }

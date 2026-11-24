@@ -251,6 +251,12 @@ namespace Jondo.Unity.World.Content
         public bool Leaves { get; init; }
 
         /// <summary>
+        /// The emote this reply teaches, or zero («teachesEmote»): Shaca, backstage at Dramak's Theatre,
+        /// shows the character how to juggle (emote 29) as he follows her instructions.
+        /// </summary>
+        public int TeachesEmote { get; init; }
+
+        /// <summary>
         /// True when the reply opens the NPC's shop as the conversation closes («shop»): Fifi de
         /// Lificha's «Dar uma olhada no que ele tem a oferecer.» and Tokageko's «Resolver dar uma
         /// olhada na loja desse mercenário.», measured on the official server (packet capture,
@@ -1259,6 +1265,7 @@ namespace Jondo.Unity.World.Content
                                          && favor.ValueKind == JsonValueKind.True,
                             Leaves = choice.TryGetProperty("leaves", out var leaves)
                                      && leaves.ValueKind == JsonValueKind.True,
+                            TeachesEmote = (int)Number(choice, "teachesEmote"),
                             OpensShop = choice.TryGetProperty("shop", out var shop)
                                         && shop.ValueKind == JsonValueKind.True,
                             ReturnsHome = choice.TryGetProperty("teleportBack", out var back)
@@ -1469,6 +1476,7 @@ namespace Jondo.Unity.World.Content
                                 writer.WriteNumber("dreamPointsPercent", choice.DreamPointsPercent);
                             if (choice.DreamFavor) writer.WriteBoolean("dreamFavor", true);
                             if (choice.Leaves) writer.WriteBoolean("leaves", true);
+                            if (choice.TeachesEmote != 0) writer.WriteNumber("teachesEmote", choice.TeachesEmote);
                             if (choice.OpensShop) writer.WriteBoolean("shop", true);
                             if (choice.Parameters.Count > 0)
                             {

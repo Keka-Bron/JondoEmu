@@ -7011,6 +7011,13 @@
       "cell": 118,
       "orientation": 3,
       "why": "Hector Kwismas on Kwismas Island's shore [-34,-83], where his boat lands: always there, so a player left on the island when the event closes can still sail back to Madrestam (his line 3255)."
+    },
+    {
+      "map": 118229250,
+      "npc": 2180,
+      "cell": 342,
+      "orientation": 1,
+      "why": "Shaca in Backstage 1 of Dramak's Theatre, behind the third room's secret arch: she teaches the Juggle emote (Dofus pour les noobs, «Théâtre de Dramak»). The cell is a free floor cell in the middle of the room; her official one is not measured."
     }
   ]
 }
