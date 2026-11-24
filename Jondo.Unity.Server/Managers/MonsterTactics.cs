@@ -1404,9 +1404,14 @@ namespace Jondo.Unity.Server.Managers
                 if (spell.SummonsByRow && enemies.Count > 0)
                 {
                     int reach = spell.ReachFor(monster);
+                    // Only cells it can be cast on are worth a place among the few tried: a summon
+                    // cast in line and in sight (the Scaraleaf boss's Nacimiento) kept six cells
+                    // off its lines and missed a legal one farther out.
                     var toward = cache.Toward
                         .Where(c => c != from)
                         .Where(c => { int d = MapGeometry.Distance(from, c); return d >= spell.MinRange && d <= reach; })
+                        .Where(c => OnItsLines(spell, from, c))
+                        .Where(c => !spell.NeedsLineOfSight || MapGeometry.Distance(from, c) <= 1 || board.Sees(from, c))
                         .Take(SummonCellsTried);
                     foreach (int cell in toward) aims.Add(cell);
                     // And where a bomb raises a wall over the enemy, with one of its kind already out.
