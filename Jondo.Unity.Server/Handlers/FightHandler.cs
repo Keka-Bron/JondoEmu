@@ -12216,7 +12216,15 @@ namespace Jondo.Unity.Server.Handlers
                             healZoneRow = effect;
                     }
                     else if (effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.HealPercent)
-                        heal = Math.Max(heal, monster.MaxHP * average / 100.0);
+                    {
+                        // A heal of the caster alone ("C") on a spell never cast on him is what the
+                        // blow gives back, not what it is aimed for: the black Tofu's Fogosidad
+                        // Tofuesca (8710, one cell away) pushes and steals MP and heals the Tofu.
+                        // Counted as a heal, it was weighed as aimed at one of its side and was
+                        // never cast.
+                        if (data.MinRange == 0 || mask.Trim() != "C")
+                            heal = Math.Max(heal, monster.MaxHP * average / 100.0);
+                    }
                     else if (Managers.EffectEngine.EsInvocacion(effect.EffectId))
                         summons = true;
                     else if (!Managers.EffectEngine.EsMarcadorDeGuion(effect.EffectId)

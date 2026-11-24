@@ -2817,6 +2817,13 @@
       "why": "Lee O'Summerly in «Kharnotaurus's Lair - Exit», who takes the winners out («Leave Kharnotaurus's Lair.»). He stood only at the door and the room had no way out. INFERRED cell."
     },
     {
+      "map": 146538496,
+      "npc": 2767,
+      "cell": 313,
+      "orientation": 3,
+      "why": "Kickroach in «Kickroach's Lair - Exit», who sends the winners out («Leave Kickroach's Lair.»). He stood nowhere and the room had no way out. INFERRED cell."
+    },
+    {
       "map": 218632194,
       "npc": 6612,
       "cell": 247,

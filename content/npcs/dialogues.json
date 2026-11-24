@@ -24979,6 +24979,21 @@
       "why": "Lee O'Summerly in «Kharnotaurus's Lair - Exit»: «By my godfathers! What a mess you've made inside!», then «Leave Kharnotaurus's Lair.» (content/world/dungeon_exits.json)."
     },
     {
+      "npc": 2767,
+      "map": 146538496,
+      "opening": 19687,
+      "lines": [
+        {
+          "message": 19687,
+          "choices": [
+            { "reply": 23569 },
+            { "reply": 23580 }
+          ]
+        }
+      ],
+      "why": "Kickroach in «Kickroach's Lair - Exit»: «I don't know how you got in here, but you're not welcome!», then «Leave Kickroach's Lair.» (content/world/dungeon_exits.json) or «Shrug your shoulders and end the conversation.». His croquette lines belong to «Miniature Adventure» (1607), not authored yet."
+    },
+    {
       "npc": 6612,
       "map": 218632194,
       "opening": 50024,

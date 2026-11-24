@@ -1494,8 +1494,15 @@ namespace Jondo.Unity.Server.Network
                     if (moved.Count == 0 && e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Teleport && castCell >= 0
                         && fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == castCell) is { } standing)
                     {
-                        verdict = "blocked";
-                        observed = $"{roleOf(standing)} {standing.Id} stands on the aimed cell {castCell}";
+                        // Unless what stands there came out of this same cast on a drawn row: the
+                        // draw picked the summon, not the teleport. Blatarata's 5284 is a third
+                        // each of teleport, invisibility and a summon on the aimed cell, and its
+                        // summons were reported as the teleport "blocked" by the newborn.
+                        bool drawnAway = e.Probabilidad > 0 && e.Probabilidad < 100 && born.Contains(standing);
+                        verdict = drawnAway ? "chance" : "blocked";
+                        observed = drawnAway
+                            ? $"not drawn: {roleOf(standing)} {standing.Id} came out of this cast on the aimed cell {castCell}"
+                            : $"{roleOf(standing)} {standing.Id} stands on the aimed cell {castCell}";
                     }
                     var crashed = moved.Count > 0 ? new List<Fighter>()
                         : fight.Todos.Where(f => castLines.Any(l => l.Contains($"[Fight] {f.Id} crashes on being pushed"))).ToList();

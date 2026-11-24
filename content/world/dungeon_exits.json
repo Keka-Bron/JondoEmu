@@ -24,6 +24,15 @@
       "why": "The Sylvan Refuge: after Raccooper the winners are in his refuge's last room (224137218), where he gives up the fight («This fight ends here. I won't risk standing up to you any longer.») and «Leave the Sylvan Refuge.» leaves, as does the quest's «...and leave the Sylvan Refuge.». The room had no border, no interactive and no NPC who leads out. INFERRED cells."
     },
     {
+      "dungeon": 88,
+      "bossRoom": 146670592,
+      "room": 146538496,
+      "cell": 342,
+      "npc": 2767,
+      "replies": [23569, 23571, 23581, 23583],
+      "why": "Kickroach's Lair: after the boss the winners are in «Kickroach's Lair - Exit» (146538496), where Kickroach (2767) stands with the Magic Croquette (2771, giver of «Miniature Adventure», 1607, whose first objective is to talk to him there). The win went straight to Kerub's Attic and he was never met. His four «Leave Kickroach's Lair.» replies leave. INFERRED cell: open floor in front of him."
+    },
+    {
       "dungeon": 115,
       "bossRoom": 199495680,
       "room": 199495682,

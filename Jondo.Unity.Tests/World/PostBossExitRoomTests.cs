@@ -7,7 +7,7 @@ namespace Jondo.Unity.Tests.World
     /// Dungeons whose catalogue named the post-boss room «Salida» as the way out, so leaving it led back
     /// into it, or shut the winners in with no border, interactive or NPC: the Cámara de los Maleficios
     /// (140), the Bastión de los Martilloseco (141), the White and Black Rats' dungeons (42, 43),
-    /// Kharnotaurus's Lair (115) and the Sylvan Refuge (142). Winning the boss room loads that room, and
+    /// Kharnotaurus's Lair (115), the Sylvan Refuge (142) and Kickroach's Lair (88). Winning the boss room loads that room, and
     /// its NPC and the map panel take the winners out to the entrance map.
     /// </summary>
     [Collection("MapManager")]
@@ -20,6 +20,7 @@ namespace Jondo.Unity.Tests.World
         [InlineData(43, 218894336L, 218894338L, 216927751L, 6614, 66779L)]
         [InlineData(115, 199495680L, 199495682L, 84411905L, 4975, 47164L)]
         [InlineData(142, 224137216L, 224137218L, 223350028L, 6807, 69096L)]
+        [InlineData(88, 146670592L, 146538496L, 103549440L, 2767, 23569L)]
         public void The_salida_room_comes_after_the_boss_and_leads_out_to_the_entrance(
             int dungeonId, long bossRoom, long exitRoom, long entrance, int npc, long reply)
         {
@@ -44,6 +45,7 @@ namespace Jondo.Unity.Tests.World
         [Theory]
         [InlineData(4975, 199495682L, 35690L, 47164L)]
         [InlineData(6807, 224137218L, 51493L, 69096L)]
+        [InlineData(2767, 146538496L, 19687L, 23569L)]
         public void The_exit_room_npc_greets_the_winners_and_offers_the_way_out(int npc, long room, long greeting, long leave)
         {
             var tree = NpcDialogues.For(npc, room);

@@ -200,6 +200,24 @@
     "door": 1,
     "why": "The Bwork Dungeon as Dofus pour les noobs walks it («Donjon des Bworks»): «Après la salle 3», a transition room, «la salle du cachot», with a pit in its floor; «en cliquant sur la porte» one goes on to the next room, and whoever falls into the pit climbs back by «l'échelle pour remonter». The maps name them: 104599041 is «Donjon des Bworks - Cachot» (Solitary Confinement), the transition room, empty; its round door (element 477758, cell 302, content/interactives/teleports.json) leads to the Fourth Room. The grille in its middle drops to 104599043, «Cachot de Kreuvète» (Swimp Confinement), by the 2.73 graph's floor passage on cell 372; its ladder (477755) climbs back to the Cachot. The guide puts a Tamed Trool (791) and Kreuvète the Bwork (2680, levels 200 to 220) in the pit, says «il n'est pas nécessaire de les combattre», and Kreuvète only while the Bwork invasion of the Crackler Mountains is on, which this server never runs (WorldEvents): the pit holds the Trool alone, and a win there lands back at the Cachot like the ladder («hub»). The rooms' monsters are the Bwork, Bwork Mage and Bwork Archer with the Bworkette in the Fifth Room (JeuxOnline's dungeon sheet; the Unity guides count three monsters and the boss): the subarea also lists the Trool and Kreuvète, who stood in every room. The catalogue walked the five rooms straight and put both cells after the boss, where nothing led. INFERRED: the landing cells (312 in the Cachot, where a win in the Third Room lands; 326 in the Fourth Room), and that the pit's Trool fights alone."
   },
+  "48": {
+    "name": "Mazmorra de los Tofus",
+    "minLevel": 30,
+    "optimalLevel": 40,
+    "difficulty": 2,
+    "entrance": 96338944,
+    "exit": 88082705,
+    "rooms": [96338946, 96206850, 96206852, 96206848, 96207874, 96208898, 96209922],
+    "empty": [96206850, 96206852],
+    "bosses": [800],
+    "keyring": 1,
+    "required": [[7918, 1]],
+    "achievements": [50, 662, 492, 663, 6155, 5980],
+    "lobby": 1,
+    "autoGroup": 1,
+    "door": 1,
+    "why": "The Tofu House as Dofus pour les noobs walks it («Donjon des Tofus»): room 2 holds no group to fight, only holes to keep out of; whoever falls in lands in the cellar and climbs back by the ladder. The client agrees: the Second Room (96206850) and its arena (96207882) flag one placement cell per team, where every fought room of the house flags ten, so it was never drawn for a fight; the 2.73 world graph's floor passage on its cell 371 drops to 96206852, «Tofu House - Basement», whose only element is a ladder (472840, cell 244, gfx 12311, the climbing ladder of other maps); the Second Room's only element is the gated door in its right-hand wall (472875, cell 248), which leads on to the Third Room (content/interactives/teleports.json). Both are walked through, so both are empty: the base's groups there were the subarea's, not the client's. The catalogue's other fields are the catalogue's; the cellar stands after the Second Room so that the boss room stays last. NOT DONE: the Tofus that wander the Second Room without fighting, and any hole but the graph's one."
+  },
   "9001": {
     "name": "Laboratorio Secreto",
     "minLevel": 0,
