@@ -1003,6 +1003,9 @@ namespace Jondo.Unity.Server.Managers
                     foreach (int cell in cache.Toward
                                  .Where(c => c != from)
                                  .Where(c => { int d = MapGeometry.Distance(from, c); return d >= spell.MinRange && d <= spell.ReachFor(monster); })
+                                 // Only cells on its lines, when its level asks for them: the few
+                                 // cells tried are spent on ones the server would accept.
+                                 .Where(c => OnItsLines(spell, from, c))
                                  .Take(spell.MinRange > 1 ? int.MaxValue : SummonCellsTried))
                         yield return (monster, cell);
             }
@@ -1065,6 +1068,7 @@ namespace Jondo.Unity.Server.Managers
                 return board.Walkable(aim) && !board.Occupied(aim)
                        && MapGeometry.Distance(from, aim) >= spell.MinRange
                        && MapGeometry.Distance(from, aim) <= Math.Max(1, spell.MaxRange)
+                       && OnItsLines(spell, from, aim)
                        && (!spell.NeedsLineOfSight || MapGeometry.Distance(from, aim) <= 1 || board.Sees(from, aim));
 
             if (spell.NeedsFreeCell && (board.Occupied(aim) || aim == from || !board.Walkable(aim))) return false;

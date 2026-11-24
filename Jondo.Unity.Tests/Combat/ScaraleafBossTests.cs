@@ -119,6 +119,76 @@ namespace Jondo.Unity.Tests.Combat
             Assert.True(MapGeometry.Distance(BossCell, next.TargetCell) <= 1 || board.Sees(BossCell, next.TargetCell));
         }
 
+        /// <summary>
+        /// Rounds 6 to 13 of a later fight: Scaraleafs (194, 241) on 232 and 203, his immature
+        /// Scaraleaf on 245, and a Scaraleaf (198) that walks to 202 to summon on its turn and,
+        /// its casts done, walks back beside the player on 216 (a melee monster ends next to the
+        /// weakest enemy). Left on 202 it would open 216 and the boss would bring out another
+        /// there; back on 216 it shuts his last line before his turn comes, so he holds
+        /// Nacimiento -- the rule of the spell (in line, in sight, a free cell) and not a fault
+        /// of his summon count or of the interval.
+        /// </summary>
+        [Fact]
+        public void The_scaraleaf_beside_him_walks_back_and_shuts_his_last_line()
+        {
+            var room = Room((232, 194), (203, 241), (202, 198), (245, ImmatureScaraleaf));
+            if (room == null) return;
+            var (fight, boss) = room.Value;
+            var birth = Usable(boss).FirstOrDefault(s => s.Id == Nacimiento);
+            var grade = DatabaseManager.GetMonsterGradeStats(198, 1);
+            if (birth == null || grade == null || grade.SpellIds.Count == 0) return;
+            var walker = fight.Rojo.Concat(fight.Azul).First(f => f.MonsterId == 198);
+            foreach (int spell in grade.SpellIds)
+            {
+                walker.SpellIds.Add(spell);
+                walker.SpellGrades[spell] = 1;
+            }
+            boss.Recarga[PoisonedFog] = 2;
+
+            // While it stands on 202, 216 is open and the boss brings one out there.
+            var open = MonsterTactics.Next(FightHandler.BoardOf(fight), boss, Usable(boss));
+            Assert.NotNull(open);
+            Assert.Equal(Nacimiento, open!.Spell.Id);
+            Assert.Equal(216, open.TargetCell);
+
+            // Its turn over, it walks back beside the player.
+            var path = MonsterTactics.Reposition(FightHandler.BoardOf(fight), walker, FightHandler.TacticsOf(walker));
+            Assert.Equal(216, path.Last());
+            walker.CellId = path.Last();
+
+            Assert.DoesNotContain(MonsterTactics.Options(FightHandler.BoardOf(fight), boss, Usable(boss)),
+                                  o => o.Spell.Id == Nacimiento);
+        }
+
+        /// <summary>
+        /// Hemmed in on every side, the boss looks further off for a cell to bring his Scaraleaf
+        /// out on. Nacimiento is cast in line: a cell off his lines is refused by the fight
+        /// (FightHandler's CastInLine check), so it is never the one aimed at, even where it is
+        /// free and in sight.
+        /// </summary>
+        [Fact]
+        public void Hemmed_in_he_aims_his_summon_only_along_his_lines()
+        {
+            var room = Room((216, Scaraleaf), (245, ImmatureScaraleaf));
+            if (room == null) return;
+            var (fight, boss) = room.Value;
+            var board = FightHandler.BoardOf(fight);
+            var birth = Usable(boss).FirstOrDefault(s => s.Id == Nacimiento);
+            if (birth == null) return;
+            Assert.DoesNotContain(MapGeometry.GetNeighbors(BossCell), c => board.Walkable(c) && !board.Occupied(c));
+            bool Open(int c)
+            {
+                int d = MapGeometry.Distance(BossCell, c);
+                return d >= 2 && d <= birth.ReachFor(boss) && board.Walkable(c) && !board.Occupied(c) && board.Sees(BossCell, c);
+            }
+            // Cells he could reach but not on his lines exist here: the test has something to refuse.
+            Assert.Contains(Enumerable.Range(0, MapGeometry.MaxCells), c => Open(c) && !MonsterTactics.OnItsLines(birth, BossCell, c));
+
+            var births = MonsterTactics.Options(board, boss, Usable(boss)).Where(o => o.Spell.Id == Nacimiento).ToList();
+
+            Assert.All(births, o => Assert.True(MonsterTactics.OnItsLines(birth, o.From, o.TargetCell)));
+        }
+
         [Fact]
         public void With_his_summon_waiting_he_fogs_the_player_beside_him()
         {
