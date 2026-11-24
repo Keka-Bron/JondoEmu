@@ -195,8 +195,21 @@ namespace Jondo.Unity.Tests.World
             await other.Quiet();
         }
 
-        private static async Task<GameFrame> Next(ClientPipe pipe) => new GameCodec().Decode(
-            await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+        /// <summary>
+        /// The next anomaly frame: tests of other collections run alongside and may broadcast to every
+        /// session or to this map, so a stray frame of any other kind is skipped.
+        /// </summary>
+        private static async Task<GameFrame> Next(ClientPipe pipe)
+        {
+            while (true)
+            {
+                var frame = new GameCodec().Decode(
+                    await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(5)));
+                if (frame.Content is SubareaRewardRateEvent or AnomalyStateEvent or StagingEvent
+                    || frame.Content is TextInformationEvent { MessageId: AnomalyHandler.AnomalyOpenHere })
+                    return frame;
+            }
+        }
 
         /// <summary>The capture read the clocks at 22:26 UTC on 12 August: «00», «26» and «4», «26».</summary>
         [Fact]
