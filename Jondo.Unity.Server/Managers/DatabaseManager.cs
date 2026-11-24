@@ -4201,6 +4201,38 @@ namespace Jondo.Unity.Server
             return 0;
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, int[]> _spellGrades = new();
+
+        /// <summary>
+        /// The grade a monster casts a spell at, among the grades SpellLevels holds for it: the
+        /// template's own when it is there, else the highest one under it, else the lowest. 189
+        /// templates name grades their spells do not have -- the Tofu nevado (868) casts its
+        /// Caída de Nieve (861, grade 1 only) at grade 6 and its Lavado de Cara (878, grade 1 only)
+        /// at its own grade, 1 to 5 --, and a grade with no rows is a spell with no effects: the
+        /// tactics weighed it as nothing and it was never cast, nor would it have done anything.
+        /// </summary>
+        internal static int ExistingSpellGrade(SqliteConnection connection, int spell, int grade)
+        {
+            var grades = _spellGrades.GetOrAdd(spell, id =>
+            {
+                var found = new List<int>();
+                try
+                {
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = "SELECT Grade FROM SpellLevels WHERE SpellId = $sid ORDER BY Grade;";
+                    cmd.Parameters.AddWithValue("$sid", id);
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read()) found.Add(reader.GetInt32(0));
+                }
+                catch { }
+                return found.ToArray();
+            });
+            if (grades.Length == 0 || Array.IndexOf(grades, grade) >= 0) return grade;
+            int below = 0;
+            foreach (int g in grades) if (g < grade && g > below) below = g;
+            return below > 0 ? below : grades[0];
+        }
+
         public static MonsterGradeStats? GetMonsterGradeStats(int monsterId, int gradeIndex)
         {
             using var connection = new SqliteConnection(WorldConnectionString);
@@ -4365,7 +4397,7 @@ namespace Jondo.Unity.Server
                             }
 
                             if (!stats.SpellIds.Contains(sid)) stats.SpellIds.Add(sid);
-                            stats.SpellGrades[sid] = spellGrade;
+                            stats.SpellGrades[sid] = ExistingSpellGrade(connection, sid, spellGrade);
                         }
                     }
                 }
