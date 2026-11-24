@@ -19246,6 +19246,20 @@
       "why": "Josefa Taplana in the Soft Oak Clearing's exit room: the Soft Oak beaten, the mythical living tree (3278); «Salir del claro» leaves (dungeon_exits.json)."
     },
     {
+      "npc": 941,
+      "map": 5244422,
+      "opening": 4191,
+      "lines": [
+        {
+          "message": 4191,
+          "choices": [
+            { "reply": 3669 }
+          ]
+        }
+      ],
+      "why": "Tina Montini in the Grotto Hesque's exit room: the Coralator Master beaten, she shows the way out (4191, her template's second line); «Salir de la Gruta Grut'Hesqua» leaves (dungeon_exits.json)."
+    },
+    {
       "npc": 2860,
       "map": 0,
       "opening": 20599,

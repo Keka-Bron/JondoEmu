@@ -12150,7 +12150,7 @@ namespace Jondo.Unity.Server.Handlers
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
                 bool hooks = false, hooksOnEnemies = false, doesSomethingAtOnce = false;
                 int zone = 0, removal = 0, buff = 0, escape = 0;
-                Managers.SpellEffect? zoneRow = null, healZoneRow = null;
+                Managers.SpellEffect? zoneRow = null, healZoneRow = null, removalZoneRow = null;
                 bool blowOnTheAim = false;
                 Managers.SpellEffect? ringRow = null;
                 bool mechanicOnTheAim = false;
@@ -12234,7 +12234,11 @@ namespace Jondo.Unity.Server.Handlers
                     bool onEnemies = NamesEnemies(mask);
                     if (stat.Value < 0 && onEnemies &&
                         (stat.Characteristic == ActionPointsCharacteristic || stat.Characteristic == MovementPointsCharacteristic))
+                    {
                         removal += -stat.Value;
+                        var row = Managers.SpellEffects.De(spell, grade).FirstOrDefault(e => e.EffectId == stat.EffectId && e.Forma != 'P');
+                        if (row != null && (removalZoneRow == null || row.Tamano > removalZoneRow.Tamano)) removalZoneRow = row;
+                    }
                     else if (stat.Value > 0 && !onEnemies && stat.Characteristic == Jondo.Unity.World.Fights.Tackle.EscapeCharacteristic)
                         escape += stat.Value;
                     else if (stat.Value > 0 && !onEnemies)
@@ -12311,6 +12315,7 @@ namespace Jondo.Unity.Server.Handlers
                     Heal = heal,
                     HealZoneRow = healZoneRow,
                     Removal = removal,
+                    RemovalZoneRow = removalZoneRow,
                     Buff = buff,
                     Escape = escape,
                     SupportMasks = supportMasks,

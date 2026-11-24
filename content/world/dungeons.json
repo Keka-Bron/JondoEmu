@@ -862,6 +862,25 @@
     },
     "why": "The Snowfoux Den as the game has it: its four fight rooms (First to Fourth Room), whose last leads to the transition room where Givrihaltès (1385) offers the two boss fights (dungeons 9007 and 9008, dungeon_exits.json). Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble». The catalogue chained eleven rooms, the Path and the Exit to the Petrified Forest first, and the boss fight always brought Tengu, Fuji, Yomi and Kami together. The rooms are the den's Maho, Soryo, Yokai, Yomi and Kami Snowfoux. The guardian keeps the door at the entrance (key 11178 or the keyring). INFERRED: the Throne Room (59516928) as the transition room, the old boss room the two new Snowfoux Den maps replaced."
   },
+  "21": {
+    "name": "Mazmorra de los Herreros",
+    "minLevel": 40,
+    "optimalLevel": 50,
+    "difficulty": 2,
+    "entrance": 88086786,
+    "exit": 88086786,
+    "rooms": [87294465, 87295489, 87296513, 87297537, 87294467, 87295491, 87294469, 87295493, 87296517, 87297541, 87294471, 87296515],
+    "empty": [87294465, 87297537, 87294469, 87296517, 87297541],
+    "next": { "87295491": 87296515 },
+    "bosses": [252],
+    "keyring": 1,
+    "required": [[1569, 1]],
+    "achievements": [43, 496, 671, 6159, 670, 6008],
+    "lobby": 1,
+    "autoGroup": 1,
+    "door": 1,
+    "why": "The Blacksmith Dungeon is branched (Dofus pour les noobs, «Donjon des Forgerons»): the keeper sets you down in the Entrance, an empty room whose door (element 505079, cell 262) opens on the First Room; First and Second Room are fights; the Third Room is an empty crossroads whose two doors are the 2.73 world graph's (cell 221 to the Fourth Room, cell 174 to the Sixth). The short way fights the Fourth and Fifth Room and then the boss in the Last Room. The long way walks the Sixth Room (empty, ore) to the Seventh (fight) and the Eighth (empty, ore), whose doors lead to the Emote Room (cell 178, the stele of the «Saluer» attitude, with a door back on 355) and to the Ninth Room (cell 404, fight), whose win opens on the Last Room. Fights only where the client has a fight board for the room (First, Second, Fourth, Fifth, Seventh, Ninth, Last). The catalogue fields are the catalogue's; the rooms are written in the client's numbers, so the Fifth Room's win is written to open on the Last Room («next»)."
+  },
   "9007": {
     "name": "Tengu Snowfoux's Room",
     "minLevel": 160,

@@ -163,6 +163,15 @@ namespace Jondo.Unity.Server.Managers
             public HashSet<long> EmptyRooms { get; } = new();
 
             /// <summary>
+            /// Where a win in a room of a hand-written dungeon leads when it is not the next room of
+            /// the list (content/world/dungeons.json «next», room to room). A branched dungeon is
+            /// written in the client's room numbers, one branch after the other, so the last room
+            /// of the first branch points past the second: the Blacksmith Dungeon's Fifth Room
+            /// opens on the boss room, not on the Sixth Room that follows it in the list.
+            /// </summary>
+            public Dictionary<long, long> WrittenNext { get; } = new();
+
+            /// <summary>
             /// A hand-written dungeon's lobby (content/world/dungeons.json «hub»), or null. Its rooms
             /// are fought in any order through the lobby's doors, and a win in one leads back to the
             /// lobby until all of them are won.
@@ -1026,6 +1035,13 @@ namespace Jondo.Unity.Server.Managers
                             if (room.TryGetInt64(out long map)) dungeon.EmptyRooms.Add(map);
                     }
 
+                    if (authored && entry.Value.TryGetProperty("next", out var nextRooms) && nextRooms.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var room in nextRooms.EnumerateObject())
+                            if (long.TryParse(room.Name, out long map) && room.Value.TryGetInt64(out long then) && then != 0)
+                                dungeon.WrittenNext[map] = then;
+                    }
+
                     if (authored && entry.Value.TryGetProperty("hub", out var hub) && hub.ValueKind == JsonValueKind.Object)
                     {
                         var lobby = new DungeonHub
@@ -1301,6 +1317,7 @@ namespace Jondo.Unity.Server.Managers
         {
             if (dungeon == null) return 0;
             if (dungeon.LastRoom != 0 && currentMapId == dungeon.LastRoom) return 0;
+            if (dungeon.WrittenNext.TryGetValue(currentMapId, out long written)) return written;
 
             int at = dungeon.Rooms.IndexOf(currentMapId);
             if (at < 0 || at + 1 >= dungeon.Rooms.Count) return 0;

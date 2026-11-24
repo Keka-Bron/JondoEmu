@@ -101,6 +101,15 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>AP and MP taken from an enemy.</summary>
             public int Removal { get; init; }
 
+            /// <summary>
+            /// The removal's row when it reaches a zone, for whom it takes points from: the Dark
+            /// Miner's Desatino de Masas (8161, range 0) takes AP from every enemy in a circle of
+            /// eight round him, and the Coralador's Golpe de Coral (1023) MP in a circle of six.
+            /// Cast on himself, the removal was weighed on himself, worth nothing, and neither was
+            /// ever cast. Null for one cell.
+            /// </summary>
+            public SpellEffect? RemovalZoneRow { get; init; }
+
             /// <summary>Points of characteristics given to one of its side.</summary>
             public int Buff { get; init; }
 
@@ -1095,6 +1104,13 @@ namespace Jondo.Unity.Server.Managers
 
             if (spell.Removal > 0 && onEnemy && (target.CurrentAP > 0 || target.CurrentMP > 0))
                 value += spell.Removal * (20 + target.Level / 4.0);
+            else if (spell.Removal > 0 && spell.OnSelf && spell.RemovalZoneRow != null)
+            {
+                // Cast on itself, it takes points from every enemy its zone reaches.
+                var cells = EffectEngine.CasillasDelEfecto(spell.RemovalZoneRow, from, aim);
+                foreach (var hit in enemies.Where(e => e.IsAlive && cells.Contains(e.CellId) && (e.CurrentAP > 0 || e.CurrentMP > 0)))
+                    value += spell.Removal * (20 + hit.Level / 4.0);
+            }
 
             if (spell.Heal > 0 && !onEnemy && spell.HealZoneRow != null)
             {
