@@ -218,6 +218,25 @@
     "door": 1,
     "why": "The Tofu House as Dofus pour les noobs walks it («Donjon des Tofus»): room 2 holds no group to fight, only holes to keep out of; whoever falls in lands in the cellar and climbs back by the ladder. The client agrees: the Second Room (96206850) and its arena (96207882) flag one placement cell per team, where every fought room of the house flags ten, so it was never drawn for a fight; the 2.73 world graph's floor passage on its cell 371 drops to 96206852, «Tofu House - Basement», whose only element is a ladder (472840, cell 244, gfx 12311, the climbing ladder of other maps); the Second Room's only element is the gated door in its right-hand wall (472875, cell 248), which leads on to the Third Room (content/interactives/teleports.json). Both are walked through, so both are empty: the base's groups there were the subarea's, not the client's. The catalogue's other fields are the catalogue's; the cellar stands after the Second Room so that the boss room stays last. NOT DONE: the Tofus that wander the Second Room without fighting, and any hole but the graph's one."
   },
+  "50": {
+    "name": "Tofullinero Real",
+    "minLevel": 110,
+    "optimalLevel": 120,
+    "difficulty": 2,
+    "entrance": 96338944,
+    "exit": 10231814,
+    "rooms": [96338948, 96338950, 96206854, 96207876, 96207878, 96208902, 96209926],
+    "empty": [96206854, 96207876],
+    "next": {"96206854": 96207878},
+    "bosses": [382],
+    "keyring": 1,
+    "required": [[8142, 1]],
+    "achievements": [73, 525, 6191, 723, 722, 5968],
+    "lobby": 1,
+    "autoGroup": 1,
+    "door": 1,
+    "why": "The Royal Tofu House as Dofus pour les noobs walks it («Donjon du Tofulailler Royal», room 3): «Pas d'obligation d'affronter des monstres pour cette salle, il vous suffit de traverser en évitant les trous et les monstres sur le passage qui agressent.» The client agrees: the Third Room (96206854) and its arena (96207884) flag one placement cell per team (372 and 284), where every fought room of the house flags ten or eleven, so it was never drawn for a fight; the 2.73 world graph's floor passage on its cell 357 drops to 96207876, the Cellar, whose only element is a ladder (472842, cell 244, gfx 12311) that climbs back; the Third Room's only element is the gated door (472876, cell 241) that leads on to the Fourth Room (content/interactives/teleports.json). Both are walked through, so both are empty: the base's groups there were the subarea's (its rows even put the boss 382 in rooms 3 and 4), not the client's. Every other field is the catalogue's own, as the server built it before this entry; only the Cellar moved to stand after the Third Room so that the boss room 96209926 stays last, and «next» keeps the Third Room leading to the Fourth. NOT DONE: the aggressive monsters on the way across, and any hole but the graph's one."
+  },
   "9001": {
     "name": "Laboratorio Secreto",
     "minLevel": 0,

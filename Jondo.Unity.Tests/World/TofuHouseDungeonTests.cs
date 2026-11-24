@@ -20,6 +20,7 @@ namespace Jondo.Unity.Tests.World
         private static DungeonManager.Dungeon Load()
         {
             if (MapManager.GetMapInfo(First) == null) MapManager.Initialize();
+            TeleportManager.Initialize();
             DungeonManager.Initialize();
             MobSpawnManager.EnsureMonsterData();
             return DungeonManager.Get(Id)!;
