@@ -211,6 +211,9 @@ namespace Jondo.Unity.Server.Managers
             var resume = TextKeysSaying("Retomar % donde % dejaste");
             // «Retomar la expedición donde la dejaste.» resumes an Expedición, which no door here opens.
             resume.ExceptWith(TextKeysSaying("Retomar la expedición"));
+            // The Le Chuko ship keeper words it «Volver al navío de Le Chuko donde lo dejaste.» instead of
+            // «Retomar ...»; without this it never offered the resume reply after leaving through the map panel.
+            resume.UnionWith(TextKeysSaying("Volver al % donde % dejaste"));
 
             int ambiguos = 0;
             foreach (var template in Npcs.Templates)
