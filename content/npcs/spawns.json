@@ -7046,6 +7046,13 @@
       "cell": 345,
       "orientation": 3,
       "why": "The Royal Lemon Jelly in the Jellith Dimension's Fifth Room, the hall after the Fourth Room, with the other three royals: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss» (Dofus pour les noobs, «Gelaxième Dimension»). INFERRED cells: a diamond of open floor around the room's middle, where the base's monster groups stood (303, 327)."
+    },
+    {
+      "map": 87033346,
+      "npc": 6459,
+      "cell": 413,
+      "orientation": 1,
+      "why": "Chaferfu (template 6459, «Chaferloko» in es.bin) in the Skeleton Dungeon's Fifth Room, the boss room: once the Chafer Ronin is beaten «parler avec le Chaferfu présent dans la salle et de suivre ses instructions pour apprendre le sort» (JeuxOnline, «Donjon des Squelettes»); text 1119887 says the spell (373) and its variant (24028) are won at the end of the Skeleton Dungeon. INFERRED cell: open floor in the lower middle of the room, away from the boss group (288)."
     }
   ]
 }

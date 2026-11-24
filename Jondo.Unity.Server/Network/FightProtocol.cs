@@ -1963,11 +1963,13 @@ namespace Jondo.Unity.Server.Network
         /// would go. Null keeps the captured shape.
         /// </param>
         /// <param name="team">The caster's side, where a summon's block carries it (f2, left out for blue).</param>
+        /// <param name="monsterIdentity">A monster caster's identity (MonsterIdentity), for the copies of 1024.</param>
         public static byte[] BuildIllusion(long author, long illusionId, int cell, int orientation,
                                            int originalCell, int originalOrientation,
                                            IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
                                            byte[] look, Pb identity = null, int team = 0,
-                                           IReadOnlyDictionary<int, long>? scrolls = null)
+                                           IReadOnlyDictionary<int, long>? scrolls = null,
+                                           Pb monsterIdentity = null)
         {
             var stats = Pb.New().Var(3, SheetKind);
             foreach (var (characteristic, baseValue, gear) in sheet)
@@ -1985,6 +1987,9 @@ namespace Jondo.Unity.Server.Network
             if (identity != null) fighter.Var(1, illusionId);
             fighter.Msg(2, stats);
             if (identity != null) fighter.Msg(6, identity);
+            // A monster's copy (1024) names the monster where any monster's block does, f3
+            // (FighterBlock): the copy of a Chafer Ronin hovers as a Chafer Ronin.
+            else if (monsterIdentity != null) fighter.Msg(3, monsterIdentity);
             fighter.Msg(7, original);
             var block = Pb.New()
                 .Msg(1, Pb.New().Var(1, cell).VarIfNotZero(2, orientation).Var(4, 0))

@@ -4188,8 +4188,9 @@ namespace Jondo.Unity.Server.Handlers
             await ChallengeWatcher.AllyTurnStartedAsync(stream, fight, fighter);
 
             // His copies, if any, go before anything else of his turn: jto 6, the switch back
-            // to visible, one 1029 each, jwi -- right behind the jzc in the capture.
-            await DesvanecerLasIlusionesAsync(stream, fight, fighter);
+            // to visible, one 1029 each, jwi -- right behind the jzc in the capture. A monster's
+            // (1024, Bunshin) stay: only a hit takes them away.
+            if (!fighter.IllusionsOutlastHisTurn) await DesvanecerLasIlusionesAsync(stream, fight, fighter);
 
             // And now the "start of turn" attitudes: this is where the Ochre Dofus checks whether he
             // has been hit since his previous turn.
@@ -9533,6 +9534,29 @@ namespace Jondo.Unity.Server.Handlers
                 }
 
                 // The ones that move somebody: where he ended up is announced.
+                if (c.Ilusiones != null && quienLanza.IsMonster)
+                {
+                    // A monster's copies (1024, Bunshin): the same jump and the same jwe 1097
+                    // block per copy, to everybody, dressed as the monster -- his identity,
+                    // sheet and look -- so that nothing tells the real one apart. No switch to
+                    // hidden: no client plays on his side.
+                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                        Network.FightProtocol.BuildTeleport(quienLanza.Id, quienLanza.Id, c.CasillaHasta)));
+                    byte[] suLook = NormalFightLook(quienLanza);
+                    var suHoja = FullSheetOf(quienLanza, conTraza: false);
+                    var quienEs = IdentityOf(quienLanza);
+                    foreach (var copia in c.Ilusiones)
+                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
+                            Network.FightProtocol.BuildIllusion(
+                                quienLanza.Id, copia.Id, copia.CellId, FacingOf(fight, copia),
+                                c.CasillaDesde, FacingOf(fight, quienLanza),
+                                suHoja, suLook, team: quienLanza.TeamId, monsterIdentity: quienEs)));
+                    Program.LogDebug($"[Fight] Monster {quienLanza.Id} jumps from {c.CasillaDesde} to " +
+                                     $"{c.CasillaHasta} and leaves {c.Ilusiones.Count} illusions.");
+                    movidos.Add(quienLanza);
+                    continue;
+                }
+
                 if (c.Ilusiones != null)
                 {
                     // In the capture's order: the switch to hidden, the teleport, one block per

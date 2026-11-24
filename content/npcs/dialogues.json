@@ -19260,6 +19260,45 @@
       "why": "Tina Montini in the Grotto Hesque's exit room: the Coralator Master beaten, she shows the way out (4191, her template's second line); «Salir de la Gruta Grut'Hesqua» leaves (dungeon_exits.json)."
     },
     {
+      "npc": 6459,
+      "map": 87033346,
+      "opening": 49101,
+      "lines": [
+        {
+          "message": 49101,
+          "choices": [
+            { "reply": 65566, "next": 49102 },
+            { "reply": 65568, "next": 49104 },
+            { "reply": 65563 },
+            { "reply": 65571 }
+          ]
+        },
+        {
+          "message": 49102,
+          "choices": [
+            { "reply": 65565, "teaches": 373, "next": 49103 },
+            { "reply": 65569 }
+          ]
+        },
+        {
+          "message": 49103,
+          "choices": [
+            { "reply": 65570 },
+            { "reply": 65564 }
+          ]
+        },
+        {
+          "message": 49104,
+          "choices": [
+            { "reply": 65567 },
+            { "reply": 65566, "next": 49102 },
+            { "reply": 65569 }
+          ]
+        }
+      ],
+      "why": "Chaferfu (6459) in the Skeleton Dungeon's boss room, the Chafer Ronin beaten (JeuxOnline, «Donjon des Squelettes»: talk to him and follow his instructions to learn the spell). His template's four lines: the greeting and his secret (49101), the secret of the summon (49102), the summon taught (49103) and the knitting answer to leaving (49104). «Pedir que te enseñen la invocación de chaferloko.» (65565) teaches Invocation de Chaferfu (373) for good; text 1119887 names its variant (24028) with it. «Solo quiero salir de este lugar.» (65568) gets 49104, whose «Aceptar para salir de aquí.» (65567) leaves the dungeon (dungeon_exits.json). INFERRED: which reply goes under which line, from their wording (the template lists them without it); «Hola.» (65563, 65570), «Adiós.» (65564), «Me niego a responder...» (65571) and «Ya basta de esta conversación absurda.» (65569) close the dialogue."
+    },
+    {
       "npc": 2860,
       "map": 0,
       "opening": 20599,

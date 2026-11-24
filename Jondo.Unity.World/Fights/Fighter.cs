@@ -501,6 +501,12 @@ namespace Jondo.Unity.World.Fights
         public List<long> Ilusiones { get; } = new List<long>();
 
         /// <summary>
+        /// Whether his copies outlast his own turn start: a monster's (effect 1024, the Chafer
+        /// Ronin's Bunshin) stay until they or he are hit; a Tymadura's (1097) go at his turn.
+        /// </summary>
+        public bool IllusionsOutlastHisTurn { get; set; }
+
+        /// <summary>
         /// Whether his own side still sees him drawn as hidden -- the visibility switch that
         /// goes with the copies -- so that the switch back can be sent even after the last
         /// copy has gone on its own.

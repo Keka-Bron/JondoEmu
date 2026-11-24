@@ -545,6 +545,15 @@
       "npc": 0,
       "replies": [],
       "why": "After the Royal Jellies, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
+    },
+    {
+      "dungeon": 47,
+      "bossRoom": 87033346,
+      "room": 87033346,
+      "cell": 400,
+      "npc": 6459,
+      "replies": [65567],
+      "why": "The Skeleton Dungeon: the winners stay in the Fifth Room, the boss room, where Chaferfu (6459) teaches «Invocation de Chaferfu»: «parler avec le Chaferfu présent dans la salle et de suivre ses instructions pour apprendre le sort» (JeuxOnline, «Donjon des Squelettes»). The win went straight to the exit (82314753) and he was never met. «Aceptar para salir de aquí.» (65567) leaves. INFERRED cell: open floor next to him (413)."
     }
   ]
 }

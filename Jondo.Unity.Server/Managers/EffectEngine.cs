@@ -2077,7 +2077,7 @@ namespace Jondo.Unity.Server.Managers
         /// They were outside the set and that is why the 22 spells carrying them summoned nothing, silently.
         /// </summary>
         private static readonly HashSet<int> AlSuelo =
-            new HashSet<int> { 181, 1008, 1011, 400, 401, 402, 1091, 1165, 2022, EffectSupport.Illusions, 780, 1034, 147, 1101, InvocaUnDoble,
+            new HashSet<int> { 181, 1008, 1011, 400, 401, 402, 1091, 1165, 2022, EffectSupport.Illusions, EffectSupport.MonsterIllusions, 780, 1034, 147, 1101, InvocaUnDoble,
                                InvocaUnDobleDelLanzador, ColocaUnPortal, DesactivaUnPortal };
 
         /// <summary>«Invoca un doble del lanzador»: the Sram's Doble and Conspirador.</summary>
@@ -2148,6 +2148,88 @@ namespace Jondo.Unity.Server.Managers
             };
             foreach (var (caracteristica, valor) in original.Otras) doble.Otras[caracteristica] = valor;
             return doble;
+        }
+
+        /// <summary>
+        /// A monster's «Crea ilusiones» (1024): the Chafer Ronin's Bunshin, "il cree quatre
+        /// illusions de lui-meme et passe son tour" (Dofus pour les noobs). Laid out as 1097
+        /// is -- the caster jumps to the aimed free cell, and the copies stand on that jump
+        /// turned a quarter, three quarters and a half around the cell he left -- and, as he
+        /// makes more than three, the cell he left and then the free cells nearest it. INFERRED:
+        /// no capture of a Bunshin; the shape keeps the real one among the copies, which is what
+        /// the guide asks the player to find out. The copies wear his monster identity, his life
+        /// and his look, play no turn, and stay until they are hit or he is (see
+        /// <see cref="Fighter.IllusionsOutlastHisTurn"/>). Cast again while copies still stand, it
+        /// only makes up the number the effect gives.
+        /// </summary>
+        internal static Outcome IlusionesDeMonstruo(FightInstance combate, Fighter quienLanza, Fighter sobre,
+                                                    SpellEffect efecto, int hechizo, int grado, int celdaApuntada)
+        {
+            if (sobre != quienLanza) return null;
+            var suelo = MapManager.GetFightWalkable(combate.ArenaMapId);
+            bool Libre(int celda) => celda >= 0 && (suelo == null || suelo.Contains(celda))
+                                     && EnLaCasilla(combate, celda) == null;
+            // A cast on his own cell, or on one taken since it was chosen: the nearest free one.
+            if (!Libre(celdaApuntada)) celdaApuntada = CeldaLibreMasCercana(combate, celdaApuntada, null);
+            if (!Libre(celdaApuntada) || celdaApuntada == quienLanza.CellId) return null;
+
+            int origen = quienLanza.CellId;
+            quienLanza.MoverA(celdaApuntada);
+            quienLanza.IllusionsOutlastHisTurn = true;
+
+            int faltan = Math.Max(1, efecto.DiceNum) - quienLanza.Ilusiones.Count(id => combate.Buscar(id)?.IsAlive == true);
+            var (ox, oy) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(origen);
+            var (ax, ay) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(celdaApuntada);
+            int vx = ax - ox, vy = ay - oy;
+            var sitios = new List<int>();
+            foreach (var (dx, dy) in new[] { (-vy, vx), (vy, -vx), (-vx, -vy) })
+                sitios.Add(Jondo.Unity.World.Maps.MapGeometry.PointToCell(ox + dx, oy + dy));
+            sitios.Add(origen);
+            var cerca = new List<(int Celda, int Lejos)>();
+            for (int dx = -4; dx <= 4; dx++)
+                for (int dy = -4; dy <= 4; dy++)
+                {
+                    int lejos = Math.Abs(dx) + Math.Abs(dy);
+                    if (lejos == 0 || lejos > 4) continue;
+                    int celda = Jondo.Unity.World.Maps.MapGeometry.PointToCell(ox + dx, oy + dy);
+                    if (celda >= 0) cerca.Add((celda, lejos));
+                }
+            sitios.AddRange(cerca.OrderBy(c => c.Lejos).ThenBy(c => c.Celda).Select(c => c.Celda));
+
+            var copias = new List<Fighter>();
+            foreach (int celda in sitios.Distinct())
+            {
+                if (copias.Count >= faltan) break;
+                if (!Libre(celda)) continue;
+                var copia = new Fighter
+                {
+                    Id = combate.SiguienteIdDeInvocado(),
+                    Name = quienLanza.Name,
+                    CellId = celda,
+                    Level = quienLanza.Level,
+                    IsMonster = true,
+                    MonsterId = quienLanza.MonsterId,
+                    GradeIndex = quienLanza.GradeIndex,
+                    MaxHP = quienLanza.MaxHP,
+                    CurrentHP = Math.Max(1, quienLanza.CurrentHP),
+                    SummonCost = 0,
+                    JuegaTurno = false,
+                    EsIlusion = true,
+                    Look = quienLanza.Look,
+                    LookBoneId = quienLanza.LookBoneId,
+                };
+                combate.Invocar(copia, quienLanza);
+                quienLanza.Ilusiones.Add(copia.Id);
+                copias.Add(copia);
+            }
+
+            return new Outcome
+            {
+                Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
+                HechizoOrigen = hechizo, NivelOrigen = grado,
+                CasillaDesde = origen, CasillaHasta = celdaApuntada,
+                Ilusiones = copias,
+            };
         }
 
         /// <summary>The zone shape that names its cells outright.</summary>
@@ -5267,6 +5349,9 @@ namespace Jondo.Unity.Server.Managers
                     Doble = doble, CasillaDeLaInvocacion = celdaApuntada,
                 };
             }
+
+            if (efecto.EffectId == EffectSupport.MonsterIllusions)
+                return IlusionesDeMonstruo(combate, quienLanza, sobre, efecto, hechizo, grado, celdaApuntada);
 
             if (efecto.EffectId == EffectSupport.Illusions)
             {

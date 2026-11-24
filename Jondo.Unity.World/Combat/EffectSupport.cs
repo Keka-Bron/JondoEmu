@@ -103,6 +103,21 @@ namespace Jondo.Unity.World.Combat
         /// jto 6, jwe 150 {2}, jwe 1029 per copy, jwi.
         /// </remarks>
         public const int Illusions = 1097;
+
+        /// <summary>
+        /// 1024 "Crea ilusiones", the monsters' own: Bunshin of the Chafer Ronin (3165, four
+        /// copies) and of 29379, Asechanza (15776), Malos Suenos (20934), Tofumegeno (29272)
+        /// and 30068 -- every spell that carries it is a monster's. Resolved as 1097 is (the
+        /// caster jumps to the aimed free cell, copies of him stand around the cell he left,
+        /// the client is told with the same jwe 1097 block), with two differences the guides
+        /// give: the copies stay until they are hit or the real one is hit -- "aucune illusion
+        /// ne doit etre presente au debut de son tour" is an achievement, so they do not go
+        /// at his turn start by themselves -- and they wear his monster identity.
+        /// </summary>
+        public const int MonsterIllusions = 1024;
+
+        public static bool CreatesIllusions(int effectId) => effectId is Illusions or MonsterIllusions;
+
         public const int IllusionGone = 1029;
         public const int Visibility = 150;
         public const int Teleport = 4;
