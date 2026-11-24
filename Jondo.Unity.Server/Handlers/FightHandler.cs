@@ -2644,11 +2644,14 @@ namespace Jondo.Unity.Server.Handlers
         /// Makes a character fighter -- a JondoBot for now -- one <paramref name="by"/> plays by
         /// hand from his client, as a hero would be: his class bar and his turns go there
         /// (<see cref="PlayedAllyBar"/>), and his casts are his class's spells at their grades.
+        /// A summon keeps the bar it came out with: it has no spells of its own besides it, and
+        /// Dramak's Pantin, handed to a player, came with an empty bar and no Desenlace (30669).
         /// </summary>
         internal static void PlayAsHero(Fighter fighter, long by)
         {
             fighter.DrivenBy = by;
             fighter.IsPlayedAlly = true;
+            if (fighter.SpellIds.Count == 0 && fighter.HechizosDeInvocado is { Count: > 0 }) return;
             fighter.HechizosDeInvocado = fighter.SpellIds
                 .Select(spell => (spell, Math.Max(1, fighter.SpellGrades.TryGetValue(spell, out int grade) ? grade : 1)))
                 .ToList();

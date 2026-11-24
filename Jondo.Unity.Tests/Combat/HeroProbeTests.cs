@@ -36,6 +36,21 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// A summon handed to a player of the other side (Dramak's Pantin) keeps the spells it came
+        /// out with, the Desenlace its player has to cast on Dramak among them.
+        /// </summary>
+        [Fact]
+        public void A_summon_handed_over_keeps_its_own_bar()
+        {
+            var pantin = new Fighter { Id = -5, Level = 1, Invocador = -1 };
+            pantin.HechizosDeInvocado = new[] { (30669, 1), (3854, 1) };
+            FightHandler.PlayAsHero(pantin, Master);
+
+            Assert.True(pantin.ControlledBy(Master));
+            Assert.Equal(new[] { (30669, 1), (3854, 1) }, pantin.HechizosDeInvocado);
+        }
+
+        /// <summary>
         /// A character's bar -- the weapon first, class spells of origin 1, the fist on slot 0 --
         /// with his player in f4, where a summon's bar carries its owner.
         /// </summary>
