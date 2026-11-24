@@ -1,5 +1,6 @@
 using System.Linq;
 using Jondo.Unity.Server;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Xunit;
 
@@ -9,6 +10,7 @@ namespace Jondo.Unity.Tests.World
     public sealed class FrigostZaapiTests
     {
         private const long CarversWorkshop = 54169896;
+        private const long DoctorMap = 54173997;
         private const long VillageZaap = 54172969;
 
         private static void Load()
@@ -30,10 +32,19 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal("frigost", network!.City);
             Assert.Equal(7, network.Destinations.Count);
             Assert.Contains(network.Destinations, destination => destination.MapId == CarversWorkshop);
+            Assert.Contains(network.Destinations, destination => destination.MapId == DoctorMap);
             Assert.Contains(network.Destinations, destination => destination.MapId == VillageZaap);
+            Assert.DoesNotContain(network.Destinations, destination => destination.MapId == 54172462);
             Assert.All(network.Destinations, destination => Assert.Equal(601, destination.SubAreaId));
             Assert.All(network.Destinations,
                 destination => Assert.Contains(Zaapis.ElementsOn(destination.MapId), element => element.Gfx == 70914));
+
+            var zaapiArrival = ZaapTravelHandler.ArrivalOn(VillageZaap, Zaapis.Kind);
+            Assert.Equal(Zaapis.ElementsOn(VillageZaap).First().Id, zaapiArrival.Id);
+            Assert.Equal(70914, zaapiArrival.Gfx);
+
+            var zaapArrival = ZaapTravelHandler.ArrivalOn(VillageZaap, 0);
+            Assert.Equal(Interactives.ZaapElements(VillageZaap).First().Id, zaapArrival.Id);
         }
     }
 }

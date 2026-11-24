@@ -30,9 +30,10 @@ namespace Jondo.Unity.Server.Managers
     /// Sufokia is added from the published Quay List: six quays in subarea 32, all using graphic
     /// 34925. Other maps with that graphic are workshops and are not part of the quay network.
     /// Frigost Village is added from the same kind of published list: seven destinations in
-    /// subarea 601 (six workshop maps and the Zaap), all using graphic 70914. The Hunters and the
-    /// Miners/Smiths entrances do not sit on the exact coordinate of the building list: their
-    /// zaapi is on the neighbouring map, which is the one whose graphic carries the network.
+    /// subarea 601 (six workshop maps and the Zaap), all using graphic 70914. The Hunters' stop
+    /// is not at its listed coordinate at all: it stands on the doctor's street map at [-80,-45]
+    /// (54173997), and the Miners/Smiths stops are on the neighbouring maps that carry the
+    /// graphic. A destination is always a map with a real zaapi element.
     /// </summary>
     public static class Zaapis
     {
