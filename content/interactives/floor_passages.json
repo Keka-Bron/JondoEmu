@@ -254,6 +254,34 @@
       "why": "The Dragon Pig's Den, Fourth Room: the way on under its right arch, where the client's map has element 460371 on the floor, leads to the Fifth Room; the 2.73 graph does not have it. INFERRED arrival, the graph's own for the den's rooms."
     },
     {
+      "map": 72356864,
+      "cell": 472,
+      "toMap": 72357888,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Sixth Room: the graph's passage sits on cell 488, which the client never walks to (a click there stops on 472), so the way on is the last cell a player reaches before the door. INFERRED arrival, the graph's own for the den's rooms."
+    },
+    {
+      "map": 72358146,
+      "cell": 473,
+      "toMap": 72358912,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Eighth Room: the graph's passage on cell 474 cannot be walked to; 473, beside it, can. INFERRED arrival, the graph's own for the den's rooms."
+    },
+    {
+      "map": 72359170,
+      "cell": 473,
+      "toMap": 72359936,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Tenth Room: a click on the graph's cell 487 stops on 473, so the way on is there. INFERRED arrival, the graph's own for the den's rooms."
+    },
+    {
+      "map": 72360960,
+      "cell": 487,
+      "toMap": 72361984,
+      "toCell": 280,
+      "why": "The Dragon Pig's Den, Twelfth Room: the graph's cell 501 is not walkable; 487 is the walkable cell next to it. INFERRED cell and arrival."
+    },
+    {
       "map": 156500992,
       "cell": 183,
       "toMap": 157810688,
