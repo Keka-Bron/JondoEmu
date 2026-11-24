@@ -866,7 +866,7 @@ namespace Jondo.Unity.Launcher.UI
         internal void MostrarSeccionDeMentira(string seccion, bool instalado = false)
         {
             _vista = Vista.Normal;
-            _seccion = seccion switch { "cuentas" => Seccion.Cuentas, "ajustes" => Seccion.Ajustes, _ => Seccion.Jugar };
+            _seccion = seccion switch { "noticias" => Seccion.Noticias, "cuentas" => Seccion.Cuentas, "ajustes" => Seccion.Ajustes, _ => Seccion.Jugar };
             if (_seccion == Seccion.Ajustes) RefrescarPacks();
             Recolocar();
             if (!instalado) return;

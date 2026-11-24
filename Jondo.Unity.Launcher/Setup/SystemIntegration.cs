@@ -217,19 +217,38 @@ namespace Jondo.Unity.Launcher.Setup
             key.SetValue("NoRepair", 1, Microsoft.Win32.RegistryValueKind.DWord);
         }
 
-        /// <summary>The version the entry shows, after an update.</summary>
+        /// <summary>
+        /// The version the entry shows, after an update of the installation in <paramref name="root"/>.
+        /// An entry that names another folder is left alone: a second copy updated by hand does not
+        /// speak for the registered one.
+        /// </summary>
         [SupportedOSPlatform("windows")]
-        public static void UpdateRegisteredVersion(string version)
+        public static void UpdateRegisteredVersion(string root, string version)
         {
             foreach (var hive in new[] { Microsoft.Win32.Registry.LocalMachine, Microsoft.Win32.Registry.CurrentUser })
             {
                 try
                 {
                     using var key = hive.OpenSubKey(UninstallKey, writable: true);
-                    key?.SetValue("DisplayVersion", version.TrimStart('v'));
+                    if (key?.GetValue("InstallLocation") is not string registered || !SameFolder(registered, root)) continue;
+                    key.SetValue("DisplayVersion", version.TrimStart('v'));
                 }
                 catch (UnauthorizedAccessException) { }
                 catch (System.Security.SecurityException) { }
+            }
+        }
+
+        private static bool SameFolder(string a, string b)
+        {
+            try
+            {
+                return string.Equals(Path.TrimEndingDirectorySeparator(Path.GetFullPath(a)),
+                                     Path.TrimEndingDirectorySeparator(Path.GetFullPath(b)),
+                                     StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                return false;
             }
         }
 

@@ -67,7 +67,7 @@ namespace Jondo.Unity.Launcher.UI
         /// screen to show was decided with an «I have logged in or not» boolean. That leaves the
         /// settings —things touched once— competing for space with the play button.
         /// </remarks>
-        private enum Seccion { Jugar, Cuentas, Ajustes }
+        private enum Seccion { Jugar, Noticias, Cuentas, Ajustes }
 
         private Seccion _seccion = Seccion.Jugar;
         private bool _servidorEnLinea;
@@ -374,8 +374,10 @@ namespace Jondo.Unity.Launcher.UI
             PanelJugar.IsVisible = _seccion == Seccion.Jugar;
             PanelCuentas.IsVisible = _seccion == Seccion.Cuentas;
             PanelAjustes.IsVisible = _seccion == Seccion.Ajustes;
+            PanelNoticias.IsVisible = _seccion == Seccion.Noticias;
 
             SeccionJugar.Classes.Set("on", _seccion == Seccion.Jugar);
+            SeccionNoticias.Classes.Set("on", _seccion == Seccion.Noticias);
             SeccionCuentas.Classes.Set("on", _seccion == Seccion.Cuentas);
             SeccionAjustes.Classes.Set("on", _seccion == Seccion.Ajustes);
 
@@ -408,10 +410,12 @@ namespace Jondo.Unity.Launcher.UI
             QuitarElAviso();
             _seccion = ((remitente as Button)?.Tag as string) switch
             {
+                "noticias" => Seccion.Noticias,
                 "cuentas" => Seccion.Cuentas,
                 "ajustes" => Seccion.Ajustes,
                 _ => Seccion.Jugar,
             };
+            if (_seccion == Seccion.Noticias) AbrirNoticias();
             // The packs can change behind the launcher's back (a client update, a folder
             // deleted by hand), so their rows are read again each time the settings open.
             if (_seccion == Seccion.Ajustes) RefrescarPacks();
@@ -435,6 +439,8 @@ namespace Jondo.Unity.Launcher.UI
             TextoSeccionJugar.Text = Textos.Frase(Textos.Jugar(_idioma));
             TextoSeccionCuentas.Text = Textos.Frase(Textos.Cuentas(_idioma));
             TextoSeccionAjustes.Text = Textos.Frase(Textos.Ajustes(_idioma));
+            TextoSeccionNoticias.Text = Textos.Frase(Textos.Noticias(_idioma));
+            AplicarIdiomaANoticias();
 
             // Accounts: the heading, the two tabs, the fields.
             TituloCuentas.Text = Textos.TituloCuentas(_idioma);

@@ -665,5 +665,123 @@ namespace Jondo.Unity.Launcher.UI
                 _ => bytes + " B",
             };
         }
+
+        // ─── News ───────────────────────────────────────────────────────────────
+
+        public static string Noticias(Language i) => i switch
+        {
+            Language.En => "NEWS",
+            Language.Fr => "ACTUALITÉS",
+            Language.Pt => "NOVIDADES",
+            _ => "NOTICIAS",
+        };
+
+        public static string UltimaVersion(Language i) => i switch
+        {
+            Language.En => "LATEST RELEASE",
+            Language.Fr => "DERNIÈRE VERSION",
+            Language.Pt => "ÚLTIMA VERSÃO",
+            _ => "ÚLTIMA VERSIÓN",
+        };
+
+        public static string HojaDeRuta(Language i) => i switch
+        {
+            Language.En => "ROADMAP",
+            Language.Fr => "FEUILLE DE ROUTE",
+            Language.Pt => "ROTEIRO",
+            _ => "HOJA DE RUTA",
+        };
+
+        public static string DescHojaDeRuta(Language i) => i switch
+        {
+            Language.En => "What has just landed, what is being done and what comes next.",
+            Language.Fr => "Ce qui vient d'arriver, ce qui est en cours et ce qui suit.",
+            Language.Pt => "O que acabou de chegar, o que está em andamento e o que vem a seguir.",
+            _ => "Lo que acaba de llegar, lo que está en marcha y lo que viene.",
+        };
+
+        public static string VerEnGitHub(Language i) => i switch
+        {
+            Language.En => "View on GitHub",
+            Language.Fr => "Voir sur GitHub",
+            Language.Pt => "Ver no GitHub",
+            _ => "Ver en GitHub",
+        };
+
+        public static string PidiendoNotas(Language i) => i switch
+        {
+            Language.En => "Asking GitHub for the latest release…",
+            Language.Fr => "Demande de la dernière version à GitHub…",
+            Language.Pt => "Pedindo a última versão ao GitHub…",
+            _ => "Pidiendo a GitHub la última versión…",
+        };
+
+        public static string NotasGuardadas(Language i) => i switch
+        {
+            Language.En => "GitHub could not be reached: this is the copy saved last time.",
+            Language.Fr => "GitHub est injoignable : voici la copie gardée la dernière fois.",
+            Language.Pt => "Não foi possível falar com o GitHub: esta é a cópia guardada da última vez.",
+            _ => "No se pudo hablar con GitHub: es la copia guardada la última vez.",
+        };
+
+        public static string SinNotas(Language i) => i switch
+        {
+            Language.En => "GitHub could not be reached and there is no saved copy yet. Try again in a while.",
+            Language.Fr => "GitHub est injoignable et aucune copie n'est encore gardée. Réessayez plus tard.",
+            Language.Pt => "Não foi possível falar com o GitHub e ainda não há cópia guardada. Tente de novo mais tarde.",
+            _ => "No se pudo hablar con GitHub y aún no hay copia guardada. Prueba dentro de un rato.",
+        };
+
+        public static string NotasVacias(Language i) => i switch
+        {
+            Language.En => "This release has no notes.",
+            Language.Fr => "Cette version n'a pas de notes.",
+            Language.Pt => "Esta versão não tem notas.",
+            _ => "Esta versión no trae notas.",
+        };
+
+        public static string Publicada(Language i, DateTime cuando)
+        {
+            var cultura = System.Globalization.CultureInfo.GetCultureInfo(i switch
+            {
+                Language.En => "en-GB",
+                Language.Fr => "fr-FR",
+                Language.Pt => "pt-BR",
+                _ => "es-ES",
+            });
+            string formato = i is Language.Es or Language.Pt ? "d 'de' MMMM 'de' yyyy" : "d MMMM yyyy";
+            string fecha = cuando.ToLocalTime().ToString(formato, cultura);
+            return i switch
+            {
+                Language.En => "Published " + fecha,
+                Language.Fr => "Publiée le " + fecha,
+                Language.Pt => "Publicada em " + fecha,
+                _ => "Publicada el " + fecha,
+            };
+        }
+
+        public static string VersionInstalada(Language i, string version) => i switch
+        {
+            Language.En => "You have " + version,
+            Language.Fr => "Vous avez la " + version,
+            Language.Pt => "Você tem a " + version,
+            _ => "Tienes la " + version,
+        };
+
+        public static string EstadoHojaDeRuta(Language i, News.RoadmapState estado) => (estado, i) switch
+        {
+            (News.RoadmapState.Done, Language.En) => "DONE",
+            (News.RoadmapState.Done, Language.Fr) => "FAIT",
+            (News.RoadmapState.Done, Language.Pt) => "FEITO",
+            (News.RoadmapState.Done, _) => "HECHO",
+            (News.RoadmapState.Now, Language.En) => "IN PROGRESS",
+            (News.RoadmapState.Now, Language.Fr) => "EN COURS",
+            (News.RoadmapState.Now, Language.Pt) => "EM ANDAMENTO",
+            (News.RoadmapState.Now, _) => "EN CURSO",
+            (_, Language.En) => "NEXT",
+            (_, Language.Fr) => "À VENIR",
+            (_, Language.Pt) => "PRÓXIMO",
+            _ => "PRÓXIMO",
+        };
     }
 }

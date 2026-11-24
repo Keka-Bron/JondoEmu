@@ -87,6 +87,24 @@ namespace Jondo.Unity.Tests.Launcher
         }
 
         [AvaloniaTheory]
+        [InlineData(1280, 800, "es")]
+        [InlineData(1600, 900, "en")]
+        public void Una_foto_de_las_noticias(int ancho, int alto, string idioma)
+        {
+            var ventana = new MainWindow { Width = ancho, Height = alto };
+            ventana.Show();
+            ventana.HablarDeMentira(idioma == "en" ? Jondo.Unity.Launcher.UI.Language.En : Jondo.Unity.Launcher.UI.Language.Es);
+            ventana.MostrarSeccionDeMentira("noticias");
+            ventana.MostrarNoticiaDeMentira(new Jondo.Unity.Launcher.UI.News.ReleaseNews("Keka-Bron/JondoEmu", "v1.0.38",
+                "Seasonal events and a new server window", new DateTime(2026, 11, 24, 9, 0, 0, DateTimeKind.Utc),
+                "## Seasonal events you control\n\n- The server window opens and shuts **Kwismas Island**, **Al Howin** and **Vulkania**.\n" +
+                "- Event monsters only show while their event runs.\n  - An ordinary monster of the zone stands in.\n" +
+                "- The passage to Vulkania Island only opens while its event runs.\n\n## Launcher\n\n" +
+                "- A **News** page with the latest release's notes and the roadmap.\n\nRun `Jondo Server.exe` again after updating."));
+            Guardar(ventana, $"noticias-{ancho}x{alto}-{idioma}.png");
+        }
+
+        [AvaloniaTheory]
         [InlineData(1280, 720, false)]
         [InlineData(1280, 720, true)]
         [InlineData(1100, 700, true)]

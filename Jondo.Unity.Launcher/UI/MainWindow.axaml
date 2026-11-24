@@ -45,6 +45,17 @@
                 <TextBlock x:Name="TextoSeccionJugar" VerticalAlignment="Center" />
               </StackPanel>
             </Button>
+            <Button x:Name="SeccionNoticias" Classes="nav" Click="AlPulsarSeccion" Tag="noticias">
+              <Panel>
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <w:Icon Kind="megaphone" Width="17" Height="17" VerticalAlignment="Center" />
+                  <TextBlock x:Name="TextoSeccionNoticias" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- A release the player has not opened yet. -->
+                <Ellipse x:Name="NoticiaNueva" Width="7" Height="7" Fill="{DynamicResource GoldBrush}" IsVisible="False"
+                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-3,-9,0" />
+              </Panel>
+            </Button>
             <Button x:Name="SeccionCuentas" Classes="nav" Click="AlPulsarSeccion" Tag="cuentas">
               <StackPanel Orientation="Horizontal" Spacing="9">
                 <w:Icon Kind="users" Width="17" Height="17" VerticalAlignment="Center" />
@@ -451,6 +462,75 @@
               </Grid>
             </StackPanel>
           </ScrollViewer>
+        </Border>
+
+        <!-- ─── NEWS: the latest release's notes, from GitHub, and the roadmap beside them ── -->
+        <Border x:Name="PanelNoticias" Classes="panel" IsVisible="False" Margin="24" MaxWidth="1360">
+          <Grid ColumnDefinitions="*,18,400" Margin="22">
+
+            <!-- The latest release: what it is called, when it came, and its notes. -->
+            <Border Grid.Column="0" Classes="card" Padding="0">
+              <DockPanel>
+                <Border DockPanel.Dock="Top" Padding="22,20,22,18"
+                        BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="0,0,0,1">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Classes="tile" Width="46" Height="46" CornerRadius="12" VerticalAlignment="Center">
+                      <w:Icon Kind="megaphone" Width="22" Height="22" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="14,0,12,0" Spacing="3" VerticalAlignment="Center">
+                      <TextBlock x:Name="EyebrowVersion" Classes="eyebrow" />
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock x:Name="TituloVersion" Classes="h1" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <Border x:Name="PildoraTag" Classes="pill" Background="#26D4AF37" IsVisible="False">
+                          <TextBlock x:Name="TextoTag" Foreground="{DynamicResource GoldBrush}" />
+                        </Border>
+                      </StackPanel>
+                      <TextBlock x:Name="FechaVersion" Classes="pie" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                      <Button x:Name="BotonRecargarNoticias" Classes="icon" Click="AlPulsarRecargarNoticias">
+                        <w:Icon Kind="refresh" Width="17" Height="17" />
+                      </Button>
+                      <Button x:Name="BotonVerEnGitHub" Classes="secondary" Height="36" Click="AlPulsarVerEnGitHub" IsEnabled="False">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <w:Icon Kind="link" Width="15" Height="15" VerticalAlignment="Center" />
+                          <TextBlock x:Name="TextoVerEnGitHub" VerticalAlignment="Center" />
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+
+                <Border x:Name="AvisoNoticias" DockPanel.Dock="Top" IsVisible="False" Margin="22,14,22,0"
+                        Padding="12,9" CornerRadius="9" Background="#1FE0A43A" BorderBrush="#40E0A43A" BorderThickness="1">
+                  <StackPanel Orientation="Horizontal" Spacing="9">
+                    <w:Icon Kind="info" Width="15" Height="15" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" />
+                    <TextBlock x:Name="TextoAvisoNoticias" Classes="desc" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Border>
+
+                <ScrollViewer x:Name="DesplazarNotas" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                  <StackPanel x:Name="NotasDeLaVersion" Margin="24,18,26,24" Spacing="6" MaxWidth="860" HorizontalAlignment="Left" />
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
+
+            <!-- The roadmap: a line down the side, a dot per step. -->
+            <Border Grid.Column="2" Classes="card" Padding="22,20">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="0,0,0,18">
+                  <Border Classes="tile"><w:Icon Kind="calendar" /></Border>
+                  <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock x:Name="TituloHojaDeRuta" Classes="eyebrow" />
+                    <TextBlock x:Name="DescHojaDeRuta" Classes="pie" />
+                  </StackPanel>
+                </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                  <StackPanel x:Name="PasosDeLaHoja" />
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
+          </Grid>
         </Border>
 
         <!-- ─── INSTALL (the downloaded setup) ──────────────────────────── -->

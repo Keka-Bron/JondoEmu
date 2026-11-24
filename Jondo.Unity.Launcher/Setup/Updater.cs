@@ -191,7 +191,7 @@ namespace Jondo.Unity.Launcher.Setup
             state.Version = release.Tag;
             state.UpdatedAt = DateTime.Now;
             _layout.Save(state);
-            if (OperatingSystem.IsWindows()) SystemIntegration.UpdateRegisteredVersion(release.Tag);
+            if (OperatingSystem.IsWindows()) SystemIntegration.UpdateRegisteredVersion(_layout.Root, release.Tag);
             step.Finish(UI.SetupTexts.UpdateSize(_lang, plan.Fetch.Count, Format.Bytes(_check.DownloadSize), plan.Full));
 
             // 4. The mods, which may have changed with it, into the client.
