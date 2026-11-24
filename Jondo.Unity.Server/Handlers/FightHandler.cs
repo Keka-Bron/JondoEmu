@@ -10285,6 +10285,10 @@ namespace Jondo.Unity.Server.Handlers
             // trampas", Concentración de Chakra "roba vida ... si este sufre daños de trampas".
             if (fight.CurrentGlyphType == Managers.EffectEngine.ColocaUnaTrampa)
                 await DispararAsync(stream, fight, target, Managers.EffectEngine.AlSufrirDanoDeTrampa);
+            // A blow that came through the portals (PDT): Qilby's islet glyphs (32144) go when
+            // whoever stands on them is hit from another islet.
+            if (fight.ProjectedFrom >= 0)
+                await DispararAsync(stream, fight, target, Managers.EffectEngine.AlSufrirDanoPorUnPortal);
             await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoDeElemento(elemento));
             if (caster != target && caster.TeamId == target.TeamId)
                 await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoDeAliado);

@@ -343,6 +343,35 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(frames, f => f.SequenceEqual(FightProtocol.BuildGlyphGone(Selatrop, 1)));
         }
 
+        /// <summary>
+        /// Qilby's islet glyph (32144 grade 1) waits on PDT: a blow cast through the portals at
+        /// Qilby while he holds 6711 gives him the islet's state 6698 for two turns, which his
+        /// starting spell answers by lowering his resistance; the same blow straight at him does not.
+        /// </summary>
+        [Fact]
+        public async Task A_blow_through_the_portals_sets_off_PDT()
+        {
+            var selatrop = Character(Selatrop, 300);
+            var qilby = Monster(-1, 330);
+            qilby.MonsterId = 8131;
+            var fight = new FightInstance(1, 1);
+            fight.AddPlayer(selatrop); fight.AddMonster(qilby);
+            selatrop.CellId = 300; qilby.CellId = 330;
+            fight.StartFight();
+            qilby.Buffs.PonerEstado(6711);
+            qilby.Buffs.ActiveSpells.Add(new Buffs.ActiveSpell { Hechizo = 32144, Grado = 1, Lanzador = qilby.Id, CaducaEnRonda = -1 });
+
+            var blow = SpellEffects.De(6773, 1).First(e => e.EffectId == 97);
+            await FightHandler.UnGolpeAsync(null, fight, selatrop, 6773, blow, 4, qilby, 95, 0, false);
+            Assert.True(qilby.CurrentHP < qilby.MaxHP);
+            Assert.False(qilby.Buffs.TieneEstado(6698));
+
+            fight.ProjectedFrom = 371;
+            await FightHandler.UnGolpeAsync(null, fight, selatrop, 6773, blow, 4, qilby, 95, 0, false);
+            fight.ProjectedFrom = -1;
+            Assert.True(qilby.Buffs.TieneEstado(6698));
+        }
+
         [Fact]
         public async Task A_push_into_a_portal_goes_on_from_the_way_out()
         {

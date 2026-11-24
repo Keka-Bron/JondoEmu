@@ -2809,6 +2809,12 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         public const string AlProyectarPorUnPortal = "PST";
 
+        /// <summary>
+        /// The bearer takes a blow cast through the portals (PDT): only Qilby's islet glyphs carry
+        /// it (32144, grades 1-4), «damage through a portal removes that islet's blue glyph».
+        /// </summary>
+        public const string AlSufrirDanoPorUnPortal = "PDT";
+
         /// <summary>The trap of the glyph family, for the fight to tell a trap's blow.</summary>
         public const int ColocaUnaTrampa = Trampa;
 
