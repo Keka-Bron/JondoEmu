@@ -1665,7 +1665,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (int hechizo in monsterFighter.SpellIds)
             {
                 int suGrado = monsterFighter.SpellGrades.TryGetValue(hechizo, out int gg) ? gg : 1;
-                int espera = LimitesDeGrado(hechizo, suGrado).EsperaInicial;
+                int espera = BornWaiting(hechizo, suGrado);
                 if (espera > 0) monsterFighter.Recarga[hechizo] = espera;
             }
 
@@ -6264,9 +6264,27 @@ namespace Jondo.Unity.Server.Handlers
         {
             foreach (var (spell, grade) in summon.HechizosDeInvocado)
             {
-                int wait = LimitesDeGrado(spell, Math.Max(1, grade)).EsperaInicial;
+                int wait = BornWaiting(spell, Math.Max(1, grade));
                 if (wait > 0) summon.Recarga[spell] = wait;
             }
+        }
+
+        /// <summary>The wait that says a spell can be cast once and never again: 63 rounds, a whole fight.</summary>
+        private const int OncePerFight = 63;
+
+        /// <summary>
+        /// How many rounds a monster's spell is born waiting: its grade's InitialCooldown, except for
+        /// a spell that locks itself for the rest of the fight when cast (1045 on itself, 63 rounds)
+        /// and is born with that same wait. The lock is the once-a-fight rule and is only worth
+        /// something if the first cast is possible: Darkli Moon's four totem spells (298 to 301)
+        /// were all born at 63 and so none came out -- the real Darkli summons all four over the fight.
+        /// </summary>
+        internal static int BornWaiting(int spell, int grade)
+        {
+            int wait = LimitesDeGrado(spell, grade).EsperaInicial;
+            if (wait < OncePerFight) return wait;
+            return Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.RecargaFijada
+                                                                   && e.DiceNum == spell && e.Value >= OncePerFight) ? 0 : wait;
         }
 
         private static async Task<Fighter> InvocarAsync(NetworkStream stream, FightInstance fight,
@@ -12258,8 +12276,14 @@ namespace Jondo.Unity.Server.Handlers
             bool Kills(Managers.SpellEffect e) => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
                                        && HasMask(e.TargetMask ?? "", "A") && !HasMask(e.TargetMask ?? "", "a")
                                        && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase);
+            // What the caster gives himself beside the kill -- Zampavoro's Zampada (6077) heals him and
+            // gives him a movement point -- is the kill's reward and does not make it a mechanic:
+            // weighed as one it was worth nothing and was never cast, even beside the enemy.
+            bool ForTheCaster(Managers.SpellEffect e) => (e.TargetMask ?? "").Trim() == "C"
+                && !(e.EffectId >= Jondo.Unity.World.Combat.EffectSupport.FirstDamage
+                     && e.EffectId <= Jondo.Unity.World.Combat.EffectSupport.LastDamage);
             return working.Any(Kills)
-                   && working.All(e => Kills(e) || Managers.EffectEngine.EsDeLaFamiliaDeSublanzar(e.EffectId));
+                   && working.All(e => Kills(e) || ForTheCaster(e) || Managers.EffectEngine.EsDeLaFamiliaDeSublanzar(e.EffectId));
         }
 
         /// <summary>

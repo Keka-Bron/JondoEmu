@@ -1381,7 +1381,7 @@ namespace Jondo.Unity.Server.Managers
 
         private const int TeletransportaOIntercambia = 1101;
         private const int RecargaMenos = 1036;
-        private const int RecargaFijada = 1045;
+        internal const int RecargaFijada = 1045;
 
         /// <summary>"#1: +#3 de reactivación": a spell's cooldown raised (CharacterAddSpellCooldown).</summary>
         private const int RecargaMas = 1035;
