@@ -168,6 +168,38 @@
     "door": 1,
     "why": "Crackler's Rocky Peaks in the order Dofus pour les noobs walks it («Pitons Rocheux des Craqueleurs»): fights in Salle 1 to 5 (First to Fifth Room), then «traverser un pont invisible» of three lines, walked on the middle one cell by cell or «vous tomberez»; whoever falls finds a monster below and fighting it «remonter» him to try the bridge again; then the boss. The Sixth Room (106959872, the guide's picture of the bridge is titled «Sixième salle») is that bridge, with nobody in it: its stairs on the far plateau (element 480373, cell 251) climb to the Seventh Room, the boss's (669). The bridge's outer lines drop to the Plateau below (106959874: the 2.73 graph's floor passage on cell 359, and content/interactives/floor_passages.json for the others), whose win brings the party back up to the bridge's foot, cell 372 under the middle line («hub»: the Sixth Room is its lobby and its «then»). 106957826 and 106957828 are the walkway under the Fourth Room's wooden bridge: the 2.73 graph's floor passage on its cell 179 leads down, 106957826's ladder (480371) back up; the guide's route never crosses them, and they are kept empty so that the base's generated groups, some with the boss in them, do not stand there. The catalogue chained a fight in the Sixth Room straight to the boss and put the Plateau and the walkway after him. INFERRED: who stands on the Plateau (the guide names no monster: it keeps a group of the dungeon's own), the landing cells, and which bridge cells drop (the two outer lines; the guide only says the middle one holds)."
   },
+  "13": {
+    "name": "Mazmorra de los Bworks",
+    "minLevel": 40,
+    "optimalLevel": 50,
+    "difficulty": 2,
+    "entrance": 104862211,
+    "exit": 104862211,
+    "rooms": [104595969, 104596993, 104598017, 104599041, 104599043, 104595971, 104596995],
+    "empty": [104599041],
+    "hub": {
+      "room": 104599041,
+      "rooms": { "104599043": 312 },
+      "then": 104599041,
+      "thenCell": 312
+    },
+    "alone": { "104599043": [791] },
+    "roster": {
+      "104595969": [53, 74, 876],
+      "104596993": [53, 74, 876],
+      "104598017": [53, 74, 876],
+      "104595971": [53, 74, 876],
+      "104596995": [53, 74, 876]
+    },
+    "bosses": [792],
+    "keyring": 1,
+    "required": [[8135, 1]],
+    "achievements": [38, 668, 495, 6158, 669, 6015],
+    "lobby": 1,
+    "autoGroup": 1,
+    "door": 1,
+    "why": "The Bwork Dungeon as Dofus pour les noobs walks it («Donjon des Bworks»): «Après la salle 3», a transition room, «la salle du cachot», with a pit in its floor; «en cliquant sur la porte» one goes on to the next room, and whoever falls into the pit climbs back by «l'échelle pour remonter». The maps name them: 104599041 is «Donjon des Bworks - Cachot» (Solitary Confinement), the transition room, empty; its round door (element 477758, cell 302, content/interactives/teleports.json) leads to the Fourth Room. The grille in its middle drops to 104599043, «Cachot de Kreuvète» (Swimp Confinement), by the 2.73 graph's floor passage on cell 372; its ladder (477755) climbs back to the Cachot. The guide puts a Tamed Trool (791) and Kreuvète the Bwork (2680, levels 200 to 220) in the pit, says «il n'est pas nécessaire de les combattre», and Kreuvète only while the Bwork invasion of the Crackler Mountains is on, which this server never runs (WorldEvents): the pit holds the Trool alone, and a win there lands back at the Cachot like the ladder («hub»). The rooms' monsters are the Bwork, Bwork Mage and Bwork Archer with the Bworkette in the Fifth Room (JeuxOnline's dungeon sheet; the Unity guides count three monsters and the boss): the subarea also lists the Trool and Kreuvète, who stood in every room. The catalogue walked the five rooms straight and put both cells after the boss, where nothing led. INFERRED: the landing cells (312 in the Cachot, where a win in the Third Room lands; 326 in the Fourth Room), and that the pit's Trool fights alone."
+  },
   "9001": {
     "name": "Laboratorio Secreto",
     "minLevel": 0,
