@@ -319,5 +319,52 @@
     "coste": 20
    }
   ]
+ },
+ "frigost": {
+  "gfx": 70914,
+  "destinos": [
+   {
+    "mapa": 54169896,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54175018,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54171430,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54173997,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54170402,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54170403,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   },
+   {
+    "mapa": 54172969,
+    "subzona": 601,
+    "tipo": 10,
+    "coste": 20
+   }
+  ]
  }
 }

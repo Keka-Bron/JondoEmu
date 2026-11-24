@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Managers
 {
     /// <summary>
-    /// The zaapis of Bonta, Brakmar and Sufokia: the short transport inside the city.
+    /// The zaapis of Bonta, Brakmar, Sufokia and Frigost Village: the short transport inside the city.
     ///
     /// On the outside they work just like a zaap —it is clicked, the server sends the destination list and one
     /// chooses— but they are something else: they cost a fixed 20 kamas, they do not have to be activated and they only lead to
@@ -29,9 +29,11 @@ namespace Jondo.Unity.Server.Managers
     ///
     /// Sufokia is added from the published Quay List: six quays in subarea 32, all using graphic
     /// 34925. Other maps with that graphic are workshops and are not part of the quay network.
-    /// Frigost's 70914 is still left out: its destinations have not been measured yet, and
-    /// registering it now would give an element that can be clicked and does nothing. Adding a city
-    /// is putting it in the .json and its graphic in <see cref="GraphicsOf"/>.
+    /// Frigost Village is added from the same kind of published list: seven destinations in
+    /// subarea 601 (six workshop maps and the Zaap), all using graphic 70914. The Hunters' stop
+    /// is not at its listed coordinate at all: it stands on the doctor's street map at [-80,-45]
+    /// (54173997), and the Miners/Smiths stops are on the neighbouring maps that carry the
+    /// graphic. A destination is always a map with a real zaapi element.
     /// </summary>
     public static class Zaapis
     {
@@ -153,6 +155,7 @@ namespace Jondo.Unity.Server.Managers
             "bonta" => new[] { 70520, 70521 },
             "brakmar" => new[] { 304418 },
             "sufokia" => new[] { 34925 },
+            "frigost" => new[] { 70914 },
             _ => Array.Empty<int>(),
         };
 

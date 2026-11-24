@@ -245,8 +245,8 @@ namespace Jondo.Unity.Server.Handlers
             // One arrives beside the zaap -- or the zaapi -- one travels to, in front of it, as the
             // captures land: the nearest walkable cell by row and column put the traveller to its
             // side or behind it, hidden by its drawing, and beside cell 0 where the map has none.
-            var zaap = Interactives.ZaapElements(target);
-            var arrival = zaap.Count > 0 ? zaap[0] : Zaapis.ElementsOn(target).FirstOrDefault();
+            // A zaapi to a map that carries both must arrive at the zaapi, not at the zaap.
+            var arrival = ArrivalOn(target, kind);
             if (arrival.Id == 0 && Transports.On(target) is { } stop && stop.Stop.MapId == target)
                 arrival = stop.Stop.Vehicle;
             Jondo.Unity.Server.Network.SessionContext.State.CellId = anomalyArrival > 0
@@ -362,6 +362,19 @@ namespace Jondo.Unity.Server.Handlers
             long cost = CostBetween(Jondo.Unity.Server.Network.SessionContext.State.MapId, map);
             return Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push("him", Pb.New().Var(1, map).VarIfNotZero(2, cost).Build()));
+        }
+
+        /// <summary>
+        /// The element one lands beside: the zaapi one travelled to when it is a zaapi, even on a map
+        /// that also carries a zaap; otherwise the zaap, with the zaapi as the fallback.
+        /// </summary>
+        internal static Interactives.Element ArrivalOn(long target, int kind)
+        {
+            var zaap = Interactives.ZaapElements(target);
+            var zaapi = Zaapis.ElementsOn(target);
+            if (kind == Zaapis.Kind)
+                return zaapi.Count > 0 ? zaapi[0] : zaap.FirstOrDefault();
+            return zaap.Count > 0 ? zaap[0] : zaapi.FirstOrDefault();
         }
 
         internal static long CostBetween(long from, long to)
