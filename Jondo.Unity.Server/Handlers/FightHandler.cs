@@ -8709,6 +8709,11 @@ namespace Jondo.Unity.Server.Handlers
                     await LayPortalAsync(fight, c.Caster ?? quienLanza, c);
                     continue;
                 }
+                if (c.PortalsGoneAt != null)
+                {
+                    await RemovePortalsAsync(fight, c.PortalsGoneAt);
+                    continue;
+                }
                 if (c.PortalsOffAt != null)
                 {
                     await SwitchPortalsOffAsync(fight, c.Caster ?? quienLanza, c.PortalsOffAt);

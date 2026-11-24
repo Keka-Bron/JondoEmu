@@ -207,6 +207,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The cells whose portals a 1183 switches off, until the caster's next turn.</summary>
         public List<int> PortalsOffAt { get; init; }
 
+        /// <summary>The cells whose portals a 4007 takes off the board for good.</summary>
+        public List<int> PortalsGoneAt { get; init; }
+
         /// <summary><see cref="Sobre"/> goes through the portal he stands on (1182, "Teleportal").</summary>
         public bool Teleportal { get; init; }
 
@@ -2125,7 +2128,7 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static readonly HashSet<int> AlSuelo =
             new HashSet<int> { 181, 1008, 1011, 400, 401, 402, 1091, 1165, 2022, EffectSupport.Illusions, EffectSupport.MonsterIllusions, 780, 1034, 147, 1101, InvocaUnDoble,
-                               InvocaUnDobleDelLanzador, ColocaUnPortal, DesactivaUnPortal };
+                               InvocaUnDobleDelLanzador, ColocaUnPortal, DesactivaUnPortal, RetiraLosPortales };
 
         /// <summary>«Invoca un doble del lanzador»: the Sram's Doble and Conspirador.</summary>
         public const int InvocaUnDoble = 180;
@@ -2149,6 +2152,9 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>«Desactiva un portal»: off until the caster's next turn (Neutral, Interrupción).</summary>
         public const int DesactivaUnPortal = 1183;
+
+        /// <summary>«Retira los portales de la casilla» (4007): Qilby's turn end and portal spell clear the cells.</summary>
+        public const int RetiraLosPortales = 4007;
 
         /// <summary>«Sigue al lanzador»: Lazo Espiritual's bond.</summary>
         public const int SigueAlLanzador = 2184;
@@ -4999,6 +5005,19 @@ namespace Jondo.Unity.Server.Managers
                     Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
                     HechizoOrigen = hechizo, NivelOrigen = grado,
                     PortalsOffAt = celdas,
+                };
+            }
+            if (efecto.EffectId == RetiraLosPortales)
+            {
+                int centro = celdaApuntada >= 0 ? celdaApuntada : quienLanza.CellId;
+                var celdas = CasillasDelEfecto(efecto, quienLanza.CellId, centro);
+                if (celdas.Count == 0) celdas = new List<int> { centro };
+                if (!celdas.Any(cell => combate.Portales.At(cell) != null)) return null;
+                return new Outcome
+                {
+                    Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
+                    HechizoOrigen = hechizo, NivelOrigen = grado,
+                    PortalsGoneAt = celdas,
                 };
             }
             if (efecto.EffectId == AtraviesaLosPortales)

@@ -100,6 +100,21 @@ namespace Jondo.Unity.Server.Handlers
             await RefreshPortalsAsync(fight, occupantOf: OccupantThen);
         }
 
+        /// <summary>A 4007: the portals of its cells leave the board, each told gone in its owner's name.</summary>
+        internal static async Task RemovePortalsAsync(FightInstance fight, IEnumerable<int> cells)
+        {
+            bool any = false;
+            foreach (int cell in cells)
+            {
+                var portal = fight.Portales.At(cell);
+                if (portal == null) continue;
+                fight.Portales.Remove(portal);
+                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, FightProtocol.BuildGlyphGone(portal.Owner, portal.Id)));
+                any = true;
+            }
+            if (any) await RefreshPortalsAsync(fight);
+        }
+
         /// <summary>A 1183: the portals of its cells off until the caster's next turn begins.</summary>
         internal static async Task SwitchPortalsOffAsync(FightInstance fight, Fighter caster, IEnumerable<int> cells)
         {
