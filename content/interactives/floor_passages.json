@@ -49,6 +49,76 @@
   ],
   "passages": [
     {
+      "map": 106959872,
+      "cell": 357,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 344,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 330,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 317,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 303,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 290,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 276,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's left line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 346,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's right line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 332,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's right line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
+      "map": 106959872,
+      "cell": 319,
+      "toMap": 106959874,
+      "toCell": 280,
+      "why": "Crackler's Rocky Peaks, Sixth Room: a cell of the invisible bridge's right line, which drops to the Plateau below (Dofus pour les noobs, «Pitons Rocheux des Craqueleurs»: walk the middle line «sinon vous tomberez»; the 2.73 graph drops from cell 359 to the same map). INFERRED: the outer lines as the cells that drop, the landing cell."
+    },
+    {
       "map": 118228992,
       "cell": 299,
       "toMap": 118229250,

@@ -144,6 +144,30 @@
     },
     "why": "The den's thirteen rooms in the order their names give (First to Thirteenth Room), its fights in every other one: Dofus pour les noobs, «Antre du Dragon Cochon»: the first two are crossed quickly, «sinon vous obtiendrez une malédiction assez gênante : Gaz Méphitique»; the third brings Cerdos de Farle and Cerdos serranos (603, 3304), the fifth adds the Don dórgano (601), the seventh is the same, the ninth adds the Don dessangre (600); the fourth, sixth, eighth, tenth and twelfth are empty («Rien de spécial dans cette salle continuez jusque la prochaine»); the eleventh is the mini-boss, the Marranórgola (3137) alone -- its side of the map has one starting cell --, and the thirteenth the Dragocerdo. The catalogue put a group in every room, the Marranórgola in the first. The doors of the empty rooms are the 2.73 graph's floor passages, and content/interactives/floor_passages.json for the second and fourth. INFERRED: the boss's companions, the rooms' grades. The first two rooms are not to be lingered in: whoever comes in carries «Efluvios nauseabundos» (13284, «Si respiras mucho tiempo los gases de esta sala, sufrirás las consecuencias»), which goes when he reaches the third; still in them, it turns into «Gas mefistofélico» (13282) and then «Gas mefistofélico potente» (13283), four fights each -- INFERRED times, 60 and 120 seconds. The porco of the entrance (784) keeps the door."
   },
+  "18": {
+    "name": "Picos Rocosos de los Crujidores",
+    "minLevel": 60,
+    "optimalLevel": 70,
+    "difficulty": 3,
+    "entrance": 185861634,
+    "exit": 185861634,
+    "rooms": [106954752, 106955776, 106956800, 106957824, 106958848, 106959872, 106959874, 106957826, 106957828, 106960896],
+    "empty": [106959872, 106957826, 106957828],
+    "hub": {
+      "room": 106959872,
+      "rooms": { "106959874": 372 },
+      "then": 106959872,
+      "thenCell": 372
+    },
+    "bosses": [669],
+    "keyring": 1,
+    "required": [[7927, 1]],
+    "achievements": [41, 506, 690, 6168, 691],
+    "lobby": 1,
+    "autoGroup": 1,
+    "door": 1,
+    "why": "Crackler's Rocky Peaks in the order Dofus pour les noobs walks it («Pitons Rocheux des Craqueleurs»): fights in Salle 1 to 5 (First to Fifth Room), then «traverser un pont invisible» of three lines, walked on the middle one cell by cell or «vous tomberez»; whoever falls finds a monster below and fighting it «remonter» him to try the bridge again; then the boss. The Sixth Room (106959872, the guide's picture of the bridge is titled «Sixième salle») is that bridge, with nobody in it: its stairs on the far plateau (element 480373, cell 251) climb to the Seventh Room, the boss's (669). The bridge's outer lines drop to the Plateau below (106959874: the 2.73 graph's floor passage on cell 359, and content/interactives/floor_passages.json for the others), whose win brings the party back up to the bridge's foot, cell 372 under the middle line («hub»: the Sixth Room is its lobby and its «then»). 106957826 and 106957828 are the walkway under the Fourth Room's wooden bridge: the 2.73 graph's floor passage on its cell 179 leads down, 106957826's ladder (480371) back up; the guide's route never crosses them, and they are kept empty so that the base's generated groups, some with the boss in them, do not stand there. The catalogue chained a fight in the Sixth Room straight to the boss and put the Plateau and the walkway after him. INFERRED: who stands on the Plateau (the guide names no monster: it keeps a group of the dungeon's own), the landing cells, and which bridge cells drop (the two outer lines; the guide only says the middle one holds)."
+  },
   "9001": {
     "name": "Laboratorio Secreto",
     "minLevel": 0,
