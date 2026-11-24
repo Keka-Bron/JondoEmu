@@ -634,7 +634,7 @@ namespace Jondo.Unity.Server.Managers
                 // carry damage under TB or TE, and so do 37 rows of class spells -- Arsénico's
                 // "98 under TB": in sram-arsenico.pcapng the cast only hooks the row, and the 27
                 // air damage go out at the start of each target's turn (frames of -2, -3, -4).
-                if (!efecto.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
+                if (!efecto.RespondeA(disparador))
                     continue;
 
                 // And a blow with a delay is not dealt at the cast either: it waits on whoever it
@@ -2318,8 +2318,19 @@ namespace Jondo.Unity.Server.Managers
         internal static List<int> CasillasDelEfecto(SpellEffect efecto, int desde, int centro)
             => efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0
                 ? new List<int>(efecto.CeldasFijas)
-                : Jondo.Unity.World.Maps.Zone.Casillas(efecto.Forma, efecto.Tamano, desde, centro, efecto.TamanoMinimo,
+                : Jondo.Unity.World.Maps.Zone.Casillas(FormaDeLaZona(efecto), efecto.Tamano, desde, centro, efecto.TamanoMinimo,
                                                        efecto.ParaEnElObjetivo);
+
+        /// <summary>
+        /// The shape the zone is built with: a line with a forced direction runs every way from its
+        /// centre (<see cref="SpellEffect.DireccionForzada"/>), the straight L as the four straight
+        /// rays and the '/' as the four diagonal ones; every other shape as it is.
+        /// </summary>
+        private static int FormaDeLaZona(SpellEffect efecto)
+            => !efecto.DireccionForzada ? efecto.Forma
+             : efecto.Forma == Jondo.Unity.World.Maps.Zone.Linea ? Jondo.Unity.World.Maps.Zone.Aspa
+             : efecto.Forma == Jondo.Unity.World.Maps.Zone.DiagonalLine ? Jondo.Unity.World.Maps.Zone.DiagonalCross
+             : efecto.Forma;
 
         /// <summary>The three effects that bring a creature onto the board.</summary>
         private static readonly HashSet<int> Invocaciones = new HashSet<int> { 181, 1008, 1011 };
@@ -3036,11 +3047,7 @@ namespace Jondo.Unity.Server.Managers
                 if (descartados.Contains(filaLeida)) continue;
                 var efecto = filaLeida;
 
-                bool leToca = false;
-                foreach (var d in efecto.Disparadores())
-                {
-                    if (string.Equals(d, trigger, StringComparison.OrdinalIgnoreCase)) { leToca = true; break; }
-                }
+                bool leToca = efecto.RespondeA(trigger);
 
                 // ARMED, a monster spell's row that waits on a trigger: at the cast, on every
                 // fighter its mask and zone name -- its conditions are read when it goes off -- to
@@ -5259,6 +5266,24 @@ namespace Jondo.Unity.Server.Managers
                                                && g.HechizoQueLoPuso == hechizo && g.Centro == celdaApuntada
                                                && (g.CaducaEnRonda < 0 || caducaElGlifo >= 0 && g.CaducaEnRonda >= caducaElGlifo)))
                     return null;
+
+                // A monster's aura laid again where the same one still lies lasts on instead of
+                // doubling: Qilby lays his islets' blue glyphs (32143 -> 32144, one round) when the
+                // fight starts and again at every turn's end, and the two sets of the first round
+                // stood on the same cells, each one counted when a blow through a portal takes the
+                // islet's glyph away.
+                if (efecto.EffectId == GlifoDeAura && !PlayerSpells.Contains(hechizo)
+                    && !ForgelanceCombat.IsActor(combate, quienLanza)
+                    && combate.Glifos.FirstOrDefault(g => !g.Gastado && g.Tipo == GlifoDeAura && g.Dueno == quienLanza.Id
+                                                          && g.Hechizo == efecto.DiceNum
+                                                          && g.Grado == Math.Max(1, efecto.DiceSide)
+                                                          && g.Centro == celdaApuntada) is { } mismaAura)
+                {
+                    if (mismaAura.CaducaEnRonda >= 0
+                        && (caducaElGlifo < 0 || caducaElGlifo > mismaAura.CaducaEnRonda))
+                        mismaAura.CaducaEnRonda = caducaElGlifo;
+                    return null;
+                }
 
                 var huella = CasillasDelEfecto(efecto, quienLanza.CellId, celdaApuntada);
                 if (hechizo == ForgelanceCombat.LanceAura && efecto.DiceSide == 2

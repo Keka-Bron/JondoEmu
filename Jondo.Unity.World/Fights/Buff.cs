@@ -840,6 +840,12 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public static Func<int, int> UidDeLaPila { get; set; } = uid => uid;
 
+        /// <summary>
+        /// Whether every grade of a spell caps its rows at one, so that the cap holds across the
+        /// grades (see <see cref="Poner"/>). Set by the spell catalogue; nothing does by default.
+        /// </summary>
+        public static Func<int, bool> CapOfOneOnEveryGrade { get; set; } = _ => false;
+
         public Buff Poner(Buff embrujo, Func<int> siguienteNumero)
         {
             Relevados.Clear();
@@ -856,8 +862,19 @@ namespace Jondo.Unity.World.Fights
             {
                 int cabe = Math.Max(1, tope);
                 int pila = UidDeLaPila(embrujo.EffectUid);
+                // A cap of exactly one on EVERY grade of a spell holds across its grades: the bearer
+                // keeps one row of that spell, whichever grade put it. Julith's tokens are 11971's
+                // grades 2 to 5 (all five grades maxStack 1), one state each; a chronomorph handed
+                // the next token loses the one it held, and that is what leaves the four
+                // chronomorphs one Slayer state each. A spell whose grades differ keeps the cap per
+                // grade: the Piojoporojo's 6326 (grade 1 uncapped, grades 2 to 4 capped at one)
+                // gives the boss one state per flea, and 6327 reads two and three of them together.
+                bool unoPorHechizo = tope == 1 && embrujo.NivelOrigen > 0
+                                     && CapOfOneOnEveryGrade(embrujo.HechizoOrigen);
                 var equivalentes = _puestos.FindAll(e => e.EffectId == embrujo.EffectId
-                                                      && UidDeLaPila(e.EffectUid) == pila
+                                                      && (UidDeLaPila(e.EffectUid) == pila
+                                                          || unoPorHechizo && e.NivelOrigen > 0
+                                                             && e.NivelOrigen != embrujo.NivelOrigen)
                                                       && e.HechizoOrigen == embrujo.HechizoOrigen
                                                       && e.HechizoAfectado == embrujo.HechizoAfectado
                                                       && e.Quien == embrujo.Quien
@@ -869,6 +886,12 @@ namespace Jondo.Unity.World.Fights
                     _puestos.Remove(relevado);
                     Relevados.Add(relevado);
                     SeVan(new[] { relevado });
+
+                    // A relieved state row takes its state with it, unless the new row puts the
+                    // same state back or another row still holds it.
+                    if (relevado.Estado != 0 && relevado.Estado != embrujo.Estado
+                        && relevado.EffectId != Jondo.Unity.World.Combat.EffectSupport.DisableState
+                        && !SigueHabiendo(relevado.Estado)) _estados.Remove(relevado.Estado);
                 }
             }
 

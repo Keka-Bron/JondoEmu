@@ -4387,7 +4387,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             foreach (var embrujo in portador.Buffs.Puestos)
             {
-                if (embrujo.Quien != quienEmpieza.Id || embrujo.Pendiente) continue;
+                if (WhoseTurnCountsIt(fight, embrujo.Quien) != quienEmpieza.Id || embrujo.Pendiente) continue;
                 bool sinceHisLastTurn = embrujo.Numero > quienEmpieza.UltimoEmbrujoDeSuTurno;
                 // Put as the fight began, before anybody's turn, the row counts its rounds whole and
                 // lives its caster's turn of the last one, whatever his place in the order. Klim's
@@ -4406,7 +4406,17 @@ namespace Jondo.Unity.Server.Handlers
                 // noobs, «Antre du Dragon Cochon»). Not a row put at this turn's own start: a
                 // delayed one coming on as his turn opens the round -- Precipitación's «-3 PA» to
                 // the ally, in the ally's next turn -- is his, of this turn.
-                if (sinceHisLastTurn && !putAtTheStart && !embrujo.CountsHisTurnThisRound
+                // Not a row a summon put in its summoner's turn, the one its own follows: Agony's
+                // Malakite Crystals switch their invulnerability off «for one turn» (12126's 952)
+                // as her Radiation IV reaches them at her turn start, and counted from their own
+                // turn right after hers it was back before any player could hit them -- the guide
+                // has them vulnerable for the turn, the only way to wake her (Dofus pour les noobs).
+                bool putInHisSummonersTurn = quienEmpieza.EsInvocado
+                    && fight.Buscar(quienEmpieza.Invocador) is { } invocador
+                    && invocador.PrimerEmbrujoDeSuTurno >= fight.LastBuffBeforeThisRound
+                    && embrujo.Numero > invocador.PrimerEmbrujoDeSuTurno
+                    && embrujo.Numero <= invocador.UltimoEmbrujoDeSuTurno;
+                if (sinceHisLastTurn && !putAtTheStart && !embrujo.CountsHisTurnThisRound && !putInHisSummonersTurn
                     && embrujo.Numero > fight.LastBuffBeforeThisRound
                     && embrujo.Numero <= fight.LastBuffBeforeThisTurn
                     && embrujo.EmpiezaEnRonda == fight.RoundNumber
@@ -4431,9 +4441,21 @@ namespace Jondo.Unity.Server.Handlers
         internal static bool LeTocaCaer(FightInstance fight, Fighter quienEmpieza, Jondo.Unity.World.Fights.Buff embrujo)
         {
             // Kept through its caster's turn (AguantaSuTurno): it falls at whoever's start comes next.
-            if (embrujo.CaeAlAcabarSuTurno) return embrujo.Quien != quienEmpieza.Id;
+            if (embrujo.CaeAlAcabarSuTurno) return WhoseTurnCountsIt(fight, embrujo.Quien) != quienEmpieza.Id;
             return ItsCastersTurnHasCome(fight, quienEmpieza, embrujo.Quien);
         }
+
+        /// <summary>
+        /// Whose turn a row's duration counts in: its caster's, or his owner's when he is a summon
+        /// that never plays. A Dathura Bud hatches as a player starts his turn next to it and makes
+        /// Dathura invulnerable «for one turn» (12006's 950, duration 1); counted from her turn
+        /// start in the next round, the player's next turn still found her invulnerable, while the
+        /// guide has her vulnerable again once her own turn is over (Dofus pour les noobs).
+        /// </summary>
+        private static long WhoseTurnCountsIt(FightInstance fight, long casterId)
+            => fight.Buscar(casterId) is { EsInvocado: true, JuegaTurno: false, IsAlive: true } summon
+                ? summon.Invocador
+                : casterId;
 
         /// <summary>
         /// Whether <paramref name="quienEmpieza"/>'s turn start is the one at which what
@@ -6757,7 +6779,7 @@ namespace Jondo.Unity.Server.Handlers
             bool turnTrigger = string.Equals(disparador, Managers.EffectEngine.AlEmpezarElTurno, StringComparison.OrdinalIgnoreCase)
                             || string.Equals(disparador, Managers.EffectEngine.AlAcabarElTurno, StringComparison.OrdinalIgnoreCase);
             return lista.Where(f => enganche.Filas.Contains(ClaveDeFila(f))
-                                 && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
+                                 && f.RespondeA(disparador))
                         .Select(f => enganche.CaducaEnRonda >= 0 ? WithoutCasterStates(f) : f)
                         .Select(f => turnTrigger ? WithoutTheAttacker(f) : f)
                         .ToList();
@@ -6864,7 +6886,7 @@ namespace Jondo.Unity.Server.Handlers
             // A delayed blow is no blow at the cast: the engine registers it to wait.
             bool EsGolpe(Managers.SpellEffect f)
                 => Managers.EffectEngine.EsDeDano(f.EffectId)
-                   && f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase))
+                   && f.RespondeA(disparador)
                    && !Managers.EffectEngine.IsDelayedBlow(f, disparador);
 
             // Who stood on the aimed cell when the spell went off. A row before the blows that
@@ -7323,7 +7345,7 @@ namespace Jondo.Unity.Server.Handlers
             var todas = enganche.Critico
                 ? Managers.EffectEngine.EfectosDeLaTirada(enganche.Hechizo, enganche.Grado, true)
                 : Managers.SpellEffects.De(enganche.Hechizo, enganche.Grado);
-            var suyas = todas.Where(f => f.Disparadores().Any(d => string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)))
+            var suyas = todas.Where(f => f.RespondeA(disparador))
                              .ToList();
             if (suyas.Count == 0) return;
             if (suyas.Any(f => Managers.EffectEngine.EsDeDano(f.EffectId)))
@@ -10224,7 +10246,7 @@ namespace Jondo.Unity.Server.Handlers
                     if (!quien.IsAlive) return;
                     int grado = vigia.Buffs.GradoDeActitud(actitud);
                     var filas = Managers.SpellEffects.De(actitud, grado)
-                        .Where(fila => fila.Disparadores().Contains(disparador, StringComparer.OrdinalIgnoreCase)
+                        .Where(fila => fila.RespondeA(disparador)
                                        && !LaMascaraEsDelLanzador(fila.TargetMask)
                                        && (!soloLosDeTurno || VigilaElTurnoDeSusEnemigos(fila))
                                        && Managers.EffectEngine.CumpleLaMascara(vigia, quien, fila.TargetMask))
@@ -10276,37 +10298,47 @@ namespace Jondo.Unity.Server.Handlers
             fight.TriggeringAttacker = caster;
             fight.DanoDelDisparo = dano;
             fight.ElementoDelDisparo = elemento;
-            await DispararAsync(stream, fight, target, Managers.EffectEngine.AlRecibirDano);
+            // Each row answers the blow once, whichever of its triggers came first (see
+            // SpellEffect.AlreadyFiredByTheBlow): one set for the one hit, another for the hitter.
+            var yaDisparados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            Managers.SpellEffect.AlreadyFiredByTheBlow.Value = yaDisparados;
+            async Task Fire(Fighter on, string trigger)
+            {
+                await DispararAsync(stream, fight, on, trigger);
+                yaDisparados.Add(trigger);
+            }
+            await Fire(target, Managers.EffectEngine.AlRecibirDano);
             // A spell's blow, not a weapon's (DS): the Xelor's cómplice returns "una parte de los
             // daños de hechizo que sufre" through its 792 under DS, and in its capture it goes
             // off after the Xelor's 13254 lands on it.
-            if (deHechizo) await DispararAsync(stream, fight, target, Managers.EffectEngine.AlRecibirDanoDeHechizo);
+            if (deHechizo) await Fire(target, Managers.EffectEngine.AlRecibirDanoDeHechizo);
             // A trap's blow (DT): Toxinas "vuelve a aplicarse mientras ... el objetivo sufra daños de
             // trampas", Concentración de Chakra "roba vida ... si este sufre daños de trampas".
             if (fight.CurrentGlyphType == Managers.EffectEngine.ColocaUnaTrampa)
-                await DispararAsync(stream, fight, target, Managers.EffectEngine.AlSufrirDanoDeTrampa);
+                await Fire(target, Managers.EffectEngine.AlSufrirDanoDeTrampa);
             // A blow that came through the portals (PDT): Qilby's islet glyphs (32144) go when
             // whoever stands on them is hit from another islet.
             if (fight.ProjectedFrom >= 0)
-                await DispararAsync(stream, fight, target, Managers.EffectEngine.AlSufrirDanoPorUnPortal);
-            await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoDeElemento(elemento));
+                await Fire(target, Managers.EffectEngine.AlSufrirDanoPorUnPortal);
+            await Fire(target, Managers.EffectEngine.DanoDeElemento(elemento));
             if (caster != target && caster.TeamId == target.TeamId)
-                await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoDeAliado);
-            if (deCerca) await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoCuerpoACuerpo);
-            if (caster.EsInvocado) await DispararAsync(stream, fight, target, Managers.EffectEngine.DanoDeInvocacion);
+                await Fire(target, Managers.EffectEngine.DanoDeAliado);
+            if (deCerca) await Fire(target, Managers.EffectEngine.DanoCuerpoACuerpo);
+            if (caster.EsInvocado) await Fire(target, Managers.EffectEngine.DanoDeInvocacion);
 
             if (caster != target && caster.IsAlive)
             {
                 fight.TriggeringAttacker = target;
-                await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeElemento(elemento));
-                if (deCerca) await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeCerca);
-                else await DispararAsync(stream, fight, caster, Managers.EffectEngine.CausaDanoDeLejos);
+                yaDisparados.Clear();
+                await Fire(caster, Managers.EffectEngine.CausaDanoDeElemento(elemento));
+                if (deCerca) await Fire(caster, Managers.EffectEngine.CausaDanoDeCerca);
+                else await Fire(caster, Managers.EffectEngine.CausaDanoDeLejos);
                 // Any blow dealt (CD), a spell's (CDS), next door (CDCAC), to a foe (CDBE) or to
                 // an ally (CDBA): Cronoensanamiento's "CDS|CDM", Brutalitis's "CDCAC|CDS".
-                if (caster.IsAlive) await DispararAsync(stream, fight, caster, "CD");
-                if (deHechizo && caster.IsAlive) await DispararAsync(stream, fight, caster, "CDS");
-                if (deCerca && caster.IsAlive) await DispararAsync(stream, fight, caster, "CDCAC");
-                if (caster.IsAlive) await DispararAsync(stream, fight, caster, caster.TeamId == target.TeamId ? "CDBA" : "CDBE");
+                if (caster.IsAlive) await Fire(caster, "CD");
+                if (deHechizo && caster.IsAlive) await Fire(caster, "CDS");
+                if (deCerca && caster.IsAlive) await Fire(caster, "CDCAC");
+                if (caster.IsAlive) await Fire(caster, caster.TeamId == target.TeamId ? "CDBA" : "CDBE");
             }
             fight.TriggeringAttacker = antes;
             fight.DanoDelDisparo = danoAntes;

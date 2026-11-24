@@ -1755,6 +1755,7 @@ namespace Jondo.Unity.World.Fights
                     if (extra.Fighter.IsAlive)
                     {
                         PlayingAdditional = extra;
+                        extra.Fighter.PrimerEmbrujoDeSuTurno = _ultimoEmbrujo;
                         extra.Fighter.StartTurn(RoundNumber);
                         return extra.Fighter;
                     }
@@ -1792,6 +1793,7 @@ namespace Jondo.Unity.World.Fights
                 return null;
             }
 
+            CurrentFighter.PrimerEmbrujoDeSuTurno = _ultimoEmbrujo;
             CurrentFighter.StartTurn(RoundNumber);
             ScheduleAdditional(CurrentFighter);
             return CurrentFighter;

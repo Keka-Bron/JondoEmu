@@ -125,5 +125,81 @@ namespace Jondo.Unity.Tests.Combat
             FightHandler.AguantaSuTurno(fight, kralamoure, kralamoure);
             Assert.Single(kralamoure.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, kralamoure, row)));
         }
+
+        /// <summary>
+        /// A row a summon puts on itself in its summoner's turn counts from its own next turn, not
+        /// from the one right after the summoner's: Agony's Radiation IV reaches her Malakite
+        /// Crystals at her turn start and they switch their invulnerability off for one turn
+        /// (952). Counted from their turn right after hers, it was back before the players played.
+        /// </summary>
+        [Fact]
+        public void A_row_a_summon_puts_in_its_summoners_turn_outlives_its_own_turn_after()
+        {
+            var fight = new FightInstance(1, 1);
+            var player = Person(10, 0, 438);
+            var agony = Person(-1, 1, 259);
+            var crystal = Person(-2, 1, 260);
+            crystal.Invocador = agony.Id;
+            crystal.JuegaTurno = true;
+            fight.AddPlayer(player); fight.AddOpponent(agony); fight.AddOpponent(crystal);
+
+            // Her turn: the crystal switches its invulnerability off for one turn.
+            agony.PrimerEmbrujoDeSuTurno = fight.UltimoEmbrujo;
+            var off = new Buff
+            {
+                EffectId = 952, Estado = 56, Quien = crystal.Id, HechizoOrigen = 12126, NivelOrigen = 1,
+                CaducaEnRonda = fight.RoundNumber + 1, EmpiezaEnRonda = fight.RoundNumber,
+            };
+            crystal.Buffs.Poner(off, fight.SiguienteEmbrujo);
+            agony.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;
+
+            // The crystal's own turn, right after hers, and then the player's: the row stays.
+            fight.LastBuffBeforeThisTurn = fight.UltimoEmbrujo;
+            FightHandler.AguantaSuTurno(fight, crystal, crystal);
+            Assert.Empty(crystal.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, crystal, row)));
+            crystal.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;
+
+            FightHandler.AguantaSuTurno(fight, player, crystal);
+            Assert.Empty(crystal.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, player, row)));
+            Assert.Single(crystal.Buffs.Puestos.Where(b => b.EffectId == 952));
+        }
+
+        /// <summary>
+        /// A row put by a summon that never plays counts in its owner's turns: a Dathura Bud
+        /// hatching at a player's turn start makes Dathura invulnerable for one turn, and the
+        /// row lives through her turn and falls once it is over, before the player plays again.
+        /// </summary>
+        [Fact]
+        public void A_row_of_a_summon_that_never_plays_lives_through_its_owners_turn()
+        {
+            var fight = new FightInstance(1, 1);
+            var player = Person(10, 0, 438);
+            var dathura = Person(-1, 1, 259);
+            var bud = Person(-2, 1, 260);
+            bud.Invocador = dathura.Id;
+            bud.JuegaTurno = false;
+            fight.AddPlayer(player); fight.AddOpponent(dathura); fight.AddOpponent(bud);
+
+            // The player's turn starts next to the bud: it hatches and Dathura is invulnerable.
+            dathura.Buffs.PonerEstado(56);
+            var invulnerable = new Buff
+            {
+                EffectId = 950, Estado = 56, Quien = bud.Id, HechizoOrigen = 12006, NivelOrigen = 2,
+                CaducaEnRonda = fight.RoundNumber + 1, EmpiezaEnRonda = fight.RoundNumber,
+            };
+            dathura.Buffs.Poner(invulnerable, fight.SiguienteEmbrujo);
+            player.UltimoEmbrujoDeSuTurno = fight.UltimoEmbrujo;   // his turn is over
+
+            // Her turn starts: the row stays through it...
+            fight.LastBuffBeforeThisTurn = fight.UltimoEmbrujo;
+            FightHandler.AguantaSuTurno(fight, dathura, dathura);
+            Assert.Empty(dathura.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, dathura, row)));
+            Assert.True(dathura.Buffs.TieneEstado(56));
+
+            // ...and falls at the next start, the player's.
+            FightHandler.AguantaSuTurno(fight, player, dathura);
+            Assert.Single(dathura.Buffs.Barrer(fight.RoundNumber, row => FightHandler.LeTocaCaer(fight, player, row)));
+            Assert.False(dathura.Buffs.TieneEstado(56));
+        }
     }
 }

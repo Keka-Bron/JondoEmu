@@ -45,6 +45,7 @@ namespace Jondo.Unity.Server.Managers
             TamanoMinimo = TamanoMinimo,
             ParaEnElObjetivo = ParaEnElObjetivo,
             SoloEnLineaDeVista = SoloEnLineaDeVista,
+            DireccionForzada = DireccionForzada,
             PasoDeCaida = PasoDeCaida,
             TopeDeCaida = TopeDeCaida,
             MaxStack = MaxStack,
@@ -123,6 +124,16 @@ namespace Jondo.Unity.Server.Managers
         public bool SoloEnLineaDeVista { get; init; }
 
         /// <summary>
+        /// The line does not follow the cast (zoneDescr.forcedDirection): an L or a '/' set so runs
+        /// every way from its centre, the four straight rays or the four diagonal ones. The data
+        /// keeps only the flag, and its users are all "who stands in line, or in diagonal, with
+        /// it": the Champion of the Crimson Dawn's chronomorphs, hit with one element, take the
+        /// invulnerability off those in line with them, and with another off those in diagonal
+        /// («alignés» / «en diagonale», Dofus pour les noobs).
+        /// </summary>
+        public bool DireccionForzada { get; init; }
+
+        /// <summary>
         /// How much damage it loses for each cell one is away from the zone's centre, as a
         /// percentage, and how many cells at most are counted.
         ///
@@ -179,6 +190,32 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public bool ForClientOnly => (Flags & ForClientOnlyFlag) != 0;
 
+        /// <summary>
+        /// The triggers one blow has already set off on the fighter now answering it. A blow
+        /// sets off several at once -- damage (D), then melee damage (DCAC), the element's, a
+        /// spell's -- and a row that waits on more than one of them is still ONE reaction to
+        /// that blow: the Proto-Noxine's "1017 under D|DCAC" went off twice on a melee hit,
+        /// took 2 % of the attacker's vitality twice and teleported him past the bomb and back.
+        /// Set by FightHandler.DispararLosDelGolpeAsync for the blow it is going through.
+        /// </summary>
+        public static readonly System.Threading.AsyncLocal<HashSet<string>> AlreadyFiredByTheBlow = new();
+
+        /// <summary>
+        /// Whether this row goes off on <paramref name="disparador"/>: it is one of its triggers,
+        /// and the blow being answered has not already set the row off through another of them.
+        /// </summary>
+        public bool RespondeA(string disparador)
+        {
+            var ya = AlreadyFiredByTheBlow.Value;
+            bool toca = false;
+            foreach (var d in Disparadores())
+            {
+                if (string.Equals(d, disparador, StringComparison.OrdinalIgnoreCase)) toca = true;
+                else if (ya != null && ya.Contains(d)) return false;
+            }
+            return toca;
+        }
+
         public IEnumerable<string> Disparadores()
         {
             if (string.IsNullOrEmpty(Triggers)) { yield return "I"; yield break; }
@@ -220,11 +257,36 @@ namespace Jondo.Unity.Server.Managers
         static SpellEffects()
         {
             Jondo.Unity.World.Fights.Buffs.UidDeLaPila = StackUidOf;
+            Jondo.Unity.World.Fights.Buffs.CapOfOneOnEveryGrade = CapsOneOnEveryGrade;
             Jondo.Unity.World.Fights.Buffs.DispellableOfItsRow = row => DispellableOf(row.HechizoOrigen, row.NivelOrigen, row.EffectUid);
             Jondo.Unity.World.Fights.Buffs.HookOutlivesItsCaster = hook =>
                 hook.Filas is { Count: > 0 } rows
                 && rows.All(uid => DispellableOf(hook.Hechizo, hook.Grado, uid) >= Jondo.Unity.World.Fights.Buffs.DispellableByStrongDispelOnly);
         }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, bool> _capOfOne = new();
+
+        /// <summary>
+        /// Whether every grade of a spell has a maxStack of exactly one (Julith's 11971), read once
+        /// per spell from SpellLevels.
+        /// </summary>
+        public static bool CapsOneOnEveryGrade(int spell)
+            => spell > 0 && _capOfOne.GetOrAdd(spell, id =>
+            {
+                try
+                {
+                    using var conexion = new SqliteConnection(DatabaseManager.WorldConnectionString);
+                    conexion.Open();
+                    var orden = conexion.CreateCommand();
+                    orden.CommandText = "SELECT COUNT(*), SUM(MaxStack = 1) FROM SpellLevels WHERE SpellId = $id;";
+                    orden.Parameters.AddWithValue("$id", id);
+                    using var lector = orden.ExecuteReader();
+                    if (!lector.Read() || lector.IsDBNull(1)) return false;
+                    long total = lector.GetInt64(0);
+                    return total > 0 && lector.GetInt64(1) == total;
+                }
+                catch (Exception) { return false; }
+            });
 
         /// <summary>
         /// The "dispellable" of a spell's row by its effect uid, in the normal list or the critical
@@ -356,7 +418,7 @@ namespace Jondo.Unity.Server.Managers
                     if ((flags & SpellEffect.ForClientOnlyFlag) != 0) continue;
 
                     int forma = 'P', tamano = 1, minimo = 0, paso = 0, tope = 0;
-                    bool para = false, enLineaDeVista = false;
+                    bool para = false, enLineaDeVista = false, forzada = false;
                     var fijas = new List<int>();
                     if (e.TryGetProperty("zoneDescr", out var z) && z.ValueKind == JsonValueKind.Object)
                     {
@@ -378,6 +440,7 @@ namespace Jondo.Unity.Server.Managers
                         minimo = Entero(z, "param2");
                         para = Entero(z, "isStopAtTarget") != 0;
                         enLineaDeVista = Entero(z, "onlyAffectIfInSightLine") != 0;
+                        forzada = Entero(z, "forcedDirection") > 0;
                         paso = Entero(z, "damageDecreaseStepPercent");
                         tope = Entero(z, "maxDamageDecreaseApplyCount");
                     }
@@ -402,6 +465,7 @@ namespace Jondo.Unity.Server.Managers
                         TamanoMinimo = minimo,
                         ParaEnElObjetivo = para,
                         SoloEnLineaDeVista = enLineaDeVista,
+                        DireccionForzada = forzada,
                         PasoDeCaida = paso,
                         TopeDeCaida = tope,
                         MaxStack = maxStack,

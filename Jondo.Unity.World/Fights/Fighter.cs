@@ -641,6 +641,13 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public int UltimoEmbrujoDeSuTurno { get; set; } = -1;
 
+        /// <summary>
+        /// The fight's last buff number when this fighter's last turn started, or minus one before
+        /// its first: the rows numbered after it, up to <see cref="UltimoEmbrujoDeSuTurno"/>, were
+        /// put during that turn.
+        /// </summary>
+        public int PrimerEmbrujoDeSuTurno { get; set; } = -1;
+
         /// <summary>The catalogue's numbers for the two kinds of points.</summary>
         public const int CaracteristicaDePuntosDeAccion = 1;
         public const int CaracteristicaDePuntosDeMovimiento = 23;

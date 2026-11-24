@@ -81,7 +81,7 @@ namespace Jondo.Unity.World.Fights
         public int Color { get; }
 
         /// <summary>The round in which it drops. Zero: it does not drop on its own.</summary>
-        public int CaducaEnRonda { get; }
+        public int CaducaEnRonda { get; set; }
 
         public string Mascara { get; }
         public Disparo Cuando { get; }
