@@ -217,6 +217,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ Server on this computer, started by the launcher, or on another machine (VPS, LAN); update repository and uninstall in *Settings*
 - ✅ HD and 4K scenery packs from Ankama's own CDN for the client's version: resumable and verified downloads
 - ✅ The Windows or Linux client from Ankama's CDN in *Settings*: downloads it whole, or checks the one in use and fetches only what is missing or damaged; on Windows the Linux client can be saved to take to another computer
+- ✅ *News* page: the notes of the latest GitHub release, kept for offline starts, and the roadmap
 - ✅ Animated neon sign and falling stars
 - 🚧 OAuth sign-in
 
@@ -233,7 +234,8 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 
 - ✅ Five listeners in one process — HAAPI (`8888`), Zaap (`15881`), game (`5555`), game node (`5556`) and chat (`6337`)
 - ✅ One session per socket: eight clients on one machine never see each other's state
-- ✅ Its own window with the live log, the counters and the connected clients
+- ✅ Its own window, four pages (Ctrl+1..4): *Console* with the live log and counters, *Players* with the connected clients, *Events* and *Settings*
+- ✅ Seasonal events switched from the *Events* page — Kwismas Island, Al Howin, Vulkania, St. Ballotwine's Day, Fleaster and Me Hearty Party — each *Calendar*, *Open* or *Closed*: their NPCs, boat passages and event monsters in the groups follow it
 - ✅ Startup checks that refuse to boot when the shipped data is inconsistent — see [Tests](#-tests)
 - ✅ Runs on another machine with `JONDO_PUBLIC_BIND=1`; the launcher relays the client to it
 - ✅ A **Settings** window (the *SETTINGS* button) for what the game itself does not decide, stored in
