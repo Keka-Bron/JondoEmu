@@ -1285,6 +1285,26 @@ namespace Jondo.Unity.Server.Managers
         internal static bool CountsItsTriggerRounds(SpellEffect row)
             => row != null && row.Duration == 0 && row.TriggerDuration > 0 && row.TriggerDuration < NoLimitTriggerDuration;
 
+        /// <summary>How many times each behaviour row of a monster has gone off, for the ones that go off a set number of times.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, Dictionary<(int Spell, int Grade, int Effect, int DiceNum, int DiceSide, string Triggers), int>> BehaviourGoOffs = new();
+
+        /// <summary>
+        /// Whether a behaviour row whose trigger duration counts (<see cref="CountsItsTriggerRounds"/>)
+        /// still has one go-off left on its monster, and if so takes it.
+        /// </summary>
+        private static bool OneMoreGoOff(Fighter monster, int spell, int grade, SpellEffect row)
+        {
+            var goOffs = BehaviourGoOffs.GetOrCreateValue(monster);
+            var key = (spell, grade, row.EffectId, row.DiceNum, row.DiceSide, row.Triggers ?? "");
+            lock (goOffs)
+            {
+                int done = goOffs.GetValueOrDefault(key);
+                if (done >= row.TriggerDuration) return false;
+                goOffs[key] = done + 1;
+                return true;
+            }
+        }
+
         /// <summary>Whether a row with no duration of its own waits on its bearer's death for as long as the fight lasts.</summary>
         internal static bool WaitsForeverOnDeath(SpellEffect row)
             => row.TriggerDuration >= NoLimitTriggerDuration
@@ -3147,6 +3167,21 @@ namespace Jondo.Unity.Server.Managers
                 if (rondaDelEnganche >= 0 && efecto.EffectId == CastsOnTheTurnOnce && efecto.Delay > 0
                     && efecto.Duration == 0 && WaitsOnATurn(efecto) && !PlayerSpells.Contains(spell)
                     && round > rondaDelEnganche + efecto.Delay)
+                {
+                    continue;
+                }
+
+                // And a behaviour's own row on its monster under a turn's trigger, with no duration
+                // and a real trigger duration (1 to 62, not the «no limit» 63), goes off as many
+                // times as that count, and no more. The immature Scaraleaf's 29833 is «792 29828
+                // under TB, trigger duration 1»: one growth two turns in (+1 AP, +1 MP, +20% life).
+                // Hooked for good with its behaviour, 29828 went off at every turn start, and each
+                // cast queued one more growth on top. Counted in goes-off rather than in rounds
+                // from the hook: the Ush Galesh's 6264 («792 6264-2 under TE, trigger duration 1»)
+                // is hooked at the fight's start and still goes off at its first turn end.
+                if (rondaDelEnganche >= 0 && target == caster && caster.Conducta == (spell, grade)
+                    && !PlayerSpells.Contains(spell) && WaitsOnATurn(efecto)
+                    && CountsItsTriggerRounds(efecto) && !OneMoreGoOff(caster, spell, grade, efecto))
                 {
                     continue;
                 }

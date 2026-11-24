@@ -994,12 +994,17 @@ namespace Jondo.Unity.Server.Managers
                 // enemy, in its reach. The Kralamoure's tentacles come out four to twelve cells
                 // away, and the cells around him are not walkable: aimed at its neighbours only,
                 // he never summoned one.
-                if (spell.MinRange > 1)
-                    foreach (int cell in cache.Toward)
-                    {
-                        int distance = MapGeometry.Distance(from, cell);
-                        if (distance >= spell.MinRange && distance <= spell.ReachFor(monster)) yield return (monster, cell);
-                    }
+                // And one that can, when none of its neighbours is free: the Scaraleaf boss (797),
+                // with the player, his own creatures and the bushes all round him, did not cast his
+                // Nacimiento (790, one to three cells) until one of them walked off.
+                bool hemmedIn = spell.MinRange <= 1 && spell.ReachFor(monster) > 1
+                                && !MapGeometry.GetNeighbors(from).Any(c => c == monster.CellId || cache.Free(c));
+                if (spell.MinRange > 1 || hemmedIn)
+                    foreach (int cell in cache.Toward
+                                 .Where(c => c != from)
+                                 .Where(c => { int d = MapGeometry.Distance(from, c); return d >= spell.MinRange && d <= spell.ReachFor(monster); })
+                                 .Take(spell.MinRange > 1 ? int.MaxValue : SummonCellsTried))
+                        yield return (monster, cell);
             }
             if (spell.Utility > 0)
             {
@@ -1059,7 +1064,8 @@ namespace Jondo.Unity.Server.Managers
             if (!spell.HasRows && spell.Summons && target == monster && aim != from)
                 return board.Walkable(aim) && !board.Occupied(aim)
                        && MapGeometry.Distance(from, aim) >= spell.MinRange
-                       && MapGeometry.Distance(from, aim) <= Math.Max(1, spell.MaxRange);
+                       && MapGeometry.Distance(from, aim) <= Math.Max(1, spell.MaxRange)
+                       && (!spell.NeedsLineOfSight || MapGeometry.Distance(from, aim) <= 1 || board.Sees(from, aim));
 
             if (spell.NeedsFreeCell && (board.Occupied(aim) || aim == from || !board.Walkable(aim))) return false;
 
@@ -1278,6 +1284,9 @@ namespace Jondo.Unity.Server.Managers
                     .Where(c => c != _monster.CellId && _board.Walkable(c) && !_board.Occupied(c) && !_board.Trapped(c))
                     .OrderBy(c => _enemies.Min(e => MapGeometry.Distance(c, e.CellId)))
                     .Take(SummonCellsKept).ToList();
+
+            /// <summary>Whether a summon can come out on the cell: walkable, with nobody and no trap on it.</summary>
+            public bool Free(int cell) => _board.Walkable(cell) && !_board.Occupied(cell) && !_board.Trapped(cell);
 
             /// <summary>The free cells an enemy is likeliest to walk on, likeliest first.</summary>
             public List<(int Cell, double Odds)> Likely
