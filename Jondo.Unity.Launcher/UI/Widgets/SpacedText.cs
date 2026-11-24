@@ -4,7 +4,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI.Widgets
+#endif
 {
     /// <summary>
     /// Text with the letters spaced out, which is the style sheet's <c>letter-spacing</c>.

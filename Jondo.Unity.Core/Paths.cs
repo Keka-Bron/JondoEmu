@@ -73,6 +73,12 @@ namespace Jondo.Unity.Launcher
         public static string ServerSettingsFile => Path.Combine(Root, "config", "server_settings.json");
 
         /// <summary>
+        /// The yearly events as the server's Events page leaves them: each one on its calendar, held
+        /// open or held shut, and whether its monsters come out. Read again whenever it changes.
+        /// </summary>
+        public static string EventsFile => Path.Combine(Root, "config", "events.json");
+
+        /// <summary>
         /// The diagnostics database where the packets we do not know how to handle are recorded.
         ///
         /// It goes apart from world.db and auth.db on purpose: it carries nothing needed to play,

@@ -171,9 +171,14 @@ namespace Jondo.Unity.World.Content
                     }
 
                     var there = new List<NpcSpawnKey>();
-                    foreach (var (key, _) in store.Rows)
+                    foreach (var (key, row) in store.Rows)
                     {
-                        if (key.MapId == mapId && !wanted.ContainsKey(key)) there.Add(key);
+                        if (key.MapId != mapId || wanted.ContainsKey(key)) continue;
+                        // The captures were walked outside the yearly events, so an NPC that only
+                        // comes with one -- the Kwismas boatman in Madrestam's port, «Sc=90001» --
+                        // could not be in them: an authored placement behind an event stays.
+                        if (row.From.Layer == ContentLayer.Authored && NamesAnEvent(row.Value.Criterion)) continue;
+                        there.Add(key);
                     }
                     foreach (var key in there) store.Erase(key, from);
                     foreach (var (key, spawn) in wanted) store.Override(key, spawn, from);
@@ -184,6 +189,10 @@ namespace Jondo.Unity.World.Content
                 report?.Invoke($"[Content] {Path.GetFileName(path)} is unreadable: {ex.Message}");
             }
         }
+
+        /// <summary>Whether a criterion asks for a yearly event or content switch, «Sc=…».</summary>
+        internal static bool NamesAnEvent(string? criterion)
+            => !string.IsNullOrEmpty(criterion) && criterion.Contains("Sc=", StringComparison.Ordinal);
 
         /// <summary>
         /// The base layer: placements worked out from the quest catalogue.

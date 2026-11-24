@@ -21,11 +21,43 @@ namespace Jondo.Unity.Server.Managers
     ///   979 Vulkania        « Premier Contact », « Prise de sang »: 1 July to 1 September
     ///   953 Fête du Ripate  « Chasse au trésor des pirates »: two weeks around 19 September
     /// </code>
-    /// Every other value is on.
+    /// Every other value is on. 980 guards the sea passage to Vulkania and its pier's element: it
+    /// is Vulkania's, an alias of 979.
+    ///
+    /// Kwismas Island has no «Sc» in the client's data (its boat is the real server's NPC alone):
+    /// <see cref="Kwismas"/> is this server's own value, written in content only -- Hector
+    /// Kwismas's spawn at the Madrestam port and his reply that sails there.
+    ///
+    /// The operator holds an event open or shut from the server's Events page
+    /// (<see cref="EventSettings"/>); left on Auto it follows the calendar below.
     /// </remarks>
     public static class SeasonalEvents
     {
         public const int Halouine = 967, SainBallotin = 982, Pwak = 945, Vulkania = 979, Ripate = 953;
+
+        /// <summary>Kwismas Island's event: a value of this server's own, no client data carries it.</summary>
+        public const int Kwismas = 90001;
+
+        /// <summary>The sea passage to Vulkania's value, which is Vulkania's.</summary>
+        public const int VulkaniaPassage = 980;
+
+        /// <summary>The events, in the calendar's order, for the Events page.</summary>
+        public static readonly int[] Events = { SainBallotin, Pwak, Vulkania, Ripate, Halouine, Kwismas };
+
+        /// <summary>The value an alias stands for: 980 for 979; any other value itself.</summary>
+        public static int Canonical(int criterion) => criterion == VulkaniaPassage ? Vulkania : criterion;
+
+        /// <summary>An event's key, the one config\events.json and the window's texts use.</summary>
+        public static string KeyOf(int criterion) => Canonical(criterion) switch
+        {
+            Kwismas => "kwismas",
+            Halouine => "halouine",
+            Vulkania => "vulkania",
+            SainBallotin => "sainballotin",
+            Pwak => "pwak",
+            Ripate => "ripate",
+            _ => criterion.ToString(),
+        };
 
         /// <summary>Each event's days in a year: [start, end).</summary>
         private static readonly Dictionary<int, Func<int, (DateTime Start, DateTime End)>> Windows = new()
@@ -35,6 +67,8 @@ namespace Jondo.Unity.Server.Managers
             [Pwak] = year => Weeks(TuesdayOnOrBefore(new DateTime(year, 4, 1)), 4),
             [Vulkania] = year => (new DateTime(year, 7, 1), new DateTime(year, 9, 1)),
             [Ripate] = year => Weeks(TuesdayOnOrBefore(new DateTime(year, 9, 19)).AddDays(-7), 2),
+            // Mid-December into January, as the island's events have run: across the new year.
+            [Kwismas] = year => (new DateTime(year, 12, 15), new DateTime(year + 1, 2, 1)),
         };
 
         private static DateTime TuesdayOnOrBefore(DateTime day)
@@ -42,13 +76,49 @@ namespace Jondo.Unity.Server.Managers
 
         private static (DateTime, DateTime) Weeks(DateTime start, int weeks) => (start, start.AddDays(7 * weeks));
 
-        /// <summary>Whether that «Sc» is met on that day: an event while it runs, anything else always.</summary>
+        /// <summary>
+        /// Whether that «Sc» is met on that day: an event while it runs -- or as the operator holds
+        /// it --, anything else always.
+        /// </summary>
         public static bool IsOn(int criterion, DateTime now)
         {
+            criterion = Canonical(criterion);
             if (ForcedOn.ContainsKey(criterion)) return true;
-            if (!Windows.TryGetValue(criterion, out var window)) return true;
-            var (start, end) = window(now.Year);
-            return now.Date >= start && now.Date < end;
+            if (!Windows.ContainsKey(criterion)) return true;
+            switch (EventSettings.Current.ModeOf(criterion))
+            {
+                case EventMode.On: return true;
+                case EventMode.Off: return false;
+            }
+            return OnTheCalendar(criterion, now);
+        }
+
+        /// <summary>Whether that event's days run on that day, whatever the operator holds.</summary>
+        public static bool OnTheCalendar(int criterion, DateTime now)
+        {
+            if (!Windows.TryGetValue(Canonical(criterion), out var window)) return true;
+            // This year's window, and last year's for one that runs across the new year.
+            foreach (int year in new[] { now.Year, now.Year - 1 })
+            {
+                var (start, end) = window(year);
+                if (now.Date >= start && now.Date < end) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// The event's days that run on that day, or the next ones to come: what the Events page
+        /// shows beside each event.
+        /// </summary>
+        public static (DateTime Start, DateTime End) WindowAround(int criterion, DateTime now)
+        {
+            var window = Windows[Canonical(criterion)];
+            foreach (int year in new[] { now.Year - 1, now.Year, now.Year + 1 })
+            {
+                var (start, end) = window(year);
+                if (now.Date < end) return (start, end);
+            }
+            return window(now.Year + 1);
         }
 
         /// <summary>
@@ -58,7 +128,7 @@ namespace Jondo.Unity.Server.Managers
         internal static readonly System.Collections.Concurrent.ConcurrentDictionary<int, bool> ForcedOn = new();
 
         /// <summary>Whether that value is one of the yearly events.</summary>
-        public static bool IsEvent(int criterion) => Windows.ContainsKey(criterion);
+        public static bool IsEvent(int criterion) => Windows.ContainsKey(Canonical(criterion));
 
         /// <summary>
         /// Whether that value's meaning is known: a yearly event, or a switch some quest's criterion

@@ -37,7 +37,15 @@ internal sealed class SettingsCardsPanel : Panel
     private void SetCompact(bool compact)
     {
         Compact = compact;
-        foreach (var hint in Hints) hint.IsVisible = !compact;
+        foreach (var hint in Hints)
+        {
+            if (hint.IsVisible == !compact) continue;
+            hint.IsVisible = !compact;
+            // A hidden or shown hint changes its card's height, but only the hint itself is marked
+            // for a new measure: without its ancestors, the card would answer its old size.
+            for (var parent = hint.Parent as Avalonia.Layout.Layoutable; parent != null && parent != this; parent = parent.Parent as Avalonia.Layout.Layoutable)
+                parent.InvalidateMeasure();
+        }
     }
 
     private double MeasureColumns(double width, int columns)

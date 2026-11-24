@@ -2,7 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI.Widgets
+#endif
 {
     /// <summary>
     /// The little flag of the language buttons, and of the game languages' dropdown.

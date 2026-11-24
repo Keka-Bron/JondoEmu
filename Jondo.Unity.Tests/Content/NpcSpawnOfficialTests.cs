@@ -69,6 +69,32 @@ namespace Jondo.Unity.Tests.Content
         }
 
         [Fact]
+        public void A_hand_placed_npc_behind_an_event_stays_on_a_listed_map()
+        {
+            // The captures were walked outside the yearly events: the event's NPC was not there to see.
+            string authored = Write("authored.json",
+                "{\"spawns\":[{\"map\":4,\"npc\":11,\"cell\":275,\"criterion\":\"Sc=90001\"},{\"map\":4,\"npc\":12,\"cell\":200}]}");
+            string official = Write("official.json", "{\"maps\":[{\"map\":4,\"spawns\":[]}]}");
+
+            var store = NpcSpawnContent.Load(null, authored, null, null, official);
+
+            Assert.True(store.TryGet(new NpcSpawnKey(4, 11, 275), out var boatman));
+            Assert.Equal("Sc=90001", boatman.Value.Criterion);
+            Assert.False(store.Contains(new NpcSpawnKey(4, 12, 200)));
+        }
+
+        /// <summary>The shipped Kwismas boatman in Madrestam's port, on a map the official layer lists.</summary>
+        [Fact]
+        public void The_kwismas_boatman_survives_the_official_layer()
+        {
+            var store = NpcSpawnContent.Load(null, Jondo.Unity.Launcher.Paths.ContentFile(NpcSpawnContent.AuthoredFile), null, null,
+                Jondo.Unity.Launcher.Paths.ContentFile(NpcSpawnContent.OfficialFile));
+
+            Assert.True(store.TryGet(new NpcSpawnKey(68420097, 795, 275), out var boatman));
+            Assert.Equal("Sc=90001", boatman.Value.Criterion);
+        }
+
+        [Fact]
         public void Only_the_authored_layer_overrides()
         {
             var store = new ContentStore<NpcSpawnKey, NpcSpawn>();

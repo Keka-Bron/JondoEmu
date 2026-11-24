@@ -5,7 +5,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI.Widgets
+#endif
 {
     /// <summary>
     /// A line icon of the launcher: drawn on a 24-unit grid with round ends, in the colour of the
@@ -94,6 +100,15 @@ namespace Jondo.Unity.Launcher.UI.Widgets
             ["drive"] = ("M3,13 L5.6,5.6 A1.6,1.6 0 0 1 7.1,4.5 L16.9,4.5 A1.6,1.6 0 0 1 18.4,5.6 L21,13 L21,18 " +
                          "A1.5,1.5 0 0 1 19.5,19.5 L4.5,19.5 A1.5,1.5 0 0 1 3,18 Z M3,13 L21,13 M16.5,16.3 L16.6,16.3", null),
             ["shortcut"] = ("M4,5 L20,5 L20,19 L4,19 Z M9,15 L15,9 M10.5,9 L15,9 L15,13.5", null),
+            ["calendar"] = ("M4,6.5 L20,6.5 L20,20 L4,20 Z M4,10.5 L20,10.5 M8.5,4 L8.5,8.5 M15.5,4 L15.5,8.5",
+                            "M8,13.5 L10,13.5 L10,15.5 L8,15.5 Z M14,13.5 L16,13.5 L16,15.5 L14,15.5 Z"),
+            ["megaphone"] = ("M4,10 L4,14 L7,14 L16,19 L16,5 L7,10 Z M7,14 L8.5,19.5 L11,19.5 L10,15.6 M19,9.5 A3,3 0 0 1 19,14.5", null),
+            ["terminal"] = ("M3.5,5 L20.5,5 L20.5,19 L3.5,19 Z M7,9.5 L10,12 L7,14.5 M12.5,15 L17,15", null),
+            ["activity"] = ("M3,12.5 L7,12.5 L9.5,6 L14,19 L16.5,12.5 L21,12.5", null),
+            ["stop"] = ("M12,3 A9,9 0 1 0 12,21 A9,9 0 1 0 12,3 Z", "M9,9 L15,9 L15,15 L9,15 Z"),
+            ["search"] = ("M10.5,4 A6.5,6.5 0 1 0 10.5,17 A6.5,6.5 0 1 0 10.5,4 Z M15.3,15.3 L20,20", null),
+            ["sword"] = ("M14.5,4 L20,4 L20,9.5 L10,19.5 L7.5,17 Z M6,14.5 L9.5,18 M4,20 L7,17", null),
+            ["map"] = ("M3.5,6 L9,4 L15,6 L20.5,4 L20.5,18 L15,20 L9,18 L3.5,20 Z M9,4 L9,18 M15,6 L15,20", null),
         };
 
         private static readonly Dictionary<string, (Geometry? Line, Geometry? Fill)> Parsed = new(StringComparer.OrdinalIgnoreCase);

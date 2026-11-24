@@ -171,6 +171,20 @@
       "cell": 452,
       "orientation": 1,
       "measured": "inferred: the haunted temple of «El último de nosotros» (2486) is an island with no border, reached only by Kroa (62920704 and the Antro del Cil's door); on 452 at the foot of the ruined steps, beside Cornelia and Kroa"
+    },
+    {
+      "map": 66060293,
+      "from": 68420097,
+      "cell": 132,
+      "orientation": 3,
+      "measured": "inferred: Hector Kwismas's boat from the Madrestam port lands on Kwismas Island's shore [-34,-83] in front of him (118), on open snow"
+    },
+    {
+      "map": 68420097,
+      "from": 66060293,
+      "cell": 289,
+      "orientation": 1,
+      "measured": "inferred: back from Kwismas Island, the boat lands at the Madrestam port [8,-6] on the quay beside Hector's spot (275)"
     }
   ]
 }

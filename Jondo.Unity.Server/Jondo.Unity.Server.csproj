@@ -64,6 +64,21 @@
     <ProjectReference Include="..\Jondo.Unity.Sprites\Jondo.Unity.Sprites.csproj" />
   </ItemGroup>
 
+  <!-- The launcher's look: its palette, star field, neon sign, flags and line icons, compiled
+       into this window's own namespace (Jondo.Unity.Server.UI.Skin) so both programs share one drawing. -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);JONDO_SERVER</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Jondo.Unity.Launcher\UI\LauncherSkin.cs" Link="UI\Skin\LauncherSkin.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\FlagIcon.cs" Link="UI\Skin\FlagIcon.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\Icon.cs" Link="UI\Skin\Icon.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\LogoBanner.cs" Link="UI\Skin\LogoBanner.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\SpacedText.cs" Link="UI\Skin\SpacedText.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\StarField.cs" Link="UI\Skin\StarField.cs" />
+    <Compile Include="..\Jondo.Unity.Launcher\UI\Widgets\StatusDot.cs" Link="UI\Skin\StatusDot.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <AvaloniaResource Include="../launcher_assets/servidor_fondo.jpg" Link="Assets/servidor_fondo.jpg" />
     <AvaloniaResource Include="icono_servidor.ico" Link="Assets/icono_servidor.ico" />

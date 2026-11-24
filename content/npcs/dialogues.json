@@ -61570,6 +61570,36 @@
         }
       ],
       "why": "The god Sadida (4210): «El arma letal» (1939), objective 13491 and the end of the quest: «Inclinarte ante el dios Sadida.» (36272), his words (30144, 30145), «Sentir la energía del embrujo del necrónix.» (36271) and the oath, «Juro que combatiré a los mediomuertos hasta que no me quede aliento.» (36270), which teaches Necronyx (9348) for good (Dofus pour les noobs («L'arme fatale»): «Le Dieu Sadida fait son apparition et vous obtenez alors le sort permanent Necronyx»)."
+    },
+    {
+      "npc": 795,
+      "map": 68420097,
+      "opening": 3254,
+      "lines": [
+        {
+          "message": 3254,
+          "choices": [
+            { "reply": 69375, "criterion": "Sc=90001", "teleport": 66060293 },
+            { "reply": 2901 }
+          ]
+        }
+      ],
+      "why": "Hector Kwismas at the Madrestam port: his line 3254 and the reply that sails to Kwismas Island (69375), landing on its shore [-34,-83] (66060293), or staying in the warmth (2901). The crossing is open while the server's Kwismas event runs."
+    },
+    {
+      "npc": 795,
+      "map": 66060293,
+      "opening": 3255,
+      "lines": [
+        {
+          "message": 3255,
+          "choices": [
+            { "reply": 2902, "teleport": 68420097 },
+            { "reply": 2904 }
+          ]
+        }
+      ],
+      "why": "Hector Kwismas on Kwismas Island's shore: his line 3255, the way back to the Madrestam port (2902) or staying on the island (2904). Always open, so nobody is stranded when the event closes."
     }
   ]
 }

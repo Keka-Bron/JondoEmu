@@ -5,7 +5,13 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI.Widgets
+#endif
 {
     /// <summary>
     /// The «JONDO EMU» sign, lit like a neon tube.

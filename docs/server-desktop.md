@@ -72,6 +72,26 @@ Each release carries `JondoEmu-<tag>-linux-x64.zip`: the server, the launcher an
 built for Linux, with the data they read. It requires the .NET runtime. The Windows zip
 carries the same three for Windows.
 
+## The window
+
+The window has four pages, reached from the sidebar or with Ctrl+1 to Ctrl+4. The top bar
+shows whether the world is online, how long it has run and how many players are in it.
+
+- **Console**: the world, network, machine and loaded-data counters, and the log with a
+  filter, auto-scroll and Clear.
+- **Players**: the characters in the world with their level, map and whether they are
+  fighting; a search box, a box to also list simulated players, Kick (with confirmation;
+  the character is saved as it leaves) and an announcement sent to every player's chat in
+  their own language.
+- **Events**: each yearly event (Kwismas Island, Al Howin, Vulkania, St. Ballotwine's Day,
+  Fleaster and Me Hearty Party) on its calendar, held open or held shut, and whether the event monsters
+  come out while it runs, with the chance for each group. These apply at once, without a
+  restart, and are saved to `config/events.json`. An open event opens its boat or passage
+  replies, its NPCs, quests and dungeon; a shut one hides them even on its own days. The
+  monsters are listed in `content/world/event_monsters.json` (Al Howin Gobballs and Tofus
+  with pumpkin masks, the Kwismas Minotoball and Dragoturkeys in Frigost).
+- **Settings**: the settings that apply at the next start, available once the world is up.
+
 ## Settings and restart
 
 Settings are saved to `config/server_settings.json`. Editing never changes the rules
@@ -93,7 +113,9 @@ dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj
 
 The suite checks TCP transport, headless Skia rendering, embedded assets, settings
 editing and validation, loot dependencies, restart confirmation, close/stop confirmation,
-bounded multiline logs, launch/restart arguments and desktop/backend shutdown coordination.
+bounded multiline logs, launch/restart arguments, desktop/backend shutdown coordination,
+and every page of the window in each language (navigation, kicks, announcements, event
+modes, the log filter and the settings editor) against an injected fake server.
 It does not start world services or edit operator settings. CI tests on Windows and
 Linux and publishes the server for both RIDs. Actual desktop smoke testing should also
 cover scaling, a long-running log, process restart and connecting the native client.

@@ -629,7 +629,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A line to everybody in the world, in each one's own language.</summary>
-        private static async Task<int> AnnounceToAllAsync(string key, params object[] values)
+        internal static async Task<int> AnnounceToAllAsync(string key, params object[] values)
         {
             int told = 0;
             foreach (var s in SessionRegistry.InWorld())

@@ -6996,6 +6996,21 @@
       "cell": 345,
       "orientation": 3,
       "why": "Kazy Ingals, keeper of the Royal Tofu House, in the peasants' workshop [5,6] next to Kurk Ingals: the dungeon's entrance is that workshop and one talks to her to go in (Dofus pour les noobs, Tofulailler Royal)."
+    },
+    {
+      "map": 68420097,
+      "npc": 795,
+      "cell": 275,
+      "orientation": 1,
+      "criterion": "Sc=90001",
+      "why": "Hector Kwismas's boat to Kwismas Island, at the Madrestam port [8,-6] beside the moored boat: he stands there only while the server's Kwismas event runs (Sc=90001, the Events page), and his line 3254 offers the crossing."
+    },
+    {
+      "map": 66060293,
+      "npc": 795,
+      "cell": 118,
+      "orientation": 3,
+      "why": "Hector Kwismas on Kwismas Island's shore [-34,-83], where his boat lands: always there, so a player left on the island when the event closes can still sail back to Madrestam (his line 3255)."
     }
   ]
 }

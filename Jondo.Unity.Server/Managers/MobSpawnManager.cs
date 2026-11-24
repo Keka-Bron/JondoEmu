@@ -1105,12 +1105,32 @@ namespace Jondo.Unity.Server.Managers
                 if (_mapMobs.TryGetValue(mapId, out var mobs)
                     && (mobs.Count > 0 || _emptiedByHand.Contains(mapId)
                         || (_asLoaded.TryGetValue(mapId, out var written) && written.Count > 0)))
+                {
+                    DressForEvents(mapId, mobs);
                     return new List<MobGroup>(mobs);
+                }
 
                 mobs = GenerateDynamicMobsForMap(mapId);
                 _mapMobs[mapId] = mobs;
+                DressForEvents(mapId, mobs);
                 return new List<MobGroup>(mobs);
             }
+        }
+
+        /// <summary>
+        /// The yearly events' monsters in this map's groups, or back out of them when their event
+        /// closed (<see cref="EventGuests"/>). Never in a dungeon room. Under the lock.
+        /// </summary>
+        private static void DressForEvents(long mapId, List<MobGroup> mobs)
+        {
+            if (mobs.Count == 0 || DungeonManager.IsRoom(mapId)) return;
+            int area = Interactives.AreaOfSubArea(MapManager.GetMapInfo(mapId)?.SubAreaId ?? 0);
+            EventGuests.Dress(mobs, area, EventSettings.Current,
+                id => _monsters.TryGetValue(id, out var data) ? data : null,
+                Handlers.FightHandler.IsGroupFighting,
+                criterion => SeasonalEvents.IsOn(criterion, Almanax.Clock()),
+                id => !UniqueMonsters.Is(id) && !WantedPosters.Is(id),
+                () => GetSpawnableMonsterIds(mapId));
         }
 
         /// <summary>

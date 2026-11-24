@@ -4,7 +4,13 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI.Widgets
+#endif
 {
     /// <summary>
     /// Golden sparks falling in front of the background drawing.

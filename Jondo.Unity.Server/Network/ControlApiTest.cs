@@ -122,6 +122,7 @@ namespace Jondo.Unity.Server.Network
                 "quests" => TestQuests(),
                 "quest" => TestQuest(cuerpo),
                 "season" => TestSeason(cuerpo),
+                "events" => TestEvents(cuerpo),
                 "reload" => TestReload(),
                 // A slot played without the Dofus client, and the console (ControlApiHeadless.cs).
                 "headless" => TestHeadless(cuerpo),

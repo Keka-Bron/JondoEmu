@@ -125,3 +125,4 @@ README.bbcode.txt
 
 # Docker compose local settings (docker-compose.yml, .env.example)
 .env
+capturas-servidor/

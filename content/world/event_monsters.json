@@ -1,0 +1,36 @@
+{
+  "_comment": [
+    "The monsters a yearly event brings out in the wild, read by Managers/EventGuests.cs.",
+    "",
+    "While its event runs (SeasonalEvents.IsOn, which the server's Events page can hold open or",
+    "shut) and the Events page leaves the event monsters on, each group on a map being loaded is",
+    "judged once: with the page's chance it takes one guest. When the event closes, the group",
+    "gets its own member back. Dungeon rooms, groups in a fight and composed groups are left alone.",
+    "The world's own groups name these monsters too (the subareas' lists do): while their event is",
+    "shut, or the event monsters are off, each gives way to a member of its group (or its ordinary",
+    "self, or a monster of the map's zone) and comes back when the event opens.",
+    "",
+    "  replace: monster -> event monster. A group holding one of these has that member replaced:",
+    "           a Gobball by an Al Howin Gobball.",
+    "  area:    and joins: one member of any group in that area becomes one of these.",
+    "",
+    "The guest takes the grade whose level is nearest the member it replaces."
+  ],
+  "events": [
+    {
+      "event": 967,
+      "replace": {
+        "36": 793, "101": 793, "3332": 793, "3330": 793, "134": 793, "149": 793,
+        "971": 793, "972": 793, "973": 793,
+        "98": 794, "111": 794, "796": 794, "3333": 794
+      },
+      "why": "Al Howin: the Gobballs and Gobblies wear pumpkin masks (Al Howin Gobball, 793) and so do the Tofus (Al Howin Tofu, 794), the event's own monsters in the client's data."
+    },
+    {
+      "event": 90001,
+      "area": 48,
+      "joins": [2819, 3117, 3118, 3119],
+      "why": "Kwismas: the Kwismas Minotoball (2819) and the Kwismas Dragoturkeys (3117, 3118, 3119) roam Frigost (area 48) among its own monsters while the server's Kwismas event runs."
+    }
+  ]
+}

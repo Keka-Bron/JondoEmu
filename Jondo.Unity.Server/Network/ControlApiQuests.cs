@@ -341,6 +341,41 @@ namespace Jondo.Unity.Server.Network
             return Bien(new { forced = Managers.SeasonalEvents.ForcedOn.Keys.OrderBy(k => k).ToList() });
         }
 
+        /// <summary>
+        /// { event, mode, monsters, chance }: what the server window's Events page does -- one
+        /// event on its calendar ("Auto"), held open ("On") or held shut ("Off"), and the event
+        /// monsters -- applied at once without touching the operator's config\events.json. Any
+        /// field left out stays as it is; the answer is the settings now.
+        /// </summary>
+        private static Respuesta TestEvents(string cuerpo)
+        {
+            var settings = EventSettings.Current.Copy();
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(cuerpo.Length == 0 ? "{}" : cuerpo);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("event", out var id) && root.TryGetProperty("mode", out var mode))
+                {
+                    if (!Managers.SeasonalEvents.IsEvent(id.GetInt32())) return Mal(404, $"event {id.GetInt32()}");
+                    if (!Enum.TryParse<EventMode>(mode.GetString(), true, out var parsed)) return Mal(400, "mode");
+                    settings.SetMode(id.GetInt32(), parsed);
+                }
+                if (root.TryGetProperty("monsters", out var monsters)) settings.EventMonsters = monsters.GetBoolean();
+                if (root.TryGetProperty("chance", out var chance)) settings.EventMonsterChance = chance.GetInt32();
+            }
+            catch (Exception ex) when (ex is System.Text.Json.JsonException or InvalidOperationException or FormatException)
+            {
+                return Mal(400, ex.Message);
+            }
+            EventSettings.Apply(settings, save: false);
+            return Bien(new
+            {
+                events = new[] { Managers.SeasonalEvents.Kwismas, Managers.SeasonalEvents.Halouine, Managers.SeasonalEvents.Vulkania, Managers.SeasonalEvents.SainBallotin, Managers.SeasonalEvents.Pwak, Managers.SeasonalEvents.Ripate }
+                    .Select(e => new { id = e, mode = settings.ModeOf(e).ToString(), on = Managers.SeasonalEvents.IsOn(e, Managers.Almanax.Clock()) }),
+                settings.EventMonsters, settings.EventMonsterChance,
+            });
+        }
+
         /// <summary>«on» false lets the event go back to its dates; anything else holds it open.</summary>
         private static bool HeldOpen(string cuerpo)
         {

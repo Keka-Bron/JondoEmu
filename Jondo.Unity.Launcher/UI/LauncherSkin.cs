@@ -3,7 +3,13 @@ using System.IO;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 
+#if JONDO_SERVER
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher.UI;
+namespace Jondo.Unity.Server.UI.Skin
+#else
 namespace Jondo.Unity.Launcher.UI
+#endif
 {
     /// <summary>
     /// The launcher's look, in Avalonia.
