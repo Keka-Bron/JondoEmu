@@ -1305,6 +1305,33 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>The spells a monster's behaviour chains and hooks for good on it, at their grade.</summary>
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, HashSet<(int Spell, int Grade)>> BehaviourChain = new();
+
+        /// <summary>
+        /// Records that a spell the monster's behaviour chains (not the behaviour itself) has just
+        /// been hooked on it, and gives its rows their go-offs back: a cast again, such as Darkli
+        /// Moon's 3276 every five rounds recasting 302, unlocks his four totems once more.
+        /// </summary>
+        public static void NoteBehaviourHook(Fighter monster, int spell, int grade)
+        {
+            if (monster == null || monster.Conducta == (spell, grade)) return;
+            var chain = BehaviourChain.GetOrCreateValue(monster);
+            lock (chain) chain.Add((spell, grade));
+            var goOffs = BehaviourGoOffs.GetOrCreateValue(monster);
+            lock (goOffs)
+                foreach (var key in goOffs.Keys.Where(k => k.Spell == spell && k.Grade == grade).ToList())
+                    goOffs.Remove(key);
+        }
+
+        /// <summary>Whether a spell is the monster's behaviour or one that behaviour chains and hooks on it.</summary>
+        private static bool IsTheBehaviourOrItsChain(Fighter monster, int spell, int grade)
+        {
+            if (monster.Conducta == (spell, grade)) return true;
+            if (!BehaviourChain.TryGetValue(monster, out var chain)) return false;
+            lock (chain) return chain.Contains((spell, grade));
+        }
+
         /// <summary>Whether a row with no duration of its own waits on its bearer's death for as long as the fight lasts.</summary>
         internal static bool WaitsForeverOnDeath(SpellEffect row)
             => row.TriggerDuration >= NoLimitTriggerDuration
@@ -3179,7 +3206,7 @@ namespace Jondo.Unity.Server.Managers
                 // cast queued one more growth on top. Counted in goes-off rather than in rounds
                 // from the hook: the Ush Galesh's 6264 («792 6264-2 under TE, trigger duration 1»)
                 // is hooked at the fight's start and still goes off at its first turn end.
-                if (rondaDelEnganche >= 0 && target == caster && caster.Conducta == (spell, grade)
+                if (rondaDelEnganche >= 0 && target == caster && IsTheBehaviourOrItsChain(caster, spell, grade)
                     && !PlayerSpells.Contains(spell) && WaitsOnATurn(efecto)
                     && CountsItsTriggerRounds(efecto) && !OneMoreGoOff(caster, spell, grade, efecto))
                 {
@@ -4615,7 +4642,15 @@ namespace Jondo.Unity.Server.Managers
 
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int), bool> _summonsTheKind = new();
 
-        /// <summary>Whether a monster of <paramref name="summoner"/>'s template has a spell that summons <paramref name="summoned"/>'s.</summary>
+        /// <summary>
+        /// Whether a monster of <paramref name="summoner"/>'s template has a spell that summons
+        /// <paramref name="summoned"/>'s on a row of its own that asks the summoner's states
+        /// ("*e"/"*E"): the Tengu's Firuleta del Amor picks the Yomi or the Yokai by the state each
+        /// one gives him, so one already standing beside him is one he need not summon. A summon
+        /// row with no such question belongs to a wave the spell calls as a whole: the Kwoknan's
+        /// Kwarmée Kwayal (29789) brings the four Bwaks at once, from the first turn (Dofus pour
+        /// les noobs, «Nid du Kwakwa»), and a Bwak placed in his group is not that wave.
+        /// </summary>
         internal static bool SummonsTheKind(int summoner, int summoned)
             => summoner > 0 && summoned > 0 && _summonsTheKind.GetOrAdd((summoner, summoned), key =>
             {
@@ -4625,11 +4660,17 @@ namespace Jondo.Unity.Server.Managers
                 {
                     foreach (var row in SpellEffects.De(spell, Math.Max(1, grade)))
                     {
-                        if (EsInvocacion(row.EffectId) && row.DiceNum == key.Item2) return true;
+                        if (EsInvocacion(row.EffectId) && row.DiceNum == key.Item2
+                            && AsksTheCastersState(row.TargetMask)) return true;
                     }
                 }
                 return false;
             });
+
+        private static bool AsksTheCastersState(string mask)
+            => !string.IsNullOrEmpty(mask)
+               && mask.Split(',').Any(t => t.Length > 2 && t[0] == '*' && (t[1] == 'e' || t[1] == 'E')
+                                           && char.IsDigit(t[2]));
 
         /// <summary>Whether the caster meets the conditions a row puts on him (its starred letters).</summary>
         internal static bool CasterMeets(Fighter caster, SpellEffect row) => CasterQualifies(caster, row.TargetMask, null);

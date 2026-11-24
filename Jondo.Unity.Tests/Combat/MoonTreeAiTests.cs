@@ -60,7 +60,7 @@ namespace Jondo.Unity.Tests.Combat
             };
 
             var cast = new List<int>();
-            for (int round = 0; round < 6; round++)
+            for (int round = 0; round < 20; round++)
             {
                 darkli.CurrentAP = darkli.MaxAP;
                 var spells = FightHandler.TacticsOf(darkli);
@@ -71,8 +71,64 @@ namespace Jondo.Unity.Tests.Combat
                     cast.Add(action.Spell.Id);
                     darkli.Recarga[action.Spell.Id] = action.Spell.Interval;
                 }
+                // The turn's end takes one round off every wait (FightHandler's end of turn).
+                foreach (int key in darkli.Recarga.Keys.ToList()) if (darkli.Recarga[key] > 0) darkli.Recarga[key]--;
             }
             Assert.Equal(Totems.OrderBy(t => t), cast.OrderBy(t => t));
+        }
+
+        /// <summary>The cast of a totem spell writes its lock the way the engine does after a monster's cast: the grade's MinCastInterval.</summary>
+        [Fact]
+        public void A_totem_spell_cast_at_its_grade_locks_for_the_fight()
+        {
+            var recipe = Summons.De(Darkli, 1);
+            if (recipe == null || recipe.Plantilla != Darkli) return;
+            var darkli = new Fighter { Id = -5, MonsterId = Darkli, IsMonster = true, TeamId = 1, Invocador = -1 };
+            Summons.Characteristics(darkli, recipe, new Fighter { Id = -1, MonsterId = Moon, IsMonster = true, Level = 100, TeamId = 1 });
+            var spells = FightHandler.TacticsOf(darkli);
+            foreach (int totem in Totems)
+            {
+                var spell = spells.Single(s => s.Id == totem);
+                Assert.True(spell.Interval >= 63, $"spell {totem} grade {spell.Grade} has interval {spell.Interval}");
+                Assert.True(FightHandler.LimitesDeGrado(totem, spell.Grade).Intervalo >= 63);
+            }
+        }
+
+        /// <summary>
+        /// His behaviour spell chains 302, whose rows (one random group of 24) unlock one totem spell
+        /// per turn start, each once ("trigger duration 1"). Hooked for good with the behaviour, the
+        /// delay-0 row went off at every turn start, so the first totem was cast every round.
+        /// </summary>
+        [Collection("MapManager")]
+        public class Unlocks
+        {
+            [Fact]
+            public async System.Threading.Tasks.Task Each_totem_spell_is_unlocked_once_in_the_four_turns_after_the_chain_is_cast()
+            {
+                var recipe = Summons.De(Darkli, 1);
+                if (recipe == null || recipe.Plantilla != Darkli || recipe.HechizoPropio == 0) return;
+
+                var moon = new Fighter { Id = -1, MonsterId = Moon, IsMonster = true, Level = 100, TeamId = 1, CellId = 301, MaxHP = 5000, CurrentHP = 5000, MaxAP = 12, CurrentAP = 12 };
+                var darkli = new Fighter { Id = -5, MonsterId = Darkli, IsMonster = true, TeamId = 1, Invocador = moon.Id, SummonCost = 1, CellId = 300 };
+                Summons.Characteristics(darkli, recipe, moon);
+                var person = Person(360);
+                var fight = new FightInstance(1, 990_092_225);
+                fight.AddPlayer(person); fight.AddMonster(moon); fight.AddMonster(darkli);
+                fight.StartFight();
+                darkli.Conducta = (recipe.HechizoPropio, recipe.GradoDelHechizoPropio);
+                await FightHandler.LanzarLaConductaAsync(null, fight, darkli);
+
+                var unlocked = Totems.ToDictionary(t => t, _ => 0);
+                for (int turn = 0; turn < 4; turn++)
+                {
+                    while (fight.CurrentFighter != darkli) fight.NextTurn();
+                    foreach (int t in Totems) darkli.Recarga[t] = 63;   // as if every totem had just been cast
+                    await FightHandler.EngancheAsync(null, fight, darkli, EffectEngine.AlEmpezarElTurno);
+                    foreach (int t in Totems) if (darkli.Recarga.GetValueOrDefault(t) == 0) unlocked[t]++;
+                    fight.NextTurn();
+                }
+                foreach (var (t, n) in unlocked) Assert.True(n == 1, $"totem spell {t} unlocked {n} times in four turns");
+            }
         }
 
         /// <summary>Zampada kills the enemy at his side and heals and speeds the caster: weighed row by row it is a kill, and it is cast when the enemy is adjacent.</summary>

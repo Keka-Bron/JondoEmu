@@ -49,6 +49,18 @@ namespace Jondo.Unity.Tests.Combat
             Assert.False(EffectEngine.SummonsTheKind(Bakazako, Bakazako));
         }
 
+        /// <summary>
+        /// The Kwoknan (2995) calls his four Bwaks at once from the first turn; a Bwak placed in his
+        /// group is no stand-in for that wave, so its Kwapoussée state does not lock his Kwarmée
+        /// Kwayal (29789, "HS!5511").
+        /// </summary>
+        [Fact]
+        public void A_placed_bwak_does_not_lock_the_kwoknans_wave()
+        {
+            if (!SpellEffects.De(29789, 1).Any()) return;   // no spell data
+            Assert.False(EffectEngine.SummonsTheKind(2995, 3284));
+        }
+
         [Fact]
         public void A_placed_doble_does_not_make_another_placed_doble_cast_sutileza()
         {

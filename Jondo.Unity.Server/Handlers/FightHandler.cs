@@ -7041,6 +7041,8 @@ namespace Jondo.Unity.Server.Handlers
                 // the first grade too, and every push brought out two pepitas.
                 var armables = grupo.Where(c => hasta < 0 || c.CasterConditionsHeld).ToList();
                 if (armables.Count == 0) continue;
+                if (deConducta && hasta < 0 && grupo.Key.Sobre.Id == grupo.Key.Quien && !offATrigger)
+                    Managers.EffectEngine.NoteBehaviourHook(grupo.Key.Sobre, grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen);
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, armables.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: (inItsCastersTurn || afterItsCastersTurn) && hasta >= 0
