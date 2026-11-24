@@ -128,6 +128,23 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// An expedition's rooms are another dungeon's, picture for picture, in a subarea with no
+        /// arena: the Audacity expedition's Blood Throne rooms fight on the Blood Throne's own boards
+        /// (its fourth room's and the boss's), not on the room among its pillars and bone heaps.
+        /// </summary>
+        [Theory]
+        [InlineData(239605277, 202378246)]   // the fourth room's copy
+        [InlineData(239606301, 202379270)]   // the boss room's copy
+        public void An_expedition_room_fights_on_its_original_s_board(long room, long board)
+        {
+            if (MapManager.Maps.Count == 0) MapManager.Initialize();
+            if (!MapManager.Maps.ContainsKey(board)) return;   // no data
+
+            Assert.Equal(board, DungeonPlacements.BoardOf(room));
+            Assert.Equal(board, MapManager.ResolveArenaMapId(room));
+        }
+
+        /// <summary>
         /// A room with no board of its own -- Missiz Freezz's, the boss's -- is fought on itself, on
         /// the cells it flags, the same every time, never drawn at random over its scenery.
         /// </summary>

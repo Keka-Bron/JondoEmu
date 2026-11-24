@@ -7061,6 +7061,20 @@
       "cell": 301,
       "orientation": 3,
       "why": "Cinder Mistigris, the Ecaflip of «Miniature Adventure» (1607), in the Vilinsekts' hideout behind the grocery store's barrel. INFERRED cell."
+    },
+    {
+      "map": 225185794,
+      "npc": 6919,
+      "cell": 314,
+      "remove": true,
+      "why": "Chief Yobgineer in the Hammerdry Bastion's exit room: the derived cell 314 is behind the big fist machine (272-301) and he cannot be seen there."
+    },
+    {
+      "map": 225185794,
+      "npc": 6919,
+      "cell": 341,
+      "orientation": 1,
+      "why": "Chief Yobgineer moved in front of the fist machine, on the open floor left of the wanted poster, beside Demena (370). INFERRED cell."
     }
   ]
 }
