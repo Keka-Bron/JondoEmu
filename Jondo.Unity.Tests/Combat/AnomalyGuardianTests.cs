@@ -111,6 +111,35 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// Agony's last crystal gone (state 1024), her Dissonance (12111) wakes her and casts 12136:
+        /// four Malakite Golems (5686) come out next to her, one on each diagonal.
+        /// </summary>
+        [Fact]
+        public async Task Agony_summons_four_golems_when_her_last_crystal_dies()
+        {
+            var player = Character(53000000036, 100);
+            var agony = Monster(-1, 300);
+            agony.MonsterId = 5684;
+            var fight = new FightInstance(1, 1);
+            fight.AddPlayer(player);
+            fight.AddMonster(agony);
+            player.CellId = 100;
+            agony.CellId = 300;
+            fight.StartFight();
+            agony.Buffs.PonerEstado(1024);
+
+            await FightHandler.AplicarEfectosAsync(null, fight, agony, 12111, 1, agony,
+                                                   EffectEngine.AlLanzar, agony.CellId);
+
+            Assert.True(agony.Buffs.TieneEstado(1105));
+            var golems = fight.Todos.Where(f => f.MonsterId == 5686 && f.IsAlive).Select(f => f.CellId).OrderBy(c => c).ToList();
+            var (x, y) = MapGeometry.CellToPoint(300);
+            var diagonals = new[] { (1, 1), (-1, -1), (1, -1), (-1, 1) }
+                .Select(d => MapGeometry.PointToCell(x + d.Item1, y + d.Item2)).OrderBy(c => c).ToList();
+            Assert.Equal(diagonals, golems);
+        }
+
+        /// <summary>
         /// The Champion of the Crimson Dawn (11957) makes his chronomorphs invulnerable and lays
         /// 11959 on everyone: a vulnerable chronomorph hit with earth takes the invulnerability off
         /// those in line with it, and hit with air off those in diagonal with it, never the
@@ -196,6 +225,41 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(4, held.Select(h => h[0]).Distinct().Count());
                 Assert.All(chronomorphs, m => Assert.DoesNotContain(new[] { 960, 961, 962, 963 }, m.Buffs.TieneEstado));
             }
+        }
+
+        /// <summary>
+        /// Qilby's starting spell (31443) gives him 60 % resistance and makes him invulnerable in
+        /// melee only: a blow from range still hurts him in his first phase.
+        /// </summary>
+        [Fact]
+        public async Task Qilby_takes_a_blow_from_range_in_his_first_phase()
+        {
+            var player = Character(53000000037, 300);
+            var qilby = Monster(-1, 330);
+            qilby.MonsterId = 8131;
+            qilby.MaxHP = qilby.CurrentHP = 27000;
+            var fight = new FightInstance(1, 1);
+            fight.AddPlayer(player);
+            fight.AddMonster(qilby);
+            var (x, y) = MapGeometry.CellToPoint(330);
+            player.CellId = MapGeometry.PointToCell(x + 6, y);
+            qilby.CellId = 330;
+            fight.StartFight();
+            qilby.NeutralResPct = 31; qilby.EarthResPct = 27; qilby.FireResPct = 25;
+            qilby.WaterResPct = 39; qilby.AirResPct = 20;
+            qilby.Conducta = (31443, 1);
+            await FightHandler.LanzarLaConductaAsync(null, fight, qilby);
+            int res = FightHandler.ResistenciaDeLaVictima(qilby, ElementType.Earth, fight.RoundNumber);
+
+            var earth = SpellEffects.De(6773, 1).First(e => e.EffectId == 97);
+            await FightHandler.UnGolpeAsync(null, fight, player, 6773, earth, 1, qilby, 200, 0, false);
+
+            // His sheet's 27 % earth and his behaviour's +60 (31443); none of the portal states
+            // 6698-6701 yet, so no 1077 row takes any of it back. On water, 39 + 60, a small
+            // spell is swallowed whole.
+            Assert.Equal(87, res);
+            Assert.Equal(99, FightHandler.ResistenciaDeLaVictima(qilby, ElementType.Water, fight.RoundNumber));
+            Assert.True(qilby.CurrentHP < qilby.MaxHP, string.Join(",", qilby.Buffs.Estados));
         }
 
         /// <summary>

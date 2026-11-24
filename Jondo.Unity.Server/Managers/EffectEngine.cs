@@ -2315,6 +2315,22 @@ namespace Jondo.Unity.Server.Managers
             return cells;
         }
 
+        /// <summary>The cells along the <paramref name="which"/>-th diagonal out of a cell, nearest first.</summary>
+        internal static List<int> AlongItsDiagonal(int from, int which, int size)
+        {
+            var cells = new List<int>();
+            var (stepX, stepY) = new[] { (1, 1), (-1, -1), (1, -1), (-1, 1) }[which % 4];
+            var (x, y) = Jondo.Unity.World.Maps.MapGeometry.CellToPoint(from);
+            for (int i = 1; i <= size; i++)
+            {
+                x += stepX; y += stepY;
+                int next = Jondo.Unity.World.Maps.MapGeometry.PointToCell(x, y);
+                if (next < 0) break;
+                cells.Add(next);
+            }
+            return cells;
+        }
+
         internal static List<int> CasillasDelEfecto(SpellEffect efecto, int desde, int centro)
             => efecto.Forma == FormaDeCeldasFijas && efecto.CeldasFijas.Count > 0
                 ? new List<int>(efecto.CeldasFijas)
@@ -3042,6 +3058,9 @@ namespace Jondo.Unity.Server.Managers
                                                 && x.Disparadores().Any(d => string.Equals(d, AlLanzar, StringComparison.OrdinalIgnoreCase))
                                                 && !(x.TargetMask ?? "").Split(',').Any(t => t.Trim() is "C" or "c"));
 
+            // A line summon aimed at the caster's own cell has no way of its own: each such row takes
+            // the next of its four diagonals.
+            int diagonalesTomadas = 0;
             foreach (var filaLeida in effects)
             {
                 if (descartados.Contains(filaLeida)) continue;
@@ -3456,7 +3475,15 @@ namespace Jondo.Unity.Server.Managers
                         && efecto.Tamano >= 1 && aimedCell >= 0)
                     {
                         var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
-                        int libre = BehindInItsMelee(caster.CellId, aimedCell, efecto.Tamano)
+                        // Aimed at the caster's own cell the line has no way: Agony's Exhumación de la
+                        // Guardia Malakita (12136, four "181 5686" rows on L63, cast on herself)
+                        // «invoque 4 x Golem Malakite à 1PO en diagonale d'elle (si la case n'est pas
+                        // disponible, invoque sur la prochaine cellule dans la diagonale)» (Dofus pour
+                        // les noobs). Through her melee there was no way at all, and none came out.
+                        var linea = aimedCell == caster.CellId
+                            ? AlongItsDiagonal(aimedCell, diagonalesTomadas++, efecto.Tamano)
+                            : BehindInItsMelee(caster.CellId, aimedCell, efecto.Tamano);
+                        int libre = linea
                             .FirstOrDefault(cell => (walkable == null || walkable.Contains(cell)) && EnLaCasilla(combat, cell) == null, -1);
                         if (libre < 0) continue;
                         dondeVan = new List<int> { libre };
