@@ -6294,13 +6294,21 @@ namespace Jondo.Unity.Server.Handlers
         /// and is born with that same wait. The lock is the once-a-fight rule and is only worth
         /// something if the first cast is possible: Darkli Moon's four totem spells (298 to 301)
         /// were all born at 63 and so none came out -- the real Darkli summons all four over the fight.
+        /// Not when another grade of the same spell lifts that lock (1045 on it below 63): then the
+        /// monster's own script says when the spell is free, and the born wait is that script's lock.
+        /// Darkli's 302 frees one totem per turn by casting its grade 1 («1045 to 0»); born free as
+        /// well, his first wave had one totem too many, cast on his first two turns.
         /// </summary>
         internal static int BornWaiting(int spell, int grade)
         {
             int wait = LimitesDeGrado(spell, grade).EsperaInicial;
             if (wait < OncePerFight) return wait;
-            return Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.RecargaFijada
-                                                                   && e.DiceNum == spell && e.Value >= OncePerFight) ? 0 : wait;
+            bool SetsItsWait(int g, Func<int, bool> to) => Managers.SpellEffects.De(spell, g).Any(
+                e => e.EffectId == Managers.EffectEngine.RecargaFijada && e.DiceNum == spell && to(e.Value));
+            if (!SetsItsWait(grade, v => v >= OncePerFight)) return wait;
+            for (int other = 1; Managers.SpellEffects.De(spell, other).Count > 0; other++)
+                if (other != grade && SetsItsWait(other, v => v < wait)) return wait;
+            return 0;
         }
 
         private static async Task<Fighter> InvocarAsync(NetworkStream stream, FightInstance fight,

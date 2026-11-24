@@ -21,9 +21,13 @@ namespace Jondo.Unity.Tests.Combat
             Id = 10, TeamId = 0, CellId = cell, MaxHP = 3000, CurrentHP = 3000, CurrentAP = 6, CurrentMP = 3, Level = 200,
         };
 
-        /// <summary>The four totem spells carry a 63-round wait as their grade's initial cooldown, and that wait is their once-a-fight lock: none is born waiting.</summary>
+        /// <summary>
+        /// The four totem spells carry a 63-round wait as their grade's initial cooldown, the same as
+        /// their once-a-fight lock, and their grade 1 lifts it («1045 to 0», cast by 302's wave): he is
+        /// born with all four waiting, and the wave frees them one per turn (Unlocks).
+        /// </summary>
         [Fact]
-        public void Darkli_is_born_able_to_cast_each_totem_spell()
+        public void Darkli_is_born_with_every_totem_spell_waiting_on_his_wave()
         {
             var recipe = Summons.De(Darkli, 1);
             if (recipe == null || recipe.Plantilla != Darkli) return;   // no monster data
@@ -32,7 +36,7 @@ namespace Jondo.Unity.Tests.Combat
             Summons.Characteristics(darkli, recipe, new Fighter { Id = -1, MonsterId = Moon, IsMonster = true, Level = 100, TeamId = 1 });
             FightHandler.SpellsBornWaiting(darkli);
 
-            foreach (int totem in Totems) Assert.False(darkli.Recarga.ContainsKey(totem), $"spell {totem} is born waiting");
+            foreach (int totem in Totems) Assert.True(darkli.Recarga.GetValueOrDefault(totem) >= 63, $"spell {totem} is born free");
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ namespace Jondo.Unity.Tests.Combat
             var moon = new Fighter { Id = -1, MonsterId = Moon, IsMonster = true, Level = 100, TeamId = 1, CellId = 301, MaxHP = 5000, CurrentHP = 5000, MaxAP = 12, CurrentAP = 12 };
             var darkli = new Fighter { Id = -5, MonsterId = Darkli, IsMonster = true, TeamId = 1, Invocador = moon.Id, SummonCost = 1, CellId = 300 };
             Summons.Characteristics(darkli, recipe, moon);
-            FightHandler.SpellsBornWaiting(darkli);
+            // All four free, as a whole wave leaves them (Unlocks covers the wave itself).
             var person = Person(360);
             var fight = new FightInstance(1, 1);
             fight.AddPlayer(person); fight.AddMonster(moon); fight.AddMonster(darkli);
@@ -128,6 +132,45 @@ namespace Jondo.Unity.Tests.Combat
                     fight.NextTurn();
                 }
                 foreach (var (t, n) in unlocked) Assert.True(n == 1, $"totem spell {t} unlocked {n} times in four turns");
+            }
+
+            /// <summary>
+            /// The first wave as the fight plays it: Darkli born as a summon is (with the waits his
+            /// spells are born with), his behaviour cast, then his turns with a totem cast whenever one
+            /// is free. Each turn has one totem free, the one the wave unlocks, and the fifth none. Born
+            /// free as well, the first two turns both cast 298 (born free, then unlocked).
+            /// </summary>
+            [Fact]
+            public async System.Threading.Tasks.Task The_first_wave_frees_one_totem_per_turn_from_the_first_turn()
+            {
+                var recipe = Summons.De(Darkli, 1);
+                if (recipe == null || recipe.Plantilla != Darkli || recipe.HechizoPropio == 0) return;
+
+                var moon = new Fighter { Id = -1, MonsterId = Moon, IsMonster = true, Level = 100, TeamId = 1, CellId = 301, MaxHP = 5000, CurrentHP = 5000, MaxAP = 12, CurrentAP = 12 };
+                var darkli = new Fighter { Id = -5, MonsterId = Darkli, IsMonster = true, TeamId = 1, Invocador = moon.Id, SummonCost = 1, CellId = 300 };
+                Summons.Characteristics(darkli, recipe, moon);
+                FightHandler.SpellsBornWaiting(darkli);
+                var person = Person(360);
+                var fight = new FightInstance(1, 990_092_226);
+                fight.AddPlayer(person); fight.AddMonster(moon); fight.AddMonster(darkli);
+                fight.StartFight();
+                darkli.Conducta = (recipe.HechizoPropio, recipe.GradoDelHechizoPropio);
+                await FightHandler.LanzarLaConductaAsync(null, fight, darkli);
+
+                var cast = new List<int>();
+                for (int turn = 1; turn <= 5; turn++)
+                {
+                    while (fight.CurrentFighter != darkli) fight.NextTurn();
+                    await FightHandler.EngancheAsync(null, fight, darkli, EffectEngine.AlEmpezarElTurno);
+                    var free = Totems.Where(t => darkli.Recarga.GetValueOrDefault(t) == 0).ToList();
+                    Assert.True(free.Count == (turn <= 4 ? 1 : 0),
+                                $"turn {turn}: totem spells free {string.Join(",", free)} (cast so far {string.Join(",", cast)})");
+                    foreach (int t in free) { cast.Add(t); darkli.Recarga[t] = 63; }   // cast: locked for the fight
+                    // The turn's end takes one round off every wait (FightHandler's end of turn).
+                    foreach (int key in darkli.Recarga.Keys.ToList()) if (darkli.Recarga[key] > 0) darkli.Recarga[key]--;
+                    fight.NextTurn();
+                }
+                Assert.Equal(Totems.OrderBy(t => t), cast.OrderBy(t => t));
             }
         }
 
