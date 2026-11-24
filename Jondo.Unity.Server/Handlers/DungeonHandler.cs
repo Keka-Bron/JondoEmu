@@ -494,6 +494,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
+        /// The exit replies a post-boss room's NPC offers up front; none for any other NPC or room.
+        /// </summary>
+        internal static long[] ExitReplies(int npcId, long mapId)
+        {
+            var room = DungeonExitRooms.At(mapId);
+            return room == null || room.Npc != npcId ? Array.Empty<long>() : room.Replies.OrderBy(r => r).ToArray();
+        }
+
+        /// <summary>
         /// The way out a post-boss room's NPC offers with one of its exit replies -- Kardorim's
         /// four «Quitter la crypte de Kardorim» --; zero for any other NPC, room or reply, whose
         /// own behaviour stays.

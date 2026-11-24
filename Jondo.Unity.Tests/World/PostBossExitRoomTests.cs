@@ -54,5 +54,24 @@ namespace Jondo.Unity.Tests.World
             Assert.True(tree.Offers(leave));
             Assert.Null(NpcDialogues.For(npc, room + 1));
         }
+
+        /// <summary>
+        /// An exit NPC with no written tree said only its template's last reply: Demena offered
+        /// «Dejarla tranquila...» and no way out. Its exit reply now comes up front.
+        /// </summary>
+        [Theory]
+        [InlineData(6946, 223875074L, 73343L)]
+        [InlineData(6847, 225185794L, 69193L)]
+        [InlineData(6612, 218632194L, 66726L)]
+        [InlineData(6614, 218894338L, 66779L)]
+        public void An_exit_npc_without_a_tree_offers_its_way_out(int npc, long room, long leave)
+        {
+            DungeonManager.Initialize();
+            DungeonExitRooms.Forget();
+            if (NpcDialogues.For(npc, room) != null) return;   // a written tree offers it itself
+
+            Assert.Equal(leave, Jondo.Unity.Server.Handlers.DungeonHandler.ExitReplies(npc, room)[0]);
+            Assert.Empty(Jondo.Unity.Server.Handlers.DungeonHandler.ExitReplies(npc, room + 1));
+        }
     }
 }

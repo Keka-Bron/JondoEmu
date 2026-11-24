@@ -345,6 +345,12 @@ namespace Jondo.Unity.Server.Handlers
             respuestas = respuestas.Where(r => !DungeonHandler.KeyringOfferedForNothing(npc.NpcId, mapId, r)
                                                && !DungeonHandler.KeyOfferedForNothing(npc.NpcId, mapId, r)).ToArray();
 
+            // A post-boss room's NPC with no written tree offers its way out up front: the template's
+            // last reply was all that showed, and Demena's «Dejarla tranquila...» left the winners with
+            // no «Abandonar el bastión.» to pick. One exit reply, not every copy of it (Kardorim has four).
+            long[] exits = escrito == null ? DungeonHandler.ExitReplies(npc.NpcId, mapId) : Array.Empty<long>();
+            if (exits.Length > 0 && !respuestas.Any(exits.Contains)) respuestas = respuestas.Prepend(exits[0]).ToArray();
+
             long resume = DungeonHandler.ResumeReply(npc.NpcId, mapId, SessionContext.State.CharacterId);
             if (resume != 0 && !respuestas.Contains(resume)) respuestas = respuestas.Append(resume).ToArray();
 
