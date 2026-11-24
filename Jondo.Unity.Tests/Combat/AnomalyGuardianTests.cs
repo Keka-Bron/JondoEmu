@@ -224,5 +224,41 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Single(blue);
             Assert.Equal(200, blue[0].Centro);
         }
+
+        /// <summary>
+        /// Qilby's place casts «[!] Gameplay joueur» (32121) on the players when the fight starts:
+        /// at a player's turn start Qilby lays a portal on the centre of the islet the player stands
+        /// on, which pairs with his central one on cell 300; at the next turn start on another islet
+        /// that portal goes and the new islet's comes, and the central one stays.
+        /// </summary>
+        [Fact]
+        public async Task Qilby_lays_a_portal_on_the_islet_of_each_player_whose_turn_starts()
+        {
+            var player = Character(53000000034, 171);
+            var qilby = Monster(-1, 330);
+            qilby.MonsterId = 8131;
+            var fight = new FightInstance(1, 1);
+            fight.AddPlayer(player);
+            fight.AddMonster(qilby);
+            player.CellId = 171;
+            qilby.CellId = 330;
+            fight.StartFight();
+
+            await FightHandler.AplicarEfectosAsync(null, fight, qilby, 32118, 1, qilby, EffectEngine.AlLanzar, 300);
+            await FightHandler.LoDelGuardianParaLosJugadoresAsync(null, fight);
+            await FightHandler.DispararAsync(null, fight, player, EffectEngine.AlEmpezarElTurno);
+
+            Assert.NotNull(fight.Portales.At(300));
+            Assert.NotNull(fight.Portales.At(170));
+            Assert.True(fight.Portales.At(170).Active);
+            Assert.True(fight.Portales.At(300).Active);
+
+            player.CellId = 180;
+            await FightHandler.DispararAsync(null, fight, player, EffectEngine.AlEmpezarElTurno);
+
+            Assert.Null(fight.Portales.At(170));
+            Assert.NotNull(fight.Portales.At(179));
+            Assert.NotNull(fight.Portales.At(300));
+        }
     }
 }

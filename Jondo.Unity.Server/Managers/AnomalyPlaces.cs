@@ -24,7 +24,15 @@ namespace Jondo.Unity.Server.Managers
         public sealed record Group(int Cell, int Orientation, IReadOnlyList<int> Members);
 
         public sealed record Place(string Name, int Guardian, long Entry, int Arrival, int Exit,
-                                   long Room, long Arena, Group? Group, bool Measured);
+                                   long Room, long Arena, Group? Group, bool Measured,
+                                   (int Spell, int Grade)? PlayerSpell = null);
+
+        /// <summary>
+        /// The place whose guardian fights in this group of monsters: its player spell, if any, is
+        /// cast on every player when the fight begins (Qilby's «[!] Gameplay joueur»).
+        /// </summary>
+        public static Place? ByGuardian(int monsterId)
+            => monsterId > 0 ? All.FirstOrDefault(p => p.Guardian == monsterId) : null;
 
         private sealed record Document(IReadOnlyList<Place> Places, int VestigeStaging,
                                        int RightClock, int WrongClock, int WrongBy,
@@ -164,7 +172,9 @@ namespace Jondo.Unity.Server.Managers
                             Long(row, "room"),
                             Long(row, "arena"),
                             group,
-                            row.TryGetProperty("measured", out var measured) && measured.ValueKind == JsonValueKind.True));
+                            row.TryGetProperty("measured", out var measured) && measured.ValueKind == JsonValueKind.True,
+                            row.TryGetProperty("playerSpell", out var ps) && Number(ps, "spell") > 0
+                                ? (Number(ps, "spell"), Math.Max(1, Number(ps, "grade"))) : null));
                     }
                 }
                 catch (Exception ex)

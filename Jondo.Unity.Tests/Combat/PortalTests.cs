@@ -323,24 +323,30 @@ namespace Jondo.Unity.Tests.Combat
         /// Insulto pushes -1 two cells, and the first is a portal that is on: he goes through it,
         /// out of the other, and the cell left is walked from there, the same way.
         /// </summary>
-        /// <summary>The second grade of Qilby's Portal (31456) carries a 4007: the portal on the aimed cell leaves the board and is told gone.</summary>
+        /// <summary>
+        /// The second grade of Qilby's Portal (31456) carries a 4007: his portal on the aimed cell
+        /// leaves the board and is told gone; another's portal on a cell it names stays.
+        /// </summary>
         [Fact]
-        public async Task Removing_the_portals_of_a_cell_takes_them_off_the_board()
+        public async Task Removing_the_portals_of_a_cell_takes_the_casters_off_the_board()
         {
             int Cell(int x, int y) => MapGeometry.PointToCell(x, y);
             var selatrop = Character(Selatrop, Cell(12, 2));
             var qilby = Monster(-1, Cell(13, 6));
             var fight = Board(selatrop, qilby);
-            Laid(fight, 1, Cell(14, 2));
-            Laid(fight, 2, Cell(14, 8));
+            Laid(fight, 1, Cell(14, 2), owner: -1);
+            Laid(fight, 2, Cell(14, 8), owner: -1);
+            Laid(fight, 3, Cell(15, 3));
             await using var wire = await Wire.Open(Selatrop);
 
             await FightHandler.AplicarEfectosAsync(null, fight, qilby, 31456, 2, null, EffectEngine.AlLanzar, Cell(14, 2));
+            await FightHandler.AplicarEfectosAsync(null, fight, qilby, 31456, 2, null, EffectEngine.AlLanzar, Cell(15, 3));
 
             Assert.Null(fight.Portales.ById(1));
             Assert.NotNull(fight.Portales.ById(2));
+            Assert.NotNull(fight.Portales.ById(3));
             var frames = (await wire.Drain()).Where(f => f.Op == "jwe").Select(f => f.Payload).ToList();
-            Assert.Contains(frames, f => f.SequenceEqual(FightProtocol.BuildGlyphGone(Selatrop, 1)));
+            Assert.Contains(frames, f => f.SequenceEqual(FightProtocol.BuildGlyphGone(-1, 1)));
         }
 
         /// <summary>

@@ -7003,6 +7003,21 @@ namespace Jondo.Unity.Server.Handlers
                     await GiveStateAsync(fight, quien, estado, -1);
         }
 
+        /// <summary>
+        /// The player spell of the anomaly place whose guardian is in this fight, cast on every
+        /// player as a starting spell: its turn-start rows are armed for the whole fight.
+        /// </summary>
+        internal static async Task LoDelGuardianParaLosJugadoresAsync(NetworkStream stream, FightInstance fight)
+        {
+            var luchadores = fight.Azul.Concat(fight.Rojo).Where(f => f != null).ToList();
+            var lugar = luchadores.Where(f => f.IsMonster)
+                                  .Select(f => Managers.AnomalyPlaces.ByGuardian(f.MonsterId))
+                                  .FirstOrDefault(p => p?.PlayerSpell != null);
+            if (lugar?.PlayerSpell is not { } hechizo) return;
+            foreach (var jugador in luchadores.Where(f => !f.IsMonster && !f.EsInvocado && f.IsAlive))
+                await LanzarLaConductaAsync(stream, fight, jugador, hechizo);
+        }
+
         internal static async Task LanzarLaConductaAsync(NetworkStream stream, FightInstance fight, Fighter quien,
                                                          (int Spell, int Grade)? otra = null)
         {
@@ -9876,6 +9891,10 @@ namespace Jondo.Unity.Server.Handlers
                 // And a monster's behaviour spell.
                 if (quien.Conducta.Spell != 0) await LanzarLaConductaAsync(stream, fight, quien);
             }
+
+            // And an anomaly guardian's spell for the players: Qilby's «[!] Gameplay joueur»,
+            // which asks him for a portal on the islet each player starts a turn on (AnomalyPlaces).
+            await LoDelGuardianParaLosJugadoresAsync(stream, fight);
 
             // And what a raid's guardian lays on the board: the Guardián's glyphs.
             await Managers.GuildRaidGuardians.OnFightStartedAsync(stream, fight);

@@ -3771,8 +3771,14 @@ namespace Jondo.Unity.Server.Managers
                     bool emptiedByTheCast = aimedCell >= 0
                         && Todos(combat).Any(f => f != null && !f.IsAlive && f.CellId == aimedCell)
                         && !Todos(combat).Any(f => f != null && f.IsAlive && f.CellId == aimedCell);
+                    // Nor a child cast on an empty named cell whose own 2960 goes at that same
+                    // point: Qilby's islet spells (31829-31832) cast their grade 2 on the islet's
+                    // centre, which casts his Portal (31456) there -- nobody stands on it, and
+                    // without it the players' islets never had a portal.
+                    bool onAnEmptyNamedCell = depth > 0 && target == null && efecto.Forma == 'P'
+                        && efecto.Tamano <= 1 && EnLaCasilla(combat, aimedCell) == null;
                     if (candidatos.Count == 0 && efecto.EffectId == 2960 && aimedCell >= 0
-                        && (ForgelanceCombat.IsActor(combat, caster) || emptiedByTheCast)
+                        && (ForgelanceCombat.IsActor(combat, caster) || emptiedByTheCast || onAnEmptyNamedCell)
                         && CasterQualifies(caster, efecto.TargetMask, estadosAlEmpezar)
                         && efecto.TargetMask.Split(',').All(t => t is "a" or "A" || t.StartsWith("*")))
                         candidatos.Add(caster);
@@ -5025,7 +5031,12 @@ namespace Jondo.Unity.Server.Managers
                 int centro = celdaApuntada >= 0 ? celdaApuntada : quienLanza.CellId;
                 var celdas = CasillasDelEfecto(efecto, quienLanza.CellId, centro);
                 if (celdas.Count == 0) celdas = new List<int> { centro };
-                if (!celdas.Any(cell => combate.Portales.At(cell) != null)) return null;
+                // Only the caster's own portals: Qilby's turn start takes his central portal, his
+                // islet spells (31829-31832) the other islets' ones, and the players' «Gameplay
+                // joueur» (32121) wipes theirs over the whole map (C63) -- not the central and islet
+                // portals Qilby laid for them, which DPLN says stand through each player's turn.
+                celdas = celdas.Where(cell => combate.Portales.At(cell)?.Owner == quienLanza.Id).ToList();
+                if (celdas.Count == 0) return null;
                 return new Outcome
                 {
                     Sobre = quienLanza, Caster = quienLanza, Efecto = efecto,
