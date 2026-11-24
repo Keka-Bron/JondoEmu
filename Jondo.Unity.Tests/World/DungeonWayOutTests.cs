@@ -82,6 +82,8 @@ namespace Jondo.Unity.Tests.World
         /// <summary>
         /// A rewritten dungeon keeps its list as written, so it must be in the client's own room
         /// numbers: the White Rat's Pantry ran Fifth Room first and its boss stood in the First.
+        /// Each part numbers its own rooms: Koolich Cavern walks through Koolich's Lair, First to
+        /// Sixth Room, between its own Second and Third.
         /// </summary>
         [Fact]
         public void A_rewritten_dungeon_walks_its_rooms_in_the_clients_numbers()
@@ -90,13 +92,31 @@ namespace Jondo.Unity.Tests.World
             var shuffled = new List<string>();
             foreach (var d in Rewritten())
             {
-                var numbers = d.Rooms.Select(r => DungeonManager.OrdinalOf(MapManager.GetMapInfo(r)?.Name ?? ""))
-                    .Where(n => n > 0).ToList();
-                if (!numbers.SequenceEqual(numbers.OrderBy(n => n)))
-                    shuffled.Add($"{d.Id} {d.Name}: {string.Join(",", numbers)}");
+                foreach (var part in d.Rooms.Select(r => MapManager.GetMapInfo(r)?.Name ?? "")
+                             .GroupBy(n => n.Split(" - ")[0]))
+                {
+                    var numbers = part.Select(DungeonManager.OrdinalOf).Where(n => n > 0).ToList();
+                    if (!numbers.SequenceEqual(numbers.OrderBy(n => n)))
+                        shuffled.Add($"{d.Id} {d.Name}: {part.Key}: {string.Join(",", numbers)}");
+                }
             }
             foreach (var l in shuffled) _out.WriteLine(l);
             Assert.Empty(shuffled);
+        }
+
+        /// <summary>
+        /// Al Howin's Vegetable Patch lets its winners out in its own lobby, which has no door out:
+        /// leaving from there goes back through the portal that leads in.
+        /// </summary>
+        [Fact]
+        public void A_lobby_that_is_its_own_exit_leaves_by_the_portal()
+        {
+            if (!Load()) { _out.WriteLine("no world data"); return; }
+            const long Lobby = 101187584, Portal = 88212737;
+            if (MapManager.GetMapInfo(Lobby) == null || MapManager.GetMapInfo(Portal) == null) return;
+            TeleportManager.Initialize();
+            Assert.NotNull(DungeonManager.LobbyAt(Lobby));
+            Assert.Equal(Portal, DungeonManager.OutsideOf(Lobby));
         }
     }
 }

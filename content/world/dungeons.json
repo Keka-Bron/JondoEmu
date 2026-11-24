@@ -858,5 +858,46 @@
       ]
     },
     "why": "Tengu and Fuji Snowfoux together, chosen at Givrihaltès in the Snowfoux Den's transition room (dungeon 58): Dofus pour les noobs, «Tanière Givrefoux»: «Une fois que vous avez terminé la salle 4, vous arrivez dans une salle de transition où vous pouvez choisir entre affronter Tengu Givrefoux seul ou Tengu et Fuji Givrefoux ensemble»; «Fuji remplace la Kami Givrefoux dans le combat», on «La map de Tengu et Fuji Givrefoux [...] beaucoup plus petite que celle du Tengu solo», the smaller of the two Snowfoux Den maps. Fuji is 3234, the boss the catalogue lists for the dungeon. Its win leads to the Exit to the Petrified Forest (dungeon_exits.json)."
+  },
+  "30": {
+    "name": "Cueva del Trankitronko",
+    "minLevel": 90,
+    "optimalLevel": 100,
+    "difficulty": 3,
+    "entrance": 139784,
+    "exit": 139265,
+    "rooms": [
+      107216896,
+      107217920,
+      107218944,
+      107219968,
+      107220992,
+      107222016,
+      107223040,
+      107224064,
+      107225088,
+      107226112,
+      107227136
+    ],
+    "bosses": [
+      670
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        7908,
+        1
+      ]
+    ],
+    "achievements": [
+      29,
+      511,
+      701,
+      700,
+      6179
+    ],
+    "autoGroup": 1,
+    "door": 1,
+    "why": "Koolich Cavern in the order its corridors walk: the First and Second Room, then Koolich's Lair through the Second Room's right-hand corridor (its First to Sixth Room, where the Boufcouls are), out of its Sixth Room into the Cavern's Third Room, and the Fourth and Fifth, Koolich's own. The catalogue's names gave two First Rooms and the Lair was never reached; the Exit is the post-boss room (dungeon_exits.json), not a fight."
   }
 }

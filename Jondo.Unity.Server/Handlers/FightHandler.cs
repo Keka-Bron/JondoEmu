@@ -11913,6 +11913,8 @@ namespace Jondo.Unity.Server.Handlers
                 Reach = (row, caster, from, aim) => Managers.EffectEngine.ReachOf(fight, caster, row, from, aim),
                 // And its summon limit, as it will be checked when the summon comes out.
                 CanSummon = (caster, template, grade) => FitsTheSummonLimit(fight, caster, template, grade),
+                LastFallen = caster => fight.Muertos.LastOrDefault(m => !m.IsAlive && m.TeamId == caster.TeamId
+                                                                         && m.IsMonster && m != caster),
                 // An invisible enemy where he was last seen, not where he is.
                 Hidden = Managers.MonsterTactics.IsInvisible,
                 LastSeen = fighter => fighter.LastSeenCell,
@@ -12154,12 +12156,25 @@ namespace Jondo.Unity.Server.Handlers
                     // and so is a monster's that only hides its own side (HidesItsSideOnly), kills
                     // (KillsEnemiesOnly) or trades places with one of its own (SwapsWithItsSide).
                     Rows = Managers.PlayerSpells.Contains(spell) || HidesItsSideOnly(spell, grade) || KillsEnemiesOnly(spell, grade)
-                           || SwapsWithItsSide(spell, grade)
+                           || SwapsWithItsSide(spell, grade) || RevivesOrOnlyPulls(spell, grade)
                         ? Managers.SpellEffects.De(spell, grade)
                         : Array.Empty<Managers.SpellEffect>(),
                 });
             }
             return spells;
+        }
+
+        /// <summary>
+        /// Whether a spell brings back the last ally to fall (780, 1034), or does nothing but pull
+        /// and set states: Al Howin's Plantas Zombis and Rastrimán. Weighed as a whole they were a
+        /// bare utility with no aim, and were never cast.
+        /// </summary>
+        internal static bool RevivesOrOnlyPulls(int spell, int grade)
+        {
+            var rows = Managers.SpellEffects.De(spell, grade);
+            if (rows.Any(r => r.EffectId is 780 or 1034)) return true;
+            return rows.Any(r => r.EffectId == Jondo.Unity.World.Combat.EffectSupport.Pull)
+                   && rows.All(r => r.EffectId is Jondo.Unity.World.Combat.EffectSupport.Pull or 950 or 951);
         }
 
         /// <summary>

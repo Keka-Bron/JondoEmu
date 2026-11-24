@@ -349,6 +349,12 @@ namespace Jondo.Unity.Server.Managers
             public Func<Fighter, int, int, bool>? CanSummon { get; init; }
 
             /// <summary>
+            /// The last of a caster's side to have fallen, the one «Invoca al último aliado muerto»
+            /// (780, 1034) would bring back; null when none has. Without one, nobody has.
+            /// </summary>
+            public Func<Fighter, Fighter?>? LastFallen { get; init; }
+
+            /// <summary>
             /// Whether a fighter is out of sight -- invisible -- and where his enemies saw him
             /// last, -1 for nowhere. An invisible enemy is not aimed at where he stands, which
             /// nobody on the other side knows, but at where he was last seen (<see cref="Ghosts"/>).
@@ -1199,6 +1205,12 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>What a pull that leaves the enemy next to the caster is worth, in turns of its damage.</summary>
+        private const double PullShare = 0.25;
+
+        /// <summary>«Invoca al último aliado muerto»: the two effects that bring the last of a side to fall back.</summary>
+        private const int Revives = 780, RevivesToo = 1034;
+
         /// <summary>How many cells an aim is weighed from when where it is cast from matters.</summary>
         private const int DirectionalTries = 3;
 
@@ -1249,6 +1261,11 @@ namespace Jondo.Unity.Server.Managers
                     foreach (int cell in MapGeometry.GetNeighbors(seen))
                         if (board.Walkable(cell)) aims.Add(cell);
                 }
+
+                // The last ally to fall comes back on a free cell by the caster.
+                if (spell.Rows.Any(r => r.EffectId is Revives or RevivesToo))
+                    foreach (int cell in MapGeometry.GetNeighbors(from))
+                        if (board.Walkable(cell) && !board.Occupied(cell)) aims.Add(cell);
 
                 // A portal goes by the enemy, its way out, and by the caster, its way in.
                 if (spell.LaysPortals)
@@ -1427,6 +1444,25 @@ namespace Jondo.Unity.Server.Managers
                         if (replaced != null && !summoned && row.DiceNum > 0 && EffectEngine.CasterMeets(caster, row))
                         {
                             value += p * (SummonStanding(monster, caster, row) + 15 * (Nearest(castFrom) - Nearest(replaced.CellId)));
+                            summoned = true;
+                        }
+                        continue;
+                    }
+
+                    if (id is Revives or RevivesToo)
+                    {
+                        // The last of its side to fall, back on the aimed cell with the die's share
+                        // of his life (FightHandler.ResucitarAsync): worth what a summon is, the
+                        // more the more life he comes back with. With nobody fallen it does
+                        // nothing -- Halouine's Plantas Zombis was never cast while it weighed
+                        // nothing at all.
+                        var fallen = board.LastFallen?.Invoke(caster);
+                        if (fallen != null && !summoned && depth == 0 && castAim != castFrom && board.Walkable(castAim)
+                            && !board.Occupied(castAim) && !board.Trapped(castAim) && EffectEngine.CasterMeets(caster, row))
+                        {
+                            double share = Math.Clamp(Math.Max(row.DiceNum, row.DiceSide), 1, 100) / 100.0;
+                            value += p * ((150 + 1.5 * fallen.Level) * (0.3 + 0.7 * share)
+                                          + 15 * (Nearest(castFrom) - Nearest(castAim)));
                             summoned = true;
                         }
                         continue;
@@ -1733,6 +1769,23 @@ namespace Jondo.Unity.Server.Managers
                             double crash = EffectEngine.DanoDeColision(caster.Level, caster.PushDamage, 0, short_);
                             blows.TryGetValue(who, out double had);
                             blows[who] = had + crash * p;
+                        }
+                        continue;
+                    }
+
+                    if (id == EffectSupport.Pull && depth == 0 && !PlayerSpells.Contains(spell.Id))
+                    {
+                        // A pull brings the enemy to its blows: worth a share of a turn's damage,
+                        // whole when he lands next to it. Weighed at nothing, Halouine's Rastrimán
+                        // was never cast and its melee boss walked after whoever kept away.
+                        // A class spell's pull is the plan's to weigh, as it moves the board (Simulation).
+                        foreach (var who in reached.Where(w => w.TeamId != monster.TeamId && w != caster))
+                        {
+                            int before = MapGeometry.Distance(who.CellId, castFrom);
+                            int after = MapGeometry.Distance(Pushed(board, who.CellId, castFrom, Math.Max(1, row.DiceNum), away: false).Cell, castFrom);
+                            if (after >= before) continue;
+                            double closer = after <= 1 ? 1.0 : (before - after) / (double)before;
+                            value += PullShare * TurnDamageOf(monster) * closer * p;
                         }
                         continue;
                     }

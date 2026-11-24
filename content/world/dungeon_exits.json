@@ -473,6 +473,15 @@
         69193
       ],
       "why": "The Bastión de los Martilloseco: after the boss the winners are in the «Salida» room, where Demena Decobre (6847) offers «Abandonar el bastión.»; the reply leaves the dungeon through its way out, the entrance map."
+    },
+    {
+      "dungeon": 30,
+      "bossRoom": 107227136,
+      "room": 107228160,
+      "cell": 282,
+      "npc": 755,
+      "replies": [2749, 2750, 2751, 2752, 56920, 63334],
+      "why": "Koolich Cavern: after Koolich the winners are in «Koolich Cavern - Exit» (107228160), where Koolich, beaten, lets them go: «Take the hat and leave.», «Take the boots and leave.», «Take the staff and leave.», «Take the bag and leave.», «Take a rain check and leave.» and «Take the ball of gobkool wool and leave.» all leave through the dungeon's way out. Seen in the client: «Take the boots and leave.» gave nothing and the boss win skipped the room. INFERRED cell."
     }
   ]
 }

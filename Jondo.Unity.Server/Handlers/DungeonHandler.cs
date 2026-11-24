@@ -478,7 +478,11 @@ namespace Jondo.Unity.Server.Handlers
             var dungeon = DungeonManager.OfRoom(SessionContext.State.MapId);
             if (dungeon == null && DungeonExitRooms.At(SessionContext.State.MapId) is { } room)
                 dungeon = DungeonManager.Get(room.Dungeon);
+            dungeon ??= DungeonManager.LobbyAt(SessionContext.State.MapId);
             long exit = dungeon == null ? 0 : Expeditions.WayOut(dungeon, SessionContext.State.CharacterId);
+            // A lobby that is its dungeon's own exit (Al Howin's Vegetable Patch) has no door
+            // out: leaving it goes back through the portal that leads in.
+            if (exit == SessionContext.State.MapId) exit = DungeonManager.OutsideOf(exit);
             if (exit == 0) return false;
             return await TeleportHandler.ToMapAsync(stream, exit) >= 0;
         }

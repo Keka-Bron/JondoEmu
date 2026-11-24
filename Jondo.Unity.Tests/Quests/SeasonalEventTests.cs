@@ -1,12 +1,17 @@
 using System;
+using Jondo.Unity.Server;
 using Jondo.Unity.Server.Managers;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Quests
 {
     /// <summary>The quests' «Sc»: content that is on, and the yearly events on their dates (Dofus pour les noobs, 2026).</summary>
+    /// <remarks>Every event on its calendar, whatever the operator holds in config/events.json.</remarks>
+    [Collection("MapManager")]
     public sealed class SeasonalEventTests
     {
+        public SeasonalEventTests() => EventSettings.UseForTests(new EventSettings());
+
         [Theory]
         [InlineData(SeasonalEvents.Halouine, 2026, 10, 22, true)]
         [InlineData(SeasonalEvents.Halouine, 2026, 11, 2, true)]

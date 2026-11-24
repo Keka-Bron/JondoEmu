@@ -1125,6 +1125,36 @@ namespace Jondo.Unity.Server.Managers
 
         public static bool IsRoom(long mapId) => _byRoom.ContainsKey(mapId);
 
+        /// <summary>
+        /// The dungeon whose entrance is a lobby inside it: a map of the same subarea as its rooms,
+        /// not one of them, where its guardian stands (Al Howin's Vegetable Patch); null for any
+        /// other map, an outdoor door included.
+        /// </summary>
+        public static Dungeon? LobbyAt(long mapId)
+        {
+            var dungeon = AtEntrance(mapId);
+            if (dungeon == null || dungeon.Rooms.Count == 0 || IsRoom(mapId)) return null;
+            var here = MapManager.GetMapInfo(mapId);
+            var first = MapManager.GetMapInfo(dungeon.Rooms[0]);
+            return here != null && first != null && here.SubAreaId == first.SubAreaId ? dungeon : null;
+        }
+
+        /// <summary>
+        /// The map outside a lobby with no door of its own: where the portal that leads into it
+        /// stands. Zero when no interactive leads there from outside the dungeon.
+        /// </summary>
+        public static long OutsideOf(long lobbyMapId)
+        {
+            var subArea = MapManager.GetMapInfo(lobbyMapId)?.SubAreaId;
+            foreach (var route in TeleportManager.All)
+            {
+                if (route.DestinationMapId != lobbyMapId || route.SourceMapId == lobbyMapId || IsRoom(route.SourceMapId)) continue;
+                var from = MapManager.GetMapInfo(route.SourceMapId);
+                if (from != null && from.SubAreaId != subArea) return route.SourceMapId;
+            }
+            return 0;
+        }
+
         /// <summary>Whether a monster is a dungeon's guardian: one of the bosses of any of them.</summary>
         public static bool IsBoss(int monsterId) => _byId.Values.Any(d => d.Bosses.Contains(monsterId));
 
