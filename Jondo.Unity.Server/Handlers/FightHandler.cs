@@ -4755,7 +4755,19 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     caducados.Add((quien, caido));
                 }
+                // Held through its caster's turn (ActiveSpell.HeldThroughItsCastersTurn): that turn
+                // is over at the next start, and at his own it is held once more.
+                quien.Buffs.ActiveSpells.RemoveAll(enganche => enganche.FallsAtTheNextStart
+                                                              && enganche.Lanzador != quienEmpieza.Id);
+                foreach (var enganche in quien.Buffs.ActiveSpells)
+                {
+                    if (!enganche.HeldThroughItsCastersTurn || enganche.CaducaEnRonda != fight.RoundNumber
+                        || enganche.Lanzador != quienEmpieza.Id) continue;
+                    enganche.HeldThroughItsCastersTurn = false;
+                    enganche.FallsAtTheNextStart = true;
+                }
                 quien.Buffs.ActiveSpells.RemoveAll(enganche => enganche.FallsAtItsCastersTurn
+                                                              && !enganche.FallsAtTheNextStart
                                                               && enganche.CaducaEnRonda >= 0
                                                               && enganche.CaducaEnRonda <= fight.RoundNumber
                                                               && ItsCastersTurnHasCome(fight, quienEmpieza, enganche.Lanzador));
@@ -6898,6 +6910,12 @@ namespace Jondo.Unity.Server.Handlers
         /// is where a buff of the same reaction, shortened by <see cref="AguantaSuTurno"/>, is gone
         /// too -- the Kílerat's poison on a hit, three ticks and not four.
         /// </param>
+        /// <param name="afterItsCastersTurn">
+        /// Whether the cast is made in somebody else's turn after the caster has played this round.
+        /// A buff of such a cast is held through his next turn (<see cref="AguantaSuTurno"/>), and so
+        /// is a hook of its rows' own duration
+        /// (<see cref="Jondo.Unity.World.Fights.Buffs.ActiveSpell.HeldThroughItsCastersTurn"/>).
+        /// </param>
         /// <summary>
         /// Whether a row a behaviour's hook set off listens for its own trigger rounds rather than
         /// for good: the behaviour's rows are the monster's for the whole fight, but a spell one of
@@ -6914,7 +6932,7 @@ namespace Jondo.Unity.Server.Handlers
                                                   bool incluirElPropio = true, bool critico = false,
                                                   bool conducta = false, bool throughPortal = false,
                                                   bool offATrigger = false, int celda = -1,
-                                                  bool inItsCastersTurn = true)
+                                                  bool inItsCastersTurn = true, bool afterItsCastersTurn = false)
         {
             // Off a trigger, every occurrence is a cast of its own, and what it hooks piles up to
             // the spell's maxStack (-1: no cap) once per bearer: Remanencia's "por cada PM que
@@ -7021,8 +7039,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (armables.Count == 0) continue;
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, armables.Select(c => ClaveDeFila(c.Efecto)), critico,
-                                                 fallsAtItsCastersTurn: inItsCastersTurn && hasta >= 0
-                                                                        && (hasta == byOwnDuration || hasta == byTheRowsLeft));
+                                                 fallsAtItsCastersTurn: (inItsCastersTurn || afterItsCastersTurn) && hasta >= 0
+                                                                        && (hasta == byOwnDuration || hasta == byTheRowsLeft),
+                                                 heldThroughItsCastersTurn: !inItsCastersTurn && afterItsCastersTurn);
             }
 
             // Every spell this cast ran that still has rows under a trigger, AT ITS GRADE: one
@@ -7268,7 +7287,15 @@ namespace Jondo.Unity.Server.Handlers
                 var tanda = new List<Managers.SpellEffect>();
                 while (i < filas.Count && EsGolpe(filas[i]) == golpes
                        && (golpes || Managers.EffectEngine.EsInvocacion(filas[i].EffectId) == invoca))
+                {
                     tanda.Add(filas[i++]);
+                    // A state somebody's hook waits on closes the run: the hook answers once its
+                    // run is over, and the rows after it must see what it did. The Yenaparda's Mort
+                    // Sûre (7222) puts 859 on its target, then casts its grade 4, whose kill reads
+                    // 858 on the dog ("A,*E858") -- and 858 is what the hook on 859 gives him. In one
+                    // run with the 950, grade 4 read the dog before the hook went off: no bite killed.
+                    if (!golpes && i < filas.Count && SomebodyWaitsOnTheState(fight, tanda[^1])) break;
+                }
 
                 if (golpes)
                 {
@@ -7298,6 +7325,26 @@ namespace Jondo.Unity.Server.Handlers
             }
             }
             finally { fight.BornOfTheCast = bornOutside; }
+        }
+
+        /// <summary>
+        /// Whether a state row's state is one some fighter's hook or attitude goes off on ("EON" of
+        /// that state): see <see cref="LanzarPorOrdenAsync"/>, which ends its run there.
+        /// </summary>
+        private static bool SomebodyWaitsOnTheState(FightInstance fight, Managers.SpellEffect fila)
+        {
+            if (fila.EffectId != Jondo.Unity.World.Combat.EffectSupport.AddState || fila.Value <= 0) return false;
+            string onIt = Managers.EffectEngine.AlPonerseElEstado(fila.Value);
+            bool Listens(int spell, int grade)
+                => Managers.SpellEffects.De(spell, grade).Any(f => f.Disparadores().Any(
+                       d => string.Equals(d, onIt, StringComparison.OrdinalIgnoreCase)));
+            foreach (var f in TodosLosCombatientes(fight))
+            {
+                if (f == null || !f.IsAlive) continue;
+                if (f.Buffs.ActiveSpells.Any(e => e.Vivo(fight.RoundNumber) && Listens(e.Hechizo, e.Grado))) return true;
+                if (f.Buffs.Actitudes.Any(a => Listens(a, f.Buffs.GradoDeActitud(a)))) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -8748,7 +8795,10 @@ namespace Jondo.Unity.Server.Handlers
                                  throughPortal: fight.CastThroughPortal, offATrigger: !alLanzar,
                                  celda: celdaApuntada,
                                  inItsCastersTurn: fight.CurrentFighter == null
-                                                   || ItsCastersTurnHasCome(fight, fight.CurrentFighter, quienLanza.Id));
+                                                   || ItsCastersTurnHasCome(fight, fight.CurrentFighter, quienLanza.Id),
+                                 afterItsCastersTurn: fight.CurrentFighter != null
+                                                      && fight.TurnOrder.IndexOf(quienLanza) is int suSitio
+                                                      && suSitio >= 0 && suSitio < fight.CurrentTurnIndex);
 
             var fichas = new HashSet<(long Quien, int Caracteristica)>();
             var vidasCambiadas = new Dictionary<long, Fighter>();
@@ -11538,7 +11588,11 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Who intercepts a blow on <paramref name="target"/>: the caster of a live 765 row of
-        /// his under a kind this blow is of, alive, and neither the one hit nor the one hitting.
+        /// his under a kind this blow is of, alive, and not the one hit. Under a class spell's row
+        /// not the one hitting either (the Sacrier's Sacrifice); under a monster's, the one who
+        /// put it takes his own blows too: Kanniboul village's 212 sneezes 6095 on its foe, who
+        /// casts 6169 and so takes every blow dealt to it -- his own melee hits killed it, and he
+        /// took nothing.
         /// </summary>
         internal static Fighter Interceptor(FightInstance fight, Fighter caster, Fighter target, bool fromTurnTrigger)
         {
@@ -11547,7 +11601,8 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var row in target.Buffs.LeidasPorElGolpe(Managers.EffectEngine.InterceptaLosDanos, fight.RoundNumber, clases))
             {
                 var quien = fight.Buscar(row.Quien);
-                if (quien == null || !quien.IsAlive || quien == target || quien == caster) continue;
+                if (quien == null || !quien.IsAlive || quien == target) continue;
+                if (quien == caster && Managers.PlayerSpells.Contains(row.HechizoOrigen)) continue;
                 return quien;
             }
             return null;
@@ -12093,6 +12148,9 @@ namespace Jondo.Unity.Server.Handlers
                 bool hooks = false, hooksOnEnemies = false, doesSomethingAtOnce = false;
                 int zone = 0, removal = 0, buff = 0;
                 Managers.SpellEffect? zoneRow = null, healZoneRow = null;
+                bool blowOnTheAim = false;
+                Managers.SpellEffect? ringRow = null;
+                bool mechanicOnTheAim = false;
                 double heal = 0, pickedDamage = 0;
                 var masks = new Dictionary<int, string>();
                 var mechanicMasks = new List<string>();
@@ -12110,6 +12168,7 @@ namespace Jondo.Unity.Server.Handlers
                         if (own) hurtsAllies = true;
                         if (effect.Forma != 'P' && (zoneRow == null || effect.Tamano > zone)) zoneRow = effect;
                         if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
+                        else blowOnTheAim = true;
                     }
                     else if (BlowsInAPickedElement.Contains(effect.EffectId))
                     {
@@ -12120,6 +12179,7 @@ namespace Jondo.Unity.Server.Handlers
                         if (own) hurtsAllies = true;
                         if (effect.Forma != 'P' && (zoneRow == null || effect.Tamano > zone)) zoneRow = effect;
                         if (effect.Forma != 'P') zone = Math.Max(zone, effect.Tamano);
+                        else blowOnTheAim = true;
                         pickedDamage = Math.Max(pickedDamage, average);
                     }
                     else if (effect.EffectId == Jondo.Unity.World.Combat.EffectSupport.FireHeal)
@@ -12139,6 +12199,11 @@ namespace Jondo.Unity.Server.Handlers
                         mechanics = true;
                         if (enemies) mechanicsOnEnemies = true;
                         if (!effect.ForClientOnly) mechanicMasks.Add(mask);
+                        if (enemies && !effect.ForClientOnly)
+                        {
+                            if (Managers.MonsterTactics.MissesItsCentre(effect)) ringRow ??= effect;
+                            else mechanicOnTheAim = true;
+                        }
                     }
                     else if (!Managers.EffectEngine.EsMarcadorDeGuion(effect.EffectId) && !effect.ForClientOnly)
                     {
@@ -12236,6 +12301,7 @@ namespace Jondo.Unity.Server.Handlers
                     Element = (Jondo.Unity.World.Fights.ElementType)Math.Clamp(data.Element, 0, 4),
                     Zone = zone,
                     ZoneRow = zoneRow,
+                    BlowOnTheAim = blowOnTheAim,
                     HurtsAllies = hurtsAllies,
                     Heal = heal,
                     HealZoneRow = healZoneRow,
@@ -12259,6 +12325,7 @@ namespace Jondo.Unity.Server.Handlers
                         ? 25 + monster.Level / 10.0 : 0,
                     NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,
+                    UtilityZoneRow = mechanicOnTheAim ? null : ringRow,
                     UtilityEnemyMasks = EnemyMasksAskingAState(mechanicMasks),
                     // A class spell -- a JondoBot's -- is weighed row by row, as the engine reads it;
                     // and so is a monster's that only hides its own side (HidesItsSideOnly), kills

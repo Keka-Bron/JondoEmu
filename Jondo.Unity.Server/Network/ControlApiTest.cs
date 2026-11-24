@@ -1386,7 +1386,9 @@ namespace Jondo.Unity.Server.Network
                     // a hole or taken; wrong when it stood free.
                     // Pulled towards somebody standing right in front of him: nowhere to go.
                     if (moved.Count == 0 && e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Pull && castCell >= 0
-                        && fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == castCell) is { } pulled)
+                        // Not the caster on his own cell: a pull centred on him (Provocaspion, 7227,
+                        // all foes on the map) has nobody to pull there, and was read as "blocked".
+                        && fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == castCell && f != me) is { } pulled)
                     {
                         var (px, py) = MapGeometry.CellToPoint(pulled.CellId);
                         var (cx, cy) = MapGeometry.CellToPoint(me.CellId);

@@ -77,6 +77,14 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public SpellEffect? ZoneRow { get; init; }
 
+            /// <summary>
+            /// Whether a blow row hits the aimed cell itself (shape 'P') besides <see cref="ZoneRow"/>.
+            /// The Mastodon Cemetery's 4620 casts 7217, which hits its target in earth (P1) and
+            /// the cells round it in air (Q1, a cross without its centre): weighed by the cross
+            /// alone, the target was never hit and the spell was never cast.
+            /// </summary>
+            public bool BlowOnTheAim { get; init; }
+
             /// <summary>Whether its blow also hurts the caster's side inside the zone.</summary>
             public bool HurtsAllies { get; init; }
 
@@ -170,6 +178,15 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public bool BlowsUpOnTimer { get; init; }
             public bool UtilityOnEnemies { get; init; }
+
+            /// <summary>
+            /// The row of what it does to enemies when that row's zone leaves out the cell it is
+            /// aimed at (a ring, a cross without its centre), and nothing else it does to them
+            /// lands there: aimed at the enemy, it misses him. Null otherwise. Dungeon 35's 301
+            /// casts 2028, a push on a ring (O1) round the aimed cell: aimed at the player, it
+            /// pushed its caster and allies round him and never him.
+            /// </summary>
+            public SpellEffect? UtilityZoneRow { get; init; }
 
             /// <summary>
             /// The masks of its mechanics on enemies when every one of them asks the target for a
@@ -975,6 +992,15 @@ namespace Jondo.Unity.Server.Managers
                             foreach (int cell in MapGeometry.GetNeighbors(enemy.CellId))
                                 yield return (enemy, cell);
                 }
+                else if (spell.UtilityOnEnemies && spell.UtilityZoneRow != null)
+                {
+                    // Its zone leaves the aimed cell out: aimed round the enemy so that he is in it,
+                    // its own cell among them.
+                    if (!spell.Offensive)
+                        foreach (var enemy in enemies)
+                            foreach (int cell in Around(enemy.CellId, Math.Max(1, spell.UtilityZoneRow.Tamano)))
+                                yield return (enemy, cell);
+                }
                 else if (spell.UtilityOnEnemies)
                 {
                     if (!spell.Offensive) foreach (var enemy in enemies) yield return (enemy, enemy.CellId);
@@ -1111,8 +1137,23 @@ namespace Jondo.Unity.Server.Managers
                 if (!onEnemy && spell.UtilityReachesOwnSide(monster, target))
                     value += spell.Utility;
             }
-            else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy && spell.UtilityReachesEnemy(monster, target) : target == monster))
+            else if (spell.Utility > 0 && (spell.UtilityOnEnemies ? onEnemy && spell.UtilityReachesEnemy(monster, target) : target == monster)
+                     && (!spell.UtilityOnEnemies || spell.UtilityZoneRow == null
+                         || EffectEngine.CasillasDelEfecto(spell.UtilityZoneRow, from, aim).Contains(target.CellId)))
+            {
                 value += spell.Utility;
+                // Of the aims round the enemy, the ones that leave its own side out of the zone
+                // when its mask names them: the caster pushed off its own blows.
+                if (spell.UtilityOnEnemies && spell.UtilityZoneRow is { } ring
+                    && (ring.TargetMask ?? "").Split(',').Any(t => t.Trim() is "a" or "g" or "C" or "c"))
+                {
+                    var zone = EffectEngine.CasillasDelEfecto(ring, from, aim);
+                    int own = allies.Append(monster).Distinct()
+                                    .Count(a => a.IsAlive && zone.Contains(a == monster ? from : a.CellId)
+                                                && EffectEngine.CumpleLaMascara(monster, a, ring.TargetMask ?? ""));
+                    value -= own * spell.Utility * OwnSideInTheRing;
+                }
+            }
 
             return value;
         }
@@ -2418,7 +2459,8 @@ namespace Jondo.Unity.Server.Managers
         /// </summary>
         private static bool Hit(Spell spell, int from, int aim, Fighter who)
             => spell.ZoneRow != null
-                ? EffectEngine.CasillasDelEfecto(spell.ZoneRow, from, aim).Contains(who.CellId)
+                ? spell.BlowOnTheAim && who.CellId == aim
+                  || EffectEngine.CasillasDelEfecto(spell.ZoneRow, from, aim).Contains(who.CellId)
                 : MapGeometry.Distance(aim, who.CellId) <= spell.Zone;
 
         /// <summary>Same row or same column of the diamond grid: a straight line.</summary>
@@ -2441,6 +2483,16 @@ namespace Jondo.Unity.Server.Managers
         /// Whether the aimed cell lies where the spell's level lets it be cast: anywhere, along the
         /// straight lines (CastInLine), along the diagonals (CastInDiagonal) or along both.
         /// </summary>
+        /// <summary>The share of a ring's utility lost for each of the caster's side the ring also takes.</summary>
+        private const double OwnSideInTheRing = 0.25;
+
+        /// <summary>Whether a row's zone leaves out the cell it is aimed at: a ring, a cross without its centre.</summary>
+        internal static bool MissesItsCentre(SpellEffect row)
+        {
+            const int centre = 300;
+            return !EffectEngine.CasillasDelEfecto(row, centre, centre).Contains(centre);
+        }
+
         internal static bool OnItsLines(Spell spell, int from, int aim)
             => !spell.InLine && !spell.InDiagonal
                || spell.InLine && InLine(from, aim)

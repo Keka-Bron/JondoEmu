@@ -134,8 +134,9 @@ namespace Jondo.Unity.Server.Managers
         public int TopeDeCaida { get; init; }
 
         /// <summary>
-        /// Maximum number of identical rows the spell level allows to coexist. Values at or below
-        /// one use refresh semantics; a larger value is a real stack limit.
+        /// Maximum number of identical rows the spell level allows to coexist: minus one is no cap,
+        /// zero and one refresh, a larger value is a real stack limit. A monster spell's zero is
+        /// read as minus one when loaded.
         /// </summary>
         public int MaxStack { get; init; }
 
@@ -313,6 +314,12 @@ namespace Jondo.Unity.Server.Managers
                     if (lector.Read())
                     {
                         int maxStack = lector.IsDBNull(2) ? -1 : lector.GetInt32(2);
+                        // A monster spell's zero is no cap: the Otomai's Ark barrels (1080) start at
+                        // 2 AP and cast 261, +1 AP for six turns, once a turn; the guides have them
+                        // cast Rhum Fourbe (938, 4 AP) on their third turn, so its +1 piles up.
+                        // Replaced, they stayed at 3 AP for good. The class spells keep the zero
+                        // their captures were measured with.
+                        if (maxStack == 0 && !PlayerSpells.Contains(hechizo)) maxStack = -1;
                         Parsear(lector.IsDBNull(0) ? "" : lector.GetString(0), normales, maxStack);
                         Parsear(lector.IsDBNull(1) ? "" : lector.GetString(1), criticos, maxStack);
                     }

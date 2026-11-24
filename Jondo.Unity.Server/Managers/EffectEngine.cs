@@ -1155,6 +1155,23 @@ namespace Jondo.Unity.Server.Managers
             [2017] = new(true,  Apunta.AlLanzadorPadre,    true),
         };
 
+        /// <summary>
+        /// A monster's delayed row with no duration, hooked on somebody else under a turn's trigger,
+        /// counts its delay in its caster's turns, as every duration is: it goes off on the bearer's
+        /// first such turn once the caster's turn of the round its delay names has come. The
+        /// Yenaparda's Mort Sûre (7222) bites, and at the target's next turn start after that (TB,
+        /// delay 1) casts its grade 2 -- 449 and the hook that makes the next bite kill, recast two
+        /// rounds later. Counted in the target's rounds, a target playing before the dog got it in
+        /// the round after the bite, before the dog's turn, and all of it fell with that turn.
+        /// </summary>
+        private static bool DelayCountsInItsCastersTurns(int spell, SpellEffect efecto, Fighter caster, Fighter bearer)
+            => efecto.Delay > 0 && efecto.Duration == 0 && WaitsOnATurn(efecto) && !PlayerSpells.Contains(spell)
+               && caster != null && bearer != null && caster != bearer;
+
+        /// <summary>Whether <paramref name="who"/> still plays in this round.</summary>
+        private static bool StillToPlay(FightInstance fight, Fighter who)
+            => who.IsAlive && fight.TurnOrder.IndexOf(who) > fight.CurrentTurnIndex;
+
         /// <summary>Whether a row waits on anything but the cast.</summary>
         private static bool EsperaUnDisparador(SpellEffect efecto)
             => efecto.Disparadores().Any(d => !string.Equals(d, AlLanzar, StringComparison.OrdinalIgnoreCase));
@@ -2916,6 +2933,7 @@ namespace Jondo.Unity.Server.Managers
                             HookUntil = efecto.Duration == 0
                                         && (portador != caster ? WaitsOnATurn(efecto) : !WaitsOnATurn(efecto))
                                 ? UntilTheirNextTurn(combat, portador, round)
+                                  + (DelayCountsInItsCastersTurns(spell, efecto, caster, portador) ? efecto.Delay : 0)
                                 : null,
                         });
                     }
@@ -3029,7 +3047,10 @@ namespace Jondo.Unity.Server.Managers
                 // turn of the cast, it took the +20 away the moment it was given.
                 if (rondaDelEnganche >= 0 && efecto.Delay > 0
                     && !string.Equals(trigger, AlLanzar, StringComparison.OrdinalIgnoreCase)
-                    && round < rondaDelEnganche + efecto.Delay)
+                    && (round < rondaDelEnganche + efecto.Delay
+                        || (round == rondaDelEnganche + efecto.Delay
+                            && DelayCountsInItsCastersTurns(spell, efecto, caster, target)
+                            && StillToPlay(combat, caster))))
                 {
                     continue;
                 }

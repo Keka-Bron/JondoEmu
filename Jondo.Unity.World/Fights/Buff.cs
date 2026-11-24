@@ -363,6 +363,19 @@ namespace Jondo.Unity.World.Fights
             public bool FallsAtItsCastersTurn { get; set; }
 
             /// <summary>
+            /// Armed after its caster's turn in this round, outside it -- a sub-cast at somebody
+            /// else's turn start --, it lives through his turn of its last round as the rows of the
+            /// same cast do (Buff.CaeAlAcabarSuTurno) and falls at the turn start after it
+            /// (<see cref="FallsAtTheNextStart"/>). The Yenaparda's Mort Sûre grade 2, cast at its
+            /// target's turn start after the dog had played, puts 449 on him until the dog's next
+            /// turn is over, and the hook on 859 that makes that turn's bite kill fell at its start.
+            /// </summary>
+            public bool HeldThroughItsCastersTurn { get; set; }
+
+            /// <summary>Held through its caster's turn, which has come: it falls at the next turn start.</summary>
+            public bool FallsAtTheNextStart { get; set; }
+
+            /// <summary>
             /// How many times it goes off when its trigger comes: once per occurrence of the
             /// trigger that hooked it in its round. Remanencia's "por cada PM que utilice" hooks
             /// its turn-end return once per step, and five steps are five returns.
@@ -398,8 +411,10 @@ namespace Jondo.Unity.World.Fights
         /// </remarks>
         /// <param name="fallsAtItsCastersTurn">See <see cref="ActiveSpell.FallsAtItsCastersTurn"/>.</param>
         public void ArmarFilas(int hechizo, int grado, int caducaEnRonda, long lanzador, int puestoEnRonda,
-                               IEnumerable<int> filas, bool critico = false, bool fallsAtItsCastersTurn = false)
+                               IEnumerable<int> filas, bool critico = false, bool fallsAtItsCastersTurn = false,
+                               bool heldThroughItsCastersTurn = false)
         {
+            heldThroughItsCastersTurn &= fallsAtItsCastersTurn && caducaEnRonda >= 0;
             var ya = ActiveSpells.FirstOrDefault(e => e.Filas != null && e.Hechizo == hechizo && e.Grado == grado
                                                      && e.Lanzador == lanzador);
             if (ya != null)
@@ -412,8 +427,14 @@ namespace Jondo.Unity.World.Fights
                     {
                         ya.CaducaEnRonda = caducaEnRonda;
                         ya.FallsAtItsCastersTurn = fallsAtItsCastersTurn;
+                        ya.HeldThroughItsCastersTurn = heldThroughItsCastersTurn;
+                        ya.FallsAtTheNextStart = false;
                     }
-                    else if (caducaEnRonda == ya.CaducaEnRonda) ya.FallsAtItsCastersTurn |= fallsAtItsCastersTurn;
+                    else if (caducaEnRonda == ya.CaducaEnRonda)
+                    {
+                        ya.FallsAtItsCastersTurn |= fallsAtItsCastersTurn;
+                        ya.HeldThroughItsCastersTurn |= heldThroughItsCastersTurn;
+                    }
                 }
                 ya.PuestoEnRonda = puestoEnRonda;
                 return;
@@ -423,6 +444,7 @@ namespace Jondo.Unity.World.Fights
                 Hechizo = hechizo, Grado = grado, CaducaEnRonda = caducaEnRonda, Lanzador = lanzador,
                 PuestoEnRonda = puestoEnRonda, Critico = critico, Filas = new HashSet<int>(filas),
                 FallsAtItsCastersTurn = fallsAtItsCastersTurn && caducaEnRonda >= 0,
+                HeldThroughItsCastersTurn = heldThroughItsCastersTurn,
             });
         }
 
