@@ -2306,9 +2306,9 @@
     {
       "map": 149689344,
       "npc": 1619,
-      "cell": 300,
+      "cell": 286,
       "orientation": 1,
-      "why": "Tronky Tranky in the Ancestral Domain's exit room, who takes the winners out. INFERRED cell."
+      "why": "Tronky Tranky in the Ancestral Domain's exit room, who takes the winners out. INFERRED cell, beside the cell the winners land on (300)."
     },
     {
       "map": 149689344,
