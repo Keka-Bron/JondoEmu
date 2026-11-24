@@ -2018,21 +2018,22 @@
       "orientation": 1,
       "why": "Brookita Pyrita by the mouth of Astrub's mine [1,-17] (Dofus pour les noobs). INFERRED cell."
     },
+    { "map": 188483080, "npc": 2836, "cell": 343, "remove": true },
     {
       "map": 188483080,
       "npc": 2836,
-      "cell": 343,
-      "orientation": 1,
+      "cell": 248,
+      "orientation": 3,
       "criterion": "Qa=1615&Qo<9526",
       "why": "Hicha held behind the bars of the hideout until the artefact is taken back."
     },
     {
       "map": 188483080,
       "npc": 2837,
-      "cell": 314,
-      "orientation": 1,
+      "cell": 301,
+      "orientation": 3,
       "criterion": "Qa=1615&Qo<9524",
-      "why": "The guard bulldog, before Hicha's bars, until beaten. INFERRED cell."
+      "why": "The guard bulldog, before Hicha's bars, until beaten."
     },
     {
       "map": 192939010,
