@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -227,6 +228,12 @@ namespace Jondo.Unity.Tests.Launcher
             // An administrator may change any folder's rights; the case is the player's.
             if (!OperatingSystem.IsWindows() || SystemIntegration.IsElevated()) return;
 
+            VerifyRepairPreservesFolderRights();
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void VerifyRepairPreservesFolderRights()
+        {
             string root = Path.Combine(Path.GetTempPath(), "jondo-rights-" + Guid.NewGuid().ToString("N"));
             var folder = Directory.CreateDirectory(root);
             string player = SystemIntegration.CurrentUserSid();

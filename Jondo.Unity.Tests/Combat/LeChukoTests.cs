@@ -83,7 +83,7 @@ namespace Jondo.Unity.Tests.Combat
             // A steal heals half of what it takes.
             Assert.Equal(3000 + stolen / 2, boss.CurrentHP);
             // Above 30% life none of the summons of the lower branch come.
-            Assert.Single(fight.Todos.Where(f => f.IsMonster));
+            Assert.Single(fight.Todos, f => f.IsMonster);
         }
 
         /// <summary>Below 50% life the sand also calls its sub-spell; at full life it does not.</summary>
@@ -93,7 +93,7 @@ namespace Jondo.Unity.Tests.Combat
             if (!HasData) return;
             var (fight, boss, player) = Fight();
             await Cast(fight, boss, player, Sand, 1);
-            Assert.Single(fight.Todos.Where(f => f.IsMonster));
+            Assert.Single(fight.Todos, f => f.IsMonster);
         }
     }
 }

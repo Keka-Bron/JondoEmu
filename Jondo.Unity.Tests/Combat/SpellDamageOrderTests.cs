@@ -68,7 +68,8 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(0, Blow(30, reduction: 50));
         }
 
-        /// <summary>A value times a percentage floors the float product (ra.fay).</summary>        [Theory]
+        /// <summary>A value times a percentage floors the float product (ra.fay).</summary>
+        [Theory]
         [InlineData(10, 110, 11)]
         [InlineData(99, 115, 113)]
         [InlineData(7, 50, 3)]
