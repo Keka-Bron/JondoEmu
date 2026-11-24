@@ -1686,11 +1686,9 @@ namespace Jondo.Unity.Server.Network
                         await FightHandler.FightDetailsAsync(session, details, frame.Uid.Value);
                     break;
                 case Game.FightSpectatePlayerRequest spectate:
-#if !JONDO_PROTOCOL_3_8_1_2
                     if (GameEntryDispatch.IsAllowed(session, spectate))
                         await FightHandler.WatchCharacterAsync(session, spectate);
-#endif
-                    break; // The subsequent spectator board is still August-only.
+                    break;
                 case Game.ContextQuitRequest:
                     await FightHandler.QuitAsync(session);
                     break;

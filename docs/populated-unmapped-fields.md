@@ -253,6 +253,15 @@ reads the two fighter lists, not that scalar. The August MCP audit found no use
 witness, with incomplete caller coverage. The typed reply omits the scalar and
 retains the request UID in the response envelope.
 
+### Spectator board
+
+The typed spectator announcement omits the defender ID (`kam` tag **3**) under
+the same policy as participant placement. The legacy spectator turn snapshot
+wrote the announced round into `jzc` tag **8** (property **199394**). The August
+native audit found no use witness and incomplete caller coverage. The typed
+board omits that scalar and still sends the current round in the separate
+`FightNewRoundEvent`. Neither omission uses a raw fallback.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

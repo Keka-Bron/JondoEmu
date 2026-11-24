@@ -300,6 +300,22 @@ public sealed class GameEntryLifecycleTests
     }
 
     [Fact]
+    public async Task Spectator_readiness_and_heartbeat_do_not_initialize_the_roleplay_map()
+    {
+        var h = new Harness();
+        await h.Enter();
+        h.Session.State.SpectatingFightId = 123;
+        h.Session.State.FightId = 123;
+        Assert.False(h.Session.State.IsInFight);
+
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new MapInformationRequest(checked((int)h.Session.MapId))));
+        Assert.Equal(GameEntryResult.Handled, await h.Send(new PingRequest(false)));
+        Assert.DoesNotContain("find", h.Backend.Calls);
+        Assert.DoesNotContain("actors", h.Backend.Calls);
+        Assert.DoesNotContain("map-initialization", h.Backend.Calls);
+    }
+
+    [Fact]
     public async Task Invalid_phases_and_missing_request_uid_close_before_any_backend_effect()
     {
         var h = new Harness(authenticated: false);

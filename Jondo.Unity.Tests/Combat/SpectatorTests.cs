@@ -14,7 +14,7 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Spectator admission and the map fight window's requests.
+    /// Spectator admission, board delivery and the map fight window's requests.
     /// </summary>
     public class SpectatorTests
     {
@@ -33,8 +33,6 @@ namespace Jondo.Unity.Tests.Combat
                                            MonsterId = 494, Level = 10 });
             return fight;
         }
-
-        private static string Hex(byte[] bytes) => string.Concat(bytes.Select(b => b.ToString("x2")));
 
         [Fact]
         public void Only_a_running_fight_open_to_spectators_is_watched()
@@ -57,14 +55,6 @@ namespace Jondo.Unity.Tests.Combat
 
             fight.SetOption(FightInstance.Azules, FightInstance.OptionSecret, true);
             Assert.Equal("the fight takes no spectators", FightHandler.WhyNotWatch(fight, who, fromTheMap: true));
-        }
-
-        /// <summary>kab { f3 kaa }: the kaa of a fight in progress, without the ready flags.</summary>
-        [Fact]
-        public void The_spectator_join_carries_a_running_fight_s_kaa()
-        {
-            Assert.Equal("1a0408013004", Hex(FightProtocol.BuildSpectatorJoined(4)));
-            Assert.Equal("1a020801", Hex(FightProtocol.BuildSpectatorJoined(0)));
         }
 
         [Fact]
@@ -176,10 +166,6 @@ namespace Jondo.Unity.Tests.Combat
             try
             {
                 await Dispatch(owner, new FightSpectatePlayerRequest(9_100_001), -99);
-#if JONDO_PROTOCOL_3_8_1_2
-                Assert.Empty(frames);
-                Assert.Equal(0, owner.State.SpectatingFightId);
-#else
                 Assert.Equal(FightId, owner.State.SpectatingFightId);
                 Assert.True(owner.State.SpectatorBoardPending);
                 Assert.Equal(elsewhere, owner.State.RoleplayMapId);
@@ -193,7 +179,124 @@ namespace Jondo.Unity.Tests.Combat
                 int sent = frames.Count;
                 await Dispatch(owner, new FightSpectatePlayerRequest(9_100_001), -100);
                 Assert.Equal(sent, frames.Count);
-#endif
+            }
+            finally
+            {
+                FightHandler.ForgetSpectator(owner);
+                Active.TryRemove(FightId, out _);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Both_admission_paths_send_the_current_public_board_once(bool byPlayer)
+        {
+            var (owner, frames) = SessionOn(byPlayer ? Map + 60 : Map);
+            var (bystander, otherFrames) = SessionOn(Map + 61);
+            var fight = Running();
+            var player = fight.Azul[0];
+            var monster = fight.Rojo[0];
+            monster.Initiative = 1000;
+            monster.Wave = 3;
+            monster.CurrentHP = 38;
+            monster.LifeTopTold = 150;
+            fight.UpdateTurnOrder();
+            fight.StartFight();
+            fight.PlayTwiceARound(monster.Id, 100);
+            fight.NextTurn();
+            fight.NextTurn();
+            // Keep the fallen summon in the roster; it must not occupy a cell or turn slot.
+            var fallen = new Fighter { Id = -3, TeamId = 0, MonsterId = 495, IsMonster = true,
+                Invocador = player.Id, CellId = 222, MaxHP = 50, CurrentHP = 0 };
+            fight.Azul.Add(fallen);
+            player.Buffs.Poner(new() { EffectId = 950, Estado = 3793, Quien = monster.Id, EffectUid = 299043,
+                HechizoOrigen = 25188, NivelOrigen = 2, Critico = true, CaducaEnRonda = -1 }, () => 1);
+            player.Buffs.Poner(new() { EffectId = 952, Pendiente = true }, () => 2);
+            fallen.Buffs.Poner(new() { EffectId = 950, Estado = 10 }, () => 3);
+            if (byPlayer)
+                fight.LastAnnouncedTurn = new(monster.Id, 0, fight.RoundNumber, 1000, DateTime.UtcNow, Carried: 41);
+
+            Assert.True(Active.TryAdd(FightId, fight));
+            try
+            {
+                using var ambient = SessionContext.Push(bystander);
+                GameRequest watch = byPlayer ? new FightSpectatePlayerRequest(player.Id) : new FightJoinRequest(0, FightId);
+                await Dispatch(owner, watch, -3);
+                Assert.True(owner.State.SpectatorBoardPending);
+                Assert.False(owner.State.IsInFight);
+                frames.Clear();
+
+                await Dispatch(owner, new ContextReadyRequest(owner.State.RoleplayMapId), -4);
+                Assert.Empty(frames);
+                Assert.True(owner.State.SpectatorBoardPending);
+
+                GameRequest ready = byPlayer ? new FightPingsRequest() : new ContextReadyRequest(fight.MapId);
+                await Dispatch(owner, ready, -5);
+                Assert.False(owner.State.SpectatorBoardPending);
+
+                var board = frames.Select(frame => frame.Content).ToArray();
+                var prefix = new[] { typeof(FightPingsEvent), typeof(FightStartingEvent), typeof(FightSpectatorJoinEvent),
+                    typeof(FightFighterShowEvent), typeof(FightFighterShowEvent), typeof(FightFighterShowEvent),
+                    typeof(EntitiesDispositionEvent), typeof(FightSynchronizeEvent) };
+                Type[] tail = [typeof(FightNewRoundEvent), typeof(FightOptionUpdateEvent), typeof(FightTurnListEvent),
+                    typeof(FightEffectsRefreshEvent), typeof(FightMapInformation), typeof(AreaFightModifierUpdateEvent)];
+                Assert.Equal(prefix.Concat(byPlayer ? [typeof(FightTurnEvent)] : Array.Empty<Type>()).Concat(tail),
+                    board.Select(message => message.GetType()));
+                Assert.All(frames, frame => Assert.Null(frame.Uid));
+                Assert.Empty(otherFrames);
+                Assert.Same(bystander, SessionContext.Actual);
+
+                var start = Assert.IsType<FightStartingEvent>(board[1]);
+                Assert.Equal(FightId, start.FightId);
+                Assert.Equal([494], start.MonsterIds);
+                Assert.Equal(new FightJoinEvent(true, false, 0, FightType.PvM),
+                    Assert.IsType<FightSpectatorJoinEvent>(board[2]).Join);
+                Assert.Equal(new[] { player.Id, fallen.Id, monster.Id },
+                    board.OfType<FightFighterShowEvent>().Select(show => show.Information.ActorId));
+                Assert.Equal(new[] { (player.Id, 200), (monster.Id, 300) },
+                    Assert.IsType<EntitiesDispositionEvent>(board[6]).Added.Select(spot => (spot.EntityId!.Value, spot.CellId!.Value)));
+
+                var sync = Assert.IsType<FightSynchronizeEvent>(board[7]).Fighters;
+                Assert.Equal(new[] { monster.Id, player.Id, fallen.Id }, sync.Select(actor => actor.ActorId));
+                var creature = Assert.IsType<ActorInformationCaseFightActor>(sync[0].ActorInformation!.ActorCase).Value;
+                Assert.Equal(3, creature.Wave);
+                Assert.Equal(-62, Assert.IsType<CharacterCharacteristicCaseValue>(creature.FightCharacteristics.Characteristics
+                    .Single(stat => stat.CharacteristicId == 97).CharacteristicCase).Value.Total);
+                var summon = Assert.IsType<ActorInformationCaseFightActor>(sync[2].ActorInformation!.ActorCase).Value;
+                Assert.False(summon.SpawnInformation.Alive);
+                Assert.Equal(Team.Challenger, summon.SpawnInformation.Team);
+                Assert.True(summon.FightCharacteristics.Summoned);
+                Assert.Equal(player.Id, summon.FightCharacteristics.Summoner);
+                Assert.Equal(150, monster.LifeTopTold);
+                Assert.Equal(new FightTurnEntity[] { new FightTurnEntityCaseWithFlag(new(false, monster.Id)),
+                    new FightTurnEntityCaseWithFlag(new(false, player.Id)), new FightTurnEntityCaseWithAdditionalId(new(monster.Id, "-1_2")) },
+                    Assert.Single(board.OfType<FightTurnListEvent>()).Turns);
+                Assert.Equal(new FightNewRoundEvent(0, 2), Assert.Single(board.OfType<FightNewRoundEvent>()));
+
+                if (byPlayer)
+                {
+                    var turn = Assert.Single(board.OfType<FightTurnEvent>());
+                    Assert.Equal(monster.Id, turn.CharacterId);
+                    Assert.Equal(1000, turn.WaitDeciseconds);
+                    Assert.Equal(41, turn.RemainingDeciseconds);
+                    Assert.InRange(turn.TurnTimeOverrideDeciseconds!.Value, 1, 1041);
+                }
+                var effect = Assert.Single(Assert.Single(board.OfType<FightEffectsRefreshEvent>()).Effects);
+                Assert.Equal(monster.Id, effect.SourceId);
+                Assert.Equal(950, effect.ActionId);
+                Assert.Equal(player.Id, effect.Effect.TargetId);
+                Assert.Equal(3793, effect.Effect.Param3);
+                Assert.Equal(FightEffectKind.State, effect.Effect.Kind);
+                Assert.True(effect.Effect.Critical);
+                Assert.Equal(new FightTurn(-1, 0), effect.Effect.EndTurn);
+                Assert.Equal(fight.MapId, Assert.Single(board.OfType<FightMapInformation>()).MapId);
+                Assert.Empty(Assert.IsType<AreaFightModifierUpdateEvent>(board[^1]).SpellPairs);
+
+                await Dispatch(owner, new ContextReadyRequest(fight.MapId), -6);
+                await Dispatch(owner, new FightPingsRequest(), -7);
+                await Dispatch(owner, new MapInformationRequest(checked((int)fight.MapId)), -8);
+                Assert.Equal(board.Length, frames.Count);
             }
             finally
             {
@@ -222,11 +325,12 @@ namespace Jondo.Unity.Tests.Combat
 
         private sealed class RecordingCodec(List<GameFrame> frames) : IGameCodec
         {
+            private readonly IGameCodec profile = new Jondo.Unity.Protocol.Game.Wire.GameCodec();
             public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new NotSupportedException();
             public byte[] Encode(GameFrame message)
             {
                 frames.Add(message);
-                return [];
+                return profile.Encode(message);
             }
         }
     }

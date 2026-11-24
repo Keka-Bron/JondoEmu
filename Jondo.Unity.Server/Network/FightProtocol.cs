@@ -182,13 +182,6 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(1, 1).Var(3, 1).Var(4, 1).VarIfNotZero(6, kind).Build();
 
         /// <summary>
-        /// A spectator's way into a running fight (kab): f3 the kaa of a fight in progress, without
-        /// the two flags a fighter's carries (f3 and f4: nothing for him to be ready for).
-        /// </summary>
-        public static byte[] BuildSpectatorJoined(int kind)
-            => Pb.New().Msg(3, Pb.New().Var(1, 1).VarIfNotZero(6, kind)).Build();
-
-        /// <summary>
         /// What accompanies the announcement (kaa).
         ///
         ///   f3: 1      f4: 1      f5: ?      f6: the fight type

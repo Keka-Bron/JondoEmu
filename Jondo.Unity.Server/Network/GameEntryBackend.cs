@@ -112,9 +112,12 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         if (request is FightPingsRequest or ContextReadyRequest)
         {
             // A spectator's client has the arena: the fight as it stands, once.
-            if (FightHandler.PendingSpectatorBoard() is { } watched)
+            if (FightHandler.PendingSpectatorBoard(session) is { } watched)
             {
-                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(StreamOf(session), watched));
+                if (request is ContextReadyRequest { MapId: var mapId } && mapId != 0 && mapId != watched.MapId)
+                    return true; // Readiness from the map just left does not consume the board.
+
+                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(session, watched));
                 return true;
             }
             // Back into a fight already running: the board as it is now, once. Placement

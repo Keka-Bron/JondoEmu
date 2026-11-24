@@ -129,8 +129,8 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
             case MapInformationRequest map:
                 if (await backend.TrySendFightMapAsync(session, request)) return GameEntryResult.Handled;
                 if (map.MapId != session.MapId) return GameEntryResult.Close;
-                // While fighting, sending the surface map's actors would take the client out of the fight.
-                if (!session.State.IsInFight && backend.FindCharacter(session.CharacterId) is { } character)
+                // Neither fighters nor spectators should receive roleplay actors into the arena.
+                if (SessionRegistry.StandsOnTheMap(session) && backend.FindCharacter(session.CharacterId) is { } character)
                     await backend.SendMapInformationAsync(session, character);
                 return GameEntryResult.Handled;
             default:
@@ -236,7 +236,7 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
 
     private async Task<bool> SendMapInitializationOnceAsync()
     {
-        if (_hasSentMapInitialization || !session.IsInWorld) return false;
+        if (_hasSentMapInitialization || !session.IsInWorld || session.State.SpectatingFightId != 0) return false;
         var character = backend.FindCharacter(session.CharacterId);
         if (character == null) return false;
 

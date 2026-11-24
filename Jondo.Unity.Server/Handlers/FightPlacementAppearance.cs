@@ -8,20 +8,30 @@ namespace Jondo.Unity.Server.Handlers;
 public static partial class FightHandler
 {
     private static FightFighterShowEvent PlacementAppearance(FightInstance fight, Fighter fighter)
+        => new(BoardFighter(fight, fighter, ongoing: false));
+
+    private static ActorPositionInformation BoardFighter(FightInstance fight, Fighter fighter, bool ongoing)
     {
+        bool isDouble = ongoing && fighter.DoubleOf != 0;
+        bool ai = fighter.IsMonster && !isDouble;
         var disposition = new EntityDisposition(fighter.CellId, MapActorMessages.Facing(FacingOf(fight, fighter)), null, 0);
-        var spawn = new SpawnInformation(TeamIdentity(fight.EquipoDe(fighter.Id)), fighter.IsAlive,
+        var spawn = new SpawnInformation(TeamIdentity(ongoing ? fighter.TeamId : fight.EquipoDe(fighter.Id)), fighter.IsAlive,
             new(disposition, null, fighter.Id));
-        var (look, identity) = PlacementIdentity(fighter);
-        var scrolls = ScrollsOf(fighter);
-        var stats = PlacementSheetOf(fighter).Select(row => PlacementStat(row.Characteristic, row.Base, row.Gear,
-            scrolls?.GetValueOrDefault(row.Characteristic) ?? 0, fighter.IsMonster)).ToArray();
-        var actor = new FightFighterInformation(fighter.IsMonster ? 0 : fighter.Id,
-            new(0, FightInvisibilityState.Visible, false, stats), spawn, identity, 0);
-        return new(new(disposition, new(look, new ActorInformationCaseFightActor(actor)), fighter.Id));
+        var (look, identity) = BoardIdentity(fighter, isDouble, isDouble ? fight.Buscar(fighter.DoubleOf) : null);
+        if (ongoing) look = BoardLookWithAppearance(look, fighter.Buffs.AparienciaEn(fight.RoundNumber));
+        long summoner = ongoing ? SummonerOf(fighter) : 0;
+        var scrolls = !isDouble ? ScrollsOf(fighter) : null;
+        // A spectator snapshot must not advance the life baseline used by live combat updates.
+        var sheet = ongoing ? FullSheetOf(fighter, conTraza: false, told: false) : PlacementSheetOf(fighter);
+        var stats = sheet.Select(row => BoardStat(row.Characteristic, row.Base, row.Gear,
+            scrolls?.GetValueOrDefault(row.Characteristic) ?? 0, ai)).ToArray();
+        var actor = new FightFighterInformation(ai ? 0 : fighter.Id,
+            new(summoner, FightInvisibilityState.Visible, summoner != 0, stats), spawn, identity,
+            ongoing && ai ? fighter.Wave : 0);
+        return new(disposition, new(look, new ActorInformationCaseFightActor(actor)), fighter.Id);
     }
 
-    private static CharacterCharacteristic PlacementStat(int id, long baseValue, long gear, long additional, bool monster)
+    private static CharacterCharacteristic BoardStat(int id, long baseValue, long gear, long additional, bool monster)
     {
         if (monster) return new(id, new CharacterCharacteristicCaseValue(new(
             id == FightProtocol.TemporaryLifeMalus ? baseValue : baseValue + gear)));
@@ -34,9 +44,9 @@ public static partial class FightHandler
         });
     }
 
-    private static (EntityLook, FightFighterInformationCase) PlacementIdentity(Fighter fighter)
+    private static (EntityLook, FightFighterInformationCase) BoardIdentity(Fighter fighter, bool isDouble, Fighter? original)
     {
-        if (fighter.IsMonster)
+        if (fighter.IsMonster && !isDouble)
         {
             bool summon = fighter.EsInvocado && fighter.DoubleOf == 0;
             EntityLook look;
@@ -54,14 +64,24 @@ public static partial class FightHandler
             return (look, new FightFighterInformationCaseAiFighter(new(ai)));
         }
 
-        var character = fighter.IsBot ? null : DatabaseManager.GetCharacterById(fighter.Id);
-        var appearance = fighter.IsBot && KoliseoBots.PlacementLook(fighter) is { } botLook ? botLook
-            : !string.IsNullOrEmpty(fighter.IncarnationLook) ? MonsterMessages.Look(fighter.IncarnationLook, false)
+        var model = original ?? fighter;
+        var character = model.IsBot ? null : DatabaseManager.GetCharacterById(isDouble ? fighter.DoubleOf : fighter.Id);
+        var appearance = model.IsBot && KoliseoBots.PlacementLook(model) is { } botLook ? botLook
+            : !string.IsNullOrEmpty(model.IncarnationLook) ? MonsterMessages.Look(model.IncarnationLook, false)
             : character != null ? CharacterLookBuilder.SemanticLook(character) : new EntityLook([], 0, fighter.LookBoneId, [], [], []);
-        var info = new FightNamedFighterCharacterInformation(character?.Breed ?? fighter.Breed,
-            (character?.Sex ?? fighter.Sex) == 1 ? Gender.Female : Gender.Male, fighter.Level,
+        var info = new FightNamedFighterCharacterInformation(character?.Breed ?? model.Breed,
+            (character?.Sex ?? model.Sex) == 1 ? Gender.Female : Gender.Male, fighter.Level,
             new(100, Alignment.Angel, null, 0, 200)); // Historical placement alignment snapshot.
         return (appearance, new FightFighterInformationCaseNamedFighter(new(-1, fighter.Name ?? "",
             new(CharacterStatusStatus.Available, ""), new FightNamedFighterInformationCharacterCaseCharacter(info))));
+    }
+
+    private static EntityLook BoardLookWithAppearance(EntityLook normal, int appearance)
+    {
+        if (appearance == 0) return normal;
+        string full = Cosmetics.AppearanceLook(appearance);
+        if (!string.IsNullOrEmpty(full)) return MonsterMessages.Look(full, false);
+        int bones = Cosmetics.AppearanceBones(appearance);
+        return bones > 0 ? normal with { Bones = bones } : normal;
     }
 }

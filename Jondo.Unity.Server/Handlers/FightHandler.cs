@@ -490,8 +490,20 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         internal static byte[] FightMapOf(FightInstance fight)
         {
+            var (subArea, x, y) = FightMapLabel(fight);
+            return Network.FightProtocol.BuildFightMap(fight.MapId, subArea, x, y);
+        }
+
+        private static (int SubArea, int X, int Y) FightMapLabel(FightInstance fight)
+        {
             var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
-            return Network.FightProtocol.BuildFightMap(fight.MapId, place?.SubAreaId ?? 0, place?.PosX ?? 0, place?.PosY ?? 0);
+            return (place?.SubAreaId ?? 0, place?.PosX ?? 0, place?.PosY ?? 0);
+        }
+
+        private static Game.FightMapInformation FightMapSnapshot(FightInstance fight)
+        {
+            var (subArea, x, y) = FightMapLabel(fight);
+            return new(subArea, fight.MapId, new Game.FightMapInformationPositionCaseCoords(new(x, y)));
         }
 
         /// <summary>
@@ -743,15 +755,16 @@ namespace Jondo.Unity.Server.Handlers
         /// up with. The list of the fight-start jxb, sent again on reconnecting and when a wave comes on.
         /// </summary>
         private static List<Network.Pb> FighterBlocksInPlayOrder(FightInstance fight)
+            => FightersInPlayOrder(fight).Select(fighter => BloqueDe(fight, fighter)).ToList();
+
+        private static IEnumerable<Fighter> FightersInPlayOrder(FightInstance fight)
         {
-            var blocks = new List<Network.Pb>();
             var listed = new HashSet<long>();
             foreach (var fighter in fight.TurnOrder.Concat(TodosLosCombatientes(fight)))
             {
                 if (fighter == null || !listed.Add(fighter.Id)) continue;
-                blocks.Add(BloqueDe(fight, fighter));
+                yield return fighter;
             }
-            return blocks;
         }
 
         /// <summary>
@@ -1190,9 +1203,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await session.SendAsync(PlacementTurnList(fight));
             await session.SendAsync(new Game.FightEffectsRefreshEvent([]));
-            var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
-            await session.SendAsync(new Game.FightMapInformation(place?.SubAreaId ?? 0, fight.MapId,
-                new Game.FightMapInformationPositionCaseCoords(new(place?.PosX ?? 0, place?.PosY ?? 0))));
+            await session.SendAsync(FightMapSnapshot(fight));
 
             // The list of challenges does NOT go here: the client asks for it (kwr) when the player
             // presses READY with challenges still to choose. See ChallengeHandler.SettingsAsync.
@@ -2832,28 +2843,34 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Every live buff in the fight as the payload its jxm carried, rebuilt from what the
-        /// buff kept. Dice and dispellability are not kept, so those two fields stay out; the
+        /// buff kept. Dice and dispellability were not part of the board snapshot; the
         /// client draws the panel from the rest.
         /// </summary>
         private static IEnumerable<byte[]> LiveBuffFrames(FightInstance fight)
         {
-            foreach (var quien in TodosLosCombatientes(fight))
+            foreach (var (target, buff) in LiveBuffs(fight))
             {
-                if (quien == null || !quien.IsAlive) continue;
-                foreach (var buff in quien.Buffs.Puestos)
-                {
-                    if (!buff.Vivo(fight.RoundNumber)) continue;
-                    var (categoria, boost) = DatabaseManager.EffectFamily(buff.EffectId);
-                    // A state's row keeps its state and no amount: its number is the value the
-                    // client describes it by ("Estado #3"), and with none it threw on the panel.
-                    yield return Network.FightProtocol.BuildBuff(
-                        quien.Id, buff.Quien, buff.Numero, buff.EffectId, buff.EffectUid,
-                        buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto, 0, 0, buff.HechizoOrigen, buff.Disparador, buff.CaducaEnRonda,
-                        0, Network.FightProtocol.FamiliaDelEmbrujo(buff.EffectId, categoria, boost),
-                        buff.NivelOrigen, buff.Critico);
-                }
+                var (categoria, boost) = DatabaseManager.EffectFamily(buff.EffectId);
+                yield return Network.FightProtocol.BuildBuff(
+                    target.Id, buff.Quien, buff.Numero, buff.EffectId, buff.EffectUid,
+                    BuffSnapshotValue(buff), 0, 0, buff.HechizoOrigen, buff.Disparador, buff.CaducaEnRonda,
+                    0, Network.FightProtocol.FamiliaDelEmbrujo(buff.EffectId, categoria, boost),
+                    buff.NivelOrigen, buff.Critico);
             }
         }
+
+        private static IEnumerable<(Fighter Target, Buff Buff)> LiveBuffs(FightInstance fight)
+        {
+            foreach (var target in TodosLosCombatientes(fight))
+            {
+                if (target == null || !target.IsAlive) continue;
+                foreach (var buff in target.Buffs.Puestos)
+                    if (buff.Vivo(fight.RoundNumber)) yield return (target, buff);
+            }
+        }
+
+        // States keep their ID separately from the amount the client uses to describe them.
+        private static int BuffSnapshotValue(Buff buff) => buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto;
 
         internal static Task HandlePlacementPositionAsync(GameSession session, Jondo.Unity.Protocol.Game.FightPlacementPositionRequest request)
             => InPlacementTurnAsync(session, fight => ChangePlacementCellAsync(session, fight, request));
