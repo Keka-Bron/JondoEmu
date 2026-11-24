@@ -83,6 +83,28 @@ welcome/selection acceptance remains to be checked.
 
 ## 1. Populated but unused in the inspected client flow
 
+### Fight entry: `UpdateLifePointsEvent` / `kuq`, tags 1–4
+
+**Live client observation (11-08-2026 build):** During fight preparation, Frida
+observed the same `kuq` instance at decoder return and handler entry. Its four
+int32 values were `1: 3059`, `2: 445` (presence bit set), `3: 0`, `4: 5228`.
+Only tag 2 has explicit presence; the decoded zero for tag 3 does not establish
+that it was sent on the wire.
+
+**Client use:** The main-thread handler `ees.wvf` (`GameAssembly.so` RVA
+`0x4c1bf90`) loaded the character service from `this` and cleared `esi` without
+reading or forwarding the message argument in `rsi`. The trace confirmed its call
+to the HP regeneration-stop routine `eet.xbg` at `0x4c1bf9c` and its `true`
+return. The event triggers that routine; none of the four payload values is used
+by this handler. All four fields remain unmapped: native caller coverage is
+incomplete, so use elsewhere in the client remains indeterminate.
+
+**Outbound decision:** Fight entry sends an empty `UpdateLifePointsEvent`
+(`kuq` in `3.6.10.10`, `kvo` in `3.8.1.2`) between server time and known zaaps.
+The event itself still stops roleplay regeneration. The payload values are omitted
+under the outbound policy, with no raw fallback. The live audit above applies to
+the August build; the same construction policy applies to both profiles.
+
 ### Gift description: `jtg.jtf.jte`, tag 6
 
 Stable owner: **GameActionItemContent**. Wire type: `string`. From

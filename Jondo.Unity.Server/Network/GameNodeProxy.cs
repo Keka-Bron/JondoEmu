@@ -283,8 +283,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr == Op.Uri("iuz")) await ItemBarHandler.ClearAsync(stream, payload);
                 // The party leader's «que me sigan».
                 else if (payloadStr == Op.Uri("ikb")) await Handlers.PartyFollowHandler.LeaderSwitchAsync(stream, payload);
-                // A cell marked for one's side in a fight.
-                else if (payloadStr == Op.Uri("kmh")) await FightHandler.MarkCellAsync(stream, payload);
                 // A party invitation withdrawn, and the party window's lock.
                 else if (payloadStr == Op.Uri("inq")) await PartyHandler.CancelInvitationAsync(stream, payload);
                 else if (payloadStr == Op.Uri("ila")) await PartyHandler.PledgeLoyaltyAsync(stream, payload);
@@ -1518,8 +1516,7 @@ namespace Jondo.Unity.Server.Network
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
                          || payloadStr.Contains(Op.Uri(Op.Jti))
-                         || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp))
-                         || payloadStr.Contains(Op.Uri(Op.Hoy)))
+                          || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp)))
                 {
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
@@ -1713,6 +1710,9 @@ namespace Jondo.Unity.Server.Network
                     break; // Placement panel mode and hover notifications have no reply.
                 case Game.FightReadyRequest ready:
                     await FightHandler.HandleReadyAsync(session, ready);
+                    break;
+                case Game.ShowCellRequest marker:
+                    await FightHandler.MarkCellAsync(session, marker);
                     break;
                 case Game.FightPlacementPositionRequest placement:
                     await FightHandler.HandlePlacementPositionAsync(session, placement);

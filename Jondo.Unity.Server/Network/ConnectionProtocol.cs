@@ -167,22 +167,8 @@ namespace Jondo.Unity.Server.Network
             => Push(Op.Ktz, Pb.New().Var(1, rate).Build());
 
         /// <summary>
-        /// Life regeneration ends (kuq): f1 the life, f2 the ticks the counter had run, f4 the
-        /// maximum. Between the lqu and the lva of the tactical map load, at every fight entry.
-        /// </summary>
-        /// <remarks>
-        /// This is what stops the client's own counter. Without it the counter started at the
-        /// world entry keeps adding one point every tick THROUGH the fight, to the local player's
-        /// bar only, which is what "the Ocra recovers life tick by tick" was: the roleplay
-        /// regeneration drawn over a fight. Measured against the two challenge captures of the
-        /// 9th of August: 08db2810970120bb29 is {5211, 151, 5307}.
-        /// </remarks>
-        public static byte[] BuildRegenerationEnded(int life, int ticks, int maxLife)
-            => Push(Op.Kuq, Pb.New().Var(1, life).VarIfNotZero(2, ticks).Var(4, maxLife).Build());
-
-        /// <summary>
         /// How many ticks a counter started at <paramref name="startedUtc"/> has run by
-        /// <paramref name="nowUtc"/>: the f2 of the kuq. Zero when it was never started.
+        /// <paramref name="nowUtc"/>. Zero when it was never started.
         /// </summary>
         public static int RegenerationTicksSince(DateTime startedUtc, DateTime nowUtc)
         {

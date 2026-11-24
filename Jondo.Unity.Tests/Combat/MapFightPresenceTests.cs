@@ -55,8 +55,9 @@ public sealed partial class MapFightPresenceTests
             e => Assert.Equal(new ContextCreationEvent(GameContext.Fight), e),
             e => Assert.Equal(new MapCurrentEvent(Arena), e),
             e => Assert.IsType<TimeEvent>(e),
-            e => Assert.Equal("kuq", e), // Existing life update between clock and environment.
+            e => Assert.IsType<UpdateLifePointsEvent>(e),
             e => Assert.IsType<ZaapKnownListEvent>(e));
+        Assert.Empty(challenged.Raw);
         Assert.All(challenged.Delivered, frame => Assert.Null(frame.Uid));
     }
 

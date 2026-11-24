@@ -1,7 +1,7 @@
-using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.World.Fights;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -17,17 +17,9 @@ namespace Jondo.Unity.Server.Handlers
         /// five places, each with the cell. Only his own side gets it, as the side's own messages go
         /// (ASuBandoAsync); out of a fight there is nothing to mark.
         /// </remarks>
-        public static async Task MarkCellAsync(NetworkStream stream, byte[] payload)
-        {
-            byte[]? kmh = ConnectionProtocol.ReadPayload(payload, "kmh");
-            long me = SessionContext.State.CharacterId;
-            var fight = FightOf(me);
-            var fighter = fight?.Buscar(me);
-            if (kmh == null || fight == null || fighter == null) return;
-
-            long cell = ProtoMessage.Parse(kmh).Fields.FirstOrDefault(f => f.FieldNumber == 2 && f.WireType == 0)?.VarIntValue ?? 0;
-            await ASuBandoAsync(fight, fighter.TeamId,
-                ConnectionProtocol.Push("kmj", Pb.New().Var(1, me).VarIfNotZero(2, cell).Build()));
-        }
+        internal static Task MarkCellAsync(GameSession session, ShowCellRequest request)
+            => InParticipantTurnAsync(session, fight => fight.State is FightState.Placement or FightState.Ongoing
+                ? ASuBandoAsync(fight, fight.EquipoDe(session.CharacterId), new ShowCellEvent(session.CharacterId, request.CellId))
+                : Task.CompletedTask);
     }
 }

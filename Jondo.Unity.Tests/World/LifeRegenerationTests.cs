@@ -16,33 +16,6 @@ namespace Jondo.Unity.Tests.World
     /// </remarks>
     public class LifeRegenerationTests
     {
-        /// <summary>The kuq of the 9th of August challenge, frame for frame: {5211, 151, 5307}.</summary>
-        [Fact]
-        public void Regeneration_ends_with_life_ticks_and_maximum()
-        {
-            byte[] packet = ConnectionProtocol.BuildRegenerationEnded(life: 5211, ticks: 151, maxLife: 5307);
-
-            Assert.Equal("08db2810970120bb29", Hex(ConnectionProtocol.ReadPayload(packet, Op.Kuq)));
-        }
-
-        /// <summary>And the one of the fight before it, with a full bar: {5307, 1079, 5307}.</summary>
-        [Fact]
-        public void A_full_bar_still_reports_the_ticks()
-        {
-            byte[] packet = ConnectionProtocol.BuildRegenerationEnded(life: 5307, ticks: 1079, maxLife: 5307);
-
-            Assert.Equal("08bb2910b70820bb29", Hex(ConnectionProtocol.ReadPayload(packet, Op.Kuq)));
-        }
-
-        /// <summary>A counter that never ran leaves f2 out, as proto3 does with a zero.</summary>
-        [Fact]
-        public void No_ticks_means_no_f2()
-        {
-            byte[] packet = ConnectionProtocol.BuildRegenerationEnded(life: 2400, ticks: 0, maxLife: 2400);
-
-            Assert.Equal("08e01220e012", Hex(ConnectionProtocol.ReadPayload(packet, Op.Kuq)));
-        }
-
         /// <summary>The ktz behind every kml kmp: 0805.</summary>
         [Fact]
         public void Regeneration_starts_at_the_measured_rate()

@@ -2,6 +2,7 @@ using System.Text.Json;
 using Google.Protobuf;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Handlers;
@@ -103,22 +104,40 @@ public sealed class CharacterLookBuilderTests
     }
 
     [Fact]
-    public void Fighter_show_uses_the_requested_fighters_look_without_an_ambient_selected_character()
+    public async Task Placement_board_uses_each_fighters_look_without_an_ambient_selected_character()
     {
         using var context = SessionContext.Push(GameSession.SinSocket());
+        var fight = new FightInstance(701, 702) { Reglas = FightRules.Desafio };
+        var codec = new GameCodec();
+        var shown = new List<ActorPositionInformation>();
+        var session = new GameSession(codec, payload =>
+        {
+            if (codec.Decode(payload).Content is FightFighterShowEvent appearance) shown.Add(appearance.Information);
+            return Task.CompletedTask;
+        });
+        session.State.CharacterId = 9_000_000_200;
         foreach (int bones in new[] { 200, 300 })
         {
-            var look = new EntityLook([0x01112233, 0x06FFFFFF], 3, bones, [120], [800 + bones], []);
-            var fighter = new Fighter { Id = 9_000_000_000 + bones, Name = "Owned fighter", IsBot = true,
-                Level = 57, MaxAP = 12, MaxMP = 6, BotLook = CharacterLookBuilder.WriteLook(look).Build() };
-            var payload = ProtoMessage.Parse(ConnectionProtocol.ReadPayload(FightHandler.BuildFighterShowBytes(fighter), "jxx")!);
-            var actor = ProtoMessage.Parse(payload.Fields.Single(field => field.FieldNumber == 2).BytesValue);
-            var details = ProtoMessage.Parse(actor.Fields.Single(field => field.FieldNumber == 2).BytesValue);
-            var appearance = ProtoMessage.Parse(details.Fields.Single(field => field.FieldNumber == 1).BytesValue);
-            Assert.Equal(bones, appearance.Fields.Single(field => field.FieldNumber == 3).VarIntValue);
-            Assert.Equal(new[] { 800 + bones }, Packed(appearance, 6));
-            Assert.Equal(new[] { 0x01112233, 0x06FFFFFF }, Packed(appearance, 1));
-            Assert.Equal(fighter.Id, actor.Fields.Single(field => field.FieldNumber == 3).VarIntValue);
+            var fighter = KoliseoBots.BuildFighter(new()
+            {
+                Id = 9_000_000_000 + bones, Breed = 8, Name = $"Bot {bones}",
+                LooksLike = new Npcs.Spawn { Bones = bones, Skins = [800 + bones], Colors = [0x01112233, 0x06FFFFFF], Scales = [120] },
+            });
+            fight.AddPlayer(fighter);
+        }
+
+        await FightHandler.SendPreparationAsync(session, fight);
+
+        Assert.Collection(shown, actor => CheckLook(actor, 200), actor => CheckLook(actor, 300));
+
+        static void CheckLook(ActorPositionInformation actor, int bones)
+        {
+            Assert.Equal(9_000_000_000 + bones, actor.ActorId);
+            Assert.NotNull(actor.ActorInformation);
+            var look = actor.ActorInformation.Look;
+            Assert.Equal(bones, look.Bones);
+            Assert.Equal(800 + bones, Assert.Single(look.Skins));
+            Assert.Equal(new[] { 0x01112233, 0x06FFFFFF }, look.Colors);
         }
     }
 

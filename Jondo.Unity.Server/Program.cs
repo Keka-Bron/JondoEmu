@@ -241,9 +241,6 @@ namespace Jondo.Unity.Server
             Managers.Emotes.Load();
             Managers.TokenShops.Initialize();
 
-            Console.WriteLine("[+] Registering Fight Packet Handlers...");
-            Handlers.FightHandler.RegisterHandlers();
-
             RegressionGuardTests.Run();
 
 

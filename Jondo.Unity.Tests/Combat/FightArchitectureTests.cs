@@ -112,22 +112,15 @@ namespace Jondo.Unity.Tests.Combat
         /// socket. Any other doing so is skipping the recipient rule.
         /// </summary>
         /// <remarks>
-        /// The first six are the per-client bursts: the entry into the fight, the preparation,
-        /// the start, the return to a fight in progress, the end and the map resend. The <c>Send…</c> are pieces of those same
-        /// bursts. The last two are loose cases with their reason:
-        ///
-        ///   HandleFightOptionToggle       the panel's switches; NOT MEASURED whether the rival sees them
-        ///   AnnounceAppearanceAsync       does not receive the fight; it has to be passed to broadcast
-        ///   RefreshPlayerSpellBarAsync    the spell bar belongs to whoever looks at it
+        /// The per-client bursts are entry, preparation, start, resume and end. The spell bar
+        /// belongs to its recipient; appearance updates need a fight to broadcast.
         /// </remarks>
         private static readonly string[] VistaDeUnaPersona =
         {
             "SendFightEntryAsync", "SendPreparationAsync", "ArrancarParaUnoAsync",
-            "ResumeForOneAsync", "TerminarParaUnoAsync", "HandleFightMapLoad", "ResendFightMapBurst3",
-            "SendFighterShow", "SendFightStarting", "SendTurnList",
-            "SendPlacementTurnStart", "SendPlacementPositionsList",
+            "ResumeForOneAsync", "TerminarParaUnoAsync",
             "RefreshPlayerSpellBarAsync",
-            "HandleFightOptionToggleRequest", "AnnounceAppearanceAsync",
+            "AnnounceAppearanceAsync",
             // FightJoin.cs: the jqz behind the jss of the one loading a map, the answer to the
             // party window's switch of the one who clicked it, and the way back of the one who
             // leaves the placement -- all three are one person's own view.

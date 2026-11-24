@@ -488,10 +488,13 @@ confirmation receives a correlated `MapMovementConfirmedResponse` (August `jsq`)
 For monster-fight openers and each duelist, `SendFightEntryAsync` sends the entering
 character's orientation and removes the defender from that client's roleplay map.
 A joiner skips that prefix. Everyone then receives context destroy, Fight context
-creation, current arena map, server time, life update, and their own known zaaps, in
-that order. The life update still uses the legacy writer to preserve HP and regeneration
-ticks. Board preparation follows the client's map request; it is not part of this opening.
-Both profiles use the same routes.
+creation, current arena map, server time, an empty `UpdateLifePointsEvent` to stop
+roleplay regeneration, and their own known zaaps, in that order. The event omits
+the historical payload on both profiles under the
+[fight-entry omission policy](populated-unmapped-fields.md#fight-entry-updatelifepointsevent--kuq-tags-14).
+Board preparation follows the client's map request. The obsolete raw map-load
+burst is retired. `hoy` is the August outbound `ServerSettingsEvent` alias and
+has no inbound fight route.
 
 For a participant in placement, `ContextReadyRequest` or `MapInformationRequest` for the
 arena sends the board only to that session. After taking the fight turn the handler
@@ -546,6 +549,12 @@ can accept; either party can cancel. A failed accept sends `FightPlacementSwapPo
 only to the caller. An invalid cancel is silent. Neither consumes another pair's offer.
 A successful cancel sends `FightPlacementSwapPositionsCancelledEvent` only to the pair;
 a successful accept broadcasts the new positions. Answers do not flush a pending fight end.
+
+`ShowCellRequest` sends a `ShowCellEvent` to the sender and their connected teammates
+during placement or ongoing combat, including outside the sender's turn. Spectators
+and opponents do not receive it. The handler rechecks membership in the original
+fight under its turn, opens any pending sequence first, and sends the event through
+each recipient's codec with no UID. Cell zero is a valid marker.
 
 On both profiles, `FightJoinRequest` names the fight and the fighter whose side
 to join. With no fighter it asks to spectate an ongoing fight. Admission is

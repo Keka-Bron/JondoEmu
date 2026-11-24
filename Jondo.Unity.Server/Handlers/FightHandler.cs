@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.World.Fights;
@@ -26,11 +25,6 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>How many fights are open right now. The server window draws it.</summary>
         public static int CombatesEnCurso => _activeFights.Count;
 
-        public static void RegisterHandlers()
-        {
-            Program.LogDebug("[FightHandler] Combat handlers registered for jxx, jyk, jyz, jza, jwb, hoy.");
-        }
-
         /// <summary>
         /// Whether a quest's fight is played alone (Keka-Bron/JondoEmu#209): when it says so
         /// (<paramref name="solo"/> true), or, saying nothing (null), when its board places one
@@ -48,7 +42,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// Used by monster attacks, aggression and scripted encounters to open their fight.
-        /// Builds the FightInstance from real mob data and sends placement bursts 1 and 2.
+        /// Builds the FightInstance from real mob data and sends the opening; the board follows on map load.
         /// </summary>
         public static async Task InitiateFightFromMobCollision(NetworkStream stream, MobSpawnManager.MobGroup mobGroup, long mapId,
                                                                long mobContextId = 0, FightRules rules = null,
@@ -468,27 +462,6 @@ namespace Jondo.Unity.Server.Handlers
         {
             var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
             return Network.FightProtocol.BuildFightMap(fight.MapId, place?.SubAreaId ?? 0, place?.PosX ?? 0, place?.PosY ?? 0);
-        }
-
-        /// <summary>
-        /// Whether a jrh or kmv asks for the fight's own map, or names none.
-        ///
-        /// Taken into a fight on another map right after a door, the client's late kmv for the room
-        /// it had just entered arrived first: answered with the placement, which the client dropped
-        /// as it loaded the arena, and its kmv for the arena found nothing left to send -- the board
-        /// stayed empty, with no foe and no ally on it.
-        /// </summary>
-        public static bool AsksForFightMap(byte[] payload, FightInstance fight)
-        {
-            var inner = ExtractMessagePayload(payload, Op.Uri(Op.Kmv))
-                        ?? ExtractMessagePayload(payload, "type.ankama.com/jrh");
-            if (inner == null) return true;
-            foreach (var field in ProtoMessage.Parse(inner).Fields)
-            {
-                if (field.FieldNumber == 1 && field.WireType == 0)
-                    return field.VarIntValue == 0 || field.VarIntValue == fight.MapId;
-            }
-            return true;
         }
 
         /// <summary>
@@ -1077,16 +1050,9 @@ namespace Jondo.Unity.Server.Handlers
             await session.SendAsync(new Game.MapCurrentEvent(fight.MapId));
             await session.SendAsync(ServerTimeMessages.Snapshot());
 
-            // Regeneration ends. The real server puts the kuq right here, between the lqu and
-            // the lva of the tactical map, 83 times out of 97, and it is what stops the counter
-            // the world entry started: without it this client kept adding one point every half
-            // second to its own bar all through the fight, which no 97 could hold down for
-            // long. Life is the fighter's, or the sheet's when the fight has not built him yet.
-            // UpdateLifePointsEvent does not yet map the HP or regeneration fields.
-            var fighter = fight.Buscar(session.CharacterId);
-            int maxLife = fighter?.MaxHP ?? session.Combat.GetPlayerMaxHp();
-            await session.SendAsync(ConnectionProtocol.BuildRegenerationEnded(fighter?.CurrentHP ?? maxLife,
-                ConnectionProtocol.RegenerationTicksSince(session.State.RegenerationStartedUtc, DateTime.UtcNow), maxLife));
+            // The client stops roleplay regeneration on receipt without reading the payload.
+            // See docs/populated-unmapped-fields.md#fight-entry-updatelifepointsevent--kuq-tags-14.
+            await session.SendAsync(new Game.UpdateLifePointsEvent());
 
             await EntryEnvironmentMessages.Live.SendKnownAsync(session);
 
@@ -2043,187 +2009,6 @@ namespace Jondo.Unity.Server.Handlers
                              (appearance == 0 ? "normal" : $"appearance {appearance}"));
         }
 
-        public static byte[] BuildIgsPacket(FightInstance fight)
-        {
-            return BuildGameNodePacket("type.ankama.com/igs", Array.Empty<byte>());
-        }
-
-        /// <summary>
-        /// Responds to map load request (kkr / jqf) from the client during fight setup.
-        /// Sends BURST 3 containing igs, jya, jyj, jxx, jyi, jyf, jyk, jxe, jwo, jox.
-        /// </summary>
-        public static async Task HandleFightMapLoad(NetworkStream stream)
-        {
-            var fight = GetCurrentFight();
-            if (fight == null) return;
-
-            // Note and check in one go: if it was already there, THIS client has already been sent it
-            // -- through here or through SendPreparationAsync -- and what is due is the short resend.
-            if (!fight.MarkPrepared(GameState.CharacterId))
-            {
-                // Re-send burst 3 on subsequent map load requests (jqf/kkr)
-                await ResendFightMapBurst3(stream, fight);
-                return;
-            }
-            Program.LogDebug("[FightHandler] Responding to fight map request (kkr) with BURST 3...");
-
-            // =========================================================================
-            // BURST 3 (Fired by the client's kkr)
-            // Sequence: igs, jya, jyj, jxx (all), jyi, jyf, jykjxe, jwo, jox
-            // =========================================================================
-            // 1. igs (GameFightComplementaryInformationsDataMessage with subarea & placement positions)
-            await WriteFrameAsync(stream, BuildIgsPacket(fight));
-
-            // 1b. jyg (GameFightJoinMessage - switches soundtrack to combat music and hides roleplay entities)
-            var jygMsg = new ProtoMessage();
-            jygMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 0 });
-            jygMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
-            jygMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 0 });
-            jygMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 450 });
-            jygMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 4 });
-            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Jyg), jygMsg.ToByteArray()));
-
-            // 2. jya (FightStarting)
-            await SendFightStarting(stream, fight);
-
-            // 3. jyj (GameFightOptionStateUpdateMessage)
-            var jyjMsg = new ProtoMessage();
-            jyjMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
-            jyjMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 4 });
-            jyjMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 443 });
-            jyjMsg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 1 });
-            await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Jyj), jyjMsg.ToByteArray()));
-
-            // 4. jxx (GameFightShowFighterMessage) for each fighter
-            foreach (var f in fight.Todos)
-            {
-                await SendFighterShow(stream, f);
-            }
-
-            // 5. jyi (GameFightPlacementPossiblePositionsMessage)
-            await SendPlacementPositionsList(stream, fight);
-
-            // 6. jyf (placement options update - single packet)
-            var jyfPackets = BuildPlacementPossiblePositionsPackets(fight);
-            if (jyfPackets.Count > 0)
-            {
-                await WriteFrameAsync(stream, jyfPackets[0]);
-            }
-
-            // 7. jyk options (0, 1, 2, 3)
-            int[] optionTypes = new int[] { 2, 1, 3, 0 };
-            foreach (int opt in optionTypes)
-            {
-                var jykMsg = new ProtoMessage();
-                jykMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = opt });
-                jykMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 300 });
-                await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jyk", jykMsg.ToByteArray()));
-            }
-
-            // 8. jxe (GameFightTurnListMessage)
-            await SendTurnList(stream, fight);
-
-            // 9. jwo (GameFightTurnStartPlayingMessage header - empty 3-letter opcode)
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/jwo", Array.Empty<byte>()));
-
-            // 10. jox (GameFightTurnStartMessage for placement phase - f1=450, f2.f1=-3, f2.f2=-2)
-            await SendPlacementTurnStart(stream, fight);
-            Program.LogDebug("[FightHandler] BURST 3 sent successfully. Client in placement phase (45s).");
-        }
-
-        private static async Task ResendFightMapBurst3(NetworkStream stream, FightInstance fight)
-        {
-            await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/igs", Array.Empty<byte>()));
-            foreach (var f in fight.Todos)
-            {
-                await SendFighterShow(stream, f);
-            }
-            await SendPlacementPositionsList(stream, fight);
-        }
-
-        public static byte[] BuildTurnListBytes(FightInstance fight)
-        {
-            var jxeMsg = new ProtoMessage();
-            var fighters = (fight.TurnOrder.Count > 0) 
-                ? fight.TurnOrder 
-                : fight.Todos.OrderByDescending(f => f.Initiative).ToList();
-
-            foreach (var fighter in fighters)
-            {
-                var fSubInner = new ProtoMessage();
-                fSubInner.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = fighter.Id });
-
-                var fSubOuter = new ProtoMessage();
-                fSubOuter.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = fSubInner.ToByteArray() });
-
-                jxeMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = fSubOuter.ToByteArray() });
-            }
-
-            return BuildGameNodePacket("type.ankama.com/jxe", jxeMsg.ToByteArray());
-        }
-
-        public static async Task SendTurnList(NetworkStream stream, FightInstance fight)
-        {
-            byte[] jxePacket = BuildTurnListBytes(fight);
-            await WriteFrameAsync(stream, jxePacket);
-            Program.LogDebug($"[FightHandler] Sent jxe (GameFightTurnListMessage) with {fight.TurnOrder.Count} fighters in turn order.");
-        }
-
-        public static async Task SendPlacementTurnStart(NetworkStream stream, FightInstance fight)
-        {
-            var joxSub = new ProtoMessage();
-            joxSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = -3 });
-            joxSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = -2 });
-
-            var joxMsg = new ProtoMessage();
-            joxMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 450 }); // 45s Placement Phase Timer
-            joxMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = joxSub.ToByteArray() });
-            if (fight != null)
-            {
-                joxMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = fight.MapId });
-            }
-
-            byte[] joxPacket = BuildGameNodePacket("type.ankama.com/jox", joxMsg.ToByteArray());
-            await WriteFrameAsync(stream, joxPacket);
-            Program.LogDebug($"[FightHandler] Sent jox Placement Phase Countdown (45s) for map {fight?.MapId}.");
-        }
-
-        public static byte[] BuildPlacementPositionsListBytes(FightInstance fight)
-        {
-            var jyiMsg = new ProtoMessage();
-
-            using var msRed = new MemoryStream();
-            var codedRed = new CodedOutputStream(msRed);
-            foreach (var c in fight.RedPlacementCells)
-            {
-                codedRed.WriteUInt32((uint)c);
-            }
-            codedRed.Flush();
-
-            using var msBlue = new MemoryStream();
-            var codedBlue = new CodedOutputStream(msBlue);
-            foreach (var c in fight.BluePlacementCells)
-            {
-                codedBlue.WriteUInt32((uint)c);
-            }
-            codedBlue.Flush();
-
-            var innerSub = new ProtoMessage();
-            innerSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = msRed.ToArray() });
-            innerSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = msBlue.ToArray() });
-
-            jyiMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = innerSub.ToByteArray() });
-
-            return BuildGameNodePacket("type.ankama.com/jyi", jyiMsg.ToByteArray());
-        }
-
-        public static async Task SendPlacementPositionsList(NetworkStream stream, FightInstance fight)
-        {
-            byte[] jyiPacket = BuildPlacementPositionsListBytes(fight);
-            await WriteFrameAsync(stream, jyiPacket);
-            Program.LogDebug("[FightHandler] Sent dynamic jyi (GameFightPlacementPossiblePositionsMessage).");
-        }
-
         public static async Task HandleFightMessageAsync(NetworkStream stream, byte[] payload, string payloadStr)
         {
             // The packet loop already holds this session's turn; the fight's keeps every other
@@ -2343,10 +2128,6 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await SurrenderBallotAsync(stream, GetCurrentFight(), payload);
             }
-            else if (payloadStr.Contains(Op.Uri(Op.Hoy)))
-            {
-                await HandleFightOptionToggleRequest(stream, payload);
-            }
         }
 
         /// <summary>
@@ -2382,80 +2163,6 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             await InitiateFightFromMobCollision(session.Stream, group, here, groupId);
-        }
-
-        private static async Task HandleFightOptionToggleRequest(NetworkStream stream, byte[] payload)
-        {
-            long mobContextId = 0;
-            try
-            {
-                var msg = ProtoMessage.Parse(payload);
-                if (msg.Fields.Count > 0 && msg.Fields[0].WireType == 2)
-                {
-                    var inner = ProtoMessage.Parse(msg.Fields[0].BytesValue);
-                    if (inner.Fields.Count > 1 && inner.Fields[1].WireType == 2)
-                    {
-                        var inner2 = ProtoMessage.Parse(inner.Fields[1].BytesValue);
-                        if (inner2.Fields.Count > 1 && inner2.Fields[1].WireType == 2)
-                        {
-                            var inner3 = ProtoMessage.Parse(inner2.Fields[1].BytesValue);
-                            if (inner3.Fields.Count > 0 && inner3.Fields[0].WireType == 0)
-                            {
-                                mobContextId = inner3.Fields[0].VarIntValue;
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            Program.LogDebug($"[FightHandler] Client requested Fight Interaction (hoy) for Mob Context ID {mobContextId}.");
-
-            var fight = GetCurrentFight();
-            if (fight == null)
-            {
-                // The group the player clicked, and only that one.
-                //
-                // Before, if the lookup by id failed, it fell into a mobs.FirstOrDefault() and the
-                // player ended up fighting any group on the map: the first one on the list. And the
-                // one that disappeared from the map on winning was that first one, not the one he had
-                // clicked. With the ids now matching between the jss and the jpv the lookup should
-                // never fail; if it fails, what has to be done is say so, not attack another one.
-                // Nor a group of another map: a stale id the client still held, looked up in the
-                // whole world, started a fight here with the monsters of a map far away.
-                var mobs = MobSpawnManager.GetMobsForMap(GameState.MapId);
-                var mobGroup = mobContextId != 0
-                    ? mobs.FirstOrDefault(m => m.MobId == mobContextId)
-                    : null;
-
-                if (mobGroup != null)
-                {
-                    await InitiateFightFromMobCollision(stream, mobGroup, GameState.MapId, mobContextId);
-                    return;
-                }
-
-                Program.LogDebug($"[Fight] The client asks to fight {mobContextId} on map " +
-                                 $"{GameState.MapId}, which is no group here. Nothing is done.");
-            }
-            else
-            {
-                // Re-sync combat context packets if requested
-                await WriteFrameAsync(stream, BuildGameNodePacket("type.ankama.com/joq", Array.Empty<byte>()));
-                await WriteFrameAsync(stream, BuildJpfPacket(fight.DefenderLeaderId));
-                
-                var johMsg = new ProtoMessage();
-                johMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.MapId });
-                await WriteFrameAsync(stream, BuildGameNodePacket(Op.Uri(Op.Joh), johMsg.ToByteArray()));
-
-                foreach (var p in BuildPlacementPossiblePositionsPackets(fight))
-                {
-                    await WriteFrameAsync(stream, p);
-                }
-                foreach (var f in fight.Todos)
-                {
-                    await SendFighterShow(stream, f);
-                }
-                await SendFightStarting(stream, fight);
-            }
         }
 
         /// <summary>
@@ -7840,7 +7547,13 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        private static async Task ASuBandoAsync(FightInstance fight, int teamId, byte[] frame)
+        private static Task ASuBandoAsync(FightInstance fight, int teamId, byte[] frame)
+            => SendToTeamAsync(fight, teamId, session => session.SendAsync(frame));
+
+        private static Task ASuBandoAsync(FightInstance fight, int teamId, Game.GameEvent message)
+            => SendToTeamAsync(fight, teamId, session => session.SendAsync(message));
+
+        private static async Task SendToTeamAsync(FightInstance fight, int teamId, Func<GameSession, Task> send)
         {
             await AbrirLoDebidoAsync(fight);
             foreach (var sesion in Publico(fight))
@@ -7849,7 +7562,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (suyo == null || suyo.TeamId != teamId) continue;
                 try
                 {
-                    await sesion.SendAsync(frame);
+                    await send(sesion);
                 }
                 catch (Exception ex)
                 {
@@ -13713,12 +13426,6 @@ namespace Jondo.Unity.Server.Handlers
                              $"{(alliesAlive ? "victory" : "defeat")}. Back to map {back}.");
         }
 
-        /// <summary>
-        /// The life points the level gives, without vitality: fifty to start with and five per level.
-        /// It is the same base-life rule the session's combat calculator uses before contributions.
-        /// </summary>
-        private static int LifeFromLevel(int level) => CharacteristicRules.BaseLifeForLevel(level);
-
         /// <summary>What casting something costs when it is not known: a spell's ordinary cost.</summary>
         private const int DefaultCastCost = 3;
 
@@ -14102,352 +13809,6 @@ namespace Jondo.Unity.Server.Handlers
         //
         // The number matters to the client rather than only to us: it reads it out of the cast
         // packet (f7.f5) and compares it against the spell's limit to grey the icon out.
-
-        // =========================================================================
-        // PACKET BUILDERS AND SENDERS (100% Organic Protobuf Construction)
-        // =========================================================================
-
-        public static byte[] BuildJpfPacket(long mobContextId)
-        {
-            int subAreaId = 450;
-            var fight = GetCurrentFight();
-            long mId = fight != null ? fight.RoleplayMapId : GameState.MapId;
-            if (MapManager.Maps.TryGetValue(mId, out var mInfo) && mInfo.SubAreaId != 0)
-            {
-                subAreaId = mInfo.SubAreaId;
-            }
-
-            var jpfSub = new ProtoMessage();
-
-            var f1Sub = new ProtoMessage();
-            f1Sub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = subAreaId });
-            f1Sub.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 5 });
-            jpfSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = f1Sub.ToByteArray() });
-
-            var boneSub = new ProtoMessage();
-            boneSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3273 });
-            boneSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 3 });
-            boneSub.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 3 });
-
-            var f3Sub = new ProtoMessage();
-            f3Sub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = boneSub.ToByteArray() });
-
-            var actorSub = new ProtoMessage();
-            actorSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = -1 });
-            actorSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = f3Sub.ToByteArray() });
-            actorSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
-
-            var lookSub = new ProtoMessage();
-            lookSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 3256 });
-            lookSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
-
-            var f2Sub = new ProtoMessage();
-            f2Sub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = lookSub.ToByteArray() });
-            f2Sub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = actorSub.ToByteArray() });
-
-            jpfSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = f2Sub.ToByteArray() });
-            jpfSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = mobContextId });
-
-            var jpfMsg = new ProtoMessage();
-            jpfMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = jpfSub.ToByteArray() });
-
-            return BuildGameNodePacket("type.ankama.com/jpf", jpfMsg.ToByteArray());
-        }
-
-        public static List<byte[]> BuildPlacementPossiblePositionsPackets(FightInstance fight)
-        {
-            var list = new List<byte[]>();
-
-            byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(GameState.CharacterName);
-
-            var lookBreedSub = new ProtoMessage();
-            lookBreedSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = nameBytes });
-            lookBreedSub.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = GameState.Breed });
-
-            var memberSub = new ProtoMessage();
-            memberSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.ChallengerLeaderId });
-            memberSub.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = lookBreedSub.ToByteArray() });
-
-            var memberOuter = new ProtoMessage();
-            memberOuter.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = memberSub.ToByteArray() });
-
-            // Send jyf #1 (Team 0: Player Team)
-            var msg1 = new ProtoMessage();
-            var team0Wrapper = new ProtoMessage();
-            team0Wrapper.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.ChallengerLeaderId });
-            team0Wrapper.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = 1 });
-            team0Wrapper.Fields.Add(new ProtoField { FieldNumber = 8, WireType = 2, BytesValue = memberOuter.ToByteArray() });
-
-            msg1.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = team0Wrapper.ToByteArray() });
-            msg1.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 300 });
-            list.Add(BuildGameNodePacket("type.ankama.com/jyf", msg1.ToByteArray()));
-
-            // Send jyf #2 (Team 1: Monster Team)
-            var msg2 = new ProtoMessage();
-            var team1Wrapper = new ProtoMessage();
-            team1Wrapper.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.DefenderLeaderId });
-            team1Wrapper.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
-            team1Wrapper.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = 1 });
-            team1Wrapper.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = 1 });
-
-            msg2.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = team1Wrapper.ToByteArray() });
-            msg2.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 300 });
-            list.Add(BuildGameNodePacket("type.ankama.com/jyf", msg2.ToByteArray()));
-
-            return list;
-        }
-
-        private static async Task SendFightStarting(NetworkStream stream, FightInstance fight)
-        {
-            var msg = new ProtoMessage();
-            msg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 300 });
-            msg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fight.ChallengerLeaderId });
-            msg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 4 });
-            msg.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = fight.DefenderLeaderId });
-
-            byte[] env = BuildGameNodePacket(Op.Uri(Op.Jya), msg.ToByteArray());
-            await WriteFrameAsync(stream, env);
-            Program.LogDebug($"[FightHandler] Sent jya (FightStarting) for Challenger={fight.ChallengerLeaderId}, Defender={fight.DefenderLeaderId}.");
-        }
-
-        public static byte[] BuildFighterShowBytes(Fighter fighter)
-        {
-            int cellId = fighter.CellId;
-            int dir = fighter.TeamId == 0 ? 3 : 7;
-            long fighterId = fighter.Id; // -1, -2 for monsters, CharacterId for player
-
-            // 1. Position submessage: f1=0, f2=cellId, f5=dir
-            var posMsg = new ProtoMessage();
-            posMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 0 });
-            posMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = cellId });
-            posMsg.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = dir });
-            byte[] posBytes = posMsg.ToByteArray();
-
-            // 2. Fighter inner location: f4 = { f1 = posBytes, f3 = fighterId }
-            var fighterInnerLoc = new ProtoMessage();
-            fighterInnerLoc.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = posBytes });
-            fighterInnerLoc.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = fighterId });
-
-            // 3. Team submessage: f2 = teamId, f3 = 1, f4 = fighterInnerLoc
-            var teamMsg = new ProtoMessage();
-            teamMsg.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fighter.TeamId });
-            teamMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 1 });
-            teamMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = fighterInnerLoc.ToByteArray() });
-
-            // 4. Stats submessage (lgk): 36 canonical entries matching official PCAP
-            var statsMsg = new ProtoMessage();
-            statsMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = 2 });
-
-            void AddStatEntry(int? statId, ProtoMessage valMsg)
-            {
-                var entry = new ProtoMessage();
-                entry.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = valMsg.ToByteArray() });
-                if (statId.HasValue)
-                {
-                    entry.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = statId.Value });
-                }
-                statsMsg.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = entry.ToByteArray() });
-            }
-
-            void AddSimpleVal(int? statId, int val)
-            {
-                var vSub = new ProtoMessage();
-                vSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = val });
-                AddStatEntry(statId, vSub);
-            }
-
-            void AddBaseBonusVal(int? statId, int baseVal, int bonusVal)
-            {
-                var vSub = new ProtoMessage();
-                if (baseVal != 0) vSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = baseVal });
-                if (bonusVal != 0) vSub.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 0, VarIntValue = bonusVal });
-                AddStatEntry(statId, vSub);
-            }
-
-            // 1. AP (statId 1)
-            if (!fighter.IsMonster) AddBaseBonusVal(1, fighter.MaxAP, 0);
-            else AddSimpleVal(1, fighter.MaxAP);
-
-            // 2. MP (statId 23)
-            if (!fighter.IsMonster) AddBaseBonusVal(23, fighter.MaxMP, 0);
-            else AddSimpleVal(23, fighter.MaxMP);
-
-            // 3-6. 37, 33, 35, 36 (empty)
-            AddStatEntry(37, new ProtoMessage());
-            AddStatEntry(33, new ProtoMessage());
-            AddStatEntry(35, new ProtoMessage());
-            AddStatEntry(36, new ProtoMessage());
-
-            // 7. 34 (Total HP - 12 for monster, empty for player)
-            if (fighter.IsMonster) AddSimpleVal(34, 12);
-            else AddStatEntry(34, new ProtoMessage());
-
-            // 8-15. 58, 54, 56, 57, 55, 85, 87, 101 (empty)
-            AddStatEntry(58, new ProtoMessage());
-            AddStatEntry(54, new ProtoMessage());
-            AddStatEntry(56, new ProtoMessage());
-            AddStatEntry(57, new ProtoMessage());
-            AddStatEntry(55, new ProtoMessage());
-            AddStatEntry(85, new ProtoMessage());
-            AddStatEntry(87, new ProtoMessage());
-            AddStatEntry(101, new ProtoMessage());
-
-            // 16-17. 27, 28 (1 for monster, empty for player)
-            if (fighter.IsMonster) { AddSimpleVal(27, 1); AddSimpleVal(28, 1); }
-            else { AddStatEntry(27, new ProtoMessage()); AddStatEntry(28, new ProtoMessage()); }
-
-            // 18. 93 (val 3)
-            AddSimpleVal(93, 3);
-
-            // 19-20. 79, 78 (empty)
-            AddStatEntry(79, new ProtoMessage());
-            AddStatEntry(78, new ProtoMessage());
-
-            // 21. 44, initiative. It was at base 5 and bonus 12, which are the numbers of the capture's
-            // character. The fighter's goes, split the same as in the roleplay sheet: what was invested
-            // in the base and the equipment's in the bonus. The monster sends it empty, which is what
-            // the capture does.
-            //
-            // It comes from THIS session's GameState, like everything else in this method: with several
-            // players in a fight it will have to come from the fighter himself.
-            if (!fighter.IsMonster) AddBaseBonusVal(44, SessionContext.Current.Combat.IniciativaInvertida(),
-                                                        SessionContext.Current.Combat.IniciativaDelEquipo());
-            else AddStatEntry(44, new ProtoMessage());
-
-            // 22. STATID 0 = LIFE POINTS / MAX HP! (statId = null -> omitted f5)
-            //
-            // Careful with what goes here in the PLAYER's case: the life points that do NOT come from
-            // vitality, that is the fifty to start with plus five per level. Vitality is added by the
-            // client by itself, since it already knows its items, and whatever we send here is ADDED to
-            // it.
-            //
-            // It was seen in two places at once. Sending GetPlayerMaxHp() -- which now does include the
-            // equipment, since LoadInventory reads the effects properly -- the character went into a fight
-            // with 8556 life instead of 4803: vitality counted twice, the client's and ours. And before
-            // that, when the equipment was worth zero, the BASE vitality was still left over: outside a
-            // fight it said 4803 and inside 4806, three too many, which are exactly the three Vitality
-            // points of the sheet. With the level's bare life both cases add up.
-            //
-            // Monsters go the other way round: there their whole life does go, because the client knows
-            // nothing about them.
-            if (!fighter.IsMonster) AddBaseBonusVal(null, LifeFromLevel(fighter.Level), 0);
-            else AddSimpleVal(null, fighter.MaxHP);
-
-            // 23. 11 (Vitality: player bonus; monster empty)
-            if (!fighter.IsMonster) AddBaseBonusVal(11, 0, GameState.TotalVitality + SessionContext.Current.Combat.GetEquipBonus(11));
-            else AddStatEntry(11, new ProtoMessage());
-
-            // 25. 97 (empty)
-            AddStatEntry(97, new ProtoMessage());
-
-            // 26-36. 107, 150, 120..125, 141..143 = 100
-            AddSimpleVal(107, 100);
-            AddSimpleVal(150, 100);
-            for (int s = 120; s <= 125; s++) AddSimpleVal(s, 100);
-            for (int s = 141; s <= 143; s++) AddSimpleVal(s, 100);
-
-            // 5. Fighter sub-field 3: f1 = teamMsg, f2 = (player ? playerId : 0), f4 = statsMsg, f7 = (monster ? f7Sub : null)
-            var fighterSub3 = new ProtoMessage();
-            fighterSub3.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = teamMsg.ToByteArray() });
-            fighterSub3.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fighter.IsMonster ? 0 : fighterId });
-            fighterSub3.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = statsMsg.ToByteArray() });
-
-            if (fighter.IsMonster)
-            {
-                int mId = fighter.MonsterId > 0 ? fighter.MonsterId : 3273;
-                int gr = fighter.GradeIndex + 1;
-                var f7Inner = new ProtoMessage();
-                f7Inner.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = mId });
-                f7Inner.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = gr });
-                f7Inner.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 3 });
-
-                var f7Outer = new ProtoMessage();
-                f7Outer.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = f7Inner.ToByteArray() });
-                fighterSub3.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 2, BytesValue = f7Outer.ToByteArray() });
-            }
-            else
-            {
-                // Block f9: the PLAYER's sheet (name and level). It is the counterpart of the f7
-                // monsters use, and without it the client shows "???" and "Lv. 0" on mouse over.
-                // Structure decoded from the capture (a level 2 character):
-                //   f9 { f3 { f2 = 1 },
-                //        f4 { f2 = <breed>, f3 = 3, f4 = 1, f5 { f2 = <level>, f4 = 3 } },
-                //        f6 = -1,
-                //        f7 = "<name>" }          <- the character name as raw UTF-8 bytes
-                var f9Level = new ProtoMessage();
-                f9Level.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = fighter.Level });
-                f9Level.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 3 });
-
-                var f9Breed = new ProtoMessage();
-                f9Breed.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = GameState.Breed });
-                f9Breed.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
-                f9Breed.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 0, VarIntValue = 1 });
-                f9Breed.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 2, BytesValue = f9Level.ToByteArray() });
-
-                var f9Flag = new ProtoMessage();
-                f9Flag.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 1 });
-
-                var f9 = new ProtoMessage();
-                f9.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = f9Flag.ToByteArray() });
-                f9.Fields.Add(new ProtoField { FieldNumber = 4, WireType = 2, BytesValue = f9Breed.ToByteArray() });
-                f9.Fields.Add(new ProtoField { FieldNumber = 6, WireType = 0, VarIntValue = -1 });
-                f9.Fields.Add(new ProtoField
-                {
-                    FieldNumber = 7,
-                    WireType = 2,
-                    BytesValue = System.Text.Encoding.UTF8.GetBytes(fighter.Name ?? GameState.CharacterName ?? "")
-                });
-
-                fighterSub3.Fields.Add(new ProtoField { FieldNumber = 9, WireType = 2, BytesValue = f9.ToByteArray() });
-            }
-
-            // 6. Entity details field 2:
-            var entityDetails = new ProtoMessage();
-
-            if (!fighter.IsMonster)
-            {
-                var fight = GetCurrentFight();
-                byte[] playerLookBytes = fight != null ? CurrentFightLook(fight, fighter) : NormalFightLook(fighter);
-                entityDetails.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = playerLookBytes });
-            }
-            else
-            {
-                int boneId = fighter.LookBoneId > 0 ? fighter.LookBoneId : 3256;
-                var monsterLookMsg = new ProtoMessage();
-                monsterLookMsg.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = boneId });
-                monsterLookMsg.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = 3 });
-                entityDetails.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = monsterLookMsg.ToByteArray() });
-
-                var boneSub = new ProtoMessage();
-                boneSub.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 0, VarIntValue = boneId });
-                boneSub.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 0, VarIntValue = 3 });
-                boneSub.Fields.Add(new ProtoField { FieldNumber = 5, WireType = 0, VarIntValue = 3 });
-
-                var boneWrapper = new ProtoMessage();
-                boneWrapper.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = boneSub.ToByteArray() });
-                entityDetails.Fields.Add(new ProtoField { FieldNumber = 7, WireType = 2, BytesValue = boneWrapper.ToByteArray() });
-            }
-
-            entityDetails.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 2, BytesValue = fighterSub3.ToByteArray() });
-
-            // 7. Outer jxx payload: f2 = { f1 = posBytes, f2 = entityDetails, f3 = fighterId }
-            var jxxInnerPayload = new ProtoMessage();
-            jxxInnerPayload.Fields.Add(new ProtoField { FieldNumber = 1, WireType = 2, BytesValue = posBytes });
-            jxxInnerPayload.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = entityDetails.ToByteArray() });
-            jxxInnerPayload.Fields.Add(new ProtoField { FieldNumber = 3, WireType = 0, VarIntValue = fighterId });
-
-            var jxxOuterPayload = new ProtoMessage();
-            jxxOuterPayload.Fields.Add(new ProtoField { FieldNumber = 2, WireType = 2, BytesValue = jxxInnerPayload.ToByteArray() });
-
-            return BuildGameNodePacket("type.ankama.com/jxx", jxxOuterPayload.ToByteArray());
-        }
-
-        private static async Task SendFighterShow(NetworkStream stream, Fighter fighter)
-        {
-            byte[] packet = BuildFighterShowBytes(fighter);
-            await WriteFrameAsync(stream, packet);
-            Program.LogDebug($"[FightHandler] Sent organic jxx for {(fighter.IsMonster ? $"Monster ID {fighter.MonsterId} (Fighter ID {fighter.Id}, BoneId {fighter.LookBoneId})" : $"Player ID {fighter.Id}")} at Cell {fighter.CellId}.");
-        }
 
         // There was a second Random here -- _lootRandom -- with no lock, while the other one (_dado)
         // had one. Random is NOT thread-safe: two fights rolling at once do not get the same
