@@ -664,7 +664,7 @@ namespace Jondo.Unity.Server.Managers
         /// brings the enemy.
         /// </summary>
         private static bool Prepares(Spell spell)
-            => spell.Summons || spell.SummonsByRow || spell.Buff > 0
+            => spell.Summons || spell.SummonsByRow || spell.Buff > 0 || spell.Escape > 0
                || spell.Rows.Any(r => r.EffectId == EffectSupport.AddState || IsSelfBuff(r) || Repositions(r.EffectId));
 
         private static bool Repositions(int effect)

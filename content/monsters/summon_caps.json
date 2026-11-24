@@ -15,6 +15,10 @@
     {
       "monster": 1159, "cap": 6,
       "why": "The Grand Ugah's Héchame un Amanita (1265, once a turn from his second): «Invoque aléatoirement un des monstres de la zone. Il peut y avoir jusqu'à 6 invocations» (Dofus pour les noobs, «Temple du Grand Ougah»). His six summonable monsters (1153-1158) cost 1 each."
+    },
+    {
+      "monster": 97, "cap": 2,
+      "why": "The Wo Wabbit summons a Tiwabbit Kiafin (331), a Tiwabbit (328, from his second turn) and a Black Tiwabbit (329, from his third), «limité à 2 invocations maximum» (Dofus pour les noobs, «Château du Wa Wabbit»). The three (72, 96, 68) cost 1 each."
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "Monster spells used only while an enemy carries a state (Managers.MonsterSpellGates). The client's",
+    "data lists them from the start and their level asks nothing of the enemy; a guide says otherwise.",
+    "Each row is a guide's word, quoted in its why.",
+    "",
+    "  spell        the monster spell",
+    "  enemyState   the state one of the caster's enemies must carry for the monster to cast it"
+  ],
+  "gates": [
+    {
+      "spell": 12216, "enemyState": 952,
+      "why": "The Waddicts' Twagón (teleport next to an enemy anywhere on the map), in the list of the Wabbinómano, Warkaiko, Wadulador and their kin: «Lorsqu'un joueur est dans l'état Chocomatose, tous les monstres (sauf le Boss) gagnent un nouveau sort» (Dofus pour les noobs, «Fonderie des Waddicts»). Chocomatose is state 952, given by the glyph each monster leaves where it dies."
+    }
+  ]
+}

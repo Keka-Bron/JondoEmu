@@ -4058,11 +4058,11 @@ namespace Jondo.Unity.Server.Handlers
                             quien.Buffs.AparienciaEn(fight.RoundNumber), fight);
                     }
 
-                    // A shield row gone means the points are gone: the fighter drops them by the
-                    // round, and the sheet says so.
+                    // A shield row gone means its points are gone (Buffs.AlIrse took them off the
+                    // fighter), and the sheet says so. Not the whole shield by the round: another
+                    // caster's row that ends this same round lives on until his own turn.
                     if (caido.EffectId == Managers.EffectEngine.ShieldPanelEffect)
                     {
-                        quien.CaducarElEscudo(fight.RoundNumber);
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
                             Network.FightProtocol.BuildSequenceStart(quien.Id, Network.FightProtocol.SheetSequence)));
                         await FichaATodosAsync(fight, quien.Id,
@@ -11977,7 +11977,10 @@ namespace Jondo.Unity.Server.Handlers
             // A spell the engine refused this turn (nothing charged, so nothing else would stop the
             // tactics from choosing it again): not tried again until the next turn.
             var refused = new HashSet<int>();
-            bool Allowed(Managers.MonsterTactics.Spell s) => !refused.Contains(s.Id) && Managers.SpellCriteria.Allows(monster, s.Id, s.Grade);
+            // And a spell a guide says the monster only gains while an enemy carries a state
+            // (MonsterSpellGates): the Waddicts' Twagón, once somebody is in Chocomatose.
+            bool Allowed(Managers.MonsterTactics.Spell s) => !refused.Contains(s.Id) && Managers.SpellCriteria.Allows(monster, s.Id, s.Grade)
+                                                             && Managers.MonsterSpellGates.Open(fight, monster, s.Id);
 
             for (int step = 0; step < TopeDeLanzamientosPorTurno; step++)
             {
@@ -12146,7 +12149,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 bool damages = false, hurtsAllies = false, summons = false, mechanics = false, mechanicsOnEnemies = false;
                 bool hooks = false, hooksOnEnemies = false, doesSomethingAtOnce = false;
-                int zone = 0, removal = 0, buff = 0;
+                int zone = 0, removal = 0, buff = 0, escape = 0;
                 Managers.SpellEffect? zoneRow = null, healZoneRow = null;
                 bool blowOnTheAim = false;
                 Managers.SpellEffect? ringRow = null;
@@ -12232,6 +12235,8 @@ namespace Jondo.Unity.Server.Handlers
                     if (stat.Value < 0 && onEnemies &&
                         (stat.Characteristic == ActionPointsCharacteristic || stat.Characteristic == MovementPointsCharacteristic))
                         removal += -stat.Value;
+                    else if (stat.Value > 0 && !onEnemies && stat.Characteristic == Jondo.Unity.World.Fights.Tackle.EscapeCharacteristic)
+                        escape += stat.Value;
                     else if (stat.Value > 0 && !onEnemies)
                         buff += stat.Value;
                 }
@@ -12307,6 +12312,7 @@ namespace Jondo.Unity.Server.Handlers
                     HealZoneRow = healZoneRow,
                     Removal = removal,
                     Buff = buff,
+                    Escape = escape,
                     SupportMasks = supportMasks,
                     UtilityAllyMasks = utilityAllyMasks,
                     UtilityOwnSideMasks = utilityOwnSideMasks,
@@ -12321,7 +12327,7 @@ namespace Jondo.Unity.Server.Handlers
                                      && !Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.DesactivaUnPortal),
                     Interval = limits.Intervalo,
                     Utility = !KillsEnemiesOnly(spell, grade)
-                              && ((!damages && heal == 0 && removal == 0 && buff == 0 && !summons && mechanics) || namedAllyStep)
+                              && ((!damages && heal == 0 && removal == 0 && buff == 0 && escape == 0 && !summons && mechanics) || namedAllyStep)
                         ? 25 + monster.Level / 10.0 : 0,
                     NamedAllyStep = namedAllyStep,
                     UtilityOnEnemies = mechanicsOnEnemies,

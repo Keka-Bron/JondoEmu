@@ -5528,7 +5528,6 @@ namespace Jondo.Unity.Server.Managers
                 if (cuanto <= 0) return null;
 
                 int caduca = Caduca(efecto, ronda);
-                sobre.Escudar(cuanto, caduca);
 
                 // And the panel row, which nothing was sending: the shield held on the server
                 // and the client never drew it. Measured on Patada: the bomb gets a jxm of
@@ -5553,7 +5552,10 @@ namespace Jondo.Unity.Server.Managers
                     CaducaEnRonda = caduca,
                     EmpiezaEnRonda = Empieza(efecto, ronda),
                 }, combate.SiguienteEmbrujo);
-                // A replaced row's points went with it (Buffs.AlIrse, on the fighter).
+                // A replaced row's points went with it (Buffs.AlIrse, on the fighter), and only
+                // then come the new ones: given first, a recast over a row the blows had already
+                // emptied took its own points back with the old row and left the new row empty.
+                sobre.Escudar(cuanto, caduca);
 
                 return new Outcome
                 {

@@ -105,6 +105,14 @@ namespace Jondo.Unity.Server.Managers
             public int Buff { get; init; }
 
             /// <summary>
+            /// Escape (characteristic 78) given to one of its side: worth something only to one an
+            /// enemy stands next to. Weighed as any boost, the Tiwabbit Kiafin's Atiwabbo (3783,
+            /// 2 AP, +20 escape) was worth eight of its Viento de Pánico per AP with nobody near
+            /// him, and the poison was never cast.
+            /// </summary>
+            public int Escape { get; init; }
+
+            /// <summary>
             /// The masks of its heals and boosts when each of them lands on the aimed cell alone;
             /// none when one reaches a zone. Whom they may be aimed at: the Minotoror's Semillas
             /// Mágicas boosts an allied summon only («j»), and aimed at one of his companions it
@@ -963,7 +971,7 @@ namespace Jondo.Unity.Server.Managers
             }
             else if (spell.Offensive)
                 foreach (var enemy in enemies) yield return (enemy, enemy.CellId);
-            if (spell.Heal > 0 || spell.Buff > 0)
+            if (spell.Heal > 0 || spell.Buff > 0 || spell.Escape > 0)
                 foreach (var ally in allies.Where(ally => spell.Supports(monster, ally)))
                     yield return (ally, ally == monster ? from : ally.CellId);
             if (spell.Summons)
@@ -1055,6 +1063,10 @@ namespace Jondo.Unity.Server.Managers
             return true;
         }
 
+        /// <summary>Whether a living enemy stands next to the cell, so that escape is worth anything there.</summary>
+        private static bool Tackled(int cell, List<Fighter> enemies)
+            => enemies.Any(e => e.IsAlive && MapGeometry.Distance(cell, e.CellId) == 1);
+
         private static double Value(Spell spell, Fighter monster, Fighter target, int aim, int from,
                                     List<Fighter> enemies, List<Fighter> allies, Board board)
         {
@@ -1109,6 +1121,9 @@ namespace Jondo.Unity.Server.Managers
 
             if (spell.Buff > 0 && !onEnemy)
                 value += 10 + spell.Buff * 2 + monster.Level / 10.0;
+
+            if (spell.Escape > 0 && !onEnemy && Tackled(target == monster ? from : target.CellId, enemies))
+                value += 10 + spell.Escape * 2 + monster.Level / 10.0;
 
             // Cast on itself, a summon comes out round it all the same: the Enutrof ghost's Un
             // Tesoro Bien Custodiado (9213, range 0) calls his four keepers, and aimed at its own

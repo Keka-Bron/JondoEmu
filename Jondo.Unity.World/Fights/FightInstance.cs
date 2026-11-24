@@ -1758,11 +1758,11 @@ namespace Jondo.Unity.World.Fights
                         if (State == FightState.Ended) return null;
                     }
 
-                    // The shields that have run their course drop here, with the change of round. If they do not
-                    // expire, a two-round shield stays on until the end of the
-                    // fight and it is not noticed: it only shows in the player holding out too long.
-                    foreach (var quien in Azul) quien?.CaducarElEscudo(RoundNumber);
-                    foreach (var quien in Rojo) quien?.CaducarElEscudo(RoundNumber);
+                    // No shield drops here. Its points go with its 1040 row (Buffs.AlIrse), and the row
+                    // falls at its CASTER's turn start in the round it ends, not at the change of
+                    // round: dropping the points here left the Wey Wabbit's row on his panel through
+                    // the players' turns of round 10 with nothing behind it, and a 914 hit went
+                    // straight to his life.
                 }
                 attempts++;
             } while (!CurrentFighter.IsAlive && attempts < TurnOrder.Count);

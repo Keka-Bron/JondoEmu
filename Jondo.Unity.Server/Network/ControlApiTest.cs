@@ -1280,7 +1280,25 @@ namespace Jondo.Unity.Server.Network
                                                                                   // A telefrag; through a portal or not; with a shield or not; the one carried.
                                                                                   || k is "T" or "t" or "R" or "r" or "PB" or "pb" or "K");
 
-        private static List<object> VerifyEffects(FightInstance fight, Fighter me, int spell, int grade, int round,
+        /// <summary>
+        /// Whether a row's mask asks its caster for a state (*E, *e) he did not meet as the cast
+        /// began. Only the states: the rest of what the caster may be asked (*V, his life) moves
+        /// with the cast itself.
+        /// </summary>
+        internal static bool CasterConditionFailed(Fighter caster, string? mask, HashSet<int>? statesAtTheCast)
+        {
+            if (string.IsNullOrEmpty(mask)) return false;
+            var stateTokens = mask.Split(',').Select(k => k.Trim())
+                                  .Where(k => k.Length > 2 && k[0] == '*' && k[1] is 'E' or 'e' && char.IsDigit(k[2]))
+                                  .ToList();
+            if (stateTokens.Count == 0) return false;
+            var states = statesAtTheCast != null
+                ? new Dictionary<Fighter, HashSet<int>> { [caster] = statesAtTheCast }
+                : null;
+            return !EffectEngine.CasterQualifies(caster, string.Join(",", stateTokens), states);
+        }
+
+        internal static List<object> VerifyEffects(FightInstance fight, Fighter me, int spell, int grade, int round,
             Dictionary<long, (int CurrentHP, int CurrentAP, int CurrentMP, int CellId, int Count, bool IsAlive)> before,
             Dictionary<long, HashSet<int>> statesBefore, List<(Fighter Who, Buff Row)> newRows, List<Glifo> newGlyphs,
             Func<Fighter, string> roleOf, string? aimedRole = null, IReadOnlyList<string>? lines = null, int castCell = -1)
@@ -1690,6 +1708,17 @@ namespace Jondo.Unity.Server.Network
                 {
                     verdict = "no-rule";
                     observed = "the harness has no check for this effect yet";
+                }
+                // A row of the spell itself that asks a state of its caster (*E, *e) he did not
+                // meet when he cast it did not go off, whatever rows a sibling left: the Wey
+                // Wabbit's Abrutissement holds -150 power while he has company (*e7020) and -300
+                // once alone (*E7020), and the 150 row, fitting the 300 one's sibling, was
+                // reported as the 300 one applied.
+                if (depth == 0 && verdict != "missing"
+                    && CasterConditionFailed(me, e.TargetMask, statesBefore.TryGetValue(me.Id, out var casterStates) ? casterStates : null))
+                {
+                    verdict = "conditional";
+                    observed = $"the caster's condition did not hold (mask {e.TargetMask}); the rows seen are another variant's";
                 }
                 if ((e.Probabilidad > 0 && e.Probabilidad < 100 || gate == "chance") && verdict == "missing") verdict = "chance";
                 // An effect whose mask asks for a state (E, *E: the target's or the caster's) that
