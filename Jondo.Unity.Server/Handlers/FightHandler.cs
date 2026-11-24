@@ -11898,7 +11898,10 @@ namespace Jondo.Unity.Server.Handlers
             // each step, as it always has.
             List<Managers.MonsterTactics.Action>? plan = null;
             int planned = 0;
-            bool Allowed(Managers.MonsterTactics.Spell s) => Managers.SpellCriteria.Allows(monster, s.Id, s.Grade);
+            // A spell the engine refused this turn (nothing charged, so nothing else would stop the
+            // tactics from choosing it again): not tried again until the next turn.
+            var refused = new HashSet<int>();
+            bool Allowed(Managers.MonsterTactics.Spell s) => !refused.Contains(s.Id) && Managers.SpellCriteria.Allows(monster, s.Id, s.Grade);
 
             for (int step = 0; step < TopeDeLanzamientosPorTurno; step++)
             {
@@ -11921,7 +11924,7 @@ namespace Jondo.Unity.Server.Handlers
                     }
                     planned++;
                 }
-                else action = Managers.MonsterTactics.Next(board, monster, usable, spells.FindAll(s => !Allowed(s)));
+                else action = Managers.MonsterTactics.Next(board, monster, usable, spells.FindAll(s => !refused.Contains(s.Id) && !Allowed(s)));
                 if (action == null) break;
 
                 if (action.Path.Count > 1 && !await MonsterWalkAsync(stream, fight, monster, new List<int>(action.Path)))
@@ -11943,7 +11946,13 @@ namespace Jondo.Unity.Server.Handlers
 
                 Program.LogDebug($"[AI] {monster.Id} casts {action.Spell.Id} at {action.Target.Id} " +
                                  $"(cell {action.TargetCell}) from {monster.CellId}, score {action.Score:0.0}.");
-                await WatchedMonsterCastAsync(stream, fight, monster, action.Spell, action.Target, action.TargetCell);
+                if (!await WatchedMonsterCastAsync(stream, fight, monster, action.Spell, action.Target, action.TargetCell))
+                {
+                    Program.LogDebug($"[AI] {monster.Id}'s cast of {action.Spell.Id} was refused; not tried again this turn.");
+                    refused.Add(action.Spell.Id);
+                    plan = null;
+                    continue;
+                }
                 if (await EffectEndedTheFightAsync(stream, fight)) return;
                 // What the cast changed -- a creature summoned, someone pushed or dead -- is on the
                 // board the next step is weighed on.
@@ -12004,6 +12013,8 @@ namespace Jondo.Unity.Server.Handlers
                 ThroughPortal = on => fight.CastThroughPortal = on,
                 // The traps of the side whose turn it is.
                 Trapped = cell => OwnTraps(fight).Any(g => g.Cubre(cell)),
+                // Any trap at all, as the engine judges a trap laid on a cell (CastAsync, MonsterCastAsync).
+                HoldsATrap = TrapCells(fight, null).Contains,
                 TrapsOut = () => OwnTraps(fight).Count(),
             };
         }
@@ -12218,6 +12229,7 @@ namespace Jondo.Unity.Server.Handlers
                                      && Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
                                                                                        && (e.TargetMask ?? "").Split(',').Any(m => m.Trim() == "C")),
                     RangeBoostable = (limits.Flags & Managers.SpellLevelFlags.RangeCanBeBoosted) != 0,
+                    PlacesTrap = LaysATrap(spell, grade),
                     ThroughPortals = (limits.Flags & Managers.SpellLevelFlags.PortalProjectionForbidden) == 0
                                      && !Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Managers.EffectEngine.DesactivaUnPortal),
                     Interval = limits.Intervalo,
@@ -12458,28 +12470,29 @@ namespace Jondo.Unity.Server.Handlers
         internal static event Action<FightInstance, Fighter, int, int, int>? CastWatchBefore;
         internal static event Action<FightInstance, Fighter, int, int, int>? CastWatchAfter;
 
-        private static async Task WatchedMonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
+        private static async Task<bool> WatchedMonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
                                                           Managers.MonsterTactics.Spell chosen, Fighter objetivo, int aim)
         {
             CastWatchBefore?.Invoke(fight, monster, chosen.Id, chosen.Grade, aim);
-            try { await MonsterCastAsync(stream, fight, monster, chosen, objetivo, aim); }
+            try { return await MonsterCastAsync(stream, fight, monster, chosen, objetivo, aim); }
             finally { CastWatchAfter?.Invoke(fight, monster, chosen.Id, chosen.Grade, aim); }
         }
 
-        private static async Task MonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
+        /// <summary>Whether the cast was made: a refused one charged nothing and must not be tried again this turn.</summary>
+        private static async Task<bool> MonsterCastAsync(NetworkStream stream, FightInstance fight, Fighter monster,
                                                    Managers.MonsterTactics.Spell chosen, Fighter objetivo, int aim)
         {
             int spell = chosen.Id;
             int monsterGrade = chosen.Grade;
             var data = DatabaseManager.GetSpellCombatData(spell, monsterGrade);
-            if (data == null) return;
+            if (data == null) return false;
 
             // The same «casillas libres» as a player's trap (CastAsync): a JondoBot Sram does not
             // see the other side's traps and may aim at one.
             if (LaysATrap(spell, monsterGrade) && TrapCells(fight, null).Contains(aim))
             {
                 Program.LogDebug($"[Fight] {monster.Id}'s spell {spell} lays a trap and cell {aim} already holds one.");
-                return;
+                return false;
             }
 
             // A class spell -- a JondoBot's -- lands on whoever stands on the aimed cell, as a
@@ -12602,6 +12615,7 @@ namespace Jondo.Unity.Server.Handlers
             int intervalo = limitesDelMonstruo.Intervalo;
             if (intervalo > 0) monster.Recarga[spell] = intervalo;
             ApplyGlobalCooldown(fight, monster, spell, limitesDelMonstruo.GlobalCooldown, intervalo);
+            return true;
         }
 
         /// <summary>

@@ -317,6 +317,13 @@ namespace Jondo.Unity.Server.Managers
             public bool LaysTraps => Rows.Any(r => r.EffectId == EffectEngine.ColocaUnaTrampa);
 
             public bool Offensive => Damage > 0 || Removal > 0;
+
+            /// <summary>
+            /// Whether the spell lays a trap (effect 400) at its level, whether or not its rows are
+            /// carried. The engine refuses one aimed at a cell that already holds a trap
+            /// (<see cref="Board.HoldsATrap"/>), so the tactics must not aim it there.
+            /// </summary>
+            public bool PlacesTrap { get; init; }
         }
 
         /// <summary>What the board says: where one can stand, who stands where, who sees whom.</summary>
@@ -396,6 +403,9 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>Whether a trap of the caster's side already covers the cell, and how many it has out.</summary>
             public Func<int, bool> Trapped { get; init; } = _ => false;
+
+            /// <summary>Whether any trap, of either side, lies on the cell: the one a trap cannot be laid on.</summary>
+            public Func<int, bool> HoldsATrap { get; init; } = _ => false;
             public Func<int> TrapsOut { get; init; } = () => 0;
         }
 
@@ -997,6 +1007,7 @@ namespace Jondo.Unity.Server.Managers
         {
             // A spell cast on the caster's own cell that needs that cell free can never be cast by
             // hand: such spells only fire from other spells' rows (the red Ush's 6238).
+            if (spell.PlacesTrap && board.HoldsATrap(aim)) return false;
             if (spell.OnSelf) return aim == from && !spell.NeedsFreeCell;
             if (!spell.HasRows && spell.Summons && target == monster && aim != from)
                 return board.Walkable(aim) && !board.Occupied(aim)
