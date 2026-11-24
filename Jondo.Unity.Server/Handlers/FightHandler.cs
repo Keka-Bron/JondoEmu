@@ -7248,6 +7248,14 @@ namespace Jondo.Unity.Server.Handlers
             // -100 power, 26 to 30 fire": the power came off him and the fire hit the empty cell.
             bool targetOnTheCell = objetivo != null && objetivo.CellId == celda;
 
+            // What the summon runs bring out is kept from this cast's later rows: they pick among
+            // the fighters there as it went off (EffectEngine.AQuien, NewbornsOutOfReach).
+            var bornOutside = fight.BornOfTheCast;
+            var born = new HashSet<long>();
+            if (caster != null)
+                fight.BornOfTheCast = new FightInstance.CastNewborns(caster.Id, hechizo, grado, born);
+            try
+            {
             int i = 0;
             while (i < filas.Count)
             {
@@ -7275,13 +7283,21 @@ namespace Jondo.Unity.Server.Handlers
                     // What goes on the ground -- a mark, a summon -- stays on the aimed cell.
                     bool follows = targetOnTheCell && objetivo.IsAlive && objetivo.CellId != celda
                                    && !tanda.Any(f => Managers.EffectEngine.VaAlSuelo(f.EffectId));
+                    var before = invoca
+                        ? TodosLosCombatientes(fight).Where(f => f != null).Select(f => f.Id).ToHashSet()
+                        : null;
                     await AplicarEfectosAsync(stream, fight, caster, hechizo, grado, objetivo, disparador,
                                               follows ? objetivo.CellId : celda,
                                               critico, tirada: tanda, rondaDelEnganche: rondaDelEnganche,
                                               soloAlObjetivo: soloAlObjetivo, conducta: conducta);
+                    if (before != null)
+                        born.UnionWith(TodosLosCombatientes(fight)
+                                       .Where(f => f != null && !before.Contains(f.Id)).Select(f => f.Id));
                 }
                 if (!caster.IsAlive && !conducta) break;
             }
+            }
+            finally { fight.BornOfTheCast = bornOutside; }
         }
 
         /// <summary>
@@ -9646,7 +9662,12 @@ namespace Jondo.Unity.Server.Handlers
                     // putting somebody into a wall with a push or a pull did nothing to him
                     // -- neither the wall, nor a trap, nor a Feca glyph.
                     movidos.Add(c.Sobre);
-                    Disparo(c.Sobre, Managers.EffectEngine.AlSerEmpujado, quienLanza);
+                    // A step of the caster's own (1041, 1042) is him walking, not being pushed: the
+                    // Wobot's «Weuche» steps 4 cells forward, and its «Louwdeuw» -- "pushed or
+                    // swapped: the attacker takes 70 fire", 792 under MS|P -- burnt the Wobot itself.
+                    if (c.Efecto.EffectId is not (Jondo.Unity.World.Combat.EffectSupport.StepForward
+                                                  or Jondo.Unity.World.Combat.EffectSupport.StepBack))
+                        Disparo(c.Sobre, Managers.EffectEngine.AlSerEmpujado, quienLanza);
                     Disparo(c.Sobre, Managers.EffectEngine.AlSerMovido, quienLanza);
                     // Drawn in (MA): Imantación's combo "solo si las bombas son desplazadas" by its
                     // pull. And the caster moved somebody else (PO).

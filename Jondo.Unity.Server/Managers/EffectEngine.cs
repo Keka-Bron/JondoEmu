@@ -2699,6 +2699,14 @@ namespace Jondo.Unity.Server.Managers
             var raizDeFuera = combate.RootCaster;
             int hechizoRaizDeFuera = combate.CastRootSpell, filasDeFuera = combate.CastRowsAfter;
             var struckDownOutside = combate.StruckDownThisCast;
+            var newbornsOutside = combate.NewbornsOutOfReach;
+            // The cast's own rows do not pick its newborns; its sub-casts do (Piojoporojo's 6278
+            // grade 2 hands each flea its state by template).
+            combate.NewbornsOutOfReach = hondo == 0 && combate.BornOfTheCast is { } born
+                                         && born.Caster == quienLanza?.Id && born.Spell == hechizo
+                                         && born.Grade == grado
+                ? born.Ids
+                : null;
             if (hondo == 0)
             {
                 combate.StruckDownThisCast = new HashSet<long>();
@@ -2736,6 +2744,7 @@ namespace Jondo.Unity.Server.Managers
                 combate.CastRootSpell = hechizoRaizDeFuera;
                 combate.CastRowsAfter = filasDeFuera;
                 combate.StruckDownThisCast = struckDownOutside;
+                combate.NewbornsOutOfReach = newbornsOutside;
             }
         }
 
@@ -4386,6 +4395,11 @@ namespace Jondo.Unity.Server.Managers
                 if (quien == null) continue;
                 // Struck down by an earlier row of this cast: no longer anybody's target.
                 if (quien != quienLanza && combate.StruckDownThisCast.Contains(quien.Id)) continue;
+                // Brought out by an earlier row of this very cast: an immediate row picks among
+                // those who were there as it went off. Rows written for the newborn ("U") and
+                // delayed ones (a summon's lifetime, 25753's "strike down after a round") reach it.
+                if (!soloLoInvocado && efecto.Delay == 0
+                    && combate.NewbornsOutOfReach?.Contains(quien.Id) == true) continue;
                 IReadOnlySet<int> susEstados = estados != null && estados.TryGetValue(quien, out var alEntrar)
                     ? alEntrar
                     : quien.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quien.Buffs.Estados);

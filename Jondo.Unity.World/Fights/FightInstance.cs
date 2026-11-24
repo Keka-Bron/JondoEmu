@@ -1297,6 +1297,25 @@ namespace Jondo.Unity.World.Fights
         public HashSet<long> StruckDownThisCast { get; set; } = new HashSet<long>();
 
         /// <summary>
+        /// The creatures a monster spell's own summon rows brought out, while its later rows are
+        /// resolved (FightHandler.LanzarPorOrdenAsync): who cast it, which spell and grade, and
+        /// the newborns' ids. Null outside such a cast.
+        /// </summary>
+        public sealed record CastNewborns(long Caster, int Spell, int Grade, HashSet<long> Ids);
+
+        /// <summary>See <see cref="CastNewborns"/>.</summary>
+        public CastNewborns BornOfTheCast { get; set; }
+
+        /// <summary>
+        /// The newborns of <see cref="BornOfTheCast"/> while the engine resolves that very cast's
+        /// own rows (depth 0), and null under its sub-casts: an immediate row of the spell that
+        /// summoned them picks among the fighters that were there as it went off, not them. The
+        /// Black Wo Wabbit's «Aspiwation» summons a Cawotte and then strikes down "a,P,F3458" on
+        /// the whole board, the previous Cawotte: it struck down the new one too.
+        /// </summary>
+        public IReadOnlySet<long> NewbornsOutOfReach { get; set; }
+
+        /// <summary>
         /// The states a fighter held just before the rows that expire at the start of ITS turn were
         /// swept, for as long as the glyphs under it are fired (null otherwise). A glyph's state
         /// conditions (E, e) read them as held: Karnhell's «Tu m'attraperas pas !» climbs her from
