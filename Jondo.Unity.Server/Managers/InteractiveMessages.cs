@@ -43,7 +43,20 @@ namespace Jondo.Unity.Server.Managers
         /// (<see cref="Pull"/>).
         /// </remarks>
         public sealed record Said(int Message, long ToMap, int ToCell, int Opens, int OpensCell, int OpensState,
-                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill, int Order = 0);
+                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill, int Order = 0)
+        {
+            /// <summary>
+            /// What pressing it puts in the bag, each item only while none is carried: the urn of
+            /// Kanniball Village's exit room and its Kannibubble Scroll.
+            /// </summary>
+            public (int Item, int Count)[] Gives { get; init; } = Array.Empty<(int, int)>();
+
+            /// <summary>
+            /// An item criterion the hand-out waits on (<see cref="ItemCriteria"/>), empty for none:
+            /// the scroll's own «PT!24015&amp;PT!24016», not to whoever already knows the spell.
+            /// </summary>
+            public string Criterion { get; init; } = "";
+        }
 
         /// <summary>
         /// The message's parameters, by name, as the official server filled them (2026-11-21):
@@ -110,7 +123,8 @@ namespace Jondo.Unity.Server.Managers
                     int message = (int)Number(row, "message");
                     int opens = (int)Number(row, "opens");
                     int skill = (int)Number(row, "skill");
-                    if (map == 0 || element == 0 || (message == 0 && opens == 0 && skill == 0)) continue;
+                    var gives = Gifts(row);
+                    if (map == 0 || element == 0 || (message == 0 && opens == 0 && skill == 0 && gives.Length == 0)) continue;
                     var frees = Cells(row, "frees");
                     var blocks = Cells(row, "blocks");
                     var names = new List<string>();
@@ -121,7 +135,12 @@ namespace Jondo.Unity.Server.Managers
                                                      opens, (int)Number(row, "opensCell"), (int)Number(row, "opensState"),
                                                      frees.ToArray(), names.ToArray(), blocks.ToArray(),
                                                      (int)Number(row, "closesAfter"), skill == 0 ? Skill : skill,
-                                                     (int)Number(row, "order"));
+                                                     (int)Number(row, "order"))
+                    {
+                        Gives = gives,
+                        Criterion = row.TryGetProperty("criterion", out var criterion)
+                                    && criterion.ValueKind == JsonValueKind.String ? criterion.GetString() ?? "" : "",
+                    };
                 }
                 Console.WriteLine($"[InteractiveMessages] {fresh.Count} interactives that say something.");
             }
@@ -136,6 +155,19 @@ namespace Jondo.Unity.Server.Managers
         {
             Ensure();
             return _byElement.TryGetValue((mapId, elementId), out var said) ? said : null;
+        }
+
+        /// <summary>
+        /// What of <see cref="Said.Gives"/> goes in the bag of whoever holds <paramref name="held"/>
+        /// of each item: only what he carries none of, so pressing the urn again with the scroll still
+        /// in the bag gives no second one.
+        /// </summary>
+        public static (int Item, int Count)[] HandOut(Said said, Func<int, int> held)
+        {
+            var handed = new List<(int, int)>();
+            foreach (var (item, count) in said.Gives)
+                if (held(item) <= 0) handed.Add((item, count));
+            return handed.ToArray();
         }
 
         private static readonly ConcurrentDictionary<(long Character, long Map), int> _pulled = new();
@@ -179,6 +211,21 @@ namespace Jondo.Unity.Server.Managers
                 foreach (var cell in list.EnumerateArray())
                     if (cell.TryGetInt32(out int c)) cells.Add(c);
             return cells;
+        }
+
+        /// <summary>A row's «gives»: { item, count } each, a count of one when it says none.</summary>
+        private static (int Item, int Count)[] Gifts(JsonElement row)
+        {
+            var gifts = new List<(int, int)>();
+            if (row.TryGetProperty("gives", out var list) && list.ValueKind == JsonValueKind.Array)
+                foreach (var gift in list.EnumerateArray())
+                {
+                    if (gift.ValueKind != JsonValueKind.Object) continue;
+                    int item = (int)Number(gift, "item");
+                    int count = (int)Number(gift, "count");
+                    if (item > 0) gifts.Add((item, count > 0 ? count : 1));
+                }
+            return gifts.ToArray();
         }
 
         private static long Number(JsonElement row, string name)

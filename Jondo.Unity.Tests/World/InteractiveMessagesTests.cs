@@ -61,10 +61,38 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(new[] { 272, 244, 258, 259 }, lever.Blocks);
         }
 
+        /// <summary>
+        /// The urn of Kanniball Village's exit room hands the Kannibulle spell scroll (Dofus pour les
+        /// noobs, «Village Kanniboul»), under the scroll's own criterion, and no second one while one
+        /// is carried.
+        /// </summary>
+        [Fact]
+        public void The_kanniball_exit_urn_gives_the_kannibubble_scroll_once_carried()
+        {
+            Load();
+            var urn = InteractiveMessages.Of(157553664, 528873);
+            Assert.NotNull(urn);
+            Assert.Equal(new[] { (27416, 1) }, urn!.Gives);
+            Assert.Equal("PT!24015&PT!24016", urn.Criterion);
+            Assert.Equal(new[] { (27416, 1) }, InteractiveMessages.HandOut(urn, _ => 0));
+            Assert.Empty(InteractiveMessages.HandOut(urn, item => item == 27416 ? 1 : 0));
+        }
+
+        /// <summary>What the urn gives is the scroll that teaches Kannibubble (24015).</summary>
+        [Fact]
+        public void The_kanniball_exit_urn_scroll_teaches_kannibubble()
+        {
+            if (!SpellTable.IsLoaded || DatabaseManager.GetItemTemplateType(27416) == 0) return;
+            Load();
+            var (item, _) = InteractiveMessages.Of(157553664, 528873)!.Gives.Single();
+            Assert.Equal(24015, LearnedSpells.TaughtBy(item));
+        }
+
         /// <summary>Declared on the map with «Usar», or the client draws it as decor and no click comes.</summary>
         [Theory]
         [InlineData(190972421, 515587)]
         [InlineData(188743687, 540439)]
+        [InlineData(157553664, 528873)]
         public void The_element_is_declared_usable(long map, int element)
         {
             Load();

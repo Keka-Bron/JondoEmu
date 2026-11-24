@@ -131,6 +131,9 @@ namespace Jondo.Unity.Server.Handlers
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                         ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, said.Message,
                             InteractiveMessages.Fill(said, SessionContext.State.CharacterName, DateTimeOffset.Now))));
+                // What it hands over (the urn of Kanniball Village's exit and its spell scroll), once
+                // its criterion holds; refused as a passage's criterion is otherwise.
+                if (said.Gives.Length > 0) await HandOutAsync(stream, mapId, elementId, said);
                 // A lever of an ordered row opens and sends only when the row is complete.
                 bool complete = InteractiveMessages.Pull(SessionContext.State.CharacterId, mapId, said);
                 if (said.Opens != 0 && complete)
@@ -297,6 +300,31 @@ namespace Jondo.Unity.Server.Handlers
                     throw new InvalidOperationException($"Unhandled interactive action: {action.Kind}.");
             }
         }
+        /// <summary>
+        /// The items an interactive that says something also puts in the bag (InteractiveMessages.Said
+        /// .Gives): each one he carries none of, with «Has conseguido» after it (lqn 21), as a quest
+        /// element's hand-out. A criterion not met is answered as an item's or a passage's is.
+        /// </summary>
+        private static async Task HandOutAsync(NetworkStream stream, long mapId, int elementId, InteractiveMessages.Said said)
+        {
+            if (said.Criterion.Length > 0 && !ItemCriteria.Holds(said.Criterion))
+            {
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Warning, ItemCriteria.RefusalOf(said.Criterion))));
+                Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId}: «{said.Criterion}» not met.");
+                return;
+            }
+            foreach (var (item, count) in InteractiveMessages.HandOut(said, Equipment.HowMany))
+            {
+                if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
+                        count.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        item.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+                Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId} gives {count}x{item}.");
+            }
+        }
+
         /// <summary>jrg { f1: state, f2: cell } per cell, walkable being zero and left out (PlateGates).</summary>
         private static byte[] Obstacles(int[] walkable, int[] blocked)
         {
