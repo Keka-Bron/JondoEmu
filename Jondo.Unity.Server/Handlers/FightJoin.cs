@@ -157,24 +157,27 @@ namespace Jondo.Unity.Server.Handlers
 
         // ─── The teams, for the map ─────────────────────────────────────────────
 
-        /// <summary>
-        /// A side as the map's messages carry it. The leader of a people's side is its first
-        /// person; of the monsters', the group, as in every capture (-20002, -20000, -21200).
-        /// </summary>
-        internal static Pb TeamOnMap(FightInstance fight, int team, bool withMembers)
+        // A companion does not make its master's team a monster side. The group's actor leads
+        // monsters; the tax collector's actor leads its defenders.
+        private static (Game.TeamType Type, long Leader) MapTeamLeader(FightInstance fight, int team)
         {
             var side = fight.Bando(team);
             if (team == FightInstance.Rojos && fight.TaxCollectorUuid != null)
-                return TaxCollectorSideOnMap(fight, side, withMembers);
-            // A companion is its master's (FightCompanions.cs): it does not make his side the
-            // monsters', and the map's list leaves it out -- who it is there is not measured.
-            bool monsters = side.Exists(f => f.IsMonster && !f.EsInvocado && !f.IsCompanion)
-                            || (team == FightInstance.Rojos && fight.Reglas.EnfrenteHayMonstruos);
+                return (Game.TeamType.TaxCollector, fight.DefenderLeaderId);
+            if (side.Exists(f => f.IsMonster && !f.EsInvocado && !f.IsCompanion)
+                || (team == FightInstance.Rojos && fight.Reglas.EnfrenteHayMonstruos))
+                return (Game.TeamType.Monster, fight.DefenderLeaderId);
+            return (Game.TeamType.Player, side.FirstOrDefault(f => !f.IsMonster && !f.EsInvocado)?.Id
+                ?? (team == FightInstance.Rojos ? fight.DefenderLeaderId : 0));
+        }
 
-            long leader = monsters
-                ? fight.DefenderLeaderId
-                : side.FirstOrDefault(f => !f.IsMonster && !f.EsInvocado)?.Id
-                  ?? (team == FightInstance.Rojos ? fight.DefenderLeaderId : 0);
+        /// <summary>A side as the historical raw map messages carry it.</summary>
+        internal static Pb TeamOnMap(FightInstance fight, int team, bool withMembers)
+        {
+            var (type, leader) = MapTeamLeader(fight, team);
+            var side = fight.Bando(team);
+            if (type == Game.TeamType.TaxCollector)
+                return TaxCollectorSideOnMap(fight, side, withMembers);
 
             List<Pb>? members = null;
             if (withMembers)
@@ -189,7 +192,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            return FightJoinProtocol.Team(team, leader, monsters, members);
+            return FightJoinProtocol.Team(team, leader, type == Game.TeamType.Monster, members);
         }
 
         /// <summary>

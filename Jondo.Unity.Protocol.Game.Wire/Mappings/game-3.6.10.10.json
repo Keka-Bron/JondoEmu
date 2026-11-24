@@ -46,8 +46,11 @@
     "lgr": {
       "name": "FighterLightInformation",
       "fields": {
+        "gawp": "Wave",
         "gawq": "Gender",
+        "gaws": "BreedId",
         "gawt": "Alive",
+        "gawu": "Level",
         "gawv": "Id"
       },
       "oneofs": {
@@ -66,15 +69,27 @@
             "gawy": {
               "type": "FighterLightInformationCaseMonsterInformation",
               "member": "Value"
+            },
+            "gawz": {
+              "type": "FighterLightInformationCaseEntityInformation",
+              "member": "Value"
             }
           }
         }
       }
     },
+    "lnv": {
+      "name": "FighterEntityLightInformation",
+      "fields": {
+        "gcev": "MasterId",
+        "gcew": "EntityModelId"
+      }
+    },
     "lpy": {
       "name": "FighterTaxCollectorLightInformation",
       "fields": {
-        "gcor": "FirstNameId"
+        "gcor": "FirstNameId",
+        "gcos": "LastNameId"
       }
     },
     "lgu": {

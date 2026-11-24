@@ -245,6 +245,14 @@ changes outbound behavior: `jondo-11-08-2026` found no native use witness, but
 caller coverage is incomplete, so client use is indeterminate. These tag and
 property numbers are not evidence for the beta profile.
 
+### Spectator fight details
+
+The retired August `BuildFightDetails` wrote the fight ID into `jqy` tag **1**
+(property **198418**). The inspected handler `Core.fhs.bffv` (`0x52ce370`)
+reads the two fighter lists, not that scalar. The August MCP audit found no use
+witness, with incomplete caller coverage. The typed reply omits the scalar and
+retains the request UID in the response envelope.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

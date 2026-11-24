@@ -783,14 +783,13 @@ namespace Jondo.Unity.Server.Handlers
         /// kaz: where a fight on this map would place everybody, answered by jxj -- the cells a
         /// fight here is placed from, computed as the fight computes them.
         /// </summary>
-        public static async Task PositionsAsync(GameSession session, byte[] payload)
+        internal static async Task PositionsAsync(GameSession session, int uid)
         {
             long map = session.MapId;
             long arena = MapManager.ResolveArenaMapId(map);
-            var (attackers, defenders) = FightHandler.Placement(map);
-            await session.SendAsync(
-                ConnectionProtocol.Answer(Op.Jxj, DreamProtocol.BuildPositions(arena, map, attackers, defenders),
-                                          ConnectionProtocol.RequestId(payload)));
+            var (attackers, defenders) = FightHandler.NextPlacement(map, arena);
+            await session.SendAsync(new Game.FightMapInformationResponse(arena, map,
+                new Game.FightStartingPositions(attackers.ToArray(), defenders.ToArray())), uid);
             Console.WriteLine($"[Dreams] Positions of map {map}: {attackers.Count} and {defenders.Count} cells.");
         }
 

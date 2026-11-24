@@ -951,11 +951,6 @@ namespace Jondo.Unity.Server.Network
                     // The loot table of the dream's room.
                     await DreamHandler.DropTableAsync(session, payload);
                 }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kaz)))
-                {
-                    // Where a fight here would place everybody.
-                    await DreamHandler.PositionsAsync(session, payload);
-                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
                 {
                     // The astral storm.
@@ -1497,21 +1492,6 @@ namespace Jondo.Unity.Server.Network
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Jrv)))
-                {
-                    // The spectator window's list of the map's fights.
-                    await FightHandler.RunningFightsAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Jrz)))
-                {
-                    // And one of them, its people.
-                    await FightHandler.FightDetailsAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kal)))
-                {
-                    // Watching a friend's, a guild mate's or an alliance mate's fight.
-                    await FightHandler.WatchCharacterAsync(stream, payload);
-                }
                 else if (payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
@@ -1693,6 +1673,24 @@ namespace Jondo.Unity.Server.Network
                 case Game.FightJoinRequest join:
                     await FightHandler.JoinRequestAsync(session, join);
                     break;
+                case Game.FightMapRequest preview:
+                    if (GameEntryDispatch.IsAllowed(session, preview))
+                        await DreamHandler.PositionsAsync(session, frame.Uid.Value);
+                    break;
+                case Game.MapRunningFightsRequest list:
+                    if (GameEntryDispatch.IsAllowed(session, list))
+                        await FightHandler.RunningFightsAsync(session, frame.Uid.Value);
+                    break;
+                case Game.MapRunningFightDetailsRequest details:
+                    if (GameEntryDispatch.IsAllowed(session, details))
+                        await FightHandler.FightDetailsAsync(session, details, frame.Uid.Value);
+                    break;
+                case Game.FightSpectatePlayerRequest spectate:
+#if !JONDO_PROTOCOL_3_8_1_2
+                    if (GameEntryDispatch.IsAllowed(session, spectate))
+                        await FightHandler.WatchCharacterAsync(session, spectate);
+#endif
+                    break; // The subsequent spectator board is still August-only.
                 case Game.ContextQuitRequest:
                     await FightHandler.QuitAsync(session);
                     break;

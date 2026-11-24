@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -72,17 +73,20 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// kal { f2 the character }: the fight that character is in, watched from wherever one
+        /// The fight that character is in, watched from wherever one
         /// stands -- the lists that offer it are the friends', the guild's and the alliance's.
         /// </summary>
-        public static async Task WatchCharacterAsync(NetworkStream stream, byte[] payload)
+        internal static async Task WatchCharacterAsync(GameSession session, Game.FightSpectatePlayerRequest request)
         {
-            byte[]? kal = ConnectionProtocol.ReadPayload(payload, Op.Kal);
-            long target = 0;
-            if (kal != null)
-                foreach (var field in ProtoMessage.Parse(kal).Fields)
-                    if (field.FieldNumber == 2 && field.WireType == 0) target = field.VarIntValue;
-            await WatchAsync(SessionContext.Current, target == 0 ? null : FightOf(target), fromTheMap: false);
+            var fight = FightOf(request.PlayerId);
+            if (fight == null) return;
+            // The dispatcher owns the session turn. Recheck membership after taking the fight turn.
+            await InTurnAsync(fight, async () =>
+            {
+                if (FightById(fight.FightId) != fight || fight.Gone.Contains(request.PlayerId)
+                    || !fight.Todos.Any(f => f.Id == request.PlayerId)) return;
+                await WatchAsync(session, fight, fromTheMap: false);
+            });
         }
 
         private static async Task WatchAsync(GameSession me, FightInstance? fight, bool fromTheMap)
@@ -232,51 +236,77 @@ namespace Jondo.Unity.Server.Handlers
         /// The map's fights (jrv → jyc), as SpectatorUi lists them: each with its kind, its start,
         /// whether it takes spectators, and each side's size, mean level and options.
         /// </summary>
-        public static async Task RunningFightsAsync(NetworkStream stream, byte[] payload)
+        internal static async Task RunningFightsAsync(GameSession session, int uid)
         {
-            var listed = new List<Pb>();
-            foreach (var fight in FightsOnMap(SessionContext.State.MapId))
+            var listed = new List<Game.RunningFightInformation>();
+            foreach (var fight in FightsOnMap(session.MapId))
             {
-                bool secret = fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)
-                              || fight.OptionOn(FightInstance.Rojos, FightInstance.OptionSecret);
-                var teams = new List<(Pb, bool)>();
-                foreach (int team in new[] { FightInstance.Azules, FightInstance.Rojos })
+                await InTurnAsync(fight, () =>
                 {
-                    var side = fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive).ToList();
-                    var shown = TeamOnMap(fight, team, withMembers: false);
-                    var kindAndLeader = ProtoMessage.Parse(shown.Build());
-                    int sideKind = (int)(kindAndLeader.Fields.Find(f => f.FieldNumber == 2)?.VarIntValue ?? 0);
-                    long leader = kindAndLeader.Fields.Find(f => f.FieldNumber == 3)?.VarIntValue ?? 0;
-                    int mean = side.Count == 0 ? 0 : (int)side.Average(f => f.Level);
-                    teams.Add((FightJoinProtocol.LightTeam(team, leader, sideKind, side.Count, mean),
-                               fight.OptionOn(team, FightInstance.OptionPartyOnly)));
-                }
-                listed.Add(FightJoinProtocol.RunningFight(fight.FightId, fight.Reglas.TipoDelKam, fight.StartedAt, secret, teams));
+                    if (FightById(fight.FightId) == fight && fight.State != FightState.Ended)
+                    {
+                        bool secret = fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)
+                                      || fight.OptionOn(FightInstance.Rojos, FightInstance.OptionSecret);
+                        listed.Add(new(null, new(checked((int)fight.FightId), FightTypeOf(fight),
+                            fight.StartedAt.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
+                            secret, [ListTeam(fight, FightInstance.Azules), ListTeam(fight, FightInstance.Rojos)])));
+                    }
+                    return Task.CompletedTask;
+                });
             }
-            await WriteFrameAsync(stream, ConnectionProtocol.Answer(Op.Jyc, FightJoinProtocol.BuildRunningFights(listed),
-                                                                    ConnectionProtocol.RequestId(payload)));
+            await session.SendAsync(new Game.MapRunningFightsResponse(listed), uid);
         }
 
-        /// <summary>One fight's people (jrz { f1 the fight } → jqy), for the spectator window's detail.</summary>
-        public static async Task FightDetailsAsync(NetworkStream stream, byte[] payload)
+        private static IEnumerable<Fighter> ListedFighters(FightInstance fight, int team)
+            => fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive);
+
+        private static Game.FightTeamsWithOptions ListTeam(FightInstance fight, int team)
         {
-            byte[]? jrz = ConnectionProtocol.ReadPayload(payload, Op.Jrz);
-            long fightId = 0;
-            if (jrz != null)
-                foreach (var field in ProtoMessage.Parse(jrz).Fields)
-                    if (field.FieldNumber == 1 && field.WireType == 0) fightId = field.VarIntValue;
-            var fight = FightById(fightId);
+            var (type, leader) = MapTeamLeader(fight, team);
+            var side = ListedFighters(fight, team).ToArray();
+            int mean = side.Length == 0 ? 0 : (int)side.Average(f => f.Level);
+            // The spectator window consumes the light case, not the map's member-list case.
+            var light = new Game.FightTeamLightInformation(false, false, side.Length, false, false, false, mean);
+            return new(new(type, leader, Game.Alignment.Without, TeamIdentity(team), 0,
+                           new Game.FightTeamInformationCaseLightInformation(light)),
+                       new(false, fight.OptionOn(team, FightInstance.OptionPartyOnly), false, false));
+        }
+
+        /// <summary>One fight's people, for the spectator window's detail.</summary>
+        internal static async Task FightDetailsAsync(GameSession session, Game.MapRunningFightDetailsRequest request, int uid)
+        {
+            var fight = FightById(request.FightId);
             if (fight == null) return;
 
-            // A character's sex is his row's; a bot carries its own.
-            int SexOf(Fighter f) => f.IsMonster ? 0 : f.IsBot ? f.Sex : DatabaseManager.GetCharacterById(f.Id)?.Sex ?? 0;
-            IEnumerable<Pb> PeopleOf(int team) => fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive)
-                .Select(f => FightJoinProtocol.FighterInDetails(f.Id, f.Level, f.IsMonster ? f.MonsterId : 0, f.Name,
-                                                                f.TaxCollectorFirstName, f.TaxCollectorLastName,
-                                                                f.Breed, SexOf(f) == 1));
-            await WriteFrameAsync(stream, ConnectionProtocol.Answer(Op.Jqy,
-                FightJoinProtocol.BuildFightDetails(fight.FightId, PeopleOf(FightInstance.Azules), PeopleOf(FightInstance.Rojos)),
-                ConnectionProtocol.RequestId(payload)));
+            Game.MapRunningFightDetailsResponse? details = null;
+            await InTurnAsync(fight, () =>
+            {
+                if (FightById(request.FightId) == fight)
+                    details = new(ListedFighters(fight, FightInstance.Rojos).Select(FighterDetail).ToArray(),
+                                  ListedFighters(fight, FightInstance.Azules).Select(FighterDetail).ToArray());
+                return Task.CompletedTask;
+            });
+            if (details != null) await session.SendAsync(details, uid);
+        }
+
+        private static Game.FighterLightInformation FighterDetail(Fighter fighter)
+        {
+            const int monsterBreed = -2; // The spectator portrait uses the monster ID for this breed.
+            if (fighter.TaxCollectorFirstName != 0 || fighter.TaxCollectorLastName != 0)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, 0, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseTaxCollectorInformation(
+                        new(fighter.TaxCollectorFirstName, fighter.TaxCollectorLastName)));
+            if (fighter.IsCompanion)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, fighter.Breed, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseEntityInformation(new(fighter.DrivenBy, fighter.CompanionId)));
+            if (fighter.IsMonster && fighter.MonsterId != 0)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, monsterBreed, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseMonsterInformation(new(fighter.MonsterId)));
+
+            // A character's gender comes from its stored row; a bot carries its own.
+            int sex = fighter.IsMonster ? 0 : fighter.IsBot ? fighter.Sex : DatabaseManager.GetCharacterById(fighter.Id)?.Sex ?? 0;
+            return new(sex == 1 ? Game.Gender.Female : Game.Gender.Male, fighter.IsAlive, fighter.Id,
+                fighter.Breed, fighter.Level, fighter.Wave, new Game.FighterLightInformationCaseNamedInformation(new(fighter.Name ?? "")));
         }
 
         /// <summary>A spectator gone: off the fight's list. His map is put back by the save on the way out.</summary>

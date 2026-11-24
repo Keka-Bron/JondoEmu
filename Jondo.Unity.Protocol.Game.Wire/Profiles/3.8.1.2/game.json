@@ -46,9 +46,12 @@
     "lgq": {
       "name": "FighterLightInformation",
       "fields": {
+        "gdmo": "Wave",
         "gdmr": "Gender",
         "gdmp": "Alive",
-        "gdms": "Id"
+        "gdmq": "BreedId",
+        "gdms": "Id",
+        "gdmt": "Level"
       },
       "oneofs": {
         "gdmy": {
@@ -66,15 +69,27 @@
             "gdmw": {
               "type": "FighterLightInformationCaseMonsterInformation",
               "member": "Value"
+            },
+            "gdmx": {
+              "type": "FighterLightInformationCaseEntityInformation",
+              "member": "Value"
             }
           }
         }
       }
     },
+    "llq": {
+      "name": "FighterEntityLightInformation",
+      "fields": {
+        "gelh": "MasterId",
+        "gelj": "EntityModelId"
+      }
+    },
     "lhr": {
       "name": "FighterTaxCollectorLightInformation",
       "fields": {
-        "gdse": "FirstNameId"
+        "gdse": "FirstNameId",
+        "gdsd": "LastNameId"
       }
     },
     "lhi": {

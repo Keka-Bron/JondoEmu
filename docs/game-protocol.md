@@ -257,8 +257,17 @@ The force-selection event is constructed directly as `CharacterForceSelectionEve
 The client automatically answers with `CharacterForceSelectionReadyRequest`; the
 server's existing policy selects the account's character whose fight can be rejoined.
 This continuation is permitted after identification and before world entry.
-`FightMapRequest` follows the same selected-character/in-world guard as other map
-readiness requests, retaining the existing spectator/resume ordering and fight locks.
+`FightMapRequest` uses the selected-character/in-world guard and returns a
+correlated `FightMapInformationResponse` with the arena ID, the current map ID,
+and both sides' preview cells. The preview reads the same placement as the next
+fight without consuming it. Fight-board readiness is handled separately.
+
+The spectator window uses typed light-team summaries and fighter detail rows on
+both Game profiles. Both replies echo the exact signed request UID. The reviewed
+fighter mappings carry breed, level, wave, both tax collector name IDs, and
+companion model and master IDs. On `3.6.10.10`, typed watch-by-player can enter
+from another map and defers board delivery to the existing readiness path.
+Watch-by-player on `3.8.1.2` still requires the spectator board migration.
 
 `GuildWeeklyResetDateRequest` replaces the provisional guild-mission request name.
 Its handler sends `GuildWeeklyResetDateResponse` directly through the owning session

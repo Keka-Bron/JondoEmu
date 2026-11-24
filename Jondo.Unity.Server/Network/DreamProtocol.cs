@@ -454,19 +454,6 @@ namespace Jondo.Unity.Server.Network
             return izo.Build();
         }
 
-        /// <summary>
-        /// jxj: where a fight on a map would place everybody. { f1: the fight's map, f2: the map,
-        /// f3 { f1: attackers' cells, f2: defenders' cells, packed } }, as in the capture.
-        /// </summary>
-        public static byte[] BuildPositions(long fightMap, long map, IEnumerable<int> attackers, IEnumerable<int> defenders)
-            => Pb.New()
-                .Var(1, fightMap)
-                .Var(2, map)
-                .Msg(3, Pb.New()
-                    .Packed(1, attackers.Select(c => (long)c))
-                    .Packed(2, defenders.Select(c => (long)c)))
-                .Build();
-
         /// <summary>The izj accompanying the astral storm: «1001» from the capture.</summary>
         public static byte[] BuildStorm() => Pb.New().Var(2, 1).Build();
 

@@ -499,21 +499,25 @@ public sealed record FightTeamsWithOptions(FightTeamInformation? FightTeam, Figh
 
 public sealed record RunningFightInformation(ArenaType? ArenaType, FightExternalInformation? FightExternalInformation);
 
-public sealed record FighterLightInformation(Gender Gender, bool Alive, long Id, FighterLightInformationCase FighterInfoCase);
+public sealed record FighterLightInformation(Gender Gender, bool Alive, long Id, int BreedId, int Level, int Wave,
+    FighterLightInformationCase FighterInfoCase);
 
 [JsonDerivedType(typeof(FighterLightInformationCaseNone), "None")]
 [JsonDerivedType(typeof(FighterLightInformationCaseTaxCollectorInformation), "TaxCollectorInformation")]
 [JsonDerivedType(typeof(FighterLightInformationCaseNamedInformation), "NamedInformation")]
 [JsonDerivedType(typeof(FighterLightInformationCaseMonsterInformation), "MonsterInformation")]
+[JsonDerivedType(typeof(FighterLightInformationCaseEntityInformation), "EntityInformation")]
 public abstract record FighterLightInformationCase;
 public sealed record FighterLightInformationCaseNone() : FighterLightInformationCase;
 public sealed record FighterLightInformationCaseTaxCollectorInformation(FighterTaxCollectorLightInformation Value) : FighterLightInformationCase;
 public sealed record FighterLightInformationCaseNamedInformation(FighterNamedLightInformation Value) : FighterLightInformationCase;
 public sealed record FighterLightInformationCaseMonsterInformation(FighterMonsterLightInformation Value) : FighterLightInformationCase;
+public sealed record FighterLightInformationCaseEntityInformation(FighterEntityLightInformation Value) : FighterLightInformationCase;
 
-public sealed record FighterTaxCollectorLightInformation(int FirstNameId);
+public sealed record FighterTaxCollectorLightInformation(int FirstNameId, int LastNameId);
 public sealed record FighterNamedLightInformation(string Name);
 public sealed record FighterMonsterLightInformation(int MonsterGid);
+public sealed record FighterEntityLightInformation(long MasterId, int EntityModelId);
 
 public sealed record FightExperienceData(long ExperienceFightDelta, long ExperienceNextLevelFloor, int ReRollExperienceMultiplier, bool ShowExperience, long Experience, long ExperienceLevelFloor, bool ShowExperienceFightDelta);
 

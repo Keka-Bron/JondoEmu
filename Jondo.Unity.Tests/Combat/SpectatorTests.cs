@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server;
@@ -9,18 +14,21 @@ using Xunit;
 namespace Jondo.Unity.Tests.Combat
 {
     /// <summary>
-    /// Watching a fight: who may, the spectator's way in (kab) and the spectator window's list of the
-    /// map's fights (jyc), as the client reads them -- fff.bdzg and fjq.bfuk for the kab, gop.blai
-    /// for the list.
+    /// Spectator admission and the map fight window's requests.
     /// </summary>
     public class SpectatorTests
     {
-        private const long Map = 191105026;
+        private const long Map = 990_100_087;
+        private const int FightId = 7_100_087;
+        private static readonly ConcurrentDictionary<long, FightInstance> Active =
+            (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
+                .GetField("_activeFights", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
 
         private static FightInstance Running()
         {
-            var fight = new FightInstance(77, Map) { RoleplayMapId = Map };
-            fight.AddPlayer(new Fighter { Id = 9_100_001, TeamId = 0, CellId = 200, MaxHP = 500, CurrentHP = 500, Level = 50, Name = "Uno" });
+            var fight = new FightInstance(FightId, Map, Map + 1) { RoleplayMapId = Map, DefenderLeaderId = -20002 };
+            fight.AddPlayer(new Fighter { Id = 9_100_001, TeamId = 0, CellId = 200, MaxHP = 500, CurrentHP = 500,
+                Level = 50, Name = "Uno", Breed = 8, IsBot = true, Sex = 1 });
             fight.AddMonster(new Fighter { Id = -1, TeamId = 1, CellId = 300, MaxHP = 100, CurrentHP = 100, IsMonster = true,
                                            MonsterId = 494, Level = 10 });
             return fight;
@@ -59,62 +67,167 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal("1a020801", Hex(FightProtocol.BuildSpectatorJoined(0)));
         }
 
-        /// <summary>
-        /// The list: jwr { f2 jwv { f1 the fight, f3 an ISO start, f5 each team { f1 lgw with its f1
-        /// case { f3 how many, f8 mean level }, f2 the options } } }.
-        /// </summary>
         [Fact]
-        public void The_map_s_fights_list_as_the_client_reads_it()
+        public async Task The_map_fight_list_uses_light_teams_and_the_signed_request_id()
         {
-            var team = FightJoinProtocol.LightTeam(0, 9_100_001, 0, 2, 75);
-            var fight = FightJoinProtocol.RunningFight(77, 4, new DateTime(2026, 10, 22, 9, 30, 0, DateTimeKind.Utc), false,
-                                                       new[] { (team, true) });
-            var jyc = ProtoMessage.Parse(FightJoinProtocol.BuildRunningFights(new[] { fight }));
-            var jwr = ProtoMessage.Parse(jyc.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var jwv = ProtoMessage.Parse(jwr.Fields.Single(f => f.FieldNumber == 2).BytesValue);
-            Assert.Equal(77, jwv.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
-            Assert.Equal("2026-10-22T09:30:00Z", System.Text.Encoding.UTF8.GetString(jwv.Fields.Single(f => f.FieldNumber == 3).BytesValue));
-            Assert.DoesNotContain(jwv.Fields, f => f.FieldNumber == 4);
-
-            var jwt = ProtoMessage.Parse(jwv.Fields.Single(f => f.FieldNumber == 5).BytesValue);
-            var lgw = ProtoMessage.Parse(jwt.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            var lcu = ProtoMessage.Parse(lgw.Fields.Single(f => f.FieldNumber == 1).BytesValue);
-            Assert.Equal(2, lcu.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
-            Assert.Equal(75, lcu.Fields.Single(f => f.FieldNumber == 8).VarIntValue);
-            Assert.Equal(9_100_001, lgw.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
-            Assert.DoesNotContain(lgw.Fields, f => f.FieldNumber == 5);   // the other case of the oneof
-            Assert.Equal("2001", Hex(jwt.Fields.Single(f => f.FieldNumber == 2).BytesValue));   // party only: f4
+            var fight = Running();
+            var (owner, frames) = SessionOn(Map);
+            fight.StartedAt = new(2026, 10, 22, 9, 30, 0, DateTimeKind.Utc);
+            fight.SetOption(FightInstance.Azules, FightInstance.OptionPartyOnly, true);
+            fight.SetOption(FightInstance.Rojos, FightInstance.OptionSecret, true);
+            fight.Azul.Add(new() { Id = 9_100_008, CurrentHP = 100, Level = 101 });
+            fight.Azul.Add(new() { Id = -3, CurrentHP = 100, Level = 200, IsMonster = true, Invocador = 9_100_001 });
+            fight.Azul.Add(new() { Id = 9_100_009, CurrentHP = 0, Level = 200 });
+            Assert.True(Active.TryAdd(FightId, fight));
+            try
+            {
+                using var ambient = SessionContext.Push(GameSession.SinSocket());
+                await Dispatch(owner, new MapRunningFightsRequest(), int.MinValue);
+                var frame = Assert.Single(frames);
+                Assert.Equal(int.MinValue, frame.Uid);
+                var listed = Assert.Single(Assert.IsType<MapRunningFightsResponse>(frame.Content).Fights);
+                Assert.Null(listed.ArenaType);
+                var info = Assert.IsType<FightExternalInformation>(listed.FightExternalInformation);
+                Assert.Equal(FightId, info.FightId);
+                Assert.Equal("2026-10-22T09:30:00Z", info.FightStart);
+                Assert.True(info.FightSpectatorLocked);
+                var blue = info.FightTeamsWithOptions[0];
+                Assert.True(blue.FightTeamOptions!.IsRestrictedToParty);
+                Assert.Equal(9_100_001, blue.FightTeam!.LeaderId);
+                Assert.Equal(Team.Challenger, blue.FightTeam.Team);
+                var light = Assert.IsType<FightTeamInformationCaseLightInformation>(blue.FightTeam.TeamInformationCase).Value;
+                Assert.Equal(2, light.TeamMembersCount);
+                Assert.Equal(75, light.AverageLevel);
+                var red = info.FightTeamsWithOptions[1].FightTeam!;
+                Assert.Equal(TeamType.Monster, red.TeamType);
+                Assert.Equal(-20002, red.LeaderId);
+            }
+            finally { Active.TryRemove(FightId, out _); }
         }
 
-        /// <summary>
-        /// A fight's people (jqy): the defenders in f2 and the attackers in f3; a person by his
-        /// name (f6), a monster by itself (f7), a tax collector by his two names (f2).
-        /// </summary>
         [Fact]
-        public void A_fight_s_details_name_people_monsters_and_tax_collectors()
+        public async Task A_fight_s_details_keep_both_sides_portraits_and_waves()
         {
-            var jqy = ProtoMessage.Parse(FightJoinProtocol.BuildFightDetails(77,
-                new[] { FightJoinProtocol.FighterInDetails(9_100_001, 50, 0, "Uno", breed: 8, female: true) },
-                new[] { FightJoinProtocol.FighterInDetails(-1, 10, 494, ""),
-                        FightJoinProtocol.FighterInDetails(-2, 60, 0, "", 12, 34) }));
-            Assert.Equal(77, jqy.Fields.Single(f => f.FieldNumber == 1).VarIntValue);
+            var (owner, frames) = SessionOn(Map);
+            var fight = Running();
+            fight.Rojo[0].Wave = 3;
+            fight.Rojo.Add(new() { Id = -2, Level = 60, CurrentHP = 100, TaxCollectorFirstName = 12, TaxCollectorLastName = 34 });
+            fight.Azul.Add(new() { Id = -3, IsMonster = true, CompanionId = 17, DrivenBy = 9_100_001,
+                Level = 50, CurrentHP = 100 });
+            Assert.True(Active.TryAdd(FightId, fight));
+            try
+            {
+                await Dispatch(owner, new MapRunningFightDetailsRequest(int.MaxValue), -1);
+                Assert.Empty(frames);
+                await Dispatch(owner, new MapRunningFightDetailsRequest(FightId), 0);
+                var frame = Assert.Single(frames);
+                Assert.Equal(0, frame.Uid);
+                var details = Assert.IsType<MapRunningFightDetailsResponse>(frame.Content);
+                Assert.Collection(details.Attackers,
+                    player => Assert.Equal(new FighterLightInformation(Gender.Female, true, 9_100_001, 8, 50, 0,
+                        new FighterLightInformationCaseNamedInformation(new("Uno"))), player),
+                    companion => Assert.Equal(new FighterLightInformation(Gender.Male, true, -3, 0, 50, 0,
+                        new FighterLightInformationCaseEntityInformation(new(9_100_001, 17))), companion));
+                Assert.Collection(details.Defenders,
+                    monster => Assert.Equal(new FighterLightInformation(Gender.Male, true, -1, -2, 10, 3,
+                        new FighterLightInformationCaseMonsterInformation(new(494))), monster),
+                    collector => Assert.Equal(new FighterTaxCollectorLightInformation(12, 34),
+                        Assert.IsType<FighterLightInformationCaseTaxCollectorInformation>(collector.FighterInfoCase).Value));
+            }
+            finally { Active.TryRemove(FightId, out _); }
+        }
 
-            var person = ProtoMessage.Parse(jqy.Fields.Single(f => f.FieldNumber == 3).BytesValue);
-            Assert.Equal("Uno", System.Text.Encoding.UTF8.GetString(
-                ProtoMessage.Parse(person.Fields.Single(f => f.FieldNumber == 6).BytesValue).Fields.Single().BytesValue));
-            // Its head: the class in f5, the sex in f3.
-            Assert.Equal(8, person.Fields.Single(f => f.FieldNumber == 5).VarIntValue);
-            Assert.Equal(1, person.Fields.Single(f => f.FieldNumber == 3).VarIntValue);
+        [Fact]
+        public async Task The_placement_preview_returns_the_next_fights_cells_without_consuming_them()
+        {
+            const long map = Map + 100;
+            var (owner, frames) = SessionOn(map);
+            var arena = MapManager.ResolveArenaMapId(map);
+            try
+            {
+                owner.LeaveWorld();
+                await Dispatch(owner, new FightMapRequest(), -1);
+                Assert.Empty(frames);
+                owner.EnterWorld();
+                await Dispatch(owner, new FightMapRequest(), -1);
+                var (attackers, defenders) = FightHandler.NextPlacement(map, arena);
+                var frame = Assert.Single(frames);
+                Assert.Equal(-1, frame.Uid);
+                var preview = Assert.IsType<FightMapInformationResponse>(frame.Content);
+                Assert.Equal(map, preview.MapId);
+                Assert.Equal(arena, preview.FightMapId);
+                Assert.NotEmpty(attackers);
+                Assert.NotEmpty(defenders);
+                Assert.Equal(attackers, preview.FightStartPositions!.ChallengersPositions);
+                Assert.Equal(defenders, preview.FightStartPositions.DefendersPositions);
+            }
+            finally { FightHandler.TakePlacement(map, arena); }
+        }
 
-            var defenders = jqy.Fields.Where(f => f.FieldNumber == 2).Select(f => ProtoMessage.Parse(f.BytesValue)).ToList();
-            Assert.Equal(494, ProtoMessage.Parse(defenders[0].Fields.Single(f => f.FieldNumber == 7).BytesValue)
-                                  .Fields.Single(f => f.FieldNumber == 1).VarIntValue);
-            Assert.DoesNotContain(defenders[0].Fields, f => f.FieldNumber == 2);
-            // A monster's head is drawn from f7 only when f5 says -2.
-            Assert.Equal(FightJoinProtocol.MonsterHead, (int)defenders[0].Fields.Single(f => f.FieldNumber == 5).VarIntValue);
-            var names = ProtoMessage.Parse(defenders[1].Fields.Single(f => f.FieldNumber == 2).BytesValue).Fields;
-            Assert.Equal(12, names.Single(f => f.FieldNumber == 1).VarIntValue);
-            Assert.Equal(34, names.Single(f => f.FieldNumber == 2).VarIntValue);
+        [Fact]
+        public async Task Watching_a_character_from_another_map_opens_a_spectator_context_once()
+        {
+            const long elsewhere = Map + 60;
+            var (owner, frames) = SessionOn(elsewhere);
+            owner.State.CellId = 123;
+            var fight = Running();
+            fight.StartFight();
+            Assert.True(Active.TryAdd(FightId, fight));
+            try
+            {
+                await Dispatch(owner, new FightSpectatePlayerRequest(9_100_001), -99);
+#if JONDO_PROTOCOL_3_8_1_2
+                Assert.Empty(frames);
+                Assert.Equal(0, owner.State.SpectatingFightId);
+#else
+                Assert.Equal(FightId, owner.State.SpectatingFightId);
+                Assert.True(owner.State.SpectatorBoardPending);
+                Assert.Equal(elsewhere, owner.State.RoleplayMapId);
+                Assert.Equal(123, owner.State.RoleplayCellId);
+                Assert.Equal(fight.MapId, owner.MapId);
+                Assert.Equal(new ContextRemoveElementEvent(owner.CharacterId), frames[0].Content);
+                Assert.IsType<ContextDestroyEvent>(frames[1].Content);
+                Assert.Equal(new ContextCreationEvent(GameContext.Fight), frames[2].Content);
+                Assert.Equal(new MapCurrentEvent(fight.MapId), frames[3].Content);
+                Assert.All(frames, frame => Assert.Null(frame.Uid));
+                int sent = frames.Count;
+                await Dispatch(owner, new FightSpectatePlayerRequest(9_100_001), -100);
+                Assert.Equal(sent, frames.Count);
+#endif
+            }
+            finally
+            {
+                FightHandler.ForgetSpectator(owner);
+                Active.TryRemove(FightId, out _);
+            }
+        }
+
+        private static async Task Dispatch(GameSession owner, GameRequest request, int uid)
+        {
+            using var turn = await owner.EnterTurnAsync();
+            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchTypedAsync(owner, new(request, uid),
+                new GameEntryService(owner, new GameEntryBackend())));
+        }
+
+        private static (GameSession Owner, List<GameFrame> Frames) SessionOn(long map)
+        {
+            var frames = new List<GameFrame>();
+            var owner = new GameSession(new RecordingCodec(frames), _ => Task.CompletedTask);
+            owner.BindAccount(9_100_002, 1);
+            owner.State.CharacterId = 9_100_002;
+            owner.State.MapId = map;
+            owner.EnterWorld();
+            return (owner, frames);
+        }
+
+        private sealed class RecordingCodec(List<GameFrame> frames) : IGameCodec
+        {
+            public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new NotSupportedException();
+            public byte[] Encode(GameFrame message)
+            {
+                frames.Add(message);
+                return [];
+            }
         }
     }
 }
