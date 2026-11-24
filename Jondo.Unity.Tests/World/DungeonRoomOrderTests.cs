@@ -40,6 +40,34 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(4, DungeonManager.PickBossRoom(ordered.Rooms!, names, ordered.NumberedLast));
         }
 
+        /// <summary>
+        /// A room split over two maps, «Fourth Room» and «Fourth Room II»: the second map just after
+        /// the first. Two rooms with one number used to leave Shadow's Pyramid in the catalogue's
+        /// list, which starts in its Fourth Room.
+        /// </summary>
+        [Fact]
+        public void ByName_puts_a_rooms_second_map_after_its_first()
+        {
+            var names = new Dictionary<long, string>
+            {
+                [1] = "Shadow's Pyramid - Fourth Room",
+                [2] = "Shadow's Pyramid - Fourth Room II",
+                [3] = "Shadow's Pyramid - First Room",
+                [4] = "Shadow's Pyramid - Second Room",
+                [5] = "Shadow's Pyramid - Third Room",
+                [6] = "Shadow's Pyramid - Fifth Room",
+                [7] = "Shadow's Pyramid - Exit",
+            };
+            var rooms = new List<long> { 7, 1, 2, 3, 4, 5, 6 };
+
+            var ordered = DungeonManager.ByName(rooms, names);
+
+            Assert.Equal(new long[] { 3, 4, 5, 1, 2, 6, 7 }, ordered.Rooms);
+            Assert.Equal(6, DungeonManager.PickBossRoom(ordered.Rooms!, names, ordered.NumberedLast));
+            Assert.Equal(new long[] { 3, 4, 5, 1, 2, 6 },
+                         DungeonManager.ByEveryName(new List<long> { 1, 2, 3, 4, 5, 6 }, names));
+        }
+
         [Fact]
         public void ByName_prefers_the_prefix_that_owns_an_Exit()
         {

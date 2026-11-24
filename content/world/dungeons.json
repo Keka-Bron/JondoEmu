@@ -899,5 +899,43 @@
     "autoGroup": 1,
     "door": 1,
     "why": "Koolich Cavern in the order its corridors walk: the First and Second Room, then Koolich's Lair through the Second Room's right-hand corridor (its First to Sixth Room, where the Boufcouls are), out of its Sixth Room into the Cavern's Third Room, and the Fourth and Fifth, Koolich's own. The catalogue's names gave two First Rooms and the Lair was never reached; the Exit is the post-boss room (dungeon_exits.json), not a fight."
+  },
+  "15": {
+    "name": "Guarida del Maxilubo",
+    "minLevel": 90,
+    "optimalLevel": 100,
+    "difficulty": 4,
+    "entrance": 171706891,
+    "exit": 171706891,
+    "rooms": [
+      155713536,
+      155714560,
+      155715584,
+      155716608,
+      155716610,
+      155717632,
+      155718656
+    ],
+    "bosses": [
+      232
+    ],
+    "keyring": 1,
+    "required": [
+      [
+        8156,
+        1
+      ]
+    ],
+    "achievements": [
+      39,
+      512,
+      703,
+      702,
+      6180,
+      6023
+    ],
+    "autoGroup": 1,
+    "door": 1,
+    "why": "Moowolf Lair in the order its rooms are numbered: First to Fourth Room, Fourth Room II, Fifth, and the Moowolf in the Sixth. Two maps share the ordinal four and the Exit has none, so the names gave no order and the catalogue's list stood, starting in the Third Room; the Exit is no fight room and a win over the Moowolf leaves by the entrance."
   }
 }

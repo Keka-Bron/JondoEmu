@@ -611,7 +611,7 @@ namespace Jondo.Unity.Server.Managers
             foreach (long room in rooms)
             {
                 if (!names.TryGetValue(room, out string? name) || name == null) return null;
-                int position = OrdinalOf(name);
+                int position = PlaceOf(name);
                 if (position == 0) return null;
                 numbered.Add((room, position));
             }
@@ -681,7 +681,7 @@ namespace Jondo.Unity.Server.Managers
                     continue;
                 }
 
-                int position = OrdinalOf(name);
+                int position = PlaceOf(name);
                 if (position == 0)
                 {
                     extras.Add(room);
@@ -771,6 +771,28 @@ namespace Jondo.Unity.Server.Managers
 
             return rooms[^1];
         }
+
+        /// <summary>
+        /// Where a room stands in its run: its ordinal, a second map of the same room («Fourth
+        /// Room II») just after the first. 0 for a room with no ordinal.
+        /// </summary>
+        /// <remarks>
+        /// Two maps with the ordinal four were two rooms with one number, so neither the names nor
+        /// the partial names gave an order: the Moowolf Lair and Shadow's Pyramid kept the
+        /// catalogue's list, which starts in their Third and Fourth Room.
+        /// </remarks>
+        internal static int PlaceOf(string name)
+        {
+            int ordinal = OrdinalOf(name);
+            if (ordinal == 0) return 0;
+            var repeat = RepeatedRoom.Match(name);
+            return ordinal * 8 + (repeat.Success ? repeat.Groups[1].Value.Length - 1 : 0);
+        }
+
+        /// <summary>The figure of a room's second or third map: « Room II», « Room III».</summary>
+        private static readonly System.Text.RegularExpressions.Regex RepeatedRoom =
+            new(@" room (i{2,4})$", System.Text.RegularExpressions.RegexOptions.Compiled
+                                    | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         internal static int OrdinalOf(string name)
         {
