@@ -15,26 +15,29 @@ namespace Jondo.Unity.Tests.Combat;
 [Collection("Challenges table")]
 public sealed class GameEntryFightMapTests
 {
-    private sealed class Board : IDisposable
+    internal sealed class Board : IDisposable
     {
-        private const long Id = 7_100_852;
+        private readonly long Id;
         private static readonly ConcurrentDictionary<long, FightInstance> Active = (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
             .GetField("_activeFights", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
-        internal readonly FightInstance Fight = new(Id, 990_100_851, 990_100_852) { OpenerId = 990_000_852 };
+        internal readonly FightInstance Fight;
         internal readonly List<GameFrame> Frames = [];
         internal readonly GameSession Session;
 
         private readonly bool _ownsSession;
 
-        internal Board(GameSession? opener = null)
+        /// <param name="shift">Moves every id this board uses, for a test class that runs beside this one.</param>
+        internal Board(GameSession? opener = null, long shift = 0)
         {
+            Id = 7_100_852 + shift;
+            Fight = new(Id, 990_100_851 + shift, 990_100_852 + shift) { OpenerId = 990_000_852 + shift };
             var codec = new GameCodec();
             _ownsSession = opener == null;
             Session = opener ?? new(codec, packet => { Frames.Add(codec.Decode(packet)); return Task.CompletedTask; });
             if (_ownsSession)
             {
                 Session.BindAccount(Id, 1);
-                Session.State.CharacterId = 990_000_852;
+                Session.State.CharacterId = 990_000_852 + shift;
                 Session.EnterWorld();
                 Assert.True(SessionRegistry.Register(Session));
             }
@@ -209,46 +212,6 @@ public sealed class GameEntryFightMapTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task Defender_gets_own_placement_cells_and_distinct_companion_and_collector_identities(bool duel)
-    {
-        using var board = new Board();
-        var fight = board.Fight;
-        var defender = fight.Azul[0];
-        fight.Azul.Remove(defender);
-        fight.AddOpponent(defender);
-        fight.AddPlayer(new() { Id = -5, CurrentHP = 40, Level = 50, IsMonster = true,
-            DrivenBy = defender.Id, CompanionId = 9, LookBoneId = 101 });
-        var collector = fight.Rojo[0];
-        collector.TaxCollectorFirstName = 35;
-        collector.TaxCollectorLastName = 109;
-        if (duel) fight.Reglas = FightRules.Desafio;
-        fight.BluePlacementCells.Add(314);
-        fight.RedPlacementCells.Add(271);
-        Assert.True(MapManager.Maps.TryAdd(fight.RoleplayMapId, new() { SubAreaId = 77, PosX = -4, PosY = 10 }));
-        try { await board.Send(new ContextReadyRequest(fight.MapId)); }
-        finally { MapManager.Maps.Remove(fight.RoleplayMapId); }
-        var events = board.Frames.Select(f => f.Content).ToArray();
-        var positions = Assert.Single(events.OfType<FightPlacementPossiblePositionsEvent>());
-        Assert.Equal(Team.Defender, positions.Team);
-        Assert.Equal(314, Assert.Single(positions.StartingPositions.ChallengersPositions));
-        Assert.Equal(271, Assert.Single(positions.StartingPositions.DefendersPositions));
-        var actors = events.OfType<FightFighterShowEvent>().ToDictionary(e => e.Information.ActorId,
-            e => Assert.IsType<ActorInformationCaseFightActor>(e.Information.ActorInformation.ActorCase).Value);
-        Assert.Equal(9, Assert.IsType<FightFighterInformationCaseEntityFighter>(actors[-5].FighterCase).Value.EntityModelId);
-        var ai = Assert.IsType<FightFighterInformationCaseAiFighter>(actors[collector.Id].FighterCase).Value;
-        Assert.Equal(new FightTaxCollectorInformation(35, 109, 492), Assert.IsType<FightAIFighterInformationCaseTaxCollector>(ai.FighterCase).Value);
-        Assert.Equal(new FightMapInformation(77, fight.MapId, new FightMapInformationPositionCaseCoords(new(-4, 10))),
-            Assert.Single(events.OfType<FightMapInformation>()));
-        if (duel)
-        {
-            Assert.Empty(events.OfType<ChallengeNumberEvent>());
-            Assert.Equal(0, Assert.Single(events.OfType<FightJoinEvent>()).TimeMaxBeforeFightStart);
-        }
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
     public async Task Queued_board_is_not_sent_after_departure_or_start(bool leaves)
     {
         using var board = new Board();
@@ -299,5 +262,53 @@ public sealed class GameEntryFightMapTests
             await pipe.Quiet();
         }
         finally { active.TryRemove(fightId, out _); }
+    }
+}
+
+/// <summary>
+/// The board's map lookup reads <see cref="MapManager.Maps"/>, which the "MapManager" collection swaps
+/// while it reloads the world, so a test that plants a map there runs in that collection.
+/// </summary>
+[Collection("MapManager")]
+public sealed class GameEntryFightMapInfoTests
+{
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Defender_gets_own_placement_cells_and_distinct_companion_and_collector_identities(bool duel)
+    {
+        using var board = new GameEntryFightMapTests.Board(shift: 5_000);
+        var fight = board.Fight;
+        var defender = fight.Azul[0];
+        fight.Azul.Remove(defender);
+        fight.AddOpponent(defender);
+        fight.AddPlayer(new() { Id = -5, CurrentHP = 40, Level = 50, IsMonster = true,
+            DrivenBy = defender.Id, CompanionId = 9, LookBoneId = 101 });
+        var collector = fight.Rojo[0];
+        collector.TaxCollectorFirstName = 35;
+        collector.TaxCollectorLastName = 109;
+        if (duel) fight.Reglas = FightRules.Desafio;
+        fight.BluePlacementCells.Add(314);
+        fight.RedPlacementCells.Add(271);
+        Assert.True(MapManager.Maps.TryAdd(fight.RoleplayMapId, new() { SubAreaId = 77, PosX = -4, PosY = 10 }));
+        try { await board.Send(new ContextReadyRequest(fight.MapId)); }
+        finally { MapManager.Maps.Remove(fight.RoleplayMapId); }
+        var events = board.Frames.Select(f => f.Content).ToArray();
+        var positions = Assert.Single(events.OfType<FightPlacementPossiblePositionsEvent>());
+        Assert.Equal(Team.Defender, positions.Team);
+        Assert.Equal(314, Assert.Single(positions.StartingPositions.ChallengersPositions));
+        Assert.Equal(271, Assert.Single(positions.StartingPositions.DefendersPositions));
+        var actors = events.OfType<FightFighterShowEvent>().ToDictionary(e => e.Information.ActorId,
+            e => Assert.IsType<ActorInformationCaseFightActor>(e.Information.ActorInformation.ActorCase).Value);
+        Assert.Equal(9, Assert.IsType<FightFighterInformationCaseEntityFighter>(actors[-5].FighterCase).Value.EntityModelId);
+        var ai = Assert.IsType<FightFighterInformationCaseAiFighter>(actors[collector.Id].FighterCase).Value;
+        Assert.Equal(new FightTaxCollectorInformation(35, 109, 492), Assert.IsType<FightAIFighterInformationCaseTaxCollector>(ai.FighterCase).Value);
+        Assert.Equal(new FightMapInformation(77, fight.MapId, new FightMapInformationPositionCaseCoords(new(-4, 10))),
+            Assert.Single(events.OfType<FightMapInformation>()));
+        if (duel)
+        {
+            Assert.Empty(events.OfType<ChallengeNumberEvent>());
+            Assert.Equal(0, Assert.Single(events.OfType<FightJoinEvent>()).TimeMaxBeforeFightStart);
+        }
     }
 }
