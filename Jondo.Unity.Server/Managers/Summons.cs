@@ -442,7 +442,12 @@ namespace Jondo.Unity.Server.Managers
 
                 bool juega = (Entero(doc.RootElement, "m_flags") & CanPlayFlag) != 0;
                 bool tackles = (Entero(doc.RootElement, "m_flags") & MonsterFlags.CanTackle) != 0;
-                var hechizos = HechizosDe(doc.RootElement, gradeIndex);
+                // Each at a grade SpellLevels holds, as a placed monster's (GetMonsterGradeStats): 18
+                // summon templates name 34 grades their spells lack -- 2762 casts 2006 at grade 6, and
+                // 2006 has 1 to 3 --, and a grade with no rows is a spell that does nothing.
+                var hechizos = HechizosDe(doc.RootElement, gradeIndex)
+                    .Select(pair => (Spell: pair.Spell, Grade: DatabaseManager.ExistingSpellGrade(conexion, pair.Spell, pair.Grade)))
+                    .ToList();
 
                 return new Summon
                 {

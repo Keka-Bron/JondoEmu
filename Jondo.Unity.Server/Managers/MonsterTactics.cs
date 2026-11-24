@@ -447,6 +447,10 @@ namespace Jondo.Unity.Server.Managers
         internal static List<Fighter> Foes(Board board, Fighter monster)
             => board.Fighters.Where(f => f.IsAlive && f.TeamId != monster.TeamId && !board.Hidden(f)).ToList();
 
+        /// <summary>Whether a removal has points to take from him on his next turn: his full points, or more if buffed.</summary>
+        internal static bool HoldsPoints(Fighter who)
+            => Math.Max(who.MaxAP, who.CurrentAP) > 0 || Math.Max(who.MaxMP, who.CurrentMP) > 0;
+
         /// <summary>
         /// The invisible enemies, each where he was last seen -- where he went invisible, or
         /// where he last cast from. A guess: he may have walked away since, so what lands there
@@ -1102,13 +1106,17 @@ namespace Jondo.Unity.Server.Managers
                         value -= Blow(spell, monster, own);
             }
 
-            if (spell.Removal > 0 && onEnemy && (target.CurrentAP > 0 || target.CurrentMP > 0))
+            // A removal lasts into the enemy's next turn, so what it is worth is what he will hold
+            // then, not what he has left now: during the monster's turn a player who has spent his
+            // turn shows 0 and 0, and asking that kept self-cast removals (monster 2975's spell 2444,
+            // summon 2976's 2448) from ever being cast. The rows path already asks the same.
+            if (spell.Removal > 0 && onEnemy && HoldsPoints(target))
                 value += spell.Removal * (20 + target.Level / 4.0);
             else if (spell.Removal > 0 && spell.OnSelf && spell.RemovalZoneRow != null)
             {
                 // Cast on itself, it takes points from every enemy its zone reaches.
                 var cells = EffectEngine.CasillasDelEfecto(spell.RemovalZoneRow, from, aim);
-                foreach (var hit in enemies.Where(e => e.IsAlive && cells.Contains(e.CellId) && (e.CurrentAP > 0 || e.CurrentMP > 0)))
+                foreach (var hit in enemies.Where(e => e.IsAlive && cells.Contains(e.CellId) && HoldsPoints(e)))
                     value += spell.Removal * (20 + hit.Level / 4.0);
             }
 
