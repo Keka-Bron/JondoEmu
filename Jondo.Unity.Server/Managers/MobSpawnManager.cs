@@ -386,6 +386,7 @@ namespace Jondo.Unity.Server.Managers
                 int wanted = 0;
                 int uniques = 0;
                 int bajoTecho = 0;
+                int beasts = 0;
                 using (var reader = cmdMapMobs.ExecuteReader())
                 {
                     while (reader.Read())
@@ -436,8 +437,14 @@ namespace Jondo.Unity.Server.Managers
 
                                 for (int i = 0; i < ids.Count; i++) {
                                     // A wanted criminal stands in one group of his zone, not in the
-                                    // 6,352 the database puts him in.
-                                    if (WantedPosters.Is(ids[i])) { criminals++; continue; }
+                                    // 6,352 the database puts him in. La Bête is in the Frigost
+                                    // roster and in hundreds of map groups, but only belongs in
+                                    // Albert Pess's cellar.
+                                    if (!Roams(mapId, ids[i])) {
+                                        if (ids[i] == LaBete) beasts++;
+                                        else if (WantedPosters.Is(ids[i])) criminals++;
+                                        continue;
+                                    }
                                     if (_monsters.TryGetValue(ids[i], out var mData)) {
                                         // Same as above: the database stores grades the
                                         // client does not accept, and they have to be trimmed here too.
@@ -518,6 +525,8 @@ namespace Jondo.Unity.Server.Managers
                                   "each comes back in one group of its zone when the first map is loaded.");
                 Console.WriteLine($"[MobSpawnManager] {wanted} groups keep a wanted monster " +
                                   $"({100.0 * wanted / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
+                if (beasts > 0)
+                    Console.WriteLine($"[MobSpawnManager] {beasts} La Bête member(s) taken out of groups outside {LaBeteBasement}.");
                 if (uniques > 0)
                 {
                     Console.WriteLine($"[MobSpawnManager] {uniques} unique monster(s) swapped for their ordinary version; " +
@@ -857,12 +866,26 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The Kanojedo's punching bag: placed by hand there and in the dojo, never met in the wild.</summary>
         internal const int PunchingBag = 494;
 
+        /// <summary>La Bête, the vaccine quest's boss: its only home is Albert Pess's cellar.</summary>
+        internal const int LaBete = 2911;
+
+        /// <summary>The cellar under Albert Pess's house, where «Los monólogos de la vacuna» fights La Bête.</summary>
+        internal const long LaBeteBasement = 54535201;
+
         /// <summary>
         /// Whether a subarea's roster may put a monster in its groups. The tables list the punching
         /// bag in Amakna's subareas, and it came out, level 100 and ten thousand life points, among
         /// the level-13 monsters of an ordinary map. A criminal of a wanted poster is placed apart.
+        /// La Bête is in Frigost Village's roster and in hundreds of map groups, but only belongs in
+        /// the quest's cellar.
         /// </summary>
-        internal static bool Roams(int monster) => monster != PunchingBag && !WantedPosters.Is(monster);
+        internal static bool Roams(int monster) => Roams(0, monster);
+
+        /// <summary>The same rule for a group on a known map: La Bête only survives in its cellar.</summary>
+        internal static bool Roams(long mapId, int monster)
+            => monster != PunchingBag
+               && !WantedPosters.Is(monster)
+               && (monster != LaBete || mapId == LaBeteBasement);
 
         /// <summary>
         /// The subarea roster entries that may stand in a generated group: only living templates
@@ -892,7 +915,7 @@ namespace Jondo.Unity.Server.Managers
                     rosters[reader.GetInt32(0)] = array.EnumerateArray()
                         .Where(e => e.ValueKind == System.Text.Json.JsonValueKind.Number)
                         .Select(e => e.GetInt32())
-                        .Where(Roams)
+                        .Where(id => Roams(id))
                         .ToList();
                 }
             }

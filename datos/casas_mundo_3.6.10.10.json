@@ -11015,23 +11015,6 @@
    "modeloInferido": true
   },
   {
-   "mapa": 54173997,
-   "elemento": 457182,
-   "casilla": 410,
-   "gfx": 21966,
-   "interior": 54525971,
-   "subzona": 601,
-   "origen": "casa",
-   "casa": 328,
-   "nombre": "Casa grande del burgo de Frigost",
-   "precio": 3000000,
-   "habitaciones": 4,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
    "mapa": 54173998,
    "elemento": 456676,
    "casilla": 294,
