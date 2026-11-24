@@ -510,10 +510,15 @@ records the values Jondo wrote and the limits of the native-use evidence.
 
 Eligible fights send the challenge count before appearances and again after the placement
 cells; only the first count includes `ChallengeModSelectedEvent`. The bonus setting is
-echoed privately. `ChallengeReadyRequest` opens the proposal and reuses the offered pair;
-selection marks a candidate silently, and validation adds it. Unfilled slots are completed
-at fight start, when the final challenge list is sent. Hover and mode notifications stay
-silent. These selection messages use the recipient's codec on both profiles.
+echoed privately. Only the fight opener can open, mark or validate the shared proposal.
+Prepared participants see the pair; a late board gets any locked choices followed by the
+current offer with its remaining time. `ChallengeSelectedEvent` updates the highlighted
+candidate before validation (`kwh.fzmt` on August, `kxw.gckm` on November, per Remap).
+The October capture shows a proposal (line 58),
+two highlight updates (60–61), then the add (62) and final list (69). The August `kwh`
+handler (`0x53e1cd0`) reads the ID from the challenge in tag 1; the choice UI's
+`OnChallengeSelected` matches the ID against its two icons. Validation adds the challenge
+and unfilled slots are completed at start.
 
 `FightReadyRequest` runs under the requesting session's
 turn and then the fight turn. The handler resolves the fight from the session's character

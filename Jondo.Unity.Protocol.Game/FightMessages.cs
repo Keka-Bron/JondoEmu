@@ -50,6 +50,7 @@ public sealed record ChallengeBonusChoiceRequest(ChallengeBonus ChallengeBonus) 
 public sealed record ChallengeBonusChoiceSelectedEvent(ChallengeBonus ChallengeBonus) : GameEvent;
 public sealed record ChallengeModSelectRequest(ChallengeMod ChallengeMod) : GameRequest;
 public sealed record ChallengeProposalEvent(long Timer, IReadOnlyList<ChallengeInformation> ChallengeProposals) : GameEvent;
+public sealed record ChallengeSelectedEvent(ChallengeInformation Challenge) : GameEvent;
 public sealed record ChallengeReadyRequest() : GameRequest;
 public sealed record ChallengeResultEvent(int ChallengeId, bool Success) : GameEvent;
 public sealed record ChallengeSelectionRequest(int ChallengeId) : GameRequest;

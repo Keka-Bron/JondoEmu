@@ -8471,6 +8471,15 @@
       "defaultOneofs": {},
       "kind": "request"
     },
+    "kwh": {
+      "name": "ChallengeSelectedEvent",
+      "fields": { "fzmt": "Challenge" },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
     "kww": {
       "name": "ChallengeAddEvent",
       "fields": {

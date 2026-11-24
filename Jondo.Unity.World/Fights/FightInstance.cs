@@ -314,6 +314,8 @@ namespace Jondo.Unity.World.Fights
             return suyo >= 0 && SigueVivo(suyo);
         }
 
+        /// <summary>Who opened the fight, even if the first fighter on the side later changes.</summary>
+        public long OpenerId { get; init; }
         public long ChallengerLeaderId => Azul.FirstOrDefault()?.Id ?? 0;
         public long DefenderLeaderId { get; set; } = -20000;
 
@@ -1618,6 +1620,7 @@ namespace Jondo.Unity.World.Fights
 
         /// <summary>The two on the table right now. Empty if the list has not been asked for.</summary>
         public List<int> ChallengesOffered { get; } = new List<int>();
+        public long ChallengeOfferDeadlineMs { get; set; }
 
         /// <summary>Which of the two the player has marked, even if he has not validated it yet.</summary>
         public int ChallengeMarked { get; set; }

@@ -175,7 +175,7 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.CanJoin(FightInstance.Rojos, FightHandler.CapOf(fight)) != FightInstance.JoinRefusal.None) return;
 
             var leftMap = session.Map;
-            if (!await FightHandler.JoinFightAsync(session, fight, FightInstance.Rojos, followingLeader: false)) return;
+            if (!await FightHandler.JoinFightAsync(session, fight, FightInstance.Rojos, autoJoining: false)) return;
             await leftMap.SendAsync(new Jondo.Unity.Protocol.Game.ContextRemoveElementEvent(me.CharacterId),
                 session.Id, fightId: 0);
 

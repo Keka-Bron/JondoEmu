@@ -589,7 +589,7 @@ public sealed partial class MapFightPresenceTests
         internal FightInstance Fight { get; }
         internal FightFixture(bool collector = false, long id = Id)
         {
-            Fight = new(id, Map, Arena) { DefenderLeaderId = -20002 };
+            Fight = new(id, Map, Arena) { OpenerId = Person, DefenderLeaderId = -20002 };
             Fight.Azul.Add(new() { Id = Person, Name = "Leader", Level = 253, CurrentHP = 100 });
             Fight.Rojo.Add(new() { Id = -1, IsMonster = true, MonsterId = 492, GradeIndex = 5,
                 TaxCollectorFirstName = collector ? 35 : 0, TaxCollectorLastName = collector ? 109 : 0, CurrentHP = 100 });

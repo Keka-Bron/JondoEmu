@@ -448,10 +448,9 @@ namespace Jondo.Unity.Tests.Combat
                 fight.SetPlacementCells(Enumerable.Range(300, 8), Enumerable.Range(180, 8));
                 var boss = Person(leader, "Leader", 200);
                 fight.AddPlayer(boss);
-                await FightHandler.PartyAfterEntryAsync(fight, Person(solo, "Solo", 200), tellTheParty: true);
-                await FightHandler.PartyAfterEntryAsync(fight, boss, tellTheParty: false);
+                await FightHandler.PartyAfterEntryAsync(fight, Person(solo, "Solo", 200), opening: true);
                 Assert.Empty(stayerCodec.Frames);
-                await FightHandler.PartyAfterEntryAsync(fight, boss, tellTheParty: true);
+                await FightHandler.PartyAfterEntryAsync(fight, boss, opening: true);
 
                 var sent = Assert.Single(stayerCodec.Frames);
                 Assert.Null(sent.Uid);
@@ -504,25 +503,62 @@ namespace Jondo.Unity.Tests.Combat
                 fight.AddPlayer(boss);
                 fight.AddMonster(Monster(-1, 492, 0));
 
-                Assert.Equal(new[] { follower }, FightHandler.FollowersInto(fight, boss));
+                Assert.Equal(new[] { follower }, FightHandler.FollowersInto(fight, boss, opening: true));
 
-                // Not from another map, not while fighting, and not behind somebody who does not lead.
+                // Not from another map, not while fighting, and not behind a non-leader's manual join.
                 sessions[1].State.MapId = map + 1;
-                Assert.Empty(FightHandler.FollowersInto(fight, boss));
+                Assert.Empty(FightHandler.FollowersInto(fight, boss, opening: true));
                 sessions[1].State.MapId = map;
                 sessions[1].State.FightId = 55;
-                Assert.Empty(FightHandler.FollowersInto(fight, boss));
+                Assert.Empty(FightHandler.FollowersInto(fight, boss, opening: true));
                 sessions[1].State.FightId = 0;
-                Assert.Empty(FightHandler.FollowersInto(fight, Person(stayer, "Stayer", 1)));
+                Assert.Empty(FightHandler.FollowersInto(fight, Person(stayer, "Stayer", 1), opening: false));
 
                 // Nor once the placement is over.
                 fight.StartFight();
-                Assert.Empty(FightHandler.FollowersInto(fight, boss));
+                Assert.Empty(FightHandler.FollowersInto(fight, boss, opening: true));
             }
             finally
             {
                 FightHandler.SetAutoOptions(follower, join: false, ready: false);
                 foreach (var s in sessions) SessionRegistry.Unregister(s);
+                Parties.Dissolve(party);
+            }
+        }
+
+        [Fact]
+        public void Only_the_original_member_opener_can_ready_the_party_leader()
+        {
+            const long leader = 8_210_000_001, opener = leader + 1, joiner = leader + 2;
+            var party = Parties.Create(leader);
+            try
+            {
+                foreach (long member in new[] { opener, joiner })
+                {
+                    Parties.Invite(party, member, leader);
+                    Parties.Accept(party, member);
+                }
+                FightHandler.SetAutoOptions(leader, join: false, ready: true);
+                FightHandler.SetAutoOptions(joiner, join: false, ready: true);
+                var fight = new FightInstance(9202, 100, 200) { OpenerId = opener };
+                fight.SetPlacementCells(Enumerable.Range(300, 8), Enumerable.Range(180, 8));
+                fight.AddPlayer(Person(opener, "Opener", 200));
+                fight.AddMonster(Monster(-1, 492, 0));
+                Assert.True(fight.JoinTeam(Person(joiner, "Joiner", 200), FightInstance.Azules, 8));
+                Assert.True(fight.JoinTeam(Person(leader, "Leader", 200), FightInstance.Azules, 8));
+
+                Assert.Equal(new[] { leader }, FightHandler.ReadyAlongWith(fight, opener));
+                Assert.False(fight.Buscar(joiner).IsReady);
+                fight.Buscar(leader).IsReady = false;
+                Assert.True(fight.LeavePlacement(opener));
+                Assert.Equal(joiner, fight.ChallengerLeaderId);
+                Assert.Empty(FightHandler.ReadyAlongWith(fight, joiner));
+                Assert.False(fight.Buscar(leader).IsReady);
+            }
+            finally
+            {
+                FightHandler.SetAutoOptions(leader, false, false);
+                FightHandler.SetAutoOptions(joiner, false, false);
                 Parties.Dissolve(party);
             }
         }

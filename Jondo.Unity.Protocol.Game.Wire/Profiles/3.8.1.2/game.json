@@ -8340,6 +8340,17 @@
       "defaultOneofs": {},
       "kind": "request"
     },
+    "kxw": {
+      "name": "ChallengeSelectedEvent",
+      "fields": {
+        "gckm": "Challenge"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {},
+      "kind": "event"
+    },
     "kxy": {
       "name": "ChallengeBonusChoiceSelectedEvent",
       "fields": {

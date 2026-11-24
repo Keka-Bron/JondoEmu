@@ -92,7 +92,7 @@ namespace Jondo.Unity.Server.Handlers
             bool namedArena = arenaMapId > 0;
             if (arenaMapId <= 0) arenaMapId = Managers.GuildRaidGuardians.ArenaOf(mobGroup, mapId);
             if (arenaMapId <= 0) arenaMapId = MapManager.ResolveArenaMapId(mapId);
-            var fight = new FightInstance(fightId, mapId, arenaMapId);
+            var fight = new FightInstance(fightId, mapId, arenaMapId) { OpenerId = GameState.CharacterId };
             fight.SoulStoneFight = soulStoneFight;
             // The waves a quest's fight brings in by the clock (NpcFights «waves»).
             if (TakeNextWaves(GameState.CharacterId) is { Count: > 0 } waves)
@@ -553,6 +553,7 @@ namespace Jondo.Unity.Server.Handlers
 
             var fight = new FightInstance(fightId, mapId, arenaMapId)
             {
+                OpenerId = !koliseo && blue.Count > 0 ? blue[0].CharacterId : 0,
                 Reglas = rules ?? (koliseo ? FightRules.Koliseo : FightRules.Desafio),
                 KoliseoMode = koliseo ? koliseoMode : -1,
             };
@@ -1163,7 +1164,11 @@ namespace Jondo.Unity.Server.Handlers
             // And again how many challenges, with the same number. It is not a slip of the capture:
             // the real server sends it twice, here and before the kaa, in the seven captures that have
             // challenges.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendCountAsync(session, fight);
+            if (fight.Reglas.HayRetos)
+            {
+                await ChallengeHandler.SendCountAsync(session, fight);
+                await ChallengeHandler.SendPlacementChoicesAsync(session, fight);
+            }
 
             // After the cells, which is where the capture puts them: who is in the fight and the four
             // options.
@@ -3147,10 +3152,13 @@ namespace Jondo.Unity.Server.Handlers
             => InPlacementTurnAsync(session, async fight =>
             {
                 if (!fight.Reglas.HayRetos) return;
+                // The chooser is the character who opened this fight, even if the party leader joined later.
+                if (request is (Game.ChallengeReadyRequest or Game.ChallengeSelectionRequest or Game.ChallengeValidateRequest)
+                    && session.CharacterId != fight.OpenerId) return;
                 switch (request)
                 {
                     case Game.ChallengeReadyRequest: await ChallengeHandler.OpenAsync(session, fight); break;
-                    case Game.ChallengeSelectionRequest select: ChallengeHandler.Mark(fight, select.ChallengeId); break;
+                    case Game.ChallengeSelectionRequest select: await ChallengeHandler.MarkAsync(fight, select.ChallengeId); break;
                     case Game.ChallengeValidateRequest validate: await ChallengeHandler.ValidateAsync(session, fight, validate.ChallengeId); break;
                     case Game.ChallengeBonusChoiceRequest bonus: await ChallengeHandler.SettingsAsync(session, bonus); break;
                 }
@@ -3263,6 +3271,9 @@ namespace Jondo.Unity.Server.Handlers
             await AllianceFights.StartedAsync(fight);
             await TaxCollectorHandler.FightStartedAsync(fight);
 
+            // Fill shared choice slots once, before any participant receives the end of placement.
+            if (fight.Reglas.HayRetos) await ChallengeHandler.FillMissingAsync(fight);
+
             // And the whole burst to each one from his own context. It is sent whole and separately,
             // instead of splitting «this to everybody and this to whoever», because the order the
             // capture carries -- kai, jyy, jxz, jxc, jto, jxb, jwi, jxh -- mixes fight frames with
@@ -3340,15 +3351,8 @@ namespace Jondo.Unity.Server.Handlers
                     monsters = fight.Rojo.Count,
                 });
 
-            // The challenges left unvalidated are closed by the server here, BEFORE the kai: if the
-            // player declared himself ready with one marked and not validated, that one counts, and
-            // if not even that, the server fills in. The ones the place imposes go after. Measured in
-            // the anomaly.
-            // Challenges are about fighting monsters: they give a bonus on their loot. In a
-            // challenge between players there is no loot to multiply, and none was offered in the
-            // placement phase -- filling them in here is where the challenge that appeared on its own
-            // at the start of the fight came from.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.FillAsync(SessionContext.Current, fight);
+            // Achievement challenges are evaluated per person, after the shared choices and before kai.
+            if (fight.Reglas.HayRetos) await ChallengeHandler.ImposeAsync(SessionContext.Current, fight);
 
             await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kai,
                 Network.FightProtocol.BuildFightBegins()));
@@ -7715,6 +7719,12 @@ namespace Jondo.Unity.Server.Handlers
 
             return quienes;
         }
+
+        // Board loading and challenge validation share the fight turn. A loading participant
+        // gets this choice in their board snapshot instead. At start there is no later placement board.
+        internal static Task SendChallengeUpdateAsync(FightInstance fight, Game.GameEvent update)
+            => ACadaUnoAsync(fight, session => fight.HasPrepared(session.CharacterId) || fight.State == FightState.Ongoing
+                ? session.SendAsync(update) : Task.CompletedTask);
 
         /// <summary>The same frame to everybody in the fight.</summary>
         private static async Task ATodosAsync(FightInstance fight, byte[] frame)

@@ -356,7 +356,7 @@ namespace Jondo.Unity.Server.Handlers
 
             foreach (var person in fight.Todos.Where(f => !f.IsMonster && !f.EsInvocado).ToList())
             {
-                await PartyAfterEntryAsync(fight, person, tellTheParty: true);
+                await PartyAfterEntryAsync(fight, person, opening: true);
             }
         }
 
@@ -519,7 +519,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            await JoinFightAsync(me, fight, team, followingLeader: false);
+            await JoinFightAsync(me, fight, team, autoJoining: false);
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace Jondo.Unity.Server.Handlers
         /// gives it to him.
         /// </remarks>
         internal static async Task<bool> JoinFightAsync(GameSession who, FightInstance fight, int team,
-                                                        bool followingLeader)
+                                                        bool autoJoining)
         {
             Fighter fighter;
             Fighter? companion = null;
@@ -645,7 +645,8 @@ namespace Jondo.Unity.Server.Handlers
             Program.LogDebug($"[Fight] {fighter.Name} joins fight #{fight.FightId}, side " +
                              $"{team}, cell {fighter.CellId}: {fight.PeopleIn(team)} on that side.");
 
-            await PartyAfterEntryAsync(fight, fighter, tellTheParty: !followingLeader);
+            // An automatic entry, including the leader's, must not recruit a second wave.
+            if (!autoJoining) await PartyAfterEntryAsync(fight, fighter, opening: false);
             return true;
         }
 
@@ -743,17 +744,16 @@ namespace Jondo.Unity.Server.Handlers
         /// leader who opened fight 471 and none for the two who were put in behind him 0.1 s
         /// later (frames 95, 96 and 108).
         /// </summary>
-        internal static async Task PartyAfterEntryAsync(FightInstance fight, Fighter person, bool tellTheParty)
+        internal static async Task PartyAfterEntryAsync(FightInstance fight, Fighter person, bool opening)
         {
             if (fight.Reglas.PagaElKoliseo) return;
             var party = Parties.Of(person.Id);
             if (party == null || !Parties.IsInParty(person.Id)) return;
 
-            var followers = FollowersInto(fight, person);
-            var told = tellTheParty ? PartyMemberInFight(fight, person) : null;
+            var followers = FollowersInto(fight, person, opening);
+            var told = PartyMemberInFight(fight, person);
             foreach (long member in Parties.MembersOf(party))
             {
-                if (told == null) break;
                 if (member == person.Id || followers.Contains(member)) continue;
                 var session = SessionRegistry.FindByCharacter(member);
                 if (session == null || !session.IsInWorld) continue;
@@ -775,20 +775,21 @@ namespace Jondo.Unity.Server.Handlers
                     continue;
                 }
 
-                await JoinFightAsync(session, fight, fight.EquipoDe(person.Id), followingLeader: true);
+                await JoinFightAsync(session, fight, fight.EquipoDe(person.Id), autoJoining: true);
             }
         }
 
         /// <summary>
-        /// The members of the person's party who follow him into this fight: he leads the party,
-        /// they have the automatic entry switched on, they stand on the fight's map out of any
-        /// fight, and his side has room.
+        /// Members may follow their leader into a fight. When another member opens the fight,
+        /// only the party leader may follow that member. In both cases the follower must opt in.
         /// </summary>
-        internal static List<long> FollowersInto(FightInstance fight, Fighter person)
+        internal static List<long> FollowersInto(FightInstance fight, Fighter person, bool opening)
         {
             var followers = new List<long>();
             var party = Parties.Of(person.Id);
-            if (party == null || party.LeaderId != person.Id) return followers;
+            if (party == null) return followers;
+            bool leaderEntering = party.LeaderId == person.Id;
+            if (!leaderEntering && !opening) return followers;
 
             int team = fight.EquipoDe(person.Id);
             if (team < 0) return followers;
@@ -797,11 +798,13 @@ namespace Jondo.Unity.Server.Handlers
             foreach (long member in Parties.MembersOf(party))
             {
                 if (followers.Count >= room) break;
+                if (!leaderEntering && member != party.LeaderId) continue;
                 if (member == person.Id || !AutoJoinOn(member)) continue;
 
                 var session = SessionRegistry.FindByCharacter(member);
                 if (session == null || !session.IsInWorld) continue;
                 if (WhyNotFollow(fight, session.State) != null) continue;
+                if (!leaderEntering && WhyNotJoin(fight, person.Id, session.State, out _) != null) continue;
                 followers.Add(member);
             }
             return followers;
@@ -859,6 +862,7 @@ namespace Jondo.Unity.Server.Handlers
                     return session.SendAsync(new Game.FightAutoJoinActivationResponse(), uid);
                 case Game.FightAutoJoinDeactivationRequest:
                     _autoJoin.TryRemove(me, out _);
+                    _joinAfterWalk.TryRemove(me, out _);
                     return session.SendAsync(new Game.FightAutoJoinDeactivationResponse(), uid);
                 case Game.FightAutoReadyActivationRequest:
                     _autoReady[me] = true;
@@ -871,8 +875,8 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The end of a walk (jqi): a member whose leader opened a fight while he was walking goes
-        /// in now. The follow capture: jqi at 18.606 s, his kml at 18.644 s.
+        /// The end of a walk (jqi): apply the deferred party auto-join. The follow capture:
+        /// jqi at 18.606 s, his kml at 18.644 s.
         /// </summary>
         public static async Task AfterWalkAsync(NetworkStream stream)
         {
@@ -884,13 +888,14 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (FightById(fight.FightId) != fight || WhyNotFollow(fight, me.State) != null) return;
                 if (fight.CanJoin(pending.Team, CapOf(fight)) != FightInstance.JoinRefusal.None) return;
-                await JoinFightAsync(me, fight, pending.Team, followingLeader: true);
+                if (!MayJoinSide(fight, pending.Team, me.CharacterId)) return;
+                await JoinFightAsync(me, fight, pending.Team, autoJoining: true);
             });
         }
 
         /// <summary>
-        /// The people who become ready with a leader: his party's members on his side with the
-        /// automatic ready on. Marked here; their kah goes out behind his.
+        /// The party leader can ready opted-in party allies. A member who opened the fight
+        /// can ready only their opted-in leader. Each ready event follows the clicker's.
         /// </summary>
         /// <remarks>
         /// Fight 488 of the follow capture: the leader's kah and the follower's leave together at
@@ -898,16 +903,20 @@ namespace Jondo.Unity.Server.Handlers
         /// was turned on AFTER the leader was ready and nothing happened: it acts on the leader's
         /// ready, not on its own.
         /// </remarks>
-        internal static List<long> ReadyAlongWith(FightInstance fight, long leaderId)
+        internal static List<long> ReadyAlongWith(FightInstance fight, long characterId)
         {
             var along = new List<long>();
-            var party = Parties.Of(leaderId);
-            if (party == null || party.LeaderId != leaderId) return along;
+            var party = Parties.Of(characterId);
+            if (party == null) return along;
+            long leaderId = party.LeaderId;
+            if (characterId != leaderId && characterId != fight.OpenerId) return along;
 
             var members = new HashSet<long>(Parties.MembersOf(party));
-            foreach (var ally in fight.Aliados(leaderId).ToList())
+            if (!members.Contains(characterId)) return along; // Of also finds pending invitees.
+            foreach (var ally in fight.Aliados(characterId).ToList())
             {
-                if (ally.Id == leaderId || ally.IsMonster || ally.EsInvocado || ally.IsReady) continue;
+                if (characterId != leaderId && ally.Id != leaderId) continue;
+                if (ally.Id == characterId || ally.IsMonster || ally.EsInvocado || ally.IsReady) continue;
                 if (!members.Contains(ally.Id) || !AutoReadyOn(ally.Id)) continue;
                 ally.IsReady = true;
                 along.Add(ally.Id);

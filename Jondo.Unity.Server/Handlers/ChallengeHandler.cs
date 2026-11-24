@@ -104,45 +104,41 @@ namespace Jondo.Unity.Server.Handlers
             if (!fight.ChallengesPending) return;
 
             // If there is already a pair on the table, the same one is sent again.
-            var nombres = new List<Challenges.Challenge>();
-
             if (fight.ChallengesOffered.Count > 0)
             {
-                foreach (int id in fight.ChallengesOffered)
-                {
-                    var reto = Challenges.Get(id);
-                    if (reto == null) continue;
-                    nombres.Add(reto);
-                }
-            }
-            else
-            {
-                var pareja = Challenges.Pair(GroupLevel(fight), FixedIds(fight), _dado);
-                if (pareja.Count == 0) return;
-
-                fight.ChallengeMarked = 0;
-                foreach (var reto in pareja)
-                {
-                    fight.ChallengesOffered.Add(reto.Id);
-                    nombres.Add(reto);
-                }
+                await SendOfferAsync(session, fight);
+                return;
             }
 
-            if (nombres.Count == 0) return;
+            var pair = Challenges.Pair(GroupLevel(fight), FixedIds(fight), _dado);
+            if (pair.Count == 0) return;
+            fight.ChallengeMarked = 0;
+            fight.ChallengesOffered.AddRange(pair.Select(c => c.Id));
+            fight.ChallengeOfferDeadlineMs = Environment.TickCount64 + FightProtocol.ChallengeTimer * 1000L;
+            await FightHandler.SendChallengeUpdateAsync(fight, Proposal(fight));
+            Console.WriteLine($"[Challenges] {Names(pair)} offered in fight #{fight.FightId}.");
+        }
 
-            await session.SendAsync(new Game.ChallengeProposalEvent(FightProtocol.ChallengeTimer,
-                nombres.Select(c => Information(c.Id, c.Percent)).ToArray()));
+        private static Game.ChallengeProposalEvent Proposal(FightInstance fight)
+            => new(Math.Max(0, fight.ChallengeOfferDeadlineMs - Environment.TickCount64 + 999) / 1000,
+                fight.ChallengesOffered.Select(id => Information(id, Challenges.Get(id)!.Percent)).ToArray());
 
-            Console.WriteLine($"[Challenges] {Names(nombres)} offered in fight #{fight.FightId}.");
+        private static async Task SendOfferAsync(GameSession session, FightInstance fight)
+        {
+            await session.SendAsync(Proposal(fight));
+            if (Challenges.Get(fight.ChallengeMarked) is { } marked)
+                await session.SendAsync(new Game.ChallengeSelectedEvent(Information(marked.Id, marked.Percent)));
         }
 
         /// <summary>
-        /// The player marks a candidate (kwv). Nothing is answered: in the captures the server stays
-        /// silent. Only which one is noted, to know what to lock in when he validates.
+        /// Relay the opener's highlight without locking it in. The observer UI selects the
+        /// matching icon; the final add is a separate event on validation.
         /// </summary>
-        internal static void Mark(FightInstance fight, int id)
+        internal static Task MarkAsync(FightInstance fight, int id)
         {
-            if (id != 0 && fight.ChallengesOffered.Contains(id)) fight.ChallengeMarked = id;
+            if (id == 0 || !fight.ChallengesOffered.Contains(id) || fight.ChallengeMarked == id) return Task.CompletedTask;
+            fight.ChallengeMarked = id;
+            return FightHandler.SendChallengeUpdateAsync(fight, new Game.ChallengeSelectedEvent(Information(id, Challenges.Get(id)!.Percent)));
         }
 
         /// <summary>
@@ -155,7 +151,7 @@ namespace Jondo.Unity.Server.Handlers
             if (id == 0) id = fight.ChallengeMarked;
             if (id == 0 || !fight.ChallengesOffered.Contains(id)) return;
 
-            await FixAsync(session, fight, id);
+            await FixAsync(fight, id);
 
             if (fight.ChallengesPending) await OpenAsync(session, fight);
         }
@@ -180,23 +176,21 @@ namespace Jondo.Unity.Server.Handlers
         ///
         /// It goes BEFORE the kai, which is the cut between placement and the fight.
         /// </summary>
-        internal static async Task FillAsync(GameSession session, FightInstance fight)
+        internal static async Task FillMissingAsync(FightInstance fight)
         {
             // Whatever was marked without being validated counts: the player chose it, he just did not
             // get to press the button before declaring himself ready.
             if (fight.ChallengeMarked != 0 && fight.ChallengesPending)
             {
-                await FixAsync(session, fight, fight.ChallengeMarked);
+                await FixAsync(fight, fight.ChallengeMarked);
             }
 
             while (fight.ChallengesPending)
             {
                 var pareja = Challenges.Pair(GroupLevel(fight), FixedIds(fight), _dado);
                 if (pareja.Count == 0) break;
-                await FixAsync(session, fight, pareja[0].Id);
+                await FixAsync(fight, pareja[0].Id);
             }
-
-            await ImposeAsync(session, fight);
         }
 
         /// <summary>
@@ -215,7 +209,7 @@ namespace Jondo.Unity.Server.Handlers
         /// them does not get them again. And only the ones the watcher can judge and that fit the party
         /// there is -- no "Dúo" for three -- are imposed: <see cref="Challenges.Imposed"/> decides.
         /// </summary>
-        private static async Task ImposeAsync(GameSession session, FightInstance fight)
+        internal static async Task ImposeAsync(GameSession session, FightInstance fight)
         {
             // Only in the boss room. These are the challenges with an achievement behind them, the reward
             // for having done the whole dungeon, and they came out in every room because the only thing
@@ -274,7 +268,14 @@ namespace Jondo.Unity.Server.Handlers
         private static Game.ChallengeInformation Information(int id, int percent)
             => new(percent, id, [], percent, Game.ChallengeState.InProgress);
 
-        private static async Task FixAsync(GameSession session, FightInstance fight, int id)
+        internal static async Task SendPlacementChoicesAsync(GameSession session, FightInstance fight)
+        {
+            foreach (var (id, percent) in fight.ChallengesFixed)
+                await session.SendAsync(new Game.ChallengeAddEvent(Information(id, percent)));
+            if (fight.ChallengesOffered.Count > 0) await SendOfferAsync(session, fight);
+        }
+
+        private static async Task FixAsync(FightInstance fight, int id)
         {
             var reto = Challenges.Get(id);
             if (reto == null) return;
@@ -283,7 +284,7 @@ namespace Jondo.Unity.Server.Handlers
             fight.ChallengesOffered.Clear();
             fight.ChallengeMarked = 0;
 
-            await session.SendAsync(new Game.ChallengeAddEvent(Information(id, reto.Percent)));
+            await FightHandler.SendChallengeUpdateAsync(fight, new Game.ChallengeAddEvent(Information(id, reto.Percent)));
         }
 
         private static int[] FixedIds(FightInstance fight)

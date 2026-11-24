@@ -20,20 +20,27 @@ public sealed class GameEntryFightMapTests
         private const long Id = 7_100_852;
         private static readonly ConcurrentDictionary<long, FightInstance> Active = (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
             .GetField("_activeFights", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
-        internal readonly FightInstance Fight = new(Id, 990_100_851, 990_100_852);
+        internal readonly FightInstance Fight = new(Id, 990_100_851, 990_100_852) { OpenerId = 990_000_852 };
         internal readonly List<GameFrame> Frames = [];
         internal readonly GameSession Session;
 
-        internal Board()
+        private readonly bool _ownsSession;
+
+        internal Board(GameSession? opener = null)
         {
             var codec = new GameCodec();
-            Session = new(codec, packet => { Frames.Add(codec.Decode(packet)); return Task.CompletedTask; });
-            Session.BindAccount(Id, 1);
-            Session.State.CharacterId = 990_000_852;
+            _ownsSession = opener == null;
+            Session = opener ?? new(codec, packet => { Frames.Add(codec.Decode(packet)); return Task.CompletedTask; });
+            if (_ownsSession)
+            {
+                Session.BindAccount(Id, 1);
+                Session.State.CharacterId = 990_000_852;
+                Session.EnterWorld();
+                Assert.True(SessionRegistry.Register(Session));
+            }
             Session.State.FightId = Id;
             Session.State.MapId = Fight.MapId;
             Session.State.IsInFight = true;
-            Session.EnterWorld();
             Fight.Azul.Add(new() { Id = Session.CharacterId, Name = "Opener", Breed = 8, Level = 123,
                 CellId = 300, CurrentHP = 90, MaxHP = 100, MaxAP = 7, CurrentAP = 7 });
             Fight.Rojo.Add(new() { Id = -1, IsMonster = true, MonsterId = 492, TeamId = 1, LookBoneId = 101,
@@ -48,7 +55,12 @@ public sealed class GameEntryFightMapTests
                 new GameEntryService(Session, new GameEntryBackend())));
         }
 
-        public void Dispose() => Active.TryRemove(Id, out _);
+        public void Dispose()
+        {
+            Active.TryRemove(Id, out _);
+            Fight.CancelTurnTimer();
+            if (_ownsSession) SessionRegistry.Unregister(Session);
+        }
     }
 
     [Fact]
@@ -93,13 +105,105 @@ public sealed class GameEntryFightMapTests
         Assert.NotEmpty(offers);
         var selected = offers[0];
         await board.Send(new ChallengeSelectionRequest(selected.ChallengeId));
-        Assert.Equal(2, board.Frames.Count);
+        Assert.Equal(selected.ChallengeId, Assert.IsType<ChallengeSelectedEvent>(board.Frames[^1].Content).Challenge.ChallengeId);
         Assert.Empty(fight.ChallengesFixed);
         await board.Send(new ChallengeValidateRequest(0));
-        var added = Assert.IsType<ChallengeAddEvent>(board.Frames[2].Content).Challenge;
+        var added = Assert.IsType<ChallengeAddEvent>(board.Frames[^1].Content).Challenge;
         Assert.Equal(selected.ChallengeId, added.ChallengeId);
         Assert.Equal(selected.ExperienceBonus, added.DropBonus);
         Assert.Contains((added.ChallengeId, added.DropBonus), fight.ChallengesFixed);
+    }
+
+    [Theory]
+    [InlineData("before-join", false)]
+    [InlineData("loading", false)]
+    [InlineData("loaded", false)]
+    [InlineData("during-offer", false)]
+    [InlineData("loaded", true)]  // A second slot is filled by the server at fight start.
+    public async Task Joiner_sees_each_locked_challenge_once_and_the_same_final_list(string whenChosen, bool twoSlots)
+    {
+        Challenges.Initialize();
+        Challenges.OnlyOffer(ChallengeWatcher.Watched);
+        const long id = 990_000_852;
+        var a = new ChallengeCodec();
+        var b = new ChallengeCodec();
+        await using var opener = await ClientPipe.OpenAsync(id + 100, id, 990_100_851, codec: a);
+        using var setup = new Board(opener.Session);
+        var fight = setup.Fight;
+        fight.BluePlacementCells.AddRange([300, 314]);
+        await using var joiner = await ClientPipe.OpenAsync(id + 101, id + 1, fight.RoleplayMapId, codec: b);
+        async Task Send(ClientPipe pipe, GameRequest request)
+        {
+            using var turn = await pipe.Session.EnterTurnAsync();
+            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchTypedAsync(pipe.Session, new(request, -1),
+                new GameEntryService(pipe.Session, new GameEntryBackend())));
+        }
+        var load = new ContextReadyRequest(fight.MapId);
+        var join = new FightJoinRequest(id, (int)fight.FightId);
+        await Send(opener, load);
+        if (whenChosen != "before-join") await Send(joiner, join);
+        if (whenChosen == "loaded") await Send(joiner, load);
+        if (twoSlots) fight.ChallengesToPick = 2;
+        if (whenChosen == "loaded")
+        {
+            await Send(joiner, new ChallengeReadyRequest());
+            Assert.Empty(fight.ChallengesOffered);
+        }
+        await Send(opener, new ChallengeReadyRequest());
+        var offer = Assert.Single(a.Events.OfType<ChallengeProposalEvent>());
+        var choice = offer.ChallengeProposals[0];
+        await Send(opener, new ChallengeSelectionRequest(choice.ChallengeId));
+        if (whenChosen == "during-offer") await Send(joiner, load);
+        if (whenChosen is "loaded" or "during-offer")
+        {
+            var observed = Assert.Single(b.Events.OfType<ChallengeProposalEvent>());
+            Assert.Equal(offer.ChallengeProposals.Select(c => c.ChallengeId), observed.ChallengeProposals.Select(c => c.ChallengeId));
+            Assert.InRange(observed.Timer, 0, offer.Timer);
+            Assert.Equal(choice.ChallengeId, Assert.Single(b.Events.OfType<ChallengeSelectedEvent>()).Challenge.ChallengeId);
+            var other = offer.ChallengeProposals[1];
+            await Send(joiner, new ChallengeSelectionRequest(other.ChallengeId));
+            Assert.Equal(choice.ChallengeId, fight.ChallengeMarked);
+            await Send(joiner, new ChallengeValidateRequest(choice.ChallengeId));
+            Assert.Empty(fight.ChallengesFixed);
+            choice = other;
+            await Send(opener, new ChallengeSelectionRequest(choice.ChallengeId));
+            Assert.Equal(choice.ChallengeId, b.Events.OfType<ChallengeSelectedEvent>().Last().Challenge.ChallengeId);
+        }
+        await Send(opener, new ChallengeValidateRequest(choice.ChallengeId));
+        if (whenChosen == "before-join") await Send(joiner, join);
+        if (whenChosen is not ("loaded" or "during-offer"))
+        {
+            Assert.Empty(b.Events.OfType<ChallengeAddEvent>());
+            await Send(joiner, load);
+        }
+        await Send(joiner, load); // Duplicate map-ready must not replay the choice again.
+        if (!twoSlots) await Send(joiner, new ChallengeReadyRequest());
+        foreach (var codec in new[] { a, b })
+            Assert.Equal(choice.ChallengeId, Assert.Single(codec.Events.OfType<ChallengeAddEvent>()).Challenge.ChallengeId);
+        Assert.True(b.Events.FindLastIndex(e => e is ChallengeNumberEvent) < b.Events.FindIndex(e => e is ChallengeAddEvent));
+
+        await Send(joiner, new FightReadyRequest(true));
+        await Send(opener, new FightReadyRequest(true));
+        Assert.Equal(FightState.Ongoing, fight.State);
+        Assert.Equal(twoSlots ? 2 : 1, fight.ChallengesFixed.Count);
+        foreach (var codec in new[] { a, b })
+        {
+            Assert.Equal(fight.ChallengesFixed, codec.Events.OfType<ChallengeAddEvent>().Select(e => (e.Challenge.ChallengeId, e.Challenge.DropBonus)));
+            Assert.Equal(fight.ChallengesFixed, Assert.Single(codec.Events.OfType<ChallengeListEvent>()).Challenges.Select(c => (c.ChallengeId, c.DropBonus)));
+        }
+    }
+
+    private sealed class ChallengeCodec : IGameCodec
+    {
+        private readonly GameCodec _wire = new();
+        internal readonly List<GameEvent> Events = [];
+        public byte[] Encode(GameFrame frame)
+        {
+            var bytes = _wire.Encode(frame);
+            if (_wire.Decode(bytes).Content is GameEvent e) Events.Add(e);
+            return bytes;
+        }
+        public GameFrame Decode(ReadOnlySpan<byte> bytes) => _wire.Decode(bytes);
     }
 
     [Theory]
