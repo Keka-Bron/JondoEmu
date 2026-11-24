@@ -61,7 +61,12 @@
     "THE BLOP ENCLAVE. Bibiblop's hall 166990848, where the Royal Blop is chosen after the fourth room,",
     "and the exit room 166989826, where he takes whoever holds its key into the Royal Rainbow Blop's lair,",
     "hold no fight (Dofus pour les noobs, «Clos des Blops»): the base's groups there, the subarea's roster",
-    "with Royal Blops among them, go. The rooms' own groups are the dungeons' (content/world/dungeons.json)."
+    "with Royal Blops among them, go. The rooms' own groups are the dungeons' (content/world/dungeons.json).",
+    "",
+    "THE JELLITH DIMENSION. The Fifth Room 98568707, where the four royals send the run on to the room its",
+    "puddles open, and the Exit room 98568705, with the magic door out, hold no fight (Dofus pour les noobs,",
+    "«Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la",
+    "salle du boss»): the base's groups there, the subarea's roster with royals among them, go."
   ],
   "groups": [
     {
@@ -895,6 +900,26 @@
    "group": -1018705,
    "remove": true,
    "why": "Vientre de la Ballena - Sala anexa (dungeon 84) is a crossing without monsters (Dofus pour les noobs, Vientre de la Ballena); the subarea roster seeded it two groups, one with the boss Protozorreur."
-  }
+  },
+    {
+      "map": 98568707,
+      "group": -1012893,
+      "remove": true
+    },
+    {
+      "map": 98568707,
+      "group": -1012894,
+      "remove": true
+    },
+    {
+      "map": 98568705,
+      "group": -1012891,
+      "remove": true
+    },
+    {
+      "map": 98568705,
+      "group": -1012892,
+      "remove": true
+    }
   ]
 }

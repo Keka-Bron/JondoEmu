@@ -7018,6 +7018,34 @@
       "cell": 342,
       "orientation": 1,
       "why": "Shaca in Backstage 1 of Dramak's Theatre, behind the third room's secret arch: she teaches the Juggle emote (Dofus pour les noobs, «Théâtre de Dramak»). The cell is a free floor cell in the middle of the room; her official one is not measured."
+    },
+    {
+      "map": 98568707,
+      "npc": 374,
+      "cell": 287,
+      "orientation": 1,
+      "why": "The Royal Blue Jelly in the Jellith Dimension's Fifth Room, the hall after the Fourth Room, with the other three royals: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss» (Dofus pour les noobs, «Gelaxième Dimension»). INFERRED cells: a diamond of open floor around the room's middle, where the base's monster groups stood (303, 327)."
+    },
+    {
+      "map": 98568707,
+      "npc": 377,
+      "cell": 289,
+      "orientation": 3,
+      "why": "The Royal Mint Jelly in the Jellith Dimension's Fifth Room, the hall after the Fourth Room, with the other three royals: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss» (Dofus pour les noobs, «Gelaxième Dimension»). INFERRED cells: a diamond of open floor around the room's middle, where the base's monster groups stood (303, 327)."
+    },
+    {
+      "map": 98568707,
+      "npc": 376,
+      "cell": 343,
+      "orientation": 1,
+      "why": "The Royal Strawberry Jelly in the Jellith Dimension's Fifth Room, the hall after the Fourth Room, with the other three royals: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss» (Dofus pour les noobs, «Gelaxième Dimension»). INFERRED cells: a diamond of open floor around the room's middle, where the base's monster groups stood (303, 327)."
+    },
+    {
+      "map": 98568707,
+      "npc": 375,
+      "cell": 345,
+      "orientation": 3,
+      "why": "The Royal Lemon Jelly in the Jellith Dimension's Fifth Room, the hall after the Fourth Room, with the other three royals: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss» (Dofus pour les noobs, «Gelaxième Dimension»). INFERRED cells: a diamond of open floor around the room's middle, where the base's monster groups stood (303, 327)."
     }
   ]
 }

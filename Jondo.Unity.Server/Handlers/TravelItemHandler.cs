@@ -86,7 +86,12 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 case MapReferenceEffect:
                 case OtherMapReferenceEffect:
-                    if (TravelData.TryMapReference(travel.Value, out long mapId, out int cellId))
+                    // The key of a dungeon without a door takes you into its first room and starts the
+                    // run there (the Gelatinous Dimension's Multygely).
+                    if (TravelData.TryMapReference(travel.Value, out long mapId, out int cellId)
+                        && DungeonManager.KeyedInto(item.Template, mapId) is { } dungeon)
+                        await DungeonHandler.EnterByItemAsync(stream, dungeon, item.Uid, cellId);
+                    else if (TravelData.TryMapReference(travel.Value, out mapId, out cellId))
                         await GoAsync(stream, item.Uid, mapId, cellId);
                     else
                         Console.WriteLine($"[Travel] Item {item.Template}: map reference {travel.Value} is not in the data.");

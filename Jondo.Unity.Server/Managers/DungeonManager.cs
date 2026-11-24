@@ -187,6 +187,34 @@ namespace Jondo.Unity.Server.Managers
             /// «bossAlone» in content/world/dungeons.json), and all of them by whoever comes in.
             /// </summary>
             public bool BossAlone { get; set; }
+
+            /// <summary>
+            /// The colour rooms of a hand-written dungeon (content/world/dungeons.json «colours»), or
+            /// null: each of its rooms holds one group per colour, and the colours won lead to the
+            /// boss room (<see cref="DungeonPuddles"/>). The Gelatinous Dimension.
+            /// </summary>
+            public ColourRooms? Colours { get; set; }
+        }
+
+        /// <summary>
+        /// A dungeon whose rooms hold one group per colour, each led by a majority of one monster, and
+        /// whose boss room is chosen by the colours beaten: «Dans chaque salle du donjon, il y a 4
+        /// groupes» and «vous affronterez la Gelée qui correspond à votre nombre le plus élevé de
+        /// flaque» (Dofus pour les noobs, «Gelaxième Dimension»).
+        /// </summary>
+        public sealed class ColourRooms
+        {
+            /// <summary>The colours in their order, as their majority monster, and the room of the boss each leads to.</summary>
+            public List<(int Monster, long Room)> Royals { get; } = new();
+
+            /// <summary>The room every colour together leads to; 0 when there is none.</summary>
+            public long All { get; set; }
+
+            /// <summary>The majority monsters of the groups, in their order.</summary>
+            public IEnumerable<int> Monsters => Royals.Select(r => r.Monster);
+
+            /// <summary>Whether that map is one of the boss rooms the colours lead to.</summary>
+            public bool LeadsTo(long map) => map != 0 && (map == All || Royals.Any(r => r.Room == map));
         }
 
         /// <summary>
@@ -1038,6 +1066,17 @@ namespace Jondo.Unity.Server.Managers
                         if (rule.Rooms.Count > 0) dungeon.Lingering = rule;
                     }
 
+                    if (authored && entry.Value.TryGetProperty("colours", out var colours) && colours.ValueKind == JsonValueKind.Object)
+                    {
+                        var rule = new ColourRooms { All = Long(colours, "all") };
+                        if (colours.TryGetProperty("royals", out var royals) && royals.ValueKind == JsonValueKind.Object)
+                            foreach (var royal in royals.EnumerateObject())
+                                if (int.TryParse(royal.Name, out int monster) && monster > 0
+                                    && royal.Value.TryGetInt64(out long map) && map != 0)
+                                    rule.Royals.Add((monster, map));
+                        if (rule.Royals.Count > 0) dungeon.Colours = rule;
+                    }
+
                     if (entry.Value.TryGetProperty("roster", out var roster) && roster.ValueKind == JsonValueKind.Object)
                     {
                         foreach (var room in roster.EnumerateObject())
@@ -1225,6 +1264,26 @@ namespace Jondo.Unity.Server.Managers
             if (dungeon == null || dungeon.LastRoom == 0) return 0;
             if (DungeonExitRooms.AfterBoss(dungeon.LastRoom) is not { } after || after.Dungeon != dungeon.Id) return 0;
             return _byId.Values.Any(other => other.Id != dungeon.Id && other.EntranceMapId == after.MapId) ? after.MapId : 0;
+        }
+
+        /// <summary>
+        /// The dungeon an item that takes you to that map is the key of: one whose first room it is
+        /// and that asks for the item. The Gelatinous Dimension has no door, «il suffit de consommer
+        /// un Multygely pour être téléporté dans le donjon» (Dofus pour les noobs). Null for any other
+        /// item or map.
+        /// </summary>
+        public static Dungeon? KeyedInto(int item, long map)
+        {
+            if (item == 0 || map == 0) return null;
+            return _byId.Values.Where(d => d.FirstRoom == map && d.Required.Any(r => r.Item == item))
+                               .OrderBy(d => d.Id).FirstOrDefault();
+        }
+
+        /// <summary>The dungeon whose colours lead to that boss room (<see cref="ColourRooms"/>), or null.</summary>
+        public static Dungeon? ColouredTo(long map)
+        {
+            if (map == 0) return null;
+            return _byId.Values.Where(d => d.Colours?.LeadsTo(map) == true).OrderBy(d => d.Id).FirstOrDefault();
         }
 
         /// <summary>The dungeon whose <see cref="ChoiceRoom"/> is this one's way in, or null.</summary>

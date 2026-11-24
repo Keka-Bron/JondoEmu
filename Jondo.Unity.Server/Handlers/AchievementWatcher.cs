@@ -42,6 +42,10 @@ namespace Jondo.Unity.Server.Handlers
 
             if (beaten.Count == 0) return;
 
+            // A colour dungeon's room leaves a puddle of the colour beaten, and its boss room
+            // forgets them (the Gelatinous Dimension, DungeonPuddles).
+            DungeonPuddles.AfterAWin(SessionContext.State.CharacterId, fight.RoleplayMapId, beaten);
+
             bool atLeastPlayerLevel = Achievements.HighLevelChallengeGroup(
                 ChallengeHandler.GroupLevel(fight), SessionContext.State.CharacterLevel);
             Achievements.AfterFight(beaten, DungeonManager.IsRoom(fight.RoleplayMapId),

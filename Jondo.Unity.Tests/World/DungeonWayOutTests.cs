@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Server;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Xunit;
 using Xunit.Abstractions;
@@ -65,15 +66,24 @@ namespace Jondo.Unity.Tests.World
             return DungeonManager.All.Values.Where(d => d.Authored && catalogue.Contains(d.Id)).ToList();
         }
 
+        /// <summary>A dungeon one of whose items is a travel item into its first room.</summary>
+        private static bool ItsItemIsTheWayIn(DungeonManager.Dungeon d)
+            => d.Required.Any(r => TravelItemHandler.TravelOf(DatabaseManager.GetItemEffectsData(
+                       DatabaseManager.GetItemTemplatePossibleEffects(r.Item))) is { } travel
+                   && TravelData.TryMapReference(travel.Value, out long map, out _) && map == d.FirstRoom);
+
         /// <summary>
         /// Rewriting a keyed dungeon used to take its keeper's door away: its keeper answered "No"
-        /// to the White Rat's Pantry key, and so did five other keepers.
+        /// to the White Rat's Pantry key, and so did five other keepers. A dungeon whose item is itself
+        /// the way in has no keeper to keep: the Jellith Dimension's Multygely («il suffit de consommer
+        /// un Multygely pour être téléporté dans le donjon», «il n'y a donc pas de sauvegarde»).
         /// </summary>
         [Fact]
         public void A_rewritten_keyed_dungeon_keeps_its_keepers_door()
         {
             if (!Load() || !File.Exists(Paths.DungeonsJson)) { _out.WriteLine("no world data"); return; }
             var doorless = Rewritten().Where(d => d.Required.Count > 0 && !d.KeepsADoor)
+                .Where(d => !ItsItemIsTheWayIn(d))
                 .Select(d => $"{d.Id} {d.Name}").ToList();
             foreach (var l in doorless) _out.WriteLine(l);
             Assert.Empty(doorless);

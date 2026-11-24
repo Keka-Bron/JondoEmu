@@ -380,6 +380,46 @@ namespace Jondo.Unity.Server.Handlers
             return await EnterNewRunAsync(stream, dungeon, to, heroWays);
         }
 
+        /// <summary>
+        /// A dungeon whose key is a teleport item, used from anywhere: the Multygely, «il suffit de
+        /// consommer un Multygely pour être téléporté dans le donjon» and «vous serez directement
+        /// téléporté dans la salle 1 du donjon» (Dofus pour les noobs, «Gelaxième Dimension»). Into
+        /// the first room on the item's own cell, the item spent there, and a new run started as the
+        /// guardian's door starts one: the heroes along on a key each, the lobby's and the colours'
+        /// wins forgotten. False, nothing spent, when he cannot go in.
+        /// </summary>
+        internal static async Task<bool> EnterByItemAsync(NetworkStream stream, DungeonManager.Dungeon dungeon,
+                                                          long itemUid, int cell)
+        {
+            var state = SessionContext.State;
+            if (dungeon.FirstRoom == 0) return false;
+            if (await HeadHunts.HoldsAsync(stream, HeadHunts.Hold.Dungeon)) return false;
+            if (dungeon.MinLevel > 0 && state.CharacterLevel < dungeon.MinLevel)
+            {
+                Console.WriteLine($"[Dungeon] {dungeon.Name}: needs level {dungeon.MinLevel} and has {state.CharacterLevel}.");
+                await WarnAsync(stream, NotHighEnough);
+                return false;
+            }
+            if (await WaysForHeroesAsync(stream, dungeon, true, DateTime.Now) is not { } heroWays) return false;
+
+            // The capture's order for a teleport item: the map change first, the item spent after.
+            if (await TeleportHandler.ToMapAsync(stream, dungeon.FirstRoom, cell) < 0) return false;
+            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, itemUid))
+                Console.WriteLine($"[Dungeon] {dungeon.Name}: the item that led in could not be spent.");
+            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now))
+                Console.WriteLine($"[Dungeon] {dungeon.Name}: a hero's key was gone by the time he went in.");
+
+            foreach (long who in heroWays.Select(w => w.Hero.CharacterId).Prepend(state.CharacterId))
+            {
+                DungeonProgress.SetHubWin(who, dungeon, 0);
+                DungeonProgress.SetRoom(who, dungeon, dungeon.FirstRoom);
+                DungeonPuddles.Forget(who, dungeon);
+            }
+            Console.WriteLine($"[Dungeon] {state.CharacterName} enters {dungeon.Name} by its item, " +
+                              $"room 1 of {dungeon.Rooms.Count}.");
+            return true;
+        }
+
         // Called before the fight sends its return map. A win saves the next room, or clears the
         // checkpoint after the boss. A defeat saves the room the character fought in.
         internal static long RecordFightProgress(long characterId, long room, bool won)

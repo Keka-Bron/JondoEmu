@@ -128,6 +128,9 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(ItemCriteria.Holds("PZ=1&Pc=11"));
                 Assert.True(ItemCriteria.Holds(""));
                 Assert.False(ItemCriteria.Holds("Qf=2442&PL>39"));
+
+                // The Multygely's: a switch no event and no quest of ours sets is let through.
+                Assert.True(ItemCriteria.Holds("Pz=0&Sc!336"));
             }
         }
     }

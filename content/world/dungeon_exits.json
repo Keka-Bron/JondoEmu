@@ -482,6 +482,60 @@
       "npc": 755,
       "replies": [2749, 2750, 2751, 2752, 56920, 63334],
       "why": "Koolich Cavern: after Koolich the winners are in «Koolich Cavern - Exit» (107228160), where Koolich, beaten, lets them go: «Take the hat and leave.», «Take the boots and leave.», «Take the staff and leave.», «Take the bag and leave.», «Take a rain check and leave.» and «Take the ball of gobkool wool and leave.» all leave through the dungeon's way out. Seen in the client: «Take the boots and leave.» gave nothing and the boss win skipped the room. INFERRED cell."
+    },
+    {
+      "dungeon": 24,
+      "bossRoom": 98567683,
+      "room": 98568707,
+      "cell": 400,
+      "npc": 374,
+      "replies": [],
+      "why": "The Jellith Dimension: after the Fourth Room the winners are in the Fifth Room, where the four royals stand and send them on to the room their puddles open (Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; the royals' dialogues, content/npcs/dialogues.json); the map panel leaves. INFERRED cell, open floor below the royals (287, 289, 343, 345)."
+    },
+    {
+      "dungeon": 9009,
+      "bossRoom": 98566661,
+      "room": 98568705,
+      "cell": 300,
+      "npc": 0,
+      "replies": [],
+      "why": "After the Royal Blue Jelly, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
+    },
+    {
+      "dungeon": 9010,
+      "bossRoom": 98567685,
+      "room": 98568705,
+      "cell": 300,
+      "npc": 0,
+      "replies": [],
+      "why": "After the Royal Mint Jelly, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
+    },
+    {
+      "dungeon": 9011,
+      "bossRoom": 98568709,
+      "room": 98568705,
+      "cell": 300,
+      "npc": 0,
+      "replies": [],
+      "why": "After the Royal Strawberry Jelly, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
+    },
+    {
+      "dungeon": 9012,
+      "bossRoom": 98566663,
+      "room": 98568705,
+      "cell": 300,
+      "npc": 0,
+      "replies": [],
+      "why": "After the Royal Lemon Jelly, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
+    },
+    {
+      "dungeon": 9013,
+      "bossRoom": 98567687,
+      "room": 98568705,
+      "cell": 300,
+      "npc": 0,
+      "replies": [],
+      "why": "After the Royal Jellies, the Jellith Dimension's Exit room (98568705), whose magic door leads out: the royals' own «If bou bant to beave our bimension, use the bagic boor» (1590). The door is still a reserved interactive, so the map panel leaves for now. INFERRED cell, open floor beside the door (268)."
     }
   ]
 }

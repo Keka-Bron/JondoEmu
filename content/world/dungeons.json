@@ -994,5 +994,159 @@
     "autoGroup": 1,
     "door": 1,
     "why": "Moowolf Lair in the order its rooms are numbered: First to Fourth Room, Fourth Room II, Fifth, and the Moowolf in the Sixth. Two maps share the ordinal four and the Exit has none, so the names gave no order and the catalogue's list stood, starting in the Third Room; the Exit is no fight room and a win over the Moowolf leaves by the entrance."
+  },
+  "24": {
+    "name": "La Gelexta Dimensión",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 88084997,
+    "exit": 88084997,
+    "rooms": [
+      98566657,
+      98567681,
+      98566659,
+      98567683
+    ],
+    "bosses": [],
+    "keyring": 0,
+    "required": [
+      [
+        996,
+        1
+      ]
+    ],
+    "autoGroup": 0,
+    "colours": {
+      "royals": {
+        "55": 98566661,
+        "56": 98567685,
+        "57": 98568709,
+        "429": 98566663
+      },
+      "all": 98567687
+    },
+    "why": "The Jellith Dimension in the order a run takes it: the First to Fourth Room, then the Fifth Room, the hall where the four royals stand (dungeon_exits.json), then the royal room the puddles open (dungeons 9009 to 9013), then the Exit room. The catalogue listed the royal rooms and the exit first, so a royal win ended the run and the Fifth Room held four royals. Dofus pour les noobs, «Gelaxième Dimension»: «Dans chaque salle du donjon, il y a 4 groupes. Chaque groupe est composé de manière différente afin qu'il y ait un type de gelée majoritaire dans chacun des groupes»; «Une fois le combat terminé, vous obtiendrez en inventaire une flaque de gelée de la couleur de la gelée majoritaire»; after the fourth room the royals wait, «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». The way in is the Multygely, «il suffit de consommer un Multygely pour être téléporté dans le donjon», and «il n'y a donc pas de sauvegarde dans ce donjon»: no door. 'colours' maps each jelly (Blueberry 55, Mint 56, Strawberry 57, Lemon 429) to its royal's room and 'all' to the Royal Jellies' room (DungeonPuddles). INFERRED: how each group mixes its colours (MobSpawnManager.ColourRoster), that the highest puddle count opens its royal and a tie opens each tied one, and that the Fifth Room is the hall."
+  },
+  "9009": {
+    "name": "The Jellith Dimension - Royal Blue Jelly",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 98568707,
+    "exit": 88084997,
+    "rooms": [
+      98566661
+    ],
+    "bosses": [
+      58
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "98566661": [
+        55
+      ]
+    },
+    "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss». Its fight is the Royal Blueberry Jelly (58) with Blueberry Jellies (55); «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
+  },
+  "9010": {
+    "name": "The Jellith Dimension - Royal Mint Jelly",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 98568707,
+    "exit": 88084997,
+    "rooms": [
+      98567685
+    ],
+    "bosses": [
+      85
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "98567685": [
+        56
+      ]
+    },
+    "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss». Its fight is the Royal Mint Jelly (85) with Mint Jellies (56); «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
+  },
+  "9011": {
+    "name": "The Jellith Dimension - Royal Strawberry Jelly",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 98568707,
+    "exit": 88084997,
+    "rooms": [
+      98568709
+    ],
+    "bosses": [
+      86
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "98568709": [
+        57
+      ]
+    },
+    "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss». Its fight is the Royal Strawberry Jelly (86) with Strawberry Jellies (57); «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
+  },
+  "9012": {
+    "name": "The Jellith Dimension - Royal Lemon Jelly",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 98568707,
+    "exit": 88084997,
+    "rooms": [
+      98566663
+    ],
+    "bosses": [
+      430
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "98566663": [
+        429
+      ]
+    },
+    "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss». Its fight is the Royal Lemon Jelly (430) with Lemon Jellies (429); «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
+  },
+  "9013": {
+    "name": "The Jellith Dimension - Royal Jellies",
+    "minLevel": 50,
+    "optimalLevel": 60,
+    "difficulty": 2,
+    "entrance": 98568707,
+    "exit": 88084997,
+    "rooms": [
+      98567687
+    ],
+    "bosses": [
+      58,
+      430,
+      86,
+      85
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "roster": {
+      "98567687": [
+        55,
+        56,
+        57,
+        429
+      ]
+    },
+    "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Its fight is the four royals together with jellies of the four colours; «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
   }
 }

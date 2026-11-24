@@ -3894,8 +3894,11 @@ namespace Jondo.Unity.Server.Managers
         /// target. Read off Pinzas: the pick-up carries "*e3" and the throw "*E3", and 3 is the
         /// state of the one carrying -- the bomb being picked up is not, the bot throwing it
         /// is. The catalogue stars states (10,121 tokens), monster templates (1,163) and life
-        /// thresholds (197); the handful of other letters starred (h, m, i, d, j, B, l, s, Q)
-        /// are not read and let the effect through.
+        /// thresholds (197). A lone "*i" asks for a summoned caster: the Summoning of Jelly
+        /// («C,*i», spell 32732) takes a fifth of the life of the summoned jellies only («Les
+        /// gelées invoquées ont 20% de PV en moins», Dofus pour les noobs). Next to other
+        /// starred kinds ("*h,*m,*d,*i") the kinds are alternatives and are not read; the other
+        /// letters starred (h, m, d, j, B, l, s, Q) are not read either and let the effect through.
         /// </summary>
         /// <remarks>
         /// Against the same snapshot as the targets' states when one is given: judged live, the
@@ -3910,9 +3913,12 @@ namespace Jondo.Unity.Server.Managers
                 : quienLanza.Buffs.Estados as IReadOnlySet<int> ?? new HashSet<int>(quienLanza.Buffs.Estados);
 
             bool hasTemplate = false, matchesTemplate = false;
-            foreach (var trozo in mascara.Split(','))
+            var trozos = mascara.Split(',').Select(x => x.Trim()).ToList();
+            if (trozos.Contains("*i") && !quienLanza.EsInvocado
+                && !trozos.Any(x => x.Length == 2 && x[0] == '*' && x[1] != 'i'))
+                return false;
+            foreach (string t in trozos)
             {
-                string t = trozo.Trim();
                 if (t.Length < 3 || t[0] != '*') continue;
                 char letra = t[1];
                 if (!int.TryParse(t.Substring(2), out int numero)) continue;

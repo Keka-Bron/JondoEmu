@@ -61601,6 +61601,78 @@
         }
       ],
       "why": "Hector Kwismas on Kwismas Island's shore: his line 3255, the way back to the Madrestam port (2902) or staying on the island (2904). Always open, so nobody is stranded when the event closes."
+    },
+    {
+      "npc": 374,
+      "map": 98568707,
+      "opening": 57266,
+      "lines": [
+        {
+          "message": 57266,
+          "choices": [
+            { "reply": 77927, "teleport": 98566661 },
+            { "reply": 77928, "teleport": 98567685 },
+            { "reply": 77929, "teleport": 98568709 },
+            { "reply": 77930, "teleport": 98566663 },
+            { "reply": 77931, "teleport": 98567687 }
+          ]
+        }
+      ],
+      "why": "The Royal Blue Jelly in the Jellith Dimension's Fifth Room: «Bow bare bou bother us buring our bame?!» (57266) and the five attacks the client gives him (77927 to 77931: the Royal Blue, Mint, Strawberry and Lemon Jelly, then the Royal Jellies), each into that royal's room. Dofus pour les noobs, «Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Which attacks are offered is the puddles' (DungeonPuddles.Opens hides a royal room the run's puddles do not open). INFERRED: the highest puddle count opens its royal, a tie each tied one."
+    },
+    {
+      "npc": 375,
+      "map": 98568707,
+      "opening": 57267,
+      "lines": [
+        {
+          "message": 57267,
+          "choices": [
+            { "reply": 77932, "teleport": 98566661 },
+            { "reply": 77933, "teleport": 98567685 },
+            { "reply": 77934, "teleport": 98568709 },
+            { "reply": 77935, "teleport": 98566663 },
+            { "reply": 77936, "teleport": 98567687 }
+          ]
+        }
+      ],
+      "why": "The Royal Lemon Jelly in the Jellith Dimension's Fifth Room: «Bow bare bou bother us buring our bame?!» (57267) and the five attacks the client gives him (77932 to 77936: the Royal Blue, Mint, Strawberry and Lemon Jelly, then the Royal Jellies), each into that royal's room. Dofus pour les noobs, «Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Which attacks are offered is the puddles' (DungeonPuddles.Opens hides a royal room the run's puddles do not open). INFERRED: the highest puddle count opens its royal, a tie each tied one."
+    },
+    {
+      "npc": 376,
+      "map": 98568707,
+      "opening": 57268,
+      "lines": [
+        {
+          "message": 57268,
+          "choices": [
+            { "reply": 77937, "teleport": 98566661 },
+            { "reply": 77938, "teleport": 98567685 },
+            { "reply": 77939, "teleport": 98568709 },
+            { "reply": 77940, "teleport": 98566663 },
+            { "reply": 77941, "teleport": 98567687 }
+          ]
+        }
+      ],
+      "why": "The Royal Strawberry Jelly in the Jellith Dimension's Fifth Room: «Bow bare bou bother us buring our bame?!» (57268) and the five attacks the client gives him (77937 to 77941: the Royal Blue, Mint, Strawberry and Lemon Jelly, then the Royal Jellies), each into that royal's room. Dofus pour les noobs, «Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Which attacks are offered is the puddles' (DungeonPuddles.Opens hides a royal room the run's puddles do not open). INFERRED: the highest puddle count opens its royal, a tie each tied one."
+    },
+    {
+      "npc": 377,
+      "map": 98568707,
+      "opening": 57269,
+      "lines": [
+        {
+          "message": 57269,
+          "choices": [
+            { "reply": 77942, "teleport": 98566661 },
+            { "reply": 77943, "teleport": 98567685 },
+            { "reply": 77944, "teleport": 98568709 },
+            { "reply": 77945, "teleport": 98566663 },
+            { "reply": 77946, "teleport": 98567687 }
+          ]
+        }
+      ],
+      "why": "The Royal Mint Jelly in the Jellith Dimension's Fifth Room: «Bow bare bou bother us buring our bame?!» (57269) and the five attacks the client gives him (77942 to 77946: the Royal Blue, Mint, Strawberry and Lemon Jelly, then the Royal Jellies), each into that royal's room. Dofus pour les noobs, «Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Which attacks are offered is the puddles' (DungeonPuddles.Opens hides a royal room the run's puddles do not open). INFERRED: the highest puddle count opens its royal, a tie each tied one."
     }
   ]
 }

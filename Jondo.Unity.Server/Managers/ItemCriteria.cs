@@ -156,6 +156,11 @@ namespace Jondo.Unity.Server.Managers
 
                 // An item worn: «POE15990,1», the rikiki wand in hand.
                 "POE" => Equipment.HowManyWorn((int)key),
+
+                // A switch no event and no quest of ours sets: unanswered, so let through. The
+                // Multygely's «Pz=0&Sc!336» would otherwise be refused for good, since an Sc we do not
+                // know reads as on; every other item asks «Sc=» of a switch we know or let through.
+                "Sc" when !SeasonalEvents.IsKnown((int)key) => null,
                 _ => Character.Count(op, key, flag),
             };
 

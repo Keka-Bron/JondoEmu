@@ -629,6 +629,19 @@ namespace Jondo.Unity.Server.Managers
                     // A room only walked through keeps nobody, not even what the base put there.
                     if (dungeon.EmptyRooms.Contains(room)) { _mapMobs.Remove(room); empty++; continue; }
                     _mapMobs.TryGetValue(room, out var before);
+
+                    // A colour room holds one group per colour (the Gelatinous Dimension).
+                    if (dungeon.Colours != null)
+                    {
+                        int first = composed;
+                        var colourGroups = ComposeColourRoom(dungeon, index,
+                            k => before != null && k < before.Count ? before[k].MobId : FirstComposedRoom - first - k);
+                        if (colourGroups.Count == 0) { empty++; continue; }
+                        _mapMobs[room] = colourGroups;
+                        composed += colourGroups.Count;
+                        continue;
+                    }
+
                     bool bossRoom = room == dungeon.LastRoom && dungeon.Bosses.Count > 0;
                     long id = bossRoom ? PrimerJefe - bosses
                             : before?.FirstOrDefault()?.MobId ?? FirstComposedRoom - composed;
@@ -698,6 +711,82 @@ namespace Jondo.Unity.Server.Managers
                 Leaders = bossRoom && dungeon.BossAlone ? members.Count : 0,
                 // A dungeon room's group waits where the room puts it: it does not roam.
             };
+        }
+
+        /// <summary>
+        /// The groups of a colour dungeon's room (<see cref="DungeonManager.ColourRooms"/>): one per
+        /// colour, in the colours' order, each with its colour in the majority however many come
+        /// (<see cref="ColourRoster"/>), at the room's grade, spread over the room. Empty for a room
+        /// with nobody to put in. «Dans chaque salle du donjon, il y a 4 groupes. Chaque groupe est
+        /// composé de manière différente afin qu'il y ait un type de gelée majoritaire dans chacun
+        /// des groupes» (Dofus pour les noobs, «Gelaxième Dimension»).
+        /// </summary>
+        internal static List<MobGroup> ComposeColourRoom(DungeonManager.Dungeon dungeon, int index, Func<int, long> idFor)
+        {
+            var groups = new List<MobGroup>();
+            var rule = dungeon.Colours;
+            if (rule == null || index < 0 || index >= dungeon.Rooms.Count) return groups;
+            long room = dungeon.Rooms[index];
+            if (dungeon.EmptyRooms.Contains(room)) return groups;
+
+            var colours = rule.Monsters.Where(m => _monsters.TryGetValue(m, out var d) && d.Grades.Count > 0).ToList();
+            var cells = SpreadCells(room, colours.Count);
+            int grade = RoomGrade(index, dungeon.Rooms.Count);
+            for (int k = 0; k < colours.Count; k++)
+            {
+                groups.Add(new MobGroup
+                {
+                    MobId = idFor(k),
+                    CellId = cells[k],
+                    Members = ColourRoster(colours, k).Select(m => MemberAt(_monsters[m], grade)).ToList(),
+                    Modular = true,
+                });
+            }
+            return groups;
+        }
+
+        /// <summary>
+        /// The eight of the colour <paramref name="k"/>'s group, in their order: its colour first,
+        /// second, fourth, sixth and eighth, one of each other colour between, so the first four,
+        /// five, six, seven or eight that come in (<see cref="MembersFor"/>) always hold more of its
+        /// colour than of any other. INFERRED: the guide gives no group's exact make-up.
+        /// </summary>
+        internal static List<int> ColourRoster(IReadOnlyList<int> colours, int k)
+        {
+            int colour = colours[k];
+            var others = colours.Where((_, i) => i != k).ToList();
+            var roster = new List<int>();
+            int next = 0;
+            for (int slot = 0; slot < DungeonGroupSize; slot++)
+                roster.Add(slot is 2 or 4 or 6 && next < others.Count ? others[next++] : colour);
+            return roster;
+        }
+
+        /// <summary>The monster a group opens with: a colour room's group's colour (<see cref="ColourRoster"/>).</summary>
+        private static int LeadingMonster(MobGroup group) => group.Members.FirstOrDefault()?.Monster?.Id ?? 0;
+
+        /// <summary>
+        /// <paramref name="count"/> cells of a room for its groups: the middle of its floor first,
+        /// then the free cells nearest to it at least <see cref="GroupSpacing"/> steps from the
+        /// others, away from its NPCs. The same cells every time.
+        /// </summary>
+        private static List<int> SpreadCells(long room, int count)
+        {
+            int middle = MiddleOfTheFloor(room);
+            var candidates = GetGroupCells(room).OrderBy(c => MapGeometry.Distance(c, middle)).ThenBy(c => c).ToList();
+            var cells = new List<int>();
+            foreach (int c in candidates)
+            {
+                if (cells.Count >= count) break;
+                if (cells.All(o => MapGeometry.Distance(c, o) >= GroupSpacing)) cells.Add(c);
+            }
+            foreach (int c in candidates)
+            {
+                if (cells.Count >= count) break;
+                if (!cells.Contains(c)) cells.Add(c);
+            }
+            while (cells.Count < count) cells.Add(middle);
+            return cells;
         }
 
         /// <summary>
@@ -914,6 +1003,24 @@ namespace Jondo.Unity.Server.Managers
 
             lock (_candado)
             {
+                // A colour room: the beaten colour comes back beside the others, where it stood.
+                if (dungeon.Colours != null)
+                {
+                    _mapMobs.TryGetValue(mapId, out var standing);
+                    standing ??= new List<MobGroup>();
+                    var present = standing.Select(LeadingMonster).ToHashSet();
+                    var missing = ComposeColourRoom(dungeon, dungeon.Rooms.IndexOf(mapId), _ => 0)
+                                    .Where(g => !present.Contains(LeadingMonster(g))).ToList();
+                    if (missing.Count == 0) return null;
+                    foreach (var back in missing)
+                    {
+                        back.MobId = ActorIds.NuevoMonstruo();
+                        standing.Add(back);
+                    }
+                    _mapMobs[mapId] = standing;
+                    return missing[0];
+                }
+
                 var group = ComposeDungeonRoom(dungeon, dungeon.Rooms.IndexOf(mapId), Array.Empty<int>(),
                                                ActorIds.NuevoMonstruo(), null);
                 if (group == null) return null;
@@ -1284,6 +1391,11 @@ namespace Jondo.Unity.Server.Managers
             if (DungeonManager.IsLoaded && DungeonManager.IsRoom(mapId))
             {
                 var dungeon = DungeonManager.OfRoom(mapId)!;
+                if (dungeon.Colours != null)
+                {
+                    result.AddRange(ComposeColourRoom(dungeon, dungeon.Rooms.IndexOf(mapId), _ => ActorIds.NuevoMonstruo()));
+                    return result;
+                }
                 var room = ComposeDungeonRoom(dungeon, dungeon.Rooms.IndexOf(mapId), Array.Empty<int>(),
                                               ActorIds.NuevoMonstruo(), null);
                 if (room != null) result.Add(room);
