@@ -755,7 +755,9 @@
             { "reply": 21560, "quest": 1517, "completes": 8537, "params": [[30, 8537]], "next": 17970, "holds": 15317 },
             { "reply": 26687 },
             { "reply": 22081, "next": 18449, "beforeQuest": 1526 },
-            { "reply": 34441, "next": 28720, "quest": 1905, "afterObjective": 13019, "beforeObjective": 13020 }
+            { "reply": 34441, "next": 28720, "quest": 1905, "afterObjective": 13019, "beforeObjective": 13020 },
+            { "reply": 23604, "next": 19705, "quest": 1607, "completes": 9396, "params": [[30, 9396]], "afterObjective": 9395, "beforeObjective": 9396, "holds": 15988 },
+            { "reply": 23611, "next": 19711, "quest": 1607, "afterObjective": 9400, "beforeObjective": 9401 }
           ]
         },
         {
@@ -1212,9 +1214,66 @@
           "choices": [
             { "reply": 34438, "quest": 1905, "beforeObjective": 13020, "completes": 13020, "params": [[30, 13020]] }
           ]
+        },
+        {
+          "message": 19705,
+          "choices": [
+            { "reply": 23607, "next": 19706 }
+          ]
+        },
+        {
+          "message": 19706,
+          "choices": [
+            { "reply": 23606, "next": 19707 }
+          ]
+        },
+        {
+          "message": 19707,
+          "choices": [
+            { "reply": 23605, "next": 19708 }
+          ]
+        },
+        {
+          "message": 19708,
+          "choices": [
+            { "reply": 23610, "next": 19709 }
+          ]
+        },
+        {
+          "message": 19709,
+          "choices": []
+        },
+        {
+          "message": 19711,
+          "choices": [
+            { "reply": 23616, "next": 19712 }
+          ]
+        },
+        {
+          "message": 19712,
+          "choices": [
+            { "reply": 23615, "next": 19713 }
+          ]
+        },
+        {
+          "message": 19713,
+          "choices": [
+            { "reply": 23614, "next": 19714 }
+          ]
+        },
+        {
+          "message": 19714,
+          "choices": [
+            { "quest": 1607, "completes": 9401, "params": [[30, 9401]], "reply": 23613, "next": 19715, "takes": 15988 }
+          ]
+        },
+        {
+          "message": 19715,
+          "names": true,
+          "choices": []
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810). «L'anneau de Tot» (Dofus pour les noobs: you tell him Meriana sends you; he sold his last ring to a client and asks you not to take it by force): «Vengo de parte de Meriana» (22081, 18449), «Meriana necesita un anillo de Tot para un ritual» (22080, 18450: his register), «Esperar» (22079, 18451: sold to one of his best clients), «¿Cómo se llama el cliente?» (22078, 18452: Nanoc Elyod, near Madrestam), «Gracias por tu ayuda» (22077, 18908: the Purple dofus guessed) and «Despedirte antes de irte» (19316) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply. «El dragón blanco» (1905), objective 13020: «Allez à la rencontre de Kérubim Crépin à Astrub en [3,-17] « Dire que vous comptez vous rendre en Ecaflipus dans le but de rencontrer Dardondakal »» (Dofus pour les noobs): «Tengo intención de ir a Zurcalia para ver a Dardondakal» (34441) -> not easy to reach the Ivory sanctuary (28720) -> «Intentar obtener más información» (34440) -> the Catseye Challenge first (28721) -> «Gracias por los ánimos» (34439) -> the travellers' portals to Zurcalia (28722) -> «Bueno, ¡hasta luego!» (34438) does 13020."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810). «L'anneau de Tot» (Dofus pour les noobs: you tell him Meriana sends you; he sold his last ring to a client and asks you not to take it by force): «Vengo de parte de Meriana» (22081, 18449), «Meriana necesita un anillo de Tot para un ritual» (22080, 18450: his register), «Esperar» (22079, 18451: sold to one of his best clients), «¿Cómo se llama el cliente?» (22078, 18452: Nanoc Elyod, near Madrestam), «Gracias por tu ayuda» (22077, 18908: the Purple dofus guessed) and «Despedirte antes de irte» (19316) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply. «El dragón blanco» (1905), objective 13020: «Allez à la rencontre de Kérubim Crépin à Astrub en [3,-17] « Dire que vous comptez vous rendre en Ecaflipus dans le but de rencontrer Dardondakal »» (Dofus pour les noobs): «Tengo intención de ir a Zurcalia para ver a Dardondakal» (34441) -> not easy to reach the Ivory sanctuary (28720) -> «Intentar obtener más información» (34440) -> the Catseye Challenge first (28721) -> «Gracias por los ánimos» (34439) -> the travellers' portals to Zurcalia (28722) -> «Bueno, ¡hasta luego!» (34438) does 13020. «Miniature Adventure» (1607): with the shrunk Magic Croquette (15988) «Show him the croquette.» (23604) does 9396 (19705, the biscuit of his reserve; 23607 -> 19706, 23606 -> 19707, 23605 -> 19708, «Ask what kind of powers the croquette has.» 23610 -> 19709: it opens the portal to Ecaflip's dimension for his children). After Cinder Mistigris: «Mention your vehement discussion with Ashante.» (23611) -> 19711, 23616 -> 19712, 23615 -> 19713, 23614 -> 19714 and «Hand over the magic croquette.» (23613, takes it) closes it with 19715 Dofus pour les noobs («Aventure miniature»). INFERRED order of the replies."
     },
     {
       "npc": 4310,
@@ -24986,12 +25045,49 @@
         {
           "message": 19687,
           "choices": [
+            { "reply": 23579, "next": 19688, "quest": 1607, "beforeObjective": 9394 },
             { "reply": 23569 },
             { "reply": 23580 }
           ]
+        },
+        {
+          "message": 19688,
+          "choices": [
+            { "reply": 23578, "next": 19690 }
+          ]
+        },
+        {
+          "message": 19690,
+          "choices": [
+            { "reply": 23577, "next": 19691 }
+          ]
+        },
+        {
+          "message": 19691,
+          "choices": [
+            { "reply": 23576, "next": 19692 }
+          ]
+        },
+        {
+          "message": 19692,
+          "choices": [
+            { "reply": 23575, "next": 19693 }
+          ]
+        },
+        {
+          "message": 19693,
+          "choices": [
+            { "reply": 23574, "next": 19694 }
+          ]
+        },
+        {
+          "message": 19694,
+          "choices": [
+            { "quest": 1607, "completes": 9394, "params": [[30, 9394]], "reply": 23573 }
+          ]
         }
       ],
-      "why": "Kickroach in «Kickroach's Lair - Exit»: «I don't know how you got in here, but you're not welcome!», then «Leave Kickroach's Lair.» (content/world/dungeon_exits.json) or «Shrug your shoulders and end the conversation.». His croquette lines belong to «Miniature Adventure» (1607), not authored yet."
+      "why": "Kickroach in «Kickroach's Lair - Exit»: «I don't know how you got in here, but you're not welcome!» (19687), then «Leave Kickroach's Lair.» (content/world/dungeon_exits.json) or «Shrug your shoulders and end the conversation.». For «Miniature Adventure» (1607): «Ask about the magic croquette.» (23579) -> 19688 (he plays dumb), «Threaten to rinse Kerub's house clean away.» (23578) -> 19690, «Reply that you'll go and find a bucket and a mop...» (23577) -> 19691, «Ask about the croquette again.» (23576) -> 19692 (an Ecaflip hired them), «Ask who this Ecaflip is.» (23575) -> 19693, «Say that you'd be interested in meeting this person.» (23574) -> 19694 (the grocery store in Astrub), «Take the croquette, then go and see Kerub to find out more.» (23573) does 9394. Dofus pour les noobs («Aventure miniature»)."
     },
     {
       "npc": 6612,
@@ -61741,6 +61837,78 @@
         }
       ],
       "why": "The Royal Mint Jelly in the Jellith Dimension's Fifth Room: «Bow bare bou bother us buring our bame?!» (57269) and the five attacks the client gives him (77942 to 77946: the Royal Blue, Mint, Strawberry and Lemon Jelly, then the Royal Jellies), each into that royal's room. Dofus pour les noobs, «Gelaxième Dimension»: after the fourth room «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Which attacks are offered is the puddles' (DungeonPuddles.Opens hides a royal room the run's puddles do not open). INFERRED: the highest puddle count opens its royal, a tie each tied one."
+    },
+    {
+      "npc": 2771,
+      "map": 146538496,
+      "opening": 19685,
+      "lines": [
+        {
+          "message": 19685,
+          "choices": [
+            { "reply": 23566, "next": 19686, "beforeQuest": 1607, "criterion": "PL>29", "startsQuest": 1607, "params": [[34, 1607]] },
+            { "reply": 23568, "quest": 1607, "afterObjective": 9394, "beforeObjective": 9395, "criterion": "POE15990,1" },
+            { "reply": 23567, "next": 19686, "quest": 1607, "afterObjective": 9394, "beforeObjective": 9395 },
+            { "reply": 23565 }
+          ]
+        },
+        {
+          "message": 19686,
+          "choices": [
+            { "reply": 23565 }
+          ]
+        }
+      ],
+      "why": "The Magic Croquette in «Kickroach's Lair - Exit», giver of «Miniature Adventure» (1607). «Decide to learn more about this croquette.» (23566) starts it (Dofus pour les noobs («Aventure miniature»), «Décider d'en apprendre plus sur cette croquette»). Once Kickroach has talked (9394), «Use the Rikiki Wand on the croquette.» (23568, only with the wand worn, POE15990,1) shrinks it into the Magic Croquette (15988) and ticks 9395; without the wand the hand on it (23567) only brings 19686. «Withdraw your hand and leave.» (23565) closes. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2769,
+      "map": 147062786,
+      "opening": 19674,
+      "openings": [
+        { "quest": 1607, "objective": 9399, "pending": 9400, "message": 19679 }
+      ],
+      "lines": [
+        {
+          "message": 19674,
+          "choices": [
+            { "reply": 23553, "next": 19676, "quest": 1607, "beforeObjective": 9398 },
+            { "reply": 23548, "quest": 1607, "beforeObjective": 9398, "teleport": 192416772 }
+          ]
+        },
+        {
+          "message": 19676,
+          "choices": [
+            { "quest": 1607, "completes": 9398, "params": [[30, 9398]], "reply": 23552, "holds": 15988, "next": 19677 }
+          ]
+        },
+        {
+          "message": 19677,
+          "choices": [
+            { "reply": 23554, "quest": 1607, "afterObjective": 9398, "beforeObjective": 9399 },
+            { "reply": 23555, "quest": 1607, "afterObjective": 9398, "beforeObjective": 9399, "teleport": 192416772 }
+          ]
+        },
+        {
+          "message": 19679,
+          "choices": [
+            { "reply": 23558, "next": 19680, "quest": 1607 }
+          ]
+        },
+        {
+          "message": 19680,
+          "choices": [
+            { "reply": 23557, "next": 19681, "quest": 1607 }
+          ]
+        },
+        {
+          "message": 19681,
+          "choices": [
+            { "quest": 1607, "completes": 9400, "params": [[30, 9400]], "reply": 23556, "teleport": 192416772 }
+          ]
+        }
+      ],
+      "why": "Cinder Mistigris, the Ecaflip in the Vilinsekts' hideout behind the grocery store's barrel [1,-16]. «Say that Kickroach sent you to deliver the agreed item.» (23553) -> 19676 (doubts), «Show the croquette as a sign of good faith.» (23552, with the Magic Croquette in hand) -> 19677 does the talk 9398, and «Defend yourself against the attack.» (23554) is the fight (npc_fights.json; run away, 23555, leaves). After it (9399) the opening is 19679: «Reply that threats don't scare you.» (23558) -> 19680, «Say that you aren't afraid of a brotherhood that nobody's ever heard of.» (23557) -> 19681, «Suppress a shiver and leave.» (23556) does 9400 and leads out to the grocery. Dofus pour les noobs («Aventure miniature»). The order of the replies is INFERRED from the message and reply ids; the fight replies 23547/23550 and 23549 are not part of the walkthrough."
     }
   ]
 }

@@ -2818,13 +2818,6 @@
       "why": "Lee O'Summerly in «Kharnotaurus's Lair - Exit», who takes the winners out («Leave Kharnotaurus's Lair.»). He stood only at the door and the room had no way out. INFERRED cell."
     },
     {
-      "map": 146538496,
-      "npc": 2767,
-      "cell": 313,
-      "orientation": 3,
-      "why": "Kickroach in «Kickroach's Lair - Exit», who sends the winners out («Leave Kickroach's Lair.»). He stood nowhere and the room had no way out. INFERRED cell."
-    },
-    {
       "map": 218632194,
       "npc": 6612,
       "cell": 247,
@@ -7061,6 +7054,13 @@
       "cell": 413,
       "orientation": 1,
       "why": "Chaferfu (template 6459, «Chaferloko» in es.bin) in the Skeleton Dungeon's Fifth Room, the boss room: once the Chafer Ronin is beaten «parler avec le Chaferfu présent dans la salle et de suivre ses instructions pour apprendre le sort» (JeuxOnline, «Donjon des Squelettes»); text 1119887 says the spell (373) and its variant (24028) are won at the end of the Skeleton Dungeon. INFERRED cell: open floor in the lower middle of the room, away from the boss group (288)."
+    },
+    {
+      "map": 147062786,
+      "npc": 2769,
+      "cell": 301,
+      "orientation": 3,
+      "why": "Cinder Mistigris, the Ecaflip of «Miniature Adventure» (1607), in the Vilinsekts' hideout behind the grocery store's barrel. INFERRED cell."
     }
   ]
 }

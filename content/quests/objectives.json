@@ -7386,6 +7386,15 @@
    "kind": "use",
    "afterObjectives": [13484],
    "why": "«Sacrifica a quemaalmas para la muñeca de necrónix» (740101): the sacrifice item 19519, used (effect 30, condition Qo=13488)."
+  },
+  {
+   "objective": 9395,
+   "quest": 1607,
+   "kind": "reply",
+   "replies": [23568],
+   "afterObjectives": [9394],
+   "gives": [{"item": 15988}],
+   "why": "«Reduce the croquette's size to carry it with you» (485902): with the Rikiki Wand worn, «Use the Rikiki Wand on the croquette.» (23568) shrinks it into the Magic Croquette (15988). Dofus pour les noobs («Aventure miniature»)."
   }
 ]
 }

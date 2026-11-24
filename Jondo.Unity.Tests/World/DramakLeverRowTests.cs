@@ -1,5 +1,10 @@
+using System.IO;
 using System.Linq;
+using Jondo.Unity.Launcher;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Network;
+using Jondo.Unity.World.Content;
+using Jondo.Unity.World.Emotes;
 using Xunit;
 
 namespace Jondo.Unity.Tests.World
@@ -11,7 +16,8 @@ namespace Jondo.Unity.Tests.World
     /// </summary>
     public class DramakLeverRowTests
     {
-        private const long Room3 = 118228992;
+        private const long Room3 = 118228992, Backstage = 118229250;
+        private const int Shaca = 2180, Juggle = 29;
         private static readonly int[] InOrder = { 482974, 482973, 482976, 482975, 482977 };
 
         private static bool Pull(long character, int element)
@@ -56,6 +62,28 @@ namespace Jondo.Unity.Tests.World
             foreach (int e in InOrder.Skip(1).Take(3)) Assert.False(Pull(me, e));
             Assert.True(Pull(me, InOrder[4]));
             Assert.False(Pull(other, InOrder[2]));
+        }
+
+        /// <summary>
+        /// Shaca's last reply teaches the Juggle emote, which no character starts with: a player
+        /// without it owns it only once learnt. (An administrator is granted every emote, so the
+        /// harness's own characters cannot show the change.)
+        /// </summary>
+        [Fact]
+        public void Shaca_teaches_the_juggle_emote_nobody_starts_with()
+        {
+            string path = Paths.ContentFile(NpcDialogueContent.AuthoredFile);
+            if (!File.Exists(path)) return;   // no data
+            var tree = NpcDialogueContent.For(NpcDialogueContent.Load(path), Shaca, Backstage);
+            Assert.NotNull(tree);
+            Assert.Empty(NpcDialogueContent.Complaints(tree!));
+            var teach = tree!.Lines.SelectMany(l => l.Choices).Single(c => c.TeachesEmote != 0);
+            Assert.Equal(19434, teach.Reply);
+            Assert.Equal(Juggle, teach.TeachesEmote);
+
+            Assert.DoesNotContain(Juggle, EmoteRules.Starting);
+            Assert.DoesNotContain(Juggle, EmoteOwnershipService.Owned(new int[0], new int[0]));
+            Assert.Contains(Juggle, EmoteOwnershipService.Owned(new[] { Juggle }, new int[0]));
         }
     }
 }

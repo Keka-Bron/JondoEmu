@@ -429,6 +429,7 @@
     {"map": 152835072, "element": 24996, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373},
     {"map": 152835072, "element": 25015, "npc": 2936, "cell": 262, "gfx": 0, "type": -1, "skill": 0, "toMap": 152836096, "toCell": 373},
     {"map": 192939014, "element": 515804, "cell": 230, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147062784, "toCell": 344, "criterion": "(POE15990,1|PO>31494,0)", "refusal": 449, "refusalType": 1},
+    {"map": 192416772, "element": 515315, "cell": 248, "gfx": 69792, "type": 0, "skill": 114, "toMap": 147062786, "toCell": 396, "criterion": "POE15990,1", "refusal": 449, "refusalType": 1},
     {"map": 147062784, "element": 507617, "cell": 329, "gfx": 47359, "type": 0, "skill": 114, "toMap": 192939014, "toCell": 244},
     {"map": 192545798, "element": 515384, "cell": 311, "gfx": 47284, "type": 0, "skill": 114, "toMap": 147063810, "toCell": 394, "criterion": "(POE15990,1|PO>31494,0)", "refusal": 449, "refusalType": 1},
     {"map": 217055492, "element": 540446, "remove": true, "why": "Bonta's guild hall zaap: the official server declares it type 16 with skill 114 and answered its use with the zaap destination list (packet capture, 2026-11-21); Jondo's guild-hall import had paired it (inferred) as a door to 212731652."},
