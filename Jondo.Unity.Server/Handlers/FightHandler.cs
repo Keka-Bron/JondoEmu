@@ -25,6 +25,15 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>How many fights are open right now. The server window draws it.</summary>
         public static int CombatesEnCurso => _activeFights.Count;
 
+        /// <summary>Iop's Bond (French) / Jump: its movement follows the cast animation.</summary>
+        internal const int BondSpell = 13107;
+
+        /// <summary>
+        /// How long the client gets to show Bond's jump before the teleport lands. The cast frame
+        /// starts the animation; without this pause the movement arrives in the same sequence and
+        /// can cut it off. This is the test value for that hypothesis, not a measured duration.
+        /// </summary>
+        internal const int BondAnimationMilliseconds = 500;
         /// <summary>
         /// Whether a quest's fight is played alone (Keka-Bron/JondoEmu#209): when it says so
         /// (<paramref name="solo"/> true), or, saying nothing (null), when its board places one
@@ -6808,6 +6817,11 @@ namespace Jondo.Unity.Server.Handlers
                                                     int spell, int grade, Fighter victim, int cell, bool critico,
                                                     IReadOnlyList<Managers.SpellEffect> tirada)
         {
+            // Bond's animation starts with the cast frame above. Give it the floor before the
+            // teleport row moves the caster, or the jump is cut off before it is seen.
+            if (spell == BondSpell)
+                await Task.Delay(BondAnimationMilliseconds);
+
             tirada = await BoostsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
             int blowsAt;
             (tirada, blowsAt) = await TeleportsFirstAsync(stream, fight, caster, spell, grade, victim, cell, critico, tirada);
