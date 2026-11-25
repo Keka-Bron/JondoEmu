@@ -7780,6 +7780,752 @@
    "map": 168560642,
    "afterObjectives": [11003],
    "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs)."
+  },
+  {
+   "objective": 9243,
+   "quest": 1571,
+   "kind": "talk",
+   "npc": 2655,
+   "map": 164364304,
+   "afterObjectives": [9242],
+   "why": "«Únete a la encargada cerca del zaap de los caminos rocosos»: talking to her by the Cania zaap (Dofus pour les noobs («Le maître des zaaps»))."
+  },
+  {
+   "objective": 9244,
+   "quest": 1571,
+   "kind": "reply",
+   "replies": [22903],
+   "afterObjectives": [9243],
+   "why": "«Presenta la encargada de los zaaps al comandante Qu»: «Te presento a la encargada de los zaaps» (22903) with her standing in the generator room (Dofus pour les noobs («Le maître des zaaps»))."
+  },
+  {
+   "objective": 9247,
+   "quest": 1571,
+   "kind": "enter",
+   "map": 145100034,
+   "overridesMap": true,
+   "afterObjectives": [9246],
+   "why": "«Obtén el acceso a la dimensión Xelorium y preséntate ante el portal»: arriving in the Xelorium dimension (Dofus pour les noobs («Le maître des zaaps»): launch a portal hunt)."
+  },
+  {
+   "objective": 18487,
+   "quest": 2445,
+   "kind": "click",
+   "elements": [{"map": 205520896, "element": 524235}],
+   "why": "«Encuentra un lugar adecuado para la meditación»: the little meditating pandawa statue of the fountain [24,-35] (graphic 60655, cell 498, a quest element); Dofus pour les noobs («Rester planté là»). INFERRED element."
+  },
+  {
+   "objective": 18488,
+   "quest": 2445,
+   "kind": "click",
+   "elements": [{"map": 205520896, "element": 524235}],
+   "afterObjectives": [18487],
+   "afterElement": -2445001,
+   "why": "«Medita junto a la fuente espiritual sin caer en distracciones»: the statue pressed again once the moskitos are beaten (their wave fight marks it)."
+  },
+  {
+   "objective": 18489,
+   "quest": 2445,
+   "kind": "reply",
+   "replies": [67932],
+   "why": "«Habla con el espíritu sereno»: closed when he tells the visitor to turn toward the shining globe."
+  },
+  {
+   "objective": 18491,
+   "quest": 2445,
+   "kind": "enter",
+   "map": 205521925,
+   "afterObjectives": [18490],
+   "why": "«Entra en la bambusería para encontrar la luz»: the light's last stop, the door of Damadrya's grove [26,-30]."
+  },
+  {
+   "objective": 18494,
+   "quest": 2445,
+   "kind": "enter",
+   "map": 155976192,
+   "afterObjectives": [18493],
+   "why": "«Localiza la tumba del leñador pandawa»: the Litneg wood [-14,-59] where the light drops the visitor."
+  },
+  {
+   "objective": 18495,
+   "quest": 2445,
+   "kind": "beat",
+   "monsters": [6913, 6914, 6915],
+   "map": 155976192,
+   "afterObjectives": [18494],
+   "why": "«Impide que los trools profanen la sepultura»: the three trolls beaten."
+  },
+  {
+   "objective": 18496,
+   "quest": 2445,
+   "kind": "reply",
+   "replies": [67948],
+   "why": "«Habla con el fantasma desarraigado»: closed when a bamboo sprout comes out of the earth."
+  },
+  {
+   "objective": 18497,
+   "quest": 2445,
+   "kind": "click",
+   "elements": [{"map": 205520896, "element": 524235}],
+   "afterObjectives": [18496],
+   "requires": [{"item": 26708, "count": 1}],
+   "spends": true,
+   "why": "«Recoge el brote de bambú y plántalo junto a la fuente espiritual»: the statue pressed carrying the sprout, which is planted (spent)."
+  },
+  {
+   "objective": 18498,
+   "quest": 2445,
+   "kind": "reply",
+   "replies": [67955],
+   "why": "«Despídete del alma renaciente»: closed when the pandawa hands over the spiritual amber."
+  },
+  {
+   "objective": 18499,
+   "quest": 2445,
+   "kind": "use",
+   "afterObjectives": [18498],
+   "why": "«Purifica el ámbar espiritual con el poder del anillo ocre»: item 26371 used with the Ocre ring equipped (its own effects tick this and give the purified yellow amber)."
+  },
+  {
+   "objective": 18500,
+   "quest": 2445,
+   "kind": "reply",
+   "replies": [67960],
+   "why": "«Habla con el espíritu sereno antes de abandonar Plantala»: closed on his farewell."
+  },
+  {
+   "objective": 9253,
+   "quest": 1572,
+   "kind": "enter",
+   "map": 144968704,
+   "afterObjectives": [9090],
+   "why": "«Encuentra el lugar que indica el oricómetro»: the old chest's map [6,6], two maps left of the outpost (Dofus pour les noobs («Énergie renouvelable»))."
+  },
+  {
+   "objective": 9254,
+   "quest": 1572,
+   "kind": "click",
+   "elements": [{"map": 144968704, "element": 486741}],
+   "afterObjectives": [9253],
+   "requires": [{"item": 15855, "count": 23}],
+   "spends": true,
+   "why": "«Abre el cofre»: the old chest shows XXIII and wants 23 Xelorium minutes (Dofus pour les noobs («Énergie renouvelable»))."
+  },
+  {
+   "objective": 9255,
+   "quest": 1572,
+   "kind": "click",
+   "elements": [{"map": 144968704, "element": 486741}],
+   "afterObjectives": [9254],
+   "gives": [{"item": 15851}],
+   "why": "«Mete el oricor inestable...» (the chest's second click): takes the unstable orichor (Dofus pour les noobs («Énergie renouvelable»)). The two ambush fights are not triggered by it (engine gap)."
+  },
+  {
+   "objective": 9258,
+   "quest": 1572,
+   "kind": "enter",
+   "map": 145489920,
+   "afterObjectives": [9257],
+   "why": "«Escolta a la encargada de los zaaps hasta el Templo del Tiempo»: arriving in the Present Day zone's temple (Dofus pour les noobs («Énergie renouvelable»))."
+  },
+  {
+   "objective": 9259,
+   "quest": 1572,
+   "kind": "reply",
+   "replies": [22930, 22929],
+   "afterObjectives": [9258],
+   "why": "«Ayuda a la encargada a fabricar la batería»: the assembly's last choice (Dofus pour les noobs («Énergie renouvelable»))."
+  },
+  {
+   "objective": 9260,
+   "quest": 1572,
+   "kind": "enter",
+   "map": 145229323,
+   "afterObjectives": [9277],
+   "why": "«Busca ayuda en el puesto avanzado de Xelorium»: the outpost's inner map (Dofus pour les noobs («Énergie renouvelable»): back with the late watch)."
+  },
+  {
+   "objective": 11007,
+   "quest": 1733,
+   "kind": "click",
+   "elements": [{"map": 169083908, "element": 508148}],
+   "why": "«Asegura las instalaciones» (647820): the installation of [23,28] (Dofus pour les noobs: En [23,28], cliquez sur l'installation); element 508148, the only one of the map without a skill besides the teleport, is INFERRED."
+  },
+  {
+   "objective": 11008,
+   "quest": 1733,
+   "kind": "click",
+   "elements": [{"map": 169083906, "element": 508402}],
+   "why": "«Asegura las instalaciones» (649715): an installation of [23,27] before the fight; element 508402 (gfx 53886) INFERRED, the guide names only the fight on this map."
+  },
+  {
+   "objective": 11010,
+   "quest": 1733,
+   "kind": "click",
+   "elements": [{"map": 169082882, "element": 508149}],
+   "why": "«Asegura las instalaciones» (649717): the installation of [22,27] (Dofus pour les noobs: En [22,27], cliquez sur l'installation); element 508149 is its only one."
+  },
+  {
+   "objective": 11011,
+   "quest": 1733,
+   "kind": "click",
+   "elements": [{"map": 169082880, "element": 508278}],
+   "why": "«Asegura las instalaciones» (649722): an installation of [22,26] before the fight; element 508278, the only one of the map, INFERRED."
+  },
+  {
+   "objective": 11019,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 169082886,
+   "afterObjectives": [11022],
+   "why": "«Escolta a Topo hasta el primer lugar de registro» (644025): the map to the left of the arrival (Dofus pour les noobs), the objective's own map."
+  },
+  {
+   "objective": 11024,
+   "quest": 1734,
+   "kind": "reply",
+   "replies": [28862],
+   "afterObjectives": [11019],
+   "why": "«Encárgate de la seguridad de Topo mientras registra los datos» (644047): Topo's «Vigilar los alrededores» (28862) at the first site; the random fight the guide mentions is not made."
+  },
+  {
+   "objective": 11020,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 169084934,
+   "afterObjectives": [11024],
+   "why": "«Escolta a Topo hasta el segundo lugar de registro» (644074): [24,29], the objective's own map."
+  },
+  {
+   "objective": 11025,
+   "quest": 1734,
+   "kind": "beat",
+   "monster": 4458,
+   "map": 169084934,
+   "afterObjectives": [11020],
+   "why": "«Encárgate de la seguridad de Topo...» (644125): the fight Topo's 28862 starts on [24,29] (npc_fights), won with him at the side."
+  },
+  {
+   "objective": 11021,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 169083912,
+   "afterObjectives": [11025],
+   "why": "«Escolta a Topo hasta el tercer lugar de registro» (644031): [23,30], the objective's own map."
+  },
+  {
+   "objective": 11026,
+   "quest": 1734,
+   "kind": "reply",
+   "replies": [28862],
+   "afterObjectives": [11021],
+   "why": "«Encárgate de la seguridad de Topo...» (644078): 28862 at the third site; the guide's random fight is not made."
+  },
+  {
+   "objective": 11023,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 169083914,
+   "afterObjectives": [11026],
+   "why": "«Escolta a Topo hasta el cuarto lugar de registro» (644072): [23,31], the objective's own map."
+  },
+  {
+   "objective": 11027,
+   "quest": 1734,
+   "kind": "beat",
+   "monster": 4458,
+   "map": 169083914,
+   "afterObjectives": [11023],
+   "why": "«Encárgate de la seguridad de Topo...» (644111): the fight of the fourth site, Topo not joining (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11028,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 170132480,
+   "afterObjectives": [11027],
+   "overridesMap": true,
+   "why": "«Encuentra a Topo en la antigua Sufokia» (1169936, no map of its own): the room hidden behind the big tank 170132480, where Topo fled (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11029,
+   "quest": 1734,
+   "kind": "click",
+   "afterObjectives": [11028],
+   "elements": [{"map": 170132480, "element": 508146}],
+   "why": "«Explora el lugar» (644071): the hieroglyphs (Dofus pour les noobs); element 508146, the room's only one without a skill, INFERRED. The guide's slab path is not checked."
+  },
+  {
+   "objective": 11030,
+   "quest": 1734,
+   "kind": "reply",
+   "replies": [28837],
+   "afterObjectives": [11029],
+   "why": "«Devuelve el robot a Prosper Maramado» (644100): 28837 «Mi misión ha sido todo un éxito» in the underwater house [22,28]."
+  },
+  {
+   "objective": 11022,
+   "quest": 1734,
+   "kind": "enter",
+   "map": 169083910,
+   "afterObjectives": [11018],
+   "overridesMap": true,
+   "why": "«Utiliza el sello en el ascensor de la antigua Sufokia» (644035): the lift of [23,28] (element 508150, open only with the Sello de los fundadores, teleports.json) lands on 169083910; arriving there closes the objective (a click binding on the lift swallowed the first click and the teleport only came with the second)."
+  },
+  {
+   "objective": 9403,
+   "quest": 1608,
+   "kind": "enter",
+   "map": 91751943,
+   "afterObjectives": [9402],
+   "why": "«Registra el lugar donde trabajaba Vardo»: Pam sends the player down to the lower floor of the Sufokian digs (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 9404,
+   "quest": 1608,
+   "kind": "click",
+   "elements": [{"map": 91751943, "element": 487852}],
+   "afterObjectives": [9403],
+   "gives": [{"item": 16021}],
+   "why": "«Lee la página del diario de Vardo»: the wooden crate in the middle of the room gives Vardo's diary page (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 9405,
+   "quest": 1608,
+   "kind": "click",
+   "elements": [{"map": 90702593, "element": 487855}],
+   "afterObjectives": [9404],
+   "gives": [{"item": 16039}],
+   "why": "«Taberna de Sufokia»: the diary leads to the tavern and the barrel at [11,24] gives the bucket of sea water (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 9407,
+   "quest": 1608,
+   "kind": "enter",
+   "map": 88083713,
+   "afterObjectives": [9406],
+   "why": "«Encuentra contrabandistas a lo largo de la ribera sufokeña»: the Sufokian shore [7,22] (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 9408,
+   "quest": 1608,
+   "kind": "beat",
+   "monsters": [3950, 3951, 3952],
+   "map": 88083713,
+   "afterObjectives": [9407],
+   "why": "«Derrota al grupo de contrabandistas»: the group of three smugglers (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 9412,
+   "quest": 1608,
+   "kind": "enter",
+   "map": 147324928,
+   "afterObjectives": [9411],
+   "why": "«Traspasa las puertas de piedra»: the undersea cave reached by the submarine (Dofus pour les noobs («Le disparu de Sufokia»)); the stone doors are not clickable in the engine, arrival counts."
+  },
+  {
+   "objective": 9414,
+   "quest": 1608,
+   "kind": "enter",
+   "map": 95422464,
+   "afterObjectives": [9413],
+   "why": "«Escolta a Vardo hasta Sufokia»: back in the submarine (Dofus pour les noobs («Le disparu de Sufokia»))."
+  },
+  {
+   "objective": 11031,
+   "quest": 1735,
+   "kind": "enter",
+   "map": 169083906,
+   "why": "«Encuéntrate con Deks en la ciudad submarina» (644129): his map [23,27], the objective's own map."
+  },
+  {
+   "objective": 11035,
+   "quest": 1735,
+   "kind": "enter",
+   "map": 169084930,
+   "afterObjectives": [11034],
+   "why": "«Entra en la Nave del Capitán Meno» (644044): the ship's entrance [24,27], the objective's own map."
+  },
+  {
+   "objective": 9467,
+   "quest": 1609,
+   "kind": "enter",
+   "map": 183768064,
+   "why": "«Ve al templo de Sram»: the Sram temple at [-4,0] (Dofus pour les noobs («Rendez-vous avec la mort»))."
+  },
+  {
+   "objective": 9468,
+   "quest": 1609,
+   "kind": "enter",
+   "map": 183768068,
+   "afterObjectives": [9467],
+   "why": "«Busca a la persona que quiere reunirse contigo»: the crypt room with the half-open coffin (Dofus pour les noobs («Rendez-vous avec la mort»))."
+  },
+  {
+   "objective": 18501,
+   "quest": 2446,
+   "kind": "enter",
+   "map": 220987393,
+   "why": "«Entra en el dédalo de Dark Vlad»: the first map of the maze, [-5,14], below the enchanted edge (open once «Un péndulo para guiar sus pasos» is done)."
+  },
+  {
+   "objective": 18502,
+   "quest": 2446,
+   "kind": "objectives",
+   "afterObjectives": [18576],
+   "why": "«Burla la vigilancia de la guardiana del túmulo»: Dofus pour les noobs: «Pour accomplir cet objectif, vous devez terminer la quête Arrête-la si tu peux» (2451, whose last objective is 18576)."
+  },
+  {
+   "objective": 18503,
+   "quest": 2446,
+   "kind": "talk",
+   "npc": 6680,
+   "afterObjectives": [18502],
+   "why": "«Descubre y examina el sello de Terrakurial»: speaking to the burning seal the Enchanterelle blessing reveals."
+  },
+  {
+   "objective": 18505,
+   "quest": 2446,
+   "kind": "beat",
+   "monster": 6920,
+   "map": 220729859,
+   "afterObjectives": [18503],
+   "why": "«Sobrevive a la mordedura de fuego de Dark Vlad»: the fight on the seal, alone."
+  },
+  {
+   "objective": 18506,
+   "quest": 2446,
+   "kind": "reply",
+   "replies": [68008],
+   "afterObjectives": [18505],
+   "spends": [{"item": 26367, "count": 1}, {"item": 26370, "count": 1}, {"item": 26372, "count": 1}],
+   "why": "«Coloca tres ámbares purificados en el sello»: the red, brown and yellow purified ambers of the Ocre chain are spent."
+  },
+  {
+   "objective": 18507,
+   "quest": 2446,
+   "kind": "beat",
+   "monster": 6942,
+   "map": 221250560,
+   "afterObjectives": [18506],
+   "why": "«Encuentra la fuente de las llamas frías»: the fight against the puppet in the Deblers' cottage opens the cellar."
+  },
+  {
+   "objective": 18508,
+   "quest": 2446,
+   "kind": "click",
+   "afterObjectives": [18507],
+   "elements": [{"map": 221251584, "element": 524268}],
+   "why": "«Acércate al fuego del centro del pentáculo»: the cold flame of the cellar's pentacle, which carries the character into the spirit world."
+  },
+  {
+   "objective": 9420,
+   "quest": 1610,
+   "kind": "reply",
+   "replies": [23777, 23778],
+   "afterObjectives": [9419],
+   "why": "«Interroga a los viajeros de la torre»: Gladis in the research room or Colonel Onil send the player to Dublia's krosmoglob in the prison (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 9421,
+   "quest": 1610,
+   "kind": "click",
+   "elements": [{"map": 130023937, "element": 488033}],
+   "afterObjectives": [9420],
+   "why": "«Activa el krosmoglob de la agente Dublia en la prisión»: the console of the prison basement (Dofus pour les noobs («Secret de fabrication»): «cliquez sur la console pour activer le Krosmoglob»)."
+  },
+  {
+   "objective": 9423,
+   "quest": 1610,
+   "kind": "click",
+   "elements": [{"map": 130024963, "element": 488034}],
+   "afterObjectives": [9422],
+   "requires": [{"item": 14509, "count": 1}, {"item": 14516, "count": 10}, {"item": 7906, "count": 10}, {"item": 14946, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 16053}],
+   "why": "«Usa el alambique del laboratorio»: the still brews the potion of total transparency (recipe 16053: porsalu leather, 10 rhinoferoce ears, 10 boufcoul horns, bulldog ear) (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 9427,
+   "quest": 1610,
+   "kind": "enter",
+   "map": 128977920,
+   "afterObjectives": [9426],
+   "why": "«Busca indicios del paso del convoy»: the cliff map [3,-5] with the hidden door (Dofus pour les noobs («Secret de fabrication»): traces of the convoy and the bucket; the bucket is the map's own door)."
+  },
+  {
+   "objective": 9428,
+   "quest": 1610,
+   "kind": "reply",
+   "replies": [23892],
+   "afterObjectives": [9427],
+   "why": "«Intenta entrar en la refinería»: the digicode's «Voy a pensármelo» (Dofus pour les noobs («Secret de fabrication»): it has to be the first answer)."
+  },
+  {
+   "objective": 9429,
+   "quest": 1610,
+   "kind": "click",
+   "elements": [{"map": 128974848, "element": 485063}, {"map": 128974850, "element": 485068}, {"map": 128974852, "element": 485069}, {"map": 128975872, "element": 485064}, {"map": 128975874, "element": 485067}, {"map": 128975876, "element": 485070}, {"map": 128976896, "element": 485065}, {"map": 128976898, "element": 485066}, {"map": 128976900, "element": 485071}, {"map": 128977924, "element": 485072}],
+   "afterObjectives": [9428],
+   "gives": [{"item": 16054}],
+   "why": "«Averigua dónde ha ocultado el código»: any chest of the dimension yields the scribbled note with the code (Dofus pour les noobs («Secret de fabrication»)). The ambush fight a chest may bring is not written."
+  },
+  {
+   "objective": 9430,
+   "quest": 1610,
+   "kind": "reply",
+   "replies": [23893],
+   "afterObjectives": [9429],
+   "why": "«Prueba el código para entrar en la refinería»: the right code on the digicode (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 9431,
+   "quest": 1610,
+   "kind": "enter",
+   "map": 131859975,
+   "afterObjectives": [9430],
+   "why": "«Averigua adónde han transportado el oricor»: the refinery's first hall (Dofus pour les noobs («Secret de fabrication»): «Franchissez la première salle»)."
+  },
+  {
+   "objective": 11039,
+   "quest": 1736,
+   "kind": "enter",
+   "map": 91753989,
+   "afterObjectives": [11038],
+   "why": "«Dirígete a la biblioteca» (644056): the library [20,25], the objective's own map."
+  },
+  {
+   "objective": 9426,
+   "quest": 1610,
+   "kind": "reply",
+   "replies": [23788],
+   "afterObjectives": [9425],
+   "why": "«Usa la pócima de transparencia total para tomar prestado el portal discretamente»: the potion has no objective effect, so the crossing of the hidden portal while transparent closes it (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 9434,
+   "quest": 1610,
+   "kind": "beat",
+   "monsters": [3961, 3962, 3963],
+   "map": 131858951,
+   "afterObjectives": [9433],
+   "why": "«Roba el oricor refinado»: the three safe-guardians beaten in the inner hall (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 9438,
+   "quest": 1610,
+   "kind": "enter",
+   "map": 131860999,
+   "afterObjectives": [9437],
+   "why": "«Sal de la refinería»: the refinery's entrance (Dofus pour les noobs («Secret de fabrication»))."
+  },
+  {
+   "objective": 11043,
+   "quest": 1737,
+   "kind": "enter",
+   "map": 168820736,
+   "why": "«Dirígete a la entrada del palacio de Dientinea» (649710): [19,26], the objective's own map."
+  },
+  {
+   "objective": 9442,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Investiga la presencia reciente de Lonyon Plata en Sramvil»: asking Ariela if she has seen him (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23806],
+   "afterObjectives": [9441]
+  },
+  {
+   "objective": 9443,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Compra una pócima de transformación en sirena en el mercadillo»: Eli Ksir's deal, 30 000 kamas or a badge (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23807, 23808],
+   "afterObjectives": [9442]
+  },
+  {
+   "objective": 9445,
+   "quest": 1611,
+   "kind": "click",
+   "why": "«Busca indicios del paso de Lonyon Plata»: the cardboard box of the Cima tenebrosa holds the Lonyon disguise (Dofus pour les noobs («S'emparer des commandes»)).",
+   "elements": [{"map": 137365762, "element": 488035}],
+   "afterObjectives": [9444],
+   "gives": [{"item": 16065}]
+  },
+  {
+   "objective": 9454,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Busca un testigo que presenciara el robo»: the lurking Maligilante outside the prison (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23834],
+   "afterObjectives": [9453]
+  },
+  {
+   "objective": 9455,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Busca a los hombres de confianza de Al Capote»: the Maligilante's answer (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23833],
+   "afterObjectives": [9454]
+  },
+  {
+   "objective": 9456,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Interroga a los comerciantes del mercadillo»: Valentín (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23835],
+   "afterObjectives": [9455]
+  },
+  {
+   "objective": 9457,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Llévale 1 anillo de bandido o 100 000 kamas a Grima Fandanga»: the payment answers (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23840, 23844],
+   "afterObjectives": [9456]
+  },
+  {
+   "objective": 9458,
+   "quest": 1611,
+   "kind": "enter",
+   "why": "«Busca a Ratero Gris en las catacombrías»: the catacombs entrance [8,6] (Dofus pour les noobs («S'emparer des commandes»)).",
+   "map": 135270145,
+   "afterObjectives": [9457]
+  },
+  {
+   "objective": 9459,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Busca indicios del paso de Ratero Gris»: Valentín in the catacombs (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23848],
+   "afterObjectives": [9458]
+  },
+  {
+   "objective": 9460,
+   "quest": 1611,
+   "kind": "click",
+   "why": "«Encuentra el modo de atravesar las rejas»: the sewer bars (Dofus pour les noobs («S'emparer des commandes»): equip the Rikiki wand and pass between the bars).",
+   "elements": [{"map": 135270145, "element": 488036}],
+   "afterObjectives": [9459]
+  },
+  {
+   "objective": 9461,
+   "quest": 1611,
+   "kind": "reply",
+   "why": "«Escucha la conversación entre Ratero Gris y Morora»: Morora's «acercarte discretamente» (Dofus pour les noobs («S'emparer des commandes»)).",
+   "replies": [23849],
+   "afterObjectives": [9460]
+  },
+  {
+   "objective": 9462,
+   "quest": 1611,
+   "kind": "beat",
+   "why": "«Derrota a las milirratas y registra sus cadáveres»: the fight against Svivomito's gang (Dofus pour les noobs («S'emparer des commandes»)).",
+   "monsters": [3967, 3968, 3969],
+   "map": 138150403,
+   "afterObjectives": [9461]
+  },
+  {
+   "objective": 9463,
+   "quest": 1611,
+   "kind": "enter",
+   "why": "«Regresa al mercadillo»: the market's [8,3] (Dofus pour les noobs («S'emparer des commandes»)).",
+   "map": 134223874,
+   "afterObjectives": [9462]
+  },
+  {
+   "objective": 9464,
+   "quest": 1611,
+   "kind": "enter",
+   "why": "«Busca a la persona que te está esperando»: the alley [9,3] (Dofus pour les noobs («S'emparer des commandes»)).",
+   "map": 134224898,
+   "afterObjectives": [9463]
+  },
+  {
+   "objective": 11051,
+   "quest": 1738,
+   "kind": "reply",
+   "replies": [28665],
+   "why": "«Busca a los bandidos en el territorio de los porcos» (886832): Lora sends the player there (28665)."
+  },
+  {
+   "objective": 11052,
+   "quest": 1738,
+   "kind": "reply",
+   "replies": [28670],
+   "why": "«Quítale el cofre al traficante» (886833): the player picks the chest up (28670)."
+  },
+  {
+   "objective": 11058,
+   "quest": 1738,
+   "kind": "enter",
+   "map": 168822786,
+   "why": "«Acompaña a Dama Askina al campamento» (886834): the camp [21,27], the objective's own map."
+  },
+  {
+   "objective": 11060,
+   "quest": 1739,
+   "kind": "beat",
+   "monsters": [4439, 4440, 4441, 4442],
+   "map": 168822786,
+   "why": "«Derrota a la pareja de trithones» (886838): the first training duo, chosen by the player."
+  },
+  {
+   "objective": 11061,
+   "quest": 1739,
+   "kind": "beat",
+   "monsters": [4439, 4440, 4441, 4442],
+   "map": 168822786,
+   "afterObjectives": [11060],
+   "why": "«Derrota a la pareja de trithones» (886839): the second training duo."
+  },
+  {
+   "objective": 11062,
+   "quest": 1739,
+   "kind": "beat",
+   "monsters": [4439, 4440, 4441, 4442],
+   "map": 168822786,
+   "afterObjectives": [11061],
+   "why": "«Derrota al cuarteto de trithones» (886840): the four kinds together."
+  },
+  {
+   "objective": 9472,
+   "quest": 1612,
+   "kind": "click",
+   "why": "«Consulta el Historibúho Compendium»: the book of the Hall of the Past (Dofus pour les noobs («C'est dans la boîte»): «consultez la légende de Méthée»). INFERRED element: the one on the same cell as the lectern.",
+   "elements": [{"map": 146146562, "element": 486831}],
+   "afterObjectives": [9471]
+  },
+  {
+   "objective": 9474,
+   "quest": 1612,
+   "kind": "reply",
+   "why": "«Encuentra al horademonio que destrozó el libro»: «Ir en busca del devorador» (Dofus pour les noobs («C'est dans la boîte»)).",
+   "replies": [24022],
+   "afterObjectives": [9473]
+  },
+  {
+   "objective": 9476,
+   "quest": 1612,
+   "kind": "reply",
+   "why": "«Interroga al devorador de libros»: «Dale la hoja arrancada...» (Dofus pour les noobs («C'est dans la boîte»)).",
+   "replies": [24027],
+   "afterObjectives": [9475]
+  },
+  {
+   "objective": 9477,
+   "quest": 1612,
+   "kind": "reply",
+   "why": "«Ve al puesto avanzado de los viajeros»: «Darle las gracias e ir al Megalito» (Dofus pour les noobs («C'est dans la boîte»)).",
+   "replies": [24034],
+   "afterObjectives": [9476]
+  },
+  {
+   "objective": 9480,
+   "quest": 1612,
+   "kind": "reply",
+   "why": "«Recupera 4 fragmentos de tiempo»: the four hunters' fragments, shown to Hyperia (Dofus pour les noobs («C'est dans la boîte»)).",
+   "replies": [24045],
+   "afterObjectives": [9478]
   }
 ]
 }

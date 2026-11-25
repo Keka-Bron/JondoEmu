@@ -1518,6 +1518,19 @@
    "toMap": 137367552,
    "toCell": 300,
    "why": "The jailer lets the player out of the prison, to the tavern where Zap Gobdon waits (INFERRED; Dofus pour les noobs, «La voix de son maître»)."
-  }
+  },
+    {
+      "map": 169083908,
+      "element": 508150,
+      "cell": 410,
+      "gfx": 60371,
+      "type": 0,
+      "skill": 114,
+      "toMap": 169083910,
+      "toCell": 310,
+      "criterion": "PO>17963,0",
+      "refusal": 449,
+      "refusalType": 1
+    }
   ]
 }

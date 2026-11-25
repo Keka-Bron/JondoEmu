@@ -928,6 +928,22 @@
    "orientation": 3,
    "members": [{"monster": 3671, "grade": 0}],
    "why": "The Berserkoffre Affectueux of «Orichomania» (1486, 8361; Dofus pour les noobs («Orichomania»): «Combattez alors ce dernier», alone). INFERRED cell and grade."
+  },
+  {
+   "map": 169083906,
+   "group": -1733001,
+   "cell": 303,
+   "orientation": 3,
+   "members": [{"monster": 4477, "grade": 0}],
+   "why": "The agitated mantaze of [23,27] (1733, objective 11009, Dofus pour les noobs: En [23,27], affrontez la Mantaze). INFERRED cell and grade."
+  },
+  {
+   "map": 169082880,
+   "group": -1733002,
+   "cell": 329,
+   "orientation": 3,
+   "members": [{"monster": 4477, "grade": 0}],
+   "why": "The agitated mantaze of [22,26] (1733, objective 11012, drops the purple crystal). INFERRED cell and grade."
   }
   ]
 }

@@ -2319,14 +2319,6 @@
       "why": "The Ancestral Treechnid in his domain's exit room, beaten, where «Munster lève le mystère» questions him. INFERRED cell."
     },
     {
-      "map": 147850754,
-      "npc": 2854,
-      "cell": 285,
-      "orientation": 3,
-      "criterion": "(Qa=1620&Qo>9570)|Qf=1620",
-      "why": "Silvosse in the Dark Forest's clearing [-11,-13], brought by the statue («faire apparaitre Silvosse»), and there from then on (he gives «L'art de la langue de bois»). INFERRED cell."
-    },
-    {
       "map": 147851273,
       "npc": 2876,
       "cell": 300,
@@ -6056,13 +6048,6 @@
       "why": "Karnhell, who comes out behind the character at the last bush of the maze [-1,16] (220989443) (Dofus pour les noobs, «Arrête-la si tu peux»: «soudain une créature mécontente de ce gâchis fait son apparition derrière vous»), from the bush (18567) until she is tamed (18571) and walks behind the character. INFERRED cell: beside her derived one."
     },
     {
-      "map": 220729859,
-      "npc": 2217,
-      "cell": 411,
-      "orientation": 3,
-      "why": "Hell Mina in the Tertre du long sommeil's post-boss room (220729859), where the character speaks to her once the dungeon is won («Arrête-la si tu peux», objective 18576; Dofus pour les noobs, «Arrête-la si tu peux»: «Une fois le donjon terminé, parlez à Hell Mina»), from the boss (18575) until she is spoken to (18576). INFERRED cell. She stands there for every winner, as the NPCs of the other exit rooms do: whoever is not on the quest still leaves through her «exit» reply (68025)."
-    },
-    {
       "map": 14551301,
       "npc": 389,
       "cell": 259,
@@ -7350,6 +7335,558 @@
       "orientation": 3,
       "criterion": "Qa=1732",
       "why": "Espiritu melancolico (3275): Rykke Zane's ghost at [27,27] (1732, Dofus pour les noobs: Montrez le luth a l'esprit melancolique); the client's map data holds no placement, INFERRED cell."
+    },
+    {
+      "map": 147850754,
+      "npc": 2854,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "(Qa=1620&Qo>9570)|Qf=1620|(Qa=2444&Qo>18484)|Qf=2444",
+      "why": "Silvosse in the Dark Forest's clearing [-11,-13], brought by the statue (Munster lifts the mystery) and waiting there at the end of the amber quest (2444, Dofus pour les noobs), then on. INFERRED cell."
+    },
+    {
+      "map": 154642,
+      "npc": 2655,
+      "cell": 276,
+      "orientation": 1,
+      "criterion": "Qa=1571&Qo>9089&Qo<9242",
+      "why": "Dofus pour les noobs («Le maître des zaaps»): the zaap master on Otomai. INFERRED cell."
+    },
+    {
+      "map": 164364304,
+      "npc": 2655,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qa=1571&Qo>9242&Qo<9243",
+      "why": "Dofus pour les noobs («Le maître des zaaps»): by the Cania zaap. INFERRED cell."
+    },
+    {
+      "map": 130023939,
+      "npc": 2655,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1571&Qo>9243&Qo<9247",
+      "why": "Dofus pour les noobs («Le maître des zaaps»): in the generator room, taken there as a follower. INFERRED cell."
+    },
+    {
+      "map": 145229319,
+      "npc": 2655,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1571&Qo>9247&Qo<9249",
+      "why": "Dofus pour les noobs («Le maître des zaaps»): at the Xelorium outpost [1,6]. INFERRED cell."
+    },
+    {
+      "map": 205520896,
+      "npc": 6720,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18487&Qo<18488",
+      "why": "The irritating moskito at the spiritual fountain [24,-35] once the meditation has begun. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205520896,
+      "npc": 6686,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "(Qa=2445&Qo>18488)|Qf=2445|Qa=2446",
+      "why": "The serene spirit of the fountain, curious about a meditating adventurer. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205520896,
+      "npc": 6722,
+      "cell": 243,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18489&Qo<18491&PO!26699",
+      "why": "The golden light at [24,-35], first of the ones to follow. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205520898,
+      "npc": 6722,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18489&Qo<18491&PO=26699&PO!26701",
+      "why": "The golden light at [24,-33]. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205521412,
+      "npc": 6722,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18489&Qo<18491&PO=26701&PO!26703",
+      "why": "The golden light at [25,-31]. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205521925,
+      "npc": 6722,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18490&Qo<18492",
+      "why": "The golden light at the door of Damadrya's grove [26,-30]. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 208670722,
+      "npc": 6722,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18492&Qo<18494",
+      "why": "The golden light in the grove's exit room, which carries the visitor to the Litneg wood. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 155976192,
+      "npc": 6723,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18493&Qo<18495",
+      "why": "The desecrating troll at the pandawa tomb [-14,-59]. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 155976192,
+      "npc": 6724,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18493&Qo<18495",
+      "why": "The ghoul troll beside him. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 155976192,
+      "npc": 6725,
+      "cell": 328,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18493&Qo<18495",
+      "why": "The sacrilegious troll beside him. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 155976192,
+      "npc": 6676,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18496&Qo<18497&PO!26708",
+      "why": "The bamboo sprout that grows from the empty tomb. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 205520896,
+      "npc": 6679,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18497&Qo<18499",
+      "why": "The reborn soul once the sprout is planted at the fountain. «Bien plantados» (2445), Dofus pour les noobs «Rester planté là». INFERRED cell."
+    },
+    {
+      "map": 145229319,
+      "npc": 2655,
+      "cell": 326,
+      "orientation": 1,
+      "criterion": "Qf=1571&Qa!1572&Qf!1572|Qa=1572&Qo<9258",
+      "why": "Dofus pour les noobs («Énergie renouvelable»): the zaap master waiting at the outpost. INFERRED cell."
+    },
+    {
+      "map": 145489920,
+      "npc": 2655,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1572&Qo>9257&Qo<9260",
+      "why": "Dofus pour les noobs («Énergie renouvelable»): in the Temple of Time, as a follower. INFERRED cell."
+    },
+    {
+      "map": 145489920,
+      "npc": 2655,
+      "cell": 284,
+      "orientation": 1,
+      "criterion": "Qa=1573",
+      "why": "Dofus pour les noobs («Traitement de choc»): the frozen zaap master in the Temple of Time. INFERRED cell."
+    },
+    {
+      "map": 145489920,
+      "npc": 2708,
+      "cell": 298,
+      "orientation": 1,
+      "criterion": "Qa=1573",
+      "why": "Dofus pour les noobs («Traitement de choc»): the Doctor's Krosmoglob in the Temple. INFERRED cell."
+    },
+    {
+      "map": 155976192,
+      "npc": 6678,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2445&Qo>18495&Qo<18497",
+      "why": "The uprooted ghost, appearing once the trolls are beaten (Dofus pour les noobs, «Rester planté là»; «Bien plantados», 2445). INFERRED cell."
+    },
+    {
+      "map": 169082886,
+      "npc": 3277,
+      "cell": 297,
+      "orientation": 3,
+      "criterion": "Qa=1734&Qo>11022&Qo<11024",
+      "why": "Topo at the first registry site (1734, objective 11024); INFERRED cell."
+    },
+    {
+      "map": 169084934,
+      "npc": 3277,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qa=1734&Qo>11024&Qo<11025",
+      "why": "Topo at the second registry site [24,29] (1734, objective 11025); INFERRED cell."
+    },
+    {
+      "map": 169083912,
+      "npc": 3277,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qa=1734&Qo>11025&Qo<11026",
+      "why": "Topo at the third registry site [23,30] (1734, objective 11026); INFERRED cell."
+    },
+    {
+      "map": 169083914,
+      "npc": 3277,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qa=1734&Qo>11026&Qo<11027",
+      "why": "Topo at the fourth registry site [23,31] (1734, objective 11027); INFERRED cell."
+    },
+    {
+      "map": 170132480,
+      "npc": 3277,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1734&Qo>11027&Qo<11030",
+      "why": "Topo hidden behind the big tank (1734, objectives 11028 to 11030, Dofus pour les noobs: Il faut retrouver ou a fui Topo); INFERRED cell."
+    },
+    {
+      "map": 91752961,
+      "npc": 1591,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1608",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Alain Bombardas in the tavern. INFERRED cell."
+    },
+    {
+      "map": 88083713,
+      "npc": 2779,
+      "cell": 201,
+      "orientation": 1,
+      "criterion": "Qa=1608&Qo<9409",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): the smuggler crew on the shore. INFERRED cells."
+    },
+    {
+      "map": 88083713,
+      "npc": 2785,
+      "cell": 242,
+      "orientation": 1,
+      "criterion": "Qa=1608&Qo<9409",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): the smuggler crew on the shore. INFERRED cells."
+    },
+    {
+      "map": 88083713,
+      "npc": 2784,
+      "cell": 276,
+      "orientation": 1,
+      "criterion": "Qa=1608&Qo<9409",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): the smuggler crew on the shore. INFERRED cells."
+    },
+    {
+      "map": 147324928,
+      "npc": 2778,
+      "cell": 260,
+      "orientation": 1,
+      "criterion": "Qa=1608&Qo<9414",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Vardo imprisoned in the undersea sanctuary. The inner map 147326976 has no way in, so he waits at the cave entrance. INFERRED cell."
+    },
+    {
+      "map": 95422464,
+      "npc": 2778,
+      "cell": 227,
+      "orientation": 1,
+      "criterion": "Qa=1608&Qo>9413&Qo<9416",
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Vardo brought to the submarine. INFERRED cell."
+    },
+    {
+      "map": 183768068,
+      "npc": 2823,
+      "cell": 332,
+      "orientation": 1,
+      "criterion": "Qa=1609|Qf=1609",
+      "why": "Dofus pour les noobs («Rendez-vous avec la mort»): Lonyon the Silent, coming out of the coffin. INFERRED cell."
+    },
+    {
+      "map": 220729859,
+      "npc": 2217,
+      "cell": 411,
+      "orientation": 3,
+      "criterion": "PO!26716|Qf=2446",
+      "why": "Hell Mina in the Tertre du long sommeil's post-boss room, away once she has been sent after Karnhell during «No hay humo sin fuego» (marker item 26716) and back when it is over. Same cell as before."
+    },
+    {
+      "map": 220729859,
+      "npc": 6682,
+      "cell": 426,
+      "orientation": 1,
+      "remove": true,
+      "why": "The derived layer placed the regenerating seal here for good; it only stands once «No hay humo sin fuego» is done (the next row)."
+    },
+    {
+      "map": 220729859,
+      "npc": 6682,
+      "cell": 426,
+      "orientation": 1,
+      "criterion": "Qf=2446|Qa=2447",
+      "why": "The regenerating seal of Terrakurial in the barrow chamber once the burning seal's ambers are placed («Pas de fumée sans feu» is over). Cell taken from the derived layer."
+    },
+    {
+      "map": 220729859,
+      "npc": 6680,
+      "cell": 426,
+      "orientation": 1,
+      "criterion": "Qa=2446&Qo>18502&Qo<18506&PO=26715&PO=26716",
+      "why": "The seal of Terrakurial, burning, revealed by the Enchanterelle blessing (26715) once Hell Mina has left (26716): Dofus pour les noobs, «Pas de fumée sans feu». Cell of the derived seal."
+    },
+    {
+      "map": 220729859,
+      "npc": 6681,
+      "cell": 426,
+      "orientation": 1,
+      "criterion": "Qa=2446&Qo>18506&Qo<18508",
+      "why": "The seal of Terrakurial burning with a cold fire after the ambers are placed (18506), until the cottage fight is won."
+    },
+    {
+      "map": 221250560,
+      "npc": 6681,
+      "cell": 228,
+      "orientation": 3,
+      "criterion": "Qa=2446&Qo>18506&Qo<18507",
+      "why": "Cold-fire ward on the top-left corner of the Deblers' cottage ([-6,18]) for the puppet fight. INFERRED cell."
+    },
+    {
+      "map": 221250564,
+      "npc": 6685,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "(Qa=2446&Qo>18507)|Qf=2446|Qa=2447",
+      "why": "The Fire Spirit on the pyre of cold flames in the spirit world under the cottage (Dofus pour les noobs, «Pas de fumée sans feu»). INFERRED cell."
+    },
+    {
+      "map": 97260043,
+      "npc": 2796,
+      "cell": 369,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9425",
+      "why": "Dofus pour les noobs («Secret de fabrication»): the hidden portal at the end of the mine. INFERRED cell."
+    },
+    {
+      "map": 131860999,
+      "npc": 2797,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9426",
+      "why": "Dofus pour les noobs («Secret de fabrication»): the digicode before the refinery's door. INFERRED cell."
+    },
+    {
+      "map": 169084930,
+      "npc": 3258,
+      "cell": 245,
+      "orientation": 3,
+      "criterion": "Qf=1735|Qo=11037",
+      "why": "Captain Meno on the ship's entrance (1735 objective 11037, then 1736): the dungeon's exit leaves the player there, not in his room 169874432; INFERRED cell."
+    },
+    {
+      "map": 169084930,
+      "npc": 3281,
+      "cell": 232,
+      "orientation": 3,
+      "criterion": "Qa=1736&Qo>11042&Qo<11094",
+      "why": "The stalker waiting at the ship's entrance after the gift (1736, objectives 11092 and 11093); INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2344,
+      "cell": 325,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9430&Qo<9433",
+      "why": "Dofus pour les noobs («Secret de fabrication»): Zap Gobdon in the inner hall. INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2343,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9431&Qo<9434",
+      "why": "Dofus pour les noobs («Secret de fabrication»): Deil Harden in the inner hall. INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2799,
+      "cell": 388,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9432&Qo<9435",
+      "why": "Dofus pour les noobs («Secret de fabrication»): the safe-guardians. INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2800,
+      "cell": 398,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9433&Qo<9436",
+      "why": "Dofus pour les noobs («Secret de fabrication»): Maurikor. INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2369,
+      "cell": 436,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9434&Qo<9437",
+      "why": "Dofus pour les noobs («Secret de fabrication»): King Nidas arriving. INFERRED cell."
+    },
+    {
+      "map": 131858951,
+      "npc": 2801,
+      "cell": 454,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9435&Qo<9438",
+      "why": "Dofus pour les noobs («Secret de fabrication»): Agent Dublia in the king's cortege. INFERRED cell."
+    },
+    {
+      "map": 131860999,
+      "npc": 2801,
+      "cell": 396,
+      "orientation": 1,
+      "criterion": "Qa=1610&Qo>9437&Qo<9440",
+      "why": "Dofus pour les noobs («Secret de fabrication»): Agent Dublia outside the refinery. INFERRED cell."
+    },
+    {
+      "map": 168820736,
+      "npc": 3257,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=1737&Qo>11044&Qo<11046",
+      "why": "Dientinea at the palace entrance after the dungeon (1737, objective 11045): the engine's dungeon exit leaves the player here, not in her room 169612288; INFERRED cell."
+    },
+    {
+      "map": 134222852,
+      "npc": 2814,
+      "cell": 176,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9454&Qo<9457",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): Valentín at the market. INFERRED cell."
+    },
+    {
+      "map": 134222852,
+      "npc": 2583,
+      "cell": 318,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9455&Qo<9458",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): Grima Fandanga at the market. INFERRED cell."
+    },
+    {
+      "map": 134222848,
+      "npc": 2497,
+      "cell": 344,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9452&Qo<9456",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): the lurking Maligilante outside the prison. INFERRED cell."
+    },
+    {
+      "map": 135270145,
+      "npc": 2814,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9457&Qo<9460",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): Valentín in the catacombs. INFERRED cell."
+    },
+    {
+      "map": 138150403,
+      "npc": 2815,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9459&Qo<9464",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): Morora in the lair. INFERRED cell."
+    },
+    {
+      "map": 138150403,
+      "npc": 2816,
+      "cell": 380,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9460&Qo<9463",
+      "why": "Dofus pour les noobs («S'emparer des commandes»): Svivomito arrives. INFERRED cell."
+    },
+    {
+      "map": 168820736,
+      "npc": 3257,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=1738&Qo>11055&Qo<11057",
+      "why": "Dientinea at the palace entrance for the ransom (1738, 11056/11057): the dungeon rooms are not reachable; INFERRED cell shared with the 1737 placement."
+    },
+    {
+      "map": 100926977,
+      "npc": 3282,
+      "cell": 327,
+      "orientation": 3,
+      "criterion": "Qa=1738&Qo>11050&Qo<11125",
+      "why": "Porco trafficker in the porco territory [0,32] (1738, 11125); INFERRED cell: a walkable cell of the map's monster groups."
+    },
+    {
+      "map": 100926977,
+      "npc": 3283,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa=1738&Qo>11125&Qo<11052",
+      "why": "Porco chest after the trafficker's fight (1738, 11052); INFERRED cell."
+    },
+    {
+      "map": 144836610,
+      "npc": 2827,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9473&Qo<9477",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): the book devourer in [1,2]. INFERRED cell."
+    },
+    {
+      "map": 145098752,
+      "npc": 2646,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9475&Qo<9478",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): the outpost corporal (the guide's Caporale Tarte). INFERRED cell."
+    },
+    {
+      "map": 144835584,
+      "npc": 2828,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9478&Qo<9480&PO!15711",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): first time hunter. INFERRED map: the guide's route is an image."
+    },
+    {
+      "map": 144703488,
+      "npc": 2830,
+      "cell": 346,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9478&Qo<9480&PO!16128",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): second time hunter. INFERRED map."
+    },
+    {
+      "map": 144704512,
+      "npc": 2831,
+      "cell": 339,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9478&Qo<9480&PO!16129",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): third time hunter. INFERRED map."
+    },
+    {
+      "map": 144703490,
+      "npc": 2830,
+      "cell": 268,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9478&Qo<9480&PO!16130",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): fourth time hunter. INFERRED map."
+    },
+    {
+      "map": 144969990,
+      "npc": 2793,
+      "cell": 360,
+      "orientation": 1,
+      "criterion": "Qa=1612&Qo>9481&Qo<9484",
+      "why": "Dofus pour les noobs («C'est dans la boîte»): Olivia outside the megalith after the rescue. INFERRED cell."
     }
   ]
 }

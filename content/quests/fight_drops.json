@@ -157,6 +157,50 @@
       "monsters": [4971, 4970, 4969, 4968, 4972],
       "criterion": "Qa=1939&Qo=13488",
       "why": "«El arma letal» (1939): the sacrifice of the Brûlâmes (Caserne du Jour sans fin), dropped at a base rate of 3 % while the doll asks for it (Dofus pour les noobs («L'arme fatale»): «drop sur ... à un taux de base de 3%»); the monsters are the ones the client's item names."
+    },
+    {
+      "item": 16050,
+      "percent": 100,
+      "monsters": [3652],
+      "criterion": "Qa=1608&PL>99&PO!16050&PL<115",
+      "why": "El desaparecido de Sufokia (1608): the dimensional diamond Marie Ride asks for drops from Malefiscof for the character's level range (Dofus pour les noobs: the boss depends on the level). Chance INFERRED."
+    },
+    {
+      "item": 16050,
+      "percent": 100,
+      "monsters": [3852],
+      "criterion": "Qa=1608&PL>114&PO!16050&PL<140",
+      "why": "El desaparecido de Sufokia (1608): the dimensional diamond Marie Ride asks for drops from Fraktal for the character's level range (Dofus pour les noobs: the boss depends on the level). Chance INFERRED."
+    },
+    {
+      "item": 16050,
+      "percent": 100,
+      "monsters": [3651],
+      "criterion": "Qa=1608&PL>139&PO!16050&PL<165",
+      "why": "El desaparecido de Sufokia (1608): the dimensional diamond Marie Ride asks for drops from Perfosil for the character's level range (Dofus pour les noobs: the boss depends on the level). Chance INFERRED."
+    },
+    {
+      "item": 16050,
+      "percent": 100,
+      "monsters": [3849],
+      "criterion": "Qa=1608&PL>164&PO!16050&PL<190",
+      "why": "El desaparecido de Sufokia (1608): the dimensional diamond Marie Ride asks for drops from XLII for the character's level range (Dofus pour les noobs: the boss depends on the level). Chance INFERRED."
+    },
+    {
+      "item": 16050,
+      "percent": 100,
+      "monsters": [3752],
+      "criterion": "Qa=1608&PL>189&PO!16050",
+      "why": "El desaparecido de Sufokia (1608): the dimensional diamond Marie Ride asks for drops from Toxoliat for the character's level range (Dofus pour les noobs: the boss depends on the level). Chance INFERRED."
+    },
+    {
+      "item": 16059,
+      "percent": 100,
+      "monsters": [
+        3963
+      ],
+      "criterion": "Qa=1610&Qo>9433&Qo<9435&PO!16059",
+      "why": "«Secreto de producción» (1610): the last guardian, Trésantène (3963), leaves the sample of refined orichor (16059) the quest hands over to Lonyon (Dofus pour les noobs («Secret de fabrication»))."
     }
   ]
 }
