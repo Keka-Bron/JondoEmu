@@ -67,15 +67,17 @@ namespace Jondo.Unity.Tests.Combat
                 try
                 {
                     using (SessionContext.Push(pipe.Session))
-                        await FightHandler.CastAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, theirs).Build()));
+                        await FightHandler.CastAsync(pipe.ToClient, fight, theirs, 0);
 
                     var frames = new List<(string Op, byte[] Payload)>();
-                    while (true)
+                    int depth = 0;
+                    do
                     {
                         var (op, payload) = await pipe.NextAny();
                         frames.Add((op, payload));
-                        if (op == Op.Jwi && Number(payload, 3) == FightProtocol.WeaponSequence) break;
-                    }
+                        if (op == Op.Jto) depth++;
+                        if (op == Op.Jwi) depth--;
+                    } while (depth > 0);
 
                     Assert.Equal(Op.Jto, frames[0].Op);
                     Assert.Equal(FightProtocol.WeaponSequence, Number(frames[0].Payload, 2));

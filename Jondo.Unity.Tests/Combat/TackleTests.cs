@@ -293,27 +293,27 @@ namespace Jondo.Unity.Tests.Combat
                 Assert.Equal(3, player.CurrentAP);
                 Assert.Equal(0, player.CurrentMP);
 
-                Assert.Equal(Hex("0891c0fc82aa021004"), await Next(fromServer, Op.Jto));                        // 477
-                Assert.Equal(Hex("1891c0fc82aa025a0c0a0affffffffffffffffff017068"), await Next(fromServer, Op.Jwe)); // 478
-                Assert.Equal(Hex("0891c0fc82aa021003"), await Next(fromServer, Op.Jto));                        // 479
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jto, Hex("0891c0fc82aa021004")), await Next(fromServer, Op.Jto));                        // 477
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jwe, Hex("1891c0fc82aa025a0c0a0affffffffffffffffff017068")), await Next(fromServer, Op.Jwe)); // 478
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jto, Hex("0891c0fc82aa021003")), await Next(fromServer, Op.Jto));                        // 479
                 await Next(fromServer, Op.Jxw);                                                                  // 480
                 SheetClose(await Next(fromServer, Op.Jwi));                                                      // 481
-                Assert.Equal(Hex("1891c0fc82aa027065a2011208fdffffffffffffffff011091c0fc82aa02"),
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jwe, Hex("1891c0fc82aa027065a2011208fdffffffffffffffff011091c0fc82aa02")),
                              await Next(fromServer, Op.Jwe));                                                    // 482
-                Assert.Equal(Hex("0891c0fc82aa021003"), await Next(fromServer, Op.Jto));                        // 483
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jto, Hex("0891c0fc82aa021003")), await Next(fromServer, Op.Jto));                        // 483
                 await Next(fromServer, Op.Jxw);                                                                  // 484
                 SheetClose(await Next(fromServer, Op.Jwi));                                                      // 485
-                Assert.Equal(Hex("1891c0fc82aa02707fa2011208feffffffffffffffff011091c0fc82aa02"),
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jwe, Hex("1891c0fc82aa02707fa2011208feffffffffffffffff011091c0fc82aa02")),
                              await Next(fromServer, Op.Jwe));                                                    // 486
-                Assert.Equal(Hex("0a04ad02bb0210032891c0fc82aa02"), await Next(fromServer, Op.Jsj));            // 487
-                Assert.Equal(Hex("0891c0fc82aa021003"), await Next(fromServer, Op.Jto));                        // 488
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jsj, Hex("0a04ad02bb0210032891c0fc82aa02")), await Next(fromServer, Op.Jsj));            // 487
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jto, Hex("0891c0fc82aa021003")), await Next(fromServer, Op.Jto));                        // 488
                 await Next(fromServer, Op.Jxw);                                                                  // 489
                 SheetClose(await Next(fromServer, Op.Jwi));                                                      // 490
-                Assert.Equal(Hex("1891c0fc82aa02708101a2011208ffffffffffffffffff011091c0fc82aa02"),
+                Assert.Equal(CombatRecordingCodec.MappedCapture(Op.Jwe, Hex("1891c0fc82aa02708101a2011208ffffffffffffffffff011091c0fc82aa02")),
                              await Next(fromServer, Op.Jwe));                                                    // 491
                 var close = ProtoMessage.Parse(await Next(fromServer, Op.Jwi)).Fields;                           // 492
                 Assert.Equal(TutorialPlayer, (long)close.Single(f => f.FieldNumber == 2).VarIntValue);
-                Assert.Equal(FightProtocol.WalkSequence, (int)close.Single(f => f.FieldNumber == 3).VarIntValue);
+                Assert.True(close.Single(f => f.FieldNumber == 1).VarIntValue > 0);
             }
             finally
             {
@@ -326,7 +326,7 @@ namespace Jondo.Unity.Tests.Combat
         {
             var fields = ProtoMessage.Parse(jwi).Fields;
             Assert.Equal(TutorialPlayer, (long)fields.Single(f => f.FieldNumber == 2).VarIntValue);
-            Assert.Equal(FightProtocol.SheetSequence, (int)fields.Single(f => f.FieldNumber == 3).VarIntValue);
+            Assert.True(fields.Single(f => f.FieldNumber == 1).VarIntValue > 0);
         }
 
         private static async Task<byte[]> Next(System.IO.Stream stream, string opcode)

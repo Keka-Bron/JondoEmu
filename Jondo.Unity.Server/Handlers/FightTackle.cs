@@ -1,3 +1,4 @@
+using Game = Jondo.Unity.Protocol.Game;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -155,8 +156,7 @@ namespace Jondo.Unity.Server.Handlers
             if (facing < 0) facing = StepOrientation(path[path.Count - 2], path[path.Count - 1]);
             mover.LastFacing = facing;
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                Network.FightProtocol.BuildSequenceStart(mover.Id, Network.FightProtocol.WalkSequence)));
+            await ATodosAsync(fight, new Game.SequenceStartEvent(Game.SequenceType.Move));
 
             var stretch = new List<int> { path[0] };
             var untackled = new List<Fighter>();
@@ -202,9 +202,7 @@ namespace Jondo.Unity.Server.Handlers
             if (onAPortal) await CrossPortalAsync(stream, fight, mover, walkedIn: true);
             else if (walked.Count > 1) await RefreshPortalsAsync(fight);
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), mover.Id,
-                                                       Network.FightProtocol.WalkSequence)));
+            await ATodosAsync(fight, new Game.SequenceEndEvent(fight.SiguienteAccion(), mover.Id));
 
             // What being left sets off on the ones he walked away from, the walker at hand as the one
             // who set it off.
@@ -228,14 +226,13 @@ namespace Jondo.Unity.Server.Handlers
             // Unseen, his steps go to his own side alone: told them, the other side's client kept
             // him hidden on his true cell and drew its turn marker there, for anybody to see
             // where the invisible Sram was walking. They know where he was last seen.
-            var moved = ConnectionProtocol.BuildActorMoved(mover.Id, stretch.Select(c => (long)c).ToList(), facing);
+            var moved = new Game.GameMapMovementEvent(stretch.ToArray(), mover.Id, false);
             if (Managers.MonsterTactics.IsInvisible(mover)) await ASuBandoAsync(fight, mover.TeamId, moved);
             else await ATodosAsync(fight, moved);
             await AnnouncePointsAsync(fight, mover, MovementPointsCharacteristic, mover.CurrentMP);
             // The 129 in the shape of any row of points, f3 / f14 / f20 in that order: byte for
             // byte the tutorial's frame 491, which BuildAction's f20-before-f14 is not.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                Network.FightProtocol.BuildPointsLost(mover.Id, Network.FightProtocol.Walked, mover.Id, steps)));
+            await ATodosAsync(fight, CombatActions.Points(mover.Id, Network.FightProtocol.Walked, mover.Id, -Math.Abs(steps)));
 
             var statistics = StatisticsBehind(fight, mover);
             if (statistics != null) statistics.MovementPointsSpent += steps;
@@ -248,25 +245,21 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task PayTackleAsync(FightInstance fight, Fighter mover, List<Fighter> tacklers,
                                                  Tackle.Loss loss)
         {
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                TackleProtocol.BuildTackled(mover.Id, tacklers.Select(t => t.Id))));
+            await ATodosAsync(fight, new Game.GameActionFightEvent(mover.Id, TackleProtocol.Tackled,
+                new Game.FightActionCaseTackled(new())));
 
             if (loss.ActionPoints > 0)
             {
                 mover.CurrentAP -= loss.ActionPoints;
                 await AnnouncePointsAsync(fight, mover, ActionPointsCharacteristic, mover.CurrentAP);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildPointsLost(mover.Id, Network.FightProtocol.ActionPointsLost,
-                                                          mover.Id, loss.ActionPoints)));
+                await ATodosAsync(fight, CombatActions.Points(mover.Id, Network.FightProtocol.ActionPointsLost, mover.Id, -Math.Abs(loss.ActionPoints)));
             }
             if (loss.MovementPoints > 0)
             {
                 mover.CurrentMP -= loss.MovementPoints;
                 if (fight.CurrentFighter == mover) fight.TurnTackledMp += loss.MovementPoints;
                 await AnnouncePointsAsync(fight, mover, MovementPointsCharacteristic, mover.CurrentMP);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    Network.FightProtocol.BuildPointsLost(mover.Id, Network.FightProtocol.MovementPointsLost,
-                                                          mover.Id, loss.MovementPoints)));
+                await ATodosAsync(fight, CombatActions.Points(mover.Id, Network.FightProtocol.MovementPointsLost, mover.Id, -Math.Abs(loss.MovementPoints)));
             }
 
             Program.LogDebug($"[Fight] {mover.Id} is tackled by {string.Join(", ", tacklers.Select(t => t.Id))}: " +
@@ -276,12 +269,9 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>One kind of points, in the short sheet sequence the real server wraps every jxw in.</summary>
         private static async Task AnnouncePointsAsync(FightInstance fight, Fighter mover, int characteristic, int value)
         {
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                Network.FightProtocol.BuildSequenceStart(mover.Id, Network.FightProtocol.SheetSequence)));
+            await ATodosAsync(fight, new Game.SequenceStartEvent(Game.SequenceType.Triggered));
             await FichaATodosAsync(fight, mover.Id, (characteristic, (long)value, 0L, 0L));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), mover.Id,
-                                                       Network.FightProtocol.SheetSequence)));
+            await ATodosAsync(fight, new Game.SequenceEndEvent(fight.SiguienteAccion(), mover.Id));
         }
 
         /// <summary>

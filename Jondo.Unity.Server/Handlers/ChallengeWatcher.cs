@@ -1075,7 +1075,7 @@ namespace Jondo.Unity.Server.Handlers
             // found everything already settled: a party's second player got no kwl and no bonus.
             if (_ends.TryGetValue(fight.FightId, out var judged))
             {
-                foreach (byte[] frame in judged.Frames) await WriteFrameAsync(stream, frame);
+                foreach (var message in judged.Frames) await SessionContext.Current.SendAsync(message);
                 foreach (int done in judged.Achievements) DatabaseManager.MarkChallengeDone(GameState.CharacterId, done);
                 return judged.Extra;
             }
@@ -1141,11 +1141,11 @@ namespace Jondo.Unity.Server.Handlers
 
                 bool cumplido = won;
                 fight.ChallengesBroken.Add(id);
-                byte[] verdict = ConnectionProtocol.Push(Op.Kwl, Network.FightProtocol.BuildChallengeResult(id, cumplido));
+                var verdict = new Game.ChallengeResultEvent(id, cumplido);
                 end.Frames.Add(verdict);
                 // Sent again for one met before: only the player whose blow met it was told then,
                 // and the client takes the same verdict twice as once (flr.bdql sets the state).
-                await WriteFrameAsync(stream, verdict);
+                await SessionContext.Current.SendAsync(verdict);
 
                 var reto = Challenges.Get(id);
                 Console.WriteLine($"[Challenges] «{reto?.Name ?? id.ToString()}» " +
@@ -1171,7 +1171,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>What the end of a fight judged, to be sent the same to each of its players.</summary>
         private sealed class EndVerdict
         {
-            public List<byte[]> Frames { get; } = new List<byte[]>();
+            public List<Game.GameEvent> Frames { get; } = [];
             public List<int> Achievements { get; } = new List<int>();
 
             /// <summary>Every challenge validated, not only the ones that carry an achievement.</summary>
@@ -1379,11 +1379,8 @@ namespace Jondo.Unity.Server.Handlers
             int porcentaje = 0;
             foreach (var (id, pct) in fight.ChallengesFixed) if (id == reto) porcentaje = pct;
 
-            byte[] ldd = Network.FightProtocol.BuildChallenge(
-                reto, porcentaje, new[] { (aQuien.CellId, aQuien.Id) });
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwm,
-                Network.FightProtocol.BuildChallengeObjective(ldd)));
+            await SessionContext.Current.SendAsync(new Game.ChallengeTargetsEvent(new(porcentaje, reto,
+                [new(aQuien.CellId, aQuien.Id, [])], porcentaje, Game.ChallengeState.InProgress)));
 
             Console.WriteLine($"[Challenges] «{Challenges.Get(reto)?.Name ?? reto.ToString()}» marks " +
                               $"{aQuien.Name}.");
@@ -1423,7 +1420,7 @@ namespace Jondo.Unity.Server.Handlers
         /// on the hit, not on the death.
         /// </summary>
         private static async Task BreakAsync(NetworkStream stream, FightInstance fight, int id,
-                                             string porque, string culpable = "", List<byte[]>? record = null)
+                                             string porque, string culpable = "", List<Game.GameEvent>? record = null)
         {
             // Every one of that kind: the generic one and the boss's break for the same thing, together.
             var sameKind = new List<int>();
@@ -1437,17 +1434,17 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>Breaks ONE challenge, by its number: what <see cref="BreakAsync"/> does to each.</summary>
         private static async Task BreakOneAsync(NetworkStream stream, FightInstance fight, int id,
-                                                string porque, string culpable = "", List<byte[]>? record = null)
+                                                string porque, string culpable = "", List<Game.GameEvent>? record = null)
         {
             if (!fight.ChallengesBroken.Add(id)) return;
 
-            byte[] broken = ConnectionProtocol.Push(Op.Kwl, Network.FightProtocol.BuildChallengeResult(id, false));
-            await WriteFrameAsync(stream, broken);
+            var broken = new Game.ChallengeResultEvent(id, false);
+            await SessionContext.Current.SendAsync(broken);
 
             if (culpable.Length == 0) culpable = GameState.CharacterName;
-            byte[] notice = ConnectionProtocol.Push(Op.Lqn,
-                ConnectionProtocol.BuildSystemMessage(ChallengeFailedMessage, culpable, id.ToString()));
-            await WriteFrameAsync(stream, notice);
+            var notice = new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage,
+                ChallengeFailedMessage, [culpable ?? "", id.ToString()]);
+            await SessionContext.Current.SendAsync(notice);
             record?.Add(broken);
             record?.Add(notice);
 
@@ -1476,7 +1473,7 @@ namespace Jondo.Unity.Server.Handlers
             if (!fight.ChallengesBroken.Add(id)) return;
             fight.ChallengesMet.Add(id);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kwl, Network.FightProtocol.BuildChallengeResult(id, true)));
+            await SessionContext.Current.SendAsync(new Game.ChallengeResultEvent(id, true));
             Console.WriteLine($"[Challenges] «{Challenges.Get(id)?.Name ?? id.ToString()}» met already: {porque}.");
         }
 

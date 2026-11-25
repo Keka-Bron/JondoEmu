@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Protocol;
+using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
@@ -49,16 +50,20 @@ namespace Jondo.Unity.Tests.Combat
             await using var theirs = await PortalTests.Wire.Open(Foe);
 
             await FightHandler.AplicarEfectosAsync(null, fight, sram, TrampaMiserable, 2, null, EffectEngine.AlLanzar, trap);
-            Assert.Contains(FightProtocol.PlacedTrap, Actions(await mine.Drain()));
-            Assert.DoesNotContain(FightProtocol.PlacedTrap, Actions(await theirs.Drain()));
+            var placement = Assert.Single(await mine.DrainActions(), a => a.ActionType == FightProtocol.PlacedTrap);
+            var mark = Assert.IsType<Game.FightActionCaseMarkCells>(placement.Payload).Value.Mark;
+            Assert.Equal(Game.FightMarkType.Trap, mark.MarkType);
+            Assert.DoesNotContain(await theirs.DrainActions(), a => a.Payload is Game.FightActionCaseMarkCells);
 
             // As the move handler does: the walk, then whatever lies where he ended up.
             await FightHandler.WalkPathAsync(fight, foe, new[] { foe.CellId, trap });
             await FightHandler.DispararLosGlifosAsync(theirs.Session.Stream, fight, foe, alPisar: true, skipWalls: true);
-            var seen = Actions(await theirs.Drain());
-            int shown = seen.IndexOf(FightProtocol.PlacedTrap), fired = seen.IndexOf(FightProtocol.EnteredGlyph);
-            Assert.True(fired >= 0, "the trap did not go off");
-            Assert.True(shown >= 0 && shown < fired, $"the trap went off unseen on the other side: {string.Join(", ", seen)}");
+            var seen = await theirs.DrainActions();
+            var shown = Assert.Single(seen, a => a.ActionType == FightProtocol.PlacedTrap);
+            var fired = Assert.Single(seen, a => a.ActionType == FightProtocol.EnteredGlyph);
+            Assert.True(seen.IndexOf(shown) < seen.IndexOf(fired));
+            Assert.Equal(mark.MarkId, Assert.IsType<Game.FightActionCaseMarkCells>(shown.Payload).Value.Mark.MarkId);
+            Assert.Equal(mark.MarkId, Assert.IsType<Game.FightActionCaseTriggerGlyphTrap>(fired.Payload).Value.MarkId);
         }
 
         /// <summary>
@@ -98,7 +103,7 @@ namespace Jondo.Unity.Tests.Combat
             try
             {
                 using (SessionContext.Push(mine.Session))
-                    await FightHandler.CastAsync(mine.Session.Stream, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build()));
+                    await FightHandler.CastAsync(mine.Session.Stream, fight, cell, spell);
             }
             finally { active.TryRemove(fight.FightId, out _); }
         }

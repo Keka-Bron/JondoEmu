@@ -213,7 +213,7 @@ namespace Jondo.Unity.Tests.Combat
                                 int apBefore = current.CurrentAP;
                                 try
                                 {
-                                    await FightHandler.CastAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build()));
+                                    await FightHandler.CastAsync(pipe.ToClient, fight, cell, spell);
                                 }
                                 catch (Exception ex) { broken.Add($"exception | {spell} | fight {n} ({lineUp}): {current.Id} casts {spell} at {cell}: {ex.GetType().Name}: {ex.Message}"); continue; }
                                 _casts++;

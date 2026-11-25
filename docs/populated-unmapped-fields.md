@@ -288,6 +288,19 @@ updated timeline, and the closing action and author IDs. If the departure ends
 the ongoing fight, the confirmation uses the same empty `FightIsTurnReadyEvent`
 as other fight endings, including in-fight surrender and forced defeats.
 
+### Live casts, effects and settlement
+
+The August writer populated these unmapped fields. `code.identify_decoys` classified
+client use as **indeterminate** on `jondo-11-08-2026` because caller coverage was incomplete.
+
+- `SpellCastCount` tag 3 (property 198950): cast interval.
+- `FightRemovableEffect` tag 11 (property 202689): parent buff ID.
+- `GameMapMovementEvent` tag 2 (property 198553): fighter facing.
+- `FightActionTackled` tag 1 (property 198913): tackler IDs.
+- `EntitySpawnCharacter` tag 2 (property 198639): the summoned double's level.
+- `FightExperienceData` tags 8 and 9 (properties 203314 and 203315): both set to `1` in the XP result block.
+- `FightPvpData` tags 2, 3 and 5 (properties 203320, 203321 and 203323): the PvP result writer supplied the honour grade, grade floor and current honour, respectively.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

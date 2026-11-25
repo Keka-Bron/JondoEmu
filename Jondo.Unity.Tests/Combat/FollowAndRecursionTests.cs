@@ -59,9 +59,9 @@ namespace Jondo.Unity.Tests.Combat
 
             var frames = await wire.Drain();
             Assert.Equal(new[] { "jto", "jsj", "jwi", "jto", "jsj", "jwi" }, frames.Select(f => f.Op));
-            Assert.Equal(Hex("08f4ffffffffffffffff011004"), frames[0].Payload);                  // 2124
-            Assert.Equal(Hex("0a049f029102100328f4ffffffffffffffff01"), frames[1].Payload);      // 2125
-            Assert.Equal(Hex("0a0491028402100728f4ffffffffffffffff01"), frames[4].Payload);      // 2140
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[0].Op, Hex("08f4ffffffffffffffff011004")), frames[0].Payload);                  // 2124
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[1].Op, Hex("0a049f029102100328f4ffffffffffffffff01")), frames[1].Payload);      // 2125
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[4].Op, Hex("0a0491028402100728f4ffffffffffffffff01")), frames[4].Payload);      // 2140
         }
 
         /// <summary>

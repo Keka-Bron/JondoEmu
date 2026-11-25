@@ -43,6 +43,159 @@ public sealed class TypedCombatMovementTests
     private static byte[] Request(string alias, byte[] body) => Pb.New().Msg(2, Pb.New()
         .Msg(1, Pb.New().Str(1, ConnectionProtocol.UriPrefix + alias).Bytes(2, body)).Var(2, -17)).Build();
 
+    [Fact]
+    public async Task Live_pass_advances_once_and_only_the_controller_can_end_the_next_turn()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        var pass = Codec.Encode(new(new FightTurnFinishRequest(false), -17));
+        pipe.Start(pass);
+        await pipe.Send(pass);
+        var events = AssertTypedEvents(pipe, await pipe.DrainToBarrier());
+        Assert.Equal(battle.Player.Id, Assert.IsType<FightTurnEndEvent>(events[0].Content).CharacterId);
+        Assert.Single(events, f => f.Content is FightTurnEndEvent);
+        Assert.IsType<FightIsTurnReadyEvent>(events[^1].Content);
+        Assert.Same(battle.Fight.Rojo[0], battle.Fight.CurrentFighter);
+        await pipe.Finish();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Live_weapon_cast_accepts_cell_or_portrait_and_rejects_missing_target(bool portrait)
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        var foe = battle.Fight.Rojo[0];
+        foe.CellId = battle.Path[1];
+        pipe.Start(Codec.Encode(new(new GameActionFightCastOnTargetRequest(-987654321, 0), 0)));
+        Assert.Empty(await pipe.DrainToBarrier());
+        int ap = battle.Player.CurrentAP;
+        GameRequest cast = portrait ? new GameActionFightCastOnTargetRequest(foe.Id, 0) : new GameActionFightCastRequest(foe.CellId, 0);
+        await pipe.Send(Codec.Encode(new(cast, -1)));
+        var frames = await pipe.DrainToBarrier();
+        var seen = frames.Select(f => Codec.Decode(f).Content).OfType<GameActionFightEvent>().ToArray();
+        var castEvent = Assert.Single(seen, e => e.Payload is FightActionCaseTargetedAbility);
+        var ability = ((FightActionCaseTargetedAbility)castEvent.Payload).Value;
+        Assert.Equal(foe.Id, ability.TargetId);
+        Assert.Equal(foe.CellId, ability.DestinationCell);
+        Assert.Equal(0, Assert.IsType<FightActionTargetedAbilityCaseWeaponGenericId>(ability.FightCase).Value);
+        Assert.Equal(battle.Player.CurrentAP - ap, Assert.Single(seen.Select(e => e.Payload).OfType<FightActionCasePointsVariation>()).Value.Delta);
+        Assert.True(battle.Player.CurrentAP < ap);
+        await pipe.Finish();
+    }
+
+    [Fact]
+    public async Task Live_ballot_only_reaches_eligible_voters_and_a_duplicate_cannot_end_it()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        await using var ally = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        var fight = battle.Fight;
+        fight.KoliseoMode = 2;
+        fight.Azul.Add(new Fighter { Id = ally.Session.CharacterId, CurrentHP = 100, MaxHP = 100 });
+        ally.Session.State.IsInFight = true;
+        ally.Session.State.FightId = fight.FightId;
+        byte[] ballot = Codec.Encode(new(new SurrenderVoteCastRequest(true), -10));
+        pipe.Start(ballot);
+        await pipe.Send(ballot);
+        var opened = Assert.Single(AssertTypedEvents(pipe, await pipe.DrainToBarrier()));
+        Assert.Equal(new SurrenderVoteStartEvent(2, 1, 0), opened.Content);
+        Assert.Equal(opened.Content, Assert.Single(ally.Codec.Encoded).Content);
+        ally.Start(Codec.Encode(new(new SurrenderVoteCastRequest(false), 0)));
+        var closed = await ally.DrainToBarrier();
+        Assert.Equal(new SurrenderVoteEndEvent(false), Codec.Decode(closed[^1]).Content);
+        Assert.Equal(new SurrenderVoteEndEvent(false), Codec.Decode(Assert.Single(await pipe.DrainToBarrier())).Content);
+        Assert.Equal(FightState.Ongoing, fight.State);
+        await ally.Finish();
+        await pipe.Finish();
+    }
+
+    [Fact]
+    public async Task Live_pass_waiting_for_the_fight_lock_does_not_advance_a_detached_fight()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        await battle.Fight.Turno.WaitAsync();
+        try
+        {
+            pipe.Start(Codec.Encode(new(new FightTurnFinishRequest(false), 0)));
+            Assert.Equal(0, pipe.Session.UnoCadaVez.CurrentCount);
+            Assert.True(Active.TryRemove(battle.Fight.FightId, out _));
+        }
+        finally { battle.Fight.Turno.Release(); }
+        Assert.Empty(await pipe.DrainToBarrier());
+        Assert.Same(battle.Player, battle.Fight.CurrentFighter);
+        await pipe.Finish();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-19)]
+    public async Task Live_surrender_options_select_leave_and_vote_and_preserve_response_uid(int uid)
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        battle.Fight.KoliseoMode = 2;
+        pipe.Start(Codec.Encode(new(new SurrenderInfoRequest(), uid)));
+        var frame = Assert.Single(await pipe.DrainToBarrier());
+        var reply = Codec.ReadEnvelope(frame);
+        Assert.Equal(GameMessageKind.Response, reply.Kind);
+        Assert.Equal(uid, reply.Uid);
+#if JONDO_PROTOCOL_3_8_1_2
+        Assert.Equal("lvk", reply.Alias);
+        Assert.Equal(Convert.FromHexString("0A020A0012020A00"), reply.Content.Value.ToByteArray());
+#else
+        Assert.Equal("luw", reply.Alias);
+        Assert.Equal(FightProtocol.BuildSurrenderOptions(), reply.Content.Value.ToByteArray());
+#endif
+        var options = Assert.IsType<SurrenderInfoResponse>(Codec.Decode(frame).Content);
+        Assert.False(options.HasSanction);
+        Assert.IsType<SurrenderAvailabilityCaseAvailable>(options.SurrenderResponse!.ResponseCase);
+        Assert.IsType<SurrenderVoteAvailabilityCaseAvailable>(options.SurrenderVoteResponse!.ResponseCase);
+        await pipe.Finish();
+    }
+
+    [Fact]
+    public async Task Live_surrender_options_are_not_sent_in_an_ordinary_fight()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        Assert.True(battle.Fight.KoliseoMode < 0);
+        pipe.Start(Codec.Encode(new(new SurrenderInfoRequest(), -19)));
+        Assert.Empty(await pipe.DrainToBarrier());
+        await pipe.Finish();
+    }
+
+    [Fact]
+    public async Task Live_cast_flushes_pending_settlement_once_in_owner_order()
+    {
+        await using var pipe = await Pipe.OpenAsync();
+        using var battle = new Battle(pipe.Session);
+        var foe = battle.Fight.Rojo[0];
+        foe.CurrentHP = 0;
+        var state = pipe.Session.State;
+        state.RoleplayMapId = battle.Fight.RoleplayMapId;
+        state.RoleplayCellId = battle.Path[0];
+        battle.Fight.FinPendiente = FightInstance.WaitsForTheJwz;
+        var cast = Codec.Encode(new(new GameActionFightCastOnTargetRequest(foe.Id, 0), -3));
+        pipe.Start(cast);
+        await pipe.Send(cast);
+        await pipe.DrainToBarrier();
+        var events = pipe.Codec.Encoded.Select(f => f.Content).ToList();
+        var end = Assert.Single(events.OfType<FightEndEvent>());
+        Assert.Collection(end.Results,
+            r => Assert.Equal((battle.Player.Id, FightOutcome.ResultVictory), (r.Fighter.FighterId, r.Outcome)),
+            r => Assert.Equal((foe.Id, FightOutcome.ResultLost), (r.Fighter.FighterId, r.Outcome)));
+        var index = events.IndexOf(end);
+        Assert.IsType<CharacterExperienceGainEvent>(events[index - 1]);
+        var stats = Assert.IsType<FightStatisticsEvent>(events[index + 1]);
+        Assert.Equal(battle.Player.Id, Assert.Single(stats.StatisticsByFighter).Key);
+        Assert.False(state.IsInFight);
+        Assert.DoesNotContain(events, e => e is GameActionFightEvent);
+        await pipe.Finish();
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

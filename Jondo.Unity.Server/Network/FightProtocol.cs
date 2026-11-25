@@ -388,52 +388,6 @@ namespace Jondo.Unity.Server.Network
         // ─── Moving and casting ─────────────────────────────────────────────────
 
         /// <summary>
-        /// Which cell is cast at and with what (jwh).
-        ///
-        ///   f1: the target cell          f4: the spell, and if it does not come it is a weapon hit
-        /// </summary>
-        public static (int Cell, int Spell) ReadCast(byte[] payload)
-        {
-            byte[]? jwh = ConnectionProtocol.ReadPayload(payload, Op.Jwh);
-            if (jwh == null) return (0, 0);
-
-            int cell = 0, spell = 0;
-            foreach (var field in ProtoMessage.Parse(jwh).Fields)
-            {
-                if (field.WireType != 0) continue;
-                if (field.FieldNumber == 1) cell = (int)field.VarIntValue;
-                else if (field.FieldNumber == 4) spell = (int)field.VarIntValue;
-            }
-            return (cell, spell);
-        }
-
-        /// <summary>
-        /// Casting by targeting FROM THE CAROUSEL (jwn): { f1: at whom, f2: the spell }.
-        ///
-        /// The id comes WITH A SIGN —monsters have it negative— and in sixty-four-bit two's
-        /// complement, so it has to be read as a <c>long</c> and not as an <c>int</c>:
-        /// two of the four real samples are minus one.
-        ///
-        ///   08ffffffffffffffffff01 10ca63   =  at fighter −1, spell 12746
-        ///   0881f092cbdd08 10b21b           =  at oneself, spell 3506
-        /// </summary>
-        public static (long Fighter, int Spell) ReadCastAtFighter(byte[] payload)
-        {
-            byte[]? jwn = ConnectionProtocol.ReadPayload(payload, Op.Jwn);
-            if (jwn == null) return (0, 0);
-
-            long quien = 0;
-            int spell = 0;
-            foreach (var field in ProtoMessage.Parse(jwn).Fields)
-            {
-                if (field.WireType != 0) continue;
-                if (field.FieldNumber == 1) quien = unchecked((long)field.VarIntValue);
-                else if (field.FieldNumber == 2) spell = (int)field.VarIntValue;
-            }
-            return (quien, spell);
-        }
-
-        /// <summary>
         /// The buff's FAMILY, which goes in f15 and decides whether the client DRAWS it or not.
         ///
         /// Here was the reason the panel always came out empty with the bytes right. The
@@ -1766,9 +1720,6 @@ namespace Jondo.Unity.Server.Network
 
         // ─── It is over ─────────────────────────────────────────────────────────
 
-        /// <summary>The fight is over (kuf). It goes empty.</summary>
-        public static byte[] BuildFightOver() => Array.Empty<byte>();
-
         /// <summary>What one takes from the fight.</summary>
         public sealed class Spoils
         {
@@ -2134,16 +2085,6 @@ namespace Jondo.Unity.Server.Network
         }
 
         private static Pb AdditionalEntry(long fighter, string id) => Pb.New().Msg(1, Pb.New().Var(1, fighter).Str(2, id ?? ""));
-
-        /// <summary>A jxy's "IsAfk" (f1): the client passing the turn on its own, its player idle.</summary>
-        public static bool ReadIdlePass(byte[] payload)
-        {
-            byte[]? jxy = ConnectionProtocol.ReadPayload(payload, "jxy");
-            if (jxy == null) return false;
-            foreach (var field in ProtoMessage.Parse(jxy).Fields)
-                if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue != 0;
-            return false;
-        }
 
         /// <summary>
         /// The challenge offered (hqc): who challenges, whom, and the id.

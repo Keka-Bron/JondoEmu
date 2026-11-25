@@ -26,7 +26,7 @@ namespace Jondo.Unity.Tests.Combat
             try
             {
                 using (SessionContext.Push(mine.Session))
-                    await FightHandler.CastAsync(mine.Session.Stream, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build()));
+                    await FightHandler.CastAsync(mine.Session.Stream, fight, cell, spell);
             }
             finally { active.TryRemove(fight.FightId, out _); }
         }

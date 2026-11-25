@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
+using Jondo.Unity.Server.Network;
 using Xunit;
 
 namespace Jondo.Unity.Tests.Combat;
@@ -22,5 +24,14 @@ internal sealed class CombatRecordingCodec(Action<GameFrame> record) : IGameCode
     {
         Assert.Same(Marker, packet);
         return Task.CompletedTask;
+    }
+
+    // Compare existing August captures by their reviewed fields, allowing protobuf field
+    // reordering and intentional omissions such as the legacy author on sequence start.
+    internal static byte[] MappedCapture(string opcode, byte[] body)
+    {
+        var codec = new GameCodec();
+        var frame = codec.Decode(ConnectionProtocol.Push(opcode, body));
+        return ConnectionProtocol.ReadPayload(codec.Encode(frame), opcode)!;
     }
 }

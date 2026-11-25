@@ -250,18 +250,12 @@ namespace Jondo.Unity.Server.Handlers
         /// The option chosen (kso { f1: its place }): to its map reference, the ankla spent there;
         /// «No teletransportarse» keeps it. A kso with no choice pending is let go.
         /// </summary>
-        public static async Task ChooseAsync(NetworkStream stream, byte[] frame)
+        internal static async Task ChooseAsync(NetworkStream stream, int place)
         {
             var me = SessionContext.State;
             var pending = me.ItemChoice;
             me.ItemChoice = null;
             if (pending == null) return;
-
-            byte[] kso = ConnectionProtocol.ReadPayload(frame, Op.Kso);
-            int place = 0;
-            if (kso != null)
-                foreach (var field in ProtoMessage.Parse(kso).Fields)
-                    if (field.FieldNumber == 1 && field.WireType == 0) place = (int)field.VarIntValue;
 
             var choice = TravelData.ChoiceOf(pending.Value.ChoiceId);
             if (choice == null || place < 0 || place >= choice.Options.Count) return;

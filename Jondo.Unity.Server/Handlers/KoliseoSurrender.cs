@@ -59,25 +59,26 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The surrender window asked for (ltf): leaving and voting, both open.</summary>
-        private static async Task SurrenderOptionsAsync(NetworkStream stream, FightInstance fight)
+        private static Task SurrenderOptionsAsync(GameSession session, FightInstance fight, int uid)
         {
-            if (fight == null || fight.KoliseoMode < 0 || fight.State != FightState.Ongoing) return;
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Luw,
-                Network.FightProtocol.BuildSurrenderOptions()));
+            if (fight.KoliseoMode >= 0)
+                return session.SendAsync(new Game.SurrenderInfoResponse(false,
+                    new(new Game.SurrenderAvailabilityCaseAvailable()),
+                    new(new Game.SurrenderVoteAvailabilityCaseAvailable())), uid);
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// A ballot (lsp). The first yes of a team opens its vote, which counts the yes; a no
         /// closes it.
         /// </summary>
-        private static async Task SurrenderBallotAsync(NetworkStream stream, FightInstance fight, byte[] payload)
+        private static async Task SurrenderBallotAsync(NetworkStream stream, FightInstance fight, bool yes)
         {
             if (fight == null || fight.KoliseoMode < 0 || fight.State != FightState.Ongoing) return;
             long me = GameState.CharacterId;
             int team = fight.EquipoDe(me);
             if (team < 0 || fight.Gone.Contains(me)) return;
 
-            bool yes = Network.FightProtocol.ReadSurrenderBallot(payload);
             var key = (fight.FightId, team);
 
             if (!_surrenderVotes.TryGetValue(key, out var vote))
@@ -90,8 +91,7 @@ namespace Jondo.Unity.Server.Handlers
                 ExpireSurrenderVote(fight, key, vote);
                 Program.LogDebug($"[Koliseo] {me} opens the give-up vote of fight #{fight.FightId}, " +
                                  $"team {team}: {vote.Voters.Count} voter(s).");
-                await ToEachAsync(vote.Voters, ConnectionProtocol.Push(Op.Lsq,
-                    Network.FightProtocol.BuildSurrenderVote(vote.Voters.Count, vote.Yes.Count)));
+                await ToEachAsync(vote.Voters, new Game.SurrenderVoteStartEvent(vote.Voters.Count, vote.Yes.Count, VoteDuration: 0));
             }
             else
             {
@@ -103,7 +103,7 @@ namespace Jondo.Unity.Server.Handlers
                     return;
                 }
                 vote.Yes.Add(me);
-                await ToEachAsync(vote.Voters, ConnectionProtocol.Push(Op.Lto, Array.Empty<byte>()));
+                await ToEachAsync(vote.Voters, new Game.SurrenderVoteUpdateEvent());
                 Program.LogDebug($"[Koliseo] {me} votes to give up: {vote.Yes.Count} of {vote.Voters.Count}.");
             }
 
@@ -111,7 +111,7 @@ namespace Jondo.Unity.Server.Handlers
 
             await CloseSurrenderVoteAsync(fight, key, vote, gaveUp: true);
             await ToEachAsync(VotersOf(fight, FightInstance.Contrario(team)),
-                ConnectionProtocol.Push(Op.Lss, Array.Empty<byte>()));
+                new Game.OpponentSurrenderEvent());
             Program.LogDebug($"[Koliseo] Team {team} gives up fight #{fight.FightId}.");
             await FallTogetherAsync(stream, fight, fight.Bando(team), "giving up");
         }
@@ -122,8 +122,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             _surrenderVotes.TryRemove(key, out _);
             vote.Clock.Cancel();
-            await ToEachAsync(vote.Voters, ConnectionProtocol.Push(Op.Ltn,
-                Network.FightProtocol.BuildSurrenderResult(gaveUp)));
+            await ToEachAsync(vote.Voters, new Game.SurrenderVoteEndEvent(gaveUp));
         }
 
         /// <summary>The minute of a vote: still open when it runs out, it is over without giving up.</summary>
@@ -161,7 +160,7 @@ namespace Jondo.Unity.Server.Handlers
                     .ToHashSet();
 
         /// <summary>The same frame to each of these people.</summary>
-        private static async Task ToEachAsync(IEnumerable<long> people, byte[] frame)
+        private static async Task ToEachAsync(IEnumerable<long> people, Game.GameEvent message)
         {
             foreach (long who in people.ToList())
             {
@@ -169,7 +168,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (session == null) continue;
                 try
                 {
-                    await session.SendAsync(frame);
+                    await session.SendAsync(message);
                 }
                 catch (Exception ex)
                 {

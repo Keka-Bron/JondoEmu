@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Game = Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Combat;
@@ -29,6 +32,59 @@ namespace Jondo.Unity.Tests.Combat
             var enemy = new Fighter { Id = 20, TeamId = 1, CellId = 400, MaxHP = 500, CurrentHP = 500, Level = 50 };
             fight.AddOpponent(enemy);
             return (fight, me);
+        }
+
+        [Fact]
+        public async Task Allied_Roublardise_is_an_unnamed_copy_only_to_its_own_side()
+        {
+            var (fight, rogue) = Board();
+            rogue.IncarnationLook = "{1|17||100}";
+            await using var allied = await PortalTests.Wire.Open(Rogue);
+            await using var enemy = await PortalTests.Wire.Open(fight.Rojo.Single().Id);
+            await FightHandler.AplicarEfectosAsync(null, fight, rogue, Tymadura, 3, rogue, EffectEngine.AlLanzar, 257);
+
+            var allies = await allied.DrainActions();
+            var foes = await enemy.DrainActions();
+            var reveal = Assert.Single(allies, a => a.Payload is Game.FightActionCaseInvisibility);
+            Assert.DoesNotContain(foes, a => a.Payload is Game.FightActionCaseInvisibility);
+            var jump = Assert.Single(allies, a => a.Payload is Game.FightActionCaseTeleportOnSameMap);
+            Assert.True(allies.IndexOf(reveal) < allies.IndexOf(jump));
+            var copies = allies.Where(a => a.ActionType == EffectSupport.Illusions).ToArray();
+            var disguises = foes.Where(a => a.ActionType == EffectSupport.Illusions).ToArray();
+            Assert.Equal(3, copies.Length);
+            Assert.Equal(copies.Length, disguises.Length);
+            Assert.True(allies.IndexOf(jump) < allies.IndexOf(copies[0]));
+            static Game.ActorPositionInformation Actor(Game.GameActionFightEvent action) => Assert.Single(
+                Assert.IsType<Game.FightActionSummonsCaseSummonsByActor>(Assert.IsType<Game.FightActionCaseSummons>(action.Payload).Value.SummonsCase).Value.Actors);
+            foreach (var (friendly, disguised) in copies.Zip(disguises))
+            {
+                var actor = Actor(friendly);
+                var info = Assert.IsType<Game.ActorInformationCaseFightActor>(actor.ActorInformation!.ActorCase).Value;
+                Assert.IsType<Game.FightFighterInformationCaseNone>(info.FighterCase);
+                Assert.Null(info.FighterId);
+                Assert.Contains(17, actor.ActorInformation.Look.Skins);
+                Assert.Equal(230, info.SpawnInformation.Position!.Disposition.CellId);
+                Assert.Equal(Rogue, info.SpawnInformation.Position.ActorId);
+                Assert.Contains(actor.ActorId, rogue.Ilusiones);
+                Assert.Contains(fight.Todos, copy => copy.Id == actor.ActorId && copy.CellId == actor.Disposition.CellId);
+                Assert.Equal(FightProtocol.IllusionSheet(rogue.Level).Select(s => (s.Characteristic, s.Base + s.Gear)),
+                    info.FightCharacteristics.Characteristics.Select(s => (s.CharacteristicId,
+                        Assert.IsType<Game.CharacterCharacteristicCaseValue>(s.CharacteristicCase).Value.Total)));
+                var other = Actor(disguised);
+                Assert.Equal(actor.ActorId, other.ActorId);
+                var named = Assert.IsType<Game.ActorInformationCaseFightActor>(other.ActorInformation!.ActorCase).Value;
+                Assert.Equal(actor.ActorId, named.FighterId);
+                Assert.IsType<Game.FightFighterInformationCaseNamedFighter>(named.FighterCase);
+#if !JONDO_PROTOCOL_3_8_1_2
+                // Compare the entire actor block, including present-zero disposition fields and the original's look.
+                var codec = new Jondo.Unity.Protocol.Game.Wire.GameCodec();
+                var expected = FightProtocol.BuildIllusion(Rogue, actor.ActorId, actor.Disposition.CellId.Value,
+                    (int)actor.Disposition.Direction, 230, (int)info.SpawnInformation.Position.Disposition.Direction,
+                    FightProtocol.IllusionSheet(rogue.Level), ConnectionProtocol.MonsterLook(rogue.IncarnationLook, false).Build());
+                var actual = codec.ReadEnvelope(codec.Encode(new(friendly)));
+                Assert.Equal(codec.DecodeRawPayload("jwe", expected), codec.DecodeRawPayload("jwe", actual.Content.Value.Span));
+#endif
+            }
         }
 
         [Fact]

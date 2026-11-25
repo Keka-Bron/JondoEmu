@@ -1331,13 +1331,6 @@ namespace Jondo.Unity.Server.Network
                     // A pet fed from the «Alimentar» window.
                     await PetFeedHandler.FeedAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kso)))
-                {
-                    // The option chosen in a choice: a fight's -- a trial's guardian or hero -- or
-                    // the one an item proposed, an ankla's dungeon.
-                    if (!await FightHandler.AnswerChoiceAsync(stream, payload))
-                        await TravelItemHandler.ChooseAsync(stream, payload);
-                }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // The dialogue's close button. It goes empty and expects an answer: khd if what
@@ -1491,13 +1484,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Hor)))
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
-                }
-                else if (payloadStr.Contains("type.ankama.com/jxy")
-                         || payloadStr.Contains(Op.Uri(Op.Jwh))
-                         || payloadStr.Contains(Op.Uri(Op.Jwn))
-                         || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp)))
-                {
-                    await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
@@ -1706,8 +1692,20 @@ namespace Jondo.Unity.Server.Network
                 case Game.FightReadyRequest ready:
                     await FightHandler.HandleReadyAsync(session, ready);
                     break;
+                case Game.ChoiceSelectedRequest choice:
+                    if (GameEntryDispatch.IsAllowed(session, choice))
+                    {
+                        using var context = SessionContext.Push(session);
+                        if (!await FightHandler.AnswerChoiceAsync(session, choice.Position) && !session.State.IsInFight)
+                            await TravelItemHandler.ChooseAsync(session.Stream, choice.Position);
+                    }
+                    break;
                 case Game.FightTurnReadyRequest or Game.GameActionAcknowledgementRequest:
                     await FightHandler.HandleCombatConfirmationAsync(session, (Game.GameRequest)frame.Content);
+                    break;
+                case Game.FightTurnFinishRequest or Game.GameActionFightCastRequest or Game.GameActionFightCastOnTargetRequest
+                    or Game.SurrenderInfoRequest or Game.SurrenderVoteCastRequest:
+                    await FightHandler.HandleLiveRequestAsync(session, (Game.GameRequest)frame.Content, frame.Uid.Value);
                     break;
                 case Game.ShowCellRequest marker:
                     await FightHandler.MarkCellAsync(session, marker);

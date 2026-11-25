@@ -85,7 +85,7 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(true)]
         public async Task Defeat_sequence_sends_just_one_prompt_and_retains_the_closing_action(bool surrender)
         {
-            using var client = new Client(allowLegacySequence: true);
+            using var client = new Client();
             var fight = AgainstABot(out var human, out _);
             int priorAction = fight.SiguienteAccion();
             if (surrender)
@@ -110,7 +110,13 @@ namespace Jondo.Unity.Tests.Combat
             }
 
             Assert.False(human.IsAlive);
-            client.AssertSinglePrompt();
+            Assert.Collection(client.Frames,
+                f => Assert.Equal(new SequenceStartEvent(SequenceType.CharacterDeath), f.Content),
+                f => Assert.Equal(new GameActionFightEvent(human.Id, FightProtocol.Died, new FightActionCaseDeath(new(human.Id))), f.Content),
+                f => Assert.IsType<FightTurnListEvent>(f.Content),
+                f => Assert.Equal(priorAction + 1, Assert.IsType<SequenceEndEvent>(f.Content).ActionId),
+                f => Assert.IsType<FightIsTurnReadyEvent>(f.Content));
+            Assert.All(client.Frames, f => Assert.Null(f.Uid));
             Assert.Equal(priorAction + 1, fight.FinPendiente);
             Assert.Equal(FightState.Ongoing, fight.State);
         }
@@ -132,10 +138,9 @@ namespace Jondo.Unity.Tests.Combat
             internal List<GameFrame> Frames { get; } = [];
             internal GameSession Session { get; }
 
-            internal Client(bool allowLegacySequence = false)
+            internal Client()
             {
-                Session = new(new CombatRecordingCodec(Frames.Add), packet => allowLegacySequence
-                    ? Task.CompletedTask : CombatRecordingCodec.RequireTypedPacketAsync(packet));
+                Session = new(new CombatRecordingCodec(Frames.Add), CombatRecordingCodec.RequireTypedPacketAsync);
                 Session.BindAccount(Player + 1, 1);
                 Session.State.CharacterId = Player;
                 Session.State.MapId = 1;

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
-using System.Text;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -135,37 +136,51 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>
         /// The result of a dream won: its code, its difficulty, its bonuses and graphs, its owner,
-        /// and f14 with its people; of one lost, f18 with the room it ended in and that room's kind.
+        /// and the winning players; a loss identifies the last room and the dream stage.
         /// </summary>
         [Fact]
         public void The_result_window_carries_the_code()
         {
             var dream = Whole(900_000_000_035, "RESULT12", difficulty: 4);
             dream.Ganados.Add(new Dreams.Bono(111, 1));
-            var players = new[] { new DreamProtocol.ResultPlayer(900_000_000_035, "Prueba", 1, 11, 1) };
+            dream.FightMs = (long)int.MaxValue + 3000;
+            dream.DreamPoints = 43;
+            dream.DreamerLevels = 2;
+            var players = new[] { new DreamProtocol.ResultPlayer(7, "Guest", 0, 2, 3),
+                new DreamProtocol.ResultPlayer(dream.CharacterId, "Prueba", 1, 11, 1) };
+            var codec = new GameCodec();
+            InfiniteDreamEndEvent RoundTrip(bool won)
+            {
+                var bytes = codec.Encode(new(DreamProtocol.BuildResult(dream, won, players, 5, 40)));
+                var envelope = codec.ReadEnvelope(bytes);
+                Assert.Equal(GameMessageKind.Event, envelope.Kind);
+                Assert.Equal(GameCodec.JondoVersion == "3.8.1.2" ? "izx" : "iya", envelope.Alias);
+                return Assert.IsType<InfiniteDreamEndEvent>(codec.Decode(bytes).Content);
+            }
 
-            var won = ProtoMessage.Parse(DreamProtocol.BuildResult(dream, true, players, 5, 40)).Fields;
-            Assert.Equal("RESULT12", Encoding.UTF8.GetString(won.Single(f => f.FieldNumber == 5).BytesValue!));
-            Assert.Equal(4, won.Single(f => f.FieldNumber == 2).VarIntValue);
-            Assert.Equal(5, won.Single(f => f.FieldNumber == 3).VarIntValue);
-            Assert.Equal(40, won.Single(f => f.FieldNumber == 13).VarIntValue);
-            Assert.Equal(Dreams.Bands, won.Count(f => f.FieldNumber == 6));
-            Assert.Single(won, f => f.FieldNumber == 7);
-            Assert.DoesNotContain(won, f => f.FieldNumber == 18);
-            var win = ProtoMessage.Parse(won.Single(f => f.FieldNumber == 14).BytesValue!).Fields;
-            var player = ProtoMessage.Parse(ProtoMessage.Parse(win.Single(f => f.FieldNumber == 1).BytesValue!)
-                                                        .Fields.Single(f => f.FieldNumber == 3).BytesValue!).Fields;
-            Assert.Equal("Prueba", Encoding.UTF8.GetString(player.Single(f => f.FieldNumber == 1).BytesValue!));
-            Assert.Equal(900_000_000_035, player.Single(f => f.FieldNumber == 3).VarIntValue);
-            Assert.Equal(11, player.Single(f => f.FieldNumber == 4).VarIntValue);
+            var won = RoundTrip(true);
+            Assert.Equal("RESULT12", won.Seed);
+            Assert.Equal(4, won.Intensity);
+            Assert.Equal(5, won.KilledWaveNumber);
+            Assert.Equal(40, won.KilledWaveGlobalTurn);
+            Assert.Equal(dream.FightMs, won.CumulatedDuration);
+            Assert.Equal(43, won.DreamPoints);
+            Assert.Equal(2, won.BonusLevels);
+            Assert.Equal(dream.Arena, won.Life);
+            Assert.Equal(dream.Tormentas, won.Rerolls);
+            Assert.Equal(Dreams.DreamerLevel(dream), won.ScaledLevel);
+            Assert.Equal(Enum.GetValues<InfiniteDreamStage>(), won.Maps.Select(m => m.Stage));
+            Assert.Equal(111, Assert.Single(won.Bonuses).Effect!.Action);
+            Assert.Equal(new InfiniteDreamCharacter("Prueba", Gender.Female, dream.CharacterId, dream.Breed), won.Owner);
+            var rows = Assert.IsType<InfiniteDreamEndEventCaseWin>(won.Outcome).Value.Players;
+            Assert.Collection(rows,
+                guest => Assert.Equal(new InfiniteDreamWinPlayer(new("Guest", Gender.Male, 7, 2), 3), guest),
+                owner => Assert.Equal(new InfiniteDreamWinPlayer(new("Prueba", Gender.Female, dream.CharacterId, 11), 1), owner));
 
-            var room = dream.Salas.First(r => r.EsFuente);
+            var room = dream.Salas.First(r => r.Franja == Dreams.Bands && r.Miembros.Count > 0);
             dream.Actual = room.Id;
-            var lost = ProtoMessage.Parse(DreamProtocol.BuildResult(dream, false, players)).Fields;
-            Assert.DoesNotContain(lost, f => f.FieldNumber == 14);
-            var where = ProtoMessage.Parse(lost.Single(f => f.FieldNumber == 18).BytesValue!).Fields;
-            Assert.Equal(room.Id.ToString(), Encoding.UTF8.GetString(where.Single(f => f.FieldNumber == 1).BytesValue!));
-            Assert.Equal(3, where.Single(f => f.FieldNumber == 2).VarIntValue);
+            var lost = Assert.IsType<InfiniteDreamEndEventCaseLoss>(RoundTrip(false).Outcome);
+            Assert.Equal(new InfiniteDreamLossResult(room.Id.ToString(), InfiniteDreamStage.Stage5), lost.Value);
             Dreams.Olvidar(900_000_000_035);
         }
 
@@ -183,9 +198,8 @@ namespace Jondo.Unity.Tests.World
             var (_, _, _, ended, result) = DreamHandler.AfterTheFight(session, fight, won: false);
             Assert.True(ended);
             Assert.NotNull(result);
-            var fields = ProtoMessage.Parse(result!).Fields;
-            Assert.Contains(fields, f => f.FieldNumber == 18);
-            Assert.Equal(dream.Seed, Encoding.UTF8.GetString(fields.Single(f => f.FieldNumber == 5).BytesValue!));
+            Assert.IsType<InfiniteDreamEndEventCaseLoss>(result!.Outcome);
+            Assert.Equal(dream.Seed, result.Seed);
         });
     }
 }

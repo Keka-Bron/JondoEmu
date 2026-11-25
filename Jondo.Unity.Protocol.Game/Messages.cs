@@ -524,10 +524,12 @@ public sealed record FightExperienceData(long ExperienceFightDelta, long Experie
 public sealed record FightFighterInformation(long? FighterId, FightCharacteristics FightCharacteristics,
     SpawnInformation SpawnInformation, FightFighterInformationCase FighterCase, int Wave);
 
+[JsonDerivedType(typeof(FightFighterInformationCaseNone), "None")]
 [JsonDerivedType(typeof(FightFighterInformationCaseAiFighter), "AiFighter")]
 [JsonDerivedType(typeof(FightFighterInformationCaseNamedFighter), "NamedFighter")]
 [JsonDerivedType(typeof(FightFighterInformationCaseEntityFighter), "EntityFighter")]
 public abstract record FightFighterInformationCase;
+public sealed record FightFighterInformationCaseNone() : FightFighterInformationCase;
 public sealed record FightFighterInformationCaseAiFighter(FightAIFighterInformation Value) : FightFighterInformationCase;
 public sealed record FightFighterInformationCaseNamedFighter(FightNamedFighterInformation Value) : FightFighterInformationCase;
 public sealed record FightFighterInformationCaseEntityFighter(EntityFighterInformation Value) : FightFighterInformationCase;
@@ -571,7 +573,7 @@ public sealed record FightMapInformationPositionCaseCoords(MapCoordinates Value)
 public sealed record FightPingsRequest() : GameRequest;
 
 public sealed record FightMark(IReadOnlyList<FightMarkedCell> Cells, int MarkId, int SpellLevel, int SpellId,
-    int MarkImpactCell, bool Active, long AuthorId);
+    int MarkImpactCell, bool Active, long AuthorId, FightMarkType MarkType, Team Team, int Param1, int Param2, int Param3);
 
 public sealed record FightMonsterInformation(int CreatureGrade, int MonsterGid, int CreatureLevel);
 

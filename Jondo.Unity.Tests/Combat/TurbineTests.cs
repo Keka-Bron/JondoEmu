@@ -62,12 +62,12 @@ namespace Jondo.Unity.Tests.Combat
             {
                 using (SessionContext.Push(pipe.Session))
                 {
-                    await FightHandler.CastAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, empty).Var(4, Turbina).Build()));
+                    await FightHandler.CastAsync(pipe.ToClient, fight, empty, Turbina);
                     Assert.True(steamer.CurrentAP < 12, $"not cast on the empty cell {empty}");
                     Assert.Equal(4000, mob.CurrentHP);
 
                     int ap = steamer.CurrentAP;
-                    await FightHandler.CastAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, mob.CellId).Var(4, Turbina).Build()));
+                    await FightHandler.CastAsync(pipe.ToClient, fight, mob.CellId, Turbina);
                     Assert.True(steamer.CurrentAP < ap, $"not cast on the monster's cell {mob.CellId}");
                     Assert.True(mob.CurrentHP < 4000, "no fire on the monster aimed at");
                 }

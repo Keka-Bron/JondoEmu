@@ -1,3 +1,4 @@
+using Game = Jondo.Unity.Protocol.Game;
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -272,7 +273,8 @@ namespace Jondo.Unity.Server.Handlers
             await ACadaUnoAsync(fight, async sesion =>
             {
                 if (sesion.State.CharacterId != who.Id) return;
-                await WriteFrameAsync(sesion.Stream, ConnectionProtocol.Push(Op.Kss, TravelProtocol.BuildChoice(proposed)));
+                await sesion.SendAsync(new Game.ChoiceSelectionEvent(proposed.Options.Select((o, position) =>
+                    new Game.Choice(o.Id, position)).ToArray(), true, proposed.Id));
             });
             Program.LogDebug($"[Fight] Choice {choiceId} put to {who.Id}: options " +
                              string.Join(", ", shown.Select(o => o.Id)) + ".");
@@ -290,16 +292,11 @@ namespace Jondo.Unity.Server.Handlers
         /// The option chosen (kso { f1: its place }) of a choice a fight put to him: its spell cast
         /// on him. False when no choice of a fight waits for him, so the kso is somebody else's.
         /// </summary>
-        public static async Task<bool> AnswerChoiceAsync(NetworkStream stream, byte[] frame)
+        internal static async Task<bool> AnswerChoiceAsync(GameSession session, int place)
         {
-            long me = SessionContext.State.CharacterId;
+            using var context = SessionContext.Push(session);
+            long me = session.CharacterId;
             if (!_choices.ContainsKey(me)) return false;
-
-            byte[] kso = ConnectionProtocol.ReadPayload(frame, Op.Kso);
-            int place = 0;
-            if (kso != null)
-                foreach (var field in ProtoMessage.Parse(kso).Fields)
-                    if (field.FieldNumber == 1 && field.WireType == 0) place = (int)field.VarIntValue;
 
             // A choice of a fight that is over is let go, and the kso is the ankla's.
             var fight = GetCurrentFight();
@@ -308,7 +305,9 @@ namespace Jondo.Unity.Server.Handlers
                 _choices.TryRemove(me, out _);
                 return false;
             }
-            await InTurnAsync(fight, () => ChooseAsync(stream, fight, me, place));
+            await InTurnAsync(fight, () => ReferenceEquals(GetCurrentFight(), fight) &&
+                _choices.TryGetValue(me, out var still) && ReferenceEquals(still, pending)
+                ? ChooseAsync(session.Stream, fight, me, place) : Task.CompletedTask);
             return true;
         }
 
@@ -397,18 +396,11 @@ namespace Jondo.Unity.Server.Handlers
             quien.Buffs.PonerActitud(spell, grade, givenInRound: fight.RoundNumber);
             int nivelId = LimitesDeGrado(spell, grade).LevelId;
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                Network.FightProtocol.BuildSequenceStart(quien.Id, Network.FightProtocol.SpellSequence)));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                Network.FightProtocol.BuildAction(
-                    quien.Id, Network.FightProtocol.Cast,
-                    Network.FightProtocol.CastAt(quien.Id, quien.Id, quien.CellId, spell, nivelId, critical: false),
-                    Network.FightProtocol.CastDetail)));
+            await ATodosAsync(fight, new Game.SequenceStartEvent(Game.SequenceType.Spell));
+            await ATodosAsync(fight, CombatActions.Cast(quien.Id, quien.Id, quien.CellId, spell, nivelId, critical: false));
             await AplicarEfectosAsync(stream, fight, quien, spell, grade, quien,
                                       Managers.EffectEngine.AlLanzar, quien.CellId, armar: false);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), quien.Id,
-                                                       Network.FightProtocol.SpellSequence)));
+            await ATodosAsync(fight, new Game.SequenceEndEvent(fight.SiguienteAccion(), quien.Id));
         }
     }
 }

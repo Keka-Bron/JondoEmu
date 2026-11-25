@@ -40,6 +40,17 @@ public sealed class NovemberProtocolTests
         Assert.Equal(settings, _codec.Decode(encoded));
     }
 
+    [Fact]
+    public void Surrender_vote_available_preserves_the_unlock_timestamp()
+    {
+        // Vote response (1) -> available (1) -> vote_unlock_time_stamp (1), with leave info absent.
+        var wire = Frame(3, 1, "lvk", Convert.FromHexString("0A070A050A03313233"), uidTag: 2, uid: -3);
+        var expected = new GameFrame(new SurrenderInfoResponse(false, null,
+            new(new SurrenderVoteAvailabilityCaseAvailable("123"))), -3);
+        Assert.Equal(expected, _codec.Decode(wire));
+        Assert.Equal(wire, _codec.Encode(expected));
+    }
+
     private static byte[] Frame(int rootTag, int anyTag, string alias, byte[] body, int? uidTag = null, int uid = 0)
     {
         byte[] any = Write(o =>
