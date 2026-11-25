@@ -116,7 +116,10 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // «Intercambiar» on an NPC who swaps things: Gobiere Trokeur's barter, not a shop.
-            if (action == Npcs.TradeCosmetics && NpcBarterHandler.Barters(npc.NpcId))
+            // «Trocar» (2) opens the same window; an NPC that also sells keeps its «Comprar» (11) for the
+            // shop: the dragons' champion answers 2 with the exchange and 11 with its catalogue.
+            if (NpcBarterHandler.Barters(npc.NpcId)
+                && (action == Npcs.Exchange || action == Npcs.TradeCosmetics && !NpcShops.Sells(npc.NpcId)))
             {
                 await NpcBarterHandler.OpenAsync(stream, npc.NpcId, npc.ContextualId);
                 return;
