@@ -14188,7 +14188,8 @@
           "choices": [
             { "reply": 37546, "quest": 1965, "completes": 14022, "params": [[30, 14022]] }
           ]
-        }
+        },
+        { "message": 31102, "choices": [] }
       ],
       "why": "The guard wauwau of the market square [2,-18], by «La fête de la chocopépite»: half asleep (31098), shown the crates, sniffing the footprints (31100), set on the trail (31101: 14022), a mercenary left to watch the crates."
     },
@@ -16115,13 +16116,11 @@
           "message": 3074,
           "choices": [
             { "reply": 2729, "startsQuest": 134, "params": [[34, 134]] },
-            { "reply": 2728, "next": 3072 }
+            { "reply": 2728, "next": 3072 },
+            { "reply": 2730 }
           ]
         },
-        {
-          "message": 3072,
-          "choices": []
-        },
+        { "message": 3072, "choices": [] },
         {
           "message": 3075,
           "choices": [
@@ -16129,30 +16128,12 @@
             { "reply": 2730 }
           ]
         },
-        {
-          "message": 3076,
-          "choices": []
-        },
-        {
-          "message": 3071,
-          "choices": []
-        },
-        {
-          "message": 3077,
-          "choices": []
-        },
-        {
-          "message": 3078,
-          "choices": []
-        },
-        {
-          "message": 3079,
-          "choices": []
-        },
-        {
-          "message": 3080,
-          "choices": []
-        }
+        { "message": 3076, "choices": [] },
+        { "message": 3071, "choices": [] },
+        { "message": 3077, "choices": [] },
+        { "message": 3078, "choices": [] },
+        { "message": 3079, "choices": [] },
+        { "message": 3080, "choices": [] }
       ],
       "why": "Verrumacha, the king's customs officer at Madrestam port [8,-4]. «Les Dents de la Mère Verumacha» (134) of Dofus pour les noobs: a shark spreading terror in the port (3074, «Je vais le suivre au sillage»), «lout» (3072); found? by a boat with a wabbit on its sail (3075: 489), no, a crimson bandit (3076); bribed? never (3077: 492); much better, pig's milk for sweets (3078), a profitable day (3079), smugglers to the sharks (3080). «Kartier Tremai se met à table»: sick of fish, no (3071: 481)."
     },
@@ -16169,37 +16150,19 @@
         { "after": 133, "message": 3073 }
       ],
       "lines": [
-        {
-          "message": 3073,
-          "choices": []
-        },
+        { "message": 3073, "choices": [] },
         {
           "message": 3092,
           "choices": [
             { "reply": 2735, "startsQuest": 136, "params": [[34, 136]], "next": 3093 },
-            { "reply": 2736, "next": 3099 }
+            { "reply": 2736 }
           ]
         },
-        {
-          "message": 3093,
-          "choices": []
-        },
-        {
-          "message": 3096,
-          "choices": []
-        },
-        {
-          "message": 3097,
-          "choices": []
-        },
-        {
-          "message": 3098,
-          "choices": []
-        },
-        {
-          "message": 3099,
-          "choices": []
-        }
+        { "message": 3093, "choices": [] },
+        { "message": 3096, "choices": [] },
+        { "message": 3097, "choices": [] },
+        { "message": 3098, "choices": [] },
+        { "message": 3099, "choices": [] }
       ],
       "why": "Eloko Osopeloso, docker of Madrestam port: «a good warm beer» (3093). «Kartier Tremai se met à table»: another good drinking bout (3073: 483). «Comment mettre un requin en bière» (136) of Dofus pour les noobs: a shark that never takes its eye off him, something to forget it (3092, «De la bière j'imagine ?»), a good warm beer (3093: three Amakna beers), comparing several kinds (3096: Feubuk, Gatokemao, Almenú, bwórkbol, Astrub), drunk too fast, some water (3097: ten), ready to face the shark (3098); «you will find it, smart one» (3099)."
     },
@@ -16776,11 +16739,17 @@
         },
         {
           "message": 10813,
-          "choices": []
+          "choices": [
+            { "reply": 11910, "compass": [2, -1, 4] }
+          ]
         },
+        { "message": 8507, "choices": [] },
         {
-          "message": 8507,
-          "choices": []
+          "message": 8510,
+          "choices": [
+            { "reply": 11909, "next": 10813 },
+            { "reply": 11193 }
+          ]
         }
       ],
       "why": "The Kwakerback host of the Equipo Turist-A before the Kwakwa's nest [-4,-7]: a new sport, sent by Hannibol Smis (8508), only a kwaks' nest behind him (10813); how were the kwaks? any eggs? (8507: «L'Ascension», 4330). The door replies are the dungeon's (DungeonHandler)."
@@ -17179,7 +17148,9 @@
         {
           "message": 15979,
           "choices": [
-            { "reply": 19417 }
+            { "reply": 19417 },
+            { "reply": 19418, "next": 16338, "compass": [-4, -2, 4] },
+            { "reply": 19419 }
           ]
         },
         {
@@ -17189,13 +17160,13 @@
             { "reply": 5625 }
           ]
         },
+        { "message": 147, "choices": [] },
+        { "message": 3935, "choices": [] },
         {
-          "message": 147,
-          "choices": []
-        },
-        {
-          "message": 3935,
-          "choices": []
+          "message": 16338,
+          "choices": [
+            { "reply": 19417 }
+          ]
         }
       ],
       "why": "Captain Lily of Madrestam port [9,-2], whose boat goes to the wabbit archipelago (460): not without a remedy for the myxomawosis, an assistant of Otomai in the Amakna village (15979; «Intrusion chez les wabbits», 827); with it, 500 kamas and she takes you (15980, «Pagarle 500 kamas»: the island's coast [24,-4], INFERRED landing map), stowaways go overboard (147, not enough kamas). «Info pour un vrai traître»: carrots from the island, a wabbit prince coming to Amakna (3935: 856, on a hello)."
@@ -17835,14 +17806,16 @@
           "message": 52704,
           "choices": [
             { "reply": 70666, "next": 52705 },
-            { "reply": 70785, "next": 52767 },
-            { "reply": 70787, "next": 52769 }
+            { "reply": 70785, "next": 52766 },
+            { "reply": 70787, "next": 52769 },
+            { "reply": 70788, "next": 52769 }
           ]
         },
         {
           "message": 52767,
           "choices": [
-            { "reply": 70784, "next": 52768 }
+            { "reply": 70784, "next": 52768 },
+            { "reply": 70783, "next": 52768 }
           ]
         },
         {
@@ -17854,13 +17827,14 @@
         {
           "message": 52769,
           "choices": [
-            { "reply": 70786 }
+            { "reply": 70786 },
+            { "reply": 70787, "next": 52770 }
           ]
         },
         {
           "message": 52705,
           "choices": [
-            { "reply": 70665, "next": 52766 },
+            { "reply": 70665, "next": 52706 },
             { "reply": 70788, "next": 52770 },
             { "reply": 70786 }
           ]
@@ -17868,7 +17842,8 @@
         {
           "message": 52766,
           "choices": [
-            { "reply": 70783, "next": 52706 }
+            { "reply": 70783, "next": 52706 },
+            { "reply": 70784, "next": 52767 }
           ]
         },
         {
@@ -17884,7 +17859,8 @@
             { "reply": 70670, "next": 52708 },
             { "reply": 70676, "next": 52711 },
             { "reply": 70679, "next": 52712 },
-            { "reply": 70683, "next": 52713 }
+            { "reply": 70683, "next": 52713 },
+            { "reply": 70734, "next": 52731 }
           ]
         },
         {
@@ -18530,10 +18506,7 @@
             { "reply": 52928, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=10", "next": 40631 }
           ]
         },
-        {
-          "message": 20438,
-          "choices": []
-        },
+        { "message": 20438, "choices": [] },
         {
           "message": 40631,
           "choices": [
@@ -18565,10 +18538,8 @@
             { "reply": 36152 }
           ]
         },
-        {
-          "message": 30075,
-          "choices": []
-        }
+        { "message": 30075, "choices": [] },
+        { "message": 20435, "choices": [] }
       ],
       "why": "Etenipse Tik of the Sadida temple [-1,9]: leather braces for his loincloth (20484). «C'est tout simple»: Manzanillo welcome to rest, the Soft Oak's magic in him (20485: 9547). And the class temple's devotion: «Faire preuve de son dévouement» (quest 772, objective 4885), then the line about the book. «Protección divina» (2194), for the class-10 temple's own: «Estoy de camino al Bosque Maléfico» (52928), madness to go without protection, train against a dopeul and pray to the statue (40631); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40634); then Trimpize at the forest's edge (40635), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52925) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36157), the towers' lair (30073), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36153) starts the quest and sends the character to pray before the class statue (30074, «Encontrar la estatua»); under level 50 he is told to wait (30075) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
@@ -18915,7 +18886,15 @@
       "lines": [
         {
           "message": 11970,
-          "choices": []
+          "choices": [
+            { "reply": 24468, "next": 20452 }
+          ]
+        },
+        {
+          "message": 20452,
+          "choices": [
+            { "reply": 24467 }
+          ]
         }
       ],
       "why": "Tronky Tranky before the Ancestral Domain [-9,-14]: dry wood for winter nights, the Ancestral Treechnid will not mind a few branches (11970). The door replies (key, keyring) are the dungeon's (DungeonHandler)."
@@ -21933,18 +21912,10 @@
             { "reply": 3072, "forfeits": 163 }
           ]
         },
-        {
-          "message": 3476,
-          "choices": []
-        },
-        {
-          "message": 3475,
-          "choices": []
-        },
-        {
-          "message": 3473,
-          "choices": []
-        }
+        { "message": 3476, "choices": [] },
+        { "message": 3475, "choices": [] },
+        { "message": 3473, "choices": [] },
+        { "message": 3477, "choices": [] }
       ],
       "why": "Gobatchef at the entrance of the bworks' camp [-3,8], who waves at you: come here (3474), not a little gob, a great goblin chief (3478); not you, he wants big muscles (3473, while the quest is not for you). «Les Gobelins de la Manufacture» (163) of Dofus pour les noobs: the oppressed goblin village, the bworks' tapestry works, spill bwork blood (3479): «C'est une faute de goût inacceptable» takes the quest (the four fights of bworks, 670-673), break bones, kill bworks (3476), a small present from a good defender of goblins (3475, once handed in on the hello: 695); or «Viens donc par là, que je me taille un morceau de tapisserie», his reinforcements (3481: «¡Qué miedo...!», the fight, and the quest over with nothing paid, «La quête se termine dès que vous lancez le combat»)."
     },
@@ -22233,7 +22204,7 @@
           "message": 3468,
           "choices": [
             { "reply": 3066, "next": 3469, "beforeQuest": 162 },
-            { "reply": 3065, "beforeQuest": 162, "buyPrice": 500, "teleport": 192414722 }
+            { "reply": 3065, "beforeQuest": 162, "buyPrice": 500, "teleport": 192414722, "passage": 3065 }
           ]
         },
         {
@@ -22242,22 +22213,10 @@
             { "reply": 3067, "startsQuest": 162, "params": [[34, 162]], "next": 3470 }
           ]
         },
-        {
-          "message": 3470,
-          "choices": []
-        },
-        {
-          "message": 3466,
-          "choices": []
-        },
-        {
-          "message": 3467,
-          "choices": []
-        },
-        {
-          "message": 3465,
-          "choices": []
-        }
+        { "message": 3470, "choices": [] },
+        { "message": 3466, "choices": [] },
+        { "message": 3467, "choices": [] },
+        { "message": 3465, "choices": [] }
       ],
       "why": "Raxitik in his hut in the goblins' camp [-5,3]: he does not want to become trool krotte (3465). «Un avenir de krotte de Trooll» (162) of Dofus pour les noobs: «are you brave?» (3468), «enough to venture here», the bworks want to feed him to a trool, nineteen minigobs to feed (3469: «and where is the nasty little trool?», 162), the pit over there, a strong trool (3470: the pit 104858115 found, 668; the tame trool beaten, 669); afraid of a little trool? (3466); you crushed the trool, brave (3467: the hello ends it, 698). «Je suis un pleutre»: «il vous téléporte dans les toilettes de la taverne d'Astrub en plus de vous prendre 500 kamas»."
     },
@@ -22535,7 +22494,7 @@
         {
           "message": 50449,
           "choices": [
-            { "reply": 67637 }
+            { "reply": 67637, "startsQuest": 2455, "params": [[34, 2455]] }
           ]
         },
         {
@@ -22575,10 +22534,7 @@
             { "reply": 67654, "next": 50467 }
           ]
         },
-        {
-          "message": 50467,
-          "choices": []
-        },
+        { "message": 50467, "choices": [] },
         {
           "message": 50469,
           "choices": [
@@ -26205,6 +26161,7 @@
         {
           "message": 11353,
           "choices": [
+            { "reply": 12550, "startsQuest": 470, "params": [[34, 470]], "quest": 459, "afterQuest": true },
             { "reply": 12550, "next": 11354, "startsQuest": 459, "params": [[34, 459]] },
             { "reply": 12550, "next": 11354, "quest": 459 },
             { "reply": 12548 }
@@ -26226,26 +26183,15 @@
             { "reply": 12548 }
           ]
         },
-        {
-          "message": 11355,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 11357,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 11355, "untilDaily": true, "choices": [] },
+        { "message": 11357, "untilDaily": true, "choices": [] },
         {
           "message": 11389,
           "choices": [
             { "reply": 53017, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=6", "next": 40703 }
           ]
         },
-        {
-          "message": 11358,
-          "choices": []
-        },
+        { "message": 11358, "choices": [] },
         {
           "message": 40703,
           "choices": [
@@ -26471,6 +26417,7 @@
         {
           "message": 11161,
           "choices": [
+            { "reply": 12317, "startsQuest": 470, "params": [[34, 470]], "quest": 463, "afterQuest": true },
             { "reply": 12317, "next": 11162, "startsQuest": 463, "params": [[34, 463]] },
             { "reply": 12317, "next": 11162, "quest": 463 },
             { "reply": 12315 }
@@ -26492,26 +26439,15 @@
             { "reply": 12315 }
           ]
         },
-        {
-          "message": 11163,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 11165,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 11163, "untilDaily": true, "choices": [] },
+        { "message": 11165, "untilDaily": true, "choices": [] },
         {
           "message": 11197,
           "choices": [
             { "reply": 53029, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=11", "next": 40709 }
           ]
         },
-        {
-          "message": 11196,
-          "choices": []
-        },
+        { "message": 11196, "choices": [] },
         {
           "message": 40709,
           "choices": [
@@ -26609,6 +26545,7 @@
         {
           "message": 11237,
           "choices": [
+            { "reply": 12412, "startsQuest": 470, "params": [[34, 470]], "quest": 465, "afterQuest": true },
             { "reply": 12412, "next": 11238, "startsQuest": 465, "params": [[34, 465]] },
             { "reply": 12412, "next": 11238, "quest": 465 },
             { "reply": 12410 }
@@ -26630,26 +26567,15 @@
             { "reply": 12410 }
           ]
         },
-        {
-          "message": 11239,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 11241,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 11239, "untilDaily": true, "choices": [] },
+        { "message": 11241, "untilDaily": true, "choices": [] },
         {
           "message": 11273,
           "choices": [
             { "reply": 53027, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=10", "next": 40708 }
           ]
         },
-        {
-          "message": 11242,
-          "choices": []
-        },
+        { "message": 11242, "choices": [] },
         {
           "message": 40708,
           "choices": [
@@ -26757,6 +26683,7 @@
         {
           "message": 11275,
           "choices": [
+            { "reply": 12457, "startsQuest": 470, "params": [[34, 470]], "quest": 467, "afterQuest": true },
             { "reply": 12457, "next": 11276, "startsQuest": 467, "params": [[34, 467]] },
             { "reply": 12457, "next": 11276, "quest": 467 },
             { "reply": 12455 }
@@ -26778,26 +26705,15 @@
             { "reply": 12455 }
           ]
         },
-        {
-          "message": 11277,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 11279,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 11277, "untilDaily": true, "choices": [] },
+        { "message": 11279, "untilDaily": true, "choices": [] },
         {
           "message": 11311,
           "choices": [
             { "reply": 53025, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=4", "next": 40707 }
           ]
         },
-        {
-          "message": 11280,
-          "choices": []
-        },
+        { "message": 11280, "choices": [] },
         {
           "message": 40707,
           "choices": [
@@ -27033,6 +26949,7 @@
         {
           "message": 10852,
           "choices": [
+            { "reply": 11951, "startsQuest": 470, "params": [[34, 470]], "quest": 715, "afterQuest": true },
             { "reply": 11951, "next": 10853, "startsQuest": 715, "params": [[34, 715]] },
             { "reply": 11951, "next": 10853, "quest": 715 },
             { "reply": 11949 }
@@ -27054,26 +26971,15 @@
             { "reply": 11949 }
           ]
         },
-        {
-          "message": 10854,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 10856,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 10854, "untilDaily": true, "choices": [] },
+        { "message": 10856, "untilDaily": true, "choices": [] },
         {
           "message": 10888,
           "choices": [
             { "reply": 53035, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=14", "next": 40712 }
           ]
         },
-        {
-          "message": 10857,
-          "choices": []
-        },
+        { "message": 10857, "choices": [] },
         {
           "message": 40712,
           "choices": [
@@ -27107,6 +27013,7 @@
         {
           "message": 11876,
           "choices": [
+            { "reply": 13342, "startsQuest": 470, "params": [[34, 470]], "quest": 940, "afterQuest": true },
             { "reply": 13342, "next": 11877, "startsQuest": 940, "params": [[34, 940]] },
             { "reply": 13342, "next": 11877, "quest": 940 },
             { "reply": 13341 }
@@ -27128,26 +27035,15 @@
             { "reply": 13341 }
           ]
         },
-        {
-          "message": 11878,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 11880,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 11878, "untilDaily": true, "choices": [] },
+        { "message": 11880, "untilDaily": true, "choices": [] },
         {
           "message": 11882,
           "choices": [
             { "reply": 13339, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=15", "next": 11875 }
           ]
         },
-        {
-          "message": 11881,
-          "choices": []
-        },
+        { "message": 11881, "choices": [] },
         {
           "message": 11875,
           "choices": [
@@ -27181,6 +27077,7 @@
         {
           "message": 20011,
           "choices": [
+            { "reply": 23942, "startsQuest": 470, "params": [[34, 470]], "quest": 1617, "afterQuest": true },
             { "reply": 23942, "next": 20012, "startsQuest": 1617, "params": [[34, 1617]] },
             { "reply": 23942, "next": 20012, "quest": 1617 },
             { "reply": 23940 }
@@ -27202,26 +27099,15 @@
             { "reply": 23940 }
           ]
         },
-        {
-          "message": 20013,
-          "untilDaily": true,
-          "choices": []
-        },
-        {
-          "message": 20015,
-          "untilDaily": true,
-          "choices": []
-        },
+        { "message": 20013, "untilDaily": true, "choices": [] },
+        { "message": 20015, "untilDaily": true, "choices": [] },
         {
           "message": 20017,
           "choices": [
             { "reply": 23939, "quest": 2194, "afterObjective": 16292, "beforeObjective": 16294, "criterion": "PG=16", "next": 20010 }
           ]
         },
-        {
-          "message": 20016,
-          "choices": []
-        },
+        { "message": 20016, "choices": [] },
         {
           "message": 20010,
           "choices": [
@@ -27760,13 +27646,11 @@
             { "reply": 10131, "quest": 763, "afterObjective": 4848, "completes": 4849, "params": [[30, 4849]], "next": 9652 },
             { "reply": 52932, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=6", "next": 40636 },
             { "reply": 36163, "next": 30076, "criterion": "PL>49&Qa!1938&Qf!1938" },
-            { "reply": 36163, "next": 30078, "criterion": "PL<50" }
+            { "reply": 36163, "next": 30078, "criterion": "PL<50" },
+            { "reply": 32188, "next": 26787 }
           ]
         },
-        {
-          "message": 9652,
-          "choices": []
-        },
+        { "message": 9652, "choices": [] },
         {
           "message": 40636,
           "choices": [
@@ -27798,10 +27682,8 @@
             { "reply": 36158 }
           ]
         },
-        {
-          "message": 30078,
-          "choices": []
-        }
+        { "message": 30078, "choices": [] },
+        { "message": 26787, "choices": [] }
       ],
       "why": "Filgar Feel, master of the class-6 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 763, objective 4849). «Protección divina» (2194), for the class-6 temple's own: «Estoy de camino al Bosque Maléfico» (52932), madness to go without protection, train against a dopeul and pray to the statue (40636); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40637); then Trimpize at the forest's edge (40638), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52929) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36163), the towers' lair (30076), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36159) starts the quest and sends the character to pray before the class statue (30077, «Encontrar la estatua»); under level 50 he is told to wait (30078) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
@@ -27994,13 +27876,11 @@
             { "reply": 10139, "quest": 771, "afterObjective": 4880, "completes": 4881, "params": [[30, 4881]], "next": 9660 },
             { "reply": 52908, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=11", "next": 40617 },
             { "reply": 36139, "next": 30064, "criterion": "PL>49&Qa!1938&Qf!1938" },
-            { "reply": 36139, "next": 30066, "criterion": "PL<50" }
+            { "reply": 36139, "next": 30066, "criterion": "PL<50" },
+            { "reply": 1241, "next": 1610 }
           ]
         },
-        {
-          "message": 9660,
-          "choices": []
-        },
+        { "message": 9660, "choices": [] },
         {
           "message": 40617,
           "choices": [
@@ -28032,10 +27912,8 @@
             { "reply": 36134 }
           ]
         },
-        {
-          "message": 30066,
-          "choices": []
-        }
+        { "message": 30066, "choices": [] },
+        { "message": 1610, "choices": [] }
       ],
       "why": "Chaki Triss, master of the class-11 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 771, objective 4881). «Protección divina» (2194), for the class-11 temple's own: «Estoy de camino al Bosque Maléfico» (52908), madness to go without protection, train against a dopeul and pray to the statue (40617); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40618); then Trimpize at the forest's edge (40619), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52905) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36139), the towers' lair (30064), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36135) starts the quest and sends the character to pray before the class statue (30065, «Encontrar la estatua»); under level 50 he is told to wait (30066) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
@@ -28160,13 +28038,11 @@
             { "reply": 10143, "quest": 775, "afterObjective": 4896, "completes": 4897, "params": [[30, 4897]], "next": 9664 },
             { "reply": 52940, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=14", "next": 40642 },
             { "reply": 36181, "next": 30085, "criterion": "PL>49&Qa!1938&Qf!1938" },
-            { "reply": 36181, "next": 30087, "criterion": "PL<50" }
+            { "reply": 36181, "next": 30087, "criterion": "PL<50" },
+            { "reply": 8790, "next": 8761 }
           ]
         },
-        {
-          "message": 9664,
-          "choices": []
-        },
+        { "message": 9664, "choices": [] },
         {
           "message": 40642,
           "choices": [
@@ -28198,10 +28074,8 @@
             { "reply": 36176 }
           ]
         },
-        {
-          "message": 30087,
-          "choices": []
-        }
+        { "message": 30087, "choices": [] },
+        { "message": 8761, "choices": [] }
       ],
       "why": "Anzeo Declaze, master of the class-14 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 775, objective 4897). «Protección divina» (2194), for the class-14 temple's own: «Estoy de camino al Bosque Maléfico» (52940), madness to go without protection, train against a dopeul and pray to the statue (40642); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40643); then Trimpize at the forest's edge (40644), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52937) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36181), the towers' lair (30085), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36177) starts the quest and sends the character to pray before the class statue (30086, «Encontrar la estatua»); under level 50 he is told to wait (30087) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
     },
@@ -28217,13 +28091,11 @@
             { "reply": 52981, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=15", "next": 40676 },
             { "reply": 29493, "next": 24549, "quest": 1760, "afterObjective": 11260, "beforeObjective": 11261 },
             { "reply": 36175, "next": 30082, "criterion": "PL>49&Qa!1938&Qf!1938" },
-            { "reply": 36175, "next": 30084, "criterion": "PL<50" }
+            { "reply": 36175, "next": 30084, "criterion": "PL<50" },
+            { "reply": 13327, "next": 11867 }
           ]
         },
-        {
-          "message": 11868,
-          "choices": []
-        },
+        { "message": 11868, "choices": [] },
         {
           "message": 40676,
           "choices": [
@@ -28279,9 +28151,12 @@
             { "reply": 36170 }
           ]
         },
+        { "message": 30084, "choices": [] },
         {
-          "message": 30084,
-          "choices": []
+          "message": 11867,
+          "choices": [
+            { "reply": 13329 }
+          ]
         }
       ],
       "why": "Julio Never, master of the class-15 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 939, objective 5713). «Protección divina» (2194), for the class-15 temple's own: «Estoy de camino al Bosque Maléfico» (52981), madness to go without protection, train against a dopeul and pray to the statue (40676); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40677); then Trimpize at the forest's edge (40678), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52978) is 16292 (Dofus pour les noobs, «Protection divine»). Quest 1760 (Dofus pour les noobs («Le héros de Sufokia»)): «Vengo de parte del rey Talas» (29493) after King Talas (11260): 24549 (Lord of the Splashes), 29492, 24550 (the abyssal dofus), 29491, 24551, 29490, 24553 (still being stabilised: the dofus itself comes with the other abyssal quests) and 29495 does 11261. INFERRED: the order of the replies. «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36175), the towers' lair (30082), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36171) starts the quest and sends the character to pray before the class statue (30083, «Encontrar la estatua»); under level 50 he is told to wait (30084) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
@@ -28783,7 +28658,8 @@
         {
           "message": 13497,
           "choices": [
-            { "reply": 82521 }
+            { "reply": 82521 },
+            { "reply": 20920, "next": 17471, "compass": [-17, 3, 4] }
           ]
         },
         {
@@ -28823,7 +28699,8 @@
           "choices": [
             { "reply": 20570, "quest": 1474, "completes": 8223, "params": [[30, 8223]] }
           ]
-        }
+        },
+        { "message": 17471, "choices": [] }
       ],
       "why": "Lauren Fertrén, Astrub's stagecoach station [0,-18] (13496). By «Luisito, fab'huritu, eres muy malito»: «Allez en [0,-18] et parlez à Hassen Cehef « Montrer le ticket de Kerubim Crépin »» (Dofus pour les noobs): «Mira, tengo un pase.» hands Kerubim's pass over (6774, 13498), the network reopened (13499) and its warning (60129). Without it the office is on strike (13497). Afterwards «Elegir destino.» (13500): «Elegir los caminos rocosos.» to Cania's bay [-29,-12], «Me voy al Cementerio de los Héroes.» to [-21,-58], «Elegir el Cementerio de los Torturados.» to the fungus territory [-12,29], the three one-way destinations of the guide; the reply names the subarea around each. For 1474 (Dofus pour les noobs, «Les monstres aboient, la diligence casse», «Parlez alors à Hassen Cehef»): «Estoy buscando a un pasajero procedente de Bonta», the Bonta-Astrub stagecoach lost passengers (17184), «¿Qué más sabes…?», an accident on the north border of the Cania peaks, the investigator never came back (17185), «Encogerte de hombros e ir a los picos de Cania» (8223)."
     },
@@ -29208,19 +29085,22 @@
             { "reply": 12944, "next": 11620, "beforeQuest": 925 },
             { "reply": 12950, "quest": 925, "completes": 5612, "params": [[30, 5612]], "next": 11624, "holds": 281 },
             { "reply": 12951, "next": 11626, "quest": 925, "afterObjective": 5612, "beforeObjective": 5616 },
-            { "reply": 12955, "quest": 925, "completes": 5616, "params": [[30, 5616]], "next": 11627, "takesAll": [13208, 13206, 13207], "afterObjectives": [5613, 5614, 5615] }
+            { "reply": 12955, "quest": 925, "completes": 5616, "params": [[30, 5616]], "next": 11627, "takesAll": [13208, 13206, 13207], "afterObjectives": [5613, 5614, 5615] },
+            { "reply": 12945, "next": 11619 }
           ]
         },
         {
           "message": 11620,
           "choices": [
-            { "reply": 12942, "next": 11621 }
+            { "reply": 12942, "next": 11621 },
+            { "reply": 12943, "next": 11621 }
           ]
         },
         {
           "message": 11621,
           "choices": [
-            { "reply": 12943, "next": 11622 }
+            { "reply": 12943, "next": 11622 },
+            { "reply": 12942, "next": 11622 }
           ]
         },
         {
@@ -29242,7 +29122,8 @@
           "message": 11619,
           "choices": [
             { "reply": 12946, "startsQuest": 925, "params": [[34, 925]] },
-            { "reply": 12947 }
+            { "reply": 12947 },
+            { "reply": 12944, "next": 11620 }
           ]
         },
         {
@@ -29276,10 +29157,7 @@
             { "reply": 12953 }
           ]
         },
-        {
-          "message": 11629,
-          "choices": []
-        }
+        { "message": 11629, "choices": [] }
       ],
       "why": "Stiff Yob in Roukerol's workshop, Sufokia [7,25], by «En busca del tiempo perdido» (À la recherche des instants perdus, Dofus pour les noobs): the lost wrench (11618); «¿Qué te ha pasado?», found wandering by Roukerol (11620), his dreams (11621), the book printed in Astrub (11622); «He leído la obra de Herdegriz, el Místico.» once «Las primeras impresiones son engañosas» is done (11623: an apple might bring it back); «Ir a conseguir una manzana.» starts it («Partir se procurer une pomme»), or the fish (11619). «Darle un manzana.» takes the apple (5612, 11624-11625: three places near Sufokia), asked again with «Pedirle más detalles sobre los objetos perdidos.» (11626). «Darle los tres objetos.» hands the iSkarab, the iZarrín and the specious stone over (5616, 11627-11628: the mask he made himself is the quest's reward). Afterwards, 11629."
     },
@@ -32878,7 +32756,8 @@
           "message": 11916,
           "choices": [
             { "reply": 19587, "next": 16445, "quest": 1444, "afterObjective": 7994, "beforeObjective": 7995 },
-            { "reply": 19539 }
+            { "reply": 19539 },
+            { "reply": 19513, "next": 16400 }
           ]
         },
         {
@@ -32913,7 +32792,14 @@
           "choices": [
             { "reply": 19588, "startsQuest": 1442, "params": [[34, 1442]] }
           ]
-        }
+        },
+        {
+          "message": 16400,
+          "choices": [
+            { "reply": 19518, "next": 16401 }
+          ]
+        },
+        { "message": 16401, "choices": [] }
       ],
       "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank."
     },
@@ -32926,7 +32812,8 @@
           "message": 11915,
           "choices": [
             { "reply": 19592, "next": 16450, "quest": 1444, "afterObjective": 7995, "beforeObjective": 7996 },
-            { "reply": 19503 }
+            { "reply": 19503 },
+            { "reply": 19502, "next": 16390 }
           ]
         },
         {
@@ -32945,6 +32832,18 @@
           "message": 16452,
           "choices": [
             { "reply": 19589, "quest": 1444, "completes": 7996, "params": [[30, 7996]], "gives": 14795, "givesCount": 12 }
+          ]
+        },
+        {
+          "message": 16390,
+          "choices": [
+            { "reply": 19501, "next": 16391 }
+          ]
+        },
+        {
+          "message": 16391,
+          "choices": [
+            { "reply": 19500 }
           ]
         }
       ],
@@ -37364,7 +37263,8 @@
             { "reply": 52803, "quest": 2192, "completes": 16279, "params": [[30, 16279]], "next": 40532, "afterObjective": 16278 },
             { "reply": 52764, "next": 40505, "quest": 1654, "afterObjective": 9973, "beforeObjective": 9974, "criterion": "PO!17000" },
             { "reply": 53314, "next": 40936, "quest": 2150, "afterObjective": 16369, "beforeObjective": 16370, "completes": 16370, "params": [[30, 16370]] },
-            { "quest": 2161, "completes": 16658, "params": [[30, 16658]], "afterObjective": 16657, "beforeObjective": 16658, "next": 41929, "reply": 54551 }
+            { "quest": 2161, "completes": 16658, "params": [[30, 16658]], "afterObjective": 16657, "beforeObjective": 16658, "next": 41929, "reply": 54551 },
+            { "reply": 54480, "next": 41862 }
           ]
         },
         {
@@ -37534,6 +37434,24 @@
           "message": 41940,
           "choices": [
             { "reply": 54552 }
+          ]
+        },
+        {
+          "message": 41862,
+          "choices": [
+            { "reply": 54479, "next": 41863 }
+          ]
+        },
+        {
+          "message": 41863,
+          "choices": [
+            { "reply": 54478, "next": 41864 }
+          ]
+        },
+        {
+          "message": 41864,
+          "choices": [
+            { "reply": 54477 }
           ]
         }
       ],
@@ -43100,7 +43018,7 @@
           "message": 42384,
           "choices": [
             { "reply": 55210, "quest": 2166, "next": 42390, "completesAll": [16767, 16768, 16769, 16770, 16771, 16772, 16773], "params": [[30, 16773]] },
-            { "reply": 55203 }
+            { "reply": 55203, "startsQuest": 2166, "params": [[34, 2166]] }
           ]
         },
         {
@@ -43125,7 +43043,8 @@
         {
           "message": 40902,
           "choices": [
-            { "reply": 55193 }
+            { "reply": 55193 },
+            { "reply": 55192, "next": 42374 }
           ]
         },
         {
@@ -43139,7 +43058,7 @@
           "message": 42375,
           "choices": [
             { "reply": 55194, "quest": 2163, "next": 42376, "completes": 16752, "params": [[30, 16752]] },
-            { "reply": 55189 }
+            { "reply": 55189, "startsQuest": 2163, "params": [[34, 2163]] }
           ]
         },
         {
@@ -43208,7 +43127,8 @@
           "choices": [
             { "reply": 56073 }
           ]
-        }
+        },
+        { "message": 43024, "choices": [] }
       ],
       "why": "The groblin gardener of Grobe, counting out loud (43016). Chain written from the client's own lines: «¿Estás bien?» (56070) to his counting of the time he takes to clean the stones with groblin soap (43017-43021); «Conseguirle jabón» (56065) starts it. With the quest, 43022 («no tener suficiente jabón»): «Aquí tienes los jabones» (56072) hands the soaps over, 43023 (INFERRED order, the quest page of Gobstinación groblin unavailable). The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
     },
@@ -43795,21 +43715,22 @@
             { "reply": 7707, "startsQuest": 541, "params": [[34, 541]], "next": 7689, "criterion": "PL>139&Qf=540&Qf!541" },
             { "reply": 7706, "quest": 539, "completes": 3653, "params": [[30, 3653]], "next": 7688, "holds": 11126, "holdsCount": 50 },
             { "reply": 7706, "quest": 540, "completes": 3654, "params": [[30, 3654]], "next": 7688, "holds": 11127, "holdsCount": 50 },
-            { "reply": 7706, "quest": 541, "completes": 3655, "params": [[30, 3655]], "next": 7688, "holds": 11128, "holdsCount": 40 }
+            { "reply": 7706, "quest": 541, "completes": 3655, "params": [[30, 3655]], "next": 7688, "holds": 11128, "holdsCount": 40 },
+            { "reply": 81647, "next": 59685 },
+            { "reply": 7720, "next": 7707 },
+            { "reply": 81681 }
           ]
         },
+        { "message": 7687, "choices": [] },
+        { "message": 7688, "choices": [] },
+        { "message": 7689, "choices": [] },
         {
-          "message": 7687,
-          "choices": []
+          "message": 59685,
+          "choices": [
+            { "reply": 81648, "startsQuest": 536, "params": [[34, 536]], "next": 7687 }
+          ]
         },
-        {
-          "message": 7688,
-          "choices": []
-        },
-        {
-          "message": 7689,
-          "choices": []
-        }
+        { "message": 7707, "choices": [] }
       ],
       "why": "Clyde Parker at the Frigost village [-76,-42] hands out the three first hunts one after the other (Dofus pour les noobs «Michel Shel enquille un Bouftonmouth»/«Espèce Menacée»/«Pied joyeux»: «vous devez obligatoirement les effectuer dans l'ordre»): «Cazar los animales que viven en las regiones cercanas al burgo.» (7705) starts 536, then 537 once 536 is done, then 538; he gives the list (7687, the three quests' step dialog) and «*Mostrar los siniestros trofeos.*» (7706) hands the 50 trophies (jalamut molars 11123, frozen guts 11124, mansot feet 11125) over: 3650, 3651, 3652; the reward line is 7688. The repeat after the whole series (random one of the three) is not authored. Clyde Parker second part of the hunts (Dofus pour les noobs «La mort vous va si bien»/«Passe ta larme à gauche»/«Une mine patibulaire», done in order after 538): «Cazar los monstruos un poco más peligrosos.» (7707) starts 539, then 540, then 541, line 7689 is their step dialog; «*Mostrar los siniestros trofeos.*» (7706) hands 50, 50 and 40 trophies (11126, 11127, 11128): 3653, 3654, 3655, reward line 7688. The random repeat is not authored."
     },
@@ -44462,13 +44383,11 @@
           "message": 7714,
           "choices": [
             { "reply": 8580, "startsQuest": 685, "params": [[34, 685]], "next": 8533, "criterion": "Qf=674&Sc=702" },
-            { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
+            { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 },
+            { "reply": 7764, "startsQuest": 615, "params": [[34, 615]], "next": 7760 }
           ]
         },
-        {
-          "message": 8198,
-          "choices": []
-        },
+        { "message": 8198, "choices": [] },
         {
           "message": 8533,
           "choices": [
@@ -44476,10 +44395,8 @@
             { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
           ]
         },
-        {
-          "message": 8534,
-          "choices": []
-        }
+        { "message": 8534, "choices": [] },
+        { "message": 7760, "choices": [] }
       ],
       "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Review fix: the start carries the quest's own Sc=702 switch (no PL clause); the weekly renewal is NOT modelled: quest 685 has no repeatType in the client data, so the engine treats it as done once (CanStart refuses it after the first run); it needs a repeatType 2 override in the quest catalogue (engine data)."
     },
@@ -44645,13 +44562,31 @@
             { "reply": 29477, "startsQuest": 1760, "params": [[34, 1760]], "next": 24538 }
           ]
         },
+        { "message": 24537, "choices": [] },
+        { "message": 24538, "choices": [] },
         {
-          "message": 24537,
-          "choices": []
+          "message": 24240,
+          "choices": [
+            { "reply": 29514, "next": 24573 }
+          ]
         },
         {
-          "message": 24538,
-          "choices": []
+          "message": 24573,
+          "choices": [
+            { "reply": 29513, "next": 24574 }
+          ]
+        },
+        {
+          "message": 24574,
+          "choices": [
+            { "reply": 29512, "next": 24575 }
+          ]
+        },
+        {
+          "message": 24575,
+          "choices": [
+            { "reply": 29511 }
+          ]
         }
       ],
       "why": "Queen Victoria in the throne room [23,24], Dofus pour les noobs («Le héros de Sufokia»): «Demander si elle a encore besoin de vos services» (29477, «¿Me necesitas para algo más?») after the thanks of 24536 starts the quest and 24538 (the step's text) sends the character to King Talas; 24537 is her reminder while it is open. INFERRED: the opening 24536 (her thanks) for the reply."
@@ -44711,7 +44646,8 @@
         {
           "message": 24579,
           "choices": [
-            { "reply": 29515 }
+            { "reply": 29515 },
+            { "reply": 29517, "next": 24580 }
           ]
         },
         {
@@ -44897,13 +44833,12 @@
         {
           "message": 7719,
           "choices": [
-            { "reply": 8205, "quest": 666, "completes": 4049, "params": [[30, 4049]], "next": 8197, "holds": 11542 }
+            { "reply": 8205, "quest": 666, "completes": 4049, "params": [[30, 4049]], "next": 8197, "holds": 11542 },
+            { "reply": 8158, "next": 8162 }
           ]
         },
-        {
-          "message": 8197,
-          "choices": []
-        }
+        { "message": 8197, "choices": [] },
+        { "message": 8162, "choices": [] }
       ],
       "why": "«Envío» (666): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8205 (4049) and his thanks (8197) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage»"
     },
@@ -45578,7 +45513,7 @@
         {
           "message": 40847,
           "choices": [
-            { "reply": 53200, "startsQuest": 2174, "params": [[34, 2174]] }
+            { "reply": 53200, "startsQuest": 2174, "params": [[34, 2174]], "next": 40845 }
           ]
         },
         {
@@ -46089,7 +46024,8 @@
           "message": 41595,
           "choices": [
             { "reply": 54158, "next": 41596 },
-            { "reply": 54156 }
+            { "reply": 54156 },
+            { "reply": 54159 }
           ]
         },
         {
@@ -46102,13 +46038,14 @@
           "message": 41597,
           "choices": [
             { "reply": 54155, "startsQuest": 2164, "params": [[34, 2164]], "next": 41598 },
-            { "reply": 54159 }
+            { "reply": 54159 },
+            { "reply": 54156 }
           ]
         },
         {
           "message": 41598,
           "choices": [
-            { "reply": 54154 }
+            { "reply": 54154, "startsQuest": 2164, "params": [[34, 2164]] }
           ]
         },
         {
@@ -46178,10 +46115,7 @@
             { "reply": 54147 }
           ]
         },
-        {
-          "message": 41586,
-          "choices": []
-        }
+        { "message": 41586, "choices": [] }
       ],
       "why": "Florawa the herbalist's apprentice, who gives «Díselo con flores»: in the garden of the alchemists' workshop [23,-29] (derived placement kept) and, once escorted, beside the sprout in the clearing [27,-31]. Start: 41594 (opening), 41595-41597 and «Yo puedo explorar el bosque en busca de tu maestra» (54155) starts it, 41598 is the step's dialog. The return (16262, a go-back-and-see): 54165 -> 41599, 41600-41602, «De acuerdo, te escoltaré hasta las flores durmientes» (54161) does it and hands the follower item 23030 (the apprentice). In the clearing 41589-41593 (16264) ends with «Dirigirte a Tierradala» (54149), which takes the follower; the pot (54148) is 16266 and ends the quest (41588). Dofus pour les noobs («Dites-le avec des fleurs»). The ORDER of the replies inside each talk is INFERRED from the reply ids and the reply texts; the messages and replies are the client's. Review fix: 54162 («Tratar de consolarla») is only the return chain's (41601 -> 41602, after «Me cuesta creerlo...»); the start talk's first reply is 54160 («Te aconsejo que pongas un poco más de empeño si quieres resultados»), which answers her sad singing over a flower that will not grow (41594 -> 41595). INFERRED: which of the unused replies, 54160 or 54166 (54166 is the escort)."
     },
@@ -46330,7 +46264,9 @@
         },
         {
           "message": 41613,
-          "choices": []
+          "choices": [
+            { "reply": 54178, "passage": 54178, "says": 1214, "gives": 23250 }
+          ]
         }
       ],
       "why": "Florecilla azul of the clearing: once the spirit asked them (16259), they all answer at once: 41606 (two kind pandawas), 41607 (they fell asleep), 41608, 41609 (the Great Deer, «¡La pobre murió!»), 41610 (Hanasaku saved her). Dofus pour les noobs («Dites-le avec des fleurs»). The replies 54169-54172 and the closing 54168 follow the reply texts: INFERRED order."
@@ -46389,7 +46325,8 @@
         {
           "message": 41637,
           "choices": [
-            { "quest": 2164, "completes": 16255, "params": [[30, 16255]], "reply": 54205, "next": 41639 }
+            { "quest": 2164, "completes": 16255, "params": [[30, 16255]], "reply": 54205, "next": 41639 },
+            { "reply": 54197 }
           ]
         },
         {
@@ -46938,13 +46875,15 @@
         {
           "message": 40941,
           "choices": [
-            { "reply": 53336, "next": 40958, "quest": 2150, "afterObjective": 16368, "beforeObjective": 16369, "completes": 16369, "params": [[30, 16369]] }
+            { "reply": 53336, "next": 40958, "quest": 2150, "afterObjective": 16368, "beforeObjective": 16369, "completes": 16369, "params": [[30, 16369]] },
+            { "reply": 53332, "next": 40953 }
           ]
         },
         {
           "message": 40953,
           "choices": [
-            { "reply": 53332, "next": 40954, "canStart": 2150 }
+            { "reply": 53332, "next": 40954, "canStart": 2150 },
+            { "reply": 53331, "next": 40954 }
           ]
         },
         {
@@ -46969,7 +46908,7 @@
         {
           "message": 40957,
           "choices": [
-            { "reply": 53327 }
+            { "reply": 53327, "startsQuest": 2150, "params": [[34, 2150]], "next": 40955 }
           ]
         },
         {
@@ -47735,13 +47674,11 @@
           "choices": [
             { "reply": 53423, "next": 41018, "quest": 2150, "afterObjective": 16372, "beforeObjective": 16377 },
             { "reply": 53427, "next": 41019, "quest": 2150, "afterObjective": 16377, "beforeObjective": 16378 },
+            { "reply": 53420 },
             { "reply": 53421, "next": 41017 }
           ]
         },
-        {
-          "message": 41017,
-          "choices": []
-        },
+        { "message": 41017, "choices": [] },
         {
           "message": 41018,
           "choices": [
@@ -47901,7 +47838,8 @@
         {
           "message": 41856,
           "choices": [
-            { "reply": 54472, "startsQuest": 2161, "params": [[34, 2161]], "next": 41857 }
+            { "reply": 54472, "startsQuest": 2161, "params": [[34, 2161]], "next": 41857 },
+            { "reply": 54473 }
           ]
         },
         {
@@ -47932,7 +47870,7 @@
         {
           "message": 41861,
           "choices": [
-            { "reply": 54467 },
+            { "reply": 54467, "startsQuest": 2161, "params": [[34, 2161]] },
             { "quest": 2161, "completes": 16652, "params": [[30, 16652]], "reply": 54536, "next": 41915 }
           ]
         },
@@ -47967,14 +47905,8 @@
             { "reply": 54538, "quest": 2161, "afterObjective": 16655, "beforeObjective": 16656 }
           ]
         },
-        {
-          "message": 41916,
-          "choices": []
-        },
-        {
-          "message": 41917,
-          "choices": []
-        },
+        { "message": 41916, "choices": [] },
+        { "message": 41917, "choices": [] },
         {
           "message": 41919,
           "choices": [
@@ -48544,7 +48476,7 @@
         {
           "message": 41790,
           "choices": [
-            { "reply": 54365, "startsQuest": 2167, "params": [[34, 2167]] }
+            { "reply": 54365, "startsQuest": 2167, "params": [[34, 2167]], "next": 41788 }
           ]
         },
         {
@@ -49285,7 +49217,7 @@
         {
           "message": 41552,
           "choices": [
-            { "reply": 54099, "startsQuest": 2168, "params": [[34, 2168]] }
+            { "reply": 54099, "startsQuest": 2168, "params": [[34, 2168]], "next": 41551 }
           ]
         },
         {
@@ -51266,7 +51198,8 @@
         {
           "message": 50788,
           "choices": [
-            { "reply": 68093, "next": 50789 }
+            { "reply": 68093, "next": 50789 },
+            { "reply": 68095, "next": 50789 }
           ]
         },
         {
@@ -51278,13 +51211,15 @@
         {
           "message": 50790,
           "choices": [
-            { "reply": 68092, "next": 50791 }
+            { "reply": 68092, "next": 50791 },
+            { "reply": 68093, "next": 50791 }
           ]
         },
         {
           "message": 50791,
           "choices": [
-            { "reply": 68095, "next": 50792 }
+            { "reply": 68095, "next": 50792 },
+            { "reply": 68092, "next": 50792 }
           ]
         },
         {
@@ -51296,7 +51231,7 @@
         {
           "message": 50793,
           "choices": [
-            { "reply": 68090 }
+            { "reply": 68090, "startsQuest": 2453, "params": [[34, 2453]], "next": 50792 }
           ]
         },
         {
@@ -61909,6 +61844,4262 @@
         }
       ],
       "why": "Cinder Mistigris, the Ecaflip in the Vilinsekts' hideout behind the grocery store's barrel [1,-16]. «Say that Kickroach sent you to deliver the agreed item.» (23553) -> 19676 (doubts), «Show the croquette as a sign of good faith.» (23552, with the Magic Croquette in hand) -> 19677 does the talk 9398, and «Defend yourself against the attack.» (23554) is the fight (npc_fights.json; run away, 23555, leaves). After it (9399) the opening is 19679: «Reply that threats don't scare you.» (23558) -> 19680, «Say that you aren't afraid of a brotherhood that nobody's ever heard of.» (23557) -> 19681, «Suppress a shiver and leave.» (23556) does 9400 and leads out to the grocery. Dofus pour les noobs («Aventure miniature»). The order of the replies is INFERRED from the message and reply ids; the fight replies 23547/23550 and 23549 are not part of the walkthrough."
+    },
+    {
+      "npc": 2274,
+      "map": 191104002,
+      "opening": 16985,
+      "lines": [
+        {
+          "message": 16985,
+          "choices": [
+            { "reply": 20260, "next": 16986 },
+            { "reply": 70750, "next": 52740 }
+          ]
+        },
+        {
+          "message": 16986,
+          "choices": [
+            { "reply": 20258, "next": 16987 },
+            { "reply": 20259 }
+          ]
+        },
+        {
+          "message": 52740,
+          "choices": [
+            { "reply": 70748, "startsQuest": 2483, "params": [[34, 2483]] },
+            { "reply": 70749 }
+          ]
+        },
+        {
+          "message": 16987,
+          "choices": [
+            { "reply": 20257 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2274,
+      "map": 229900288,
+      "opening": 52789,
+      "lines": [
+        {
+          "message": 52789,
+          "choices": [
+            { "reply": 70808 },
+            { "reply": 70813 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 88080660,
+      "opening": 20467,
+      "lines": [
+        { "message": 20467, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 88081686,
+      "opening": 20468,
+      "lines": [
+        { "message": 20468, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 88083734,
+      "opening": 20468,
+      "lines": [
+        { "message": 20468, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 88212244,
+      "opening": 20467,
+      "lines": [
+        { "message": 20467, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 185862661,
+      "opening": 20467,
+      "lines": [
+        { "message": 20467, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2873,
+      "map": 185863684,
+      "opening": 20468,
+      "lines": [
+        { "message": 20468, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6587,
+      "map": 68423176,
+      "opening": 49840,
+      "lines": [
+        {
+          "message": 49840,
+          "choices": [
+            { "reply": 79082, "next": 57864 }
+          ]
+        },
+        {
+          "message": 57864,
+          "choices": [
+            { "reply": 79080, "passage": 79080, "buyPrice": 500 },
+            { "reply": 79081 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6587,
+      "map": 212730373,
+      "opening": 49840,
+      "lines": [
+        {
+          "message": 49840,
+          "choices": [
+            { "reply": 79074, "next": 57863 }
+          ]
+        },
+        {
+          "message": 57863,
+          "choices": [
+            { "reply": 79078, "passage": 79078, "buyPrice": 500 },
+            { "reply": 79079 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6530,
+      "map": 90705410,
+      "opening": 49576,
+      "lines": [
+        {
+          "message": 49576,
+          "choices": [
+            { "reply": 66179, "passage": 66179, "buyPrice": 300 },
+            { "reply": 66180 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6530,
+      "map": 212864519,
+      "opening": 49576,
+      "lines": [
+        {
+          "message": 49576,
+          "choices": [
+            { "reply": 66178, "passage": 66178, "buyPrice": 300 },
+            { "reply": 66180 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2924,
+      "map": 68422662,
+      "opening": 20622,
+      "lines": [
+        {
+          "message": 20622,
+          "choices": [
+            { "reply": 78068, "next": 57337 }
+          ]
+        },
+        {
+          "message": 57337,
+          "choices": [
+            { "reply": 78067, "next": 57338 }
+          ]
+        },
+        {
+          "message": 57338,
+          "choices": [
+            { "reply": 78065, "passage": 78065, "buyPrice": 500 },
+            { "reply": 78066 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2924,
+      "map": 212865031,
+      "opening": 20622,
+      "lines": [
+        {
+          "message": 20622,
+          "choices": [
+            { "reply": 66173, "next": 49574 }
+          ]
+        },
+        {
+          "message": 49574,
+          "choices": [
+            { "reply": 66171, "passage": 66171, "buyPrice": 500 },
+            { "reply": 66172 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1592,
+      "map": 0,
+      "opening": 11914,
+      "lines": [
+        {
+          "message": 11914,
+          "choices": [
+            { "reply": 13521, "next": 12024 }
+          ]
+        },
+        {
+          "message": 12024,
+          "choices": [
+            { "reply": 13519, "startsQuest": 950, "params": [[34, 950]], "next": 12025 },
+            { "reply": 13520 }
+          ]
+        },
+        { "message": 12025, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 272,
+      "map": 0,
+      "opening": 1183,
+      "lines": [
+        {
+          "message": 1183,
+          "choices": [
+            { "reply": 852, "next": 1184 }
+          ]
+        },
+        { "message": 1184, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3329,
+      "map": 0,
+      "opening": 24246,
+      "lines": [
+        { "message": 24246, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6873,
+      "map": 0,
+      "opening": 51569,
+      "lines": [
+        {
+          "message": 51569,
+          "choices": [
+            { "reply": 69199, "next": 51570 },
+            { "reply": 69201, "next": 51575 }
+          ]
+        },
+        {
+          "message": 51570,
+          "choices": [
+            { "reply": 69198, "next": 51571 }
+          ]
+        },
+        {
+          "message": 51571,
+          "choices": [
+            { "reply": 69197, "next": 51572 }
+          ]
+        },
+        {
+          "message": 51572,
+          "choices": [
+            { "reply": 69196, "next": 51573 }
+          ]
+        },
+        {
+          "message": 51573,
+          "choices": [
+            { "reply": 69195, "next": 51574 }
+          ]
+        },
+        {
+          "message": 51574,
+          "choices": [
+            { "reply": 69194 }
+          ]
+        },
+        {
+          "message": 51575,
+          "choices": [
+            { "reply": 69200 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7030,
+      "map": 0,
+      "opening": 52537,
+      "lines": [
+        {
+          "message": 52537,
+          "choices": [
+            { "reply": 70374 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2184,
+      "map": 0,
+      "opening": 16423,
+      "lines": [
+        { "message": 16423, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3290,
+      "map": 0,
+      "opening": 24130,
+      "lines": [
+        {
+          "message": 24130,
+          "choices": [
+            { "reply": 29205, "next": 24311 }
+          ]
+        },
+        { "message": 24311, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1605,
+      "map": 0,
+      "opening": 11919,
+      "lines": [
+        {
+          "message": 11919,
+          "choices": [
+            { "reply": 13525, "next": 12026 }
+          ]
+        },
+        {
+          "message": 12026,
+          "choices": [
+            { "reply": 13523, "startsQuest": 951, "params": [[34, 951]] },
+            { "reply": 13524 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 356,
+      "map": 0,
+      "opening": 1424,
+      "lines": [
+        {
+          "message": 1424,
+          "choices": [
+            { "reply": 1073, "next": 1430 },
+            { "reply": 1077, "next": 1435 },
+            { "reply": 14833, "next": 12883 }
+          ]
+        },
+        {
+          "message": 1430,
+          "choices": [
+            { "reply": 1074, "next": 1431 }
+          ]
+        },
+        {
+          "message": 1431,
+          "choices": [
+            { "reply": 1078, "next": 1436 }
+          ]
+        },
+        {
+          "message": 1436,
+          "choices": [
+            { "reply": 1079, "next": 1437 }
+          ]
+        },
+        { "message": 1437, "choices": [] },
+        { "message": 1435, "choices": [] },
+        { "message": 12883, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1600,
+      "map": 0,
+      "opening": 11930,
+      "lines": [
+        {
+          "message": 11930,
+          "choices": [
+            { "reply": 13484, "next": 12006 }
+          ]
+        },
+        {
+          "message": 12006,
+          "choices": [
+            { "reply": 13481, "startsQuest": 942, "params": [[34, 942]], "next": 12007 },
+            { "reply": 13482, "startsQuest": 941, "params": [[34, 941]], "next": 12008 },
+            { "reply": 13483 }
+          ]
+        },
+        { "message": 12007, "choices": [] },
+        { "message": 12008, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1601,
+      "map": 0,
+      "opening": 11918,
+      "lines": [
+        {
+          "message": 11918,
+          "choices": [
+            { "reply": 13511, "next": 12020 },
+            { "reply": 28397, "next": 23640 }
+          ]
+        },
+        {
+          "message": 12020,
+          "choices": [
+            { "reply": 13513, "next": 12021 }
+          ]
+        },
+        {
+          "message": 12021,
+          "choices": [
+            { "reply": 13512, "startsQuest": 949, "params": [[34, 949]], "next": 12020 },
+            { "reply": 13514 }
+          ]
+        },
+        {
+          "message": 23640,
+          "choices": [
+            { "reply": 28396, "next": 23641 }
+          ]
+        },
+        {
+          "message": 23641,
+          "choices": [
+            { "reply": 28391, "next": 23642, "buyItem": 17810, "buyPrice": 1 },
+            { "reply": 28392 },
+            { "reply": 28395 }
+          ]
+        },
+        {
+          "message": 23642,
+          "choices": [
+            { "reply": 28390 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 711,
+      "map": 0,
+      "opening": 4557,
+      "lines": [
+        {
+          "message": 4557,
+          "choices": [
+            { "reply": 23658, "next": 19748 },
+            { "reply": 23661, "next": 19750 }
+          ]
+        },
+        {
+          "message": 19748,
+          "choices": [
+            { "reply": 23657 }
+          ]
+        },
+        {
+          "message": 19750,
+          "choices": [
+            { "reply": 23660, "next": 19751 }
+          ]
+        },
+        { "message": 19751, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1591,
+      "map": 0,
+      "opening": 11931,
+      "lines": [
+        { "message": 11931, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1599,
+      "map": 0,
+      "opening": 11920,
+      "lines": [
+        {
+          "message": 11920,
+          "choices": [
+            { "reply": 13392, "next": 11924 }
+          ]
+        },
+        { "message": 11924, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3327,
+      "map": 0,
+      "opening": 24238,
+      "lines": [
+        { "message": 24238, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3328,
+      "map": 0,
+      "opening": 24243,
+      "lines": [
+        { "message": 24243, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3667,
+      "map": 0,
+      "opening": 26399,
+      "lines": [
+        {
+          "message": 26399,
+          "choices": [
+            { "reply": 31675, "next": 26400 },
+            { "reply": 31678 }
+          ]
+        },
+        {
+          "message": 26400,
+          "choices": [
+            { "reply": 31674, "next": 26401 }
+          ]
+        },
+        {
+          "message": 26401,
+          "choices": [
+            { "reply": 31673, "startsQuest": 1825, "params": [[34, 1825]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3310,
+      "map": 0,
+      "opening": 24339,
+      "lines": [
+        {
+          "message": 24339,
+          "choices": [
+            { "reply": 29373, "next": 24454 }
+          ]
+        },
+        {
+          "message": 24454,
+          "choices": [
+            { "reply": 29372 }
+          ]
+        },
+        {
+          "message": 24340,
+          "choices": [
+            { "reply": 29377, "next": 24456 }
+          ]
+        },
+        {
+          "message": 24456,
+          "choices": [
+            { "reply": 29376 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3250,
+      "map": 0,
+      "opening": 23911,
+      "lines": [
+        { "message": 23911, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3280,
+      "map": 0,
+      "opening": 23838,
+      "lines": [
+        { "message": 23838, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3248,
+      "map": 0,
+      "opening": 24470,
+      "lines": [
+        { "message": 24470, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3253,
+      "map": 0,
+      "opening": 23889,
+      "lines": [
+        {
+          "message": 23889,
+          "choices": [
+            { "reply": 28727, "next": 23890 }
+          ]
+        },
+        {
+          "message": 23890,
+          "choices": [
+            { "reply": 28720, "next": 23891 }
+          ]
+        },
+        {
+          "message": 23891,
+          "choices": [
+            { "reply": 28719 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3249,
+      "map": 0,
+      "opening": 23885,
+      "lines": [
+        {
+          "message": 23885,
+          "choices": [
+            { "reply": 28716, "next": 23886 }
+          ]
+        },
+        {
+          "message": 23886,
+          "choices": [
+            { "reply": 28715, "next": 23887 }
+          ]
+        },
+        { "message": 23887, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7642,
+      "map": 0,
+      "opening": 57316,
+      "lines": [
+        {
+          "message": 57316,
+          "choices": [
+            { "reply": 82778 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1603,
+      "map": 0,
+      "opening": 11925,
+      "lines": [
+        {
+          "message": 11925,
+          "choices": [
+            { "reply": 13393, "next": 11926 },
+            { "reply": 13394, "next": 11927 }
+          ]
+        },
+        { "message": 11926, "choices": [] },
+        { "message": 11927, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2186,
+      "map": 0,
+      "opening": 16374,
+      "lines": [
+        { "message": 16374, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1598,
+      "map": 0,
+      "opening": 11917,
+      "lines": [
+        {
+          "message": 11917,
+          "choices": [
+            { "reply": 13490, "next": 12012 }
+          ]
+        },
+        {
+          "message": 12012,
+          "choices": [
+            { "reply": 13491, "next": 12013 }
+          ]
+        },
+        {
+          "message": 12013,
+          "choices": [
+            { "reply": 13497, "startsQuest": 943, "params": [[34, 943]] },
+            { "reply": 13498 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2187,
+      "map": 0,
+      "opening": 16384,
+      "lines": [
+        { "message": 16384, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3326,
+      "map": 0,
+      "opening": 24233,
+      "lines": [
+        { "message": 24233, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1595,
+      "map": 0,
+      "opening": 11859,
+      "lines": [
+        { "message": 11859, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 118,
+      "map": 0,
+      "opening": 384,
+      "lines": [
+        { "message": 384, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 120,
+      "map": 0,
+      "opening": 389,
+      "lines": [
+        { "message": 389, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 300,
+      "map": 0,
+      "opening": 1167,
+      "lines": [
+        {
+          "message": 1167,
+          "choices": [
+            { "reply": 839, "next": 1169 }
+          ]
+        },
+        { "message": 1169, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 164,
+      "map": 0,
+      "opening": 614,
+      "lines": [
+        {
+          "message": 614,
+          "choices": [
+            { "reply": 521, "next": 616 }
+          ]
+        },
+        {
+          "message": 616,
+          "choices": [
+            { "reply": 522, "next": 617 },
+            { "reply": 523, "next": 617 }
+          ]
+        },
+        {
+          "message": 617,
+          "choices": [
+            { "reply": 524, "next": 618 }
+          ]
+        },
+        {
+          "message": 618,
+          "choices": [
+            { "reply": 525, "next": 619 }
+          ]
+        },
+        { "message": 619, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 165,
+      "map": 0,
+      "opening": 615,
+      "lines": [
+        { "message": 615, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1359,
+      "map": 0,
+      "opening": 8120,
+      "lines": [
+        {
+          "message": 8120,
+          "choices": [
+            { "reply": 8109, "next": 8121 }
+          ]
+        },
+        {
+          "message": 8121,
+          "choices": [
+            { "reply": 8110, "next": 8122 }
+          ]
+        },
+        {
+          "message": 8122,
+          "choices": [
+            { "reply": 8111, "passage": 8111 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6801,
+      "map": 68421124,
+      "opening": 51204,
+      "lines": [
+        {
+          "message": 51204,
+          "choices": [
+            { "reply": 68741, "next": 51211 },
+            { "reply": 68742, "next": 51212 },
+            { "reply": 68743, "passage": 68743, "buyPrice": 100 }
+          ]
+        },
+        {
+          "message": 51211,
+          "choices": [
+            { "reply": 68749 },
+            { "reply": 68750 }
+          ]
+        },
+        {
+          "message": 51212,
+          "choices": [
+            { "reply": 68751 },
+            { "reply": 68752 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6801,
+      "map": 223347712,
+      "opening": 51205,
+      "lines": [
+        {
+          "message": 51205,
+          "choices": [
+            { "reply": 68756 },
+            { "reply": 69451, "passage": 69451 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5452,
+      "map": 0,
+      "opening": 39706,
+      "lines": [
+        { "message": 39706, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 91,
+      "map": 0,
+      "opening": 283,
+      "lines": [
+        {
+          "message": 283,
+          "choices": [
+            { "reply": 226, "next": 284 }
+          ]
+        },
+        { "message": 284, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 90,
+      "map": 0,
+      "opening": 278,
+      "lines": [
+        {
+          "message": 278,
+          "choices": [
+            { "reply": 224, "next": 281 }
+          ]
+        },
+        { "message": 281, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5767,
+      "map": 0,
+      "opening": 41907,
+      "lines": [
+        {
+          "message": 41907,
+          "choices": [
+            { "reply": 54529, "next": 41909 },
+            { "reply": 54532 }
+          ]
+        },
+        {
+          "message": 41909,
+          "choices": [
+            { "reply": 54528 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2596,
+      "map": 0,
+      "opening": 18272,
+      "lines": [
+        { "message": 18272, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3464,
+      "map": 68422145,
+      "opening": 25721,
+      "lines": [
+        {
+          "message": 25721,
+          "choices": [
+            { "reply": 30858, "passage": 30858, "buyPrice": 500 },
+            { "reply": 30860 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3464,
+      "map": 173277701,
+      "opening": 25718,
+      "lines": [
+        {
+          "message": 25718,
+          "choices": [
+            { "reply": 30854, "passage": 30854 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1140,
+      "map": 0,
+      "opening": 6780,
+      "lines": [
+        { "message": 6780, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1090,
+      "map": 0,
+      "opening": 6194,
+      "lines": [
+        { "message": 6194, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5640,
+      "map": 0,
+      "opening": 40787,
+      "lines": [
+        { "message": 40787, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5765,
+      "map": 0,
+      "opening": 42069,
+      "lines": [
+        {
+          "message": 42069,
+          "choices": [
+            { "reply": 54750, "next": 42070 },
+            { "reply": 55188 }
+          ]
+        },
+        {
+          "message": 42070,
+          "choices": [
+            { "reply": 54749, "next": 42071 }
+          ]
+        },
+        {
+          "message": 42071,
+          "choices": [
+            { "reply": 54748, "next": 42072 }
+          ]
+        },
+        {
+          "message": 42072,
+          "choices": [
+            { "reply": 54747, "next": 42073 }
+          ]
+        },
+        {
+          "message": 42073,
+          "choices": [
+            { "reply": 54746, "next": 42074 }
+          ]
+        },
+        {
+          "message": 42074,
+          "choices": [
+            { "reply": 54745, "startsQuest": 2159, "params": [[34, 2159]], "next": 42071, "says": 54, "gives": 23368 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5794,
+      "map": 0,
+      "opening": 42497,
+      "lines": [
+        { "message": 42497, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5784,
+      "map": 0,
+      "opening": 42120,
+      "lines": [
+        { "message": 42120, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5785,
+      "map": 0,
+      "opening": 42124,
+      "lines": [
+        { "message": 42124, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5786,
+      "map": 0,
+      "opening": 42122,
+      "lines": [
+        { "message": 42122, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5960,
+      "map": 0,
+      "opening": 43623,
+      "lines": [
+        {
+          "message": 43623,
+          "choices": [
+            { "reply": 58559, "next": 44790 }
+          ]
+        },
+        {
+          "message": 44790,
+          "choices": [
+            { "reply": 58558 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5694,
+      "map": 0,
+      "opening": 43015,
+      "lines": [
+        { "message": 43015, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5702,
+      "map": 0,
+      "opening": 41650,
+      "lines": [
+        { "message": 41650, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5599,
+      "map": 0,
+      "opening": 42385,
+      "lines": [
+        { "message": 42385, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 681,
+      "map": 0,
+      "opening": 2843,
+      "lines": [
+        { "message": 2843, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5906,
+      "map": 0,
+      "opening": 43056,
+      "lines": [
+        { "message": 43056, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5603,
+      "map": 0,
+      "opening": 41273,
+      "lines": [
+        { "message": 41273, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5932,
+      "map": 0,
+      "opening": 43114,
+      "lines": [
+        { "message": 43114, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 660,
+      "map": 0,
+      "opening": 2681,
+      "lines": [
+        {
+          "message": 2681,
+          "choices": [
+            { "reply": 2284, "buyItem": 7046, "buyPrice": 10 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5684,
+      "map": 0,
+      "opening": 41352,
+      "lines": [
+        { "message": 41352, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5931,
+      "map": 0,
+      "opening": 43115,
+      "lines": [
+        { "message": 43115, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 661,
+      "map": 0,
+      "opening": 2846,
+      "lines": [
+        { "message": 2846, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 671,
+      "map": 0,
+      "opening": 2748,
+      "lines": [
+        { "message": 2748, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 663,
+      "map": 0,
+      "opening": 2845,
+      "lines": [
+        { "message": 2845, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7644,
+      "map": 0,
+      "opening": 57321,
+      "lines": [
+        {
+          "message": 57321,
+          "choices": [
+            { "reply": 82779 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7645,
+      "map": 0,
+      "opening": 57326,
+      "lines": [
+        {
+          "message": 57326,
+          "choices": [
+            { "reply": 78046 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6186,
+      "map": 0,
+      "opening": 45664,
+      "lines": [
+        {
+          "message": 45664,
+          "choices": [
+            { "reply": 60574, "next": 45665 },
+            { "reply": 60575, "says": 1327 }
+          ]
+        },
+        {
+          "message": 45665,
+          "choices": [
+            { "reply": 60573, "next": 45666 }
+          ]
+        },
+        {
+          "message": 45666,
+          "choices": [
+            { "reply": 60572 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1625,
+      "map": 0,
+      "opening": 12047,
+      "lines": [
+        {
+          "message": 12047,
+          "choices": [
+            { "reply": 13557, "next": 12049 },
+            { "reply": 13569, "next": 12057 }
+          ]
+        },
+        {
+          "message": 12057,
+          "choices": [
+            { "reply": 13568, "next": 12058 },
+            { "reply": 13572, "next": 12059 },
+            { "reply": 13577, "next": 12060 }
+          ]
+        },
+        {
+          "message": 12058,
+          "choices": [
+            { "reply": 13566, "next": 12057 },
+            { "reply": 13567 }
+          ]
+        },
+        {
+          "message": 12059,
+          "choices": [
+            { "reply": 13570, "next": 12057 },
+            { "reply": 13571 }
+          ]
+        },
+        {
+          "message": 12060,
+          "choices": [
+            { "reply": 13574, "next": 12061 },
+            { "reply": 13575 },
+            { "reply": 13576 }
+          ]
+        },
+        {
+          "message": 12061,
+          "choices": [
+            { "reply": 13573, "compass": [-20, 5, 4] }
+          ]
+        },
+        {
+          "message": 12049,
+          "choices": [
+            { "reply": 13705, "next": 12197 }
+          ]
+        },
+        {
+          "message": 12197,
+          "choices": [
+            { "reply": 13869, "next": 12198 }
+          ]
+        },
+        {
+          "message": 12198,
+          "choices": [
+            { "reply": 13867, "startsQuest": 1044, "params": [[34, 1044]] },
+            { "reply": 13868 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1626,
+      "map": 0,
+      "opening": 12044,
+      "lines": [
+        {
+          "message": 12044,
+          "choices": [
+            { "reply": 13549, "next": 12045 },
+            { "reply": 13550, "next": 12046 }
+          ]
+        },
+        { "message": 12045, "choices": [] },
+        { "message": 12046, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 359,
+      "map": 0,
+      "opening": 1466,
+      "lines": [
+        { "message": 1466, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4570,
+      "map": 0,
+      "opening": 32209,
+      "lines": [
+        {
+          "message": 32209,
+          "choices": [
+            { "reply": 38969 },
+            { "reply": 38971 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4567,
+      "map": 0,
+      "opening": 32208,
+      "lines": [
+        {
+          "message": 32208,
+          "choices": [
+            { "reply": 38966 },
+            { "reply": 38968 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4571,
+      "map": 0,
+      "opening": 32210,
+      "lines": [
+        {
+          "message": 32210,
+          "choices": [
+            { "reply": 38972 },
+            { "reply": 38974 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 772,
+      "map": 0,
+      "opening": 3162,
+      "lines": [
+        {
+          "message": 3162,
+          "choices": [
+            { "reply": 2780, "next": 3163 }
+          ]
+        },
+        {
+          "message": 3163,
+          "choices": [
+            { "reply": 6612 },
+            { "reply": 11163 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4572,
+      "map": 0,
+      "opening": 32211,
+      "lines": [
+        {
+          "message": 32211,
+          "choices": [
+            { "reply": 38975 },
+            { "reply": 38977 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1432,
+      "map": 0,
+      "opening": 48316,
+      "lines": [
+        { "message": 48316, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1428,
+      "map": 0,
+      "opening": 48315,
+      "lines": [
+        { "message": 48315, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7580,
+      "map": 0,
+      "opening": 57130,
+      "lines": [
+        {
+          "message": 57130,
+          "choices": [
+            { "reply": 77731, "next": 57131 },
+            { "reply": 77729 }
+          ]
+        },
+        {
+          "message": 57131,
+          "choices": [
+            { "reply": 77730, "next": 59981 }
+          ]
+        },
+        {
+          "message": 59981,
+          "choices": [
+            { "reply": 82307 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 430,
+      "map": 0,
+      "opening": 48287,
+      "lines": [
+        { "message": 48287, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 427,
+      "map": 0,
+      "opening": 48282,
+      "lines": [
+        { "message": 48282, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1247,
+      "map": 0,
+      "opening": 7724,
+      "lines": [
+        { "message": 7724, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1993,
+      "map": 0,
+      "opening": 14073,
+      "lines": [
+        { "message": 14073, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1350,
+      "map": 0,
+      "opening": 8024,
+      "lines": [
+        { "message": 8024, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1277,
+      "map": 0,
+      "opening": 7693,
+      "lines": [
+        { "message": 7693, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7643,
+      "map": 0,
+      "opening": 57311,
+      "lines": [
+        {
+          "message": 57311,
+          "choices": [
+            { "reply": 82777 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1250,
+      "map": 0,
+      "opening": 8066,
+      "lines": [
+        {
+          "message": 8066,
+          "choices": [
+            { "reply": 8057 },
+            { "reply": 8056, "next": 8067 }
+          ]
+        },
+        {
+          "message": 8067,
+          "choices": [
+            { "reply": 8058, "startsQuest": 646, "params": [[34, 646]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1382,
+      "map": 0,
+      "opening": 8218,
+      "lines": [
+        { "message": 8218, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1261,
+      "map": 0,
+      "opening": 7720,
+      "lines": [
+        { "message": 7720, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1320,
+      "map": 0,
+      "opening": 7925,
+      "lines": [
+        {
+          "message": 7925,
+          "choices": [
+            { "reply": 7935, "next": 7926 }
+          ]
+        },
+        {
+          "message": 7926,
+          "choices": [
+            { "reply": 7936, "next": 7927 }
+          ]
+        },
+        {
+          "message": 7927,
+          "choices": [
+            { "reply": 7937, "startsQuest": 543, "params": [[34, 543]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1278,
+      "map": 0,
+      "opening": 8124,
+      "lines": [
+        { "message": 8124, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1992,
+      "map": 0,
+      "opening": 14213,
+      "lines": [
+        {
+          "message": 14213,
+          "choices": [
+            { "reply": 16528, "next": 14214 }
+          ]
+        },
+        { "message": 14214, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1272,
+      "map": 0,
+      "opening": 7711,
+      "lines": [
+        { "message": 7711, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5554,
+      "map": 0,
+      "opening": 40437,
+      "lines": [
+        { "message": 40437, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1381,
+      "map": 0,
+      "opening": 10417,
+      "lines": [
+        {
+          "message": 10417,
+          "choices": [
+            { "reply": 11401, "next": 10419 },
+            { "reply": 11406, "next": 10421 }
+          ]
+        },
+        { "message": 10419, "choices": [] },
+        {
+          "message": 10421,
+          "choices": [
+            { "reply": 11402, "next": 13782 },
+            { "reply": 11403, "next": 13783 },
+            { "reply": 11404, "next": 13784 },
+            { "reply": 11405, "next": 13785 }
+          ]
+        },
+        { "message": 13782, "choices": [] },
+        { "message": 13783, "choices": [] },
+        { "message": 13784, "choices": [] },
+        { "message": 13785, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1262,
+      "map": 0,
+      "opening": 7718,
+      "lines": [
+        { "message": 7718, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1376,
+      "map": 0,
+      "opening": 14055,
+      "lines": [
+        { "message": 14055, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1375,
+      "map": 0,
+      "opening": 14037,
+      "lines": [
+        { "message": 14037, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1360,
+      "map": 0,
+      "opening": 8328,
+      "lines": [
+        { "message": 8328, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1256,
+      "map": 0,
+      "opening": 7729,
+      "lines": [
+        {
+          "message": 7729,
+          "choices": [
+            { "reply": 16532, "next": 14217 }
+          ]
+        },
+        {
+          "message": 14217,
+          "choices": [
+            { "reply": 16531, "next": 14218 }
+          ]
+        },
+        { "message": 14218, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1249,
+      "map": 0,
+      "opening": 7727,
+      "lines": [
+        { "message": 7727, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1244,
+      "map": 0,
+      "opening": 7731,
+      "lines": [
+        { "message": 7731, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1248,
+      "map": 0,
+      "opening": 7723,
+      "lines": [
+        {
+          "message": 7723,
+          "choices": [
+            { "reply": 81637 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4216,
+      "map": 0,
+      "opening": 29620,
+      "lines": [
+        { "message": 29620, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1246,
+      "map": 0,
+      "opening": 7728,
+      "lines": [
+        { "message": 7728, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1996,
+      "map": 0,
+      "opening": 14178,
+      "lines": [
+        { "message": 14178, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1291,
+      "map": 0,
+      "opening": 7792,
+      "lines": [
+        {
+          "message": 7792,
+          "choices": [
+            { "reply": 7821, "startsQuest": 589, "params": [[34, 589]], "next": 7795 },
+            { "reply": 81633 }
+          ]
+        },
+        { "message": 7795, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1994,
+      "map": 0,
+      "opening": 14134,
+      "lines": [
+        { "message": 14134, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1995,
+      "map": 0,
+      "opening": 14153,
+      "lines": [
+        { "message": 14153, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1303,
+      "map": 0,
+      "opening": 7843,
+      "lines": [
+        { "message": 7843, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1306,
+      "map": 0,
+      "opening": 7869,
+      "lines": [
+        { "message": 7869, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1255,
+      "map": 0,
+      "opening": 7715,
+      "lines": [
+        { "message": 7715, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1351,
+      "map": 0,
+      "opening": 8025,
+      "lines": [
+        { "message": 8025, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1252,
+      "map": 0,
+      "opening": 7716,
+      "lines": [
+        { "message": 7716, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1366,
+      "map": 0,
+      "opening": 8172,
+      "lines": [
+        {
+          "message": 8172,
+          "choices": [
+            { "reply": 78620, "next": 57625 }
+          ]
+        },
+        {
+          "message": 57625,
+          "choices": [
+            { "reply": 78619, "next": 57626 },
+            { "reply": 78622 }
+          ]
+        },
+        {
+          "message": 57626,
+          "choices": [
+            { "reply": 79099 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3523,
+      "map": 0,
+      "opening": 25012,
+      "lines": [
+        { "message": 25012, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173277701,
+      "opening": 25061,
+      "lines": [
+        { "message": 25061, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173278211,
+      "opening": 25061,
+      "lines": [
+        { "message": 25061, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173278722,
+      "opening": 25061,
+      "lines": [
+        { "message": 25061, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173281025,
+      "opening": 25061,
+      "lines": [
+        { "message": 25061, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173936130,
+      "opening": 25061,
+      "lines": [
+        { "message": 25061, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 173936386,
+      "opening": 25061,
+      "lines": [
+        {
+          "message": 25061,
+          "choices": [
+            { "reply": 31540, "next": 26295 }
+          ]
+        },
+        { "message": 26295, "choices": [] }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3597,
+      "map": 175112192,
+      "opening": 25061,
+      "lines": [
+        {
+          "message": 25061,
+          "choices": [
+            { "reply": 31853, "next": 26528 }
+          ]
+        },
+        {
+          "message": 26528,
+          "choices": [
+            { "reply": 31856, "next": 26529 }
+          ]
+        },
+        {
+          "message": 26529,
+          "choices": [
+            { "reply": 31854, "startsQuest": 1838, "params": [[34, 1838]] },
+            { "reply": 31855 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3511,
+      "map": 0,
+      "opening": 25062,
+      "lines": [
+        {
+          "message": 25062,
+          "choices": [
+            { "reply": 30209, "next": 25158 },
+            { "reply": 30077 }
+          ]
+        },
+        { "message": 25158, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3556,
+      "map": 0,
+      "opening": 25168,
+      "lines": [
+        { "message": 25168, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3538,
+      "map": 0,
+      "opening": 25102,
+      "lines": [
+        {
+          "message": 25102,
+          "choices": [
+            { "reply": 30123 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3533,
+      "map": 0,
+      "opening": 25140,
+      "lines": [
+        {
+          "message": 25140,
+          "choices": [
+            { "reply": 30179 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3537,
+      "map": 0,
+      "opening": 25079,
+      "lines": [
+        {
+          "message": 25079,
+          "choices": [
+            { "reply": 30090 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3592,
+      "map": 0,
+      "opening": 25548,
+      "lines": [
+        { "message": 25548, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3598,
+      "map": 0,
+      "opening": 25069,
+      "lines": [
+        { "message": 25069, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3636,
+      "map": 0,
+      "opening": 25983,
+      "lines": [
+        { "message": 25983, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3517,
+      "map": 0,
+      "opening": 25000,
+      "lines": [
+        { "message": 25000, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3578,
+      "map": 0,
+      "opening": 25301,
+      "lines": [
+        { "message": 25301, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3589,
+      "map": 0,
+      "opening": 25411,
+      "lines": [
+        {
+          "message": 25411,
+          "choices": [
+            { "reply": 30486, "next": 25412 }
+          ]
+        },
+        { "message": 25412, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3590,
+      "map": 0,
+      "opening": 25417,
+      "lines": [
+        { "message": 25417, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3555,
+      "map": 0,
+      "opening": 25164,
+      "lines": [
+        {
+          "message": 25164,
+          "choices": [
+            { "reply": 30210, "next": 25165 },
+            { "reply": 30270, "next": 25215 }
+          ]
+        },
+        { "message": 25165, "choices": [] },
+        {
+          "message": 25215,
+          "choices": [
+            { "reply": 30269, "next": 25216 }
+          ]
+        },
+        {
+          "message": 25216,
+          "choices": [
+            { "reply": 30268, "next": 25217 }
+          ]
+        },
+        {
+          "message": 25217,
+          "choices": [
+            { "reply": 30267, "next": 25218 }
+          ]
+        },
+        {
+          "message": 25218,
+          "choices": [
+            { "reply": 31575, "next": 26328 }
+          ]
+        },
+        {
+          "message": 26328,
+          "choices": [
+            { "reply": 31574, "next": 26329 }
+          ]
+        },
+        {
+          "message": 26329,
+          "choices": [
+            { "reply": 31573, "next": 26330 }
+          ]
+        },
+        {
+          "message": 26330,
+          "choices": [
+            { "reply": 31572, "startsQuest": 1806, "params": [[34, 1806]], "next": 25217 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3516,
+      "map": 0,
+      "opening": 26002,
+      "lines": [
+        {
+          "message": 26002,
+          "choices": [
+            { "reply": 31177 },
+            { "reply": 31178, "next": 26004 }
+          ]
+        },
+        { "message": 26004, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3658,
+      "map": 0,
+      "opening": 26235,
+      "lines": [
+        { "message": 26235, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3635,
+      "map": 0,
+      "opening": 25980,
+      "lines": [
+        { "message": 25980, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3557,
+      "map": 0,
+      "opening": 25170,
+      "lines": [
+        { "message": 25170, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3524,
+      "map": 0,
+      "opening": 25005,
+      "lines": [
+        { "message": 25005, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3606,
+      "map": 0,
+      "opening": 25728,
+      "lines": [
+        {
+          "message": 25728,
+          "choices": [
+            { "reply": 30871, "next": 25729 },
+            { "reply": 30872, "next": 25730 }
+          ]
+        },
+        { "message": 25729, "choices": [] },
+        { "message": 25730, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3605,
+      "map": 0,
+      "opening": 25191,
+      "lines": [
+        {
+          "message": 25191,
+          "choices": [
+            { "reply": 79025, "next": 57829 }
+          ]
+        },
+        {
+          "message": 57829,
+          "choices": [
+            { "reply": 79024, "next": 57830 }
+          ]
+        },
+        {
+          "message": 57830,
+          "choices": [
+            { "reply": 79094 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3522,
+      "map": 0,
+      "opening": 25063,
+      "lines": [
+        { "message": 25063, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3591,
+      "map": 0,
+      "opening": 25544,
+      "lines": [
+        { "message": 25544, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3637,
+      "map": 0,
+      "opening": 25987,
+      "lines": [
+        { "message": 25987, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3548,
+      "map": 0,
+      "opening": 25207,
+      "lines": [
+        {
+          "message": 25207,
+          "choices": [
+            { "reply": 30256, "next": 25795 }
+          ]
+        },
+        { "message": 25795, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3560,
+      "map": 0,
+      "opening": 25199,
+      "lines": [
+        { "message": 25199, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3646,
+      "map": 0,
+      "opening": 26005,
+      "lines": [
+        {
+          "message": 26005,
+          "choices": [
+            { "reply": 31184 },
+            { "reply": 31187 },
+            { "reply": 31188, "next": 26009 }
+          ]
+        },
+        { "message": 26009, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3607,
+      "map": 0,
+      "opening": 25196,
+      "lines": [
+        { "message": 25196, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3630,
+      "map": 0,
+      "opening": 25889,
+      "lines": [
+        {
+          "message": 25889,
+          "choices": [
+            { "reply": 31056, "next": 25890 }
+          ]
+        },
+        {
+          "message": 25890,
+          "choices": [
+            { "reply": 31057, "next": 25891 }
+          ]
+        },
+        {
+          "message": 25891,
+          "choices": [
+            { "reply": 31058 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3552,
+      "map": 0,
+      "opening": 25628,
+      "lines": [
+        { "message": 25628, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3596,
+      "map": 0,
+      "opening": 25909,
+      "lines": [
+        {
+          "message": 25909,
+          "choices": [
+            { "reply": 31085, "next": 25910 }
+          ]
+        },
+        {
+          "message": 25910,
+          "choices": [
+            { "reply": 31084, "next": 25911 }
+          ]
+        },
+        {
+          "message": 25911,
+          "choices": [
+            { "reply": 31083, "next": 25912 }
+          ]
+        },
+        {
+          "message": 25912,
+          "choices": [
+            { "reply": 31082, "next": 25913 }
+          ]
+        },
+        {
+          "message": 25913,
+          "choices": [
+            { "reply": 31081, "next": 25914 }
+          ]
+        },
+        {
+          "message": 25914,
+          "choices": [
+            { "reply": 31080, "startsQuest": 1817, "params": [[34, 1817]], "next": 25913 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5553,
+      "map": 0,
+      "opening": 40436,
+      "lines": [
+        { "message": 40436, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3551,
+      "map": 0,
+      "opening": 25106,
+      "lines": [
+        {
+          "message": 25106,
+          "choices": [
+            { "reply": 30130, "next": 25109 }
+          ]
+        },
+        {
+          "message": 25109,
+          "choices": [
+            { "reply": 30129, "next": 25110 }
+          ]
+        },
+        {
+          "message": 25110,
+          "choices": [
+            { "reply": 30128 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3549,
+      "map": 0,
+      "opening": 25624,
+      "lines": [
+        {
+          "message": 25624,
+          "choices": [
+            { "reply": 30754, "next": 25625 },
+            { "reply": 30798 }
+          ]
+        },
+        {
+          "message": 25625,
+          "choices": [
+            { "reply": 30755 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3583,
+      "map": 0,
+      "opening": 25353,
+      "lines": [
+        { "message": 25353, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3544,
+      "map": 0,
+      "opening": 25430,
+      "lines": [
+        {
+          "message": 25430,
+          "choices": [
+            { "reply": 30508, "next": 25431 }
+          ]
+        },
+        {
+          "message": 25431,
+          "choices": [
+            { "reply": 30509, "next": 25432 }
+          ]
+        },
+        {
+          "message": 25432,
+          "choices": [
+            { "reply": 30510, "next": 25433 }
+          ]
+        },
+        {
+          "message": 25433,
+          "choices": [
+            { "reply": 30511, "startsQuest": 1812, "params": [[34, 1812]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3562,
+      "map": 0,
+      "opening": 25223,
+      "lines": [
+        { "message": 25223, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3543,
+      "map": 0,
+      "opening": 25634,
+      "lines": [
+        {
+          "message": 25634,
+          "choices": [
+            { "reply": 30788, "next": 25654 }
+          ]
+        },
+        { "message": 25654, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3627,
+      "map": 0,
+      "opening": 25884,
+      "lines": [
+        { "message": 25884, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3619,
+      "map": 0,
+      "opening": 25674,
+      "lines": [
+        { "message": 25674, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3566,
+      "map": 0,
+      "opening": 25236,
+      "lines": [
+        { "message": 25236, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3567,
+      "map": 0,
+      "opening": 25238,
+      "lines": [
+        { "message": 25238, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3561,
+      "map": 0,
+      "opening": 25219,
+      "lines": [
+        { "message": 25219, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3620,
+      "map": 0,
+      "opening": 25678,
+      "lines": [
+        { "message": 25678, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3579,
+      "map": 0,
+      "opening": 25315,
+      "lines": [
+        { "message": 25315, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3618,
+      "map": 0,
+      "opening": 25669,
+      "lines": [
+        { "message": 25669, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3534,
+      "map": 0,
+      "opening": 25144,
+      "lines": [
+        {
+          "message": 25144,
+          "choices": [
+            { "reply": 30188 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3521,
+      "map": 0,
+      "opening": 25101,
+      "lines": [
+        { "message": 25101, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3657,
+      "map": 0,
+      "opening": 26148,
+      "lines": [
+        {
+          "message": 26148,
+          "choices": [
+            { "reply": 31384 },
+            { "reply": 31385 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3547,
+      "map": 0,
+      "opening": 25848,
+      "lines": [
+        {
+          "message": 25848,
+          "choices": [
+            { "reply": 31011, "next": 25849 }
+          ]
+        },
+        {
+          "message": 25849,
+          "choices": [
+            { "reply": 31012, "next": 25850 }
+          ]
+        },
+        {
+          "message": 25850,
+          "choices": [
+            { "reply": 31014, "startsQuest": 1813, "params": [[34, 1813]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3690,
+      "map": 0,
+      "opening": 26477,
+      "lines": [
+        { "message": 26477, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3709,
+      "map": 0,
+      "opening": 26670,
+      "lines": [
+        { "message": 26670, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3679,
+      "map": 0,
+      "opening": 26439,
+      "lines": [
+        {
+          "message": 26439,
+          "choices": [
+            { "reply": 31734 },
+            { "reply": 31735 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3673,
+      "map": 0,
+      "opening": 26543,
+      "lines": [
+        { "message": 26543, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3934,
+      "map": 0,
+      "opening": 27936,
+      "lines": [
+        { "message": 27936, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 343,
+      "map": 0,
+      "opening": 1391,
+      "lines": [
+        { "message": 1391, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7656,
+      "map": 0,
+      "opening": 57333,
+      "lines": [
+        {
+          "message": 57333,
+          "choices": [
+            { "reply": 78061, "next": 57334 },
+            { "reply": 78063, "next": 57336 },
+            { "reply": 78064 }
+          ]
+        },
+        {
+          "message": 57334,
+          "choices": [
+            { "reply": 78060, "next": 57335 }
+          ]
+        },
+        {
+          "message": 57335,
+          "choices": [
+            { "reply": 78059 }
+          ]
+        },
+        {
+          "message": 57336,
+          "choices": [
+            { "reply": 78062 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3870,
+      "map": 0,
+      "opening": 27729,
+      "lines": [
+        { "message": 27729, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 345,
+      "map": 0,
+      "opening": 1392,
+      "lines": [
+        { "message": 1392, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4276,
+      "map": 0,
+      "opening": 30031,
+      "lines": [
+        { "message": 30031, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 830,
+      "map": 97255965,
+      "opening": 3534,
+      "lines": [
+        {
+          "message": 3534,
+          "choices": [
+            { "reply": 77978 },
+            { "reply": 77979 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 830,
+      "map": 97261085,
+      "opening": 3535,
+      "lines": [
+        {
+          "message": 3535,
+          "choices": [
+            { "reply": 3113, "passage": 3113 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 830,
+      "map": 178784260,
+      "opening": 3454,
+      "lines": [
+        {
+          "message": 3454,
+          "choices": [
+            { "reply": 3049, "passage": 3049, "buyPrice": 50 },
+            { "reply": 3054 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 341,
+      "map": 0,
+      "opening": 1369,
+      "lines": [
+        { "message": 1369, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3214,
+      "map": 0,
+      "opening": 23301,
+      "lines": [
+        {
+          "message": 23301,
+          "choices": [
+            { "reply": 28013, "next": 23302 }
+          ]
+        },
+        {
+          "message": 23302,
+          "choices": [
+            { "reply": 28012 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2150,
+      "map": 0,
+      "opening": 15999,
+      "lines": [
+        { "message": 15999, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3868,
+      "map": 0,
+      "opening": 27568,
+      "lines": [
+        { "message": 27568, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 344,
+      "map": 0,
+      "opening": 1386,
+      "lines": [
+        { "message": 1386, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4009,
+      "map": 0,
+      "opening": 28180,
+      "lines": [
+        { "message": 28180, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3869,
+      "map": 0,
+      "opening": 27743,
+      "lines": [
+        { "message": 27743, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3867,
+      "map": 0,
+      "opening": 27566,
+      "lines": [
+        { "message": 27566, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3865,
+      "map": 0,
+      "opening": 27412,
+      "lines": [
+        {
+          "message": 27412,
+          "choices": [
+            { "reply": 33056, "next": 27540 }
+          ]
+        },
+        {
+          "message": 27540,
+          "choices": [
+            { "reply": 33055, "next": 27541 }
+          ]
+        },
+        {
+          "message": 27541,
+          "choices": [
+            { "reply": 33054, "next": 27542 }
+          ]
+        },
+        {
+          "message": 27542,
+          "choices": [
+            { "reply": 33053, "startsQuest": 1860, "params": [[34, 1860]] }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3866,
+      "map": 0,
+      "opening": 27415,
+      "lines": [
+        { "message": 27415, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4277,
+      "map": 0,
+      "opening": 30036,
+      "lines": [
+        { "message": 30036, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 383,
+      "map": 0,
+      "opening": 1626,
+      "lines": [
+        { "message": 1626, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4251,
+      "map": 0,
+      "opening": 29783,
+      "lines": [
+        { "message": 29783, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5910,
+      "map": 0,
+      "opening": 42653,
+      "lines": [
+        { "message": 42653, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5610,
+      "map": 0,
+      "opening": 41912,
+      "lines": [
+        { "message": 41912, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5630,
+      "map": 0,
+      "opening": 40752,
+      "lines": [
+        { "message": 40752, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5639,
+      "map": 0,
+      "opening": 40740,
+      "lines": [
+        { "message": 40740, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1161,
+      "map": 0,
+      "opening": 7020,
+      "lines": [
+        { "message": 7020, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5613,
+      "map": 0,
+      "opening": 40732,
+      "lines": [
+        { "message": 40732, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5616,
+      "map": 0,
+      "opening": 40658,
+      "lines": [
+        { "message": 40658, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5609,
+      "map": 0,
+      "opening": 40664,
+      "lines": [
+        { "message": 40664, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5608,
+      "map": 0,
+      "opening": 40606,
+      "lines": [
+        { "message": 40606, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5607,
+      "map": 0,
+      "opening": 40590,
+      "lines": [
+        {
+          "message": 40590,
+          "choices": [
+            { "reply": 53544 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4330,
+      "map": 0,
+      "opening": 31280,
+      "lines": [
+        { "message": 31280, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7918,
+      "map": 0,
+      "opening": 60131,
+      "lines": [
+        {
+          "message": 60131,
+          "choices": [
+            { "reply": 82529, "next": 60132 },
+            { "reply": 82530 }
+          ]
+        },
+        {
+          "message": 60132,
+          "choices": [
+            { "reply": 82527 },
+            { "reply": 82528 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1015,
+      "map": 0,
+      "opening": 5155,
+      "lines": [
+        { "message": 5155, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1235,
+      "map": 0,
+      "opening": 7621,
+      "lines": [
+        {
+          "message": 7621,
+          "choices": [
+            { "reply": 7631 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4008,
+      "map": 172229135,
+      "opening": 28179,
+      "lines": [
+        {
+          "message": 28179,
+          "choices": [
+            { "reply": 33818, "passage": 33818, "buyPrice": 100 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4008,
+      "map": 172233229,
+      "opening": 28179,
+      "lines": [
+        {
+          "message": 28179,
+          "choices": [
+            { "reply": 33818, "passage": 33818, "buyPrice": 100 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4008,
+      "map": 172235786,
+      "opening": 28179,
+      "lines": [
+        {
+          "message": 28179,
+          "choices": [
+            { "reply": 33819, "passage": 33819, "buyPrice": 100 },
+            { "reply": 33821, "passage": 33821, "buyPrice": 100 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3859,
+      "map": 0,
+      "opening": 27386,
+      "lines": [
+        { "message": 27386, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3860,
+      "map": 0,
+      "opening": 27393,
+      "lines": [
+        { "message": 27393, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3861,
+      "map": 0,
+      "opening": 27401,
+      "lines": [
+        { "message": 27401, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3970,
+      "map": 0,
+      "opening": 27590,
+      "lines": [
+        {
+          "message": 27590,
+          "choices": [
+            { "reply": 33113, "next": 27591 }
+          ]
+        },
+        {
+          "message": 27591,
+          "choices": [
+            { "reply": 33112, "next": 27592 }
+          ]
+        },
+        {
+          "message": 27592,
+          "choices": [
+            { "reply": 33111, "next": 27593 }
+          ]
+        },
+        { "message": 27593, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 3862,
+      "map": 0,
+      "opening": 27407,
+      "lines": [
+        { "message": 27407, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 428,
+      "map": 0,
+      "opening": 48283,
+      "lines": [
+        { "message": 48283, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6885,
+      "map": 88213267,
+      "opening": 51804,
+      "lines": [
+        {
+          "message": 51804,
+          "choices": [
+            { "reply": 69540, "next": 51805 }
+          ]
+        },
+        {
+          "message": 51805,
+          "choices": [
+            { "reply": 69541, "passage": 69541, "buyPrice": 10 },
+            { "reply": 69543 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6885,
+      "map": 223482635,
+      "opening": 51804,
+      "lines": [
+        {
+          "message": 51804,
+          "choices": [
+            { "reply": 69554, "next": 51808 }
+          ]
+        },
+        {
+          "message": 51808,
+          "choices": [
+            { "reply": 69551, "passage": 69551, "buyPrice": 10 },
+            { "reply": 69553 }
+          ]
+        }
+      ],
+      "why": "As the official server says it on this map, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7101,
+      "map": 0,
+      "opening": 52777,
+      "lines": [
+        { "message": 52777, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 61,
+      "map": 0,
+      "opening": 36,
+      "lines": [
+        {
+          "message": 36,
+          "choices": [
+            { "reply": 70842 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 124,
+      "map": 0,
+      "opening": 398,
+      "lines": [
+        { "message": 398, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7046,
+      "map": 0,
+      "opening": 53011,
+      "lines": [
+        {
+          "message": 53011,
+          "choices": [
+            { "reply": 71157, "next": 53012 }
+          ]
+        },
+        {
+          "message": 53012,
+          "choices": [
+            { "reply": 71156, "next": 53013 }
+          ]
+        },
+        {
+          "message": 53013,
+          "choices": [
+            { "reply": 71155, "next": 53014 }
+          ]
+        },
+        {
+          "message": 53014,
+          "choices": [
+            { "reply": 71154 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7104,
+      "map": 0,
+      "opening": 53015,
+      "lines": [
+        {
+          "message": 53015,
+          "choices": [
+            { "reply": 71307 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7042,
+      "map": 0,
+      "opening": 52996,
+      "lines": [
+        {
+          "message": 52996,
+          "choices": [
+            { "reply": 71134, "next": 52998 },
+            { "reply": 71135 }
+          ]
+        },
+        {
+          "message": 52998,
+          "choices": [
+            { "reply": 71133 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7092,
+      "map": 0,
+      "opening": 52733,
+      "lines": [
+        {
+          "message": 52733,
+          "choices": [
+            { "reply": 70739, "next": 52734 }
+          ]
+        },
+        {
+          "message": 52734,
+          "choices": [
+            { "reply": 70738 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7094,
+      "map": 0,
+      "opening": 52738,
+      "lines": [
+        {
+          "message": 52738,
+          "choices": [
+            { "reply": 70747, "next": 52739 }
+          ]
+        },
+        {
+          "message": 52739,
+          "choices": [
+            { "reply": 70746 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7100,
+      "map": 0,
+      "opening": 52773,
+      "lines": [
+        {
+          "message": 52773,
+          "choices": [
+            { "reply": 70790 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7095,
+      "map": 0,
+      "opening": 52737,
+      "lines": [
+        {
+          "message": 52737,
+          "choices": [
+            { "reply": 70744 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7097,
+      "map": 0,
+      "opening": 52741,
+      "lines": [
+        {
+          "message": 52741,
+          "choices": [
+            { "reply": 70755, "next": 52742 },
+            { "reply": 70772, "next": 52750 },
+            { "reply": 70770 }
+          ]
+        },
+        {
+          "message": 52742,
+          "choices": [
+            { "reply": 70754, "next": 52748 },
+            { "reply": 70768, "next": 52749 },
+            { "reply": 70769 }
+          ]
+        },
+        {
+          "message": 52748,
+          "choices": [
+            { "reply": 70766 }
+          ]
+        },
+        {
+          "message": 52749,
+          "choices": [
+            { "reply": 70767 }
+          ]
+        },
+        {
+          "message": 52750,
+          "choices": [
+            { "reply": 70771 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7099,
+      "map": 0,
+      "opening": 52772,
+      "lines": [
+        {
+          "message": 52772,
+          "choices": [
+            { "reply": 71019, "next": 52920 },
+            { "reply": 70789 }
+          ]
+        },
+        {
+          "message": 52920,
+          "choices": [
+            { "reply": 71025, "next": 52921 }
+          ]
+        },
+        {
+          "message": 52921,
+          "choices": [
+            { "reply": 71024, "next": 52922 }
+          ]
+        },
+        {
+          "message": 52922,
+          "choices": [
+            { "reply": 71023, "next": 52923 }
+          ]
+        },
+        {
+          "message": 52923,
+          "choices": [
+            { "reply": 71022, "next": 52924 }
+          ]
+        },
+        {
+          "message": 52924,
+          "choices": [
+            { "reply": 71021, "next": 52925 }
+          ]
+        },
+        {
+          "message": 52925,
+          "choices": [
+            { "reply": 71020 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7093,
+      "map": 0,
+      "opening": 52771,
+      "lines": [
+        {
+          "message": 52771,
+          "choices": [
+            { "reply": 70791 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7045,
+      "map": 0,
+      "opening": 52952,
+      "lines": [
+        {
+          "message": 52952,
+          "choices": [
+            { "reply": 71066, "next": 52953 }
+          ]
+        },
+        {
+          "message": 52953,
+          "choices": [
+            { "reply": 71065, "next": 52954 }
+          ]
+        },
+        {
+          "message": 52954,
+          "choices": [
+            { "reply": 71064 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 99,
+      "map": 0,
+      "opening": 308,
+      "lines": [
+        {
+          "message": 308,
+          "choices": [
+            { "reply": 250, "next": 309 },
+            { "reply": 298, "next": 310 }
+          ]
+        },
+        { "message": 309, "choices": [] },
+        { "message": 310, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 117,
+      "map": 0,
+      "opening": 382,
+      "lines": [
+        { "message": 382, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 2233,
+      "map": 0,
+      "opening": 16514,
+      "lines": [
+        { "message": 16514, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 4893,
+      "map": 0,
+      "opening": 34507,
+      "lines": [
+        { "message": 34507, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 59,
+      "map": 0,
+      "opening": 33,
+      "lines": [
+        {
+          "message": 33,
+          "choices": [
+            { "reply": 60384, "next": 45519 }
+          ]
+        },
+        {
+          "message": 45519,
+          "choices": [
+            { "reply": 60383, "next": 45520 }
+          ]
+        },
+        {
+          "message": 45520,
+          "choices": [
+            { "reply": 60382, "next": 45521 }
+          ]
+        },
+        {
+          "message": 45521,
+          "choices": [
+            { "reply": 60381, "next": 45522 }
+          ]
+        },
+        {
+          "message": 45522,
+          "choices": [
+            { "reply": 60380 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6185,
+      "map": 0,
+      "opening": 45655,
+      "lines": [
+        {
+          "message": 45655,
+          "choices": [
+            { "reply": 60565, "next": 45656 },
+            { "reply": 60566 }
+          ]
+        },
+        {
+          "message": 45656,
+          "choices": [
+            { "reply": 60564, "next": 45657 },
+            { "reply": 61750 }
+          ]
+        },
+        {
+          "message": 45657,
+          "choices": [
+            { "reply": 60563, "next": 45658 }
+          ]
+        },
+        {
+          "message": 45658,
+          "choices": [
+            { "reply": 60562 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5195,
+      "map": 0,
+      "opening": 38274,
+      "lines": [
+        {
+          "message": 38274,
+          "choices": [
+            { "reply": 49893 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5194,
+      "map": 0,
+      "opening": 38272,
+      "lines": [
+        {
+          "message": 38272,
+          "choices": [
+            { "reply": 49892 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 5193,
+      "map": 0,
+      "opening": 38264,
+      "lines": [
+        { "message": 38264, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 6674,
+      "map": 0,
+      "opening": 50515,
+      "lines": [
+        {
+          "message": 50515,
+          "choices": [
+            { "reply": 67777 },
+            { "reply": 67774 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 66,
+      "map": 0,
+      "opening": 53,
+      "lines": [
+        { "message": 53, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 423,
+      "map": 0,
+      "opening": 48289,
+      "lines": [
+        { "message": 48289, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1120,
+      "map": 0,
+      "opening": 6591,
+      "lines": [
+        {
+          "message": 6591,
+          "choices": [
+            { "reply": 5897, "next": 6592 }
+          ]
+        },
+        { "message": 6592, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 1162,
+      "map": 0,
+      "opening": 7069,
+      "lines": [
+        {
+          "message": 7069,
+          "choices": [
+            { "reply": 6633 },
+            { "reply": 11165 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 7036,
+      "map": 0,
+      "opening": 52643,
+      "lines": [
+        {
+          "message": 52643,
+          "choices": [
+            { "reply": 70552, "passage": 70552, "gives": 28266 },
+            { "reply": 70558, "next": 52644 },
+            { "reply": 70593 },
+            { "reply": 70584, "next": 52662 }
+          ]
+        },
+        {
+          "message": 52644,
+          "choices": [
+            { "reply": 70557, "next": 52645 },
+            { "reply": 70565 },
+            { "reply": 70578, "next": 52660 },
+            { "reply": 70583 }
+          ]
+        },
+        {
+          "message": 52645,
+          "choices": [
+            { "reply": 70556, "next": 52646 }
+          ]
+        },
+        {
+          "message": 52646,
+          "choices": [
+            { "reply": 70555, "next": 52647 },
+            { "reply": 70561 }
+          ]
+        },
+        {
+          "message": 52647,
+          "choices": [
+            { "reply": 70559 },
+            { "reply": 70560 }
+          ]
+        },
+        {
+          "message": 52660,
+          "choices": [
+            { "reply": 70582 }
+          ]
+        },
+        {
+          "message": 52662,
+          "choices": [
+            { "reply": 70586 }
+          ]
+        }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
+    },
+    {
+      "npc": 488,
+      "map": 0,
+      "opening": 2336,
+      "lines": [
+        { "message": 2336, "choices": [] }
+      ],
+      "why": "As the official server says it, with no quest under way.",
+      "_source": "official server packet captures, 2026-11-17 to 11-21"
     }
   ]
 }

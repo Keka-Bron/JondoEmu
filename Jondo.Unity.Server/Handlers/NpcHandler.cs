@@ -1608,6 +1608,20 @@ namespace Jondo.Unity.Server.Handlers
             if (elegidaAhora != null && elegidaAhora.Marks != 0 && SessionContext.State.ElementsUsed.Add(elegidaAhora.Marks))
                 DatabaseManager.RememberElement(GameState.CharacterId, elegidaAhora.Marks);
 
+            // A paid passage that leads nowhere from here is not paid for: the reply is wrong for this
+            // map (Capitã Isabella Utissier's «Pagar 100 kamas e embarcar.» offered again in Albuera
+            // took the kamas and left the character where he was, 2026-11-23).
+            if (elegidaAhora != null && elegidaAhora.TeleportPassage != 0 && elegidaAhora.BuysPrice > 0)
+            {
+                long aqui = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
+                if (!TeleportManager.TryGetNpcPassage(aqui, elegidaAhora.TeleportPassage, SessionContext.State.OpenDialogueNpcId, out _))
+                {
+                    Console.WriteLine($"[NPC] Passage {elegidaAhora.TeleportPassage} does not leave from {aqui}: nothing charged.");
+                    await CloseAsync(stream);
+                    return;
+                }
+            }
+
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.
             bool sinPagar = false;
