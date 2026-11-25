@@ -116,7 +116,10 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // «Intercambiar» on an NPC who swaps things: Gobiere Trokeur's barter, not a shop.
-            if (action == Npcs.TradeCosmetics && NpcBarterHandler.Barters(npc.NpcId))
+            // «Trocar» (2) opens the same window; an NPC that also sells keeps its «Comprar» (11) for the
+            // shop: the dragons' champion answers 2 with the exchange and 11 with its catalogue.
+            if (NpcBarterHandler.Barters(npc.NpcId)
+                && (action == Npcs.Exchange || action == Npcs.TradeCosmetics && !NpcShops.Sells(npc.NpcId)))
             {
                 await NpcBarterHandler.OpenAsync(stream, npc.NpcId, npc.ContextualId);
                 return;
@@ -1611,6 +1614,20 @@ namespace Jondo.Unity.Server.Handlers
             // The mark the reply leaves («marks»): the heap of filings that has given its handful.
             if (elegidaAhora != null && elegidaAhora.Marks != 0 && SessionContext.State.ElementsUsed.Add(elegidaAhora.Marks))
                 DatabaseManager.RememberElement(GameState.CharacterId, elegidaAhora.Marks);
+
+            // A paid passage that leads nowhere from here is not paid for: the reply is wrong for this
+            // map (Capitã Isabella Utissier's «Pagar 100 kamas e embarcar.» offered again in Albuera
+            // took the kamas and left the character where he was, 2026-11-23).
+            if (elegidaAhora != null && elegidaAhora.TeleportPassage != 0 && elegidaAhora.BuysPrice > 0)
+            {
+                long aqui = SessionContext.State.OpenDialogueMapId != 0 ? SessionContext.State.OpenDialogueMapId : SessionContext.State.MapId;
+                if (!TeleportManager.TryGetNpcPassage(aqui, elegidaAhora.TeleportPassage, SessionContext.State.OpenDialogueNpcId, out _))
+                {
+                    Console.WriteLine($"[NPC] Passage {elegidaAhora.TeleportPassage} does not leave from {aqui}: nothing charged.");
+                    await CloseAsync(stream);
+                    return;
+                }
+            }
 
             // Does the answer buy something? Before the quest, because a purchase that fails must not
             // leave the conversation halfway with the quest already started.

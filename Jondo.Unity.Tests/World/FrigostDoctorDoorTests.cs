@@ -24,7 +24,7 @@ namespace Jondo.Unity.Tests.World
 
             Assert.True(TeleportManager.TryGet(Street, StreetDoor, out var entrance));
             Assert.Equal(House, entrance.DestinationMapId);
-            Assert.Equal(381, entrance.DestinationCellId);
+            Assert.Equal(382, entrance.DestinationCellId);   // measured on the official server, 2026-11-23
 
             Assert.True(TeleportManager.TryGet(House, 504218, out var exit));
             Assert.Equal(Street, exit.DestinationMapId);
@@ -36,7 +36,7 @@ namespace Jondo.Unity.Tests.World
 
             Assert.True(TeleportManager.TryGet(Cellar, 457180, out var up));
             Assert.Equal(House, up.DestinationMapId);
-            Assert.Equal(311, up.DestinationCellId);
+            Assert.Equal(310, up.DestinationCellId);   // measured on the official server, 2026-11-23
         }
     }
 }

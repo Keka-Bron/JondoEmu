@@ -38,12 +38,15 @@ namespace Jondo.Unity.Server.Managers
         /// until the opened element shuts again and its cells are blocked back (Amakna castle's piano:
         /// the door 471367 opened at 943.384 s and shut at 953.384 s, the capture's clock). <c>Skill</c>:
         /// the option it is declared with, «Usar» 184 or «Acionar» 179 (the levers, whose staging
-        /// MapStagings plays). <c>Order</c>: its place in a row of levers pulled in turn, zero for
+        /// MapStagings plays). <c>Emote</c>: an attitude learned (Sufokia, 2026-11-22: «Usar» on 488044
+        /// of 130811393 answered keo { 28 }, «Tocar violão», the shape of 3.6's khi; on 472519 of
+        /// 91750913, { 5 } «Medo»). <c>Order</c>: its place in a row of levers pulled in turn, zero for
         /// none -- what it opens and where it sends only happen when the whole row is pulled in order
         /// (<see cref="Pull"/>).
         /// </remarks>
         public sealed record Said(int Message, long ToMap, int ToCell, int Opens, int OpensCell, int OpensState,
-                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill, int Order = 0)
+                                  int[] Frees, string[] Params, int[] Blocks, int ClosesAfter, int Skill, int Order = 0,
+                                  int Emote = 0)
         {
             /// <summary>
             /// What pressing it puts in the bag, each item only while none is carried: the urn of
@@ -80,7 +83,8 @@ namespace Jondo.Unity.Server.Managers
                     "name" => characterName,
                     "hour" => paris.Hour.ToString("00"),
                     "minute" => paris.Minute.ToString("00"),
-                    _ => "",
+                    // anything else is said as it is: Madrestam's wrong clock, «14» «53» as measured
+                    _ => said.Params[i],
                 };
             return filled;
         }
@@ -143,7 +147,7 @@ namespace Jondo.Unity.Server.Managers
                                                      opens, (int)Number(row, "opensCell"), (int)Number(row, "opensState"),
                                                      frees.ToArray(), names.ToArray(), blocks.ToArray(),
                                                      (int)Number(row, "closesAfter"), skill == 0 ? Skill : skill,
-                                                     (int)Number(row, "order"))
+                                                     (int)Number(row, "order"), (int)Number(row, "emote"))
                     {
                         Gives = gives,
                         Cases = cases,

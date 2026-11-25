@@ -159,6 +159,7 @@ namespace Jondo.Unity.Server.Handlers
                             ConnectionProtocol.Push(Op.Jqx, Obstacles(said.Frees, said.Blocks)));
                     if (said.ClosesAfter > 0) _ = ShutLaterAsync(session, mapId, said);
                 }
+                if (said.Emote != 0) await Emotes.LearnAsync(session, said.Emote);
                 Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId} says {said.Message}.");
                 if (said.ToMap != 0 && complete) await TeleportHandler.ToMapAsync(stream, said.ToMap, said.ToCell);
                 return;
@@ -330,7 +331,9 @@ namespace Jondo.Unity.Server.Handlers
             }
             foreach (var (item, count) in InteractiveMessages.HandOut(said, Equipment.HowMany))
             {
-                if (!await Equipment.GiveAsync(stream, item, count)) continue;
+                // a roleplay buff goes on as the official server put it on (Sufokia's 538581: iqx «Desarranjo
+                // Sufokiano» 31477, lof 21, kjm), anything else in the bag
+                if (!await QuestFollowers.GiveAsync(stream, item, count)) continue;
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
                         count.ToString(System.Globalization.CultureInfo.InvariantCulture),
