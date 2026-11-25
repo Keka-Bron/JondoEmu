@@ -200,6 +200,9 @@ namespace Jondo.Unity.World.Fights
         public int Cara { get; set; }
         public int Valor { get; set; }
 
+        /// <summary>The parameters announced for this live effect, including meaningful zeros.</summary>
+        public (int Param1, int Param2, int Param3)? AnnouncedParameters { get; set; }
+
         /// <summary>
         /// The catalogue's "dispellable" of the spell row this one was put from (see
         /// <see cref="Buffs.DispellableByADispel"/> and the three after it), filled from that row

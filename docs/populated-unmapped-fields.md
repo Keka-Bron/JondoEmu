@@ -262,6 +262,15 @@ native audit found no use witness and incomplete caller coverage. The typed
 board omits that scalar and still sends the current round in the separate
 `FightNewRoundEvent`. Neither omission uses a raw fallback.
 
+### Participant reconnect board
+
+The reconnect announcement likewise omits `kam` tag **3**. Its ordinary
+`FightJoinEvent` keeps both mapped true flags (`kaa` tags **1** and **4**), with
+no countdown, and omits the historical `true` in tag **3** under the placement
+policy above. Reconnect uses the same turn snapshot as spectating (omits `jzc`
+tag **8**, with a separate round event). Its trailing turn-ready notification
+uses the empty typed `FightIsTurnReadyEvent` described below. No raw fallback.
+
 ### Combat startup and turn confirmation
 
 The typed opening sequence omits `SequenceStartEvent` / `jto` tag **1** (the former

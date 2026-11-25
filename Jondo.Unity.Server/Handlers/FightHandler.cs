@@ -488,12 +488,6 @@ namespace Jondo.Unity.Server.Handlers
         /// The jrk of a fight: the map it is drawn on, named after the map it was started from (an
         /// arena has no subarea or coordinates of its own), or after itself when that one is unknown.
         /// </summary>
-        internal static byte[] FightMapOf(FightInstance fight)
-        {
-            var (subArea, x, y) = FightMapLabel(fight);
-            return Network.FightProtocol.BuildFightMap(fight.MapId, subArea, x, y);
-        }
-
         private static (int SubArea, int X, int Y) FightMapLabel(FightInstance fight)
         {
             var place = MapManager.GetMapInfo(fight.RoleplayMapId) ?? MapManager.GetMapInfo(fight.MapId);
@@ -691,23 +685,6 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// How a PERSON is announced in placement, whichever side he is on.
-        /// </summary>
-        /// <remarks>
-        /// The team-zero loop read the sheet of the player watching, which works when the only player
-        /// in the fight is him. With two people the sheet of EACH ONE has to be read: the look and the
-        /// name come from his row, not from the watcher's.
-        /// </remarks>
-        private static byte[] BuildPlayerAppearance(FightInstance fight, Fighter fighter)
-        {
-            var (look, breed, sex) = CharacterLookOf(fighter);
-            return Network.FightProtocol.BuildFighter(
-                fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter), look,
-                Network.FightProtocol.PlayerIdentity(breed, fighter.Name, sex, fighter.Level),
-                isMonster: false, team: fighter.TeamId, scrolls: ScrollsOf(fighter));
-        }
-
-        /// <summary>
         /// A character fighter's look, class and sex: from his row, or -- a Koliseo JondoBot has
         /// none -- from the fighter itself.
         /// </summary>
@@ -724,11 +701,6 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>A fighter's full sheet for the jxb, person or creature.</summary>
-        /// <remarks>
-        /// <see cref="BuildPlayerAppearance"/>'s twin for the start of the fight: that one makes the
-        /// placement jxg and this one the jxb block, which is the same content with the sheet filled
-        /// in. Both read the FIGHTER's sheet and not the watcher's, which was the bug.
-        /// </remarks>
         internal static Network.Pb BloqueDe(FightInstance fight, Fighter fighter)
         {
             if (fighter.DoubleOf != 0) return DoubleBlock(fight, fighter, CurrentFightLook(fight, fighter));
@@ -752,7 +724,7 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// Every fighter's jxb block, each once: in play order -- the order of the jzu, which the
         /// client's carousel is indexed against -- and then whoever the turn order has not caught
-        /// up with. The list of the fight-start jxb, sent again on reconnecting and when a wave comes on.
+        /// up with. Still used for live updates such as a new wave.
         /// </summary>
         private static List<Network.Pb> FighterBlocksInPlayOrder(FightInstance fight)
             => FightersInPlayOrder(fight).Select(fighter => BloqueDe(fight, fighter)).ToList();
@@ -1928,19 +1900,7 @@ namespace Jondo.Unity.Server.Handlers
         private static long SummonerOf(Fighter fighter) => fighter.EsInvocado ? fighter.Invocador : 0;
 
         /// <summary>
-        /// A creature's jxg in a fight already running -- a reconnection's, a spectator's --, its
-        /// summon's owner and look with it.
-        /// </summary>
-        internal static byte[] CreatureFighter(FightInstance fight, Fighter fighter)
-            => fighter.DoubleOf != 0
-                ? Network.Pb.New().Msg(2, DoubleBlock(fight, fighter, CurrentFightLook(fight, fighter))).Build()
-                : Network.FightProtocol.BuildFighter(
-                    fighter.CellId, FacingOf(fight, fighter), fighter.Id, PlacementSheetOf(fighter),
-                    CurrentFightLook(fight, fighter), IdentityOf(fighter), isMonster: true, summoner: SummonerOf(fighter),
-                    team: fighter.IsCompanion ? fighter.TeamId : null, companion: fighter.IsCompanion);
-
-        /// <summary>
-        /// A double (180) in a fighter block -- a jxb's, a reconnection's or a spectator's jxg --:
+        /// A double (180) in a legacy fighter block:
         /// dressed as the character it copies, as an illusion is for the other side
         /// (<see cref="Network.FightProtocol.BuildIllusion"/>), and its owner's summon by the sheet.
         /// </summary>
@@ -2700,17 +2660,17 @@ namespace Jondo.Unity.Server.Handlers
         /// it with ijm/kmv. Null for a placement (that goes through PendingPreparation) and for
         /// everybody else.
         /// </summary>
-        public static FightInstance? PendingResume()
+        internal static FightInstance? PendingResume(GameSession session)
         {
-            var suyo = Network.SessionContext.State;
-            if (!suyo.FightRejoinPending) return null;
-            var fight = GetCurrentFight();
-            if (fight == null || fight.State != Jondo.Unity.World.Fights.FightState.Ongoing) return null;
-            return fight;
+            var state = session.State;
+            if (!state.FightRejoinPending || !state.IsInFight || state.SpectatingFightId != 0) return null;
+            var fight = FightById(state.FightId);
+            return fight != null && fight.State == FightState.Ongoing && IsParticipant(fight, session.CharacterId)
+                ? fight : null;
         }
 
         /// <summary>
-        /// The board of a fight already running, for somebody who just came back into it.
+        /// The ongoing board, privately to the returning participant under both turns.
         /// </summary>
         /// <remarks>
         /// The order is the one of the capture at 30.8 s, frame for frame:
@@ -2728,140 +2688,78 @@ namespace Jondo.Unity.Server.Handlers
         ///   the turn is in progress (30.8 s)    nothing more; the client gets no jxh and sends no
         ///                                       jwz, its clock just runs down
         ///   a turn is waiting to be confirmed   jxh, so that the client answers jwz and the turn
-        ///   (61.1 s)                            opens through ConfirmAsync as any other
+        ///   (61.1 s)                            opens through the usual confirmation path
         ///
         /// A fight whose only player was away parks in the second state, because nobody was
         /// there to confirm; a challenge is in the first, because the other player kept it going.
         /// </remarks>
-        public static async Task ResumeForOneAsync(NetworkStream stream, FightInstance fight)
+        internal static async Task ResumeForOneAsync(GameSession session, FightInstance fight)
         {
-            long me = GameState.CharacterId;
-            Network.SessionContext.State.FightRejoinPending = false;
+            if (PendingResume(session) != fight) return;
+            long me = session.CharacterId;
+            session.State.FightRejoinPending = false;
+            using var context = SessionContext.Push(session); // The spell layout still uses session-local choices and equipment.
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ijq,
-                Network.FightProtocol.BuildMapReady()));
+            await session.SendAsync(new Game.FightPingsEvent(new Dictionary<int, int>(), new Dictionary<long, int>()));
 
             var monsters = fight.Reglas.EnfrenteHayMonstruos && fight.TaxCollectorUuid == null
-                ? fight.Rojo.ConvertAll(f => (long)f.MonsterId)
-                : new List<long>();
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kam,
-                Network.FightProtocol.BuildFightAnnounced(
-                    fight.Reglas.TipoDelKam, fight.DefenderLeaderId, monsters, fight.FightId, me)));
-            // The kaa of a fight in progress: f1 = 1 and no countdown. Without the flag the
-            // client came back into the placement phase -- the READY button where the pass
-            // button goes -- and pressing it started the fight over. Measured: "0801180120013004"
-            // in both resumes of the capture against "1801200128bc033004" in its placement.
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kaa,
-                Network.FightProtocol.BuildFightInProgressSummary(
-                    fight.Reglas.KaaConCuentaAtras ? fight.Reglas.TipoDelKam : 0)));
+                ? fight.Rojo.Select(f => f.MonsterId).ToArray() : [];
+            var type = FightTypeOf(fight);
+            await session.SendAsync(new Game.FightStartingEvent(false, type, monsters, checked((int)fight.FightId), me));
+            // Preserve both mapped participant join flags. Without the first, the client came
+            // back to the placement phase (Ready instead of Pass). There is no countdown.
+            await session.SendAsync(new Game.FightJoinEvent(IsTeamPhase: true, IsFightStarted: true,
+                TimeMaxBeforeFightStart: 0, FightType: fight.Reglas.KaaConCuentaAtras ? type : Game.FightType.Challenge));
 
-            // Everybody, where he stands now. The dead are listed too: the capture's jxg of a
-            // fight in progress carry every fighter, and the jxb behind them says who is alive.
-            foreach (var fighter in TodosLosCombatientes(fight))
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
-                    fighter.IsMonster
-                        ? CreatureFighter(fight, fighter)
-                        : BuildPlayerAppearance(fight, fighter)));
-            }
+            var fighters = TodosLosCombatientes(fight).ToArray();
+            // The dead are shown and synchronized too, but no longer occupy cells.
+            foreach (var fighter in fighters)
+                await session.SendAsync(new Game.FightFighterShowEvent(BoardFighter(fight, fighter, ongoing: true)));
 
             var character = DatabaseManager.GetCharacterById(me);
             var spellLayout = Managers.FightSpellLayout.ForFight(character?.Breed ?? 0,
-                                                                 GameState.CharacterLevel,
-                                                                 SessionContext.Current.AccountId);
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                Network.FightProtocol.BuildSpellBar(me, spellLayout.Spells, spellLayout.Bar, spellLayout.WithWeapon)));
+                session.State.CharacterLevel, session.AccountId);
+            await session.SendAsync(SpellBar(me, me, spellLayout.Spells, spellLayout.Bar, spellLayout.WithWeapon));
 
             // And the bar of every summon of his he plays, as on summoning it: without it his
             // client no longer had them in hand.
-            foreach (var summon in TodosLosCombatientes(fight))
+            foreach (var summon in fighters)
             {
-                if (summon == null || !summon.IsAlive || !(summon.EsInvocado || summon.IsPlayedAlly) || !summon.JuegaTurno
+                if (!summon.IsAlive || !(summon.EsInvocado || summon.IsPlayedAlly) || !summon.JuegaTurno
                     || !summon.ControlledBy(me)) continue;
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
-                    Network.FightProtocol.BuildCooldowns(summon.Id, RecargasDe(summon))));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                    summon.IsPlayedAlly ? PlayedAllyBar(summon, me)
-                                        : Network.FightProtocol.BuildSummonSpellBar(summon.Id, me, summon.HechizosDeInvocado)));
+                await session.SendAsync(SpellCooldowns(summon.Id, summon));
+                await session.SendAsync(summon.IsPlayedAlly ? PlayedAllyContext(summon, me) : SummonContext(summon, me));
             }
 
-            var spots = new List<(int Cell, int Orientation, long Fighter)>();
-            foreach (var fighter in TodosLosCombatientes(fight))
-            {
-                if (fighter.IsAlive) spots.Add((fighter.CellId, FacingOf(fight, fighter), fighter.Id));
-            }
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk,
-                Network.FightProtocol.BuildFightersPlaced(spots)));
+            await session.SendAsync(new Game.EntitiesDispositionEvent(fighters.Where(f => f.IsAlive)
+                .Select(f => PlacementSpot(fight, f)).ToArray()));
+            await session.SendAsync(new Game.FightSynchronizeEvent(FightersInPlayOrder(fight)
+                .Select(f => BoardFighter(fight, f, ongoing: true, tellLife: true)).ToArray()));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
-                Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
+            if (ResumedTurn(fight) is { } turn) await session.SendAsync(turn);
 
-            // The turn the fight is on. The last one announced, with what is left of it; and if
-            // none was announced yet -- the fight had just started when he left -- the one that
-            // is about to be.
-            var announced = fight.LastAnnouncedTurn;
-            if (announced.Announced)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzc,
-                    Network.FightProtocol.BuildTurnResumed(announced.FighterId, announced.Deciseconds,
-                                                           announced.RemainingDeciseconds(DateTime.UtcNow),
-                                                           announced.Round, announced.Carried)));
-            }
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(session, fight);
 
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(SessionContext.Current, fight);
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
-                Network.FightProtocol.BuildRound(fight.RoundNumber)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kau,
-                Network.FightProtocol.BuildFightOption(FightInstance.Azules, FightInstance.OptionSecret,
-                    fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret), fight.FightId)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu,
-                TeamsOf(fight)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq,
-                Network.FightProtocol.BuildBuffSync(LiveBuffFrames(fight))));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk,
-                FightMapOf(fight)));
+            await session.SendAsync(new Game.FightNewRoundEvent(0, fight.RoundNumber));
+            await session.SendAsync(OptionUpdate(fight, FightInstance.Azules, FightInstance.OptionSecret,
+                fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)));
+            await session.SendAsync(FightTimeline(fight));
+            await session.SendAsync(FightBuffSnapshot(fight));
+            await session.SendAsync(FightMapSnapshot(fight));
 
             // His own cooldowns, which the fight-start burst would have given him.
-            var yoMismo = fight.Buscar(me);
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
-                Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
+            await session.SendAsync(SpellCooldowns(me, fight.Buscar(me)));
 
             // And the Koliseo's leave button, which a new client has greyed out again.
-            await SendSurrenderStateAsync(SessionContext.Current, fight);
+            await SendSurrenderStateAsync(session, fight);
 
-            if (fight.TurnAwaitingConfirmation)
-            {
-                var next = fight.CurrentFighter;
-                if (next != null)
-                {
-                    await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxh,
-                        Network.FightProtocol.BuildConfirmTurn(next.Id)));
-                }
-            }
+            if (fight.TurnAwaitingConfirmation && fight.CurrentFighter != null)
+                await session.SendAsync(new Game.FightIsTurnReadyEvent());
 
-            Program.LogDebug($"[Fight] {GameState.CharacterName} has the board of " +
+            Program.LogDebug($"[Fight] {session.State.CharacterName} has the board of " +
                              $"fight #{fight.FightId} again: round {fight.RoundNumber}, " +
                              $"turn of {fight.CurrentFighter?.Id}" +
                              (fight.TurnAwaitingConfirmation ? ", waiting for their jwz." : "."));
-        }
-
-        /// <summary>
-        /// Every live buff in the fight as the payload its jxm carried, rebuilt from what the
-        /// buff kept. Dice and dispellability were not part of the board snapshot; the
-        /// client draws the panel from the rest.
-        /// </summary>
-        private static IEnumerable<byte[]> LiveBuffFrames(FightInstance fight)
-        {
-            foreach (var (target, buff) in LiveBuffs(fight))
-            {
-                var (categoria, boost) = DatabaseManager.EffectFamily(buff.EffectId);
-                yield return Network.FightProtocol.BuildBuff(
-                    target.Id, buff.Quien, buff.Numero, buff.EffectId, buff.EffectUid,
-                    BuffSnapshotValue(buff), 0, 0, buff.HechizoOrigen, buff.Disparador, buff.CaducaEnRonda,
-                    0, Network.FightProtocol.FamiliaDelEmbrujo(buff.EffectId, categoria, boost),
-                    buff.NivelOrigen, buff.Critico);
-            }
         }
 
         private static IEnumerable<(Fighter Target, Buff Buff)> LiveBuffs(FightInstance fight)
@@ -2873,9 +2771,6 @@ namespace Jondo.Unity.Server.Handlers
                     if (buff.Vivo(fight.RoundNumber)) yield return (target, buff);
             }
         }
-
-        // States keep their ID separately from the amount the client uses to describe them.
-        private static int BuffSnapshotValue(Buff buff) => buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto;
 
         internal static Task HandlePlacementPositionAsync(GameSession session, Jondo.Unity.Protocol.Game.FightPlacementPositionRequest request)
             => InPlacementTurnAsync(session, fight => ChangePlacementCellAsync(session, fight, request));
@@ -3246,12 +3141,14 @@ namespace Jondo.Unity.Server.Handlers
 
         private static Game.FightActorContextEvent PlayedAllyContext(Fighter played, long controllerId)
         {
-            if (!played.IsCharacter)
-                return SpellBar(played.Id, controllerId, played.HechizosDeInvocado,
-                    played.HechizosDeInvocado.Select((spell, slot) => (slot, spell.Spell)), false, Game.SpellType.Unknown6);
+            if (!played.IsCharacter) return SummonContext(played, controllerId);
             var (spells, bar, withWeapon) = PlayedCharacterLayout(played);
             return SpellBar(played.Id, controllerId, spells, bar, withWeapon);
         }
+
+        private static Game.FightActorContextEvent SummonContext(Fighter summon, long controllerId)
+            => SpellBar(summon.Id, controllerId, summon.HechizosDeInvocado,
+                summon.HechizosDeInvocado.Select((spell, slot) => (slot, spell.Spell)), false, Game.SpellType.Unknown6);
 
         /// <summary>
         /// A fight lost at once: the side with the players dies inside one sequence, as giving up
@@ -4324,6 +4221,8 @@ namespace Jondo.Unity.Server.Handlers
                     int effect = result.WireEffect != 0 ? result.WireEffect : waiting.EffectId;
                     int dice = result.WireEffect != 0 ? -result.Live.Cuanto : waiting.Dado;
                     int side = result.WireEffect != 0 ? 0 : waiting.Cara;
+                    if (effect == result.Live.EffectId)
+                        result.Live.AnnouncedParameters = (dice, side, waiting.Valor);
                     var (categoria, boost) = DatabaseManager.EffectFamily(effect);
                     int familia = Network.FightProtocol.FamiliaDelEmbrujo(effect, categoria, boost);
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm,
@@ -9732,6 +9631,8 @@ namespace Jondo.Unity.Server.Handlers
                 // uid 383796", 29723's own critical row; Tumulto's critical cast puts 13154's
                 // ordinary "+20", which has no critical list, without the flag.
                 c.Buff.Critico = c.Critico;
+                if (efectoAnunciado == c.Buff.EffectId)
+                    c.Buff.AnnouncedParameters = (dadoAnunciado, caraAnunciada, c.Efecto.Value);
                 foreach (var d in c.Efecto.Disparadores())
                 {
                     await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxm,

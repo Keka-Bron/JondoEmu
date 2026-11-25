@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol.Game;
-using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
@@ -17,7 +16,6 @@ public sealed class FightStartupTests
 {
     private const int FightId = 7_300_901;
     private const long Arena = 990_300_901;
-    private static readonly GameCodec Wire = new();
     private static readonly ConcurrentDictionary<long, FightInstance> Active =
         (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
             .GetField("_activeFights", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
@@ -164,15 +162,15 @@ public sealed class FightStartupTests
         MaxHP = 500, CurrentHP = 425, MaxAP = 6, CurrentAP = 6, MaxMP = 3, CurrentMP = 3,
     };
 
-    private sealed class Client : IGameCodec, IDisposable
+    private sealed class Client : IDisposable
     {
-        private readonly List<(long Recipient, GameEvent Event)> _sent;
         public GameSession Session { get; }
 
         public Client(long id, List<(long Recipient, GameEvent Event)> sent, bool inFight = true)
         {
-            _sent = sent;
-            Session = new(this, _ => Task.CompletedTask);
+            // Startup and confirmation can also run legacy combat effects; observe only the typed messages here.
+            Session = new(new CombatRecordingCodec(frame => sent.Add((id, Assert.IsAssignableFrom<GameEvent>(frame.Content)))),
+                _ => Task.CompletedTask);
             Session.BindAccount(id + 1_000_000_000, 1);
             Session.State.CharacterId = id;
             Session.State.CharacterLevel = 50;
@@ -186,19 +184,8 @@ public sealed class FightStartupTests
         public async Task Request(GameRequest request)
         {
             using var turn = await Session.EnterTurnAsync();
-            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchPacketAsync(Session,
-                Wire.Encode(new(request, -42)), new GameEntryService(Session, new GameEntryBackend()),
-                () => throw new InvalidOperationException("Combat confirmation must use typed dispatch.")));
-        }
-
-        public GameFrame Decode(ReadOnlySpan<byte> payload) => Wire.Decode(payload);
-
-        public byte[] Encode(GameFrame frame)
-        {
-            var packet = Wire.Encode(frame);
-            var delivered = frame.Content is ChallengeTargetsEvent ? Wire.Decode(packet).Content : frame.Content;
-            _sent.Add((Session.CharacterId, Assert.IsAssignableFrom<GameEvent>(delivered)));
-            return packet;
+            Assert.Equal(GameEntryResult.Handled, await GameNodeProxy.DispatchTypedAsync(Session,
+                new(request, -42), new GameEntryService(Session, new GameEntryBackend())));
         }
 
         public void Dispose() => SessionRegistry.Unregister(Session);

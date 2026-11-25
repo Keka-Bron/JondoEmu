@@ -74,19 +74,6 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildPlacementDone() => Array.Empty<byte>();
 
         /// <summary>
-        /// The same jwq when a fight is already running: every live buff of everybody, each
-        /// entry being exactly the payload its jxm carried. Measured in the reconnection
-        /// capture, where the jwq of the burst is 1,449 bytes of jxm bodies where the one of a
-        /// fresh fight is empty.
-        /// </summary>
-        public static byte[] BuildBuffSync(IEnumerable<byte[]> buffs)
-        {
-            var jwq = Pb.New();
-            foreach (byte[] buff in buffs) jwq.Bytes(1, buff);
-            return jwq.Build();
-        }
-
-        /// <summary>
         /// Which map the fight is on (jrk).
         ///
         ///   f2: the subarea      f3: its coordinates {1 x, 2 y}      f4: the map
@@ -102,11 +89,6 @@ namespace Jondo.Unity.Server.Network
             => Pb.New().Var(2, subAreaId).Msg(3, Pb.New().VarIfNotZero(1, x).VarIfNotZero(2, y)).Var(4, mapId).Build();
 
         // ─── The fight exists ───────────────────────────────────────────────────
-
-        /// <summary>
-        /// The map is ready (ijq). It goes empty and goes out right before the fight is announced.
-        /// </summary>
-        public static byte[] BuildMapReady() => Array.Empty<byte>();
 
         /// <summary>
         /// There is a fight here (kam). It is THE message that creates the fight for the client.
@@ -172,14 +154,6 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public static byte[] BuildDuelSummary()
             => Pb.New().Var(2, 1).Var(3, 1).Var(4, 1).Build();
-
-        /// <summary>
-        /// The kaa of a fight already running, for whoever comes back into it: f1 = 1 and no
-        /// countdown. "0801180120013004" in both resumes of the reconnection capture; a duel's
-        /// would carry no f6, which is not measured.
-        /// </summary>
-        public static byte[] BuildFightInProgressSummary(int kind)
-            => Pb.New().Var(1, 1).Var(3, 1).Var(4, 1).VarIfNotZero(6, kind).Build();
 
         /// <summary>
         /// What accompanies the announcement (kaa).
@@ -610,21 +584,6 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>The longest a character's turn can be, carried time and all: a minute and a half.</summary>
         public const int MaxTurnDeciseconds = 900;
-
-        /// <summary>
-        /// The same jzc for somebody who comes back in the middle of the turn: f6 is what is
-        /// left of it, in tenths. One sample, and it adds up to the tenth: in the reconnection
-        /// capture the turn of 350 had started 21.8 seconds before the burst and f6 says 132.
-        /// That frame carries no f7, so neither does this one.
-        /// </summary>
-        public static byte[] BuildTurnResumed(long fighterId, int deciseconds, int remaining, int round, int carried = 0)
-            => Pb.New()
-                .Var(1, fighterId)
-                .Var(2, deciseconds)
-                .VarIfNotZero(4, carried)
-                .VarIfNotZero(6, remaining)
-                .VarIfNotZero(8, round)
-                .Build();
 
         /// <summary>How long a turn lasts, in tenths: a character, a monster and a summon.</summary>
         public const int PlayerTurnDeciseconds = 400;

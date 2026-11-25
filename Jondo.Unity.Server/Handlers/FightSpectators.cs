@@ -155,24 +155,28 @@ namespace Jondo.Unity.Server.Handlers
             await session.SendAsync(new Game.FightSynchronizeEvent(FightersInPlayOrder(fight)
                 .Select(Snapshot).ToArray()));
 
-            var announced = fight.LastAnnouncedTurn;
-            if (announced.Announced)
-            {
-                int remaining = announced.RemainingDeciseconds(DateTime.UtcNow);
-                await session.SendAsync(new Game.FightTurnEvent(announced.FighterId, announced.Deciseconds,
-                    AdditionalId: "", RemainingDeciseconds: announced.Carried,
-                    TurnTimeOverrideDeciseconds: remaining > 0 ? remaining : null, TurnOrder: 0));
-            }
+            if (ResumedTurn(fight) is { } turn) await session.SendAsync(turn);
 
             await session.SendAsync(new Game.FightNewRoundEvent(0, fight.RoundNumber));
             await session.SendAsync(OptionUpdate(fight, FightInstance.Azules, FightInstance.OptionSecret,
                 fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)));
             await session.SendAsync(FightTimeline(fight));
-            await session.SendAsync(new Game.FightEffectsRefreshEvent(LiveBuffs(fight)
-                .Select(row => BoardEffect(row.Target, row.Buff)).ToArray()));
+            await session.SendAsync(FightBuffSnapshot(fight));
             await session.SendAsync(FightMapSnapshot(fight));
             await session.SendAsync(new Game.AreaFightModifierUpdateEvent([]));
         }
+
+        private static Game.FightTurnEvent? ResumedTurn(FightInstance fight)
+        {
+            var announced = fight.LastAnnouncedTurn;
+            if (!announced.Announced) return null;
+            int remaining = announced.RemainingDeciseconds(DateTime.UtcNow);
+            return new(announced.FighterId, announced.Deciseconds, AdditionalId: "", RemainingDeciseconds: announced.Carried,
+                TurnTimeOverrideDeciseconds: remaining > 0 ? remaining : null, TurnOrder: 0);
+        }
+
+        private static Game.FightEffectsRefreshEvent FightBuffSnapshot(FightInstance fight)
+            => new(LiveBuffs(fight).Select(row => BoardEffect(row.Target, row.Buff)).ToArray());
 
         private static Game.FightTurnListEvent FightTimeline(FightInstance fight)
         {
@@ -200,14 +204,27 @@ namespace Jondo.Unity.Server.Handlers
                 _ => Game.FightEffectKind.Unknown0,
             };
             var trigger = FightProtocol.WireTrigger(buff.Disparador);
-            return new(new(0, target.Id, buff.Numero, buff.NivelOrigen, new(buff.CaducaEnRonda, 0),
+            var (param1, param2, param3) = BoardEffectParameters(buff);
+            return new(new(param1, target.Id, buff.Numero, buff.NivelOrigen, new(buff.CaducaEnRonda, 0),
 #if JONDO_PROTOCOL_3_8_1_2
                 new Game.FightEffectTrigger(null, [], trigger),
 #else
                 trigger,
 #endif
-                buff.EffectUid, buff.Critico, BuffSnapshotValue(buff), new(-1, -1), 0, buff.HechizoOrigen,
-                kind, Game.EffectDissipationState.Dissipated), buff.Quien, buff.EffectId);
+                 buff.EffectUid, buff.Critico, param3, new(-1, -1), param2, buff.HechizoOrigen,
+                 kind, Game.EffectDissipationState.Dissipated), buff.Quien, buff.EffectId);
+        }
+
+        private static (int Param1, int Param2, int Param3) BoardEffectParameters(Buff buff)
+        {
+            if (buff.AnnouncedParameters is { } announced) return announced;
+
+            // Engine-created damage-taken rows can have only the resolved percentage. The
+            // client multiplies by Param1 for effect 1163; placing it in Param3 makes previews zero.
+            if (buff.EffectId == Buffs.DanoSufridoPorCiento) return (buff.Cuanto, 0, 0);
+            if (buff.Dado != 0 || buff.Cara != 0 || buff.Valor != 0) return (buff.Dado, buff.Cara, buff.Valor);
+
+            return (0, 0, buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto);
         }
 
         /// <summary>

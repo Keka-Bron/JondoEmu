@@ -112,13 +112,11 @@ namespace Jondo.Unity.Tests.Combat
         /// socket. Any other doing so is skipping the recipient rule.
         /// </summary>
         /// <remarks>
-        /// The per-client bursts are entry, preparation, start, resume and end. The spell bar
-        /// belongs to its recipient; appearance updates need a fight to broadcast.
+        /// The spell bar belongs to its recipient; appearance updates need a fight to broadcast.
         /// </remarks>
         private static readonly string[] VistaDeUnaPersona =
         {
-            "SendFightEntryAsync", "SendPreparationAsync", "ArrancarParaUnoAsync",
-            "ResumeForOneAsync", "TerminarParaUnoAsync",
+            "SendFightEntryAsync", "TerminarParaUnoAsync",
             "RefreshPlayerSpellBarAsync",
             "AnnounceAppearanceAsync",
             // FightJoin.cs: the jqz behind the jss of the one loading a map, the answer to the

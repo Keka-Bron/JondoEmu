@@ -23,8 +23,8 @@ namespace Jondo.Unity.Server.Handlers
     /// </code>
     /// The kind is the client's enum ur, 0 to 6, which EntityPing and CellPing draw. The party mates
     /// on the map get the same two: INFERRED, the capture only has the one who pinged, and a ping
-    /// nobody else sees would mean nothing. The same ijq goes out empty before every fight
-    /// (<see cref="FightProtocol.BuildMapReady"/>), which wipes the marks off the map.
+    /// nobody else sees would mean nothing. The same ijq goes out as an empty
+    /// <see cref="Jondo.Unity.Protocol.Game.FightPingsEvent"/> when loading a fight board, wiping the marks off the map.
     /// </remarks>
     public static class EntityPingHandler
     {

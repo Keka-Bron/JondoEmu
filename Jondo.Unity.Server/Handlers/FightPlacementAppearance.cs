@@ -21,7 +21,7 @@ public static partial class FightHandler
         if (ongoing) look = BoardLookWithAppearance(look, fighter.Buffs.AparienciaEn(fight.RoundNumber));
         long summoner = ongoing ? SummonerOf(fighter) : 0;
         var scrolls = !isDouble ? ScrollsOf(fighter) : null;
-        // The opening roster sets the shared life baseline; a private spectator snapshot does not.
+        // Participant synchronization sets the life baseline; a spectator snapshot does not.
         var sheet = ongoing ? FullSheetOf(fighter, conTraza: tellLife, told: tellLife) : PlacementSheetOf(fighter);
         var stats = sheet.Select(row => BoardStat(row.Characteristic, row.Base, row.Gear,
             scrolls?.GetValueOrDefault(row.Characteristic) ?? 0, ai)).ToArray();

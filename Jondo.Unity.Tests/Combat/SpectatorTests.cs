@@ -315,23 +315,12 @@ namespace Jondo.Unity.Tests.Combat
         private static (GameSession Owner, List<GameFrame> Frames) SessionOn(long map)
         {
             var frames = new List<GameFrame>();
-            var owner = new GameSession(new RecordingCodec(frames), _ => Task.CompletedTask);
+            var owner = new GameSession(new CombatRecordingCodec(frames.Add), CombatRecordingCodec.RequireTypedPacketAsync);
             owner.BindAccount(9_100_002, 1);
             owner.State.CharacterId = 9_100_002;
             owner.State.MapId = map;
             owner.EnterWorld();
             return (owner, frames);
-        }
-
-        private sealed class RecordingCodec(List<GameFrame> frames) : IGameCodec
-        {
-            private readonly IGameCodec profile = new Jondo.Unity.Protocol.Game.Wire.GameCodec();
-            public GameFrame Decode(ReadOnlySpan<byte> payload) => throw new NotSupportedException();
-            public byte[] Encode(GameFrame message)
-            {
-                frames.Add(message);
-                return profile.Encode(message);
-            }
         }
     }
 }
