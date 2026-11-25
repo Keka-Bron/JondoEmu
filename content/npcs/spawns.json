@@ -8738,6 +8738,30 @@
       "orientation": 1,
       "criterion": "Qa=1934&Qo>13422&Qo<13424",
       "why": "Incognita in the street [5,2!] outside the tavern (1934, 13424). INFERRED cell."
+    },
+    {
+      "map": 137366528,
+      "npc": 3502,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "Qf=1934&Qa!1935&Qf!1935",
+      "why": " «Sombres desseins» (1935, Dofus pour les noobs): Incognita in the street [5,2!] after 1934, to start 1935 (the 1934 row's cell)."
+    },
+    {
+      "map": 68421127,
+      "npc": 4196,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1935&Qo>13427&Qo<13429",
+      "why": " «Sombres desseins» (1935, Dofus pour les noobs): the cute Miaumiau at the meeting place [10,0]. INFERRED cell."
+    },
+    {
+      "map": 87818757,
+      "npc": 2769,
+      "cell": 289,
+      "orientation": 3,
+      "criterion": "Qa=1935&Qo>13431&Qo<13434",
+      "why": " «Sombres desseins» (1935, Dofus pour les noobs): Mistigris inside the Madrestam lighthouse [13,-2]. INFERRED cell."
     }
   ]
 }

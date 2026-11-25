@@ -2005,6 +2005,9 @@
       "allies": [ { "monster": 5155, "grade": 0 } ], "allyProof": [ 5155 ],
       "sacrifice": { "ally": 5155, "message": 855, "takes": 19428 }, "winMessage": 854,
       "winMap": 187304450, "winCell": 300,
-      "why": "The ambush in the catacombs (1934): the bodyguard fights beside the player; on the blow that would kill the player he dies in his place and the fight ends (855), otherwise the poison cloud of the win (854). Either way the toxins carry the player to their cell. Lost with the bodyguard already down, it is fought again." }
+      "why": "The ambush in the catacombs (1934): the bodyguard fights beside the player; on the blow that would kill the player he dies in his place and the fight ends (855), otherwise the poison cloud of the win (854). Either way the toxins carry the player to their cell. Lost with the bodyguard already down, it is fought again." },
+    { "npc": 4196, "map": 68421127, "reply": 35846,
+      "monsters": [ { "monster": 5159, "grade": 0 }, { "monster": 5160, "grade": 0 } ],
+      "why": " «Sombres desseins» (1935, Dofus pour les noobs): the Weremoggies (Hate-Filled and Not-So-Cute), alone." }
   ]
 }

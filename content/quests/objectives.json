@@ -9720,6 +9720,33 @@
    "gives": [{"item": 14808, "count": 10}],
    "anyOrder": true,
    "why": "«Ron marino» (14808, gathered by skill 239 per the client's skills table). DPLN «L'ivresse des profondeurs»: bottles stand in the Splash Zone rooms ([20,19] one beside the crate, [21,20] and [23,18] two each, plus [22,19], [22,21], [23,20], [23,26]-style singles) and need no steamer battery. The ten gfx 42429 elements of subarea 804 (a bottle drawn on a crate in the client) each hand one bottle to the character walking up and clicking it; the earlier world-graph teleport on these ids is an approximate reverse-element guess, not a door. Respawn every 5 minutes is not modelled (one bottle per element per session)."
+  },
+  {
+   "objective": 13428,
+   "quest": 1935,
+   "kind": "enter",
+   "map": 68421127,
+   "afterObjectives": [13427],
+   "why": "«Ve al lugar acordado que dijo Mori Arty» (739717): [10,0]."
+  },
+  {
+   "objective": 13429,
+   "quest": 1935,
+   "kind": "beat",
+   "monster": 5159,
+   "map": 68421127,
+   "afterObjectives": [13428],
+   "gives": [{"item": 19481, "count": 1}],
+   "why": "«Vence a los micholobos» (739718): the fight leaves the scribbled scroll (19481), read by double click."
+  },
+  {
+   "objective": 13432,
+   "quest": 1935,
+   "kind": "enter",
+   "map": 87818757,
+   "afterObjectives": [13431],
+   "worn": [{"item": 17519, "count": 1}],
+   "why": "«Ve al faro de Madrestam disfrazado de micholobo» (746139): the lighthouse with the Weremoggy eidolon (17519) worn."
   }
 ]
 }
