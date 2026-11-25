@@ -7263,6 +7263,93 @@
       "cell": 271,
       "orientation": 3,
       "why": "Dama Askina (3268) at the trithon domain entrance [21,27] (Dofus pour les noobs, 1731); no placement in the client data, INFERRED cell."
+    },
+    {
+      "map": 137367552,
+      "npc": 2344,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qf=1531&Qf!1532",
+      "why": "Zap Gobdon waits in the Torturer's tavern [5,2] («retournez voir Zab Gobdon dans la taverne en [5,2]»). INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 137367552,
+      "npc": 2343,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1532&Qo<8743",
+      "why": "Deil Harden (Belle Adrenne) at the tavern: the rusty hook is hers (18831). INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 136054022,
+      "npc": 2543,
+      "cell": 289,
+      "orientation": 1,
+      "why": "Rebanacuellos guards the grille of the Cima tenebrosa [6,-2] (18647). INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 137367812,
+      "npc": 2454,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1532&Qo>8747&Qo<8750",
+      "why": "Mundy Smis (Franche Smisse) in the Conspirators' alley. INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 137367812,
+      "npc": 2343,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1532&Qo>8750&Qo<8753",
+      "why": "Deil Harden in the alley (the Queen's disguise). INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 137367812,
+      "npc": 2447,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1532&Qo>8753&Qo<8755",
+      "why": "The Queen of Thieves, unmasked. INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 137369602,
+      "npc": 2559,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1532&Qo>8744&Qo<8746",
+      "why": "The jailer of Sramvil in the prison cell. INFERRED cell on open floor; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "map": 170133506,
+      "npc": 3244,
+      "cell": 299,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Sered waits at the palace basin [23,24] (1732, objective 10998, Dofus pour les noobs); INFERRED cell."
+    },
+    {
+      "map": 168558592,
+      "npc": 3244,
+      "cell": 342,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Sered at the plateau of Ryluglugló [25,26] (1732, objective 11000); INFERRED cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3244,
+      "cell": 402,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Sered at [27,27] by the ghost (1732, objectives 11003 to 11005); INFERRED cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3275,
+      "cell": 388,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Espiritu melancolico (3275): Rykke Zane's ghost at [27,27] (1732, Dofus pour les noobs: Montrez le luth a l'esprit melancolique); the client's map data holds no placement, INFERRED cell."
     }
   ]
 }

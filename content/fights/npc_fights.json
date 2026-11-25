@@ -1661,6 +1661,17 @@
       "monsters": [ { "monster": 4450, "grade": 0 }, { "monster": 4448, "grade": 0 }, { "monster": 4448, "grade": 0 } ],
       "alliesMustLive": true,
       "allies": [ { "monster": 4429, "grade": 0 } ],
-      "why": "«La pêche aux infos» (1731): Shokkoth plus two Grofonds, solo, Poly Perkin (4429) as ally." }
+      "why": "«La pêche aux infos» (1731): Shokkoth plus two Grofonds, solo, Poly Perkin (4429) as ally." },
+    { "npc": 3272, "map": 0, "reply": 28610, "solo": true,
+      "monsters": [ { "monster": 4430, "grade": 0 } ],
+      "why": "«La musique de Rykke Zane» (1732): Sesina la Sordina (4430), alone (Dofus pour les noobs)." },
+    { "npc": 3274, "map": 0, "reply": 28616, "solo": true,
+      "monsters": [ { "monster": 4428, "grade": 0 } ],
+      "why": "«La musique de Rykke Zane» (1732): Kalahfate (4428), alone (Dofus pour les noobs)." },
+    { "npc": 3244, "map": 0, "reply": 28595, "solo": true,
+      "monsters": [ { "monster": 4466, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 4465, "grade": 0 } ],
+      "why": "«La musique de Rykke Zane» (1732): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs: Le combat s'effectue seul en compagnie de Sered)." }
   ]
 }

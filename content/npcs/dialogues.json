@@ -63605,6 +63605,7 @@
       "map": 0,
       "opening": 17676,
       "openings": [
+        { "quest": 1532, "objective": 8755, "pending": 8756, "message": 17676 },
         { "quest": 1530, "objective": 8719, "message": 17678 },
         { "quest": 1530, "message": 18700 }
       ],
@@ -63612,7 +63613,8 @@
         {
           "message": 17676,
           "choices": [
-            { "reply": 21183 }
+            { "reply": 21183 },
+            { "reply": 22504, "quest": 1532, "criterion": "Qo<8756", "next": 18854 }
           ]
         },
         {
@@ -63644,9 +63646,32 @@
           "choices": [
             { "reply": 22355, "quest": 1530, "completes": 8720, "params": [[30, 8720]] }
           ]
+        },
+        {
+          "message": 18854,
+          "choices": [
+            { "reply": 22503, "next": 18855 }
+          ]
+        },
+        {
+          "message": 18855,
+          "choices": [
+            { "quest": 1532, "completes": 8756, "params": [[30, 8756]], "reply": 22500, "next": 18856 },
+            { "quest": 1532, "completes": 8756, "params": [[30, 8756]], "reply": 22502, "next": 18857 }
+          ]
+        },
+        {
+          "message": 18856,
+          "names": true,
+          "choices": []
+        },
+        {
+          "message": 18857,
+          "names": true,
+          "choices": []
         }
       ],
-      "why": "Exploranciana, founder of the travellers' order, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): the first talk is 18700 (Lonyon Plata and the Queen of Thieves), 22348 / 22346 lead to 18702 where she gives the Lingote de Anutropía (15463) for Vil Smis; back with Vil's news (22356) she sends you to Sramvil (18710, 22355 = objective 8720). The line order and the return opening (17678) are INFERRED; the greeting 17676 with 21183 is the plain one. Fix: the greeting must not tick 8642 (a talk objective): «Voy al pueblo de Amakna» (22345) completes it, and the opening is 18700 for the whole quest until Vil's news is in."
+      "why": "Exploranciana, founder of the travellers' order, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): the first talk is 18700 (Lonyon Plata and the Queen of Thieves), 22348 / 22346 lead to 18702 where she gives the Lingote de Anutropía (15463) for Vil Smis; back with Vil's news (22356) she sends you to Sramvil (18710, 22355 = objective 8720). The line order and the return opening (17678) are INFERRED; the greeting 17676 with 21183 is the plain one. Fix: the greeting must not tick 8642 (a talk objective): «Voy al pueblo de Amakna» (22345) completes it, and the opening is 18700 for the whole quest until Vil's news is in. «La voix de son maître» (1532; Dofus pour les noobs («La voix de son maître»)): «He estado con la Reina de los Ladrones» (22504) -> 18854, «Lo ha negado todo» (22503) -> 18855, and either «Revelarle lo que sabes sobre la madre de la reina» (22500, 18856) or «No me he enterado de nada interesante» (22502, 18857) ends 1532 (both end the quest in the walkthrough)."
     },
     {
       "npc": 2540,
@@ -63723,6 +63748,7 @@
       "map": 0,
       "opening": 18723,
       "openings": [
+        { "quest": 1532, "pending": 8750, "message": 18723 },
         { "before": 1531, "criterion": "Qf=1530", "message": 18724 },
         { "quest": 1530, "message": 18723 }
       ],
@@ -63731,7 +63757,8 @@
           "message": 18723,
           "choices": [
             { "reply": 22370, "quest": 1530, "completes": 8724, "params": [[30, 8724]], "next": 18724 },
-            { "reply": 22430, "quest": 1531, "criterion": "Qo<8741", "afterObjectives": [8643, 8729, 8733, 8736, 8737, 8742, 8738, 8739, 8740], "completes": 8741, "params": [[30, 8741]], "next": 18783 }
+            { "reply": 22430, "quest": 1531, "criterion": "Qo<8741", "afterObjectives": [8643, 8729, 8733, 8736, 8737, 8742, 8738, 8739, 8740], "completes": 8741, "params": [[30, 8741]], "next": 18783 },
+            { "reply": 22488, "quest": 1532, "criterion": "Qo<8750", "next": 18842 }
           ]
         },
         {
@@ -63769,9 +63796,15 @@
           "choices": [
             { "reply": 22427 }
           ]
+        },
+        {
+          "message": 18842,
+          "choices": [
+            { "quest": 1532, "completes": 8750, "params": [[30, 8750]], "reply": 22487 }
+          ]
         }
       ],
-      "why": "Mundy Smis, cousin of Vil, in the dark summit for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): showing Vil's glove (22370, not spent) is 8724 and she answers 18724. Her letters quest (1531) adds its lines. «Messager clandestin» (1531; Dofus pour les noobs («Messager clandestin»)): after the glove (18724) «¿El qué?» (22369) and «Seguir escuchando» (22368) lead to the letters (18725, 18726) and «Ir a repartir los sobres» (22367) starts 1531; with the nine deliveries done «Ya he cumplido la tarea que me confiaste» (22430) is 8741 and she tells of the queen's mother (18783-18785). INFERRED order. Fix: whoever finished 1530 and has not begun 1531 meets her on the 18724 line (she wants a favour), so the start is reachable again later."
+      "why": "Mundy Smis, cousin of Vil, in the dark summit for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): showing Vil's glove (22370, not spent) is 8724 and she answers 18724. Her letters quest (1531) adds its lines. «Messager clandestin» (1531; Dofus pour les noobs («Messager clandestin»)): after the glove (18724) «¿El qué?» (22369) and «Seguir escuchando» (22368) lead to the letters (18725, 18726) and «Ir a repartir los sobres» (22367) starts 1531; with the nine deliveries done «Ya he cumplido la tarea que me confiaste» (22430) is 8741 and she tells of the queen's mother (18783-18785). INFERRED order. Fix: whoever finished 1530 and has not begun 1531 meets her on the 18724 line (she wants a favour), so the start is reachable again later. «La voix de son maître» (1532): in the alley «¿Qué estás haciendo aquí?» (22488) -> 18842 and «Girarse hacia Deil Harden» (22487) ticks 8750; Dofus pour les noobs («La voix de son maître»)."
     },
     {
       "npc": 3326,
@@ -64108,7 +64141,7 @@
         {
           "message": 50643,
           "choices": [
-            { "reply": 67881 },
+            { "reply": 67881, "gives": 26685, "quest": 2444, "afterObjective": 18479, "beforeObjective": 18578 },
             { "reply": 67889, "next": 50644, "quest": 2444, "afterObjective": 18578, "beforeObjective": 18481, "completes": 18481, "params": [[30, 18481]] }
           ]
         },
@@ -64598,6 +64631,463 @@
         }
       ],
       "why": "Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights). Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights)."
+    },
+    {
+      "npc": 2344,
+      "map": 137367552,
+      "opening": 18825,
+      "openings": [
+        { "quest": 1532, "objective": 8746, "pending": 8747, "message": 18836 }
+      ],
+      "lines": [
+        {
+          "message": 18825,
+          "choices": [
+            { "reply": 22475, "criterion": "Qf=1531&Qa!1532&Qf!1532", "startsQuest": 1532, "params": [[34, 1532]], "next": 18826 }
+          ]
+        },
+        {
+          "message": 18826,
+          "choices": [
+            { "reply": 22474, "next": 18827 }
+          ]
+        },
+        {
+          "message": 18827,
+          "choices": [
+            { "reply": 22473, "next": 18828 }
+          ]
+        },
+        {
+          "message": 18828,
+          "choices": [
+            { "reply": 22472, "next": 18829 }
+          ]
+        },
+        {
+          "message": 18829,
+          "choices": [
+            { "reply": 22470, "next": 18830 },
+            { "reply": 22471 }
+          ]
+        },
+        {
+          "message": 18830,
+          "choices": [
+            { "reply": 21286 }
+          ]
+        },
+        {
+          "message": 18836,
+          "choices": [
+            { "reply": 22485, "next": 18837 },
+            { "reply": 22484, "next": 18838 }
+          ]
+        },
+        {
+          "message": 18837,
+          "choices": [
+            { "quest": 1532, "completes": 8747, "params": [[30, 8747]], "reply": 22483 }
+          ]
+        },
+        {
+          "message": 18838,
+          "choices": [
+            { "quest": 1532, "completes": 8747, "params": [[30, 8747]], "reply": 22483 }
+          ]
+        }
+      ],
+      "why": "Zap Gobdon (Zab Gobdon in French) in the Torturer's tavern [5,2]: «Estoy disponible» (22475, «dire que vous êtes actuellement disposé à l'aider») starts 1532 after 1531 and the plan is told (18826-18830); on coming back from the prison «No, el cofre estaba vacío» / «he dado un rodeo pasando por la casilla de prisión» (22485, 22484) and «Vale, voy al barrio de la cima tenebrosa» (22483) close 8747. Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "npc": 2343,
+      "map": 0,
+      "opening": 18831,
+      "openings": [
+        { "quest": 1532, "pending": 8743, "message": 18831 },
+        { "quest": 1532, "objective": 8750, "pending": 8753, "message": 18844 }
+      ],
+      "lines": [
+        {
+          "message": 18831,
+          "choices": [
+            { "quest": 1532, "completes": 8743, "params": [[30, 8743]], "reply": 22477, "gives": 15531, "next": 18832, "criterion": "Qo<8743" }
+          ]
+        },
+        {
+          "message": 18832,
+          "choices": [
+            { "reply": 22476 }
+          ]
+        },
+        {
+          "message": 18844,
+          "choices": [
+            { "reply": 22492, "next": 18845 }
+          ]
+        },
+        {
+          "message": 18845,
+          "choices": [
+            { "reply": 22491, "next": 18846 }
+          ]
+        },
+        {
+          "message": 18846,
+          "choices": [
+            { "quest": 1532, "completes": 8753, "params": [[30, 8753]], "reply": 22490, "next": 18847 },
+            { "quest": 1532, "completes": 8753, "params": [[30, 8753]], "reply": 22489, "next": 18847 }
+          ]
+        },
+        {
+          "message": 18847,
+          "choices": []
+        }
+      ],
+      "why": "Deil Harden (Belle Adrenne in French): «Necesito el gancho oxidado» (22477) gives the rusty hook (15531) and ticks 8743; in the Conspirators' alley «Lo cierto es que yo no he tenido más suerte que tú» (22492), «Seguro que tendremos que pagar...» (22491) and «¿Por qué me hablas de usted de repente?» (22490, 8753) show the queen's disguise (18844-18847). Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "npc": 2447,
+      "map": 0,
+      "opening": 18848,
+      "openings": [
+        { "quest": 1532, "objective": 8753, "pending": 8755, "message": 18848 }
+      ],
+      "lines": [
+        {
+          "message": 18848,
+          "choices": [
+            { "reply": 22498, "next": 18849 }
+          ]
+        },
+        {
+          "message": 18849,
+          "choices": [
+            { "reply": 22497, "next": 18851 }
+          ]
+        },
+        {
+          "message": 18851,
+          "choices": [
+            { "reply": 22496, "next": 18850 }
+          ]
+        },
+        {
+          "message": 18850,
+          "choices": [
+            { "reply": 22495, "next": 18852 }
+          ]
+        },
+        {
+          "message": 18852,
+          "choices": [
+            { "reply": 22494, "next": 18853 }
+          ]
+        },
+        {
+          "message": 18853,
+          "choices": [
+            { "quest": 1532, "completes": 8755, "params": [[30, 8755]], "reply": 22493 }
+          ]
+        }
+      ],
+      "why": "The Queen of Thieves unmasked in the Conspirators' alley (Dofus pour les noobs: «Belle Adrenne est en fait la Reine des Voleurs qui avait prise sont apparence»): «Yo te conozco, ¡eres la Reina de los Ladrones!» (22498), «¿Por qué contrataste a Lonyon...?» (22497) and the three listens (22496, 22495, 22494) end on «Hasta luego» (22493), which ticks 8755 (18848-18853). Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "npc": 2543,
+      "map": 0,
+      "opening": 18647,
+      "lines": [
+        {
+          "message": 18647,
+          "choices": [
+            { "reply": 22482, "criterion": "PO=15464", "next": 18648 }
+          ]
+        },
+        {
+          "message": 18648,
+          "choices": [
+            { "reply": 22481, "next": 18835 }
+          ]
+        },
+        {
+          "message": 18835,
+          "choices": []
+        }
+      ],
+      "why": "Rebanacuellos (Coupe-Gorge in French) at the Cima tenebrosa grille [6,-2]: «Aquí tienes el guante de Vil Smis» (22482), «Entrar» (22481); 18647 refuses, 18648 and 18835 let the bearer of the glove pass. The grille itself is open in the engine. Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "npc": 2559,
+      "map": 0,
+      "opening": 18121,
+      "lines": [
+        {
+          "message": 18121,
+          "choices": [
+            { "reply": 21727, "next": 18122 }
+          ]
+        },
+        {
+          "message": 18122,
+          "choices": [
+            { "reply": 21728, "quest": 1532, "criterion": "PO=15530", "takes": 15530, "takesCount": 20, "passage": 2559001 }
+          ]
+        }
+      ],
+      "why": "Carcelera de Sramvil in the prison: «¿Cómo puedo salir de la celda?» (21727) -> «Pela 20 batatas» (18122); «Aquí tienes todas las batatas» (21728) takes the 20 sweet potatoes (15530) and lets the player out to the tavern (the walkthrough's solution 1). Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+    },
+    {
+      "npc": 3244,
+      "map": 0,
+      "opening": 23775,
+      "openings": [
+        { "quest": 1732, "pending": 11005, "message": 23800, "objective": 11004 },
+        { "quest": 1732, "pending": 11004, "message": 23797, "objective": 11003 },
+        { "quest": 1732, "pending": 11003, "message": 23790, "objective": 11002 },
+        { "quest": 1732, "pending": 11002, "message": 23789, "objective": 11001 },
+        { "quest": 1732, "pending": 11001, "message": 23789, "objective": 11000 },
+        { "quest": 1732, "pending": 11000, "message": 23788, "objective": 10999 },
+        { "quest": 1732, "pending": 10999, "message": 23787, "objective": 10998 },
+        { "quest": 1732, "pending": 10998, "message": 23786, "objective": 10997 },
+        { "quest": 1732, "pending": 10997, "message": 23784, "objective": 10996 },
+        { "quest": 1732, "pending": 10996, "message": 23779, "objective": 10995 },
+        { "quest": 1732, "pending": 10995, "message": 23779, "objective": 10994 },
+        { "quest": 1732, "pending": 10994, "message": 23779, "objective": 10993 },
+        { "quest": 1732, "pending": 10993, "message": 23779, "objective": 10992 },
+        { "quest": 1732, "pending": 10992, "message": 23779, "objective": 10991 },
+        { "quest": 1732, "pending": 10991, "message": 23779, "objective": 10990 },
+        { "quest": 1732, "pending": 10990, "message": 23779, "objective": 10989 },
+        { "quest": 1732, "pending": 10989, "message": 23780, "objective": 10988 },
+        { "quest": 1732, "pending": 10988, "message": 23779, "objective": 10987 },
+        { "quest": 1732, "pending": 10987, "message": 23779 }
+      ],
+      "lines": [
+        {
+          "message": 23775,
+          "choices": [
+            { "reply": 28572, "next": 23776 },
+            { "reply": 28571 }
+          ]
+        },
+        {
+          "message": 23776,
+          "choices": [
+            { "reply": 28577, "next": 23777 }
+          ]
+        },
+        {
+          "message": 23777,
+          "names": true,
+          "choices": [
+            { "reply": 28570, "next": 23778 }
+          ]
+        },
+        {
+          "message": 23778,
+          "choices": [
+            { "reply": 28569, "startsQuest": 1732, "params": [[34, 1732]] }
+          ]
+        },
+        {
+          "message": 23779,
+          "choices": [
+            { "reply": 28574, "quest": 1732 },
+            { "reply": 28579, "quest": 1732, "next": 23780, "holds": 17860, "beforeObjective": 10988, "completes": 10988, "params": [[30, 10988]], "afterObjective": 10987 },
+            { "reply": 28582, "quest": 1732, "next": 23784, "beforeObjective": 10996, "completes": 10996, "params": [[30, 10996]], "afterObjective": 10995 }
+          ]
+        },
+        {
+          "message": 23780,
+          "choices": [
+            { "reply": 28575, "quest": 1732, "beforeObjective": 10989, "completes": 10989, "params": [[30, 10989]], "afterObjective": 10988 }
+          ]
+        },
+        {
+          "message": 23784,
+          "choices": [
+            { "reply": 28580 }
+          ]
+        },
+        {
+          "message": 23786,
+          "choices": [
+            { "reply": 28584, "quest": 1732, "next": 23787, "beforeObjective": 10998, "completes": 10998, "params": [[30, 10998]], "afterObjective": 10997 }
+          ]
+        },
+        {
+          "message": 23787,
+          "choices": [
+            { "reply": 28583 }
+          ]
+        },
+        {
+          "message": 23788,
+          "choices": [
+            { "reply": 28586, "next": 23789 }
+          ]
+        },
+        {
+          "message": 23789,
+          "choices": [
+            { "reply": 28585, "quest": 1732, "beforeObjective": 11000, "completes": 11000, "params": [[30, 11000]], "gives": 17861, "afterObjective": 10999 }
+          ]
+        },
+        {
+          "message": 23790,
+          "names": true,
+          "choices": [
+            { "reply": 28593, "next": 23791 }
+          ]
+        },
+        {
+          "message": 23791,
+          "choices": [
+            { "reply": 28590, "quest": 1732, "next": 23797, "beforeObjective": 11003, "completes": 11003, "params": [[30, 11003]], "afterObjective": 11002 }
+          ]
+        },
+        {
+          "message": 23797,
+          "choices": [
+            { "reply": 28595, "quest": 1732, "afterObjective": 11003, "beforeObjective": 11004 }
+          ]
+        },
+        {
+          "message": 23800,
+          "choices": [
+            { "reply": 28602, "quest": 1732, "next": 23801, "beforeObjective": 11005, "completes": 11005, "params": [[30, 11005]], "afterObjective": 11004 }
+          ]
+        },
+        {
+          "message": 23801,
+          "names": true,
+          "choices": [
+            { "reply": 28601 }
+          ]
+        }
+      ],
+      "why": "Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602). Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602)."
+    },
+    {
+      "npc": 3272,
+      "map": 0,
+      "opening": 23808,
+      "openings": [
+        { "quest": 1732, "objective": 10991, "pending": 10992, "message": 23810 }
+      ],
+      "lines": [
+        {
+          "message": 23808,
+          "choices": [
+            { "reply": 28609, "next": 23809, "quest": 1732, "beforeObjective": 10990, "completes": 10990, "params": [[30, 10990]] },
+            { "reply": 28611 }
+          ]
+        },
+        {
+          "message": 23809,
+          "choices": [
+            { "reply": 28610, "quest": 1732, "afterObjective": 10990, "beforeObjective": 10991 },
+            { "reply": 28608 }
+          ]
+        },
+        {
+          "message": 23810,
+          "choices": [
+            { "reply": 28614, "next": 23811 }
+          ]
+        },
+        {
+          "message": 23811,
+          "choices": [
+            { "reply": 28613, "next": 23812 }
+          ]
+        },
+        {
+          "message": 23812,
+          "choices": [
+            { "reply": 28612, "quest": 1732, "afterObjective": 10991, "beforeObjective": 10992, "completes": 10992, "params": [[30, 10992]] }
+          ]
+        }
+      ],
+      "why": "Sesina la Sordina (3272), abandoned building [11,20]: 1732: 28609 is the question about Rykke Zane (23809), 28610 attacks her (fight in npc_fights), after the fight she says where he was last seen (23810 to 23812). Sesina la Sordina (3272), abandoned building [11,20]: 1732: 28609 is the question about Rykke Zane (23809), 28610 attacks her (fight in npc_fights), after the fight she says where he was last seen (23810 to 23812)."
+    },
+    {
+      "npc": 3274,
+      "map": 0,
+      "opening": 23814,
+      "openings": [
+        { "quest": 1732, "objective": 10994, "pending": 10995, "message": 23816 }
+      ],
+      "lines": [
+        {
+          "message": 23814,
+          "choices": [
+            { "reply": 28621, "next": 23815, "quest": 1732, "afterObjective": 10992, "beforeObjective": 10993, "completes": 10993, "params": [[30, 10993]] },
+            { "reply": 28617 }
+          ]
+        },
+        {
+          "message": 23815,
+          "choices": [
+            { "reply": 28616, "quest": 1732, "afterObjective": 10993, "beforeObjective": 10994 },
+            { "reply": 28617 }
+          ]
+        },
+        {
+          "message": 23816,
+          "choices": [
+            { "reply": 28622, "next": 23817 }
+          ]
+        },
+        {
+          "message": 23817,
+          "choices": [
+            { "reply": 28620, "next": 23818 }
+          ]
+        },
+        {
+          "message": 23818,
+          "choices": [
+            { "reply": 28619, "next": 23819 }
+          ]
+        },
+        {
+          "message": 23819,
+          "choices": [
+            { "reply": 28618, "quest": 1732, "afterObjective": 10994, "beforeObjective": 10995, "completes": 10995, "params": [[30, 10995]] }
+          ]
+        }
+      ],
+      "why": "Kalahfate (3274), shipwright at [15,18]: 1732: the question about Rykke Zane (28621, 23815), the attack (28616, fight in npc_fights), then what he saw: the flute and the tentacles (23816 to 23819). Kalahfate (3274), shipwright at [15,18]: 1732: the question about Rykke Zane (28621, 23815), the attack (28616, fight in npc_fights), then what he saw: the flute and the tentacles (23816 to 23819)."
+    },
+    {
+      "npc": 3275,
+      "map": 0,
+      "opening": 23820,
+      "lines": [
+        {
+          "message": 23820,
+          "choices": [
+            { "reply": 28623, "next": 23823 },
+            { "reply": 28624, "next": 23821, "quest": 1732, "holds": 17860, "afterObjective": 11000, "beforeObjective": 11001, "completes": 11001, "params": [[30, 11001]] }
+          ]
+        },
+        {
+          "message": 23821,
+          "choices": []
+        },
+        {
+          "message": 23823,
+          "choices": [
+            { "reply": 28625, "next": 23822 }
+          ]
+        },
+        {
+          "message": 23822,
+          "choices": []
+        }
+      ],
+      "why": "Espiritu melancolico (3275), the cold plateau [27,27]: 1732: silent until the lute is shown to it (28624, 23821, objective 11001). Espiritu melancolico (3275), the cold plateau [27,27]: 1732: silent until the lute is shown to it (28624, 23821, objective 11001)."
     }
   ]
 }

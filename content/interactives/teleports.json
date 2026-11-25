@@ -1482,6 +1482,42 @@
       "toMap": 54171984,
       "toCell": 268,
       "why": "Caverna del Destino (111673344): the way back out to the keeper's map 54171984 (Nordalie 1909 walks in and out of the cave). Element 505527, the only element on the cave's lower rim."
-    }
+    },
+  {
+   "map": 137367812,
+   "element": 485548,
+   "cell": 393,
+   "gfx": 46072,
+   "type": 0,
+   "skill": 114,
+   "toMap": 137890818,
+   "toCell": 299,
+   "criterion": "Qa=1532&Qo>8743",
+   "why": "The door of the house of the Conspirators' alley opens onto its chest room once the lockpick is made (INFERRED passage; Dofus pour les noobs, «La voix de son maître»)."
+  },
+  {
+   "map": 137890818,
+   "element": 485500,
+   "cell": 286,
+   "gfx": 46581,
+   "type": 85,
+   "skill": 114,
+   "toMap": 137369602,
+   "toCell": 300,
+   "criterion": "Qa=1532&Qo>8745&Qo<8746",
+   "why": "The empty chest: the guards take the thief to the prison of Sramvil (INFERRED passage; Dofus pour les noobs, «La voix de son maître»)."
+  },
+  {
+   "map": 137369602,
+   "element": 2559001,
+   "npc": 2559,
+   "cell": 300,
+   "gfx": 0,
+   "type": -1,
+   "skill": 0,
+   "toMap": 137367552,
+   "toCell": 300,
+   "why": "The jailer lets the player out of the prison, to the tavern where Zap Gobdon waits (INFERRED; Dofus pour les noobs, «La voix de son maître»)."
+  }
   ]
 }

@@ -7714,14 +7714,6 @@
    "why": "«Escolta a Poly Perkin hasta Sufokia» (644086): the surface basin at [23,24] is the palace map 170133506 (Dofus pour les noobs: «Ramenez Pollie à la surface devant le bassin en [23,24]»); stepping on it closes the escort."
   },
   {
-   "objective": 10975,
-   "quest": 1731,
-   "kind": "enter",
-   "map": 169083904,
-   "afterObjectives": [10974],
-   "why": "«Descend into the sea depths» (area 860): the objective is an area discovery, but the arrival on map 169083904 reaches the quest code with no subarea for this map, so the area never matched; the map itself is where the basin leads (Dofus pour les noobs: «Descendez dans les fonds marins en cliquant sur le bassin»)."
-  },
-  {
    "objective": 8721,
    "quest": 1530,
    "kind": "enter",
@@ -7729,6 +7721,65 @@
    "afterObjectives": [8720],
    "overridesMap": true,
    "why": "«Obtén el acceso a la dimensión Sramvil y preséntate ante el portal» (1132308): the objective carries the Travelers Tower map, but the portal of the Amakna village lands on Sramvil's arrival map 134351108, so the enter row overrides the map (Dofus pour les noobs, «La cité de l'indicible mal»)."
+  },
+  {
+   "objective": 8744,
+   "quest": 1532,
+   "kind": "click",
+   "elements": [{"map": 137367812, "element": 485548}],
+   "afterObjectives": [8743],
+   "requires": [{"item": 15533, "count": 1}],
+   "spends": true,
+   "why": "«Fuerza la puerta de la casa del callejón de los Conspiradores» (453657): the lock is picked with the lockpick (15533, made from the rusty hook) and it is lost (Dofus pour les noobs («La voix de son maître»)). Door element INFERRED: a prop of the alley map (gfx 46072)."
+  },
+  {
+   "objective": 8745,
+   "quest": 1532,
+   "kind": "click",
+   "elements": [{"map": 137890818, "element": 485500}],
+   "afterObjectives": [8744],
+   "why": "«Abre el cofre de la casa» (453811): the chest of the house is empty and the guards take the thief to the prison (Dofus pour les noobs («La voix de son maître»))."
+  },
+  {
+   "objective": 8746,
+   "quest": 1532,
+   "kind": "reply",
+   "replies": [21728],
+   "afterObjectives": [8745],
+   "why": "«Sal de la prisión de Sramvil» (453812): the jailer lets whoever brings the 20 sweet potatoes out (21728; Dofus pour les noobs («La voix de son maître»))."
+  },
+  {
+   "objective": 8748,
+   "quest": 1532,
+   "kind": "reply",
+   "replies": [22481],
+   "afterObjectives": [8747],
+   "why": "«Habla con el Rebanacuellos» (453810): showing him the glove (22482) and «Entrar» (22481) lets the player through to the alley (Dofus pour les noobs («La voix de son maître»))."
+  },
+  {
+   "objective": 10987,
+   "quest": 1732,
+   "kind": "click",
+   "elements": [{"map": 99096075, "element": 497312}],
+   "gives": [{"item": 17860, "count": 1}],
+   "why": "«Busca a Rykke Zane por los alrededores de Sufokia» (644038): the rock of the shipwreck [15,21] hands over Rykke's old lute (17860) (Dofus pour les noobs: Cliquez sur le rocher au milieu de la map afin d'obtenir un Vieux luth); element 497312, the only one of the room without a skill, is INFERRED."
+  },
+  {
+   "objective": 10999,
+   "quest": 1732,
+   "kind": "enter",
+   "map": 168558592,
+   "afterObjectives": [10998],
+   "why": "«Encuentrate con Sered en Ryluglugló» (644134): the plateau [25,26], the objective's own map."
+  },
+  {
+   "objective": 11004,
+   "quest": 1732,
+   "kind": "beat",
+   "monster": 4466,
+   "map": 168560642,
+   "afterObjectives": [11003],
+   "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs)."
   }
 ]
 }
