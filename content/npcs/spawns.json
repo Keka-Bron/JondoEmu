@@ -7447,24 +7447,16 @@
       "npc": 2655,
       "cell": 284,
       "orientation": 1,
-      "criterion": "Qa=1572&Qo>9257&Qo<9260",
-      "why": "Dofus pour les noobs («Énergie renouvelable»): in the Temple of Time, as a follower. INFERRED cell."
+      "criterion": "(Qa=1572&Qo>9257&Qo<9260)|Qa=1573",
+      "why": "Dofus pour les noobs («Énergie renouvelable», «Traitement de choc»): in the Temple of Time, as a follower on 1572's last steps and as the frozen zaap master on 1573; one row, since both stand on the same cell. INFERRED cell."
     },
     {
       "map": 145489920,
-      "npc": 2655,
-      "cell": 284,
-      "orientation": 1,
-      "criterion": "Qa=1573",
-      "why": "Dofus pour les noobs («Traitement de choc»): the frozen zaap master in the Temple of Time. INFERRED cell."
-    },
-    {
-      "map": 145489920,
-      "npc": 2708,
+      "npc": 2652,
       "cell": 298,
       "orientation": 1,
       "criterion": "Qa=1573",
-      "why": "Dofus pour les noobs («Traitement de choc»): the Doctor's Krosmoglob in the Temple. INFERRED cell."
+      "why": "Dofus pour les noobs («Traitement de choc»): the Doctor's Krosmoglob in the Temple. The client gives its line 19241 and replies 22938/22956 to NPC 2652 (2708 is Belle Adrenne's Krosmoglob, whose template has none of them, so the replies showed blank). INFERRED cell."
     },
     {
       "map": 155976192,
@@ -8774,6 +8766,28 @@
       "orientation": 1,
       "criterion": "Qa=1750&Qo>11174&Qo<11181",
       "why": "Deks assistant at the machine [20,27] once the player has escorted him there (11174), until the quest is reported."
-    }
+    },
+    {"map": 179308034, "npc": 4201, "cell": 284, "orientation": 3, "criterion": "Qa=1936&Qo>13445&Qo<13446&PO!19392", "why": "The iridescent nemroza posing as a bush on [-64,30], in sight of the hunters' camp, until the character holds the rainbow powder (1936; Dofus pour les noobs («Le jour des assassins»): «Allez en [-64,30] pour parler au Nemroz chatoyant»). INFERRED cell."},
+    {"map": 179308545, "npc": 3812, "cell": 302, "orientation": 3, "criterion": "Qa=1936&Qo>13447&Qo<13448", "why": "The excited magicorrinco of Animatopia's glade [-63,29] the character practises the lullaby on (1936; Dofus pour les noobs («Le jour des assassins»): «Parlez au Magypus qui semble tout excité»). INFERRED cell."},
+{"map": 88086291, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=1", "why": "The Asesino mediomuerto at the Feca temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 68420104, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=2", "why": "The Asesino mediomuerto at the Osamodas temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 128974850, "npc": 4202, "cell": 283, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=3", "why": "The Asesino mediomuerto at the Enutrof temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88213783, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=4", "why": "The Asesino mediomuerto at the Sram temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88081685, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=5", "why": "The Asesino mediomuerto at the Xelor temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 185863685, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=6", "why": "The Asesino mediomuerto at the Ecaflip temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 68419591, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=7", "why": "The Asesino mediomuerto at the Eniripsa temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88080659, "npc": 4202, "cell": 282, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=8", "why": "The Asesino mediomuerto at the Iop temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88212756, "npc": 4202, "cell": 282, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=9", "why": "The Asesino mediomuerto at the Cra temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88212238, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=10", "why": "The Asesino mediomuerto at the Sadida temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88213786, "npc": 4202, "cell": 288, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=11", "why": "The Asesino mediomuerto at the Sacrieur temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88081689, "npc": 4202, "cell": 327, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=12", "why": "The Asesino mediomuerto at the Pandawa temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88081684, "npc": 4202, "cell": 288, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=13", "why": "The Asesino mediomuerto at the Roublard temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 101713423, "npc": 4202, "cell": 283, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=14", "why": "The Asesino mediomuerto at the Zobal temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 68420616, "npc": 4202, "cell": 284, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=15", "why": "The Asesino mediomuerto at the Steamer temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88082199, "npc": 4202, "cell": 301, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=16", "why": "The Asesino mediomuerto at the Eliotrope temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88214297, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=17", "why": "The Asesino mediomuerto at the Huppermage temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 176555010, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=18", "why": "The Asesino mediomuerto at the Ouginak temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 88212755, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=19", "why": "The Asesino mediomuerto at the Forgelance temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
+{"map": 177209344, "npc": 4200, "cell": 413, "orientation": 1, "criterion": "Qa=1936&Qo>13449&Qo<13450", "why": "The guardian molocan (4200) Chalcas lends once the character has taught him the lullaby (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): Chalcas hands over a molosk after smelling the magypus). INFERRED cell: beside Chalcas."}
   ]
 }

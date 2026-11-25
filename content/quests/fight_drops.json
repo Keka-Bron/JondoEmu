@@ -248,6 +248,7 @@
    "percent": 20,
    "criterion": "Qa=1764&PB=861&Qo<11269",
    "why": "«Le vieux gob et la mer» (1764): the centenary greuvettes drop at 20 % base on the monsters of the Old Sufokia zone only (Dofus pour les noobs)."
-  }
+  },
+  {"item": 19392, "percent": 100, "monsters": [5164], "criterion": "Qa=1936&Qo>13445&Qo<13446", "why": "«El día de los asesinos» (1936): the iridescent nemroza gives the rainbow powder Doktari mixes into the sand (Dofus pour les noobs («Le jour des assassins»): «vous récupérez de la Poudre d'arc-en-ciel»)."}
   ]
 }

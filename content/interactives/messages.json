@@ -504,6 +504,8 @@
         { "item": 31477, "count": 1 }
       ],
       "what": "pressed on the official server: iqx 31477 (roleplay buff, put on), lof 21, kjm; a second press was not measured, so it is given only to who has none"
-    }
+    },
+    {"map": 145097728, "element": 486746, "type": 249, "cases": [{"gives": [{"item": 15855, "count": 7}], "stacks": true, "uses": 5, "lockFor": 300}], "what": "Quest 1572 (Énergie renouvelable): the left sundial of [2,6] («Clock That's 7 Minutes Fast», gfx 48661, a fast clock) gives 7 Minute from Xelorium (15855) at each use. Dofus pour les noobs: «prenez 3 fois 7 minutes sur le cadran de gauche et 1 fois 2 minutes sur celui de droite»; each dial gives or takes its own number of minutes and, after many uses, rests for a few minutes. INFERRED: left and right by the cells (259 left of 360), the 5 uses before the dial rests and its 300 seconds of rest."},
+    {"map": 145097728, "element": 486747, "type": 247, "cases": [{"gives": [{"item": 15855, "count": 2}], "stacks": true, "uses": 5, "lockFor": 300}], "what": "Quest 1572 (Énergie renouvelable): the right sundial of [2,6] («Clock That's 2 Minutes Fast», gfx 48661, a fast clock) gives 2 Minute from Xelorium (15855) at each use. Dofus pour les noobs: «prenez 3 fois 7 minutes sur le cadran de gauche et 1 fois 2 minutes sur celui de droite»; each dial gives or takes its own number of minutes and, after many uses, rests for a few minutes. INFERRED: left and right by the cells (259 left of 360), the 5 uses before the dial rests and its 300 seconds of rest."}
   ]
 }

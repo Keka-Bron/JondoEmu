@@ -7880,20 +7880,23 @@
    "objective": 9254,
    "quest": 1572,
    "kind": "click",
-   "elements": [{"map": 144968704, "element": 486741}],
+   "elements": [{"map": 144968704, "element": 486716}],
+   "type": 241,
    "afterObjectives": [9253],
    "requires": [{"item": 15855, "count": 23}],
    "spends": true,
-   "why": "«Abre el cofre»: the old chest shows XXIII and wants 23 Xelorium minutes (Dofus pour les noobs («Énergie renouvelable»))."
+   "why": "«Abre el cofre»: the old chest of [6,6] (486716, gfx 3027, the only one in the subarea; type 241 «Old Chest XXIII» on hover) shows XXIII and wants 23 Xelorium minutes, taken from the sundials (Dofus pour les noobs («Énergie renouvelable»)). The element 486741 bound before was one of the map's slow clocks (gfx 48662)."
   },
   {
    "objective": 9255,
    "quest": 1572,
    "kind": "click",
-   "elements": [{"map": 144968704, "element": 486741}],
+   "elements": [{"map": 144968704, "element": 486716}],
+   "type": 241,
    "afterObjectives": [9254],
+   "afterElement": -1572001,
    "gives": [{"item": 15851}],
-   "why": "«Mete el oricor inestable...» (the chest's second click): takes the unstable orichor (Dofus pour les noobs («Énergie renouvelable»)). The two ambush fights are not triggered by it (engine gap)."
+   "why": "«Mete el oricor inestable...»: the opened chest, clicked again, first ambushes the character (npc_fights.json, element 486716: three waves alone, then four monsters with a Krosmoglob beside him); the second fight won (mark -1572001), the chest gives the unstable orichor (Dofus pour les noobs («Énergie renouvelable»): «Re-cliquez sur le coffre pour enfin récupérer votre Orichor instable»)."
   },
   {
    "objective": 9258,
@@ -9757,6 +9760,9 @@
    "afterObjectives": [11173],
    "showsNpc": 3298,
    "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant follows the player (follower item 18118, given with his agreement 29363) down to the machine's map [20,27]; arriving there ticks the escort and he stands at the machine (Dofus pour les noobs: «Retournez en [20,27]»)."
-  }
+  },
+  {"objective": 13444, "quest": 1936, "kind": "click", "elements": [{"map": 179307011, "element": 509881}], "gives": [{"item": 19496, "count": 1}], "why": "«Consigue pelos de magicorrinco» (739750): the hole at the foot of the tree left of the river on [-66,31] gives a few magicorrinco hairs (Dofus pour les noobs («Le jour des assassins»): «cliquez sur le trou au pied du tronc d'arbre à gauche de la rivière»). INFERRED element: the map's graphic 40689 on cell 294."},
+  {"objective": 13450, "quest": 1936, "kind": "talk", "npc": 4202, "afterObjectives": [13449], "why": "«Patrulla en los alrededores de tu templo con el molocán guardián» (744922): the patrol ends on finding the Asesino mediomuerto around the class temple (Dofus pour les noobs («Le jour des assassins»): «Une fois que vous avez trouvé l'assassin, le molosk qui vous suivait prend peur et se sauve»); speaking to him ticks it."},
+  {"objective": 13451, "quest": 1936, "kind": "beat", "monster": 5174, "afterObjectives": [13450], "why": "«Vence al asesino enviado por Toxina» (739849): the Asesino mediomuerto fought alone (Dofus pour les noobs («Le jour des assassins»))."}
 ]
 }
