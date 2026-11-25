@@ -9755,7 +9755,8 @@
    "kind": "walk",
    "map": 168821762,
    "afterObjectives": [11173],
-   "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant follows the player (follower item 18118, given with his agreement 29363) down to the machine's map [20,27]; arriving there ticks the escort (Dofus pour les noobs: «Retournez en [20,27]»)."
+   "showsNpc": 3298,
+   "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant follows the player (follower item 18118, given with his agreement 29363) down to the machine's map [20,27]; arriving there ticks the escort and he stands at the machine (Dofus pour les noobs: «Retournez en [20,27]»)."
   }
 ]
 }

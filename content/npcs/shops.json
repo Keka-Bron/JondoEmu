@@ -609,6 +609,7 @@
       "items": [
         {"gid": 17867, "price": 20, "criterion": "Qf=1740"},
         {"gid": 17865, "price": 20, "criterion": "Qf=1734"},
+        {"gid": 17864, "price": 5},
         {"gid": 17868, "price": 20, "criterion": "Qf=1742"},
         {"gid": 17869, "price": 20, "criterion": "Qf=1745"},
         {"gid": 17870, "price": 20, "criterion": "Qf=1756"},

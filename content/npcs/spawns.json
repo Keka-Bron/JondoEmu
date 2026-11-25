@@ -7158,11 +7158,11 @@
       "why": "Zap Gobdon, in the chest costume, from «Orichomania» (1486): «Parlez à Zap Gobdon qui a l'apparence d'un coffre» (Dofus pour les noobs («Orichomania»)). INFERRED cell."
     },
     {
-      "map": 98567681,
+      "map": 88084998,
       "npc": 3333,
-      "cell": 312,
+      "cell": 381,
       "orientation": 3,
-      "why": "Colonel Ilkor (3333) is on the Peninsula of the Gelatins [10,29] (Dofus pour les noobs, «Competencia desleal»: «Allez en [10,29]... le Colonel»); the client's map data holds no placement, so he stands on a free cell in the open, in sight of the arrival."
+      "why": "Colonel Ilkor (3333) stands on the open Amakna Peninsula of the Gelatins map [10,29] (not the dimension room), on the beach-side grass left of the palms, as in the Dofus pour les noobs picture of his dialogue."
     },
     {
       "map": 221249536,
@@ -8770,7 +8770,7 @@
     {
       "map": 168821762,
       "npc": 3298,
-      "cell": 271,
+      "cell": 272,
       "orientation": 1,
       "criterion": "Qa=1750&Qo>11174&Qo<11181",
       "why": "Deks assistant at the machine [20,27] once the player has escorted him there (11174), until the quest is reported."
