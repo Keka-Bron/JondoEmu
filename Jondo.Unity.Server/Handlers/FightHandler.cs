@@ -2276,7 +2276,7 @@ namespace Jondo.Unity.Server.Handlers
             fight.Sacrificed = true;
             guard.CurrentHP = 0;
             CarriedFollows(fight, guard);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(guard.Id, guard.Id)));
+            await ATodosAsync(fight, CombatActions.Death(guard.Id, guard.Id));
             await CaenSusInvocadosAsync(stream, fight, guard);
             fight.RebuildTurnOrderOnFighterDeath();
             if (fight.WonByEffect < 0) fight.WonByEffect = quien.TeamId;
