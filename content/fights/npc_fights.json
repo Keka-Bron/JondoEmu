@@ -1995,6 +1995,16 @@
       "monsters": [ { "monster": 4910, "grade": 1 } ] },
     { "npc": 3914, "map": 172098570, "reply": 33255, "solo": true, "byLevel": true,
       "monsters": [ { "monster": 4931, "grade": 1 } ],
-      "why": "1868 (DPLN La voix des morts): threatening the partisan (33255) starts the useless fight against the Imaguni follower of the bermanes camp [-29,4] (DPLN: the other choice launches a useless fight, no more information). Monster 4931, solo; win or defeat changes nothing in the quest." }
+      "why": "1868 (DPLN La voix des morts): threatening the partisan (33255) starts the useless fight against the Imaguni follower of the bermanes camp [-29,4] (DPLN: the other choice launches a useless fight, no more information). Monster 4931, solo; win or defeat changes nothing in the quest." },
+    { "npc": 2585, "map": 136052996, "reply": 35678, "criterion": "PO=19428", "byLevel": true,
+      "monsters": [ { "monster": 5153, "grade": 0 }, { "monster": 5154, "grade": 0 } ],
+      "allies": [ { "monster": 5155, "grade": 0 } ], "allyProof": [ 5155 ],
+      "why": "The Desosseur chief's minions (1934): the player and Incognita's bodyguard (monster 5155, the follower 19428 he walks with) against two Desosseurs, all at the player's level (grades 40-200). The bodyguard takes no damage from his side. Lost, the follower is spent and is taken back at the tavern (Dofus pour les noobs, «La bande des Toxines»)." },
+    { "npc": 2541, "map": 135269891, "reply": 35688, "criterion": "PO=19428", "byLevel": true,
+      "monsters": [ { "monster": 5156, "grade": 0 } ],
+      "allies": [ { "monster": 5155, "grade": 0 } ], "allyProof": [ 5155 ],
+      "sacrifice": { "ally": 5155, "message": 855, "takes": 19428 }, "winMessage": 854,
+      "winMap": 187304450, "winCell": 300,
+      "why": "The ambush in the catacombs (1934): the bodyguard fights beside the player; on the blow that would kill the player he dies in his place and the fight ends (855), otherwise the poison cloud of the win (854). Either way the toxins carry the player to their cell. Lost with the bodyguard already down, it is fought again." }
   ]
 }

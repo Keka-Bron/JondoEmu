@@ -8650,6 +8650,94 @@
       "orientation": 1,
       "criterion": "Qf!590&Qo<3755",
       "why": "Dofus pour les noobs («Promenons nous dans les bois»): Grimebène (Bern Grim) in the wood until he is escorted. INFERRED cell."
+    },
+    {
+      "map": 177209344,
+      "npc": 2594,
+      "cell": 431,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo<13412",
+      "why": "The Sramvil portal in the Uginak temple [8,-67] while the character has not crossed (Dofus pour les noobs, «Le gang des Toxines»). INFERRED cell."
+    },
+    {
+      "map": 137367552,
+      "npc": 3502,
+      "cell": 299,
+      "orientation": 1,
+      "criterion": "Qa=1934&Qo<13417",
+      "why": "Incognita in the Torturer's tavern [5,2] (1934). INFERRED cell."
+    },
+    {
+      "map": 137367552,
+      "npc": 4198,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1934&Qo>13412&Qo<13417&PO!19428",
+      "why": "Her bodyguard beside her (1934), until he is a follower. INFERRED cell."
+    },
+    {
+      "map": 136052996,
+      "npc": 2585,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo>13413&Qo<13417",
+      "why": "The Desosseur chief on the dark heights [5,-1] (1934). INFERRED cell."
+    },
+    {
+      "map": 135269891,
+      "npc": 2541,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo>13416&Qo<13418",
+      "why": "Venenosa in the catacombs (1934); the 1531 row stays. INFERRED cell."
+    },
+    {
+      "map": 187304450,
+      "npc": 2541,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo>13418&Qo<13419",
+      "why": "Venenosa in the cell (1934, 13419)."
+    },
+    {
+      "map": 187304450,
+      "npc": 4190,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo>13419&Qo<13420",
+      "why": "The Intractable Guardian takes her place (1934, 13420) and leaves after. GAP: no way to bring her back when the puzzle's 'watched' mark is set."
+    },
+    {
+      "map": 187173378,
+      "npc": 4191,
+      "cell": 326,
+      "orientation": 3,
+      "criterion": "Qa=1934&Qo>13420&Qo<13423",
+      "why": "Toxina in the hideout (1934). INFERRED cell."
+    },
+    {
+      "map": 187173378,
+      "npc": 2541,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1934&Qo>13420&Qo<13422",
+      "why": "Venenosa talking to her (1934). INFERRED cell."
+    },
+    {
+      "map": 187173378,
+      "npc": 3502,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=1934&Qo>13421&Qo<13423",
+      "why": "Incognita arrives to rescue (1934, 13423). INFERRED cell."
+    },
+    {
+      "map": 137366528,
+      "npc": 3502,
+      "cell": 401,
+      "orientation": 1,
+      "criterion": "Qa=1934&Qo>13422&Qo<13424",
+      "why": "Incognita in the street [5,2!] outside the tavern (1934, 13424). INFERRED cell."
     }
   ]
 }

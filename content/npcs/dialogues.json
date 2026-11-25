@@ -28899,6 +28899,8 @@
       "map": 0,
       "opening": 26744,
       "openings": [
+        { "criterion": "Qa=1934&Qo<13413", "message": 29653 },
+        { "criterion": "Qf=1869&PL>49&Qa!1934&Qf!1934", "message": 27841 },
         { "criterion": "Qf=1867&PL>29&Qa!1868&Qf!1868", "message": 27647 }
       ],
       "lines": [
@@ -29052,10 +29054,22 @@
         {
           "message": 27841,
           "names": true,
+          "choices": [
+            { "reply": 33404, "next": 29652, "startsQuest": 1934, "params": [[34, 1934]], "criterion": "Qa!1934&Qf!1934" }
+          ]
+        },
+        {
+          "message": 29652,
+          "choices": [
+            { "reply": 33403, "next": 29653 }
+          ]
+        },
+        {
+          "message": 29653,
           "choices": []
         }
       ],
-      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36229), the towers' lair (30109), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36225) starts the quest and sends the character to pray before the class statue (30110, «Encontrar la estatua»); under level 50 he is told to wait (30111) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). «Ne tirez pas sur le messager» (1845, Dofus pour les noobs («Ne tirez pas sur le messager»)): «Háblame de los uginaks.» (32139, with 1607 finished and level 30) -> 26822..26824 (a mage called Imaguni, the Brotherhood, the newcomers of Incarnam); 26825, the line the quest's first step names, starts it with «Puedo ayudarte con eso.» (32225), 26826 and 26827 hand over the parchment (18650) with «Agarrar el mensaje e irte.» (32223). INFERRED order of the replies (32228, 32226 and the second copy 26828-26833 are not used). «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): after 1853 «Tienes novedades con respecto a Imaguni?» (33181) tells of Azrim's murder (27642..27644) and asks the character to fetch the necromancer Relik; «Aceptar y marcharte a Brakmar.» (33182) on 27645 starts it. Back with Relik (12454 done) «He vuelto con el nigromante.» (33187) is 12455 (27646, 33188 sends him to the dead god's room); after the ritual «Contarle lo que pasó en la sala del dios muerto.» (33189) is 12457 and ends the quest (27647). INFERRED reply order. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Nosya podría tener razón...» (27647) is the step's own line, reached after the ritual and again as the opening once 1867 is done; «Puedo traer a Imaguni por las buenas o por las malas.» (33191) starts it. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Mostrar el puñal envenenado y decir lo que has averiguado.» (33407) hands over the Puñal envenenado (12492) -> 27838 «¿Qué aspecto tenía la sram...?» -> «Describir a la cazadora con quien luchaste.» (33406) -> 27839 -> «Seguir escuchando.» (33403) -> 27840 -> 33405 -> 27841 (he sends the character to Sramvil). INFERRED reply order. Announcing Relik's arrival (33187) takes the follower item 19051: Relik waits in the dead god's room."
+      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36229), the towers' lair (30109), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36225) starts the quest and sends the character to pray before the class statue (30110, «Encontrar la estatua»); under level 50 he is told to wait (30111) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). «Ne tirez pas sur le messager» (1845, Dofus pour les noobs («Ne tirez pas sur le messager»)): «Háblame de los uginaks.» (32139, with 1607 finished and level 30) -> 26822..26824 (a mage called Imaguni, the Brotherhood, the newcomers of Incarnam); 26825, the line the quest's first step names, starts it with «Puedo ayudarte con eso.» (32225), 26826 and 26827 hand over the parchment (18650) with «Agarrar el mensaje e irte.» (32223). INFERRED order of the replies (32228, 32226 and the second copy 26828-26833 are not used). «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): after 1853 «Tienes novedades con respecto a Imaguni?» (33181) tells of Azrim's murder (27642..27644) and asks the character to fetch the necromancer Relik; «Aceptar y marcharte a Brakmar.» (33182) on 27645 starts it. Back with Relik (12454 done) «He vuelto con el nigromante.» (33187) is 12455 (27646, 33188 sends him to the dead god's room); after the ritual «Contarle lo que pasó en la sala del dios muerto.» (33189) is 12457 and ends the quest (27647). INFERRED reply order. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Nosya podría tener razón...» (27647) is the step's own line, reached after the ritual and again as the opening once 1867 is done; «Puedo traer a Imaguni por las buenas o por las malas.» (33191) starts it. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Mostrar el puñal envenenado y decir lo que has averiguado.» (33407) hands over the Puñal envenenado (12492) -> 27838 «¿Qué aspecto tenía la sram...?» -> «Describir a la cazadora con quien luchaste.» (33406) -> 27839 -> «Seguir escuchando.» (33403) -> 27840 -> 33405 -> 27841 (he sends the character to Sramvil). INFERRED reply order. Announcing Relik's arrival (33187) takes the follower item 19051: Relik waits in the dead god's room. «Le gang des Toxines» (1934, Dofus pour les noobs): after the Envoyee's clue, «Estoy preparado para ir alli» (33404) starts it; 29652 (the noble who owes him) and 29653 (go to the Torturer's tavern, Incognita waits) are the step's own lines, the reply order INFERRED from the client's ids; the opening 29653 repeats the way while the character has not seen Incognita."
     },
     {
       "npc": 6837,
@@ -65981,6 +65995,12 @@
       "npc": 2541,
       "map": 0,
       "opening": 18772,
+      "openings": [
+        { "criterion": "Qa=1934&Qo>13420&Qo<13421", "message": 29703 },
+        { "criterion": "Qa=1934&Qo>13418&Qo<13419", "message": 29705 },
+        { "criterion": "Qa=1934&Qo>13417&Qo<13418", "message": 29707 },
+        { "criterion": "Qa=1934&Qo>13416&Qo<13417", "message": 29706 }
+      ],
       "lines": [
         {
           "message": 18772,
@@ -65993,9 +66013,51 @@
           "choices": [
             { "reply": 22417, "quest": 1531, "completes": 8739, "params": [[30, 8739]] }
           ]
+        },
+        {
+          "message": 29706,
+          "choices": [
+            { "reply": 35690, "next": 29707, "quest": 1934, "completes": 13417, "params": [[30, 13417]] }
+          ]
+        },
+        {
+          "message": 29707,
+          "choices": [
+            { "reply": 35688, "afterObjective": 13417, "beforeObjective": 13418 }
+          ]
+        },
+        {
+          "message": 29705,
+          "choices": [
+            { "reply": 35687, "quest": 1934, "completes": 13419, "params": [[30, 13419]] }
+          ]
+        },
+        {
+          "message": 29703,
+          "choices": [
+            { "reply": 35685, "next": 29712 }
+          ]
+        },
+        {
+          "message": 29712,
+          "choices": [
+            { "reply": 35698, "next": 29702 }
+          ]
+        },
+        {
+          "message": 29702,
+          "choices": [
+            { "reply": 35686, "next": 29711 }
+          ]
+        },
+        {
+          "message": 29711,
+          "choices": [
+            { "reply": 35697, "quest": 1934, "completes": 13421, "params": [[30, 13421]] }
+          ]
         }
       ],
-      "why": "Venenosa [8,8], the necrotics hunter: she will think over the invitation (22418, 18773; the leave reply 22417 = 8739). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+      "why": "Venenosa [8,8], the necrotics hunter: she will think over the invitation (22418, 18773; the leave reply 22417 = 8739). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»). Venenosa (1934): the catacomb interrogation 29706/29707 (13417, fight 35688 lost on purpose), the cell 29705 (13419) and the eavesdrop on [5,-11]'s hideout, one continuous exchange with Toxina's lines 29712 and 29711 (13421). DEVIATION: the speaker shown is the clicked NPC."
     },
     {
       "npc": 2535,
@@ -74078,6 +74140,208 @@
         }
       ],
       "why": "DaLny Storm (Staurme Jauni, the Iop) in the wood (Dofus pour les noobs («Promenons nous dans les bois»)): «Acompañar al joven hasta Adalid Esvergunzao» (7833) hands over his follower item (11236, effect 148 = npc 1295) and closes 3749; 7815 once his sister is home. INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
+    },
+    {
+      "npc": 2594,
+      "map": 177209344,
+      "opening": 18120,
+      "lines": [
+        {
+          "message": 18120,
+          "names": true,
+          "choices": [
+            { "reply": 21726, "passage": 259401 }
+          ]
+        }
+      ],
+      "why": "Portal de Sramvil in the Uginak temple «Le gang des Toxines» (1934, Dofus pour les noobs): 21726 crosses to Sramvil (objective 13412). Portal de Sramvil in the Uginak temple «Le gang des Toxines» (1934, Dofus pour les noobs): 21726 crosses to Sramvil (objective 13412)."
+    },
+    {
+      "npc": 3502,
+      "map": 0,
+      "opening": 29657,
+      "openings": [
+        { "criterion": "Qa=1934&Qo>13423&Qo<13424", "message": 29688 },
+        { "criterion": "Qa=1934&Qo>13420&Qo<13423", "message": 29691 },
+        { "criterion": "Qa=1934&Qo>13413&Qo<13417", "message": 29661 },
+        { "criterion": "Qa=1934&Qo<13413", "message": 29657 }
+      ],
+      "lines": [
+        {
+          "message": 29657,
+          "choices": [
+            { "reply": 35635, "next": 29659 }
+          ]
+        },
+        {
+          "message": 29659,
+          "choices": [
+            { "reply": 35634, "next": 29660 }
+          ]
+        },
+        {
+          "message": 29660,
+          "choices": [
+            { "reply": 35633, "next": 29661 }
+          ]
+        },
+        {
+          "message": 29661,
+          "choices": [
+            { "reply": 35632, "completes": 13413, "params": [[30, 13413]], "criterion": "Qo<13413" }
+          ]
+        },
+        {
+          "message": 29691,
+          "choices": [
+            { "reply": 35672, "quest": 1934, "teleport": 137366528, "completes": 13423, "params": [[30, 13423]] }
+          ]
+        },
+        {
+          "message": 29688,
+          "choices": [
+            { "reply": 35670, "next": 29689 }
+          ]
+        },
+        {
+          "message": 29689,
+          "choices": [
+            { "reply": 35669, "next": 29690 }
+          ]
+        },
+        {
+          "message": 29690,
+          "choices": [
+            { "reply": 35668, "quest": 1934, "completes": 13424, "params": [[30, 13424]] }
+          ]
+        }
+      ],
+      "why": "Incognita, «Le gang des Toxines» (1934, Dofus pour les noobs): the tavern briefing 29657 to 29661 (35632 ends 13413), her rescue 29691 (35672 takes the character to the street, 13423) and the debrief 29688 to 29690 (13424). The order of the debrief replies is INFERRED (35671 unused). Incognita, «Le gang des Toxines» (1934, Dofus pour les noobs): the tavern briefing 29657 to 29661 (35632 ends 13413), her rescue 29691 (35672 takes the character to the street, 13423) and the debrief 29688 to 29690 (13424). The order of the debrief replies is INFERRED (35671 unused)."
+    },
+    {
+      "npc": 4198,
+      "map": 0,
+      "opening": 29662,
+      "lines": [
+        {
+          "message": 29662,
+          "choices": [
+            { "reply": 35636, "quest": 1934, "gives": 19428, "beforeObjective": 13414, "completes": 13414, "params": [[30, 13414]] },
+            { "reply": 35636, "gives": 19428, "afterObjective": 13414, "criterion": "PO!19428" },
+            { "reply": 35637 }
+          ]
+        }
+      ],
+      "why": "Incognita's bodyguard (1934): 35636 takes him as a follower (item 19428) and ends 13414; talking again while the item is missing (after a lost fight) gives it back, as the guide says. Incognita's bodyguard (1934): 35636 takes him as a follower (item 19428) and ends 13414; talking again while the item is missing (after a lost fight) gives it back, as the guide says."
+    },
+    {
+      "npc": 2585,
+      "map": 0,
+      "opening": null,
+      "openings": [
+        { "criterion": "Qa=1934&Qo>13415&Qo<13417", "message": 29692 },
+        { "criterion": "Qa=1934&Qo>13414&Qo<13416", "message": 18980 },
+        { "criterion": "Qa=1934&Qo>13413&Qo<13415", "message": 18980 }
+      ],
+      "lines": [
+        {
+          "message": 18980,
+          "choices": [
+            { "reply": 35681, "next": 29697, "criterion": "Qa=1934" },
+            { "reply": 22638 }
+          ]
+        },
+        {
+          "message": 29697,
+          "choices": [
+            { "reply": 35680, "next": 29698 }
+          ]
+        },
+        {
+          "message": 29698,
+          "choices": [
+            { "reply": 35682, "next": 29699 }
+          ]
+        },
+        {
+          "message": 29699,
+          "choices": [
+            { "reply": 35678 }
+          ]
+        },
+        {
+          "message": 29692,
+          "choices": [
+            { "reply": 35677, "next": 29693 }
+          ]
+        },
+        {
+          "message": 29693,
+          "choices": [
+            { "reply": 35676, "next": 29694 }
+          ]
+        },
+        {
+          "message": 29694,
+          "choices": [
+            { "reply": 35675, "next": 29695 }
+          ]
+        },
+        {
+          "message": 29695,
+          "choices": [
+            { "reply": 35679, "next": 29696 }
+          ]
+        },
+        {
+          "message": 29696,
+          "choices": [
+            { "reply": 35673, "quest": 1934, "completes": 13416, "params": [[30, 13416]] }
+          ]
+        }
+      ],
+      "why": "The Ouginak Desosseur chief (1934): 18980 to 29699 and the fight on 35678; afterwards 29692 to 29696 (13416). The order of the post-fight replies is INFERRED from their texts. The Ouginak Desosseur chief (1934): 18980 to 29699 and the fight on 35678; afterwards 29692 to 29696 (13416). The order of the post-fight replies is INFERRED from their texts."
+    },
+    {
+      "npc": 4190,
+      "map": 0,
+      "opening": 29708,
+      "openings": [
+        { "criterion": "Qa=1934&Qo>13419&Qo<13420", "message": 29708 }
+      ],
+      "lines": [
+        {
+          "message": 29708,
+          "choices": [
+            { "reply": 35693, "quest": 1934, "completes": 13420, "params": [[30, 13420]] },
+            { "reply": 35694, "quest": 1934, "completes": 13420, "params": [[30, 13420]] }
+          ]
+        }
+      ],
+      "why": "Intractable Guardian (1934): takes Venenosa's place and leaves once spoken to (13420). Intractable Guardian (1934): takes Venenosa's place and leaves once spoken to (13420)."
+    },
+    {
+      "npc": 4191,
+      "map": 0,
+      "opening": 29709,
+      "openings": [
+        { "criterion": "Qa=1934&Qo>13421&Qo<13422", "message": 29709 }
+      ],
+      "lines": [
+        {
+          "message": 29709,
+          "choices": [
+            { "reply": 35696, "next": 29710 }
+          ]
+        },
+        {
+          "message": 29710,
+          "choices": [
+            { "reply": 35695, "quest": 1934, "completes": 13422, "params": [[30, 13422]] }
+          ]
+        }
+      ],
+      "why": "Toxina (1934): she spots the listener (13422). The fight replies 29951 to 29954 belong to the next quest. Toxina (1934): she spots the listener (13422). The fight replies 29951 to 29954 belong to the next quest."
     }
   ]
 }

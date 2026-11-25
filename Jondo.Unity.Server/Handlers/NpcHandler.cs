@@ -1371,9 +1371,11 @@ namespace Jondo.Unity.Server.Handlers
                 if (fightChoice != null && fightChoice.Stagings.Count > 0)
                     await Managers.MapStagings.PlayAsync(session, fightChoice.Stagings);
                 await CloseAsync(session);
-                var monsters = npcFight.ByLevel
-                    ? npcFight.Monsters.Select(m => (m.Monster, MobSpawnManager.GradeForLevel(m.Monster, SessionContext.State.CharacterLevel))).ToList()
-                    : npcFight.Monsters;
+                IReadOnlyList<(int Monster, int Grade)> AtHisLevel(IReadOnlyList<(int Monster, int Grade)> members) => npcFight.ByLevel
+                    ? members.Select(m => (m.Monster, MobSpawnManager.GradeForLevel(m.Monster, SessionContext.State.CharacterLevel))).ToList()
+                    : members;
+                // His allies too: the bodyguard of «La bande des Toxines» has a grade every 20 levels.
+                var monsters = AtHisLevel(npcFight.Monsters);
                 var group = MobSpawnManager.ComposeOffMap(monsters);
                 if (group == null) return;
                 // The monster he fights as: the Entrenador of «Barnabé en el espacio».
@@ -1385,7 +1387,7 @@ namespace Jondo.Unity.Server.Handlers
                 // And what the quest adds to it: the Yokai Nana lent, Kuatinbe's Pandasiman.
                 if (!npcFight.Rules.IsEmpty) FightHandler.RulesInNextFight(GameState.CharacterId, npcFight.Rules);
                 await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
-                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(npcFight.Allies),
+                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(AtHisLevel(npcFight.Allies)),
                     alliesMustLive: npcFight.AlliesMustLive,
                     winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks,
                     alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0,

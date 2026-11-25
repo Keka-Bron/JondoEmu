@@ -9684,6 +9684,42 @@
    "elements": [{"map": 99096075, "element": 474399}],
    "gives": [{"item": 17860, "count": 1}],
    "why": "«Busca a Rykke Zane por los alrededores de Sufokia» (644038): the DPLN screenshot circles the round hatch on the right wall of the shipwreck [15,21] (element 474399, gfx 36222, cell 249 in the client's map data), which hands over Rykke's old lute (17860); the barrel 497312 the earlier pass used is not what DPLN shows (Dofus pour les noobs: Cliquez sur le rocher au milieu de la map)."
+  },
+  {
+   "objective": 13412,
+   "quest": 1934,
+   "kind": "enter",
+   "map": 134351108,
+   "why": "«Atraviesa el portal hacia Sramvil» (739516): arriving on the Sramvil dimension's map by the temple portal."
+  },
+  {
+   "objective": 13415,
+   "quest": 1934,
+   "kind": "beat",
+   "monster": 5153,
+   "map": 136052996,
+   "afterObjectives": [13414],
+   "why": "«Deshazte de los esbirros» (739523): the fight 35678 against the Desosseurs."
+  },
+  {
+   "objective": 13418,
+   "quest": 1934,
+   "kind": "beat",
+   "monster": 5156,
+   "map": 135269891,
+   "afterObjectives": [13417],
+   "why": "«Sobrevive al ataque de las toxinas» (739659): the ambush 35688, ended by the bodyguard's sacrifice (855) or won (854); either way the character wakes in the toxins' cell (npc_fights winMap)."
+  },
+  {
+   "objective": 7946,
+   "quest": 1433,
+   "kind": "click",
+   "elements": [{"map": 117703180, "element": 483126}, {"map": 117704204, "element": 483128}, {"map": 117704204, "element": 483129}, {"map": 117704202, "element": 483122}, {"map": 117704200, "element": 483114}, {"map": 117704200, "element": 508072}, {"map": 117705219, "element": 483113}, {"map": 117705226, "element": 483124}, {"map": 117705224, "element": 483115}, {"map": 117705228, "element": 483130}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 14808, "count": 10}],
+   "anyOrder": true,
+   "why": "«Ron marino» (14808, gathered by skill 239 per the client's skills table). DPLN «L'ivresse des profondeurs»: bottles stand in the Splash Zone rooms ([20,19] one beside the crate, [21,20] and [23,18] two each, plus [22,19], [22,21], [23,20], [23,26]-style singles) and need no steamer battery. The ten gfx 42429 elements of subarea 804 (a bottle drawn on a crate in the client) each hand one bottle to the character walking up and clicking it; the earlier world-graph teleport on these ids is an approximate reverse-element guess, not a door. Respawn every 5 minutes is not modelled (one bottle per element per session)."
   }
 ]
 }

@@ -1154,9 +1154,46 @@ namespace Jondo.Unity.World.Fights
             /// <summary>No rules at all.</summary>
             public static readonly QuestRules None = new(Array.Empty<int>(), Array.Empty<(int, int)>(), Array.Empty<(int, int)>(), 0);
 
+            /// <summary>
+            /// The ally that dies in the player's place («sacrifice»: { ally, message }): the blow
+            /// that would kill him kills that ally instead and the fight is won. The bodyguard of
+            /// «La bande des Toxines», «le garde du corps vous sauvera en se sacrifiant lui-même au
+            /// dernier moment» (Dofus pour les noobs). Zero for none.
+            /// </summary>
+            public int SacrificeAlly { get; init; }
+
+            /// <summary>The info message the sacrifice ends the fight with (855), or zero.</summary>
+            public int SacrificeMessage { get; init; }
+            /// <summary>The follower item the sacrificed ally was, taken when he dies (zero for none).</summary>
+            public int SacrificeTakes { get; init; }
+
+            /// <summary>The info message a win without the sacrifice ends with («winMessage»), or zero.</summary>
+            public int WinMessage { get; init; }
+
+            /// <summary>
+            /// The allies no blow of their own side hurts («allyProof»): the same bodyguard,
+            /// «immunisé contre les dommages subis par un allié».
+            /// </summary>
+            public IReadOnlyList<int> AllyProof { get; init; } = Array.Empty<int>();
+
             /// <summary>Whether there is nothing to apply.</summary>
-            public bool IsEmpty => Grants.Count == 0 && Passives.Count == 0 && States.Count == 0 && WinState == 0;
+            public bool IsEmpty => Grants.Count == 0 && Passives.Count == 0 && States.Count == 0 && WinState == 0
+                                   && SacrificeAlly == 0 && WinMessage == 0 && AllyProof.Count == 0;
         }
+
+        /// <summary>The ally that dies in the player's place (<see cref="QuestRules.SacrificeAlly"/>), or zero.</summary>
+        public int SacrificeAlly { get; set; }
+
+        /// <summary>The message <see cref="SacrificeAlly"/>'s sacrifice ends the fight with, or zero.</summary>
+        public int SacrificeMessage { get; set; }
+        /// <summary>The follower item <see cref="SacrificeAlly"/> was, taken once he has died in the player's place.</summary>
+        public int SacrificeTakes { get; set; }
+
+        /// <summary>The message a win ends with when nobody was sacrificed, or zero.</summary>
+        public int WinMessage { get; set; }
+
+        /// <summary>Whether <see cref="SacrificeAlly"/> has died in the player's place.</summary>
+        public bool Sacrificed { get; set; }
 
         /// <summary>The state every enemy must hold at once to win (<see cref="QuestRules.WinState"/>), or zero.</summary>
         public int WinState { get; set; }

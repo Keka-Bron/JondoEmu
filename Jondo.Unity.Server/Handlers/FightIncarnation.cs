@@ -117,6 +117,12 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (rules == null || rules.IsEmpty) return;
             fight.WinState = rules.WinState;
+            fight.SacrificeAlly = rules.SacrificeAlly;
+            fight.SacrificeMessage = rules.SacrificeMessage;
+            fight.SacrificeTakes = rules.SacrificeTakes;
+            fight.WinMessage = rules.WinMessage;
+            foreach (var ally in fight.Azul.Where(f => f.IsMonster && rules.AllyProof.Contains(f.MonsterId)))
+                ally.ImmuneToAllies = true;
             foreach (int spell in rules.Grants)
             {
                 player.GrantedSpells.RemoveAll(g => g.Spell == spell);

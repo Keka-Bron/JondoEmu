@@ -212,7 +212,8 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// A row's quest rules: «grants» [spell...], «passives» [{ monster, spell }], «states»
-        /// [{ monster, state }] and «winState».
+        /// [{ monster, state }], «winState», «sacrifice» { ally, message }, «winMessage» and
+        /// «allyProof» [monster...].
         /// </summary>
         internal static Jondo.Unity.World.Fights.FightInstance.QuestRules RulesOf(JsonElement row)
         {
@@ -220,8 +221,20 @@ namespace Jondo.Unity.Server.Managers
             if (row.TryGetProperty("grants", out var list) && list.ValueKind == JsonValueKind.Array)
                 foreach (var spell in list.EnumerateArray())
                     if (spell.ValueKind == JsonValueKind.Number && spell.GetInt32() > 0) grants.Add(spell.GetInt32());
+            var allyProof = new List<int>();
+            if (row.TryGetProperty("allyProof", out var proof) && proof.ValueKind == JsonValueKind.Array)
+                foreach (var monster in proof.EnumerateArray())
+                    if (monster.ValueKind == JsonValueKind.Number && monster.GetInt32() > 0) allyProof.Add(monster.GetInt32());
+            bool sacrifice = row.TryGetProperty("sacrifice", out var sacrificed) && sacrificed.ValueKind == JsonValueKind.Object;
             var rules = new Jondo.Unity.World.Fights.FightInstance.QuestRules(
-                grants, Pairs(row, "passives", "spell"), Pairs(row, "states", "state"), (int)Long(row, "winState"));
+                grants, Pairs(row, "passives", "spell"), Pairs(row, "states", "state"), (int)Long(row, "winState"))
+            {
+                SacrificeAlly = sacrifice ? (int)Long(sacrificed, "ally") : 0,
+                SacrificeMessage = sacrifice ? (int)Long(sacrificed, "message") : 0,
+                SacrificeTakes = sacrifice ? (int)Long(sacrificed, "takes") : 0,
+                WinMessage = (int)Long(row, "winMessage"),
+                AllyProof = allyProof,
+            };
             return rules.IsEmpty ? Jondo.Unity.World.Fights.FightInstance.QuestRules.None : rules;
         }
 

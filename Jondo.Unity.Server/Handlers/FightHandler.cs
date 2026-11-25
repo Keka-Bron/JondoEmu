@@ -2275,6 +2275,8 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (quien == null || !quien.IsAlive) return false;
             if (quien.Muriendo) return true;
+            // Somebody dies in his place: the blow is not dealt, he stays standing.
+            if (await SacrificedForAsync(stream, fight, quien)) return false;
             quien.Muriendo = true;
             quien.LastBuffBeforeHisDeath = fight.UltimoEmbrujo;
             var antes = fight.TriggeringAttacker;
@@ -2304,6 +2306,31 @@ namespace Jondo.Unity.Server.Handlers
                 if (quien.IsAlive) quien.Muriendo = false;
             }
             return quien.IsAlive;
+        }
+
+        /// <summary>
+        /// The ally a quest's fight names (<see cref="FightInstance.SacrificeAlly"/>) dies in the
+        /// place of the player a blow was about to kill, and the fight is won: the bodyguard of
+        /// «La bande des Toxines», «le garde du corps vous sauvera en se sacrifiant lui-même au
+        /// dernier moment» (Dofus pour les noobs); then «Cuando pensabas haber ganado este
+        /// combate...» (855). True when he did: the caller does not deal the blow.
+        /// </summary>
+        internal static async Task<bool> SacrificedForAsync(NetworkStream stream, FightInstance fight, Fighter quien)
+        {
+            if (fight.SacrificeAlly == 0 || fight.Sacrificed || quien.IsMonster || quien.EsInvocado) return false;
+            var guard = TodosLosCombatientes(fight).FirstOrDefault(f => f != null && f.IsAlive && !f.EsInvocado
+                && f.IsMonster && f.MonsterId == fight.SacrificeAlly && f.TeamId == quien.TeamId);
+            if (guard == null) return false;
+
+            fight.Sacrificed = true;
+            guard.CurrentHP = 0;
+            CarriedFollows(fight, guard);
+            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, Network.FightProtocol.BuildDeath(guard.Id, guard.Id)));
+            await CaenSusInvocadosAsync(stream, fight, guard);
+            fight.RebuildTurnOrderOnFighterDeath();
+            if (fight.WonByEffect < 0) fight.WonByEffect = quien.TeamId;
+            Program.LogDebug($"[Fight] Fight #{fight.FightId}: {guard.Id} dies in the place of {quien.Id}; the fight is won.");
+            return true;
         }
 
         /// <summary>A blow landed: written down for whoever dealt it and for whoever took it.</summary>
@@ -10685,6 +10712,13 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
+            // An ally no blow of its own side hurts: the bodyguard of «La bande des Toxines».
+            if (target.ImmuneToAllies && caster != null && caster.Id != target.Id && caster.TeamId == target.TeamId)
+            {
+                Program.LogDebug($"[Combat] {target.Id} takes nothing from its ally {caster.Id}.");
+                return;
+            }
+
             // The element is given by the catalogue: 0 neutral, 1 earth, 2 fire, 3 water, 4 air.
             var element = elemento switch
             {
@@ -13443,6 +13477,15 @@ namespace Jondo.Unity.Server.Handlers
                     fight.WinCellId != 0 ? fight.WinCellId : TeleportHandler.MapCentre);
                 DatabaseManager.SaveCurrentCharacter();
             }
+
+            // And what the quest tells of the end: the sacrifice's own words, or the win's.
+            int endMessage = !alliesAlive ? 0 : fight.Sacrificed ? fight.SacrificeMessage : fight.WinMessage;
+            if (endMessage != 0)
+                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
+                    ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, endMessage, Array.Empty<string>())));
+            // The ally who died in his place no longer follows him.
+            if (alliesAlive && fight.Sacrificed && fight.SacrificeTakes != 0)
+                await Managers.QuestFollowers.TakeAsync(stream, fight.SacrificeTakes, 1);
 
             // Was the fight inside a dungeon? Winning moves to the next room, its post-boss room,
             // or outside. It is decided HERE and not after this is over, because the jru below

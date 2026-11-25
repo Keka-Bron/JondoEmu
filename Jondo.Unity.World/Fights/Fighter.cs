@@ -383,6 +383,12 @@ namespace Jondo.Unity.World.Fights
         public bool IsPlayedAlly { get; set; }
 
         /// <summary>
+        /// Whether no blow of its own side hurts it: the bodyguard of «La bande des Toxines»,
+        /// «immunisé contre les dommages subis par un allié» (Dofus pour les noobs).
+        /// </summary>
+        public bool ImmuneToAllies { get; set; }
+
+        /// <summary>
         /// The companion this fighter is (the client's companions table), zero for anybody else: a
         /// creature its master brought by wearing it, played by him by hand as a played ally
         /// (<see cref="DrivenBy"/> is the master), and told to the clients as a companion -- the
