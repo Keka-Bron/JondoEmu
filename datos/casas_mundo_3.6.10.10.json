@@ -8279,23 +8279,6 @@
    "modeloInferido": true
   },
   {
-   "mapa": 54172461,
-   "elemento": 457177,
-   "casilla": 260,
-   "gfx": 21966,
-   "interior": 54525969,
-   "subzona": 601,
-   "origen": "casa",
-   "casa": 325,
-   "nombre": "Casa grande del burgo de Frigost",
-   "precio": 3000000,
-   "habitaciones": 4,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
    "mapa": 54172462,
    "elemento": 456703,
    "casilla": 283,
@@ -9938,23 +9921,6 @@
    "nombre": "Casa grande del burgo de Frigost",
    "precio": 3000000,
    "habitaciones": 4,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
-   "mapa": 54173482,
-   "elemento": 457185,
-   "casilla": 470,
-   "gfx": 21966,
-   "interior": 54526978,
-   "subzona": 601,
-   "origen": "casa",
-   "casa": 317,
-   "nombre": "Casa pequeña del burgo de Frigost",
-   "precio": 2000000,
-   "habitaciones": 2,
    "instancias": [
     1
    ],
@@ -14383,23 +14349,6 @@
    "modeloInferido": true
   },
   {
-   "mapa": 68421638,
-   "elemento": 459526,
-   "casilla": 375,
-   "gfx": 29518,
-   "interior": 90439680,
-   "subzona": 1,
-   "origen": "casa",
-   "casa": 249,
-   "nombre": "Casa grande de Madrestam",
-   "precio": 1500000,
-   "habitaciones": 2,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
    "mapa": 68421639,
    "elemento": 459547,
    "casilla": 350,
@@ -17162,23 +17111,6 @@
    ]
   },
   {
-   "mapa": 88081169,
-   "elemento": 473031,
-   "casilla": 180,
-   "gfx": 38090,
-   "interior": 98828803,
-   "subzona": 482,
-   "origen": "casaArea",
-   "casa": 308,
-   "nombre": "Casa mediana del castillo de Amakna",
-   "precio": 2000000,
-   "habitaciones": 2,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
    "mapa": 88081170,
    "elemento": 473681,
    "casilla": 241,
@@ -17478,23 +17410,6 @@
    "casa": 308,
    "nombre": "Casa mediana del castillo de Amakna",
    "precio": 2000000,
-   "habitaciones": 2,
-   "instancias": [
-    1
-   ],
-   "modeloInferido": true
-  },
-  {
-   "mapa": 88081681,
-   "elemento": 517094,
-   "casilla": 219,
-   "gfx": 38092,
-   "interior": 95158787,
-   "subzona": 482,
-   "origen": "casaArea",
-   "casa": 303,
-   "nombre": "Casa pequeña del castillo de Amakna",
-   "precio": 1500000,
    "habitaciones": 2,
    "instancias": [
     1
