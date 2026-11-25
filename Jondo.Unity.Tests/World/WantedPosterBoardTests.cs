@@ -43,7 +43,7 @@ namespace Jondo.Unity.Tests.World
             Assert.Equal(11, Readables.OnMap(192413706).Count());
             Assert.Equal(19, Readables.OnMap(217449476).Count());
             Assert.Equal(19, Readables.OnMap(216663298).Count());
-            Assert.Equal(7, Readables.OnMap(54536209).Count());
+            Assert.Equal(8, Readables.OnMap(54536209).Count());   // measured 2026-11-23: eight posters, each its own criminal
             Assert.Equal(6, Readables.OnMap(111411713).Count());
         }
     }
