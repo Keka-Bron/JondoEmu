@@ -9746,8 +9746,7 @@
    "monster": 4466,
    "map": 168560642,
    "afterObjectives": [11003],
-   "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs). The beat hands over the remains of Rykke Zane (18044, «Restes de Rykke Zane», DPLN: «vous obtenez des Restes de Rykke Zane dans votre inventaire de quête»), which Sered takes in 28602.",
-   "gives": [{"item": 18044, "count": 1}]
+   "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs). The remains of Rykke Zane (18044) are the monster's own drop (the fight showed one Loot line); Sered takes them in 28602."
   }
 ]
 }

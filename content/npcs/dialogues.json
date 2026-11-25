@@ -66238,6 +66238,7 @@
       "map": 0,
       "opening": 23848,
       "openings": [
+        { "criterion": "Qo>10984&Qo<10986&PO!18045", "message": 23884 },
         { "criterion": "Qa=1759&Qo>11257&Qf!1759", "message": 24530 },
         { "criterion": "Qa=1759&Qo>11257&Qo<11258", "message": 24530 },
         { "quest": 1731, "pending": 10973, "message": 23852 },
@@ -66332,7 +66333,8 @@
         {
           "message": 23884,
           "choices": [
-            { "reply": 28714 }
+            { "reply": 28714, "quest": 1731, "gives": 18045, "criterion": "PO!18045" },
+            { "reply": 28714, "quest": 1731, "criterion": "PO=18045" }
           ]
         },
         {
@@ -66348,7 +66350,7 @@
           ]
         }
       ],
-      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530, 24531, 29466). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530); looser criterion. Redo 25/11: the closing reply (28627) takes the follower item 18045 back (the escort ends at the basin, Dofus pour les noobs: Poly stops following)."
+      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530, 24531, 29466). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530); looser criterion. Redo 25/11: the closing reply (28627) takes the follower item 18045 back (the escort ends at the basin, Dofus pour les noobs: Poly stops following). «La pêche aux infos» (1731): INFERRED, losing a fight takes the escort (follower) away, so 28714 («Escoltar a Poly Perkin hasta Sufokia») hands Poly's follower over again when it is not carried."
     },
     {
       "npc": 3249,
@@ -66648,11 +66650,14 @@
       "npc": 3276,
       "map": 0,
       "opening": 24003,
+      "openings": [
+        { "criterion": "Qo>10982&Qo<10983", "message": 24004 }
+      ],
       "lines": [
         {
           "message": 24003,
           "choices": [
-            { "reply": 28871, "quest": 1731, "next": 24004, "afterObjective": 10981, "beforeObjective": 10982, "completes": 10982, "params": [[30, 10982]] }
+            { "reply": 28871, "quest": 1731, "next": 24004, "afterObjective": 10981, "beforeObjective": 10982, "completes": 10982, "params": [[30, 10982]], "criterion": "Qo>10980" }
           ]
         },
         {
@@ -66662,7 +66667,7 @@
           ]
         }
       ],
-      "why": "Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights). Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights)."
+      "why": "Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights). Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights). «La pêche aux infos» (1731): after a lost fight the merchant offers the vocalize reply again (24004, 28870) while the beat 10983 is not done, so the aggression can be retried. «La pêche aux infos» (1731): the merchant is interviewed only after Poly's interview on the Askina map (10980), the order of the objectives."
     },
     {
       "npc": 2344,
