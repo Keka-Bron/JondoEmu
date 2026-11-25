@@ -572,6 +572,15 @@
       "npc": 5843,
       "replies": [55519],
       "why": "The Casa de los Espíritus: after the boss the winners stand in the last room with Kumijo, who does not mind having lost and talks (Dofus pour les noobs, «Une fois le donjon terminé, parlez à Koumiho»); «Salir de la Casa de los Espíritus.» (55519) leaves. INFERRED cell: open floor in the middle of the room."
+    },
+    {
+      "dungeon": 7,
+      "bossRoom": 198972416,
+      "room": 198972418,
+      "cell": 304,
+      "npc": 4655,
+      "replies": [39544],
+      "why": "Cocabulia's lair: after the boss the winners are in the fifth room's second map (198972418) where Cocabulia (4655) lies; Retroceder y asegurarte de que la sed de la espada ha sido saciada antes de abandonar el lugar (39544) leaves. Moja la espada con la sangre de Cocabulia (2036) is her other reply (39545). Dofus pour les noobs (Le forgeur de légende): ne sortez pas tout de suite du donjon... Parlez a la Crocabulia."
     }
   ]
 }

@@ -1592,6 +1592,31 @@
       "toCell": 283,
       "criterion": "Qf=1756|(Qa=1756&Qo>11234&PO=17968)",
       "why": "The sealed slab of the pit (508127, 1756): down to the deep room only with the Snedon statuette, after learning of it (11234)."
-    }
+    },
+    {
+      "map": 178783244,
+      "element": 510497,
+      "cell": 474,
+      "gfx": 59078,
+      "type": 0,
+      "skill": 114,
+      "toMap": 173015560,
+      "toCell": 282,
+      "why": "The anvil at the end of the mine [-28,24] takes the character to Volkaragnar's forge (173015560): Direction l'entree de la Mine en [-23,21]... allez toujours a gauche... l'enclume qui vous teleporte devant le forgeron (Dofus pour les noobs (Le forgeur de légende))."
+    },
+    {
+      "map": 173015560,
+      "element": 3923001,
+      "npc": 3923,
+      "cell": 216,
+      "gfx": 3923001,
+      "type": -1,
+      "skill": 339,
+      "toMap": 178783244,
+      "toCell": 472,
+      "why": "The way back from the forge: Volkaragnar's Partir hacia el puente de piedra (33180) leaves to the mine anvil room. INFERRED: the client gives no other exit; the forge has no neighbour maps."
+    },
+    {"map": 178783244, "element": 3922001, "npc": 3922, "cell": 458, "gfx": 3922001, "type": -1, "skill": 339, "toMap": 173015560, "toCell": 282, "why": "«Poner la mano sobre el yunque.» (33373) of Volkaragnar's smith shape takes the character to the crater (Dofus pour les noobs («Le fléau de Burin»))."},
+    {"map": 178783236, "element": 510383, "cell": 309, "gfx": 56079, "type": -1, "skill": 114, "toMap": 178782214, "toCell": 206, "criterion": "PO=18855", "refusal": 449, "refusalType": 1, "why": "The stairs down to the burning room [-26,22]: without Búril's talisman (18855) the heat is deadly («Tentez de franchir la prochaine pièce mais c'est impossible il fait trop chaud», Dofus pour les noobs («Le fléau de Burin»))."}
   ]
 }

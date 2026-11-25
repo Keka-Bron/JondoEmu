@@ -8463,7 +8463,7 @@
     {
       "map": 212865030,
       "npc": 3808,
-      "cell": 258,
+      "cell": 272,
       "orientation": 3,
       "why": "Impexpo Ortador (the guide's Portim Portex) on Brakmar's harbour [-20,39], «A la rescousse des magypus» (1853). INFERRED cell."
     },
@@ -8522,6 +8522,115 @@
       "orientation": 3,
       "criterion": "Qa=1853&Qo>12329&Qo<12332",
       "why": "The second magicorrinco brought to Animatopia (1853, 12329). INFERRED cell."
+    },
+    {
+      "map": 171443205,
+      "npc": 3971,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1867&Qo>12445&Qo<12446",
+      "why": "The cursed chafer of the Tormented's Graveyard [-15,40] while the cursed bone (12446) is asked (Dofus pour les noobs («Dernier contact»)). INFERRED cell."
+    },
+    {
+      "map": 171835915,
+      "npc": 3908,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1867&Qo>12451&Qo<12452",
+      "why": "The rabid marauder of the milubo camp [-29,0] (Dofus pour les noobs («Dernier contact»)). INFERRED cell."
+    },
+    {
+      "map": 171835915,
+      "npc": 3909,
+      "cell": 314,
+      "orientation": 3,
+      "criterion": "Qa=1867&Qo>12451&Qo<12452",
+      "why": "The hungry marauder of the milubo camp [-29,0] (Dofus pour les noobs («Dernier contact»)). INFERRED cell."
+    },
+    {
+      "map": 171835915,
+      "npc": 3910,
+      "cell": 328,
+      "orientation": 3,
+      "criterion": "Qa=1867&Qo>12451&Qo<12452",
+      "why": "The cruel marauder of the milubo camp [-29,0] (Dofus pour les noobs («Dernier contact»)). INFERRED cell."
+    },
+    {
+      "map": 177211392,
+      "npc": 3905,
+      "cell": 282,
+      "orientation": 3,
+      "criterion": "Qa=1867&Qo>12455&Qo<12457",
+      "why": "Relik the necromancer in the dead god's room of the Uginak temple, on the floor in front of the bone (cell 273 put him behind the bone's decor) (Dofus pour les noobs, «Dernier contact»). INFERRED cell."
+    },
+    {
+      "map": 176422914,
+      "npc": 3724,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qa=1868&Qo<12458",
+      "why": "Nosya la Roa outside the Uginak temple [9,-66] until she gives the whistle (Dofus pour les noobs («La voix des morts»)). INFERRED cell."
+    },
+    {
+      "map": 179176718,
+      "npc": 3724,
+      "cell": 359,
+      "orientation": 3,
+      "criterion": "(Qa=1868&Qo>12479)|(Qf=1868&Qa!1869&Qf!1869)",
+      "why": "Nosya la Roa arrives in the sanctuary once the whistle is used and stays for 1869's start (Dofus pour les noobs («La voix des morts»)). INFERRED cell."
+    },
+    {
+      "map": 179176718,
+      "npc": 3919,
+      "cell": 344,
+      "orientation": 1,
+      "why": "Imaguni in the shibak sanctuary [-12,22] (Dofus pour les noobs («La voix des morts»)); the derived cell 329 stood behind a pot. INFERRED cell."
+    },
+    {
+      "map": 75497732,
+      "npc": 4652,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qa=2036&Qo>14698&Qo<14604",
+      "why": "The koalak diviner beside the enchanted spring [-20,-7], from the forging until beaten (14604). INFERRED cell, a neighbour of the spring (314)."
+    },
+    {
+      "map": 198972418,
+      "npc": 4655,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Cocabulia in the room after her fight (198972418), as the dungeon exit NPC and the one whose blood wets the sword (14695). INFERRED cell."
+    },
+    {
+      "map": 179176718,
+      "npc": 3919,
+      "cell": 329,
+      "remove": true,
+      "why": "Imaguni stands on cell 344 of the shibak sanctuary now (content_1868a); the derived cell 329 was a guess next to a pot, so it goes."
+    },
+    {
+      "map": 178783244,
+      "npc": 3922,
+      "cell": 458,
+      "orientation": 3,
+      "criterion": "Qa=1869&Qo>12486&Qo<12488",
+      "why": "Volkaragnar in his smith's shape before his anvil, from the character's arrival until he has talked to the dragon (Dofus pour les noobs («Le fléau de Burin»)). INFERRED cell."
+    },
+    {
+      "map": 181404676,
+      "npc": 3925,
+      "cell": 290,
+      "orientation": 3,
+      "criterion": "Qa=1869&Qo>12489&Qo<12491",
+      "why": "The Sram hunter of Srambad waits for the witness in the Fungus caverns until she is beaten (Dofus pour les noobs («Le fléau de Burin»)). INFERRED cell."
+    },
+    {
+      "map": 183501836,
+      "npc": 4086,
+      "cell": 386,
+      "orientation": 1,
+      "criterion": "Qa=1909&Qo>13101&Qo<13102",
+      "why": "Spirit of Menalt at the Ilyzaelle viewpoint once Hyrkul is beaten (1909, 13102; Dofus pour les noobs «Nordalie»); cell INFERRED next to Hyrkul's."
     }
   ]
 }

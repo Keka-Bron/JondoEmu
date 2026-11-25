@@ -242,6 +242,12 @@
       "percent": 35,
       "criterion": "Qa=2062&Qo<14834&PO!20822",
       "why": "2062 (Cada cosa a su tiempo): the perpetual pixel off monsters (Dofus pour les noobs: 100% from an anomaly's boss, otherwise a chance per fight; here any monster, INFERRED 35%)."
-    }
+    },
+  {
+   "item": 18107,
+   "percent": 20,
+   "criterion": "Qa=1764&PB=861&Qo<11269",
+   "why": "«Le vieux gob et la mer» (1764): the centenary greuvettes drop at 20 % base on the monsters of the Old Sufokia zone only (Dofus pour les noobs)."
+  }
   ]
 }

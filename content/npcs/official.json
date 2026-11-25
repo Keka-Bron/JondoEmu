@@ -10505,6 +10505,14 @@
      "cell": 301,
      "orientation": 3,
      "name": "Shayni Fings"
+    },
+    {
+     "npc": 4651,
+     "cell": 357,
+     "orientation": 1,
+     "criterion": "Qa=2036&Qo>14702&Qo<14703",
+     "name": "Cocopalo",
+     "kept": "authored in Jondo: Cocopalo sets the jade stone in the hilt of Cocobur here (2036, DPLN), INFERRED cell beside Shani"
     }
    ]
   },
@@ -13612,7 +13620,16 @@
     -20,
     39
    ],
-   "spawns": []
+   "spawns": [
+    {
+     "npc": 3808,
+     "cell": 272,
+     "orientation": 3,
+     "criterion": "Qa=1853",
+     "name": "Impexpo Ortador",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
   },
   {
    "map": 212865031,

@@ -9308,6 +9308,394 @@
    "map": 179308545,
    "afterObjectives": [12330],
    "why": "«Pon a los magicorrincos a salvo en Animatopía» (722706): reaching Animatopia [-63,29] with them (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 11270,
+   "quest": 1764,
+   "kind": "click",
+   "afterObjectives": [11269],
+   "elements": [{"map": 169082888, "element": 508191}],
+   "why": "«Esconde los cebos» (649712): the flower-like element of Old Sufokia [22,30] where the bait goes (Dofus pour les noobs: click on the sort of flower, then stand next to the goblin); element INFERRED."
+  },
+  {
+   "objective": 12449,
+   "quest": 1867,
+   "kind": "click",
+   "elements": [{"map": 171707400, "element": 510904}],
+   "gives": [{"item": 18821, "count": 1}],
+   "why": "«Consigue un recuerdo de Azrim en la gruta en la que el chamán meditaba» (725023): the camp-fire remains in Azrim's cave [-22,-3] (element 510904) capture the memory with the crystal globe (Dofus pour les noobs («Dernier contact»))."
+  },
+  {
+   "objective": 12451,
+   "quest": 1867,
+   "kind": "enter",
+   "map": 171835915,
+   "why": "«Encuentra a los merodeadores milubos» (725076): their camp [-29,0] (Dofus pour les noobs («Dernier contact»))."
+  },
+  {
+   "objective": 12452,
+   "quest": 1867,
+   "kind": "beat",
+   "monsters": [4903, 4904, 4905],
+   "map": 171835915,
+   "afterObjectives": [12451],
+   "why": "«Vence a los merodeadores milubos» (725077): the rabid, hungry and cruel marauders beaten in one solo fight (Dofus pour les noobs («Dernier contact»)); the rabid one drops the bone totem (18822) through its client drop."
+  },
+  {
+   "objective": 12448,
+   "quest": 1867,
+   "kind": "enter",
+   "map": 171707400,
+   "why": "«Gruta de Azrim» (725019), a «discover the map» objective that carries no map in the client's data (it names the cave only as text) and so stays open: Azrim's cave [-22,-3] (Dofus pour les noobs, «Dernier contact»)."
+  },
+  {
+   "objective": 11274,
+   "quest": 1765,
+   "kind": "enter",
+   "map": 168559630,
+   "why": "«Blublup Ryluglugl mglw'nogl» (649684): visit the map [26,33].",
+   "anyOrder": true
+  },
+  {
+   "objective": 11275,
+   "quest": 1765,
+   "kind": "enter",
+   "map": 168558608,
+   "why": "«Blublup Ryluglugl ph'neglb» (649689): visit the map [25,34].",
+   "anyOrder": true
+  },
+  {
+   "objective": 11276,
+   "quest": 1765,
+   "kind": "enter",
+   "map": 168560656,
+   "why": "«Blublup Ryluglugl wgah'ptiph» (649692): visit the map [27,34], the quest's start map.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11277,
+   "quest": 1765,
+   "kind": "click",
+   "elements": [{"map": 168560652, "element": 508196}],
+   "why": "«Plogplob gnk'tgeblap» (649738): the fish bone right of the big fossil at [27,32]; element INFERRED from the quest's element ids 508196-508198.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11278,
+   "quest": 1765,
+   "kind": "click",
+   "elements": [{"map": 168558604, "element": 508197}],
+   "why": "«Plogplob shk'golonakph» (649726): the bone next to the skeletal fish at [25,32]; element INFERRED.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11279,
+   "quest": 1765,
+   "kind": "click",
+   "elements": [{"map": 168560654, "element": 508198}],
+   "why": "«Plogplob dhol'chtitaq» (649699): the fish bone at the centre of [27,33]; element INFERRED.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11280,
+   "quest": 1765,
+   "kind": "beat",
+   "monster": 4452,
+   "map": 168559628,
+   "gives": [{"item": 18108, "count": 1}],
+   "why": "«Cloolooth P'Kutulu Ch'ton» (649713): the klutist (4452) beaten at [26,32], whose P'Koutoulou Ch'ton (18108, 30 % in the client) is won; the 30 % is a sure drop here.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11281,
+   "quest": 1765,
+   "kind": "beat",
+   "monster": 4452,
+   "map": 168558606,
+   "gives": [{"item": 18109, "count": 1}],
+   "why": "«Cloolooth P'Kutulu Zothoth» (649708): the klutist beaten at [25,33], P'Koutoulou Zothoth (18109); the 30 % is a sure drop here.",
+   "anyOrder": true
+  },
+  {
+   "objective": 11282,
+   "quest": 1765,
+   "kind": "beat",
+   "monster": 4452,
+   "map": 168559632,
+   "gives": [{"item": 18110, "count": 1}],
+   "why": "«Cloolooth P'Kutulu Glaakiph» (649736): the klutist beaten at [26,34], P'Koutoulou Glaakiph (18110); the 30 % is a sure drop here.",
+   "anyOrder": true
+  },
+  {
+   "objective": 12460,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 171706881,
+   "why": "«Ve al campamento de los bradores» (725130): the bradores camp [-23,-10] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12462,
+   "quest": 1868,
+   "kind": "beat",
+   "monsters": [4927, 4930],
+   "map": 171706881,
+   "afterObjectives": [12461],
+   "why": "«Ayuda a Kalidar» (725152): the solo fight against the kanig batallador and belicoso with Kalidar beside the character (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12464,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 172098571,
+   "why": "«Ve al campamento de los bermanes» (725153): the bermanes camp [-29,5] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12467,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 173016068,
+   "why": "«Ve al campamento de los matas» (725172): the matas camp [-28,20] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12469,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 173019657,
+   "why": "«Ve al campamento de los pániels» (725176): the pañiels camp [-21,25] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12471,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 173019143,
+   "why": "«Encuentra al seguidor de Imaguni» (725199): the disciple on the fire trial [-22,23] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12475,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 179177742,
+   "why": "«Ve al campamento de los shibaks» (725245): Hinu's hill in the Desecrated Lands [-13,22] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12478,
+   "quest": 1868,
+   "kind": "enter",
+   "map": 179176718,
+   "afterObjectives": [12476],
+   "why": "«Ve a ver a Imaguni» (725248): the sanctuary entrance [-12,22] (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "objective": 12481,
+   "quest": 1868,
+   "kind": "beat",
+   "monsters": [4907, 4908, 4909],
+   "map": 179176718,
+   "afterObjectives": [12480],
+   "why": "«Vence a Imaguni y a sus servidores» (725258): Imaguni and her two servants in one solo fight beside Nosya; the dagger (18835) comes from Imaguni's client drop (Dofus pour les noobs («La voix des morts»))."
+  },
+  {
+   "quest": 2036,
+   "objective": 14594,
+   "kind": "enter",
+   "map": 173015560,
+   "why": "Encuentra un herrero capaz de reparar a Cocobur (768665): arriving at Volkaragnar's forge (173015560) through the anvil of the mine [-28,24]. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14597,
+   "kind": "click",
+   "elements": [{"map": 54167858, "element": 516599}, {"map": 54167346, "element": 516599}],
+   "afterObjectives": [14697],
+   "requires": [{"item": 20210, "count": 1}],
+   "anyOrder": true,
+   "why": "Sumerge la espada en el lago helado de Frigost (769194): the hole in the ice of the frozen lake [-68,-50] (element 516599, cell 163). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14598,
+   "kind": "click",
+   "elements": [{"map": 206046727, "element": 519877}],
+   "afterObjectives": [14697],
+   "requires": [{"item": 20210, "count": 1}],
+   "anyOrder": true,
+   "why": "Sumerge la espada en el horno de Fuegodala (768674): Feudala's furnace in the Pandala cave [15,-31]. The furnace's own element (516602) is in no bundle: element 519877 (cell 286) of the same map stands in, INFERRED. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14599,
+   "kind": "click",
+   "elements": [{"map": 173016065, "element": 516600}],
+   "afterObjectives": [14697],
+   "requires": [{"item": 20210, "count": 1}],
+   "anyOrder": true,
+   "why": "Sumerge la espada en un crater acido de las tierras desoladas (768675): the acid crater [-28,17] (element 516600, cell 203). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14601,
+   "kind": "click",
+   "elements": [{"map": 173015560, "element": 516601}],
+   "afterObjectives": [14600],
+   "requires": [{"item": 20210, "count": 1}],
+   "why": "Coloca la espada sobre el yunque de Volkaragnar (768676): the anvil of the forge (element 516601, cell 259, not walkable: pressed from a neighbour). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14602,
+   "kind": "beat",
+   "monster": 5415,
+   "map": 173015560,
+   "afterObjectives": [14601],
+   "why": "Asiste a Volkaragnar mientras vuelve a forjar la hoja (768677): the volcanic forge fire (5415), fought alone after the forging replies. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14603,
+   "kind": "enter",
+   "map": 75497732,
+   "afterObjectives": [14698],
+   "why": "Encuentra una fuente de magia en los lagos encantados (768678): the enchanted lakes [-20,-7] (map 75497732). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14604,
+   "kind": "beat",
+   "monster": 5419,
+   "map": 75497732,
+   "afterObjectives": [14603],
+   "gives": [{"item": 20211, "count": 1}],
+   "why": "Rellena un frasco con agua de la fuente de magia (768715): the koalak diviner (5419) of the spring is beaten and the water is taken (the DPLN presses the spring again afterwards; here the win gives the Agua magificadora 20211). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14699,
+   "kind": "reply",
+   "replies": [39527],
+   "afterObjectives": [14605],
+   "why": "Consulta a la joyera de Astrub (769240): Shani Sings answers about jade and the crocodail expert (39526-39527). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14700,
+   "kind": "enter",
+   "map": 101713411,
+   "afterObjectives": [14699],
+   "why": "Encuentra a Cocopalo (769241): the Astrub sewers [2,-15] where she works; the way is left-left-left-up-up from [5,-17]. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14701,
+   "kind": "beat",
+   "monsters": [5416, 5417, 5418],
+   "map": 101713411,
+   "afterObjectives": [14700],
+   "why": "Vence a los guardianes de la espada (769242): the three guardians (5416-5418) that appear beside Cocopalo, fought through her reply 39536. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14703,
+   "kind": "reply",
+   "replies": [39529],
+   "afterObjectives": [14702],
+   "why": "Engasta una piedra de jade en la empunadura de Cocobur (769244): Cocopalo at Shani's workshop [6,-15] sets the jade; her last reply (39529) ticks it. Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "quest": 2036,
+   "objective": 14695,
+   "kind": "reply",
+   "replies": [39545],
+   "afterObjectives": [14607],
+   "why": "Moja la espada con la sangre de Cocabulia (769023): in the room after her fight (198972418) the character cuts Cocabulia's side (39545). Dofus pour les noobs (Le forgeur de légende)."
+  },
+  {
+   "objective": 13098,
+   "quest": 1909,
+   "kind": "click",
+   "afterObjectives": [13159],
+   "elements": [{"map": 111673344, "element": 480598}],
+   "requires": [{"item": 19171, "count": 1}],
+   "spends": true,
+   "why": "«Coloca el hilo de Dardondakal en el telar»: the loom of the nordes' cave [-76,-80] (element 480598 INFERRED, the only decor there); the thread 19171 is given by Atroskuld."
+  },
+  {
+   "objective": 13099,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 183501836,
+   "afterObjectives": [13098],
+   "why": "«Retoma el camino del Mirador de Ilyzaelle»: the viewpoint where Hyrkul waits (183501836)."
+  },
+  {
+   "objective": 13101,
+   "quest": 1909,
+   "kind": "beat",
+   "monster": 4991,
+   "map": 183501836,
+   "why": "«Trata de defenderte del ataque de Hyrkul»: the fight against Hyrkul (4991) with two Valiant Heart centaurs."
+  },
+  {
+   "objective": 12485,
+   "quest": 1869,
+   "kind": "enter",
+   "map": 178784260,
+   "afterObjectives": [12484],
+   "why": "«Explora la mina abandonada» (725276): the first gallery of the Phalda mine, entered from [-23,21] (Dofus pour les noobs («Le fléau de Burin»))."
+  },
+  {
+   "objective": 12486,
+   "quest": 1869,
+   "kind": "beat",
+   "monsters": [4934],
+   "map": 178784258,
+   "elements": [{"map": 178784258, "element": 510905}],
+   "spawns": {"monster": 4934, "count": 1, "attacks": true},
+   "afterObjectives": [12485],
+   "why": "«Halla una forma de entrar en la fragua» (725279): Búril's tomb (element 510905, graphic 49339) in the room right and down of the four-way crossing (178784258); clicking it wakes a cave Trool (4934) that is fought alone and drops Búril's talisman (18855, client drop under Qo=12486) (Dofus pour les noobs («Le fléau de Burin»))."
+  },
+  {
+   "objective": 12487,
+   "quest": 1869,
+   "kind": "enter",
+   "map": 178783244,
+   "afterObjectives": [12486],
+   "why": "«Encuentra al herrero» (725285): the heart of the volcano [-28,24] where the smith stands, past the room the talisman lets through (Dofus pour les noobs («Le fléau de Burin»))."
+  },
+  {
+   "objective": 12490,
+   "quest": 1869,
+   "kind": "enter",
+   "map": 181404676,
+   "afterObjectives": [12489],
+   "why": "«Encuentra a la cazadora de Sramvil» (725310): the Fungus caverns [-12,31] (Dofus pour les noobs («Le fléau de Burin»))."
+  },
+  {
+   "objective": 13095,
+   "quest": 1909,
+   "kind": "objectives",
+   "afterObjectives": [13122],
+   "why": "«Obtén la aprobación de Clothurd»: her quest «La felicidad está en campo rociado» (1911) done, 13122 its last objective (Dofus pour les noobs: the four quests of the nordes)."
+  },
+  {
+   "objective": 13096,
+   "quest": 1909,
+   "kind": "objectives",
+   "afterObjectives": [13138],
+   "why": "«Obtén la aprobación de Lachandi»: «Una voz de cristal» (1912) done, 13138 its last objective."
+  },
+  {
+   "objective": 13097,
+   "quest": 1909,
+   "kind": "objectives",
+   "afterObjectives": [13158],
+   "why": "«Obtén la aprobación de Atroskuld»: «Muerto en vida» (1913) done, 13158 its last objective."
+  },
+  {
+   "objective": 13159,
+   "quest": 1909,
+   "kind": "objectives",
+   "afterObjectives": [13173],
+   "why": "«Descubre más cosas sobre Hyrkul»: «El Guerrero Negro» (1914) done, 13173 its last objective."
   }
 ]
 }
