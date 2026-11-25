@@ -65,7 +65,8 @@ namespace Jondo.Unity.Server.Handlers
         /// master's client does not turn the pages of a bar that is not its character's, so what
         /// is past the first page cannot be reached.
         /// </summary>
-        private static byte[]? HeroBar(Fighter played, long me)
+        private static (IReadOnlyList<(int Spell, int Grade)> Spells, IReadOnlyList<(int Slot, int Spell)> Bar,
+            bool WithWeapon)? PackedHeroLayout(Fighter played)
         {
             if (!_heroBars.TryGetValue(played.Id, out var layout)) return null;
             var packed = new List<(int Slot, int Spell)>();
@@ -75,7 +76,7 @@ namespace Jondo.Unity.Server.Handlers
             // What he knows and did not put on his bar comes after, so that every spell he has is in hand.
             foreach (var (spell, _) in layout.Spells)
                 if (!packed.Any(p => p.Spell == spell)) packed.Add((packed.Count, spell));
-            return Network.FightProtocol.BuildSpellBar(played.Id, layout.Spells, packed, layout.WithWeapon, controllerId: me);
+            return (layout.Spells, packed, layout.WithWeapon);
         }
 
         internal static byte[] PlayedAllyBarForTests(Fighter played, long me) => PlayedAllyBar(played, me);

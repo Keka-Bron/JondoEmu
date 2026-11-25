@@ -465,14 +465,6 @@ namespace Jondo.Unity.Server.Network
         // ─── The real fight ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// "Placement is over" (kai). It goes empty all ten times it appears.
-        ///
-        /// It is the only clean cut between the two phases: everything before is placement and everything
-        /// after —jyy, jxz, jxc, jto, jxb, jwi— is the loading of the fight already started.
-        /// </summary>
-        public static byte[] BuildFightBegins() => Array.Empty<byte>();
-
-        /// <summary>
         /// Giving up unlocked, or not, in a Koliseo fight (ltm): <c>f2</c> is what the client
         /// enables its leave button with; the rest goes empty.
         /// </summary>
@@ -564,9 +556,6 @@ namespace Jondo.Unity.Server.Network
         /// 08021083a8e3aab8081805. The 5 appears exactly once per capture and only there.
         /// </remarks>
         public const int SurrenderSequence = 5;
-
-        /// <summary>The fight's start sequence.</summary>
-        public const int OpeningSequence = 8;
 
         /// <summary>The end-of-turn one.</summary>
         public const int TurnEndSequence = 7;
@@ -886,22 +875,6 @@ namespace Jondo.Unity.Server.Network
         public const int ShownRowFlag = 4;
 
         public const int SpellEffectsRemoved = 406;
-
-        /// <summary>
-        /// Which sequence the client acknowledges (jti): <c>f2</c> carries the same action number it
-        /// was closed with, that of the jwi's <c>f1</c>. Returns zero if it does not come.
-        /// </summary>
-        public static int ReadSequenceAck(byte[] payload)
-        {
-            byte[]? jti = ConnectionProtocol.ReadPayload(payload, Op.Jti);
-            if (jti == null) return 0;
-
-            foreach (var field in ProtoMessage.Parse(jti).Fields)
-            {
-                if (field.WireType == 0 && field.FieldNumber == 2) return (int)field.VarIntValue;
-            }
-            return 0;
-        }
 
         /// <summary>
         /// What happens (jwe). <c>f14</c> says what it is about:

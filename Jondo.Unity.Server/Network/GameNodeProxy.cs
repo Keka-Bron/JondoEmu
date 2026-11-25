@@ -1492,11 +1492,10 @@ namespace Jondo.Unity.Server.Network
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
                 }
-                else if (payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
+                else if (payloadStr.Contains("type.ankama.com/jxy")
                          || payloadStr.Contains(Op.Uri(Op.Jwh))
                          || payloadStr.Contains(Op.Uri(Op.Jwn))
-                         || payloadStr.Contains(Op.Uri(Op.Jti))
-                          || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp)))
+                         || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp)))
                 {
                     await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
@@ -1706,6 +1705,9 @@ namespace Jondo.Unity.Server.Network
                     break; // Placement panel mode and hover notifications have no reply.
                 case Game.FightReadyRequest ready:
                     await FightHandler.HandleReadyAsync(session, ready);
+                    break;
+                case Game.FightTurnReadyRequest or Game.GameActionAcknowledgementRequest:
+                    await FightHandler.HandleCombatConfirmationAsync(session, (Game.GameRequest)frame.Content);
                     break;
                 case Game.ShowCellRequest marker:
                     await FightHandler.MarkCellAsync(session, marker);

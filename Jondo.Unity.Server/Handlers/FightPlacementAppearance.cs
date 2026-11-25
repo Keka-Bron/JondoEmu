@@ -10,7 +10,7 @@ public static partial class FightHandler
     private static FightFighterShowEvent PlacementAppearance(FightInstance fight, Fighter fighter)
         => new(BoardFighter(fight, fighter, ongoing: false));
 
-    private static ActorPositionInformation BoardFighter(FightInstance fight, Fighter fighter, bool ongoing)
+    private static ActorPositionInformation BoardFighter(FightInstance fight, Fighter fighter, bool ongoing, bool tellLife = false)
     {
         bool isDouble = ongoing && fighter.DoubleOf != 0;
         bool ai = fighter.IsMonster && !isDouble;
@@ -21,8 +21,8 @@ public static partial class FightHandler
         if (ongoing) look = BoardLookWithAppearance(look, fighter.Buffs.AparienciaEn(fight.RoundNumber));
         long summoner = ongoing ? SummonerOf(fighter) : 0;
         var scrolls = !isDouble ? ScrollsOf(fighter) : null;
-        // A spectator snapshot must not advance the life baseline used by live combat updates.
-        var sheet = ongoing ? FullSheetOf(fighter, conTraza: false, told: false) : PlacementSheetOf(fighter);
+        // The opening roster sets the shared life baseline; a private spectator snapshot does not.
+        var sheet = ongoing ? FullSheetOf(fighter, conTraza: tellLife, told: tellLife) : PlacementSheetOf(fighter);
         var stats = sheet.Select(row => BoardStat(row.Characteristic, row.Base, row.Gear,
             scrolls?.GetValueOrDefault(row.Characteristic) ?? 0, ai)).ToArray();
         var actor = new FightFighterInformation(ai ? 0 : fighter.Id,

@@ -6568,7 +6568,11 @@
     },
     "lru": {
       "name": "ChallengeTarget",
-      "fields": {},
+      "fields": {
+        "gfor": "FighterId",
+        "gfos": "CellId",
+        "gfot": "AttackersId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],

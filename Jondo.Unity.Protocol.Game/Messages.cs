@@ -1380,7 +1380,7 @@ public sealed record ChallengeModSelectedEvent(ChallengeMod ChallengeMod) : Game
 
 public sealed record ChallengeNumberEvent(int ChallengeNumber) : GameEvent;
 
-public sealed record ChallengeTarget();
+public sealed record ChallengeTarget(int CellId, long FighterId, IReadOnlyList<long> AttackersId);
 
 public sealed record CharacterAppearanceCollectionEvent(CharacterColors? CharacterColors) : GameEvent;
 

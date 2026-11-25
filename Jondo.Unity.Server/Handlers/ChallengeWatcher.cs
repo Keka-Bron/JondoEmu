@@ -9,6 +9,7 @@ using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
+using Game = Jondo.Unity.Protocol.Game;
 using static Jondo.Protocol.NetworkMessage;
 
 namespace Jondo.Unity.Server.Handlers
@@ -155,7 +156,7 @@ namespace Jondo.Unity.Server.Handlers
         /// picked at random among those present, which is the only reasonable thing: which one the real
         /// server chooses cannot be known from three samples.
         /// </summary>
-        public static async Task FightStartedAsync(NetworkStream stream, FightInstance fight)
+        public static async Task FightStartedAsync(GameSession session, FightInstance fight)
         {
             if (fight.ChallengesFixed.Count == 0) return;
 
@@ -174,13 +175,17 @@ namespace Jondo.Unity.Server.Handlers
                         .ToHashSet();
             }
 
-            foreach (int reto in SenalanAlEmpezar)
+            foreach (int reto in SenalanAlEmpezar.Append(Imprevisible))
             {
-                if (Vivo(fight, reto)) await SenalarAsync(stream, fight, reto, UnEnemigoVivo(fight));
+                if (!Vivo(fight, reto)) continue;
+                // Each client gets its own burst, but all play against the same target.
+                var target = fight.ChallengeTargets.TryGetValue(reto, out long id) ? fight.Buscar(id) : UnEnemigoVivo(fight);
+                if (target == null) continue;
+                fight.ChallengeTargets[reto] = target.Id;
+                int percent = fight.ChallengesFixed.First(challenge => challenge.Id == reto).Percent;
+                await session.SendAsync(new Game.ChallengeTargetsEvent(new(percent, reto,
+                    [new(target.CellId, target.Id, [])], percent, Game.ChallengeState.InProgress)));
             }
-
-            if (Vivo(fight, Imprevisible))
-                await SenalarAsync(stream, fight, Imprevisible, UnEnemigoVivo(fight));
         }
 
         /// <summary>Somebody's turn starts: where he starts from and with how many MP is noted.</summary>

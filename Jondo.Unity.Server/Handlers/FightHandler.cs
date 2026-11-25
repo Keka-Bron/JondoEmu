@@ -2088,6 +2088,27 @@ namespace Jondo.Unity.Server.Handlers
             });
         }
 
+        // The packet loop holds the session turn; acquire the fight turn second, just as the clocks do.
+        internal static async Task HandleCombatConfirmationAsync(GameSession session, Game.GameRequest request)
+        {
+            using var context = SessionContext.Push(session);
+            if (!session.State.IsInFight || GetCurrentFight() is not { } fight || session.State.FightId != fight.FightId) return;
+            await InTurnAsync(fight, async () =>
+            {
+                if (!session.State.IsInFight || session.State.FightId != fight.FightId || !ReferenceEquals(GetCurrentFight(), fight)) return;
+                switch (request)
+                {
+                    case Game.GameActionAcknowledgementRequest acknowledgement:
+                        await AcuseAsync(fight, acknowledgement.ActionId);
+                        break;
+                    case Game.FightTurnReadyRequest:
+                        // As before, the arrival acknowledges the prompt; older senders may omit the flag.
+                        if (!await FinishPendingFightAsync(fight)) await ConfirmAsync(session.Stream);
+                        break;
+                }
+            });
+        }
+
         private static async Task<bool> FinishPendingFightAsync(FightInstance fight)
         {
             if (fight.FinPendiente == 0) return false;
@@ -2112,26 +2133,13 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"  Hex: {hex}");
             }
 
-            // Only these three are sent by the 3.6.10.10 client during placement, and they are
-            // measured. The old code listened for jyz, jza, jub, jwe and jxw: the first with its letters
-            // transposed and the others either nonexistent in this version or messages the SERVER
-            // sends, not the client. The rest of the fight will come in here as it is deciphered.
             // Safety net for the pending end: if anything else arrives before the acknowledgement,
             // it is shown right away. That way a client that does not acknowledge does not leave the
             // fight hanging forever, and no extra timer is needed for it.
-            // And the jwz that answers the jxh of the end is what normally ends it: it comes once
-            // the client has played the blows that ended the fight (see CheckFightOverAsync).
             var fight = GetCurrentFight();
+            if (fight != null) await FinishPendingFightAsync(fight);
 
-            if (fight != null && !payloadStr.Contains(Op.Uri(Op.Jti)))
-                await FinishPendingFightAsync(fight);
-
-            if (payloadStr.Contains("type.ankama.com/jwz"))
-            {
-                // "Got the jxh": until this arrives, the turn does not start.
-                await ConfirmAsync(stream);
-            }
-            else if (payloadStr.Contains("type.ankama.com/jxy"))
+            if (payloadStr.Contains("type.ankama.com/jxy"))
             {
                 // Pass turn. It comes empty -- or, on a test server, with the client's "IsAfk":
                 // the harness plays the character from the server, the client sees its player
@@ -2153,12 +2161,6 @@ namespace Jondo.Unity.Server.Handlers
                 // fight and no branch picked it up: it fell off the end of the if/else with no trace
                 // at all. There are TWO routing chains, not one.
                 await CastAsync(stream, payload);
-            }
-            else if (payloadStr.Contains(Op.Uri(Op.Jti)))
-            {
-                // The acknowledgement of each closed sequence. It carries no answer, but it is what
-                // unlocks the end-of-fight screen when the last hit left it waiting.
-                await AcuseAsync(stream, payload);
             }
             else if (payloadStr.Contains(Op.Uri(Op.Ltf)))
             {
@@ -2269,11 +2271,14 @@ namespace Jondo.Unity.Server.Handlers
         {
             if (!played.IsCharacter)
                 return Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado);
-            if (HeroBar(played, me) is { } heroBar) return heroBar;
-            var bar = new List<(int Slot, int Spell)> { (0, Network.FightProtocol.HechizoCuerpoACuerpo) };
-            for (int i = 0; i < played.HechizosDeInvocado.Count; i++) bar.Add((i + 1, played.HechizosDeInvocado[i].Spell));
-            return Network.FightProtocol.BuildSpellBar(played.Id, played.HechizosDeInvocado, bar, conArma: true, controllerId: me);
+            var (spells, bar, withWeapon) = PlayedCharacterLayout(played);
+            return Network.FightProtocol.BuildSpellBar(played.Id, spells, bar, withWeapon, controllerId: me);
         }
+
+        private static (IReadOnlyList<(int Spell, int Grade)> Spells, IReadOnlyList<(int Slot, int Spell)> Bar,
+            bool WithWeapon) PlayedCharacterLayout(Fighter played)
+            => PackedHeroLayout(played) ?? (played.HechizosDeInvocado,
+                played.HechizosDeInvocado.Select((spell, i) => (Slot: i + 1, spell.Spell)).Prepend((0, 0)).ToArray(), true);
 
         /// <summary>
         /// Whose end-of-fight numbers a fighter's deeds go to: his own when he is a person,
@@ -2823,7 +2828,7 @@ namespace Jondo.Unity.Server.Handlers
                 Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
 
             // And the Koliseo's leave button, which a new client has greyed out again.
-            await SendSurrenderStateAsync(stream, fight, me);
+            await SendSurrenderStateAsync(SessionContext.Current, fight);
 
             if (fight.TurnAwaitingConfirmation)
             {
@@ -3060,7 +3065,7 @@ namespace Jondo.Unity.Server.Handlers
             // capture carries -- kai, jyy, jxz, jxc, jto, jxb, jwi, jxh -- mixes fight frames with
             // frames of whoever is watching, and splitting it would leave a client receiving the jxb
             // out of its own sequence.
-            await ACadaUnoAsync(fight, sesion => ArrancarParaUnoAsync(sesion.Stream, fight));
+            await ACadaUnoAsync(fight, session => ArrancarParaUnoAsync(session, fight));
 
             // And what happens on the board before the first turn, once, behind everybody's burst.
             await BoardStartsAsync(fight);
@@ -3119,11 +3124,11 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The starting burst, as ONE of the people in the fight sees it.</summary>
-        private static async Task ArrancarParaUnoAsync(NetworkStream stream, FightInstance fight)
+        private static async Task ArrancarParaUnoAsync(GameSession session, FightInstance fight)
         {
-            var character = DatabaseManager.GetCharacterById(GameState.CharacterId);
-            long me = GameState.CharacterId;
-            ActivityJournal.Current.Write("fight.started", SessionContext.Current.AccountId, me,
+            long me = session.CharacterId;
+            var character = DatabaseManager.GetCharacterById(me);
+            ActivityJournal.Current.Write("fight.started", session.AccountId, me,
                 new
                 {
                     fightId = fight.FightId,
@@ -3133,13 +3138,12 @@ namespace Jondo.Unity.Server.Handlers
                 });
 
             // Achievement challenges are evaluated per person, after the shared choices and before kai.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.ImposeAsync(SessionContext.Current, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.ImposeAsync(session, fight);
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kai,
-                Network.FightProtocol.BuildFightBegins()));
+            await session.SendAsync(new Game.FightStartEvent());
 
             // And the final list, which goes between the kai and the jyy.
-            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(SessionContext.Current, fight);
+            if (fight.Reglas.HayRetos) await ChallengeHandler.SendFinalListAsync(session, fight);
 
             // The spells fought with are the SAME the character has outside the fight, and with the
             // same guts: the usual hms carries f1 { f1: grade, f3: spell, f4: 1 } and the jyy repeats
@@ -3147,20 +3151,16 @@ namespace Jondo.Unity.Server.Handlers
             // that is why the client showed every spell during placement -- its own, from before --
             // and went blank at the start of the turn, when our short list finally reached it.
             var spellLayout = Managers.FightSpellLayout.ForFight(character?.Breed ?? 0,
-                                                                 GameState.CharacterLevel,
-                                                                 SessionContext.Current.AccountId);
+                session.State.CharacterLevel, session.AccountId);
             var spells = spellLayout.Spells;
-            var bar = spellLayout.Bar;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy,
-                Network.FightProtocol.BuildSpellBar(me, spells, bar, spellLayout.WithWeapon)));
+            await session.SendAsync(SpellBar(me, me, spells, spellLayout.Bar, spellLayout.WithWeapon));
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz,
-                Network.FightProtocol.BuildRound(FirstRound)));
+            await session.SendAsync(new Game.FightNewRoundEvent(0, FirstRound));
 
             // The challenges that point out an enemy do it here, after the jyy, which is where the
             // three kwm of the captures come out.
-            if (fight.Reglas.HayRetos) await ChallengeWatcher.FightStartedAsync(stream, fight);
+            if (fight.Reglas.HayRetos) await ChallengeWatcher.FightStartedAsync(session, fight);
 
             // The spells that are BORN with a cooldown: their grade's InitialCooldown. In the Paso de
             // Cacería capture the fight's first jxc carries {370:1, 373:1, 32469:1}, and in the
@@ -3178,19 +3178,16 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
-                Network.FightProtocol.BuildCooldowns(me, RecargasDe(yoMismo))));
+            await session.SendAsync(SpellCooldowns(me, yoMismo));
 
             // And the bar of each ally he plays, as a summon's comes when it is summoned: Barnabé's.
             foreach (var played in fight.Azul.Where(f => f.IsPlayedAlly && f.ControlledBy(me)).ToList())
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxc,
-                    Network.FightProtocol.BuildCooldowns(played.Id, RecargasDe(played))));
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jyy, PlayedAllyBar(played, me)));
+                await session.SendAsync(SpellCooldowns(played.Id, played));
+                await session.SendAsync(PlayedAllyContext(played, me));
             }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jto,
-                Network.FightProtocol.BuildSequenceStart(me, Network.FightProtocol.OpeningSequence)));
+            await session.SendAsync(new Game.SequenceStartEvent(Game.SequenceType.FightStart));
 
             // Everybody's full sheets. This is where the life, the level and the resistances that
             // travelled empty during placement arrive.
@@ -3204,23 +3201,21 @@ namespace Jondo.Unity.Server.Handlers
             // placement.
             // In PLAY ORDER, the same order as the jzu: the real fight-start jxb lists the first
             // player first, and the client indexes its carousel against that.
-            var everyone = FighterBlocksInPlayOrder(fight);
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
-                Network.FightProtocol.BuildAllFighters(everyone)));
-
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwi,
-                Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), me,
-                                                       Network.FightProtocol.OpeningSequence)));
+            var everyone = FightersInPlayOrder(fight).Select(fighter => BoardFighter(fight, fighter, ongoing: true,
+                tellLife: true)).ToArray();
+            await session.SendAsync(new Game.FightSynchronizeEvent(everyone));
+            await session.SendAsync(new Game.SequenceEndEvent(fight.SiguienteAccion(), me));
 
             Program.LogDebug($"[Fight] Fight #{fight.FightId} starts: " +
-                             $"{everyone.Count} fighters, first {fight.CurrentFighter?.Id}.");
+                             $"{everyone.Length} fighters, first {fight.CurrentFighter?.Id}.");
 
             // What he carries for every spell -- a dream's "Sorts : +1 Portée maximale" -- for his
             // client to draw and allow.
             if (yoMismo != null)
-                await SendEverySpellModifiersAsync(packet => WriteFrameAsync(stream, packet), fight, yoMismo,
-                                                   spells.Select(s => s.Spell));
+                foreach (var (kind, action, spell, total) in EverySpellModifiers(fight, yoMismo, spells.Select(s => s.Spell)))
+                    // The reviewed August modifier values match these stable enum members.
+                    await session.SendAsync(new Game.ApplySpellModifierEvent(new(0, (Game.SpellModifierActionType)action,
+                        total, (Game.SpellModifierType)kind, spell), me));
 
             // In an arena fight the client greys its leave button out until the server unlocks
             // giving up, and nothing did: against JondoBots there was no way out but losing. The
@@ -3229,10 +3224,33 @@ namespace Jondo.Unity.Server.Handlers
             // vote with the team to give up (KoliseoSurrender) --: the 2v2 capture's ltm "0801"
             // before the first round, with the button's f2 on top. Without it the button stayed
             // grey the whole fight and there was no way out.
-            await SendSurrenderStateAsync(stream, fight, me);
+            await SendSurrenderStateAsync(session, fight);
 
             // The board's own start -- the passives, the raids' and the first turn -- follows
             // everybody's burst, once (BoardStartsAsync).
+        }
+
+        private static Game.FightSpellCooldownEvent SpellCooldowns(long id, Fighter? fighter)
+            => new(RecargasDe(fighter).Select(row => new Game.FightSpellCooldown(row.Spell, row.Rounds)).ToArray(), id);
+
+        private static Game.FightActorContextEvent SpellBar(long actorId, long controllerId,
+            IReadOnlyList<(int Spell, int Grade)> spells, IEnumerable<(int Slot, int Spell)> bar, bool withWeapon,
+            Game.SpellType spellType = Game.SpellType.Unknown1)
+        {
+            var items = new List<Game.SpellItem>(spells.Count + (withWeapon ? 1 : 0));
+            if (withWeapon) items.Add(new(1, 0, Game.SpellType.Unknown2));
+            items.AddRange(spells.Select(spell => new Game.SpellItem(spell.Grade, spell.Spell, spellType)));
+            return new(actorId, controllerId, items,
+                bar.Select(slot => new Game.Shortcut(slot.Slot, new Game.ShortcutCaseShortcutSpell(new(slot.Spell)))).ToArray());
+        }
+
+        private static Game.FightActorContextEvent PlayedAllyContext(Fighter played, long controllerId)
+        {
+            if (!played.IsCharacter)
+                return SpellBar(played.Id, controllerId, played.HechizosDeInvocado,
+                    played.HechizosDeInvocado.Select((spell, slot) => (slot, spell.Spell)), false, Game.SpellType.Unknown6);
+            var (spells, bar, withWeapon) = PlayedCharacterLayout(played);
+            return SpellBar(played.Id, controllerId, spells, bar, withWeapon);
         }
 
         /// <summary>
@@ -3303,18 +3321,22 @@ namespace Jondo.Unity.Server.Handlers
         internal static async Task SendEverySpellModifiersAsync(Func<byte[], Task> send, FightInstance fight,
                                                                 Fighter who, IEnumerable<int> spells)
         {
+            foreach (var (kind, action, spell, total) in EverySpellModifiers(fight, who, spells))
+                await send(ConnectionProtocol.Push(Op.Hnd,
+                    Network.FightProtocol.BuildSpellModifier(who.Id, kind, spell, total, action)));
+        }
+
+        private static IEnumerable<(int Kind, int Action, int Spell, int Total)> EverySpellModifiers(
+            FightInstance fight, Fighter who, IEnumerable<int> spells)
+        {
             var aspects = who.EverySpell.Where(m => m.Value != 0).Select(m => m.Key).ToList();
-            if (aspects.Count == 0) return;
+            if (aspects.Count == 0) yield break;
             var list = spells.Where(s => s != 0).Distinct().ToList();
             foreach (var aspect in aspects)
             {
                 if (Managers.SpellModifiers.OnTheWire(aspect) is not { } wire) continue;
                 foreach (int spell in list)
-                {
-                    await send(ConnectionProtocol.Push(Op.Hnd, Network.FightProtocol.BuildSpellModifier(
-                        who.Id, wire.Kind, spell,
-                        Managers.SpellModifiers.Total(who, spell, aspect, fight.RoundNumber), wire.Action)));
-                }
+                    yield return (wire.Kind, wire.Action, spell, Managers.SpellModifiers.Total(who, spell, aspect, fight.RoundNumber));
             }
         }
 
@@ -3334,26 +3356,15 @@ namespace Jondo.Unity.Server.Handlers
 
 
         /// <summary>
-        /// "Confirm to me" (jxh). The server sends it before each turn and waits for the client's
-        /// jwz; until it arrives, the turn does not start.
+        /// Ask the clients to confirm that they have played the preceding sequences, before opening the turn.
         /// </summary>
-        /// <param name="deQuien">
-        /// Whose id it carries: the fighter whose turn has just ENDED, not the one about to
-        /// play. Measured over 77 captures: 1,409 of the 1,471 jxh name the fighter of the jyt
-        /// before them, and the rest are the first of a fight -- where there is nobody ending
-        /// and it names the first to play -- or the last, with no turn behind. The client
-        /// answers with the jti of the closing sequences and then the jwz.
-        /// </param>
-        private static async Task AskToConfirmAsync(NetworkStream stream, FightInstance fight,
-                                                    long deQuien = 0)
+        private static async Task AskToConfirmAsync(NetworkStream stream, FightInstance fight)
         {
             var next = fight.CurrentFighter;
             if (next == null) return;
 
-            // The question goes to both, so that both clients know a turn is starting. Of the two
-            // answers, only the first does the work: see ConfirmAsync.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh,
-                Network.FightProtocol.BuildConfirmTurn(deQuien != 0 ? deQuien : next.Id)));
+            // Every participant can confirm; spectators observe the prompt without holding the turn.
+            await ATodosAsync(fight, new Game.FightIsTurnReadyEvent());
 
             // And if no client answers at all, the turn still opens: after a summon its player
             // drives had passed its turn, the client sent no jwz and the fight stood still for good.
@@ -3620,10 +3631,8 @@ namespace Jondo.Unity.Server.Handlers
             // A turret that has become its Steamer's since: its bar, before any turn starts.
             await HandOverWhatBecameHisAsync(fight);
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jzc,
-                Network.FightProtocol.BuildTurnStart(fighter.Id, duration,
-                                                     fight.CurrentTurnIndex, fight.RoundNumber, carried,
-                                                     fight.PlayingAdditional?.Id)));
+            await ATodosAsync(fight, new Game.FightTurnEvent(fighter.Id, duration,
+                fight.PlayingAdditional?.Id ?? "", carried, TurnTimeOverrideDeciseconds: null, fight.CurrentTurnIndex));
             fight.LastAnnouncedTurn = new FightInstance.AnnouncedTurn(
                 fighter.Id, fight.CurrentTurnIndex, fight.RoundNumber, duration, DateTime.UtcNow, carried);
 
@@ -3909,12 +3918,11 @@ namespace Jondo.Unity.Server.Handlers
                 var his = fighter.IsPlayedAlly ? owner
                         : fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
                 if (his != null)
-                    await his.SendAsync(ConnectionProtocol.Push(Op.Jyj, Network.FightProtocol.BuildYourTurn()));
+                    await his.SendAsync(new Game.FightTurnStartPlayingEvent());
             }
             else if (owner != null)
             {
-                await owner.SendAsync(ConnectionProtocol.Push(Op.Jyj,
-                    Network.FightProtocol.BuildYourTurn()));
+                await owner.SendAsync(new Game.FightTurnStartPlayingEvent());
             }
 
             Program.LogDebug($"[Fight] Turn of {fighter.Id} ({(fighter.IsMonster ? "monster" : "player")}), " +
@@ -6577,7 +6585,7 @@ namespace Jondo.Unity.Server.Handlers
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxb, Network.FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
         }
 
-        private static IEnumerable<(int Spell, int Rounds)> RecargasDe(Fighter quien)
+        private static IEnumerable<(int Spell, int Rounds)> RecargasDe(Fighter? quien)
         {
             if (quien == null) yield break;
             foreach (var par in quien.Recarga) yield return (par.Key, par.Value);
@@ -12698,8 +12706,7 @@ namespace Jondo.Unity.Server.Handlers
         private static async Task FirstDimensionWaveAsync(FightInstance fight)
         {
             if (fight.WaveArrivalState == 0 || fight.TimedWaves.Count == 0) return;
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jyb,
-                Network.FightProtocol.BuildNewWave(FightInstance.Rojos, fight.WaveNumber, fight.TimedWaves[0].Turns)));
+            await ATodosAsync(fight, new Game.FightNewWaveEvent(Game.Team.Defender, fight.WaveNumber, fight.TimedWaves[0].Turns));
         }
 
         /// <summary>
@@ -12859,16 +12866,9 @@ namespace Jondo.Unity.Server.Handlers
         /// results screen before animating anything: neither the spell, nor the damage, nor the death.
         /// Waiting for the acknowledgement, the client has already swallowed the whole sequence.
         /// </summary>
-        private static async Task AcuseAsync(NetworkStream stream, byte[] payload)
+        private static async Task AcuseAsync(FightInstance fight, int actionId)
         {
-            // THE FIGHT OF WHOEVER SENDS THE ACKNOWLEDGEMENT, not the last one left waiting on the
-            // whole server: with two fights at once, one's acknowledgement closed the other and paid
-            // the wrong person.
-            var fight = GetCurrentFight();
-            if (fight == null || fight.FinPendiente == 0) return;
-
-            int acusada = Network.FightProtocol.ReadSequenceAck(payload);
-            if (acusada != 0 && acusada < fight.FinPendiente) return;
+            if (fight.FinPendiente == 0 || (actionId != 0 && actionId < fight.FinPendiente)) return;
 
             fight.FinPendiente = 0;
             await EndFightAsync(fight);
@@ -13955,7 +13955,7 @@ namespace Jondo.Unity.Server.Handlers
                     await NextTimedWaveAsync(stream, fight);
             }
 
-            await AskToConfirmAsync(stream, fight, deQuien: ending.Id);
+            await AskToConfirmAsync(stream, fight);
         }
 
         public static async Task RefreshPlayerSpellBarAsync(NetworkStream stream)

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
+using Game = Jondo.Unity.Protocol.Game;
 using static Jondo.Protocol.NetworkMessage;
 
 namespace Jondo.Unity.Server.Handlers
@@ -49,20 +50,12 @@ namespace Jondo.Unity.Server.Handlers
         /// The leave button of a Koliseo fight, unlocked (ltm): leaving at once against JondoBots,
         /// the surrender window in a fight of people. Nothing in any other fight.
         /// </summary>
-        internal static async Task SendSurrenderStateAsync(NetworkStream stream, FightInstance fight, long me)
+        private static async Task SendSurrenderStateAsync(GameSession session, FightInstance fight)
         {
-            if (CanGiveUpAtOnce(fight, me))
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ltm,
-                    Network.FightProtocol.BuildSurrenderUnlocked(true)));
-                Program.LogDebug($"[Koliseo] {me} may give up fight #{fight.FightId}.");
-            }
-            else if (OpensSurrender(fight, me))
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ltm,
-                    Network.FightProtocol.BuildSurrenderOpen()));
-                Program.LogDebug($"[Koliseo] {me} may leave or vote to give up fight #{fight.FightId}.");
-            }
+            if (fight.KoliseoMode < 0) return;
+            bool popup = OpensSurrender(fight, session.CharacterId);
+            await session.SendAsync(new Game.SurrenderStateEvent(HasSurrenderPopup: popup, CanLeave: true));
+            Program.LogDebug($"[Koliseo] {session.CharacterId} may {(popup ? "leave or vote to give up" : "give up")} fight #{fight.FightId}.");
         }
 
         /// <summary>The surrender window asked for (ltf): leaving and voting, both open.</summary>

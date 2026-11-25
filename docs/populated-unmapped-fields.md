@@ -262,6 +262,17 @@ native audit found no use witness and incomplete caller coverage. The typed
 board omits that scalar and still sends the current round in the separate
 `FightNewRoundEvent`. Neither omission uses a raw fallback.
 
+### Combat startup and turn confirmation
+
+The typed opening sequence omits `SequenceStartEvent` / `jto` tag **1** (the former
+author ID, property **198700**) and `SequenceEndEvent` / `jwi` tag **3** (the former
+sequence kind, property **199065**). It retains the reviewed start kind and the
+end's action and author IDs. `FightIsTurnReadyEvent` / `jxh` omits the former fighter
+ID (tag **2**, property **199176**) and sends the empty notification. The August
+MCP audit reported **indeterminate** use with incomplete caller coverage for all
+three fields. The shared typed turn announcement omits `jzc` tag **8** under the
+same policy as the spectator snapshot. These are not findings of global non-use.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

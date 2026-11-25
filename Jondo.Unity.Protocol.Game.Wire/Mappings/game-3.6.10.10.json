@@ -6662,7 +6662,11 @@
     },
     "lda": {
       "name": "ChallengeTarget",
-      "fields": {},
+      "fields": {
+        "gaet": "AttackersId",
+        "gaeu": "CellId",
+        "gaev": "FighterId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
