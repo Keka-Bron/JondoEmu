@@ -7765,15 +7765,6 @@
    "why": "«Encuentrate con Sered en Ryluglugló» (644134): the plateau [25,26], the objective's own map."
   },
   {
-   "objective": 11004,
-   "quest": 1732,
-   "kind": "beat",
-   "monster": 4466,
-   "map": 168560642,
-   "afterObjectives": [11003],
-   "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs)."
-  },
-  {
    "objective": 9243,
    "quest": 1571,
    "kind": "talk",
@@ -9714,12 +9705,12 @@
    "objective": 7946,
    "quest": 1433,
    "kind": "click",
-   "elements": [{"map": 117703180, "element": 483126}, {"map": 117704204, "element": 483128}, {"map": 117704204, "element": 483129}, {"map": 117704202, "element": 483122}, {"map": 117704200, "element": 483114}, {"map": 117704200, "element": 508072}, {"map": 117705219, "element": 483113}, {"map": 117705226, "element": 483124}, {"map": 117705224, "element": 483115}, {"map": 117705228, "element": 483130}],
+   "elements": [{"map": 117703180, "element": 483329}, {"map": 117703180, "element": 483330}, {"map": 117703180, "element": 483331}, {"map": 117704204, "element": 483328}, {"map": 117703185, "element": 483332}, {"map": 117703185, "element": 483333}, {"map": 117703185, "element": 483334}, {"map": 117703187, "element": 483336}, {"map": 117703187, "element": 483337}, {"map": 117708805, "element": 483324}, {"map": 117708805, "element": 483325}, {"map": 117708805, "element": 483570}, {"map": 117708803, "element": 483326}, {"map": 117708803, "element": 483327}],
    "onlyGives": true,
    "givesEach": true,
    "gives": [{"item": 14808, "count": 10}],
    "anyOrder": true,
-   "why": "«Ron marino» (14808, gathered by skill 239 per the client's skills table). DPLN «L'ivresse des profondeurs»: bottles stand in the Splash Zone rooms ([20,19] one beside the crate, [21,20] and [23,18] two each, plus [22,19], [22,21], [23,20], [23,26]-style singles) and need no steamer battery. The ten gfx 42429 elements of subarea 804 (a bottle drawn on a crate in the client) each hand one bottle to the character walking up and clicking it; the earlier world-graph teleport on these ids is an approximate reverse-element guess, not a door. Respawn every 5 minutes is not modelled (one bottle per element per session)."
+   "why": "«Ron marino» (14808, gathered by skill 239 per the client's skills table). Dofus pour les noobs «L'ivresse des profondeurs»: bottles stand on a table, a post and a crate of the Splash Zone rooms (their screenshots), and in the Currents rooms [21,24] x3, [20,25] x2, [22,27], [23,27] x2. In the client map data they are the small interactive props gfx 2428/2427/2426 (table, post, crate); the gfx 42429 elements are the round porthole doors (world graph type 32, skill 184) and are not bottles. Each prop hands one bottle to the character clicking it. Respawn every 5 minutes is not modelled (one bottle per element per session)."
   },
   {
    "objective": 13428,
@@ -9747,6 +9738,16 @@
    "afterObjectives": [13431],
    "worn": [{"item": 17519, "count": 1}],
    "why": "«Ve al faro de Madrestam disfrazado de micholobo» (746139): the lighthouse with the Weremoggy eidolon (17519) worn."
+  },
+  {
+   "objective": 11004,
+   "quest": 1732,
+   "kind": "beat",
+   "monster": 4466,
+   "map": 168560642,
+   "afterObjectives": [11003],
+   "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs). The beat hands over the remains of Rykke Zane (18044, «Restes de Rykke Zane», DPLN: «vous obtenez des Restes de Rykke Zane dans votre inventaire de quête»), which Sered takes in 28602.",
+   "gives": [{"item": 18044, "count": 1}]
   }
 ]
 }

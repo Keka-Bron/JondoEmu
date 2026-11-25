@@ -8762,6 +8762,12 @@
       "orientation": 3,
       "criterion": "Qa=1935&Qo>13431&Qo<13434",
       "why": " «Sombres desseins» (1935, Dofus pour les noobs): Mistigris inside the Madrestam lighthouse [13,-2]. INFERRED cell."
+    },
+    {
+      "map": 117706767,
+      "npc": 2196,
+      "cell": 242,
+      "why": "Teo Dolito stands at the foot of the arched door on the left of the Aquadome entrance [22,30], right of its base (Dofus pour les noobs, «Relevez les niveaux», last two screenshots; cell read off tools/dibujar_mapa.py drawing of the map). INFERRED to one cell."
     }
   ]
 }
