@@ -1471,6 +1471,17 @@
     { "map": 54173997, "element": 457182, "cell": 410, "gfx": 21966, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 381, "why": "Albert Pess's door at [-80,-45] (54173997: element 457182, graphic 21966 on cell 410) into the doctor's house (54534177), landing on 381. The house table had this door as a player house leading to 54525971, which is why the quest interior could not be entered. The 2.73 graph has the passage; this keeps the measured landing cell." },
     { "map": 54534177, "element": 504218, "cell": 396, "gfx": 3507, "type": 0, "skill": 114, "toMap": 54173997, "toCell": 410, "why": "The doctor's house door (54534177: element 504218, graphic 3507 on cell 396) back out to [-80,-45] (54173997), landing on 410 in front of it." },
     { "map": 54534177, "element": 457181, "cell": 338, "gfx": 22090, "type": 0, "skill": 114, "toMap": 54535201, "toCell": 352, "why": "The cellar door inside Albert Pess's house (54534177: element 457181, graphic 22090 on cell 338) down to the quest basement (54535201), landing on 352. This is where La Bête is allowed to remain." },
-    { "map": 54535201, "element": 457180, "cell": 338, "gfx": 21987, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 311, "why": "The quest basement's door (54535201: element 457180, graphic 21987 on cell 338) back up into Albert Pess's house (54534177), landing on 311." }
+    { "map": 54535201, "element": 457180, "cell": 338, "gfx": 21987, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 311, "why": "The quest basement's door (54535201: element 457180, graphic 21987 on cell 338) back up into Albert Pess's house (54534177), landing on 311." },
+    {
+      "map": 111673344,
+      "element": 505527,
+      "cell": 466,
+      "gfx": 3507,
+      "type": -1,
+      "skill": 184,
+      "toMap": 54171984,
+      "toCell": 268,
+      "why": "Caverna del Destino (111673344): the way back out to the keeper's map 54171984 (Nordalie 1909 walks in and out of the cave). Element 505527, the only element on the cave's lower rim."
+    }
   ]
 }

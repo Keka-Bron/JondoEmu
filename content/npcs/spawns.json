@@ -7075,6 +7075,94 @@
       "cell": 341,
       "orientation": 1,
       "why": "Chief Yobgineer moved in front of the fist machine, on the open floor left of the wanted poster, beside Demena (370). INFERRED cell."
+    },
+    {
+      "map": 173278212,
+      "npc": 3606,
+      "cell": 326,
+      "orientation": 3,
+      "criterion": "Qo=13071",
+      "why": "Vhaso sells water at Saharach (15,-56) for Ivory quest 1909 objective 13071; the earlier map was wrong."
+    },
+    {
+      "map": 175642626,
+      "npc": 3702,
+      "cell": 309,
+      "orientation": 3,
+      "criterion": "Qo=13072",
+      "why": "Mum-Ra stands at the pyramid entrance for Ivory quest 1909 objective 13072."
+    },
+    {
+      "map": 171704840,
+      "npc": 3939,
+      "cell": 313,
+      "orientation": 3,
+      "criterion": "Qo=13078",
+      "why": "The sacred fire of the ancients next to Hyrini, for Ivory quest 1909 objective 13078."
+    },
+    {
+      "map": 54163258,
+      "npc": 3904,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qo=13079",
+      "why": "Aparluk watches the frozen lake for Ivory quest 1909 objective 13079."
+    },
+    {
+      "map": 183241225,
+      "npc": 4080,
+      "cell": 464,
+      "orientation": 3,
+      "criterion": "Qo=13091",
+      "why": "Maewin as a gull on the reef, Ivory quest 1909 objective 13091."
+    },
+    {
+      "map": 183241225,
+      "npc": 4082,
+      "cell": 450,
+      "orientation": 3,
+      "criterion": "Qo=13092",
+      "why": "Galaethiel as a mansot on the reef, Ivory quest 1909 objective 13092."
+    },
+    {
+      "map": 121896960,
+      "npc": 1442,
+      "cell": 340,
+      "orientation": 3,
+      "criterion": "Qa=2442&Qo>18466&Qo<18467",
+      "why": "Jykel in the lab's side room (the objective's map). INFERRED cell."
+    },
+    {
+      "map": 24119823,
+      "npc": 1442,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2442&Qo>18468&Qo<18470",
+      "why": "Jykel in the Hakam nest. INFERRED cell."
+    },
+    {
+      "map": 88604676,
+      "npc": 1442,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2442&Qo>18469&Qo<18470",
+      "why": "Jykel at Otomai's house. INFERRED cell."
+    },
+    {
+      "map": 121899010,
+      "npc": 6694,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=2442&Qo>18463&Qo<18551",
+      "why": "Bwodiguardh in Richards' lab while «La razón del más fuerte» runs; clear floor in front of the statue. INFERRED cell."
+    },
+    {
+      "map": 121899010,
+      "npc": 1442,
+      "cell": 341,
+      "orientation": 1,
+      "criterion": "Qa=2442&Qo>18463&Qo<18466",
+      "why": "Jykel beside his cybwork in Richards' lab, on clear floor. INFERRED cell."
     }
   ]
 }

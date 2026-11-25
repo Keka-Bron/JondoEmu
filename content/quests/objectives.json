@@ -7395,6 +7395,133 @@
    "afterObjectives": [9394],
    "gives": [{"item": 15988}],
    "why": "«Reduce the croquette's size to carry it with you» (485902): with the Rikiki Wand worn, «Use the Rikiki Wand on the croquette.» (23568) shrinks it into the Magic Croquette (15988). Dofus pour les noobs («Aventure miniature»)."
+  },
+  {
+   "objective": 13068,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 111673344,
+   "why": "«Caverna del Destino» (732406): the cave of the three nornes, 111673344. Dofus pour les noobs «Nordalie»: «parler au Gardien du Destin pour entrer dans la caverne»."
+  },
+  {
+   "objective": 13073,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 176160768,
+   "why": "Enter the Chamber of Tal Kasha (732413): its first room, 176160768, entered through the keeper on 175637504."
+  },
+  {
+   "objective": 13080,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 183242249,
+   "why": "«Balsa de Galaethiel» (732423): the raft of Galaethiel, reached down the ladder at the Frigost lake shore (54170933 to 183242249)."
+  },
+  {
+   "objective": 13081,
+   "quest": 1909,
+   "kind": "click",
+   "afterObjectives": [13080],
+   "elements": [{"map": 54170933, "element": 511075}],
+   "requires": [{"item": 19170, "count": 1}],
+   "spends": true,
+   "why": "«Dale una inverluza fantasma al gíno sagrado para tomar la balsa» (732434): the offering, at the shore, of the ghost inverluza; DPLN «faire une offrande au mansot»."
+  },
+  {
+   "objective": 13090,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 183241225,
+   "why": "«Roca de las gaviotas» (732435): the reef of the two goddesses, reached by the raft."
+  },
+  {
+   "objective": 11465,
+   "quest": 1781,
+   "kind": "talk",
+   "npc": 914,
+   "map": 88604676,
+   "why": "«Ve a ver a Otomai» (699702), map 88604676: «Dès que vous engagez la conversation avec Otomaï, la quête se termine automatiquement» (Dofus pour les noobs, «Le Dofus et l'alchimiste»); greeting him ticks it."
+  },
+  {
+   "objective": 18459,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67763],
+   "why": "«Explora el territorio de los bworks en busca de supervivientes»: Bworknroll's camp is the surviving clan's refuge; learning there that his assistant was sent to the Akademia ends it. INFERRED reply."
+  },
+  {
+   "objective": 18460,
+   "quest": 2442,
+   "kind": "enter",
+   "map": 104071939,
+   "afterObjectives": [18459],
+   "why": "«Entra en la Akademia de los Goblins»: the dungeon's entrance map itself carries the objective."
+  },
+  {
+   "objective": 18462,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67780],
+   "why": "Grunob's last reply hands over the notebook; the talk with him closes there rather than on the greeting."
+  },
+  {
+   "objective": 18461,
+   "quest": 2442,
+   "kind": "beat",
+   "monster": 6903,
+   "map": 221778432,
+   "afterObjectives": [18460],
+   "why": "«Derrota al director Grunob»: monster 6903 is the Akademia dungeon's boss (Dungeons row 138). The objective names the Laboratory side room (221777410), an indoor map where no group stands, so it is closed in the boss room, which is where 6903 is fought."
+  },
+  {
+   "objective": 4724,
+   "quest": 742,
+   "kind": "reply",
+   "replies": [9179, 9180],
+   "why": "«Consigue 30 lenguas de cascasaurio para llevárselas a Nevark»: Dofus pour les noobs («Chasse aux Krokilles»): «Cette quête revient donc à terminer au moins une fois la quête répétable» of the player's tier; the reply that hands the tongues of any tier over closes it."
+  },
+  {
+   "objective": 18464,
+   "quest": 2442,
+   "kind": "enter",
+   "map": 121899010,
+   "afterObjectives": [18463],
+   "why": "«Encuentra al bwork al que Jykel ha embaucado»: the notes lead to Richards' lab, where the cybwork is. INFERRED: closed on entering it."
+  },
+  {
+   "objective": 18465,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67824],
+   "why": "«Habla con Jykel»: closed when the notebook is handed back."
+  },
+  {
+   "objective": 18466,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67859],
+   "why": "«Pregunta a Bwodiguardh por lo sucedido en el Bosque Maléfico»: closed on his answer about the attacks. INFERRED reply."
+  },
+  {
+   "objective": 18551,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67812],
+   "why": "«Habla con Jykel»: closed when he has handed over the brain and the potion."
+  },
+  {
+   "objective": 18469,
+   "quest": 2442,
+   "kind": "reply",
+   "replies": [67809],
+   "why": "«Ayuda a Jykel a abandonar el nido»: closed when he takes the flask after the birds are beaten. INFERRED reply."
+  },
+  {
+   "objective": 18471,
+   "quest": 2443,
+   "kind": "reply",
+   "replies": [67844],
+   "why": "«Habla sobre lo que has descubierto con Otomai» (type 0): closed when Otomai's explanation ends (reply 67844, put the ring away and head for the coral cave). INFERRED reply; Dofus pour les noobs."
   }
 ]
 }

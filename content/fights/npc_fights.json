@@ -1638,6 +1638,12 @@
       "why": "«El último de nosotros» (2486, 18923): the Discípula de la Funga Oscura sends her new chosen at the spies. Dofus pour les noobs («Les derniers d'entre nous»): «Un combat à vagues se lance, il s'effectue seul (+ compagnon) en compagnie de Cornelia Granpa que vous pouvez contrôler. Vague 1 : 2 x Élu infecté. Vague 2 (dans 2 tours) : 3 x Élu infecté + 1 x Colosse infecté. Vague 3 (dans 7 tours) : 2 x Élu infecté» -- the Elegido infectado (7390: Combustible fúngico, Acroesporas, Chascorazón, Esporación, Grito del Chascorazón) and the Hinchado infectado (7389: Corteza fúngica, Bolsa Mikotóxica, Mikologalización, Corbíceps), with Cornelia Trancos (7384) on the character's side and played by him. INFERRED: the third wave five rounds after the second (the guide's «dans 7 tours» read from the start)." },
     { "npc": 2769, "map": 147062786, "reply": 23554, "solo": true, "byLevel": true,
       "monsters": [ { "monster": 3938, "grade": 1 }, { "monster": 3948, "grade": 1 }, { "monster": 3947, "grade": 1 } ],
-      "why": "«Defend yourself against the attack.»: Ecacheet, a Snitching Pyrasite and a Miserable Roarcher (the guide's Ecatchit, Pyrasite Mouchard and Cafarcher), alone (Dofus pour les noobs («Aventure miniature»): «Un combat se lance, il s'effectue seul»)." }
+      "why": "«Defend yourself against the attack.»: Ecacheet, a Snitching Pyrasite and a Miserable Roarcher (the guide's Ecatchit, Pyrasite Mouchard and Cafarcher), alone (Dofus pour les noobs («Aventure miniature»): «Un combat se lance, il s'effectue seul»)." },
+    { "npc": 6694, "map": 121899010, "reply": 67791,
+      "solo": true, "monsters": [ { "monster": 6906, "grade": 0 } ], "marks": -2442001,
+      "why": "«La razón del más fuerte» (2442): «Desafiar al coloso verde para hacer que hable» -- the cybwork Bwodiguardh (6906) is fought, after which he talks. INFERRED composition: him alone." },
+    { "npc": 1442, "map": 24119823, "reply": 67811,
+      "solo": true, "monsters": [ { "monster": 6907, "grade": 0 }, { "monster": 6907, "grade": 0 }, { "monster": 6908, "grade": 0 }, { "monster": 6908, "grade": 0 } ], "marks": -2442002,
+      "why": "«La razón del más fuerte» (2442): «Desplumar a las aves» -- the Tufos obtusos and Pohoyos cerriles (6907, 6908) of the nest, whose names the quest's objective gives. INFERRED: two of each." }
   ]
 }

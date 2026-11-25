@@ -1055,14 +1055,15 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// Whether a reply does an objective its quest has not come to yet: of the objectives it does,
-        /// the first (the rest of a «completesAll» open one after another as it marks them).
+        /// Whether a reply does an objective its quest has not come to yet. A «completesAll» reply hands
+        /// over several, the rest opening one after another as it marks them, and its «completes» names
+        /// the last of them: it is offered once any of them is the character's to do.
         /// </summary>
-        private static bool NotItsTurnYet(Jondo.Unity.World.Content.DialogueChoice choice)
+        internal static bool NotItsTurnYet(Jondo.Unity.World.Content.DialogueChoice choice)
         {
-            int first = choice.Completes != 0 ? choice.Completes
-                        : choice.CompletesAll.Count > 0 ? choice.CompletesAll[0] : 0;
-            return Managers.Quests.NotYetRevealed(first);
+            if (choice.CompletesAll.Count > 0)
+                return choice.CompletesAll.All(Managers.Quests.NotYetRevealed);
+            return Managers.Quests.NotYetRevealed(choice.Completes);
         }
 
         private static long[] LasQueTocan(DialogueLine linea)
