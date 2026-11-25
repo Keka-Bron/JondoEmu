@@ -83,6 +83,37 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(store.Contains(new NpcSpawnKey(4, 12, 200)));
         }
 
+        [Fact]
+        public void A_hand_placed_npc_for_one_quest_step_stays_on_a_listed_map()
+        {
+            // The walking character was not on that step of the quest, so the NPC was not listed.
+            string authored = Write("authored.json",
+                "{\"spawns\":[{\"map\":4,\"npc\":11,\"cell\":289,\"criterion\":\"Qa=7&Qo>3&Qo<6\"}," +
+                "{\"map\":4,\"npc\":12,\"cell\":200,\"criterion\":\"PL>50\"}," +
+                "{\"map\":4,\"npc\":13,\"cell\":300,\"criterion\":\"Qa!9\"}]}");
+            string official = Write("official.json",
+                "{\"maps\":[{\"map\":4,\"spawns\":[{\"npc\":13,\"cell\":350}]}]}");
+
+            var store = NpcSpawnContent.Load(null, authored, null, null, official);
+
+            Assert.True(store.TryGet(new NpcSpawnKey(4, 11, 289), out var helper));
+            Assert.Equal("Qa=7&Qo>3&Qo<6", helper.Value.Criterion);
+            Assert.False(store.Contains(new NpcSpawnKey(4, 12, 200)));
+            // The official map lists npc 13 elsewhere: its cell wins, no second copy.
+            Assert.False(store.Contains(new NpcSpawnKey(4, 13, 300)));
+            Assert.True(store.Contains(new NpcSpawnKey(4, 13, 350)));
+        }
+
+        /// <summary>The shipped Mistigris on the Sramvil cliff, on a map the official layer lists.</summary>
+        [Fact]
+        public void Mistigris_on_the_cliff_survives_the_official_layer()
+        {
+            var store = NpcSpawnContent.Load(null, Jondo.Unity.Launcher.Paths.ContentFile(NpcSpawnContent.AuthoredFile), null, null,
+                Jondo.Unity.Launcher.Paths.ContentFile(NpcSpawnContent.OfficialFile));
+
+            Assert.True(store.Contains(new NpcSpawnKey(87818757, 2769, 289)));
+        }
+
         /// <summary>The shipped Kwismas boatman in Madrestam's port, on a map the official layer lists.</summary>
         [Fact]
         public void The_kwismas_boatman_survives_the_official_layer()

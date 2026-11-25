@@ -170,6 +170,8 @@ namespace Jondo.Unity.World.Content
                         };
                     }
 
+                    var listed = new HashSet<int>();
+                    foreach (var key in wanted.Keys) listed.Add(key.NpcId);
                     var there = new List<NpcSpawnKey>();
                     foreach (var (key, row) in store.Rows)
                     {
@@ -178,6 +180,12 @@ namespace Jondo.Unity.World.Content
                         // comes with one -- the Kwismas boatman in Madrestam's port, «Sc=90001» --
                         // could not be in them: an authored placement behind an event stays.
                         if (row.From.Layer == ContentLayer.Authored && NamesAnEvent(row.Value.Criterion)) continue;
+                        // Nor could they see an NPC who only stands there for one step of a quest
+                        // (Mistigris on the Sramvil cliff, «Qa=1935&Qo>13431&Qo<13434»): the walking
+                        // character was not on that step, so the map's contents left him out. When the
+                        // official map does list that NPC, its own cell wins and the hand guess goes.
+                        if (row.From.Layer == ContentLayer.Authored && NamesAQuestState(row.Value.Criterion) &&
+                            !listed.Contains(key.NpcId)) continue;
                         there.Add(key);
                     }
                     foreach (var key in there) store.Erase(key, from);
@@ -193,6 +201,14 @@ namespace Jondo.Unity.World.Content
         /// <summary>Whether a criterion asks for a yearly event or content switch, «Sc=…».</summary>
         internal static bool NamesAnEvent(string? criterion)
             => !string.IsNullOrEmpty(criterion) && criterion.Contains("Sc=", StringComparison.Ordinal);
+
+        /// <summary>
+        /// Whether a criterion asks for a quest's state: active «Qa», on an objective «Qo»,
+        /// finished «Qf» or completable «Qc».
+        /// </summary>
+        internal static bool NamesAQuestState(string? criterion)
+            => !string.IsNullOrEmpty(criterion) &&
+               System.Text.RegularExpressions.Regex.IsMatch(criterion, @"(?<![A-Za-z])Q[aofc][=!<>]");
 
         /// <summary>
         /// The base layer: placements worked out from the quest catalogue.
