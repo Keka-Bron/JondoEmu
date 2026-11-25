@@ -1208,6 +1208,15 @@ namespace Jondo.Unity.World.Fights
         public int WinCellId { get; set; }
 
         /// <summary>
+        /// Where LOSING leaves the players, when a quest scripts the defeat instead of sending them
+        /// to their save point: overpowered and thrown into a cell («loseMap»). Zero for every other fight.
+        /// </summary>
+        public long LoseMapId { get; set; }
+
+        /// <summary>The cell <see cref="LoseMapId"/> is reached on.</summary>
+        public int LoseCellId { get; set; }
+
+        /// <summary>
         /// A mark the win leaves on each winner, among the elements it has used, for a reply's
         /// «afterElement»: the moguis guarding a heap of filings, once beaten, let it be taken
         /// (content/fights/npc_fights.json, «marks»). Zero for every other fight.

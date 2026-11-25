@@ -37,13 +37,17 @@ namespace Jondo.Unity.Server.Handlers
         /// <b>The monster is <c>MonsterId</c>, never the fighter id.</b> <c>Fighter.Id</c> is a
         /// per-fight sequence, negative, and means nothing outside the fight it belongs to.
         ///
-        /// <b>Losing counts for nothing.</b> Every one of these objective types is worded as
+        /// <b>Losing counts for nothing</b>, but for a beat binding marked «lost». Every one of these objective types is worded as
         /// beating something.
         /// </remarks>
         public static async Task FightEndedAsync(GameSession session, FightInstance fight, bool won)
         {
             using var context = SessionContext.Push(session);
-            if (!won) return;
+            if (!won)
+            {
+                await CreditDefeatAsync(session, fight);
+                return;
+            }
 
             var log = Quests.Log;
             var book = Quests.Book;
@@ -78,6 +82,48 @@ namespace Jondo.Unity.Server.Handlers
                 quests: shared.Select(key => key.QuestId).Distinct().ToList());
         }
 
+        /// <summary>
+        /// A fight lost: only the beat bindings marked «lost» move, for the monsters that were in it.
+        /// The quest that wants the character overpowered -- caught and thrown into a cell -- goes
+        /// on from the defeat; every other objective still counts losing as nothing.
+        /// </summary>
+        private static async Task CreditDefeatAsync(GameSession session, FightInstance fight)
+        {
+            var log = Quests.Log;
+            var book = Quests.Book;
+            if (log == null || book == null || Quests.Bindings == null) return;
+
+            // Who was there, summons aside: a defeat is against the group, not what it made up.
+            var faced = new HashSet<int>();
+            foreach (var monster in fight.Rojo)
+            {
+                if (monster.MonsterId <= 0 || monster.EsInvocado) continue;
+                faced.Add(monster.MonsterId);
+            }
+            if (faced.Count == 0) return;
+
+            long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
+            foreach (var run in log.Doing().ToList())
+            {
+                var step = book.Step(run.StepId);
+                if (step == null || run.Finished) continue;
+
+                foreach (var objective in step.Objectives.ToList())
+                {
+                    var binding = Quests.Bindings.Of(objective.Id);
+                    if (binding == null || binding.Kind != QuestBindingKind.Beat || !binding.Lost) continue;
+                    if (run.Done.Contains(objective.Id)) continue;
+                    if (!binding.NamesOneOf(faced.Contains)) continue;
+                    if (binding.MapId != 0 && binding.MapId != mapId && !SameDungeonRoom(binding.MapId, mapId)) continue;
+                    if (binding.AfterObjectives.Any(before => !run.Done.Contains(before) && !log.ObjectiveDone(before)))
+                        continue;
+
+                    System.Console.WriteLine($"[Quests] Objective {objective.Id}: lost as the quest wants it.");
+                    await Quests.TickAsync(session, run.QuestId, objective.Id);
+                }
+            }
+        }
+
         private static async Task CreditKillsAsync(GameSession session, Dictionary<int, int> beaten, long mapId,
                                                    HashSet<(int QuestId, int StepId, int ObjectiveId)> shared, bool isHero)
         {
@@ -106,6 +152,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     if (objective.MonsterId == 0) continue;
                     if (!beaten.TryGetValue(objective.MonsterId, out int killed)) continue;
+                    if (Quests.Bindings?.Of(objective.Id)?.Lost == true) continue;
 
                     // Type 16 wants it done on one particular map. Exact match first; if the kill
                     // was on another room of the same dungeon (boss placed on the wrong hall while
@@ -139,7 +186,7 @@ namespace Jondo.Unity.Server.Handlers
                 foreach (var objective in step.Objectives.ToList())
                 {
                     var binding = Quests.Bindings.Of(objective.Id);
-                    if (binding == null || binding.Kind != QuestBindingKind.Beat) continue;
+                    if (binding == null || binding.Kind != QuestBindingKind.Beat || binding.Lost) continue;
                     if (!binding.NamesOneOf(beaten.ContainsKey)) continue;
                     if (binding.MapId != 0 && binding.MapId != mapId &&
                         !SameDungeonRoom(binding.MapId, mapId))

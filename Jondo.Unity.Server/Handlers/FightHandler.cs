@@ -60,7 +60,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                bool alliesMustLive = false,
                                                                long winMapId = 0, int winCellId = 0, int winMarks = 0,
                                                                long alliesPlayedBy = 0, bool? soulStoneFight = false,
-                                                               bool defeatFree = false, bool? solo = false)
+                                                               bool defeatFree = false, bool? solo = false,
+                                                               long loseMapId = 0, int loseCellId = 0)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(SessionContext.Current)) return;
@@ -201,6 +202,8 @@ namespace Jondo.Unity.Server.Handlers
             fight.DefeatFree = defeatFree;
             fight.WinMapId = winMapId;
             fight.WinCellId = winCellId;
+            fight.LoseMapId = loseMapId;
+            fight.LoseCellId = loseCellId;
             fight.WinMarks = winMarks;
 
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
@@ -13403,6 +13406,16 @@ namespace Jondo.Unity.Server.Handlers
                         : defeat.SavePointCell;
                     DatabaseManager.SaveCurrentCharacter();
                 }
+            }
+
+            // A defeat the quest scripts: the cell he is thrown into, not his save point.
+            if (!alliesAlive && fight.LoseMapId != 0 && MapManager.GetMapInfo(fight.LoseMapId) != null)
+            {
+                back = fight.LoseMapId;
+                Network.SessionContext.State.MapId = fight.LoseMapId;
+                Network.SessionContext.State.CellId = MapManager.GetNearestWalkableCell(fight.LoseMapId,
+                    fight.LoseCellId != 0 ? fight.LoseCellId : TeleportHandler.MapCentre);
+                DatabaseManager.SaveCurrentCharacter();
             }
 
             // Lost inside the Gigalodón: back to the top of the abyss, without the treasures he

@@ -764,7 +764,8 @@ namespace Jondo.Unity.Server.Managers
                                                            fight.IncarnationGrade, false);
             await Handlers.FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
                 arenaMapId: fight.ArenaMapId, winMapId: fight.WinMapId, winCellId: fight.WinCellId,
-                defeatFree: fight.DefeatFree, solo: null);
+                defeatFree: fight.DefeatFree, solo: null,
+                loseMapId: fight.LoseMapId, loseCellId: fight.LoseCellId);
             // Taken by the fight when it was built; one that did not start leaves none for the next.
             Handlers.FightHandler.TakeNextIncarnation(GameState.CharacterId);
             Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: its fight on {fight.ArenaMapId}.");

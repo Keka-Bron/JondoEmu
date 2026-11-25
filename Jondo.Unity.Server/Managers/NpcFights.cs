@@ -39,6 +39,12 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The cell of <see cref="WinMapId"/>.</summary>
             public int WinCellId { get; init; }
+
+            /// <summary>Where a scripted defeat leaves the character («loseMap», «loseCell»).</summary>
+            public long LoseMapId { get; init; }
+
+            /// <summary>The cell of <see cref="LoseMapId"/>.</summary>
+            public int LoseCellId { get; init; }
             /// <summary>
             /// A mark the win notes among the character's used elements («marks»), which a reply's
             /// «afterElement» asks for: the heaps of filings of «Las primeras impresiones son
@@ -163,6 +169,8 @@ namespace Jondo.Unity.Server.Managers
                                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                                 WinMapId = Long(row, "winMap"),
                                 WinCellId = (int)Long(row, "winCell"),
+                                LoseMapId = Long(row, "loseMap"),
+                                LoseCellId = (int)Long(row, "loseCell"),
                                 Marks = (int)Long(row, "marks"),
                                 ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
                                 Incarnates = incarnates ? (int)Long(incarnation, "monster") : 0,

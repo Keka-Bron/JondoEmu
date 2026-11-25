@@ -245,6 +245,13 @@ namespace Jondo.Unity.World.Quests
         /// </summary>
         public int Times { get; init; } = 1;
 
+        /// <summary>
+        /// A fight the quest wants LOST («lost»): the beat binding ticks when the character loses
+        /// to <see cref="MonsterId"/>, and a win leaves it open. Scripted defeats such as being
+        /// overpowered and thrown into a cell are written this way.
+        /// </summary>
+        public bool Lost { get; init; }
+
         /// <summary>The quest this element HANDS OUT, when an NPC does not give it.</summary>
         /// <remarks>
         /// There are quests that start by pressing something, not by talking: «Mort au rat» starts at the
@@ -405,7 +412,8 @@ namespace Jondo.Unity.World.Quests
     /// reply says in content/fights/npc_fights.json, said by an element.
     /// </summary>
     public sealed record QuestBindingFight(long ArenaMapId, int Incarnates, int IncarnationGrade,
-                                           bool DefeatFree, long WinMapId, int WinCellId);
+                                           bool DefeatFree, long WinMapId, int WinCellId,
+                                           long LoseMapId = 0, int LoseCellId = 0);
 
     /// <summary>Every binding there is, indexed the two ways the server asks for them.</summary>
     public sealed class QuestBindingBook
@@ -687,6 +695,7 @@ namespace Jondo.Unity.World.Quests
                 SpawnsAttack = spawnAttacks,
                 SpawnsChance = spawnChance,
                 Times = Math.Max(1, Int(row, "times")),
+                Lost = row.TryGetProperty("lost", out var lost) && lost.ValueKind == JsonValueKind.True,
                 Starts = Int(row, "starts"),
                 ThenStarts = Int(row, "thenStarts"),
                 AfterObjectives = Ints(row, "afterObjectives"),
@@ -715,7 +724,9 @@ namespace Jondo.Unity.World.Quests
                             ? Math.Max(1, Int(grade, "grade")) : 1,
                         fight.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                         Long(fight, "winMap"),
-                        Int(fight, "winCell"))
+                        Int(fight, "winCell"),
+                        Long(fight, "loseMap"),
+                        Int(fight, "loseCell"))
                     : null,
 
                 // Not `Int(...) == 0 ? default : value`, because -1 IS the default and 0 is a
