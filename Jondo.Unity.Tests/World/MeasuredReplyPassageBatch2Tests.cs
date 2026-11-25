@@ -21,7 +21,7 @@ namespace Jondo.Unity.Tests.World
 
         /// <summary>
         /// Feldz Paf's mine carts: «Subir a bordo do carrinho.» for 50 kamas, and again once the Shadow
-        /// Miners are beaten; Ingradadu Dicerva's way out.
+        /// Miners are beaten; Florzinha Azul's (5567) way.
         /// </summary>
         [Theory]
         [InlineData(830, 178784260, 3454, 3049, 97255965, 304, 50)]
