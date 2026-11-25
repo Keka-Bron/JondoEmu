@@ -176,6 +176,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static Readable? Of(long mapId, int elementId)
         {
+            Ensure();
             if (_porElemento.TryGetValue((mapId, elementId), out var lectura)) return lectura;
             return _porElemento.TryGetValue((0, elementId), out lectura) ? lectura : null;
         }
@@ -187,6 +188,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static (long Map, int Element, Readable Lectura)? ByAcceptReply(long reply)
         {
+            Ensure();
             foreach (var ((map, element), lectura) in _porElemento)
             {
                 if (lectura.Accept != 0 && lectura.Accept == reply) return (map, element, lectura);
@@ -202,6 +204,7 @@ namespace Jondo.Unity.Server.Managers
         /// </remarks>
         public static IEnumerable<int> OnMap(long mapId)
         {
+            Ensure();
             foreach (var ((map, element), _) in _porElemento)
             {
                 if (map == mapId || map == 0) yield return element;
