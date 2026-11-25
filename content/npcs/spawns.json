@@ -7181,14 +7181,6 @@
       "why": "Zap Gobdon comes to the messenger's rescue beside Goblío once the letter is handed over (DPLN «Messager clandestin»). INFERRED cell."
     },
     {
-      "map": 135269891,
-      "npc": 2541,
-      "cell": 300,
-      "orientation": 1,
-      "criterion": "Qa=1531",
-      "why": "Venenosa, the necrotics hunter of [8,8], receives an envelope (DPLN «Messager clandestin»). No capture lists her: INFERRED cell."
-    },
-    {
       "map": 136052736,
       "npc": 2454,
       "cell": 296,
@@ -8684,14 +8676,6 @@
       "why": "The Desosseur chief on the dark heights [5,-1] (1934). INFERRED cell."
     },
     {
-      "map": 135269891,
-      "npc": 2541,
-      "cell": 300,
-      "orientation": 3,
-      "criterion": "Qa=1934&Qo>13416&Qo<13418",
-      "why": "Venenosa in the catacombs (1934); the 1531 row stays. INFERRED cell."
-    },
-    {
       "map": 187304450,
       "npc": 2541,
       "cell": 301,
@@ -8736,16 +8720,8 @@
       "npc": 3502,
       "cell": 401,
       "orientation": 1,
-      "criterion": "Qa=1934&Qo>13422&Qo<13424",
-      "why": "Incognita in the street [5,2!] outside the tavern (1934, 13424). INFERRED cell."
-    },
-    {
-      "map": 137366528,
-      "npc": 3502,
-      "cell": 401,
-      "orientation": 1,
-      "criterion": "Qf=1934&Qa!1935&Qf!1935",
-      "why": " «Sombres desseins» (1935, Dofus pour les noobs): Incognita in the street [5,2!] after 1934, to start 1935 (the 1934 row's cell)."
+      "criterion": "(Qa=1934&Qo>13422&Qo<13424)|(Qf=1934&Qa!1935&Qf!1935)",
+      "why": "Incognita in the street [5,2!] outside the tavern: the end of 1934 (13424) and, after it, the start of «Sombres desseins» (1935, Dofus pour les noobs). One row: two rows on the same map, npc and cell hide each other. INFERRED cell."
     },
     {
       "map": 68421127,
@@ -8768,6 +8744,36 @@
       "npc": 2196,
       "cell": 242,
       "why": "Teo Dolito stands at the foot of the arched door on the left of the Aquadome entrance [22,30], right of its base (Dofus pour les noobs, «Relevez les niveaux», last two screenshots; cell read off tools/dibujar_mapa.py drawing of the map). INFERRED to one cell."
+    },
+    {
+      "map": 135269891,
+      "npc": 2541,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1531|(Qa=1934&Qo>13416&Qo<13418)",
+      "why": "Venenosa in the catacombs of the dark heights: receives an envelope in 1531 (Dofus pour les noobs, «Messager clandestin») and is met again in 1934. Both placements shared one map, npc and cell and the later one hid the first, so they are one row with both criteria. INFERRED cell."
+    },
+    {
+      "map": 168821762,
+      "npc": 3298,
+      "cell": 271,
+      "remove": true
+    },
+    {
+      "map": 170133512,
+      "npc": 3298,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "Qa=1750&Qo<11173",
+      "why": "Deks assistant in the Sufokia palace [23,24] until he agrees to help (Dofus pour les noobs picture: dark figure at the foot of the throne stairs). Cell read off that picture."
+    },
+    {
+      "map": 168821762,
+      "npc": 3298,
+      "cell": 271,
+      "orientation": 1,
+      "criterion": "Qa=1750&Qo>11174&Qo<11181",
+      "why": "Deks assistant at the machine [20,27] once the player has escorted him there (11174), until the quest is reported."
     }
   ]
 }

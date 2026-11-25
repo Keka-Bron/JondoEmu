@@ -65103,7 +65103,7 @@
       "map": 0,
       "opening": 24445,
       "openings": [
-        { "quest": 1750, "objective": 11174, "message": 24448 }
+        { "criterion": "Qa=1750&Qo>11174", "message": 24448 }
       ],
       "lines": [
         {
@@ -65121,13 +65121,13 @@
         {
           "message": 24447,
           "choices": [
-            { "reply": 29363 }
+            { "reply": 29363, "gives": 18118 }
           ]
         },
         {
           "message": 24448,
           "choices": [
-            { "reply": 29367, "quest": 1750, "next": 24449 },
+            { "reply": 29367, "quest": 1750, "next": 24449, "takes": 18118, "takesCount": 1 },
             { "reply": 29371, "quest": 1750, "afterObjective": 11177, "completesAll": [11178, 11179], "params": [[30, 11179]], "next": 24458 },
             { "reply": 29370, "quest": 1750, "afterObjective": 11179 }
           ]
@@ -66868,11 +66868,12 @@
         {
           "message": 18122,
           "choices": [
-            { "reply": 21728, "quest": 1532, "criterion": "PO=15530", "takes": 15530, "takesCount": 20, "passage": 2559001 }
+            { "reply": 21728, "quest": 1532, "criterion": "PO=15530", "takes": 15530, "takesCount": 20, "passage": 2559001 },
+            { "reply": 21729, "quest": 1532, "criterion": "Qo>8745&Qo<8746" }
           ]
         }
       ],
-      "why": "Carcelera de Sramvil in the prison: «¿Cómo puedo salir de la celda?» (21727) -> «Pela 20 batatas» (18122); «Aquí tienes todas las batatas» (21728) takes the 20 sweet potatoes (15530) and lets the player out to the tavern (the walkthrough's solution 1). Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»)."
+      "why": "Carcelera de Sramvil in the prison: «¿Cómo puedo salir de la celda?» (21727) -> «Pela 20 batatas» (18122); «Aquí tienes todas las batatas» (21728) takes the 20 sweet potatoes (15530) and lets the player out to the tavern (the walkthrough's solution 1). Reply-to-line order INFERRED from the client's lines; Dofus pour les noobs («La voix de son maître»). The second way out (DPLN, solution 2: «attirez votre geôlière à proximité des barreaux pour l'attaquer. Le combat se fait seul»): 21729 «Atraerla hacia los barrotes y atacarle» (client text 456676) starts a solo fight against the jailer (monster 3797); beating her is 8746."
     },
     {
       "npc": 3244,
@@ -74366,7 +74367,7 @@
         {
           "message": 29690,
           "choices": [
-            { "reply": 35668, "quest": 1934, "completes": 13424, "params": [[30, 13424], [34, 1935]], "startsQuest": 1935 },
+            { "reply": 35668, "quest": 1934, "completes": 13424, "params": [[30, 13424]] },
             { "reply": 35668, "startsQuest": 1935, "params": [[34, 1935]], "criterion": "Qf=1934&Qa!1935&Qf!1935" }
           ]
         }

@@ -7528,14 +7528,6 @@
    "why": "«Encuentra ámbar antediluviano en la Gruta Grut'Hesqua»: after the Corailleur Magistral (the boss room hands the character to 5244422), a big coral of the cave (element 524203, cell 193, graphic 17578) gives the antediluvian amber 26365 and closes the objective (Dofus pour les noobs «Après lui, le déluge»). INFERRED element, the only one of the map."
   },
   {
-   "objective": 11174,
-   "quest": 1750,
-   "kind": "reply",
-   "replies": [29363],
-   "afterObjectives": [11173],
-   "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant already stands at the machine's map in the client data (3298 and 3297 share map 168821762), so his agreement (29363) also closes the escort."
-  },
-  {
    "objective": 8355,
    "quest": 1486,
    "kind": "enter",
@@ -9747,6 +9739,23 @@
    "map": 168560642,
    "afterObjectives": [11003],
    "why": "«Enfrentate al flautista con la ayuda de Sered» (644082): the flautist (4466) with Sered (4465) as ally, solo (Dofus pour les noobs). The remains of Rykke Zane (18044) are the monster's own drop (the fight showed one Loot line); Sered takes them in 28602."
+  },
+  {
+   "objective": 8746,
+   "quest": 1532,
+   "kind": "beat",
+   "monster": 3797,
+   "map": 137369602,
+   "afterObjectives": [8745],
+   "why": "«Sal de la prisión de Sramvil» (453812), second way: the jailer beaten at the bars (Dofus pour les noobs («La voix de son maître»))."
+  },
+  {
+   "objective": 11174,
+   "quest": 1750,
+   "kind": "walk",
+   "map": 168821762,
+   "afterObjectives": [11173],
+   "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant follows the player (follower item 18118, given with his agreement 29363) down to the machine's map [20,27]; arriving there ticks the escort (Dofus pour les noobs: «Retournez en [20,27]»)."
   }
 ]
 }

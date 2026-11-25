@@ -2008,6 +2008,10 @@
       "why": "The ambush in the catacombs (1934): the bodyguard fights beside the player; on the blow that would kill the player he dies in his place and the fight ends (855), otherwise the poison cloud of the win (854). Either way the toxins carry the player to their cell. Lost with the bodyguard already down, it is fought again." },
     { "npc": 4196, "map": 68421127, "reply": 35846,
       "monsters": [ { "monster": 5159, "grade": 0 }, { "monster": 5160, "grade": 0 } ],
-      "why": " «Sombres desseins» (1935, Dofus pour les noobs): the Weremoggies (Hate-Filled and Not-So-Cute), alone." }
+      "why": " «Sombres desseins» (1935, Dofus pour les noobs): the Weremoggies (Hate-Filled and Not-So-Cute), alone." },
+    { "npc": 2559, "map": 137369602, "reply": 21729,
+      "monsters": [ { "monster": 3797, "grade": 0 } ],
+      "winMap": 137367552, "winCell": 300,
+      "why": "Carcelera de Sramvil (3797) lured to the bars: «Le combat se fait seul» (Dofus pour les noobs («La voix de son maître»)). The tavern is where the other way out leads (21728)." }
   ]
 }
