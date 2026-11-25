@@ -944,6 +944,14 @@
    "orientation": 3,
    "members": [{"monster": 4477, "grade": 0}],
    "why": "The agitated mantaze of [22,26] (1733, objective 11012, drops the purple crystal). INFERRED cell and grade."
+  },
+  {
+   "map": 170132482,
+   "group": -1744001,
+   "cell": 303,
+   "orientation": 3,
+   "members": [{"monster": 4445, "grade": 0}],
+   "why": "The guardian of Leonora in the sanctuary (1744, 11105): fought after clicking the documents in the middle; INFERRED cell and grade."
   }
   ]
 }

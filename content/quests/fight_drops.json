@@ -201,6 +201,20 @@
       ],
       "criterion": "Qa=1610&Qo>9433&Qo<9435&PO!16059",
       "why": "«Secreto de producción» (1610): the last guardian, Trésantène (3963), leaves the sample of refined orichor (16059) the quest hands over to Lonyon (Dofus pour les noobs («Secret de fabrication»))."
+    },
+    {
+      "item": 11368,
+      "percent": 100,
+      "monsters": [2857],
+      "criterion": "Qa=543&PO!11368",
+      "why": "La marche de l'impératrice (543): the original captures a mamansot as a follower after a fight with one; here the Mamagüina (item 11368, dropped by monster 2857) comes with the win while the quest is in hand. INFERRED mechanic: followers do not exist in the engine."
+    },
+    {
+      "item": 11245,
+      "percent": 100,
+      "monsters": [2848],
+      "criterion": "Qa=591&Qo>3761&PO!11245",
+      "why": "Los cazadores (591): Gerard's family jewels drop automatically at the end of the Royal Mansot Excavation (Dofus pour les noobs: «A la fin du donjon, vous dropez automatiquement les Bijoux de famille de Gerard»; client item 11245 drops from monster 2848)."
     }
   ]
 }

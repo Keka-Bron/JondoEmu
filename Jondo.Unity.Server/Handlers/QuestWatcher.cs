@@ -133,6 +133,9 @@ namespace Jondo.Unity.Server.Handlers
                 // And the free-text ones that are a fight in all but the catalogue's type.
                 // "Vaincre le Milimilou" is objective 9785 of quest 1635, written as prose with no
                 // monster in it: the catalogue says nothing, so the binding does.
+                // One win closes one link of a chain: three rows on the same monsters, each after
+                // the one before, take three fights, not one that ticks them all in a row.
+                var closedNow = new HashSet<int>();
                 foreach (var objective in step.Objectives.ToList())
                 {
                     var binding = Quests.Bindings.Of(objective.Id);
@@ -143,6 +146,7 @@ namespace Jondo.Unity.Server.Handlers
                         continue;
                     if (binding.AfterObjectives.Any(before => !run.Done.Contains(before) && !log.ObjectiveDone(before)))
                         continue;
+                    if (binding.AfterObjectives.Any(closedNow.Contains)) continue;
 
                     if (!CanCredit(run, step, objective)) continue;
 
@@ -161,6 +165,7 @@ namespace Jondo.Unity.Server.Handlers
                     }
 
                     await Quests.TickAsync(session, run.QuestId, objective.Id);
+                    closedNow.Add(objective.Id);
                 }
             }
         }

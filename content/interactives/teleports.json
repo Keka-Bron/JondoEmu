@@ -1531,6 +1531,31 @@
       "criterion": "PO>17963,0",
       "refusal": 449,
       "refusalType": 1
+    },
+    {
+      "map": 221251584,
+      "element": 524268,
+      "cell": 371,
+      "gfx": 70939,
+      "type": 0,
+      "skill": 114,
+      "toMap": 221250564,
+      "toCell": 298,
+      "why": "The cold flame at the centre of the pentacle in the cellar of the Deblers' cottage [-6,18] takes the character to the spirit world (Dofus pour les noobs, «Ocre d'ambre»: «cliquez sur la flamme froide au centre du pentacle pour vous téléporter dans le monde des esprits»). Its Teleport skill had no destination."
+    },
+    {
+      "map": 170131460,
+      "element": 508125,
+      "cell": 313,
+      "gfx": 53746,
+      "type": 0,
+      "skill": 114,
+      "toMap": 170132484,
+      "toCell": 339,
+      "criterion": "Qf=1745|(Qa=1745&Qo>11117&PO=17967)",
+      "refusal": 449,
+      "refusalType": 1,
+      "why": "The basin of Justine's house (508125, 1745): down to the pit only with the fear-catcher, after learning of it (11117)."
     }
   ]
 }

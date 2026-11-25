@@ -563,6 +563,15 @@
       "npc": 6459,
       "replies": [65567],
       "why": "The Skeleton Dungeon: the winners stay in the Fifth Room, the boss room, where Chaferfu (6459) teaches «Invocation de Chaferfu»: «parler avec le Chaferfu présent dans la salle et de suivre ses instructions pour apprendre le sort» (JeuxOnline, «Donjon des Squelettes»). The win went straight to the exit (82314753) and he was never met. «Aceptar para salir de aquí.» (65567) leaves. INFERRED cell: open floor next to him (413)."
+    },
+    {
+      "dungeon": 131,
+      "bossRoom": 210243584,
+      "room": 210243586,
+      "cell": 300,
+      "npc": 5843,
+      "replies": [55519],
+      "why": "The Casa de los Espíritus: after the boss the winners stand in the last room with Kumijo, who does not mind having lost and talks (Dofus pour les noobs, «Une fois le donjon terminé, parlez à Koumiho»); «Salir de la Casa de los Espíritus.» (55519) leaves. INFERRED cell: open floor in the middle of the room."
     }
   ]
 }

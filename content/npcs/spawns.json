@@ -7621,14 +7621,6 @@
       "npc": 6682,
       "cell": 426,
       "orientation": 1,
-      "remove": true,
-      "why": "The derived layer placed the regenerating seal here for good; it only stands once «No hay humo sin fuego» is done (the next row)."
-    },
-    {
-      "map": 220729859,
-      "npc": 6682,
-      "cell": 426,
-      "orientation": 1,
       "criterion": "Qf=2446|Qa=2447",
       "why": "The regenerating seal of Terrakurial in the barrow chamber once the burning seal's ambers are placed («Pas de fumée sans feu» is over). Cell taken from the derived layer."
     },
@@ -7991,6 +7983,107 @@
       "orientation": 3,
       "criterion": "Qa=2447&Qo>18510&Qo<18512",
       "why": "The Fire Spirit waiting in the Petrified Forest [-77,-67] (Dofus pour les noobs, «Quand les esprits s'échauffent»), from the character's arrival until he is bluffed and flees. INFERRED cell."
+    },
+    {
+      "map": 210243586,
+      "npc": 5843,
+      "cell": 205,
+      "orientation": 3,
+      "why": "Kumijo in the post-boss room of the Casa de los Espíritus (Dofus pour les noobs, «Quand les esprits s'échauffent»). INFERRED cell: beside the tent where the drawing of the map shows the kitsune."
+    },
+    {
+      "map": 170132480,
+      "npc": 3266,
+      "cell": 373,
+      "orientation": 3,
+      "criterion": "Qa=1743&Qo>11099&Qo<11102",
+      "why": "Prosper in the hidden room behind the big tank (1743, 11101: «pass the secret passage then show the key to Prosper»); INFERRED cell."
+    },
+    {
+      "map": 54531097,
+      "npc": 1291,
+      "cell": 354,
+      "orientation": 1,
+      "why": "Dofus pour les noobs («Bricole Girl»): Francky (Igoi Algueros) in the Frigost workshop [-75,-38]. INFERRED cell."
+    },
+    {
+      "map": 54167848,
+      "npc": 1290,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=589&Qo>3742",
+      "why": "Dofus pour les noobs («Bricole Girl»): Valy (Kristina Pielhova) is back once the snowman has melted. INFERRED cell."
+    },
+    {
+      "map": 54791183,
+      "npc": 1254,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=589&Qo=3741",
+      "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]. INFERRED cell."
+    },
+    {
+      "map": 170132480,
+      "npc": 3266,
+      "cell": 373,
+      "orientation": 3,
+      "criterion": "Qf=1743",
+      "why": "Prosper in the hidden room [23,31] where 1744 starts (the 1743 spawn lasts only until the key is shown); INFERRED cell."
+    },
+    {
+      "map": 170132482,
+      "npc": 3266,
+      "cell": 373,
+      "orientation": 3,
+      "criterion": "Qa=1744&Qo>11108&Qo<11110",
+      "why": "Prosper in the sanctuary of Leonora (1744, 11109: he appears after the machine); INFERRED cell."
+    },
+    {
+      "map": 170132482,
+      "npc": 3258,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa=1744&Qo>11105&Qo<11108",
+      "why": "Captain Meno in the sanctuary of Leonora (1744, 11106/11107: he appears after the guardian); INFERRED cell."
+    },
+    {
+      "map": 54163252,
+      "npc": 1293,
+      "cell": 301,
+      "orientation": 1,
+      "why": "Dofus pour les noobs («Promenons nous dans les bois»): Richard Rouge (Reltux Richards, the blue Xelor) in the wood [-59,-52]. INFERRED cell."
+    },
+    {
+      "map": 221251586,
+      "npc": 6689,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa!2448|Qo<18521",
+      "why": "The horned queen in the amber block before the memory fight (Dofus pour les noobs, «Le serment de l'ambre»). Cell taken from the derived layer."
+    },
+    {
+      "map": 221251586,
+      "npc": 6688,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=2448&Qo>18520",
+      "why": "The horned queen, still imprisoned once the fight is won (Dofus pour les noobs, «Le serment de l'ambre»). Same cell as the first one."
+    },
+    {
+      "map": 220729859,
+      "npc": 6682,
+      "cell": 426,
+      "orientation": 1,
+      "criterion": "Qf=2447",
+      "why": "The regenerating seal of Terrakurial in the barrow chamber after «Cuando se caldean las ánimas» (2447) is over: the start of «El juramento del ámbar» (Dofus pour les noobs). Cell taken from the derived layer."
+    },
+    {
+      "map": 170133512,
+      "npc": 3265,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qa=1745&Qo>11122|Qf=1745",
+      "why": "Captain Skyluza in the throne room of Sufokia's palace [23,24] (1745, 11123: Dofus pour les noobs); INFERRED cell."
     }
   ]
 }

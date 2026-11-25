@@ -8580,6 +8580,243 @@
    "replies": [68052],
    "afterObjectives": [18512],
    "why": "«Pídele ayuda a un especialista en espíritus»: Surivitna's last line, after which the character sets out for Grobe (68052)."
+  },
+  {
+   "objective": 11087,
+   "quest": 1742,
+   "kind": "beat",
+   "monsters": [4439, 4440, 4441],
+   "map": 168822786,
+   "why": "«Sobrevive a la primera oleada» (886810): the first wave in the camp."
+  },
+  {
+   "objective": 11088,
+   "quest": 1742,
+   "kind": "beat",
+   "monsters": [4442],
+   "map": 168822786,
+   "afterObjectives": [11087],
+   "why": "«Sobrevive a la segunda oleada» (886811): the second wave is the first one with riluro."
+  },
+  {
+   "objective": 11089,
+   "quest": 1742,
+   "kind": "beat",
+   "monsters": [4443, 4510],
+   "map": 168822786,
+   "afterObjectives": [11088],
+   "why": "«Sobrevive a la tercera oleada» (886812): the third wave brings the diondino and the tryde chief."
+  },
+  {
+   "objective": 18514,
+   "quest": 2447,
+   "kind": "beat",
+   "monster": 6394,
+   "map": 210243584,
+   "afterObjectives": [18513],
+   "why": "«Capta la atención de la kitsu de nueve colas demostrando tu fuerza»: the Casa de los Espíritus' boss fight in its last room (dungeon 131, boss 6394; Dofus pour les noobs: «entrer dans le donjon Demeure des Esprits pour vaincre Koumiho»)."
+  },
+  {
+   "objective": 18515,
+   "quest": 2447,
+   "kind": "reply",
+   "replies": [68060],
+   "afterObjectives": [18514],
+   "why": "«Alcanza un trato con Kumijo»: «Accepter» (68060), Kumijo's request to feed Inali's messengers."
+  },
+  {
+   "objective": 18516,
+   "quest": 2447,
+   "kind": "reply",
+   "replies": [68068],
+   "afterObjectives": [18515],
+   "requires": [{"item": 26753, "count": 12}],
+   "spends": true,
+   "gives": [{"item": 26750, "count": 1}],
+   "why": "«Llévale las delicias de los kitsus a Jibakurei»: twelve Delicia de los kitsus (26753: spices, bloody meat and rice, a hunter's recipe) are handed over; Inali's will (26750), the little kitsu, comes along."
+  },
+  {
+   "objective": 18517,
+   "quest": 2447,
+   "kind": "enter",
+   "map": 221251584,
+   "afterObjectives": [18516],
+   "why": "«Vuelve al sótano de la choza a ver al espíritu»: the cellar of the Deblers' cottage [-6,18]."
+  },
+  {
+   "objective": 11095,
+   "quest": 1743,
+   "kind": "enter",
+   "map": 148637185,
+   "why": "«Entra en el templo de los selotropes» (644118): the temple's map."
+  },
+  {
+   "objective": 11096,
+   "quest": 1743,
+   "kind": "reply",
+   "replies": [28859],
+   "why": "«Obtén información sobre la arena de Wakfu» (644085): Aurelia answers (28859)."
+  },
+  {
+   "objective": 11098,
+   "quest": 1743,
+   "kind": "enter",
+   "map": 169082890,
+   "why": "«Utiliza un volante hidráulico para accionar el ascensor» (644033): the sunken ruins' map; the elevator's use is not modelled, INFERRED."
+  },
+  {
+   "objective": 3739,
+   "quest": 589,
+   "kind": "walk",
+   "map": 54167848,
+   "why": "«Investiga los alrededores del taller de campesinos»: the clue is at [-68,-40] (Dofus pour les noobs («Bricole Girl»)); the first walk finished on that map closes it."
+  },
+  {
+   "objective": 18518,
+   "quest": 2447,
+   "kind": "beat",
+   "monster": 6925,
+   "map": 221250564,
+   "afterObjectives": [18517],
+   "why": "«Impone la voluntad de Inali al espíritu Botafuego»: the last fight with the Fire Spirit, alone, in the spirit world under the cottage."
+  },
+  {
+   "objective": 18519,
+   "quest": 2447,
+   "kind": "reply",
+   "replies": [68074],
+   "afterObjectives": [18518],
+   "why": "«Vuelve a examinar el sello de Terrakurial»: the flames are gone (68074)."
+  },
+  {
+   "objective": 11103,
+   "quest": 1744,
+   "kind": "click",
+   "elements": [{"map": 170132480, "element": 508145}],
+   "why": "«Consigue atravesar los barrotes mágicos del santuario de Leonora» (644123): the hole in the wall (element 508145, teleport to the sanctuary)."
+  },
+  {
+   "objective": 11104,
+   "quest": 1744,
+   "kind": "enter",
+   "map": 170132482,
+   "afterObjectives": [11103],
+   "why": "«Explora el santuario de Leonora» (644046): the sanctuary's map."
+  },
+  {
+   "objective": 11108,
+   "quest": 1744,
+   "kind": "click",
+   "elements": [{"map": 170132482, "element": 508154}],
+   "afterObjectives": [11107],
+   "why": "«Explora el santuario de Leonora» (644055): the metal globe after the annihilator (element 508154, INFERRED among the room's three)."
+  },
+  {
+   "objective": 3745,
+   "quest": 590,
+   "kind": "talk",
+   "npc": 1293,
+   "map": 54163252,
+   "why": "«Charla con los supervivientes»: greeting Reltux Richards in the wood (Dofus pour les noobs («Promenons nous dans les bois»))."
+  },
+  {
+   "objective": 3746,
+   "quest": 590,
+   "kind": "talk",
+   "npc": 1293,
+   "map": 54163252,
+   "why": "«Acompaña a Ally Storm hasta Adalid»: the follower is not authored; Reltux's second greeting stands for taking Ally along (Dofus pour les noobs («Promenons nous dans les bois»))."
+  },
+  {
+   "objective": 3749,
+   "quest": 590,
+   "kind": "talk",
+   "npc": 1293,
+   "map": 54163252,
+   "why": "«Acompaña a DaLny Storm hasta Adalid»: as 3746, the third greeting (Dofus pour les noobs («Promenons nous dans les bois»))."
+  },
+  {
+   "objective": 3760,
+   "quest": 591,
+   "kind": "walk",
+   "map": 55836672,
+   "why": "«Registra las inmediaciones de la caverna»: going down into the mansot cavern [-64,-55] (Dofus pour les noobs («Les chasseurs»)); the first walk on that map closes it. INFERRED map."
+  },
+  {
+   "objective": 3761,
+   "quest": 591,
+   "kind": "click",
+   "elements": [{"map": 55837184, "element": 511191}],
+   "afterObjectives": [3760],
+   "why": "«Registra la caverna»: the ice cart (element 511191, gfx 59659, cell 270) in the second cavern map gives Gerard's message before the dungeon descent (Dofus pour les noobs («Les chasseurs»))."
+  },
+  {
+   "objective": 18520,
+   "quest": 2448,
+   "kind": "beat",
+   "monster": 6931,
+   "map": 221251586,
+   "why": "«Enfréntate al mal encerrado en el bloque de ámbar»: the memory fight against the horned queen's spirits."
+  },
+  {
+   "objective": 18521,
+   "quest": 2448,
+   "kind": "reply",
+   "replies": [68126],
+   "afterObjectives": [18520],
+   "why": "«Repara el sello de Terrakurial»: the ring's breath released into the seal (68126)."
+  },
+  {
+   "objective": 11112,
+   "quest": 1745,
+   "kind": "click",
+   "afterObjectives": [11111],
+   "elements": [{"map": 91753989, "element": 508168}, {"map": 91753989, "element": 508169}],
+   "why": "«Lee un extracto de las obras de Lavacroft» (644104): the volumes of the library [20,25] (508168, 508169, INFERRED among its quest elements)."
+  },
+  {
+   "objective": 11114,
+   "quest": 1745,
+   "kind": "enter",
+   "map": 90707715,
+   "afterObjectives": [11113],
+   "why": "«Encuentra la casa de Justine Smauss» (644098): the map of the house, [21,22]."
+  },
+  {
+   "objective": 11115,
+   "quest": 1745,
+   "kind": "click",
+   "afterObjectives": [11114],
+   "onlyGives": true,
+   "elements": [{"map": 91750917, "element": 508156}],
+   "gives": [{"item": 17996, "count": 1}],
+   "why": "Roukairol's toolbox [7,25] (508156) hands over the Ganzúa de Roukairol that opens Justine's door (Dofus pour les noobs)."
+  },
+  {
+   "objective": 11115,
+   "quest": 1745,
+   "kind": "click",
+   "afterObjectives": [11114],
+   "elements": [{"map": 90707715, "element": 508124}],
+   "requires": [{"item": 17996, "count": 1}],
+   "spends": true,
+   "why": "«Abre la puerta de la casa de Justine Smauss» (644105): the door (508124) is picked with the lock pick."
+  },
+  {
+   "objective": 11116,
+   "quest": 1745,
+   "kind": "click",
+   "afterObjectives": [11115],
+   "elements": [{"map": 170131460, "element": 508158}, {"map": 170131460, "element": 508159}, {"map": 170131460, "element": 508125}],
+   "why": "«Registra la casa» (644116): the basin and the house's furniture (508125, 508158, 508159; the basin cannot be descended yet)."
+  },
+  {
+   "objective": 11118,
+   "quest": 1745,
+   "kind": "click",
+   "afterObjectives": [11117],
+   "elements": [{"map": 170131460, "element": 508125}],
+   "why": "«Desciende la fosa protegiéndote con un atrapamiedos» (644041): the basin (508125) with the fear-catcher."
   }
 ]
 }
