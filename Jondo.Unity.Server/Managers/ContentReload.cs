@@ -41,6 +41,9 @@ namespace Jondo.Unity.Server.Managers
             // The monster groups written by hand (content/monsters/groups.json), which a quest's
             // fights stand on: read at the start only, they waited for a restart.
             Managers.MobSpawnManager.ReloadWritten();
+            // The yearly events' monsters (content/world/event_monsters.json): read once, they
+            // waited for a restart.
+            Managers.EventGuests.Forget();
             Managers.FightWinAlterations.Forget();
             Managers.IdolRules.Forget();
             Managers.IdolRules.Load();

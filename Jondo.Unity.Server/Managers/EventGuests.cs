@@ -71,6 +71,15 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Reads content/world/event_monsters.json again on next use (a content reload). The groups
+        /// already dressed or hidden keep what they stood for, so they still go back as they were.
+        /// </summary>
+        public static void Forget()
+        {
+            lock (Gate) _rules = null;
+        }
+
         /// <summary>Whether that monster is an event's guest.</summary>
         public static bool IsGuest(int monster)
         {

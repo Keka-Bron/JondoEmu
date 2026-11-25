@@ -31,6 +31,20 @@ namespace Jondo.Unity.Tests.Quests
         public void Kwismas_runs_across_the_new_year(int year, int month, int day, bool on)
             => Assert.Equal(on, SeasonalEvents.OnTheCalendar(SeasonalEvents.Kwismas, Day(year, month, day)));
 
+        /// <summary>Holding one event open opens no other: on 24 November only Al Howin runs.</summary>
+        [Fact]
+        public void Holding_one_event_open_leaves_the_others_on_their_calendar()
+        {
+            EventSettings.UseForTests(new EventSettings { Halouine = EventMode.On });
+            try
+            {
+                var day = Day(2026, 11, 24);
+                foreach (int ev in SeasonalEvents.Events)
+                    Assert.Equal(ev == SeasonalEvents.Halouine, SeasonalEvents.IsOn(ev, day));
+            }
+            finally { EventSettings.UseForTests(null); }
+        }
+
         [Fact]
         public void The_sea_passage_to_Vulkania_follows_Vulkania()
         {
@@ -117,6 +131,7 @@ namespace Jondo.Unity.Tests.Quests
             [98] = Monster(98, 1, 2, 3, 4, 5),
             [500] = Monster(500, 100, 110, 120),
             [793] = Monster(793, 2, 4, 6, 8, 10),
+            [1232] = Monster(1232, 2, 4, 6, 8, 10),
             [2819] = Monster(2819, 110, 120, 130, 140, 150),
         };
 
@@ -316,6 +331,46 @@ namespace Jondo.Unity.Tests.Quests
             var known = MobSpawnManager.AllMonsters.Select(m => m.Id).ToHashSet();
             var ids = rules.SelectMany(r => r.Replace.Keys.Concat(r.Replace.Values).Concat(r.Joins)).Distinct();
             Assert.All(ids, id => Assert.Contains(id, known));
+        }
+
+        /// <summary>
+        /// The Chocrosis Gobball is Sain Ballotin's: on its calendar it roams the Gobball fields the
+        /// week of 14 February and gives way to a Gobball the rest of the year, while Al Howin held
+        /// open by the operator leaves it out.
+        /// </summary>
+        [Theory]
+        [InlineData(2026, 11, 24, false)]
+        [InlineData(2026, 10, 25, false)]
+        [InlineData(2026, 2, 9, false)]
+        [InlineData(2026, 2, 10, true)]
+        [InlineData(2026, 2, 14, true)]
+        [InlineData(2026, 2, 17, false)]
+        [InlineData(2027, 2, 14, true)]
+        public void The_Chocrosis_Gobball_roams_only_in_Sain_Ballotins_week(int year, int month, int day, bool shows)
+        {
+            if (!File.Exists(Paths.ContentFile(EventGuests.AuthoredFile))) return;
+            var before = EventGuests.Dice;
+            EventGuests.UseForTests(null);
+            EventGuests.Dice = _ => 0;
+            EventSettings.UseForTests(new EventSettings { Halouine = EventMode.On, EventMonsterChance = 0 });
+            try
+            {
+                Assert.True(EventGuests.IsGuest(1232));
+                var now = new DateTime(year, month, day, 12, 0, 0);
+                Assert.Equal(shows, SeasonalEvents.IsOn(SeasonalEvents.SainBallotin, now));
+                Assert.True(SeasonalEvents.IsOn(SeasonalEvents.Halouine, now));
+
+                var group = Group(20 + day + 100 * month, (36, 3), (1232, 4));
+                EventGuests.Dress(new[] { group }, 1, EventSettings.Current, id => Bestiary.GetValueOrDefault(id),
+                                  _ => false, criterion => SeasonalEvents.IsOn(criterion, now), _ => true);
+                Assert.Equal(shows ? 1232 : 36, group.Members[1].Monster.Id);
+            }
+            finally
+            {
+                EventGuests.Dice = before;
+                EventGuests.UseForTests(null);
+                EventSettings.UseForTests(null);
+            }
         }
 
         /// <summary>

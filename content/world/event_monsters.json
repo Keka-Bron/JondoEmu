@@ -27,6 +27,14 @@
       "why": "Al Howin: the Gobballs and Gobblies wear pumpkin masks (Al Howin Gobball, 793) and so do the Tofus (Al Howin Tofu, 794), the event's own monsters in the client's data."
     },
     {
+      "event": 982,
+      "replace": {
+        "36": 1232, "101": 1232, "3332": 1232, "3330": 1232, "134": 1232, "149": 1232,
+        "971": 1232, "972": 1232, "973": 1232
+      },
+      "why": "Sain Ballotin: the Chocrosis Gobball (1232) is the event's Gobball, on the same subarea lists as the Al Howin one (5 and 30) and in the world's own groups, so without this row it roamed all year."
+    },
+    {
       "event": 90001,
       "area": 48,
       "joins": [2819, 3117, 3118, 3119],
