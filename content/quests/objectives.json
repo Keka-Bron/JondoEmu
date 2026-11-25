@@ -9221,6 +9221,93 @@
    "elements": [{"map": 170132484, "element": 508127}],
    "requires": [{"item": 17968, "count": 1}],
    "why": "«Sumérgete en las aguas bajo la losa protegiéndote con una estatuilla de Snedon» (649711): the slab (508127) with the statuette in hand."
+  },
+  {
+   "objective": 11254,
+   "quest": 1759,
+   "kind": "enter",
+   "map": 168560640,
+   "why": "«Entra en el Templo de Kutulú» (649709): the entrance map [27,26]."
+  },
+  {
+   "objective": 12284,
+   "quest": 1853,
+   "elements": [{"map": 180092930, "element": 509882}],
+   "onlyGives": true,
+   "gives": [{"item": 18737, "count": 1}],
+   "why": "The chest at the bottom right of Gerard's tent (509882, cell 524) hands over Gerard's spare clothes (18737) (Dofus pour les noobs («A la rescousse des magypus»): «Cliquez sur le coffre en bas à droite dans la pièce afin de mettre la main sur une Tenue de rechange de Gérard»). The objective itself («Consigue más información sobre el lugar al que han sido enviados», 721523) is the sailor's reply 32614."
+  },
+  {
+   "objective": 12284,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32614],
+   "why": "«Consigue más información sobre el lugar al que han sido enviados los dos magicorrincos» (721523): the grumpy sailor, taken for Gerard, tells they went to Brakmar (32614) (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12322,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32612],
+   "afterObjectives": [12284],
+   "why": "«Encuentra al anutrof que ha firmado el albarán» (722286): the sailor's note (32612), signed by the Enutrof (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12323,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32617],
+   "afterObjectives": [12322],
+   "why": "«Averigua el nombre del cliente que compró los magicorrincos» (722632): Impexpo's register page (32617) after the bribe (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12325,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32978],
+   "afterObjectives": [12323],
+   "why": "«Consigue que Nevark te dé explicaciones» (722631): the page under his nose (32978) (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12326,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32975],
+   "afterObjectives": [12325],
+   "why": "«Identifica al falsificador que imitó la firma de Nevark» (722703): «¿Quién es el culpable?» (32975), and he points to Madrestam (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12327,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32652],
+   "afterObjectives": [12326],
+   "why": "«Encontrar a los magicorrincos» (722704): Mori Arty's trail to the Rocky Roads, 32652 (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12328,
+   "quest": 1853,
+   "kind": "reply",
+   "replies": [32661],
+   "afterObjectives": [12327],
+   "why": "«Habla con los rufianes» (722736): refusing the hungry ruffian's price (32661) on the Rocky Roads (Dofus pour les noobs («A la rescousse des magypus»))."
+  },
+  {
+   "objective": 12330,
+   "quest": 1853,
+   "kind": "beat",
+   "monster": 4849,
+   "map": 164364817,
+   "afterObjectives": [12328],
+   "why": "«Vence a los rufianes» (722735): the hungry, the mute and the cruel ruffians (4849, 4850, 4851) fought alone (Dofus pour les noobs («A la rescousse des magypus»): «Un combat se lance, il s'effectue seul»)."
+  },
+  {
+   "objective": 12329,
+   "quest": 1853,
+   "kind": "enter",
+   "map": 179308545,
+   "afterObjectives": [12330],
+   "why": "«Pon a los magicorrincos a salvo en Animatopía» (722706): reaching Animatopia [-63,29] with them (Dofus pour les noobs («A la rescousse des magypus»))."
   }
 ]
 }

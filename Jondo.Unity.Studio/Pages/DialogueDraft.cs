@@ -77,7 +77,8 @@ namespace Jondo.Unity.Studio.Pages
                 return a.Message.CompareTo(b.Message);
             });
 
-            long opening = Opening != 0 ? Opening : (lines.Count > 0 ? lines[0].Message : 0);
+            // A tree read from the file with no opening greets only through its criteria and keeps none.
+            long opening = Opening != 0 || _source != null ? Opening : (lines.Count > 0 ? lines[0].Message : 0);
             return _source != null
                 ? _source.WithLines(opening, lines)
                 : new NpcDialogue { NpcId = NpcId, MapId = NpcDialogueKey.AnyMap, Opening = opening, Lines = lines };

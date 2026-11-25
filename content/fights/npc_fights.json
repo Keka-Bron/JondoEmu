@@ -1946,6 +1946,17 @@
       "why": "2064 (Sera mejor antes): Ganymed alone (+ his Arakna, which he summons), with the player wearing the bottle and the suit (Dofus pour les noobs)." },
     { "npc": 3335, "map": 0, "reply": 29419,
       "monsters": [ { "monster": 4499, "grade": 0 }, { "monster": 4471, "grade": 0 } ],
-      "why": "«Quand les astres seront propices» (1756): the collector mie-do (4499) with a giant pulprofundo (4471) (Dofus pour les noobs: Li-Fo and a Grofond)." }
+      "why": "«Quand les astres seront propices» (1756): the collector mie-do (4499) with a giant pulprofundo (4471) (Dofus pour les noobs: Li-Fo and a Grofond)." },
+    { "npc": 3270, "map": 0, "reply": 29478,
+      "monsters": [ { "monster": 4500, "grade": 0 } ],
+      "why": "«Il suffira d'un signe» (1758): the venerable starfish (4500) of [26,34] (Dofus pour les noobs)." },
+    { "npc": 3262, "map": 0, "reply": 29461,
+      "monsters": [ { "monster": 4501, "grade": 0 }, { "monster": 4452, "grade": 0 }, { "monster": 4452, "grade": 0 }, { "monster": 4449, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 4482, "grade": 0 } ],
+      "why": "«De mal en impie» (1759): the priest in yellow (4501) with two clutistas (4452) and an n'yalg (4449) against the player and Skyluza (4482) (Dofus pour les noobs)." },
+    { "npc": 3813, "map": 164364817, "reply": 32660, "solo": true, "byLevel": true,
+      "monsters": [ { "monster": 4849, "grade": 1 }, { "monster": 4850, "grade": 1 }, { "monster": 4851, "grade": 1 } ],
+      "why": "«Defenderte del ataque de los rufianes.»: the hungry, mute and cruel ruffians (Dofus pour les noobs («A la rescousse des magypus»): «Un combat se lance, il s'effectue seul»)." }
   ]
 }

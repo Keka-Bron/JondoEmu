@@ -758,7 +758,8 @@
             { "reply": 34441, "next": 28720, "quest": 1905, "afterObjective": 13019, "beforeObjective": 13020 },
             { "reply": 23604, "next": 19705, "quest": 1607, "completes": 9396, "params": [[30, 9396]], "afterObjective": 9395, "beforeObjective": 9396, "holds": 15988 },
             { "reply": 23611, "next": 19711, "quest": 1607, "afterObjective": 9400, "beforeObjective": 9401 },
-            { "reply": 32243, "next": 26834, "holds": 18650, "quest": 1845, "completes": 12200, "params": [[30, 12200]] }
+            { "reply": 32243, "next": 26834, "holds": 18650, "quest": 1845, "completes": 12200, "params": [[30, 12200]] },
+            { "reply": 32715, "next": 27246, "quest": 1853, "completes": 12332, "params": [[30, 12332]], "afterObjective": 12331 }
           ]
         },
         {
@@ -1302,9 +1303,22 @@
           "choices": [
             { "reply": 32238 }
           ]
+        },
+        {
+          "message": 27246,
+          "choices": [
+            { "reply": 32714, "next": 27247 },
+            { "reply": 32713 }
+          ]
+        },
+        {
+          "message": 27247,
+          "choices": [
+            { "reply": 32713 }
+          ]
         }
       ],
-      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810). «L'anneau de Tot» (Dofus pour les noobs: you tell him Meriana sends you; he sold his last ring to a client and asks you not to take it by force): «Vengo de parte de Meriana» (22081, 18449), «Meriana necesita un anillo de Tot para un ritual» (22080, 18450: his register), «Esperar» (22079, 18451: sold to one of his best clients), «¿Cómo se llama el cliente?» (22078, 18452: Nanoc Elyod, near Madrestam), «Gracias por tu ayuda» (22077, 18908: the Purple dofus guessed) and «Despedirte antes de irte» (19316) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply. «El dragón blanco» (1905), objective 13020: «Allez à la rencontre de Kérubim Crépin à Astrub en [3,-17] « Dire que vous comptez vous rendre en Ecaflipus dans le but de rencontrer Dardondakal »» (Dofus pour les noobs): «Tengo intención de ir a Zurcalia para ver a Dardondakal» (34441) -> not easy to reach the Ivory sanctuary (28720) -> «Intentar obtener más información» (34440) -> the Catseye Challenge first (28721) -> «Gracias por los ánimos» (34439) -> the travellers' portals to Zurcalia (28722) -> «Bueno, ¡hasta luego!» (34438) does 13020. «Miniature Adventure» (1607): with the shrunk Magic Croquette (15988) «Show him the croquette.» (23604) does 9396 (19705, the biscuit of his reserve; 23607 -> 19706, 23606 -> 19707, 23605 -> 19708, «Ask what kind of powers the croquette has.» 23610 -> 19709: it opens the portal to Ecaflip's dimension for his children). After Cinder Mistigris: «Mention your vehement discussion with Ashante.» (23611) -> 19711, 23616 -> 19712, 23615 -> 19713, 23614 -> 19714 and «Hand over the magic croquette.» (23613, takes it) closes it with 19715 Dofus pour les noobs («Aventure miniature»). INFERRED order of the replies. «Ne tirez pas sur le messager» (1845): «Entregarle el pergamino que escribió Chalcas.» (32243, with the parchment 18650 in hand) does 12200 and leads to 26834..26838 (Imaguni, daughter of the Ouginak god; he will need the character; the talisman 18651 given on 32239) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies; 26839 is the Ouginak-class variant."
+      "why": "Kerubim Crepin, Astrub's antique dealer. «Six pieds sous terre» (Dofus pour les noobs): «Describir al hombre que ha guiado a las tres turistas» (13974): Marco Mercial (30947), the swindle he suffered too (30948), and the plan to catch him at his own game (30949, 31384-31386, the line «Tel est pris qui croyait prendre» names): «Seguiré tu plan.» hands it over with his purse for Primir (19728, the item its first objective asks for), «De momento no seguiré tu plan.» leaves it; «Escuchar su plan» takes it up again. «Limpieza general» (Scène de ménage, Dofus pour les noobs): «¿Tú también formas parte de los kerubimes?» (13383: no longer, the celestial militia took his name), his age (13384), a mission (13385), the magic shop (13386), Luisito the fab'huritu (13387, explained in 13388 or skipped), the Tomatic duster (13391, 13392) and its three feathers (13393): «Por supuesto.» starts it (13394, where to find them). «Aquí tienes las tres plumas.» hands them over (6757, 13395). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Bien velu, c'est Kerubim» (Dofus pour les noobs), a daily quest: «Demander comment fabriquer des objets légendaires» (15375): only replicas (13453), whose secret ingredient is his hair (13454-13457), for whoever stops the mad Xelor's hawkers (13458): «Por supuesto.» starts it (13459). On later days «Necesito otra dosis del ingrediente secreto.» starts it again (13461). «Aquí tienes las cajas del xelor loco.» hands the three crates over (6761, 13460). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «Luisito, fab'huritu, eres muy malito» (Shushu et Lulu, Dofus pour les noobs): «¿Te preocupa algo?» (15377): Graslahad of Bonta, the fab'huritu hunter, is in town (13462); «Podría hacerlo yo.» starts it (13463: the tavern). «Decirle por qué Graslahad está en Astrub.» reports (6764, 13466); the plan, a fake fab'shu baka, and a volunteer, Piti Macholos by the old chapel (13470-13472, 6765). Whoever leaves before the plan hears it again with «¿Cuál es tu plan?» (13467-13469). «Empujar a Piti Macholos para que entre en la habitación.» hands the brat over (6767, the portable cell 13475) and the second part of the plan follows (13480-13483, 6768), or later with «Escuchar la segunda parte del plan.» (13476-13479). «¡Que brille, que brille!» (Il faut que cha brille, Dofus pour les noobs), weekly: «Darte cuenta de que hay un olor extraño en la sala.» (19317): pischi oil instead of boar wax (16273), «¿Quieres que te traiga cera?» (16274), the ingredients (16275): «Voy en busca de los ingredientes.» starts it. Once done, the next weeks «Si quieres, te puedo ayudar...» (19322, 16277) starts it again. «Ya he terminado de limpiar los muebles.» ends it (7930, 16276). «Paseo por Zurcalia» (Balade en Ecaflipus, Dofus pour les noobs): «Quiero ir a Zurcalia.» (36610) and his offer (30370); «Aceptar con entusiasmo.» starts it and the cookie opens the circle of light (30371): «Entrar en la luz.» is 10418 and lands in Zurcalia [-6,-1]. Whoever came back halfway asks again with «Irte a la dimensión Zurcalia.» (30372-30373), and the light takes them to where the visit was left: the arrival, the statues' place [-7,-1] once Kerubim moved there (10564), or the last place [-7,-2] (10566). «Reír a base de palos» (Du rire en barre, Dofus pour les noobs): «Demander où vous pouvez dénicher des Rabmablagues» is «¿Dónde puedo encontrar Lotachistosos?» (14832): inside the Lotapes' wrappers (12878-12880), and «Gracias por el consejo.» is 6744 (12881). «Un huevo para Zurcarák» (1517, Dofus pour les noobs «Un œuf pour Ecaflip»: level 130, after the achievement «Ángeles y demonios» -- «Faire le keke», 586 --, at his home in Astrub [3,-17]): «¿Cómo estás?» (21556) gets «¡Te has convertido en todo un Keké!» (17965); taken as a compliment (21554) he asks a favour (17966), «¿Qué favor?» (21553) is a fertilised egg of Thor Pestruz from the nest in Cania's natural park, against the dotruz (17967), «¿Y qué vas a hacer con el huevo?» (21551) is a present for his father Zurcarák (17968), hiding the surprise (21557) he asks again (17969), and «Me voy a Cania» (21558) starts the quest; «Tomártelo como un insulto e irte» (21555) and «No, gracias. Adiós» (21552) leave. With the egg, «Aquí tienes el huevo fecundado de Thor Pestruz» (21560) hands it over (8537) and gets the dotruz (17970, the step's reward), «Despedirte e irte con tu dotruz» (21559). For «L'amour perdu de Nabur» (Dofus pour les noobs, «L'amour perdu de Nabur»: «posez lui des questions au sujet de Nabur»): the master of arms (16808), killed by Dark Vlad though he took a dofus from him (16809), and his youth's love in the first village of Amakna, on the dragoeufs' peninsula (16810). «L'anneau de Tot» (Dofus pour les noobs: you tell him Meriana sends you; he sold his last ring to a client and asks you not to take it by force): «Vengo de parte de Meriana» (22081, 18449), «Meriana necesita un anillo de Tot para un ritual» (22080, 18450: his register), «Esperar» (22079, 18451: sold to one of his best clients), «¿Cómo se llama el cliente?» (22078, 18452: Nanoc Elyod, near Madrestam), «Gracias por tu ayuda» (22077, 18908: the Purple dofus guessed) and «Despedirte antes de irte» (19316) hands the quest over; its own criterion (Qa=1523&Qo>8635) decides who is offered the first reply. «El dragón blanco» (1905), objective 13020: «Allez à la rencontre de Kérubim Crépin à Astrub en [3,-17] « Dire que vous comptez vous rendre en Ecaflipus dans le but de rencontrer Dardondakal »» (Dofus pour les noobs): «Tengo intención de ir a Zurcalia para ver a Dardondakal» (34441) -> not easy to reach the Ivory sanctuary (28720) -> «Intentar obtener más información» (34440) -> the Catseye Challenge first (28721) -> «Gracias por los ánimos» (34439) -> the travellers' portals to Zurcalia (28722) -> «Bueno, ¡hasta luego!» (34438) does 13020. «Miniature Adventure» (1607): with the shrunk Magic Croquette (15988) «Show him the croquette.» (23604) does 9396 (19705, the biscuit of his reserve; 23607 -> 19706, 23606 -> 19707, 23605 -> 19708, «Ask what kind of powers the croquette has.» 23610 -> 19709: it opens the portal to Ecaflip's dimension for his children). After Cinder Mistigris: «Mention your vehement discussion with Ashante.» (23611) -> 19711, 23616 -> 19712, 23615 -> 19713, 23614 -> 19714 and «Hand over the magic croquette.» (23613, takes it) closes it with 19715 Dofus pour les noobs («Aventure miniature»). INFERRED order of the replies. «Ne tirez pas sur le messager» (1845): «Entregarle el pergamino que escribió Chalcas.» (32243, with the parchment 18650 in hand) does 12200 and leads to 26834..26838 (Imaguni, daughter of the Ouginak god; he will need the character; the talisman 18651 given on 32239) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies; 26839 is the Ouginak-class variant. «A la rescousse des magypus» (1853): «Relatar tu conversación con Kaskarina.» (32715, after 12331) is 12332 and ends the quest; 27246/27247 (the daughter of Osamodas, the rumours of the Ouginak temple and Sidimote) (Dofus pour les noobs («A la rescousse des magypus»)). INFERRED reply order."
     },
     {
       "npc": 4310,
@@ -45735,7 +45749,8 @@
           "names": true,
           "choices": [
             { "reply": 29477, "startsQuest": 1760, "params": [[34, 1760]], "next": 24538 },
-            { "reply": 29430, "quest": 1756, "next": 24501, "afterObjective": 11237, "beforeObjective": 11238 }
+            { "reply": 29430, "quest": 1756, "next": 24501, "afterObjective": 11237, "beforeObjective": 11238 },
+            { "reply": 29458, "criterion": "Qf=1758&Qa!1759&Qf!1759", "next": 24524 }
           ]
         },
         {
@@ -45798,9 +45813,21 @@
           "choices": [
             { "reply": 29428, "quest": 1756, "afterObjective": 11237, "beforeObjective": 11238, "completes": 11238, "params": [[30, 11238]] }
           ]
+        },
+        {
+          "message": 24524,
+          "choices": [
+            { "reply": 29457, "next": 24525 }
+          ]
+        },
+        {
+          "message": 24525,
+          "choices": [
+            { "reply": 29456, "startsQuest": 1759, "params": [[34, 1759]] }
+          ]
         }
       ],
-      "why": "Queen Victoria in the throne room [23,24], Dofus pour les noobs («Le héros de Sufokia»): «Demander si elle a encore besoin de vos services» (29477, «¿Me necesitas para algo más?») after the thanks of 24536 starts the quest and 24538 (the step's text) sends the character to King Talas; 24537 is her reminder while it is open. INFERRED: the opening 24536 (her thanks) for the reply. Queen Victoria, «Reina de la belleza» (1737): while it is open her opening is 24240; 29202 relays Dientinea's demands (11046), 24309 and 24310 are her answer. 1738 «Rançon nage» (Dofus pour les noobs): once the demands are relayed she sends the character to the treasurer; 29203 «Obedecer» on her declared line 24310 starts the quest; she greets a character who may start it with 24309. Queen Victoria (3246), «En la boca del infierno» (1742): the player gives her the eye of Ansoh (29238, 11091). Queen Victoria (3246), «Quand les astres seront propices» (1756, Dofus pour les noobs): the start line is 24250 (the stars and Mage Llanes), reached from 24249; the report of the brain (29430, 24501-24502, 29428) closes 11238."
+      "why": "Queen Victoria in the throne room [23,24], Dofus pour les noobs («Le héros de Sufokia»): «Demander si elle a encore besoin de vos services» (29477, «¿Me necesitas para algo más?») after the thanks of 24536 starts the quest and 24538 (the step's text) sends the character to King Talas; 24537 is her reminder while it is open. INFERRED: the opening 24536 (her thanks) for the reply. Queen Victoria, «Reina de la belleza» (1737): while it is open her opening is 24240; 29202 relays Dientinea's demands (11046), 24309 and 24310 are her answer. 1738 «Rançon nage» (Dofus pour les noobs): once the demands are relayed she sends the character to the treasurer; 29203 «Obedecer» on her declared line 24310 starts the quest; she greets a character who may start it with 24309. Queen Victoria (3246), «En la boca del infierno» (1742): the player gives her the eye of Ansoh (29238, 11091). Queen Victoria (3246), «Quand les astres seront propices» (1756, Dofus pour les noobs): the start line is 24250 (the stars and Mage Llanes), reached from 24249; the report of the brain (29430, 24501-24502, 29428) closes 11238. Queen Victoria (3246), «De mal en impie» (1759, Dofus pour les noobs): ready to face Kutulu (29458, 24524) and the order to go to the temple (24525, 29456); the order of the replies is inferred."
     },
     {
       "npc": 3245,
@@ -64037,6 +64064,7 @@
       "map": 0,
       "opening": 9036,
       "openings": [
+        { "quest": 1853, "objective": 12323, "pending": 12326, "message": 27171 },
         { "quest": 743, "message": 9038 },
         { "quest": 744, "message": 9040 },
         { "quest": 745, "message": 9042 },
@@ -64182,9 +64210,53 @@
           "choices": [
             { "reply": 9235 }
           ]
+        },
+        {
+          "message": 27171,
+          "choices": [
+            { "reply": 32978, "next": 27174, "quest": 1853, "afterObjective": 12323, "beforeObjective": 12325 },
+            { "reply": 32979, "next": 27173 }
+          ]
+        },
+        {
+          "message": 27173,
+          "choices": [
+            { "reply": 32971 }
+          ]
+        },
+        {
+          "message": 27174,
+          "choices": [
+            { "reply": 32973, "next": 27175 },
+            { "reply": 32977, "next": 27176 }
+          ]
+        },
+        {
+          "message": 27175,
+          "choices": [
+            { "reply": 32972 }
+          ]
+        },
+        {
+          "message": 27176,
+          "choices": [
+            { "reply": 32976, "next": 27177 }
+          ]
+        },
+        {
+          "message": 27177,
+          "choices": [
+            { "reply": 32975, "next": 27178, "quest": 1853, "afterObjective": 12325, "beforeObjective": 12326 }
+          ]
+        },
+        {
+          "message": 27178,
+          "choices": [
+            { "reply": 32974 }
+          ]
         }
       ],
-      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270). «El safari de las almas» 740 (Dofus pour les noobs («Le Safari des âmes»)): the last tier. The five full soul stones go by 9511 (partial); the four optional steps (the laska of each rare krokille, items 12560-12579, INFERRED order 3178-3197) by 10064, which takes the twenty. Lines 9270/9271/9572 INFERRED ids."
+      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270). «El safari de las almas» 740 (Dofus pour les noobs («Le Safari des âmes»)): the last tier. The five full soul stones go by 9511 (partial); the four optional steps (the laska of each rare krokille, items 12560-12579, INFERRED order 3178-3197) by 10064, which takes the twenty. Lines 9270/9271/9572 INFERRED ids. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): with the register page (12323) «Ponerle delante de sus narices la página firmada de su puño y letra.» (32978) is 12325 and 27174 (he laughs: the page is a forgery), 32977 -> 27176 (he asks for it), 32976 -> 27177 (it looks like his signature), «¿Quién es el culpable?» (32975) is 12326 and 27178 sends the character to Madrestam. INFERRED order and tier of the replies (the three copies of the lines 27173..27188 are the same text)."
     },
     {
       "npc": 1442,
@@ -65530,6 +65602,7 @@
       "map": 0,
       "opening": 23848,
       "openings": [
+        { "criterion": "Qa=1759&Qo>11257&Qo<11258", "message": 24530 },
         { "quest": 1731, "pending": 10973, "message": 23852 },
         { "quest": 1731, "pending": 10974, "message": 23861, "objective": 10973 },
         { "quest": 1731, "pending": 10975, "message": 23862, "objective": 10974 },
@@ -65615,7 +65688,8 @@
           "message": 24531,
           "names": true,
           "choices": [
-            { "reply": 28712, "quest": 1731, "next": 23884, "afterObjective": 10983, "beforeObjective": 10984, "completes": 10984, "params": [[30, 10984]] }
+            { "reply": 28712, "quest": 1731, "next": 23884, "afterObjective": 10983, "beforeObjective": 10984, "completes": 10984, "params": [[30, 10984]] },
+            { "reply": 29466 }
           ]
         },
         {
@@ -65637,7 +65711,7 @@
           ]
         }
       ],
-      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage)."
+      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530, 24531, 29466)."
     },
     {
       "npc": 3249,
@@ -70002,7 +70076,8 @@
             { "reply": 28564, "quest": 1743, "next": 23769, "afterObjective": 11096, "beforeObjective": 11099 },
             { "reply": 45192, "next": 34957, "quest": 2064, "afterObjective": 14884, "beforeObjective": 14890, "completes": 14890, "params": [[30, 14890]] },
             { "reply": 45192, "next": 34957, "quest": 2064, "afterObjective": 14890, "beforeObjective": 14891, "completes": 14891, "params": [[30, 14891]] },
-            { "reply": 45192, "next": 34957, "quest": 2064, "afterObjective": 14891, "beforeObjective": 14892, "completes": 14892, "params": [[30, 14892]] }
+            { "reply": 45192, "next": 34957, "quest": 2064, "afterObjective": 14891, "beforeObjective": 14892, "completes": 14892, "params": [[30, 14892]] },
+            { "reply": 45190, "next": 34958, "criterion": "Qa=2064&Qo>14892&Qo<14893" }
           ]
         },
         {
@@ -70056,7 +70131,7 @@
           ]
         }
       ],
-      "why": "Roukairol (1599), «La llave del enigma» (1743): the player hands over ten Wakfu sand and six opaline coral (28562 twice, 11097 and 11099 as two bring steps) and takes the Leonora sanctuary key (28560). Roukairol (1599), «La llave del enigma» (1743): the player hands over ten Wakfu sand and six opaline coral (28562 twice, 11097 and 11099 as two bring steps) and takes the Leonora sanctuary key (28560). 2064 (Sera mejor antes): the player hands over the four inspirations, the four expiry dates and the four airs of the time (one delivery per click, 14890-14892), then waits, mentions the anomaly and takes the bottle 21009 and the suit 21010 (34957-34961). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "Roukairol (1599), «La llave del enigma» (1743): the player hands over ten Wakfu sand and six opaline coral (28562 twice, 11097 and 11099 as two bring steps) and takes the Leonora sanctuary key (28560). Roukairol (1599), «La llave del enigma» (1743): the player hands over ten Wakfu sand and six opaline coral (28562 twice, 11097 and 11099 as two bring steps) and takes the Leonora sanctuary key (28560). 2064 (Sera mejor antes): the player hands over the four inspirations, the four expiry dates and the four airs of the time (one delivery per click, 14890-14892), then waits, mentions the anomaly and takes the bottle 21009 and the suit 21010 (34957-34961). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2064 (Sera mejor antes): after the third delivery the opening line must offer the wait that leads to the gear hand-out (34958-34961). Reply order INFERRED."
     },
     {
       "npc": 1291,
@@ -70372,6 +70447,8 @@
       "map": 0,
       "opening": 24069,
       "openings": [
+        { "criterion": "Qa=1759&Qo>11255&Qo<11257", "message": 24527 },
+        { "criterion": "Qa=1759&Qo>11258&Qo<11262", "message": 24532 },
         { "criterion": "Qa=1747&Qo>11211&Qo<11213", "message": 24153 },
         { "criterion": "Qa=1747&Qo>11209&Qo<11211", "message": 24146 },
         { "criterion": "Qf=1746&Qa!1747&Qf!1747", "cells": [358], "message": 24117 },
@@ -70473,7 +70550,9 @@
         },
         {
           "message": 24119,
-          "choices": []
+          "choices": [
+            { "reply": 29022, "startsQuest": 1747, "params": [[34, 1747]] }
+          ]
         },
         {
           "message": 24146,
@@ -70510,9 +70589,25 @@
           "choices": [
             { "reply": 29063, "quest": 1747 }
           ]
+        },
+        {
+          "message": 24527,
+          "choices": []
+        },
+        {
+          "message": 24532,
+          "choices": [
+            { "reply": 29399, "next": 24533 }
+          ]
+        },
+        {
+          "message": 24533,
+          "choices": [
+            { "reply": 29399, "teleport": 170133512 }
+          ]
         }
       ],
-      "why": "Captain Skyluza (3265), «Celle qui glougloutait dans les ténèbres» (1745): why he wanted to see the player (28961, 24070-24072); the quest's last step 11123 closes on greeting him in the palace. Captain Skyluza (3265), «Celle qui glougloutait dans les ténèbres» (1745): why he wanted to see the player (28961, 24070-24072); the quest's last step 11123 closes on greeting him in the palace. Captain Skyluza (3265), «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): starts it in the palace (28963, 24074, 28962); the statuette and Julio (24086-24088), the attack (24102, 24103, 29005), the ritual (24105-24107) and the cell (24117-24119). INFERRED order of the replies. Captain Skyluza in the cell «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): no quest key on the replies, 1746 being over by then. Captain Skyluza on the quay «La Poly mala» / «Poly la Maudite» (1747, Dofus pour les noobs): Poly is not herself (24146, 24148, 29054: the shorrokh 4489 attacks) and he sends the player to the queen (24153-24156). INFERRED order."
+      "why": "Captain Skyluza (3265), «Celle qui glougloutait dans les ténèbres» (1745): why he wanted to see the player (28961, 24070-24072); the quest's last step 11123 closes on greeting him in the palace. Captain Skyluza (3265), «Celle qui glougloutait dans les ténèbres» (1745): why he wanted to see the player (28961, 24070-24072); the quest's last step 11123 closes on greeting him in the palace. Captain Skyluza (3265), «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): starts it in the palace (28963, 24074, 28962); the statuette and Julio (24086-24088), the attack (24102, 24103, 29005), the ritual (24105-24107) and the cell (24117-24119). INFERRED order of the replies. Captain Skyluza in the cell «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): no quest key on the replies, 1746 being over by then. Captain Skyluza on the quay «La Poly mala» / «Poly la Maudite» (1747, Dofus pour les noobs): Poly is not herself (24146, 24148, 29054: the shorrokh 4489 attacks) and he sends the player to the queen (24153-24156). INFERRED order. Captain Skyluza (3265), «De mal en impie» (1759, Dofus pour les noobs): waiting in the priest's room (24527), and his thanks after the fight (24532-24533), which leads out of the temple. CI: the map-0 tree carries 24119 (1747 hand-over), so it starts 1747 like the map tree of the cell block."
     },
     {
       "npc": 1598,
@@ -70666,7 +70761,7 @@
       "map": 0,
       "opening": 34406,
       "openings": [
-        { "quest": 2064, "objective": 14881, "message": 34490 }
+        { "quest": 2064, "pending": 14881, "message": 34490 }
       ],
       "lines": [
         {
@@ -70850,6 +70945,7 @@
       "map": 0,
       "opening": 0,
       "openings": [
+        { "criterion": "Qa=1758&Qo<11246", "message": 11918 },
         { "criterion": "Qa=1756&Qo<11229", "message": 24317 },
         { "criterion": "Qa=1749&Qo>11147&Qo<11150", "message": 24172 }
       ],
@@ -70919,9 +71015,45 @@
           "choices": [
             { "reply": 29216, "quest": 1756 }
           ]
+        },
+        {
+          "message": 11918,
+          "choices": [
+            { "reply": 29489, "quest": 1758, "next": 24544 }
+          ]
+        },
+        {
+          "message": 24544,
+          "choices": [
+            { "reply": 29488, "quest": 1758, "next": 24545 }
+          ]
+        },
+        {
+          "message": 24545,
+          "choices": [
+            { "reply": 29487, "quest": 1758, "next": 24546 }
+          ]
+        },
+        {
+          "message": 24546,
+          "choices": [
+            { "reply": 29486, "quest": 1758, "next": 24547 }
+          ]
+        },
+        {
+          "message": 24547,
+          "choices": [
+            { "reply": 29484, "quest": 1758, "next": 24548, "buyPrice": 5000 }
+          ]
+        },
+        {
+          "message": 24548,
+          "choices": [
+            { "reply": 29483, "quest": 1758, "gives": 18086 }
+          ]
         }
       ],
-      "why": "Mage Llanes (1601), «Memorias de un amnesico» (1749, Dofus pour les noobs): Markaris's amnesia, a Mie-do and the toklium ore (24172-24176; 11149 closes on greeting). INFERRED order. Mage Llanes (1601), «Memorias de un amnesico» (1749, Dofus pour les noobs): Markaris's amnesia, a Mie-do and the toklium ore (24172-24176; 11149 closes on greeting). INFERRED order. Mage Llanes (1601), «Quand les astres seront propices» (1756, Dofus pour les noobs): the next alignment of the stars (24317-24322): the last one was in the year 492 and the archives of Sufokia tell of it."
+      "why": "Mage Llanes (1601), «Memorias de un amnesico» (1749, Dofus pour les noobs): Markaris's amnesia, a Mie-do and the toklium ore (24172-24176; 11149 closes on greeting). INFERRED order. Mage Llanes (1601), «Memorias de un amnesico» (1749, Dofus pour les noobs): Markaris's amnesia, a Mie-do and the toklium ore (24172-24176; 11149 closes on greeting). INFERRED order. Mage Llanes (1601), «Quand les astres seront propices» (1756, Dofus pour les noobs): the next alignment of the stars (24317-24322): the last one was in the year 492 and the archives of Sufokia tell of it. Mage Llanes (1601), «Il suffira d'un signe» (1758, Dofus pour les noobs): the visionary mage's hair (24544-24548) for 5,000 kamas; the order of the replies is inferred. The hair (18086) is only handed over here; the show objective 11246 closes at Nomis, since a type 2 objective needs the item in hand."
     },
     {
       "npc": 3252,
@@ -71494,12 +71626,15 @@
       "map": 179308545,
       "opening": 26868,
       "openings": [
-        { "quest": 1845, "objective": 12282, "pending": 12283, "message": 26873 }
+        { "quest": 1845, "objective": 12282, "pending": 12283, "message": 26873 },
+        { "after": 1845, "message": 26874, "criterion": "Qa!1853&Qf!1853" },
+        { "quest": 1853, "objective": 12329, "pending": 12331, "message": 26868 }
       ],
       "lines": [
         {
           "message": 26868,
           "choices": [
+            { "reply": 32712, "next": 27239, "quest": 1853, "completes": 12331, "params": [[30, 12331]], "afterObjective": 12329, "beforeObjective": 12331 },
             { "reply": 32298, "next": 26869 },
             { "reply": 32294 }
           ]
@@ -71538,10 +71673,79 @@
         },
         {
           "message": 26874,
+          "choices": [
+            { "reply": 32299, "startsQuest": 1853, "params": [[34, 1853]] },
+            { "reply": 32302, "next": 26875 },
+            { "reply": 32294 }
+          ]
+        },
+        {
+          "message": 26875,
+          "choices": [
+            { "reply": 32301, "next": 26876 }
+          ]
+        },
+        {
+          "message": 26876,
+          "choices": [
+            { "reply": 32300, "next": 26877 }
+          ]
+        },
+        {
+          "message": 26877,
+          "choices": [
+            { "reply": 32299, "startsQuest": 1853, "params": [[34, 1853]] },
+            { "reply": 32294 }
+          ]
+        },
+        {
+          "message": 27239,
+          "choices": [
+            { "reply": 32711, "next": 27240 },
+            { "reply": 32706, "next": 27245 }
+          ]
+        },
+        {
+          "message": 27240,
+          "choices": [
+            { "reply": 32710, "next": 27241 }
+          ]
+        },
+        {
+          "message": 27241,
+          "choices": [
+            { "reply": 32709, "next": 27242 },
+            { "reply": 32708, "next": 27243 },
+            { "reply": 32706, "next": 27245 }
+          ]
+        },
+        {
+          "message": 27242,
+          "choices": [
+            { "reply": 32708, "next": 27243 },
+            { "reply": 32706, "next": 27245 }
+          ]
+        },
+        {
+          "message": 27243,
+          "choices": [
+            { "reply": 32707, "next": 27244 },
+            { "reply": 32706, "next": 27245 }
+          ]
+        },
+        {
+          "message": 27244,
+          "choices": [
+            { "reply": 32706, "next": 27245 }
+          ]
+        },
+        {
+          "message": 27245,
+          "names": true,
           "choices": []
         }
       ],
-      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies."
+      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): after 1845, 26874 (what the magicorrincos are, will you rescue them) is her greeting until 1853 starts; «Acepto.» (32299) starts it on that line or after the family questions (32302 -> 26875 -> 26876 -> 26877). With the magicorrincos brought to safety (12329) «Los magicorrincos están sanos y salvos.» (32712) does 12331 and opens the Brotherhood questions 27239..27245 (Dofus pour les noobs («A la rescousse des magypus»): Coqueline tells of the Brotherhood of the Forgotten). INFERRED reply order."
     },
     {
       "npc": 3749,
@@ -71620,6 +71824,7 @@
             { "reply": 32342, "next": 26923 },
             { "reply": 32343, "quest": 1845, "afterObjective": 12246, "beforeObjective": 12249 },
             { "reply": 32350, "next": 26924, "quest": 1845, "afterObjective": 12255, "beforeObjective": 12256 },
+            { "reply": 32350, "next": 26924, "criterion": "Qa=1853&Qo<12284" },
             { "reply": 32345 }
           ]
         },
@@ -71632,7 +71837,8 @@
         {
           "message": 26924,
           "choices": [
-            { "reply": 32349, "next": 26925, "holds": 18708, "quest": 1845, "afterObjective": 12255, "beforeObjective": 12256 }
+            { "reply": 32349, "next": 26925, "holds": 18708, "quest": 1845, "afterObjective": 12255, "beforeObjective": 12256 },
+            { "reply": 32349, "next": 26925, "holds": 18708, "criterion": "Qa=1853&Qo<12284" }
           ]
         },
         {
@@ -71642,7 +71848,7 @@
           ]
         }
       ],
-      "why": "Bernardino at the hunters' camp [-68,31] (179438083), «Ne tirez pas sur le messager» (1845): «Insistir.» (32344) -> 26922 (they await rainbow jalatos), «Irte y pensar en algún truco para engañar a Bernardiño.» (32343) is 12249; once the stuffed jalato is made, «He capturado a un jalató arcoíris.» (32350) -> 26924 and «Enseñarle rápidamente el peluche...» (32349, with the plush 18708) is 12256; 26925 lets the character in (32348, to Gerard's tent) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies."
+      "why": "Bernardino at the hunters' camp [-68,31] (179438083), «Ne tirez pas sur le messager» (1845): «Insistir.» (32344) -> 26922 (they await rainbow jalatos), «Irte y pensar en algún truco para engañar a Bernardiño.» (32343) is 12249; once the stuffed jalato is made, «He capturado a un jalató arcoíris.» (32350) -> 26924 and «Enseñarle rápidamente el peluche...» (32349, with the plush 18708) is 12256; 26925 lets the character in (32348, to Gerard's tent) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853): the guide has the character play the rainbow jalato trick on Bernardino again (Dofus pour les noobs («A la rescousse des magypus»): «refaites lui le coup du Bouftou arc-en-ciel pour entrer dans la tente»); 32350 and 32349 (with the plush 18708) are offered while 1853 is under way and the camp is not yet searched (12284), and lead to 26925, the tent."
     },
     {
       "npc": 3737,
@@ -71784,8 +71990,8 @@
       "map": 0,
       "opening": 34967,
       "openings": [
-        { "quest": 2064, "objective": 14896, "message": 34968 },
-        { "quest": 2064, "objective": 14897, "message": 34976 }
+        { "quest": 2064, "objective": 14895, "pending": 14896, "message": 34968 },
+        { "quest": 2064, "objective": 14896, "pending": 14897, "message": 34976 }
       ],
       "lines": [
         {
@@ -71934,33 +72140,423 @@
       "map": 0,
       "opening": 24505,
       "openings": [
+        { "criterion": "Qa=1758&Qo>11250&Qo<11249", "message": 24512 },
+        { "canStart": 1758, "message": 24506 },
+        { "criterion": "Qa=1758&Qo<11249", "message": 24511 },
         { "criterion": "Qa=1756&Qo>11239", "message": 24506 }
       ],
       "lines": [
         {
           "message": 24506,
           "choices": [
-            { "reply": 29439, "quest": 1756, "next": 24507 }
+            { "reply": 29439, "next": 24507 }
           ]
         },
         {
           "message": 24507,
           "choices": [
-            { "reply": 29437, "quest": 1756, "next": 24508 }
+            { "reply": 29437, "next": 24508 }
           ]
         },
         {
           "message": 24508,
           "choices": [
-            { "reply": 29435, "quest": 1756 }
+            { "reply": 29436, "next": 24509 }
           ]
         },
         {
           "message": 24505,
           "choices": []
+        },
+        {
+          "message": 24509,
+          "choices": [
+            { "reply": 29435, "startsQuest": 1758, "params": [[34, 1758]], "next": 24510 }
+          ]
+        },
+        {
+          "message": 24510,
+          "choices": [
+            { "reply": 29434, "quest": 1758 }
+          ]
+        },
+        {
+          "message": 24511,
+          "choices": [
+            { "reply": 29442, "quest": 1758, "next": 24512, "completes": 11248, "completesAll": [11241, 11242, 11243, 11244, 11245, 11246, 11248], "params": [[30, 11248]] },
+            { "reply": 29443, "quest": 1758 }
+          ]
+        },
+        {
+          "message": 24512,
+          "choices": [
+            { "reply": 29441, "quest": 1758, "next": 24513 }
+          ]
+        },
+        {
+          "message": 24513,
+          "choices": [
+            { "reply": 29449, "quest": 1758, "next": 24514 }
+          ]
+        },
+        {
+          "message": 24514,
+          "choices": [
+            { "reply": 29448, "quest": 1758, "next": 24515 }
+          ]
+        },
+        {
+          "message": 24515,
+          "choices": [
+            { "reply": 29447, "quest": 1758, "next": 24516 }
+          ]
+        },
+        {
+          "message": 24516,
+          "choices": [
+            { "reply": 29446, "quest": 1758, "next": 24518 },
+            { "reply": 29445, "quest": 1758, "next": 24517 }
+          ]
+        },
+        {
+          "message": 24517,
+          "choices": [
+            { "reply": 29444, "quest": 1758, "next": 24513 }
+          ]
+        },
+        {
+          "message": 24518,
+          "choices": [
+            { "reply": 29455, "quest": 1758, "next": 24519 }
+          ]
+        },
+        {
+          "message": 24519,
+          "choices": [
+            { "reply": 29454, "quest": 1758, "next": 24520 }
+          ]
+        },
+        {
+          "message": 24520,
+          "choices": [
+            { "reply": 29453, "quest": 1758, "next": 24521 }
+          ]
+        },
+        {
+          "message": 24521,
+          "choices": [
+            { "reply": 29452, "quest": 1758, "next": 24522 }
+          ]
+        },
+        {
+          "message": 24522,
+          "choices": [
+            { "reply": 29451, "quest": 1758, "next": 24523 }
+          ]
+        },
+        {
+          "message": 24523,
+          "choices": [
+            { "reply": 29450, "quest": 1758, "completes": 11249, "params": [[30, 11249]] }
+          ]
         }
       ],
-      "why": "Professor Nomis (3261), «Quand les astres seront propices» (1756, Dofus pour les noobs): his thanks and the way to stop the ritual (24506-24508): the greeting closes 11252. Professor Nomis (3261), «Quand les astres seront propices» (1756, Dofus pour les noobs): his thanks and the way to stop the ritual (24506-24508): the greeting closes 11252. Professor Nomis' default greeting (24505), «Quand les astres seront propices» (1756)."
+      "why": "Professor Nomis (3261), «Quand les astres seront propices» (1756, Dofus pour les noobs): his thanks and the way to stop the ritual (24506-24508): the greeting closes 11252. Professor Nomis (3261), «Quand les astres seront propices» (1756, Dofus pour les noobs): his thanks and the way to stop the ritual (24506-24508): the greeting closes 11252. Professor Nomis' default greeting (24505), «Quand les astres seront propices» (1756). Professor Nomis (3261), «Il suffira d'un signe» (1758, Dofus pour les noobs): the start (24509), the show of the ingredients (24511), and the sign (24512-24523): the order of the arms is inferred, the Grofond tentacles go first (Dofus pour les noobs). Replies without the quest key: 1756 is finished when 1758 is offered, and the engine drops keyed replies of a finished quest. The show of the ingredients (24511): the criterion on the carried items hid the reply, the engine checks the items itself. Once the ingredients are shown (11248) and the starfish is caught (11250), Nomis goes straight to the sign (24512): the show reply is only offered while an ingredient objective is open."
+    },
+    {
+      "npc": 3270,
+      "map": 0,
+      "opening": 24539,
+      "lines": [
+        {
+          "message": 24539,
+          "choices": [
+            { "reply": 29478, "quest": 1758 }
+          ]
+        }
+      ],
+      "why": "The venerable starfish (3270), «Il suffira d'un signe» (1758, Dofus pour les noobs): 29478 starts the fight to capture it. The venerable starfish (3270), «Il suffira d'un signe» (1758, Dofus pour les noobs): 29478 starts the fight to capture it."
+    },
+    {
+      "npc": 3259,
+      "map": 0,
+      "opening": 0,
+      "openings": [
+        { "criterion": "Qa=1759&Qo>11255&Qo<11256", "message": 24474 }
+      ],
+      "lines": [
+        {
+          "message": 24474,
+          "choices": [
+            { "reply": 29522, "quest": 1759, "teleport": 169350144 }
+          ]
+        }
+      ],
+      "why": "Sanazero (3259), «De mal en impie» (1759, Dofus pour les noobs): after Kutulu's larva is beaten he lets the player into the room of the priest in yellow (24474, 29522); the rest of his talk is the native dungeon one. Sanazero (3259), «De mal en impie» (1759, Dofus pour les noobs): after Kutulu's larva is beaten he lets the player into the room of the priest in yellow (24474, 29522); the rest of his talk is the native dungeon one."
+    },
+    {
+      "npc": 3262,
+      "map": 169350144,
+      "opening": 24142,
+      "lines": [
+        {
+          "message": 24142,
+          "choices": [
+            { "reply": 29462, "quest": 1759, "next": 24143 }
+          ]
+        },
+        {
+          "message": 24143,
+          "choices": [
+            { "reply": 29463, "quest": 1759, "next": 24528 },
+            { "reply": 29461, "quest": 1759 }
+          ]
+        },
+        {
+          "message": 24528,
+          "choices": [
+            { "reply": 29461, "quest": 1759 }
+          ]
+        }
+      ],
+      "why": "The priest in yellow (3262) in his room, «De mal en impie» (1759, Dofus pour les noobs): 24142-24528 and the fight with Skyluza's help (29461). The priest in yellow (3262) in his room, «De mal en impie» (1759, Dofus pour les noobs): 24142-24528 and the fight with Skyluza's help (29461)."
+    },
+    {
+      "npc": 3766,
+      "map": 179438083,
+      "opening": 27153,
+      "lines": [
+        {
+          "message": 27153,
+          "choices": [
+            { "reply": 32610, "next": 27263 },
+            { "reply": 32615, "next": 27156, "criterion": "Qa=1853&Qo<12284" },
+            { "reply": 32611 }
+          ]
+        },
+        {
+          "message": 27263,
+          "choices": [
+            { "reply": 32608 }
+          ]
+        },
+        {
+          "message": 27156,
+          "choices": [
+            { "reply": 32614, "next": 27157, "quest": 1853, "beforeObjective": 12284 },
+            { "reply": 32611 }
+          ]
+        },
+        {
+          "message": 27157,
+          "choices": [
+            { "reply": 32613, "next": 27158 },
+            { "reply": 32611 }
+          ]
+        },
+        {
+          "message": 27158,
+          "choices": [
+            { "reply": 32612, "next": 27159, "quest": 1853, "afterObjective": 12284, "beforeObjective": 12323, "gives": 18749 },
+            { "reply": 32611 }
+          ]
+        },
+        {
+          "message": 27159,
+          "choices": [
+            { "reply": 32611 }
+          ]
+        }
+      ],
+      "why": "The grumpy sailor at the hunters' camp [-68,31] (179438083), «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «Parlez au Marin bougon en vous faisant passer pour Gérard et renseignez vous sur les deux Magypus. Il vous confirme les avoir transportés vers Brâkmar et livrés à un Enutrof»): asking plainly (32610) gets 27263; in Gerard's clothes «Poner una voz grave y hacerte pasar por Gerard.» (32615) -> 27156, «¿Han llegado los dos magicorrincos a buen puerto?» (32614) is 12284 with 27157, «Exijo ver el albarán.» (32613) -> 27158 and «Agarrar el albarán.» (32612) gives the delivery note (18749) and is 12322. INFERRED order of the replies and that the disguise needs no criterion (the mutation is not testable from a reply)."
+    },
+    {
+      "npc": 3808,
+      "map": 212865030,
+      "opening": 27160,
+      "lines": [
+        {
+          "message": 27160,
+          "choices": [
+            { "reply": 32616, "next": 27161, "criterion": "Qa=1853" },
+            { "reply": 32622 }
+          ]
+        },
+        {
+          "message": 27161,
+          "choices": [
+            { "reply": 32620, "next": 27162 }
+          ]
+        },
+        {
+          "message": 27162,
+          "choices": [
+            { "reply": 32618, "next": 27163, "buyPrice": 10001 },
+            { "reply": 32619, "next": 27164 },
+            { "reply": 32622 }
+          ]
+        },
+        {
+          "message": 27163,
+          "choices": [
+            { "reply": 32617, "quest": 1853, "afterObjective": 12322, "beforeObjective": 12325, "gives": 18750 }
+          ]
+        },
+        {
+          "message": 27164,
+          "choices": [
+            { "reply": 32622 }
+          ]
+        }
+      ],
+      "why": "Impexpo Ortador (the guide's Portim Portex), the Enutrof of Brakmar's harbour [-20,39] (212865030), «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «soudoyez le avec 10 001 kamas ... «Proposer dix mille et un kamas»»): showing the note (32616) -> 27161, asking who the client is (32620) -> 27162, «Proponer diez mil y un kamas.» (32618, charges 10001 kamas) -> 27163 and «Agarrar el documento e irte.» (32617) gives the page of his register (18750) and is 12323. Threatening him (32619) only gets 27164 (the guide's prison path is not written). INFERRED order."
+    },
+    {
+      "npc": 90,
+      "map": 87819777,
+      "opening": 278,
+      "lines": [
+        {
+          "message": 278,
+          "choices": [
+            { "reply": 32657, "next": 27195, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 },
+            { "reply": 224, "next": 281 },
+            { "reply": 225, "next": 282 }
+          ]
+        },
+        {
+          "message": 281,
+          "choices": [
+            { "reply": 32657, "next": 27195, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        },
+        {
+          "message": 282,
+          "choices": []
+        },
+        {
+          "message": 27195,
+          "choices": [
+            { "reply": 32656, "next": 27196, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        },
+        {
+          "message": 27196,
+          "choices": [
+            { "reply": 32655, "next": 27197, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        },
+        {
+          "message": 27197,
+          "choices": [
+            { "reply": 32654, "next": 27198, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        },
+        {
+          "message": 27198,
+          "choices": [
+            { "reply": 32653, "next": 27199, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        },
+        {
+          "message": 27199,
+          "choices": [
+            { "reply": 32652, "quest": 1853, "afterObjective": 12326, "beforeObjective": 12327 }
+          ]
+        }
+      ],
+      "why": "Mori Arty at his house in Madrestam [9,-4] (87819777), «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «Montrer le document et le sommer de s'expliquer sur son implication»): 32657 -> 27195, «¿Dónde están los magicorrincos?» (32656) -> 27196 (eaten), 32655 -> 27197 (a joke; handed to the person who ordered them), 32654 -> 27198, «¿A qué juegas?» (32653) -> 27199 and «Desistir en comprender sus motivaciones y salir hacia los caminos rocosos.» (32652) is 12327. His own greeting 278 is kept (planes 224 -> 281; the band 225 -> 282, whose quest is not here). INFERRED order."
+    },
+    {
+      "npc": 3813,
+      "map": 164364817,
+      "opening": 27201,
+      "lines": [
+        {
+          "message": 27201,
+          "choices": [
+            { "reply": 32663, "next": 27202 },
+            { "reply": 32662, "next": 27203 },
+            { "reply": 32664 }
+          ]
+        },
+        {
+          "message": 27202,
+          "choices": [
+            { "reply": 32662, "next": 27203 },
+            { "reply": 32664 }
+          ]
+        },
+        {
+          "message": 27203,
+          "choices": [
+            { "reply": 32661, "next": 27204, "quest": 1853, "afterObjective": 12327, "beforeObjective": 12328 }
+          ]
+        },
+        {
+          "message": 27204,
+          "choices": [
+            { "reply": 32660 }
+          ]
+        }
+      ],
+      "why": "The hungry ruffian on the Rocky Roads [-19,-19] (164364817), «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): 27201 (the blue creatures), 27202 (stolen from a Sram), 27203 (a million kamas, or he eats them); «Negarse a pagar tanto.» (32661) is 12328 and 27204; «Defenderte del ataque de los rufianes.» (32660) starts the fight (npc_fights.json, alone). INFERRED order."
+    },
+    {
+      "npc": 3814,
+      "map": 164364817,
+      "opening": 27205,
+      "lines": [
+        {
+          "message": 27205,
+          "choices": [
+            { "reply": 32666, "next": 27206 },
+            { "reply": 32667 }
+          ]
+        },
+        {
+          "message": 27206,
+          "choices": [
+            { "reply": 32667 }
+          ]
+        }
+      ],
+      "why": "A ruffian of the camp on the Rocky Roads, «A la rescousse des magypus» (1853): his answer about the blue creatures (27206) and «Atacar a los rufianes.» (the fight with the three, alone)."
+    },
+    {
+      "npc": 3815,
+      "map": 164364817,
+      "opening": 27207,
+      "lines": [
+        {
+          "message": 27207,
+          "choices": [
+            { "reply": 32669, "next": 27208 },
+            { "reply": 32670 }
+          ]
+        },
+        {
+          "message": 27208,
+          "choices": [
+            { "reply": 32670 }
+          ]
+        }
+      ],
+      "why": "A ruffian of the camp on the Rocky Roads, «A la rescousse des magypus» (1853): his answer about the blue creatures (27208) and «Atacar a los rufianes.» (the fight with the three, alone)."
+    },
+    {
+      "npc": 3812,
+      "map": 164364817,
+      "opening": 27192,
+      "lines": [
+        {
+          "message": 27192,
+          "choices": [
+            { "reply": 32651, "teleport": 179308545, "quest": 1853, "afterObjective": 12330, "beforeObjective": 12329 }
+          ]
+        }
+      ],
+      "why": "A magicorrinco (the guide's magypus) in the ruffians' cage on the Rocky Roads, «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «Rassurez-les ... les reconduire à Nimotopia ... personnages suiveurs»): «Tranquilizar a los magicorrincos y llevarlos a Animatopía.» (32651) takes the character to Animatopia [-63,29], which is 12329. GAP: the animals do not follow, they stand by Kaskarina."
     }
   ]
 }

@@ -8427,6 +8427,101 @@
       "criterion": "Qa=2064&Qo<14882",
       "orientation": 3,
       "why": "Entropix beside the Envoyee de Xelor while 2064 is under way and before her questions (14881 talk). INFERRED cell."
+    },
+    {
+      "map": 168559632,
+      "npc": 3270,
+      "cell": 268,
+      "orientation": 3,
+      "criterion": "Qa=1758&Qo<11250",
+      "why": "The venerable starfish [26,34] (1758, Dofus pour les noobs: talk to it to try to capture it); INFERRED cell."
+    },
+    {
+      "map": 169350144,
+      "npc": 3265,
+      "cell": 330,
+      "orientation": 3,
+      "criterion": "Qa=1759&Qo>11255",
+      "why": "Captain Skyluza in the priest's room of the temple of Kutulu [27,26] (1759, 11256 and 11262); INFERRED cell."
+    },
+    {
+      "map": 169350144,
+      "npc": 3262,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "Qa=1759&Qo>11256&Qo<11257",
+      "why": "The priest in yellow in his room (1759, 11257); INFERRED cell."
+    },
+    {
+      "map": 169350144,
+      "npc": 3238,
+      "cell": 302,
+      "orientation": 3,
+      "criterion": "Qa=1759&Qo>11257&Qo<11259",
+      "why": "Poly Perkin in the priest's room, freed (1759, 11258); INFERRED cell."
+    },
+    {
+      "map": 212865030,
+      "npc": 3808,
+      "cell": 258,
+      "orientation": 3,
+      "why": "Impexpo Ortador (the guide's Portim Portex) on Brakmar's harbour [-20,39], «A la rescousse des magypus» (1853). INFERRED cell."
+    },
+    {
+      "map": 164364817,
+      "npc": 3813,
+      "cell": 303,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12327&Qo<12330",
+      "why": "The hungry ruffian by the fire of the Rocky Roads camp (1853). INFERRED cell."
+    },
+    {
+      "map": 164364817,
+      "npc": 3814,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12327&Qo<12330",
+      "why": "The mute ruffian by the fire of the Rocky Roads camp (1853). INFERRED cell."
+    },
+    {
+      "map": 164364817,
+      "npc": 3815,
+      "cell": 345,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12327&Qo<12330",
+      "why": "The cruel ruffian by the fire of the Rocky Roads camp (1853). INFERRED cell."
+    },
+    {
+      "map": 164364817,
+      "npc": 3812,
+      "cell": 232,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12327&Qo<12329",
+      "why": "A magicorrinco of the ruffians' cage on the Rocky Roads (1853), by the lean-to. INFERRED cell."
+    },
+    {
+      "map": 164364817,
+      "npc": 3812,
+      "cell": 246,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12327&Qo<12329",
+      "why": "The second magicorrinco of the ruffians' cage on the Rocky Roads (1853). INFERRED cell."
+    },
+    {
+      "map": 179308545,
+      "npc": 3812,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12329&Qo<12332",
+      "why": "A magicorrinco brought to Animatopia (1853, 12329): spawned beside Kaskarina instead of following. INFERRED cell."
+    },
+    {
+      "map": 179308545,
+      "npc": 3812,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1853&Qo>12329&Qo<12332",
+      "why": "The second magicorrinco brought to Animatopia (1853, 12329). INFERRED cell."
     }
   ]
 }
