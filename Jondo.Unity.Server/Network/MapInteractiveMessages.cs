@@ -43,7 +43,19 @@ internal static class MapInteractiveMessages
             if (elements.Any(e => e.ElementId == elementId && e.EnabledSkills.Count > 0)) continue;
             elements.RemoveAll(e => e.ElementId == elementId);
             states.RemoveAll(s => s.ElementId == elementId);
-            Add(elementId, InteractiveMessages.Of(mapId, elementId)?.Skill ?? InteractiveMessages.Skill, QuestBinding.DefaultType);
+            var said = InteractiveMessages.Of(mapId, elementId);
+            Add(elementId, said?.Skill ?? InteractiveMessages.Skill, said is { Type: not 0 } ? said.Type : QuestBinding.DefaultType);
+        }
+        // An element whose use starts a written fight (npc_fights.json «element»), while that fight
+        // is still to be fought by this character: the Xelorium's old chest, «Old Chest XXIII» on hover.
+        foreach (var scripted in NpcFights.OnMap(mapId))
+        {
+            int elementId = scripted.ElementId;
+            if (NpcFights.ForElement(mapId, elementId, SessionContext.State.ElementsUsed.Contains) == null) continue;
+            if (elements.Any(e => e.ElementId == elementId && e.EnabledSkills.Count > 0)) continue;
+            elements.RemoveAll(e => e.ElementId == elementId);
+            states.RemoveAll(s => s.ElementId == elementId);
+            Add(elementId, QuestBinding.DefaultSkill, scripted.ElementType != 0 ? scripted.ElementType : QuestBinding.DefaultType);
         }
         int altar = AlmanaxOfferingHandler.AltarOn(mapId);
         if (altar != 0 && AlmanaxOfferingHandler.MayPray()) Add(altar, QuestBinding.DefaultSkill, QuestBinding.DefaultType);

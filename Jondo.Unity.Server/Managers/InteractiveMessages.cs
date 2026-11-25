@@ -55,6 +55,12 @@ namespace Jondo.Unity.Server.Managers
             public (int Item, int Count)[] Gives { get; init; } = Array.Empty<(int, int)>();
 
             /// <summary>
+            /// The interactive type it is declared with («type»), the client's name for it on hover;
+            /// zero for the quest default: the Xelorium's «Clock That's 7 Minutes Fast» (249).
+            /// </summary>
+            public int Type { get; init; }
+
+            /// <summary>
             /// An item criterion the hand-out waits on (<see cref="ItemCriteria"/>), empty for none:
             /// the scroll's own «PT!24015&amp;PT!24016», not to whoever already knows the spell.
             /// </summary>
@@ -151,6 +157,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         Gives = gives,
                         Cases = cases,
+                        Type = (int)Number(row, "type"),
                         Criterion = row.TryGetProperty("criterion", out var criterion)
                                     && criterion.ValueKind == JsonValueKind.String ? criterion.GetString() ?? "" : "",
                     };

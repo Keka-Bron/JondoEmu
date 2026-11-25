@@ -42,6 +42,51 @@ namespace Jondo.Unity.Server.Managers
     }
 
     /// <summary>
+    /// How many times each character has used an element whose cases count their uses
+    /// (<see cref="PuzzleCase.Uses"/>), and until when it is locked: the Xelorium's clocks hand out
+    /// their minutes but, used too much, lock for a few minutes (Dofus pour les noobs,
+    /// «Énergie renouvelable»).
+    /// </summary>
+    /// <remarks>
+    /// Kept in memory as <see cref="PuzzleMarks"/> are: a restart frees every clock.
+    /// </remarks>
+    public static class PuzzleUses
+    {
+        private static readonly ConcurrentDictionary<(long Character, string Key), (int Count, DateTimeOffset Until)> _uses = new();
+
+        /// <summary>Whether <paramref name="key"/> is locked for this character now.</summary>
+        public static bool Locked(long character, string key, DateTimeOffset now)
+        {
+            if (!_uses.TryGetValue((character, key), out var used) || used.Until == default) return false;
+            if (used.Until > now) return true;
+            _uses.TryRemove((character, key), out _);
+            return false;
+        }
+
+        /// <summary>
+        /// One more use of <paramref name="key"/>: the <paramref name="uses"/>-th locks it for
+        /// <paramref name="lockFor"/> seconds and starts the count again. True when this use locked it.
+        /// </summary>
+        public static bool Use(long character, string key, int uses, int lockFor, DateTimeOffset now)
+        {
+            if (uses <= 0) return false;
+            var slot = (character, key);
+            int count = (_uses.TryGetValue(slot, out var used) && used.Until == default ? used.Count : 0) + 1;
+            if (count < uses)
+            {
+                _uses[slot] = (count, default);
+                return false;
+            }
+            if (lockFor > 0) _uses[slot] = (0, now.AddSeconds(lockFor));
+            else _uses.TryRemove(slot, out _);
+            return lockFor > 0;
+        }
+
+        /// <summary>For the tests: forget everything.</summary>
+        internal static void Clear() => _uses.Clear();
+    }
+
+    /// <summary>
     /// One of the answers an element or a cell gives, chosen by what the character carries and what
     /// the puzzle remembers of him: the padlock without the lockpick rattles and brings the guardian
     /// back (866), with it opens without a sound (867) and is remembered as open.
@@ -67,11 +112,47 @@ namespace Jondo.Unity.Server.Managers
         public long ToMap { get; init; }
         public int ToCell { get; init; }
 
+        /// <summary>
+        /// Whether the items add up («stacks»): its gives go in on every use, whatever is carried,
+        /// and its takes take what there is up to their count. A Xelorium clock 7 minutes fast adds 7
+        /// Minutes from Xelorium each time; one 8 minutes slow takes up to 8.
+        /// </summary>
+        public bool Stacks { get; init; }
+
+        /// <summary>
+        /// Uses before the element locks («uses»), zero for no limit; while locked the case does not
+        /// hold and the next one is tried. Counted per element and character (<see cref="PuzzleUses"/>).
+        /// </summary>
+        public int Uses { get; init; }
+
+        /// <summary>Seconds the element stays locked after its <see cref="Uses"/> («lockFor»).</summary>
+        public int LockFor { get; init; }
+
         public bool Applies(Func<string, bool> holds, Func<string, bool> has)
             => (Criterion.Length == 0 || holds(Criterion)) && Needs.All(has) && !Lacks.Any(has);
 
         public static PuzzleCase? First(IEnumerable<PuzzleCase> cases, Func<string, bool> holds, Func<string, bool> has)
             => cases.FirstOrDefault(c => c.Applies(holds, has));
+
+        /// <summary>
+        /// The first case that holds and is not locked: a case with <see cref="Uses"/> is skipped
+        /// while <paramref name="locked"/> says its element is.
+        /// </summary>
+        public static PuzzleCase? First(IEnumerable<PuzzleCase> cases, Func<string, bool> holds, Func<string, bool> has,
+                                        Func<bool> locked)
+            => cases.FirstOrDefault(c => c.Applies(holds, has) && (c.Uses <= 0 || !locked()));
+
+        /// <summary>
+        /// How many of a give go in for whoever carries <paramref name="held"/>: all of them when
+        /// the case <see cref="Stacks"/>, otherwise only while none is carried.
+        /// </summary>
+        public int GiveNow(int held, int count) => Stacks || held <= 0 ? count : 0;
+
+        /// <summary>
+        /// How many of a take go for whoever carries <paramref name="held"/>: what there is up to the
+        /// count when the case <see cref="Stacks"/>, otherwise the whole count or nothing.
+        /// </summary>
+        public int TakeNow(int held, int count) => Stacks ? Math.Min(Math.Max(0, held), count) : held >= count ? count : 0;
 
         /// <summary>A row's «cases», in their order; none when it has none.</summary>
         public static PuzzleCase[] Read(JsonElement row, string name = "cases")
@@ -99,6 +180,9 @@ namespace Jondo.Unity.Server.Managers
             For = (int)Number(c, "for"),
             ToMap = Number(c, "toMap"),
             ToCell = (int)Number(c, "toCell"),
+            Stacks = c.TryGetProperty("stacks", out var stacks) && stacks.ValueKind == JsonValueKind.True,
+            Uses = (int)Number(c, "uses"),
+            LockFor = (int)Number(c, "lockFor"),
         };
 
         /// <summary>A list of words, or a single word for a list of one.</summary>

@@ -61,7 +61,8 @@ namespace Jondo.Unity.Server.Handlers
                                                                long winMapId = 0, int winCellId = 0, int winMarks = 0,
                                                                long alliesPlayedBy = 0, bool? soulStoneFight = false,
                                                                bool defeatFree = false, bool? solo = false,
-                                                               long loseMapId = 0, int loseCellId = 0)
+                                                               long loseMapId = 0, int loseCellId = 0,
+                                                               Managers.NpcFights.StartCells? startCells = null)
         {
             // In somebody else's dream only its owner starts the fights; a guest joins them.
             if (rules == null && await DreamHandler.GuestMayNotFightAsync(SessionContext.Current)) return;
@@ -162,6 +163,14 @@ namespace Jondo.Unity.Server.Handlers
                 fight.SetPlacementCells(own.Blue, own.Red);
             }
 
+            // A board that leaves a side no cell to stand on is placed on its own walkable cells.
+            var boardWalkable = MapManager.GetFightWalkable(arenaMapId);
+            if (UsablePlacement(fight.BluePlacementCells, fight.RedPlacementCells, boardWalkable) is { } usable)
+            {
+                LogBoardWithoutPlacementOnce(arenaMapId);
+                fight.SetPlacementCells(usable.Blue, usable.Red);
+            }
+
             // The four elementals IN FULL: what the player has put in points plus what the
             // equipment gives. They are worked out up here because initiative needs them whole.
             var playerFighter = BuildPlayerFighter(fight);
@@ -185,9 +194,11 @@ namespace Jondo.Unity.Server.Handlers
             // Monsters on the player's side, played by the AI against the other side: the tutorial's
             // Master Darmas, fighter -1 before the chafers in the capture.
             // Or played by the character himself, when the fight says so: Barnabé (IsPlayedAlly).
+            var besideHim = new List<Fighter>();
             foreach (var ally in allies ?? Array.Empty<MobSpawnManager.MobMember>())
             {
                 var beside = BuildMonsterFighter(ally, monsterSeqId--, 0);
+                besideHim.Add(beside);
                 if (alliesPlayedBy != 0)
                 {
                     beside.DrivenBy = alliesPlayedBy;
@@ -208,6 +219,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // All of an ordinary group; of a dungeon room's, the first clamp(players, 4, 8).
             int players = fight.Azul.Count(f => !f.IsMonster);
+            var inFront = new List<Fighter>();
             foreach (var member in MobSpawnManager.MembersFor(mobGroup, players))
             {
                 long monFighterId = monsterSeqId--;
@@ -215,8 +227,14 @@ namespace Jondo.Unity.Server.Handlers
                     ? fight.RedPlacementCells[redIdx++]
                     : CasillaDeColocacionSobrante(fight, fight.RedPlacementCells.FirstOrDefault());
 
-                fight.AddMonster(BuildMonsterFighter(member, monFighterId, monCellId));
+                var monster = BuildMonsterFighter(member, monFighterId, monCellId);
+                inFront.Add(monster);
+                fight.AddMonster(monster);
             }
+
+            // And where a quest's fight says each one starts (npc_fights «playerCell», «allyCells»,
+            // a monster's «cell»), over the board's placement.
+            if (startCells != null) PinStartCells(fight, playerFighter, besideHim, inFront, startCells, boardWalkable);
 
             // A quest's own rules on top of the data: Kuatinbe's Pandasiman, the Yokai Nana lent.
             ApplyRules(fight, playerFighter, TakeNextRules(GameState.CharacterId));
@@ -7979,6 +7997,77 @@ namespace Jondo.Unity.Server.Handlers
             return sendAsync(packet);
         }
 
+        /// <summary>The boards already logged as giving a side no cell to stand on, each told once.</summary>
+        private static readonly ConcurrentDictionary<long, bool> _boardsWithoutPlacement = new();
+
+        private static void LogBoardWithoutPlacementOnce(long board)
+        {
+            if (_boardsWithoutPlacement.TryAdd(board, true))
+                Console.WriteLine($"[Fight] Board {board} gives a side no walkable placement cell; " +
+                                  "its fights are placed on its own walkable cells.");
+        }
+
+        /// <summary>
+        /// A placement both sides can stand on, when the one drawn leaves a side without a single
+        /// walkable cell of the board, or null when it is usable (or the board is not known):
+        /// the first walkable cells of the board for the players, the last ones for the monsters,
+        /// eight at most each. A board under sixteen fight cells fell to a fixed list made for
+        /// other maps, cells that need not exist on it, and nobody could place.
+        /// </summary>
+        internal static (List<int> Blue, List<int> Red)? UsablePlacement(IReadOnlyList<int> blue, IReadOnlyList<int> red,
+                                                                        IReadOnlySet<int>? walkable)
+        {
+            if (walkable == null || walkable.Count < 2) return null;
+            if (blue.Any(walkable.Contains) && red.Any(walkable.Contains)) return null;
+            var cells = walkable.Where(MapGeometry.IsValid).OrderBy(c => c).ToList();
+            if (cells.Count < 2) return null;
+            int each = Math.Min(PlacementLayout.PerTeam, cells.Count / 2);
+            return (cells.Take(each).ToList(), cells.Skip(cells.Count - each).ToList());
+        }
+
+        /// <summary>
+        /// Puts each fighter a quest's fight names a cell for on it (npc_fights «playerCell»,
+        /// «allyCells», a monster's «cell»): the cell joins his side's placement, leaves the other
+        /// side's, and whoever stood there takes his old cell -- or, from the other side, a free
+        /// cell of his own side. A cell the board cannot be stood on is left to the board, said in
+        /// the log.
+        /// </summary>
+        internal static void PinStartCells(FightInstance fight, Fighter player, IReadOnlyList<Fighter> allies,
+                                           IReadOnlyList<Fighter> monsters, Managers.NpcFights.StartCells cells,
+                                           IReadOnlySet<int>? walkable)
+        {
+            void Pin(Fighter who, int cell)
+            {
+                if (cell <= 0) return;
+                if (!MapGeometry.IsValid(cell) || (walkable is { Count: > 0 } && !walkable.Contains(cell)))
+                {
+                    Console.WriteLine($"[Fight] Start cell {cell} cannot be stood on in board {fight.ArenaMapId}; " +
+                                      $"fighter {who.Id} is placed by the board.");
+                    return;
+                }
+                bool blue = fight.Azul.Contains(who);
+                var own = blue ? fight.BluePlacementCells : fight.RedPlacementCells;
+                var other = blue ? fight.RedPlacementCells : fight.BluePlacementCells;
+                int old = who.CellId;
+                var there = fight.Todos.FirstOrDefault(o => o != who && o.CellId == cell);
+                if (there != null)
+                {
+                    bool sameSide = fight.Azul.Contains(there) == blue;
+                    var theirs = sameSide ? own : other;
+                    there.CellId = sameSide && old > 0
+                        ? old
+                        : theirs.FirstOrDefault(c => c != cell && !fight.Todos.Any(o => o.CellId == c), old);
+                }
+                who.CellId = cell;
+                other.Remove(cell);
+                if (!own.Contains(cell)) own.Add(cell);
+            }
+
+            for (int i = 0; i < monsters.Count && i < cells.Monsters.Count; i++) Pin(monsters[i], cells.Monsters[i]);
+            Pin(player, cells.Player);
+            for (int i = 0; i < allies.Count && i < cells.Allies.Count; i++) Pin(allies[i], cells.Allies[i]);
+        }
+
         /// <summary>
         /// Where a monster starts once his side's flagged cells have run out: the nearest cell to
         /// them the fight can step on, nobody stands on, and the other side does not start on.
@@ -13111,6 +13200,10 @@ namespace Jondo.Unity.Server.Handlers
             // the moguis of a heap of filings beaten, the heap lets its handful be taken.
             if (won && fight.WinMarks != 0 && Network.SessionContext.State.ElementsUsed.Add(fight.WinMarks))
                 DatabaseManager.RememberElement(GameState.CharacterId, fight.WinMarks);
+
+            // And the written fight it chains to (npc_fights.json «then»), ready once he is back on
+            // the map if he won; a lost fight ends the chain.
+            ScriptedFightHandler.FightEnded(GameState.CharacterId, fight.FightId, won);
 
             // And what the achievements count, set aside until the character is back on the map.
             AchievementWatcher.FightEnded(fight, won);

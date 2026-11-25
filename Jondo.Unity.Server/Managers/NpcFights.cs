@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Jondo.Unity.Launcher;
 
@@ -30,6 +31,24 @@ namespace Jondo.Unity.Server.Managers
             public long ArenaMapId { get; init; }
             public IReadOnlyList<(int Monster, int Grade)> Monsters { get; init; } = Array.Empty<(int, int)>();
             public IReadOnlyList<(int Monster, int Grade)> Allies { get; init; } = Array.Empty<(int, int)>();
+
+            /// <summary>
+            /// The cell of the fight's board the character starts on («playerCell»), or 0 for the
+            /// board's placement: «Le jour des assassins» is won by putting the magypus to sleep in
+            /// the first round, at range 1, and a drawn placement left him rows away from it.
+            /// </summary>
+            public int PlayerCell { get; init; }
+
+            /// <summary>Each ally's start cell, in the order of <see cref="Allies"/> («allyCells»), 0 for none.</summary>
+            public IReadOnlyList<int> AllyCells { get; init; } = Array.Empty<int>();
+
+            /// <summary>Each monster's start cell, in the order of <see cref="Monsters"/> (its «cell»), 0 for none.</summary>
+            public IReadOnlyList<int> MonsterCells { get; init; } = Array.Empty<int>();
+
+            /// <summary>Where the row starts its fighters, or null when the board's placement does it all.</summary>
+            public StartCells? Start => PlayerCell > 0 || AllyCells.Any(c => c > 0) || MonsterCells.Any(c => c > 0)
+                ? new StartCells(PlayerCell, AllyCells, MonsterCells)
+                : null;
 
             /// <summary>Whether the fight is lost when one of the allies falls («alliesMustLive»).</summary>
             public bool AlliesMustLive { get; init; }
@@ -118,7 +137,42 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public Jondo.Unity.World.Fights.FightInstance.QuestRules Rules { get; init; }
                 = Jondo.Unity.World.Fights.FightInstance.QuestRules.None;
+
+            /// <summary>
+            /// The element of <see cref="MapId"/> whose use starts the fight («element»), for a row
+            /// with no NPC: the old chest of the Xelorium [6,6], opened, ambushes whoever opened it.
+            /// </summary>
+            public int ElementId { get; init; }
+
+            /// <summary>
+            /// The interactive type the element is declared with while its fight is to be fought
+            /// («type»), the client's name on hover; zero for the quest default.
+            /// </summary>
+            public int ElementType { get; init; }
+
+            /// <summary>
+            /// The fight that starts as soon as this one is won and the character is back on the
+            /// map («then», a row of its own without npc, reply or element): the Xelorium chest's
+            /// second ambush, right after the first one's waves.
+            /// </summary>
+            public Fight? Then { get; init; }
+
+            /// <summary>The last fight of the chain this one starts (itself without <see cref="Then"/>).</summary>
+            public Fight Final => Then?.Final ?? this;
+
+            /// <summary>
+            /// Whether the whole chain is behind the character: its last fight leaves a mark
+            /// (<see cref="Marks"/>) and <paramref name="marked"/> has it. An element's chain is fought once.
+            /// </summary>
+            public bool Done(Func<int, bool> marked) => Final.Marks != 0 && marked(Final.Marks);
         }
+
+        /// <summary>
+        /// The cells a row starts its fighters on, which win over the board's placement: the
+        /// character's, each ally's and each monster's, in the order the row lists them; 0 leaves
+        /// that one to the board.
+        /// </summary>
+        public sealed record StartCells(int Player, IReadOnlyList<int> Allies, IReadOnlyList<int> Monsters);
 
         private static List<Fight>? _fights;
         private static readonly object _lock = new();
@@ -129,11 +183,37 @@ namespace Jondo.Unity.Server.Managers
             Load();
             foreach (var fight in _fights!)
             {
+                if (fight.ElementId != 0) continue;
                 if (fight.NpcId != npcId || fight.Reply != reply || (fight.MapId != 0 && fight.MapId != mapId)) continue;
                 if (fight.Criterion.Length > 0 && !PlayerCriteria.Met(fight.Criterion, mapId)) continue;
                 return fight;
             }
             return null;
+        }
+
+        /// <summary>
+        /// The fight this element of this map starts for the session's character, or null: its row's
+        /// criterion holds and its chain is not done yet (<see cref="Fight.Done"/>).
+        /// </summary>
+        public static Fight? ForElement(long mapId, int elementId, Func<int, bool> marked)
+        {
+            Load();
+            foreach (var fight in _fights!)
+            {
+                if (fight.ElementId != elementId || fight.MapId != mapId) continue;
+                if (fight.Done(marked)) continue;
+                if (fight.Criterion.Length > 0 && !PlayerCriteria.Met(fight.Criterion, mapId)) continue;
+                return fight;
+            }
+            return null;
+        }
+
+        /// <summary>The element rows of a map, to declare their elements usable.</summary>
+        public static IEnumerable<Fight> OnMap(long mapId)
+        {
+            Load();
+            foreach (var fight in _fights!)
+                if (fight.ElementId != 0 && fight.MapId == mapId) yield return fight;
         }
 
         /// <summary>For the tests: read the file again.</summary>
@@ -156,36 +236,7 @@ namespace Jondo.Unity.Server.Managers
                         using var doc = JsonDocument.Parse(File.ReadAllText(path));
                         foreach (var row in doc.RootElement.GetProperty("fights").EnumerateArray())
                         {
-                            bool incarnates = row.TryGetProperty("incarnates", out var incarnation)
-                                              && incarnation.ValueKind == JsonValueKind.Object;
-                            fights.Add(new Fight
-                            {
-                                NpcId = (int)Long(row, "npc"),
-                                MapId = Long(row, "map"),
-                                Reply = Long(row, "reply"),
-                                ArenaMapId = Long(row, "arena"),
-                                Monsters = Members(row, "monsters"),
-                                Allies = Members(row, "allies"),
-                                AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
-                                WinMapId = Long(row, "winMap"),
-                                WinCellId = (int)Long(row, "winCell"),
-                                LoseMapId = Long(row, "loseMap"),
-                                LoseCellId = (int)Long(row, "loseCell"),
-                                Marks = (int)Long(row, "marks"),
-                                ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
-                                Incarnates = incarnates ? (int)Long(incarnation, "monster") : 0,
-                                IncarnationGrade = incarnates ? Math.Max(1, (int)Long(incarnation, "grade")) : 1,
-                                IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
-                                                          && invulnerable.ValueKind == JsonValueKind.True,
-                                AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
-                                DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
-                                Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
-                                            ? criterion.GetString() ?? "" : "",
-                                Solo = row.TryGetProperty("solo", out var solo) && solo.ValueKind is JsonValueKind.True or JsonValueKind.False
-                                       ? solo.GetBoolean() : null,
-                                Waves = Waves(row),
-                                Rules = RulesOf(row),
-                            });
+                            fights.Add(Parse(row));
                         }
                     }
                 }
@@ -195,6 +246,47 @@ namespace Jondo.Unity.Server.Managers
                 }
                 _fights = fights;
             }
+        }
+
+        /// <summary>One row of the file, and the fight it chains to («then»), read the same way.</summary>
+        internal static Fight Parse(JsonElement row)
+        {
+            bool incarnates = row.TryGetProperty("incarnates", out var incarnation)
+                              && incarnation.ValueKind == JsonValueKind.Object;
+            return new Fight
+            {
+                NpcId = (int)Long(row, "npc"),
+                MapId = Long(row, "map"),
+                Reply = Long(row, "reply"),
+                ArenaMapId = Long(row, "arena"),
+                Monsters = Members(row, "monsters"),
+                Allies = Members(row, "allies"),
+                PlayerCell = Math.Max(0, (int)Long(row, "playerCell")),
+                AllyCells = Cells(row),
+                MonsterCells = MemberCells(row, "monsters"),
+                AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
+                WinMapId = Long(row, "winMap"),
+                WinCellId = (int)Long(row, "winCell"),
+                LoseMapId = Long(row, "loseMap"),
+                LoseCellId = (int)Long(row, "loseCell"),
+                Marks = (int)Long(row, "marks"),
+                ByLevel = row.TryGetProperty("byLevel", out var byLevel) && byLevel.ValueKind == JsonValueKind.True,
+                Incarnates = incarnates ? (int)Long(incarnation, "monster") : 0,
+                IncarnationGrade = incarnates ? Math.Max(1, (int)Long(incarnation, "grade")) : 1,
+                IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
+                                          && invulnerable.ValueKind == JsonValueKind.True,
+                AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
+                DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
+                Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
+                            ? criterion.GetString() ?? "" : "",
+                Solo = row.TryGetProperty("solo", out var solo) && solo.ValueKind is JsonValueKind.True or JsonValueKind.False
+                       ? solo.GetBoolean() : null,
+                Waves = Waves(row),
+                Rules = RulesOf(row),
+                ElementId = (int)Long(row, "element"),
+                ElementType = (int)Long(row, "type"),
+                Then = row.TryGetProperty("then", out var then) && then.ValueKind == JsonValueKind.Object ? Parse(then) : null,
+            };
         }
 
         private static List<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves(JsonElement row)
@@ -259,6 +351,26 @@ namespace Jondo.Unity.Server.Managers
                 int monster = (int)Long(member, "monster");
                 if (monster != 0) found.Add((monster, (int)Long(member, "grade")));
             }
+            return found;
+        }
+
+        /// <summary>The «allyCells» of a row: one per ally, in order; 0 or a missing one leaves it to the board.</summary>
+        private static List<int> Cells(JsonElement row)
+        {
+            var found = new List<int>();
+            if (!row.TryGetProperty("allyCells", out var list) || list.ValueKind != JsonValueKind.Array) return found;
+            foreach (var cell in list.EnumerateArray())
+                found.Add(cell.ValueKind == JsonValueKind.Number && cell.TryGetInt32(out int n) && n > 0 ? n : 0);
+            return found;
+        }
+
+        /// <summary>Each member's «cell», 0 when it has none, in the order <see cref="Members"/> reads them.</summary>
+        private static List<int> MemberCells(JsonElement row, string name)
+        {
+            var found = new List<int>();
+            if (!row.TryGetProperty(name, out var list) || list.ValueKind != JsonValueKind.Array) return found;
+            foreach (var member in list.EnumerateArray())
+                if (Long(member, "monster") != 0) found.Add(Math.Max(0, (int)Long(member, "cell")));
             return found;
         }
 

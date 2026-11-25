@@ -121,6 +121,11 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
+            // An element that starts a written fight (npc_fights.json «element»): the Xelorium's
+            // old chest ambushes whoever opens it. After the quests, whose objective may be the very
+            // click that comes once the fights are won.
+            if (await ScriptedFightHandler.TryElementAsync(stream, mapId, elementId)) return;
+
             // The day's room's altar: the offering's prayer.
             if (await AlmanaxOfferingHandler.OnAltarUsedAsync(stream, mapId, elementId)) return;
 
@@ -135,10 +140,11 @@ namespace Jondo.Unity.Server.Handlers
                 // A puzzle's element answers by what the character carries and has done: the prison's
                 // padlock rattles without the lockpick and opens with it (PuzzleCase). With no case
                 // that holds it says what the row says.
-                var answer = said.Cases.Length > 0 ? PuzzleHandler.Pick(said.Cases) : null;
+                string puzzleKey = $"{mapId}:{elementId}";
+                var answer = said.Cases.Length > 0 ? PuzzleHandler.Pick(said.Cases, puzzleKey) : null;
                 if (answer != null)
                 {
-                    await PuzzleHandler.PlayAsync(stream, answer, $"element {elementId} of {mapId}");
+                    await PuzzleHandler.PlayAsync(stream, answer, $"element {elementId} of {mapId}", puzzleKey);
                     return;
                 }
                 if (said.Message != 0)

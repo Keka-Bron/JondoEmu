@@ -14,19 +14,24 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     public static class PuzzleHandler
     {
-        /// <summary>The first of <paramref name="cases"/> that holds for the session's character.</summary>
-        public static PuzzleCase? Pick(PuzzleCase[] cases)
+        /// <summary>
+        /// The first of <paramref name="cases"/> that holds for the session's character. <paramref name="key"/>
+        /// names the element or cell, for the cases that count their uses (<see cref="PuzzleCase.Uses"/>).
+        /// </summary>
+        public static PuzzleCase? Pick(PuzzleCase[] cases, string key = "")
         {
             long character = SessionContext.State.CharacterId;
             var now = DateTimeOffset.Now;
-            return PuzzleCase.First(cases, ItemCriteria.Holds, mark => PuzzleMarks.Has(character, mark, now));
+            return PuzzleCase.First(cases, ItemCriteria.Holds, mark => PuzzleMarks.Has(character, mark, now),
+                                    () => key.Length > 0 && PuzzleUses.Locked(character, key, now));
         }
 
         /// <summary>
         /// The case played: its messages, the items it takes («Has perdido», lqn) and gives, each one
-        /// only while none is carried («Has conseguido»), its marks, and the move last.
+        /// only while none is carried («Has conseguido») unless the case stacks, its marks, its use
+        /// counted against <paramref name="key"/>, and the move last.
         /// </summary>
-        public static async Task PlayAsync(NetworkStream stream, PuzzleCase said, string where)
+        public static async Task PlayAsync(NetworkStream stream, PuzzleCase said, string where, string key = "")
         {
             long character = SessionContext.State.CharacterId;
             var now = DateTimeOffset.Now;
@@ -35,20 +40,24 @@ namespace Jondo.Unity.Server.Handlers
                     ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, message, Array.Empty<string>())));
             foreach (var (item, count) in said.Takes)
             {
-                if (Equipment.HowMany(item) < count || !await Equipment.TakeAsync(stream, item, count)) continue;
+                int taken = said.TakeNow(Equipment.HowMany(item), count);
+                if (taken <= 0 || !await Equipment.TakeAsync(stream, item, taken)) continue;
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemLost,
-                        count.ToString(CultureInfo.InvariantCulture), item.ToString(CultureInfo.InvariantCulture))));
+                        taken.ToString(CultureInfo.InvariantCulture), item.ToString(CultureInfo.InvariantCulture))));
             }
             foreach (var (item, count) in said.Gives)
             {
-                if (Equipment.HowMany(item) > 0 || !await Equipment.GiveAsync(stream, item, count)) continue;
+                int given = said.GiveNow(Equipment.HowMany(item), count);
+                if (given <= 0 || !await Equipment.GiveAsync(stream, item, given)) continue;
                 await WriteAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                     ConnectionProtocol.BuildSystemMessage(InfoMessages.ItemGained,
-                        count.ToString(CultureInfo.InvariantCulture), item.ToString(CultureInfo.InvariantCulture))));
+                        given.ToString(CultureInfo.InvariantCulture), item.ToString(CultureInfo.InvariantCulture))));
             }
             foreach (string mark in said.Unmark) PuzzleMarks.Clear(character, mark);
             foreach (string mark in said.Mark) PuzzleMarks.Set(character, mark, said.For, now);
+            if (said.Uses > 0 && key.Length > 0 && PuzzleUses.Use(character, key, said.Uses, said.LockFor, now))
+                Console.WriteLine($"[Puzzle] {where}: locked for {said.LockFor} s after {said.Uses} use(s).");
             Console.WriteLine($"[Puzzle] {where}: messages [{string.Join(",", said.Messages)}], marks +[{string.Join(",", said.Mark)}] " +
                               $"-[{string.Join(",", said.Unmark)}]{(said.ToMap != 0 ? $", to {said.ToMap} cell {said.ToCell}" : "")}.");
             if (said.ToMap != 0) await TeleportHandler.ToMapAsync(stream, said.ToMap, said.ToCell);
@@ -63,9 +72,10 @@ namespace Jondo.Unity.Server.Handlers
             var spot = FloorRiddles.SpotOf(mapId, cellId);
             if (spot != null)
             {
-                var said = Pick(spot.Cases);
+                string key = $"{mapId}@{cellId}";
+                var said = Pick(spot.Cases, key);
                 if (said == null) return false;
-                await PlayAsync(stream, said, $"cell {cellId} of {mapId}");
+                await PlayAsync(stream, said, $"cell {cellId} of {mapId}", key);
                 return true;
             }
 

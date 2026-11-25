@@ -115,7 +115,13 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
         public Task RestoreTravelersTowerAsync(GameSession session) => TravelersTowerHandler.OnMapLoadedAsync(session);
         public Task RestoreSeasonAsync(GameSession session) => OsavoraSeasonHandler.OnMapLoadedAsync(session);
         public Task RestoreAnomalyAsync(GameSession session) => AnomalyHandler.OnMapLoadedAsync(session);
-        public Task RestoreGargandiasAsync(GameSession session) => GargandiasHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
+        public async Task RestoreGargandiasAsync(GameSession session)
+        {
+            await GargandiasHandler.OnMapLoadedAsync(StreamOf(session), session.MapId);
+            // And the next fight of a written chain, back on the map after winning the one before
+            // (the Xelorium chest's second ambush): a fight started during the map reply, as the titan's.
+            await ScriptedFightHandler.OnMapLoadedAsync(StreamOf(session), session.CharacterId, session.MapId);
+        }
         public Task RestoreGuildHallAsync(GameSession session)
             => GuildHallHandler.OnMapLoadedAsync(session);
         public int SubAreaOf(long mapId) => MapManager.GetMapInfo(mapId)?.SubAreaId ?? 0;

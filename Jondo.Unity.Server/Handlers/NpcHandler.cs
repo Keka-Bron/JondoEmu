@@ -1374,32 +1374,9 @@ namespace Jondo.Unity.Server.Handlers
                 if (fightChoice != null && fightChoice.Stagings.Count > 0)
                     await Managers.MapStagings.PlayAsync(session, fightChoice.Stagings);
                 await CloseAsync(session);
-                IReadOnlyList<(int Monster, int Grade)> AtHisLevel(IReadOnlyList<(int Monster, int Grade)> members) => npcFight.ByLevel
-                    ? members.Select(m => (m.Monster, MobSpawnManager.GradeForLevel(m.Monster, SessionContext.State.CharacterLevel))).ToList()
-                    : members;
-                // His allies too: the bodyguard of «La bande des Toxines» has a grade every 20 levels.
-                var monsters = AtHisLevel(npcFight.Monsters);
-                var group = MobSpawnManager.ComposeOffMap(monsters);
-                if (group == null) return;
-                // The monster he fights as: the Entrenador of «Barnabé en el espacio».
-                if (npcFight.Incarnates != 0)
-                    FightHandler.IncarnateInNextFight(GameState.CharacterId, npcFight.Incarnates,
-                                                      npcFight.IncarnationGrade, npcFight.IncarnationInvulnerable);
-                // And the waves that come in later: Dark Vlad's chafers.
-                if (npcFight.Waves.Count > 0) FightHandler.WavesInNextFight(GameState.CharacterId, npcFight.Waves);
-                // And what the quest adds to it: the Yokai Nana lent, Kuatinbe's Pandasiman.
-                if (!npcFight.Rules.IsEmpty) FightHandler.RulesInNextFight(GameState.CharacterId, npcFight.Rules);
-                await FightHandler.InitiateFightFromMobCollision(stream, group, SessionContext.State.MapId,
-                    arenaMapId: npcFight.ArenaMapId, allies: MobSpawnManager.ComposeMembers(AtHisLevel(npcFight.Allies)),
-                    alliesMustLive: npcFight.AlliesMustLive,
-                    winMapId: npcFight.WinMapId, winCellId: npcFight.WinCellId, winMarks: npcFight.Marks,
-                    alliesPlayedBy: npcFight.AlliesPlayed ? GameState.CharacterId : 0,
-                    defeatFree: npcFight.DefeatFree, solo: npcFight.Solo,
-                    loseMapId: npcFight.LoseMapId, loseCellId: npcFight.LoseCellId);
-                // Taken by the fight when it was built; one that did not start leaves none for the next.
-                FightHandler.TakeNextIncarnation(GameState.CharacterId);
-                FightHandler.TakeNextWaves(GameState.CharacterId);
-                FightHandler.TakeNextRules(GameState.CharacterId);
+                // The fight itself, started as every written fight is: at his level when the row
+                // says so, with its incarnation, waves and quest rules, and what it chains to.
+                await ScriptedFightHandler.StartAsync(stream, npcFight, SessionContext.State.MapId);
                 return;
             }
 
