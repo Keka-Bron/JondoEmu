@@ -1641,6 +1641,12 @@
       "toMap": 134351108,
       "toCell": 372,
       "why": " «Le gang des Toxines» (1934, Dofus pour les noobs): the portal of the Sramvil dimension stands in the temple [8,-67] («utilisez le portail vers la dimension Srambad»); it lands on the dimension's arrival map (the Travellers' portal's, 134351108 c372). The portal npc is 2594 «Portal de Sramvil» (message 18120, reply 21726). INFERRED cell."
-    }
+    },
+  {
+   "map": 99096075,
+   "element": 474399,
+   "remove": true,
+   "why": "Shipwreck interior [15,21]: the lute rock of «La musique de Rykke Zane» (1732, objective 10987). The legacy-version import paired it with 88088322 (the beach map east of the wreck), but the walkthrough only has the player click the rock to get Rykke's old lute and stay in the room; the teleport is removed."
+  }
   ]
 }
