@@ -241,6 +241,118 @@ public sealed class FightReconnectionTests
         finally { Active.TryRemove(FightId, out _); }
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Declining_reentry_restores_roleplay_and_only_remaining_fighters_see_the_death_sequence(
+        bool ongoing, bool endsFight)
+    {
+        var sent = new List<(long Recipient, GameFrame Frame)>();
+        void Record(long id, GameFrame frame) => sent.Add((id, frame));
+        using var leaving = new Client(PlayerId, reconnecting: false, inWorld: false, record: Record);
+        using var first = new Client(PlayerId + 1, reconnecting: false, record: Record);
+        using var second = new Client(PlayerId + 2, reconnecting: false, record: Record);
+        using var watcher = new Client(PlayerId + 3, reconnecting: false, record: Record);
+        watcher.Session.State.IsInFight = false;
+        watcher.Session.State.FightId = 0;
+        watcher.Session.State.MapId = Roleplay;
+        // A character being selected has loaded their saved stats but has not entered the world.
+        leaving.Session.State.IsInFight = false;
+        leaving.Session.State.FightId = 0;
+
+        var fight = new FightInstance(FightId, Roleplay, Arena) { Reglas = FightRules.Desafio };
+        var quitter = Person(PlayerId, 200);
+        var author = Person(first.Session.CharacterId, 300);
+        author.Initiative = 1000;
+        var peer = Person(second.Session.CharacterId, 301);
+        var monster = new Fighter { Id = -2, IsMonster = true, CellId = 302, CurrentHP = 50, MaxHP = 50 };
+        fight.AddPlayer(quitter);
+        fight.AddOpponent(author);
+        if (endsFight) fight.AddOpponent(peer);
+        else fight.AddPlayer(peer);
+        fight.AddMonster(monster);
+        fight.DeDondeVenian[quitter.Id] = (Roleplay, 72);
+        if (ongoing) fight.StartFight();
+        var turnAuthor = fight.CurrentFighter?.Id;
+        var survivingOrder = fight.TurnOrder.Where(f => f != quitter).Select(f => f.Id).ToArray();
+
+        Assert.True(Active.TryAdd(FightId, fight));
+        try
+        {
+            if (ongoing)
+            {
+                Assert.NotEqual(quitter.Id, turnAuthor);
+                using var watchingTurn = await watcher.Session.EnterTurnAsync();
+                using var watching = SessionContext.Push(watcher.Session);
+                await FightHandler.WatchCharacterAsync(watcher.Session, new(author.Id));
+                Assert.Contains(watcher.Session, FightHandler.SpectatorsOf(fight));
+                watcher.Frames.Clear();
+                sent.Clear();
+            }
+
+            using var turn = await leaving.Session.EnterTurnAsync();
+            using var context = SessionContext.Push(leaving.Session);
+            await new GameEntryBackend().AbandonFightAsync(quitter.Id);
+
+            Assert.Same(leaving.Session, SessionContext.Actual);
+            Assert.Equal(Roleplay, leaving.Session.MapId);
+            Assert.Equal(72, leaving.Session.State.CellId);
+            Assert.False(leaving.Session.State.IsInFight);
+            Assert.Equal(0, leaving.Session.State.FightId);
+            Assert.Equal(0, leaving.Session.State.RoleplayMapId);
+            Assert.False(quitter.IsAlive);
+            Assert.Null(FightHandler.FightToRejoin(quitter.Id));
+            Assert.All(sent, row => Assert.Null(row.Frame.Uid));
+            Assert.Equal(endsFight ? FightInstance.WaitsForTheJwz : 0, fight.FinPendiente);
+
+            if (!ongoing)
+            {
+                Assert.Equal(FightState.Placement, fight.State);
+                Assert.Empty(sent);
+                return;
+            }
+
+            var bursts = sent.Where(row => row.Frame.Content is not FightIsTurnReadyEvent).ToArray();
+            Assert.Equal(8, bursts.Length);
+            int? lastAction = null;
+            foreach (var burst in bursts.Chunk(4))
+            {
+                long recipient = burst[0].Recipient;
+                Assert.Contains(recipient, new[] { first.Session.CharacterId, second.Session.CharacterId });
+                Assert.All(burst, row => Assert.Equal(recipient, row.Recipient));
+                Assert.Collection(burst.Select(row => row.Frame.Content),
+                    start => Assert.Equal(new SequenceStartEvent(SequenceType.CharacterDeath), start),
+                    death => Assert.Equal(new GameActionFightEvent(quitter.Id, 103,
+                        new FightActionCaseDeath(new FightActionDeath(quitter.Id))), death),
+                    update => Assert.Equal(survivingOrder, Assert.IsType<FightTurnListEvent>(update).Turns.Select(
+                        entry => Assert.IsType<FightTurnEntityCaseWithFlag>(entry).Value.EntityId)),
+                    end =>
+                    {
+                        var closure = Assert.IsType<SequenceEndEvent>(end);
+                        Assert.Equal(turnAuthor, closure.AuthorId);
+                        if (lastAction is int previous) Assert.Equal(previous + 1, closure.ActionId);
+                        lastAction = closure.ActionId;
+                    });
+            }
+            Assert.NotEqual(bursts[0].Recipient, bursts[4].Recipient);
+            if (endsFight)
+            {
+                // The terminal prompt uses the established broadcast audience, unlike the direct sequence.
+                Assert.Equal(new[] { quitter.Id, author.Id, peer.Id, watcher.Session.CharacterId }.Order(),
+                    sent.Skip(8).Select(row => row.Recipient).Order());
+                Assert.All(sent.Skip(8), row => Assert.IsType<FightIsTurnReadyEvent>(row.Frame.Content));
+            }
+            else Assert.Equal(bursts, sent);
+        }
+        finally
+        {
+            Active.TryRemove(FightId, out _);
+            watcher.Session.State.SpectatingFightId = 0;
+            FightHandler.SpectatorsOf(fight); // Prune the watcher from the shared index.
+        }
+    }
+
     [Fact]
     public void What_is_left_of_a_turn_is_counted_in_tenths()
     {
@@ -276,9 +388,13 @@ public sealed class FightReconnectionTests
         public List<GameFrame> Frames { get; } = [];
         public GameSession Session { get; }
 
-        public Client(long id, bool reconnecting)
+        public Client(long id, bool reconnecting, bool inWorld = true, Action<long, GameFrame>? record = null)
         {
-            Session = new(new CombatRecordingCodec(Frames.Add), CombatRecordingCodec.RequireTypedPacketAsync);
+            Session = new(new CombatRecordingCodec(frame =>
+            {
+                Frames.Add(frame);
+                record?.Invoke(id, frame);
+            }), CombatRecordingCodec.RequireTypedPacketAsync);
             Session.BindAccount(id + 1_000_000_000, 1);
             Session.State.CharacterId = id;
             Session.State.CharacterLevel = 50;
@@ -287,7 +403,7 @@ public sealed class FightReconnectionTests
             Session.State.IsInFight = true;
             Session.State.FightId = FightId;
             Session.State.FightRejoinPending = reconnecting;
-            Session.EnterWorld();
+            if (inWorld) Session.EnterWorld();
             _entry = new GameEntryService(Session, new GameEntryBackend());
             Assert.True(SessionRegistry.Register(Session));
         }

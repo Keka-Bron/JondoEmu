@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
@@ -41,16 +45,14 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public async Task A_fight_lost_in_the_bots_turn_waits_for_the_client_to_play_it()
         {
-            await using var wire = await PortalTests.Wire.Open(Player);
+            using var client = new Client();
             var fight = AgainstABot(out var human, out var bot);
             Assert.Same(bot, fight.CurrentFighter);
             human.CurrentHP = 0;
 
             Assert.True(await FightHandler.CheckFightOverAsync(null!, fight));
 
-            var (op, payload) = Assert.Single(await wire.Drain());
-            Assert.Equal(Op.Jxh, op);
-            Assert.Equal(FightProtocol.BuildConfirmTurn(bot.Id), payload);
+            client.AssertSinglePrompt();
             Assert.Equal(FightInstance.WaitsForTheJwz, fight.FinPendiente);
             Assert.Equal(FightState.Ongoing, fight.State);
         }
@@ -63,8 +65,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public async Task The_ally_who_had_to_live_falling_last_still_ends_the_fight()
         {
-            await using var wire = await PortalTests.Wire.Open(Player);
-            var fight = AgainstABot(out var human, out var bot);
+            using var client = new Client();
+            var fight = AgainstABot(out var human, out _);
             var ally = new Fighter { Id = -1, IsMonster = true, MaxHP = 500, CurrentHP = 500, Level = 50 };
             fight.AddPlayer(ally);
             fight.AlliesMustLive = true;
@@ -74,21 +76,81 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.True(await FightHandler.EffectEndedTheFightAsync(null!, fight));
 
-            var (op, _) = Assert.Single(await wire.Drain());
-            Assert.Equal(Op.Jxh, op);
+            client.AssertSinglePrompt();
             Assert.Equal(FightInstance.WaitsForTheJwz, fight.FinPendiente);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Defeat_sequence_sends_just_one_prompt_and_retains_the_closing_action(bool surrender)
+        {
+            using var client = new Client(allowLegacySequence: true);
+            var fight = AgainstABot(out var human, out _);
+            int priorAction = fight.SiguienteAccion();
+            if (surrender)
+            {
+                var active = (ConcurrentDictionary<long, FightInstance>)typeof(FightHandler)
+                    .GetField("_activeFights", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+                Assert.True(active.TryAdd(fight.FightId, fight));
+                try
+                {
+                    client.Session.State.FightId = fight.FightId;
+                    client.Session.State.IsInFight = true;
+                    using var turn = await client.Session.EnterTurnAsync();
+                    using var context = SessionContext.Push(client.Session);
+                    await FightHandler.QuitAsync(client.Session);
+                }
+                finally { active.TryRemove(fight.FightId, out _); }
+            }
+            else
+            {
+                fight.WonByEffect = FightInstance.Rojos;
+                Assert.True(await FightHandler.EffectEndedTheFightAsync(null!, fight));
+            }
+
+            Assert.False(human.IsAlive);
+            client.AssertSinglePrompt();
+            Assert.Equal(priorAction + 1, fight.FinPendiente);
+            Assert.Equal(FightState.Ongoing, fight.State);
         }
 
         [Fact]
         public async Task A_fight_with_both_sides_standing_asks_nothing()
         {
-            await using var wire = await PortalTests.Wire.Open(Player);
+            using var client = new Client();
             var fight = AgainstABot(out _, out _);
 
             Assert.False(await FightHandler.CheckFightOverAsync(null!, fight));
 
-            Assert.Empty(await wire.Drain());
+            Assert.Empty(client.Frames);
             Assert.Equal(0, fight.FinPendiente);
+        }
+
+        private sealed class Client : IDisposable
+        {
+            internal List<GameFrame> Frames { get; } = [];
+            internal GameSession Session { get; }
+
+            internal Client(bool allowLegacySequence = false)
+            {
+                Session = new(new CombatRecordingCodec(Frames.Add), packet => allowLegacySequence
+                    ? Task.CompletedTask : CombatRecordingCodec.RequireTypedPacketAsync(packet));
+                Session.BindAccount(Player + 1, 1);
+                Session.State.CharacterId = Player;
+                Session.State.MapId = 1;
+                Session.EnterWorld();
+                Assert.True(SessionRegistry.Register(Session));
+            }
+
+            internal void AssertSinglePrompt()
+            {
+                var frame = Assert.Single(Frames);
+                Assert.IsType<FightIsTurnReadyEvent>(frame.Content);
+                Assert.Null(frame.Uid);
+            }
+
+            public void Dispose() => SessionRegistry.Unregister(Session);
         }
     }
 }

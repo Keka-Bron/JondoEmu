@@ -2586,8 +2586,8 @@ namespace Jondo.Unity.Server.Handlers
         /// <remarks>
         /// Not measured on the wire -- the second reconnection capture's "decir que no" leaves
         /// no trace and the fight simply goes on -- so this is the surrender sequence of
-        /// AbandonAsync sent to the OTHERS, from outside the fight. Nothing is written to the
-        /// one leaving: he is at the character screen.
+        /// AbandonAsync sent to the OTHERS, from outside the fight. The surrender sequence is
+        /// not sent to the one leaving: he is at the character screen.
         /// </remarks>
         public static async Task AbandonFromOutsideAsync(FightInstance fight, long characterId)
         {
@@ -2617,17 +2617,14 @@ namespace Jondo.Unity.Server.Handlers
                 if (fight.CurrentFighter == quitter) PararElReloj(fight);
                 var author = (fight.CurrentFighter ?? quitter).Id;
                 quitter.CurrentHP = 0;
+                var timeline = FightTimeline(fight);
                 foreach (var otro in others)
                 {
-                    await otro.SendAsync(ConnectionProtocol.Push(Op.Jto,
-                        Network.FightProtocol.BuildSequenceStart(author, Network.FightProtocol.SurrenderSequence)));
-                    await otro.SendAsync(ConnectionProtocol.Push(Op.Jwe,
-                        Network.FightProtocol.BuildDeath(quitter.Id, quitter.Id)));
-                    await otro.SendAsync(ConnectionProtocol.Push(Op.Jzu,
-                        TeamsOf(fight)));
-                    await otro.SendAsync(ConnectionProtocol.Push(Op.Jwi,
-                        Network.FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), author,
-                                                               Network.FightProtocol.SurrenderSequence)));
+                    await otro.SendAsync(new Game.SequenceStartEvent(Game.SequenceType.CharacterDeath));
+                    await otro.SendAsync(new Game.GameActionFightEvent(quitter.Id, Network.FightProtocol.Died,
+                        new Game.FightActionCaseDeath(new Game.FightActionDeath(quitter.Id))));
+                    await otro.SendAsync(timeline);
+                    await otro.SendAsync(new Game.SequenceEndEvent(fight.SiguienteAccion(), author));
                 }
             }
             else
@@ -3199,7 +3196,7 @@ namespace Jondo.Unity.Server.Handlers
             int closure = fight.SiguienteAccion();
             await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
                 Network.FightProtocol.BuildSequenceEnd(closure, author, Network.FightProtocol.SurrenderSequence)));
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh, Network.FightProtocol.BuildConfirmTurn(author)));
+            await ATodosAsync(fight, new Game.FightIsTurnReadyEvent());
             Program.LogDebug($"[Fight] Fight #{fight.FightId}: the {which} side falls at once.");
             await CheckFightOverAsync(stream, fight, closure, alreadyAsked: true);
         }
@@ -12846,8 +12843,7 @@ namespace Jondo.Unity.Server.Handlers
             // And the jxh after it, which the three captures send there and the client answers with
             // jwz. In «aceptar desafio» that jwz is the ONLY acknowledgement that arrives: there is no
             // jti anywhere, so waiting only for the jti would leave the result screen never showing.
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh,
-                Network.FightProtocol.BuildConfirmTurn(author)));
+            await ATodosAsync(fight, new Game.FightIsTurnReadyEvent());
 
             Program.LogDebug($"[Fight] Character {quitter.Id} abandoned fight #{fight.FightId}; " +
                              $"waiting for jti action {closure} before the result screen.");
@@ -12910,7 +12906,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The closing action of the client's own sequence that ended it: its jti may end the wait
         /// before the jwz does.
         /// </param>
-        /// <param name="alreadyAsked">The jxh has gone out already (abandoning sends its own).</param>
+        /// <param name="alreadyAsked">The caller already sent the turn-ready prompt.</param>
         internal static async Task<bool> CheckFightOverAsync(NetworkStream stream, FightInstance fight,
                                                              int esperarAcuse = 0, bool alreadyAsked = false)
         {
@@ -12935,10 +12931,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (!alreadyAsked)
-            {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jxh,
-                    Network.FightProtocol.BuildConfirmTurn(whose.Id)));
-            }
+                await ATodosAsync(fight, new Game.FightIsTurnReadyEvent());
             fight.FinPendiente = esperarAcuse != 0 ? esperarAcuse : FightInstance.WaitsForTheJwz;
             EndsAnywayAfterAWhile(fight);
             Program.LogDebug($"[Fight] It ended on {whose.Id}'s turn; the ending waits for the client " +

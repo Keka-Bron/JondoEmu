@@ -18,7 +18,7 @@ namespace Jondo.Unity.Server.Handlers
     /// the map sees it: the swords, the teams, the count.
     /// </summary>
     /// <remarks>
-    /// Three ways in, all measured (the frames are in Network/FightJoinProtocol.cs):
+    /// Three ways in, all measured:
     ///
     /// <list type="bullet">
     /// <item>A player clicks the swords of a fight on the map and his client sends a kay naming
@@ -169,53 +169,6 @@ namespace Jondo.Unity.Server.Handlers
                 return (Game.TeamType.Monster, fight.DefenderLeaderId);
             return (Game.TeamType.Player, side.FirstOrDefault(f => !f.IsMonster && !f.EsInvocado)?.Id
                 ?? (team == FightInstance.Rojos ? fight.DefenderLeaderId : 0));
-        }
-
-        /// <summary>A side as the historical raw map messages carry it.</summary>
-        internal static Pb TeamOnMap(FightInstance fight, int team, bool withMembers)
-        {
-            var (type, leader) = MapTeamLeader(fight, team);
-            var side = fight.Bando(team);
-            if (type == Game.TeamType.TaxCollector)
-                return TaxCollectorSideOnMap(fight, side, withMembers);
-
-            List<Pb>? members = null;
-            if (withMembers)
-            {
-                members = new List<Pb>();
-                foreach (var f in side.ToList())
-                {
-                    if (f.EsInvocado || f.IsCompanion || !f.IsAlive) continue;
-                    members.Add(f.IsMonster
-                        ? FightJoinProtocol.MonsterOnTeam(f.Id, f.MonsterId, f.GradeIndex + 1)
-                        : FightJoinProtocol.PersonOnTeam(f.Id, f.Level, f.Name));
-                }
-            }
-
-            return FightJoinProtocol.Team(team, leader, type == Game.TeamType.Monster, members);
-        }
-
-        /// <summary>
-        /// A tax collector's side: led by the tax collector's actor, the tax collector by its names
-        /// and its defenders as people. The kae of the attack capture: {f2 3, f3 -20074, f4 1,
-        /// f5 {f1 {f2 -1, f3 {35, 109}}}, f6 1}.
-        /// </summary>
-        private static Pb TaxCollectorSideOnMap(FightInstance fight, List<Fighter> side, bool withMembers)
-        {
-            List<Pb>? members = null;
-            if (withMembers)
-            {
-                members = new List<Pb>();
-                foreach (var f in side.ToList())
-                {
-                    if (f.EsInvocado || !f.IsAlive) continue;
-                    members.Add(f.TaxCollectorFirstName > 0
-                        ? FightJoinProtocol.TaxCollectorOnTeam(f.Id, f.TaxCollectorFirstName, f.TaxCollectorLastName)
-                        : FightJoinProtocol.PersonOnTeam(f.Id, f.Level, f.Name));
-                }
-            }
-            return FightJoinProtocol.Team(FightInstance.Rojos, fight.DefenderLeaderId,
-                                          FightJoinProtocol.TaxCollectorSide, members);
         }
 
         /// <summary>

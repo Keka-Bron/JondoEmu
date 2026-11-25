@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game.Wire;
 using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server;
@@ -17,18 +16,6 @@ namespace Jondo.Unity.Tests.Combat
     /// <summary>
     /// Coming into somebody else's fight during its placement, and the fight as the map shows it.
     /// </summary>
-    /// <remarks>
-    /// The frames are the captures', byte for byte:
-    ///
-    ///   F  Combate/entrar a combate con listo automatico y entrada automatica siguiendo a lider
-    ///      de grupo-combate-victoria (PartyLeader 290000000003 leads, Hero-Example 300000000001
-    ///      follows him into fight 487 against the group -20002)
-    ///   S  Combate/meterse en combate de otra persona haciendo click en la espadita y luego
-    ///      abandonar para salirse (Fighter2 into Challenger1's side of challenge 4923)
-    ///   B  Busqueda grupo/busqueda automatica de grupo-encuentra para una dung... (fight 471)
-    ///   J  Mazmorras/mazmorra de los jalatós completa (a kay turned down, fight 4368)
-    ///   Z  Clases/Zobal/zobal-hechizos normales (Fighter1's fight 3331 seen from the map)
-    /// </remarks>
     [Collection("MapManager")]   // shares map 188744196 with FightStartOnceTests and the placement tests
     public class FightJoinTests
     {
@@ -36,116 +23,6 @@ namespace Jondo.Unity.Tests.Combat
         private const long Recorder = 300000000001;
         private const long Group = -20002;
         private const long Fight487 = 487;
-
-        private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
-        private static byte[] Bytes(string hex) => Convert.FromHexString(hex);
-
-        // ════════════════════════════════════════════════════════════════════
-        //  The frames
-        // ════════════════════════════════════════════════════════════════════
-
-        /// <summary>S frame 0: the kay of a click on Challenger1's flag. J frame 855 as well.</summary>
-        [Fact]
-        public void The_kay_names_a_fighter_of_the_side_and_the_fight()
-        {
-            var (fighter, fight) = FightJoinProtocol.ReadJoinRequest(
-                ConnectionProtocol.Push(Op.Kay, Bytes("0888f4dbabd40110bb26")));
-            Assert.Equal(57000000008, fighter);
-            Assert.Equal(4923, fight);
-
-            (fighter, fight) = FightJoinProtocol.ReadJoinRequest(
-                ConnectionProtocol.Push(Op.Kay, Bytes("0887c0d9a0ce19109022")));
-            Assert.Equal(880000000007, fighter);
-            Assert.Equal(4368, fight);
-
-            Assert.Equal((0L, 0L), FightJoinProtocol.ReadJoinRequest(ConnectionProtocol.Push(Op.Kmv)));
-        }
-
-        /// <summary>J frame 856: the one refusal measured, 16, for a side restricted to its party.</summary>
-        [Fact]
-        public void A_refused_kay_is_answered_with_the_fighter_and_the_reason()
-        {
-            Assert.Equal("0887c0d9a0ce191010",
-                         Hex(FightJoinProtocol.BuildJoinRefused(880000000007, FightJoinProtocol.RefusedPartyOnly)));
-        }
-
-        /// <summary>F frames 139-141: the map's kae for each side, and the monsters' growing.</summary>
-        [Fact]
-        public void The_map_gets_each_side_as_a_kae()
-        {
-            var leaderTeam = FightJoinProtocol.Team(0, PartyLeader, false,
-                new[] { FightJoinProtocol.PersonOnTeam(PartyLeader, 447, "Leader") });
-            Assert.Equal("0a211883a8e3aab80820012a160a140a0b08bf0312064c65616465721083a8e3aab80810e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(leaderTeam, Fight487)));
-
-            var empty = FightJoinProtocol.Team(1, Group, true, Array.Empty<Pb>());
-            Assert.Equal("0a13100118dee3feffffffffffff0120012a00300110e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(empty, Fight487)));
-
-            var one = FightJoinProtocol.Team(1, Group, true, new[] { FightJoinProtocol.MonsterOnTeam(-1, 492, 1) });
-            Assert.Equal("0a27100118dee3feffffffffffff0120012a140a1210ffffffffffffffffff012a0508ec031001300110e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(one, Fight487)));
-        }
-
-        /// <summary>
-        /// The board's kae: the receiver's own side, its leader, no members. F frame 168 (the
-        /// attackers) and S frame 23 (the red side of a challenge, f6 = 1).
-        /// </summary>
-        [Fact]
-        public void The_board_carries_one_kae_for_the_receivers_own_side()
-        {
-            Assert.Equal("0a0b1883a8e3aab80820012a0010e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(FightJoinProtocol.Team(0, PartyLeader, false, null), Fight487)));
-            Assert.Equal("0a0d1888f4dbabd40120012a00300110bb26",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(
-                             FightJoinProtocol.Team(1, 57000000008, false, null), 4923)));
-        }
-
-        /// <summary>The count, the swords going, a member off a side, a fighter off the board.</summary>
-        [Fact]
-        public void The_small_ones_are_the_captures()
-        {
-            Assert.Equal("08f7ffffffffffffffff01", Hex(FightJoinProtocol.BuildFighterRemoved(-9)));  // B 140
-            Assert.Empty(FightJoinProtocol.BuildLeftFight());                                        // S 37
-        }
-
-        /// <summary>
-        /// The ilh: B frame 95 (a fight against monsters, 449 tenths of placement left) and the
-        /// challenge's (no countdown, f7 = 4), both with the map's MapPositions row in f8.
-        /// </summary>
-        [Fact]
-        public void The_party_hears_that_a_member_went_into_a_fight()
-        {
-            byte[] dungeon = FightJoinProtocol.BuildPartyMemberInFight(
-                840000000006, 449, 60000006, "Rover1", 471, 108346,
-                FightJoinProtocol.PartyFightMonsters, 225181696, 32, -64, 1028);
-            Assert.Equal("0886a09b9fb91810c10318868ece1c2206526f7665723128d70330bace0638014215088080b06b"
-                         + "102020840828c0ffffffffffffffff01", Hex(dungeon));
-
-            byte[] challenge = FightJoinProtocol.BuildPartyMemberInFight(
-                PartyLeader, 0, 63000188, "Leader", 492, 71272,
-                FightJoinProtocol.PartyFightChallenge, 188744196, 2, -18, 95);
-            Assert.Equal("0883a8e3aab80818fc9c851e22064c656164657228ec0330e8ac0438044214088484805a1002205f"
-                         + "28eeffffffffffffffff01", Hex(challenge));
-        }
-
-        /// <summary>
-        /// What the follower's board says (F 162-163): the kam names who OPENED the fight, the kaa
-        /// what is left of the placement; and where he stands with the side he faces (F 152).
-        /// </summary>
-        [Fact]
-        public void The_joiners_board_names_the_opener_and_what_is_left()
-        {
-            Assert.Equal("100418dee3feffffffffffff012202ec0328e7033083a8e3aab808",
-                         Hex(FightProtocol.BuildFightAnnounced(4, Group, new long[] { 492 }, Fight487, PartyLeader)));
-            Assert.Equal("1801200128ba033004", Hex(FightProtocol.BuildFightSummary(4, 442)));
-            Assert.Equal("121008bb01100118ffffffffffffffffff01120c08e50210051881f092cbdd08",
-                         Hex(FightProtocol.BuildFightersPlaced(new[] { (187, 1, -1L), (357, 5, Recorder) })));
-        }
-
-        // ════════════════════════════════════════════════════════════════════
-        //  The teams of a real fight, as the map sees them
-        // ════════════════════════════════════════════════════════════════════
 
         private static Fighter Person(long id, string name, int level)
             => new Fighter { Id = id, Name = name, Level = level, MaxHP = 100, CurrentHP = 100 };
@@ -164,26 +41,6 @@ namespace Jondo.Unity.Tests.Combat
             fight.AddPlayer(Person(PartyLeader, "Leader", 447));
             fight.AddMonster(Monster(-1, 492, 0));
             return fight;
-        }
-
-        /// <summary>F frames 153, 140 and 141, built from the fight itself after Recorder came in.</summary>
-        [Fact]
-        public void A_fights_sides_come_out_as_the_capture_draws_them()
-        {
-            var fight = FollowFight();
-            Assert.True(fight.JoinTeam(Person(Recorder, "Hero-Example", 354), FightInstance.Azules,
-                                       FightHandler.MaxPeoplePerTeam));
-
-            Assert.Equal("0a3d1883a8e3aab80820012a320a140a0b08bf0312064c65616465721083a8e3aab8080a1a0a1108e2"
-                         + "02120c4865726f2d4578616d706c651081f092cbdd0810e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(
-                             FightHandler.TeamOnMap(fight, FightInstance.Azules, withMembers: true), Fight487)));
-            Assert.Equal("0a13100118dee3feffffffffffff0120012a00300110e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(
-                             FightHandler.TeamOnMap(fight, FightInstance.Rojos, withMembers: false), Fight487)));
-            Assert.Equal("0a27100118dee3feffffffffffff0120012a140a1210ffffffffffffffffff012a0508ec031001300110e703",
-                         Hex(FightJoinProtocol.BuildTeamUpdate(
-                             FightHandler.TeamOnMap(fight, FightInstance.Rojos, withMembers: true), Fight487)));
         }
 
         // ════════════════════════════════════════════════════════════════════

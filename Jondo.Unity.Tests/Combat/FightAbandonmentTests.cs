@@ -70,14 +70,6 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         [Fact]
-        public void And_a_jxh_follows_it()
-        {
-            // jxh 1083a8e3aab808. In this capture the client answers it with jwz and NO jti
-            // arrives at all, so waiting only on jti would leave the result screen stuck.
-            Assert.Equal("1083a8e3aab808", Hex(FightProtocol.BuildConfirmTurn(DuelAuthor)));
-        }
-
-        [Fact]
         public void The_wrapper_belongs_to_the_fighter_whose_turn_it_is()
         {
             // The two captures look contradictory until you see who dies inside. In the duel the

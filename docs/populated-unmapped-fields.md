@@ -271,7 +271,7 @@ policy above. Reconnect uses the same turn snapshot as spectating (omits `jzc`
 tag **8**, with a separate round event). Its trailing turn-ready notification
 uses the empty typed `FightIsTurnReadyEvent` described below. No raw fallback.
 
-### Combat startup and turn confirmation
+### Combat startup, turn confirmation, and fight endings
 
 The typed opening sequence omits `SequenceStartEvent` / `jto` tag **1** (the former
 author ID, property **198700**) and `SequenceEndEvent` / `jwi` tag **3** (the former
@@ -281,6 +281,12 @@ ID (tag **2**, property **199176**) and sends the empty notification. The August
 MCP audit reported **indeterminate** use with incomplete caller coverage for all
 three fields. The shared typed turn announcement omits `jzc` tag **8** under the
 same policy as the spectator snapshot. These are not findings of global non-use.
+
+The typed sequence for declining reentry makes the same `jto` and `jwi`
+omissions. It retains the character-death start kind, the death action and
+updated timeline, and the closing action and author IDs. If the departure ends
+the ongoing fight, the confirmation uses the same empty `FightIsTurnReadyEvent`
+as other fight endings, including in-fight surrender and forced defeats.
 
 ## Quest-journal construction policy
 
