@@ -1,6 +1,6 @@
 {
  "_comment": [
-  "The NPCs the OFFICIAL server listed on each map's contents, read out of packet captures of walks through the world (Incarnam, Astrub, Bonta, Brakmar, Amakna and others, 2026-11-17 to 11-21).",
+  "The NPCs the OFFICIAL server listed on each map's contents, read out of packet captures of walks through the world (Incarnam, Astrub, Bonta, Brakmar, Amakna and others, 2026-11-17 to 11-24).",
   "On each listed map this is the whole set of NPCs, with cell and facing as shown (NpcSpawnContent.ReadOfficial): an empty list means the map had none.",
   "A row with a criterion and a 'kept' note is a quest NPC the capturing character could not see there (Jondo's own quest data sends the player to it on this map); it is kept, gated by the quest."
  ],
@@ -78,6 +78,46 @@
    "spawns": []
   },
   {
+   "map": 4456450,
+   "pos": [
+    -2,
+    -7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 4457474,
+   "pos": [
+    -6,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 4459522,
+   "pos": [
+    -3,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 4460544,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 4460546,
+   "pos": [
+    0,
+    -8
+   ],
+   "spawns": []
+  },
+  {
    "map": 17048576,
    "pos": [
     -1,
@@ -151,6 +191,1545 @@
     -4
    ],
    "spawns": []
+  },
+  {
+   "map": 38535168,
+   "pos": [
+    14,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 41944064,
+   "pos": [
+    -3,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54159142,
+   "pos": [
+    -51,
+    -38
+   ],
+   "spawns": [
+    {
+     "npc": 1359,
+     "cell": 215,
+     "orientation": 1,
+     "name": "John Loque"
+    }
+   ]
+  },
+  {
+   "map": 54169894,
+   "pos": [
+    -72,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54169895,
+   "pos": [
+    -72,
+    -39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54169896,
+   "pos": [
+    -72,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54169897,
+   "pos": [
+    -72,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170402,
+   "pos": [
+    -73,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170403,
+   "pos": [
+    -73,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170404,
+   "pos": [
+    -73,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170405,
+   "pos": [
+    -73,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170406,
+   "pos": [
+    -73,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170407,
+   "pos": [
+    -73,
+    -39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170408,
+   "pos": [
+    -73,
+    -40
+   ],
+   "spawns": [
+    {
+     "npc": 1351,
+     "cell": 105,
+     "orientation": 3,
+     "name": "Julie Lattecup"
+    }
+   ]
+  },
+  {
+   "map": 54170409,
+   "pos": [
+    -73,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170410,
+   "pos": [
+    -73,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170411,
+   "pos": [
+    -73,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170912,
+   "pos": [
+    -74,
+    -32
+   ],
+   "spawns": [
+    {
+     "npc": 1351,
+     "cell": 271,
+     "orientation": 1,
+     "criterion": "(PL>109)|Qa=634|Qf=634",
+     "name": "Julie Lattecup",
+     "kept": "gives quest [634] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 54170913,
+   "pos": [
+    -74,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170914,
+   "pos": [
+    -74,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170915,
+   "pos": [
+    -74,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170916,
+   "pos": [
+    -74,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170917,
+   "pos": [
+    -74,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170918,
+   "pos": [
+    -74,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170919,
+   "pos": [
+    -74,
+    -39
+   ],
+   "spawns": [
+    {
+     "npc": 1304,
+     "cell": 426,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 384,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1306,
+     "cell": 341,
+     "orientation": 1,
+     "name": "Dazel"
+    }
+   ]
+  },
+  {
+   "map": 54170920,
+   "pos": [
+    -74,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170921,
+   "pos": [
+    -74,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170922,
+   "pos": [
+    -74,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170923,
+   "pos": [
+    -74,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54170924,
+   "pos": [
+    -74,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171424,
+   "pos": [
+    -75,
+    -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171425,
+   "pos": [
+    -75,
+    -33
+   ],
+   "spawns": [
+    {
+     "npc": 1303,
+     "cell": 202,
+     "orientation": 3,
+     "name": "Estivador"
+    }
+   ]
+  },
+  {
+   "map": 54171426,
+   "pos": [
+    -75,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171428,
+   "pos": [
+    -75,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171429,
+   "pos": [
+    -75,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171430,
+   "pos": [
+    -75,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171431,
+   "pos": [
+    -75,
+    -39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171432,
+   "pos": [
+    -75,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171433,
+   "pos": [
+    -75,
+    -41
+   ],
+   "spawns": [
+    {
+     "npc": 1304,
+     "cell": 228,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 284,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    }
+   ]
+  },
+  {
+   "map": 54171434,
+   "pos": [
+    -75,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171435,
+   "pos": [
+    -75,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171436,
+   "pos": [
+    -75,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171437,
+   "pos": [
+    -75,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171942,
+   "pos": [
+    -76,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171943,
+   "pos": [
+    -76,
+    -39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171944,
+   "pos": [
+    -76,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171945,
+   "pos": [
+    -76,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171946,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171947,
+   "pos": [
+    -76,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171948,
+   "pos": [
+    -76,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171949,
+   "pos": [
+    -76,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54171950,
+   "pos": [
+    -76,
+    -46
+   ],
+   "spawns": [
+    {
+     "npc": 1376,
+     "cell": 327,
+     "orientation": 3,
+     "name": "Jammy Rokwai"
+    },
+    {
+     "npc": 1262,
+     "cell": 382,
+     "orientation": 1,
+     "name": "Casper Kolador"
+    },
+    {
+     "npc": 1375,
+     "cell": 524,
+     "orientation": 3,
+     "name": "Michele Seyroth"
+    }
+   ]
+  },
+  {
+   "map": 54172455,
+   "pos": [
+    -77,
+    -39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172456,
+   "pos": [
+    -77,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172457,
+   "pos": [
+    -77,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172458,
+   "pos": [
+    -77,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 4216,
+     "cell": 216,
+     "orientation": 1,
+     "name": "Trounes"
+    }
+   ]
+  },
+  {
+   "map": 54172459,
+   "pos": [
+    -77,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172460,
+   "pos": [
+    -77,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172461,
+   "pos": [
+    -77,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172462,
+   "pos": [
+    -77,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172968,
+   "pos": [
+    -78,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172969,
+   "pos": [
+    -78,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172970,
+   "pos": [
+    -78,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172971,
+   "pos": [
+    -78,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172972,
+   "pos": [
+    -78,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172973,
+   "pos": [
+    -78,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54172974,
+   "pos": [
+    -78,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173481,
+   "pos": [
+    -79,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173482,
+   "pos": [
+    -79,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1304,
+     "cell": 469,
+     "orientation": 1,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 514,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    }
+   ]
+  },
+  {
+   "map": 54173483,
+   "pos": [
+    -79,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173484,
+   "pos": [
+    -79,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173485,
+   "pos": [
+    -79,
+    -45
+   ],
+   "spawns": [
+    {
+     "npc": 1304,
+     "cell": 134,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 149,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    }
+   ]
+  },
+  {
+   "map": 54173486,
+   "pos": [
+    -79,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173993,
+   "pos": [
+    -80,
+    -41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173994,
+   "pos": [
+    -80,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173995,
+   "pos": [
+    -80,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173996,
+   "pos": [
+    -80,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173997,
+   "pos": [
+    -80,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54173998,
+   "pos": [
+    -80,
+    -46
+   ],
+   "spawns": [
+    {
+     "npc": 1320,
+     "cell": 134,
+     "orientation": 1,
+     "name": "Ken Tucky"
+    }
+   ]
+  },
+  {
+   "map": 54174506,
+   "pos": [
+    -81,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54174507,
+   "pos": [
+    -81,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54174508,
+   "pos": [
+    -81,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54174509,
+   "pos": [
+    -81,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54174510,
+   "pos": [
+    -81,
+    -46
+   ],
+   "spawns": [
+    {
+     "npc": 1304,
+     "cell": 370,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 412,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1261,
+     "cell": 358,
+     "orientation": 3,
+     "name": "Diana Djone"
+    },
+    {
+     "npc": 1304,
+     "cell": 397,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    },
+    {
+     "npc": 1304,
+     "cell": 454,
+     "orientation": 3,
+     "name": "Awaw do gelo"
+    }
+   ]
+  },
+  {
+   "map": 54175018,
+   "pos": [
+    -82,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175019,
+   "pos": [
+    -82,
+    -43
+   ],
+   "spawns": [
+    {
+     "npc": 1350,
+     "cell": 180,
+     "orientation": 3,
+     "name": "Gromeo Oatmenu"
+    }
+   ]
+  },
+  {
+   "map": 54175020,
+   "pos": [
+    -82,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175021,
+   "pos": [
+    -82,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175022,
+   "pos": [
+    -82,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175531,
+   "pos": [
+    -83,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175532,
+   "pos": [
+    -83,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175533,
+   "pos": [
+    -83,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54175534,
+   "pos": [
+    -83,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54176043,
+   "pos": [
+    -84,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54176044,
+   "pos": [
+    -84,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54176045,
+   "pos": [
+    -84,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54176555,
+   "pos": [
+    -85,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54176556,
+   "pos": [
+    -85,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54531087,
+   "pos": [
+    -74,
+    -33
+   ],
+   "spawns": [
+    {
+     "npc": 1994,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Brokkeitri"
+    }
+   ]
+  },
+  {
+   "map": 54531089,
+   "pos": [
+    -81,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 1260,
+     "cell": 316,
+     "orientation": 3,
+     "name": "Herb Olário"
+    }
+   ]
+  },
+  {
+   "map": 54531091,
+   "pos": [
+    -83,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 1277,
+     "cell": 229,
+     "orientation": 3,
+     "name": "Frigostina"
+    }
+   ]
+  },
+  {
+   "map": 54531093,
+   "pos": [
+    -79,
+    -43
+   ],
+   "spawns": [
+    {
+     "npc": 1993,
+     "cell": 345,
+     "orientation": 1,
+     "name": "Joe Rives"
+    }
+   ]
+  },
+  {
+   "map": 54531095,
+   "pos": [
+    -72,
+    -40
+   ],
+   "spawns": [
+    {
+     "npc": 1255,
+     "cell": 357,
+     "orientation": 3,
+     "name": "Natasha Dicambio"
+    }
+   ]
+  },
+  {
+   "map": 54531097,
+   "pos": [
+    -75,
+    -38
+   ],
+   "spawns": [
+    {
+     "npc": 1291,
+     "cell": 372,
+     "orientation": 3,
+     "name": "Franky"
+    }
+   ]
+  },
+  {
+   "map": 54531099,
+   "pos": [
+    -76,
+    -40
+   ],
+   "spawns": [
+    {
+     "npc": 2975,
+     "cell": 258,
+     "orientation": 1,
+     "name": "Drachir Garfield"
+    },
+    {
+     "npc": 1996,
+     "cell": 285,
+     "orientation": 3,
+     "name": "Carla Garfield"
+    }
+   ]
+  },
+  {
+   "map": 54531101,
+   "pos": [
+    -79,
+    -46
+   ],
+   "spawns": [
+    {
+     "npc": 1278,
+     "cell": 301,
+     "orientation": 3,
+     "name": "Al Shab"
+    }
+   ]
+  },
+  {
+   "map": 54531103,
+   "pos": [
+    -82,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1245,
+     "cell": 356,
+     "orientation": 3,
+     "name": "Clarisse Togata"
+    }
+   ]
+  },
+  {
+   "map": 54531105,
+   "pos": [
+    -74,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1360,
+     "cell": 330,
+     "orientation": 3,
+     "name": "Dutch"
+    }
+   ]
+  },
+  {
+   "map": 54532111,
+   "pos": [
+    -74,
+    -33
+   ],
+   "spawns": [
+    {
+     "npc": 1995,
+     "cell": 345,
+     "orientation": 3,
+     "name": "Amur Ália"
+    }
+   ]
+  },
+  {
+   "map": 54532113,
+   "pos": [
+    -81,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532115,
+   "pos": [
+    -83,
+    -44
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532117,
+   "pos": [
+    -79,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532119,
+   "pos": [
+    -72,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532121,
+   "pos": [
+    -75,
+    -38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532123,
+   "pos": [
+    -76,
+    -40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532125,
+   "pos": [
+    -79,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54532127,
+   "pos": [
+    -77,
+    -45
+   ],
+   "spawns": [
+    {
+     "npc": 5554,
+     "cell": 261,
+     "orientation": 3,
+     "name": "Marten Poris"
+    },
+    {
+     "npc": 1272,
+     "cell": 244,
+     "orientation": 3,
+     "name": "Ernest Lê"
+    },
+    {
+     "npc": 1992,
+     "cell": 298,
+     "orientation": 1,
+     "name": "Vovô Músculo"
+    },
+    {
+     "npc": 1381,
+     "cell": 332,
+     "orientation": 3,
+     "name": "Vovó Laisol"
+    }
+   ]
+  },
+  {
+   "map": 54532129,
+   "pos": [
+    -74,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54534159,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1252,
+     "cell": 272,
+     "orientation": 1,
+     "name": "Bonnie Barrow"
+    },
+    {
+     "npc": 1253,
+     "cell": 273,
+     "orientation": 3,
+     "name": "Clyde Parker"
+    }
+   ]
+  },
+  {
+   "map": 54534161,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54534165,
+   "pos": [
+    -77,
+    -41
+   ],
+   "spawns": [
+    {
+     "npc": 100,
+     "cell": 343,
+     "orientation": 3,
+     "name": "Banqueiro"
+    }
+   ]
+  },
+  {
+   "map": 54534167,
+   "pos": [
+    -77,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1246,
+     "cell": 289,
+     "orientation": 3,
+     "name": "Marilu Brificanty"
+    }
+   ]
+  },
+  {
+   "map": 54534169,
+   "pos": [
+    -77,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 1244,
+     "cell": 214,
+     "orientation": 3,
+     "name": "Walter Hego"
+    }
+   ]
+  },
+  {
+   "map": 54534171,
+   "pos": [
+    -82,
+    -46
+   ],
+   "spawns": [
+    {
+     "npc": 1250,
+     "cell": 244,
+     "orientation": 1,
+     "name": "Unde Dossó"
+    },
+    {
+     "npc": 1382,
+     "cell": 312,
+     "orientation": 1,
+     "name": "Assistente de Unde Dossó"
+    }
+   ]
+  },
+  {
+   "map": 54534173,
+   "pos": [
+    -78,
+    -43
+   ],
+   "spawns": [
+    {
+     "npc": 1248,
+     "cell": 385,
+     "orientation": 3,
+     "name": "Caetano Ventoso"
+    }
+   ]
+  },
+  {
+   "map": 54534175,
+   "pos": [
+    -79,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54534177,
+   "pos": [
+    -80,
+    -45
+   ],
+   "spawns": [
+    {
+     "npc": 1251,
+     "cell": 356,
+     "orientation": 1,
+     "name": "Walter Pez"
+    }
+   ]
+  },
+  {
+   "map": 54535183,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54535185,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54535191,
+   "pos": [
+    -77,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1237,
+     "cell": 289,
+     "orientation": 3,
+     "name": "Prefeita Berna"
+    }
+   ]
+  },
+  {
+   "map": 54535193,
+   "pos": [
+    -77,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 1256,
+     "cell": 414,
+     "orientation": 1,
+     "name": "Paul Ygamo"
+    },
+    {
+     "npc": 1249,
+     "cell": 272,
+     "orientation": 1,
+     "name": "Laurent Gebleuh"
+    }
+   ]
+  },
+  {
+   "map": 54535195,
+   "pos": [
+    -82,
+    -46
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54535197,
+   "pos": [
+    -78,
+    -43
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54535199,
+   "pos": [
+    -79,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1247,
+     "cell": 357,
+     "orientation": 3,
+     "name": "Hipólito Termya"
+    }
+   ]
+  },
+  {
+   "map": 54535201,
+   "pos": [
+    -80,
+    -45
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54536207,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1366,
+     "cell": 311,
+     "orientation": 1,
+     "name": "Peter S. Hilton"
+    }
+   ]
+  },
+  {
+   "map": 54536209,
+   "pos": [
+    -76,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54536215,
+   "pos": [
+    -77,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54536217,
+   "pos": [
+    -77,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 1257,
+     "cell": 471,
+     "orientation": 3,
+     "name": "Kamão Nabolsa"
+    }
+   ]
+  },
+  {
+   "map": 54536225,
+   "pos": [
+    -79,
+    -42
+   ],
+   "spawns": [
+    {
+     "npc": 1283,
+     "cell": 343,
+     "orientation": 3,
+     "name": "Avô"
+    },
+    {
+     "npc": 1368,
+     "cell": 413,
+     "orientation": 3,
+     "name": "Kiki"
+    }
+   ]
+  },
+  {
+   "map": 54537239,
+   "pos": [
+    -77,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54537249,
+   "pos": [
+    -79,
+    -42
+   ],
+   "spawns": []
+  },
+  {
+   "map": 54658069,
+   "pos": [
+    -85,
+    -44
+   ],
+   "spawns": [
+    {
+     "npc": 7643,
+     "cell": 229,
+     "orientation": 1,
+     "name": "Gil Lete"
+    },
+    {
+     "npc": 7529,
+     "cell": 386,
+     "orientation": 3,
+     "name": "Fifi de Lificha"
+    }
+   ]
   },
   {
    "map": 67108864,
@@ -334,7 +1913,16 @@
     8,
     -6
    ],
-   "spawns": []
+   "spawns": [
+    {
+     "npc": 795,
+     "cell": 275,
+     "orientation": 1,
+     "criterion": "Sc=90001",
+     "name": "Hector Nataw",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
   },
   {
    "map": 68420098,
@@ -352,10 +1940,388 @@
    ]
   },
   {
+   "map": 68420099,
+   "pos": [
+    8,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 743,
+     "cell": 432,
+     "orientation": 3,
+     "name": "Verrumacha"
+    }
+   ]
+  },
+  {
+   "map": 68420100,
+   "pos": [
+    8,
+    -3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68420101,
+   "pos": [
+    8,
+    -2
+   ],
+   "spawns": [
+    {
+     "npc": 118,
+     "cell": 370,
+     "orientation": 3,
+     "name": "Phil Kaki"
+    },
+    {
+     "npc": 120,
+     "cell": 369,
+     "orientation": 1,
+     "name": "Max"
+    },
+    {
+     "npc": 2285,
+     "cell": 355,
+     "orientation": 1,
+     "criterion": "Qa=1473&Qo>8213&Qo<8216",
+     "name": "Tobieri",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 68420102,
+   "pos": [
+    8,
+    -1
+   ],
+   "spawns": []
+  },
+  {
    "map": 68420104,
    "pos": [
     8,
     1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68420610,
+   "pos": [
+    9,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68420611,
+   "pos": [
+    9,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 745,
+     "cell": 398,
+     "orientation": 1,
+     "name": "Esqualo, o Vermelho"
+    }
+   ]
+  },
+  {
+   "map": 68420612,
+   "pos": [
+    9,
+    -3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68420613,
+   "pos": [
+    9,
+    -2
+   ],
+   "spawns": [
+    {
+     "npc": 134,
+     "cell": 314,
+     "orientation": 1,
+     "name": "Capitã Lily"
+    },
+    {
+     "npc": 5452,
+     "cell": 399,
+     "orientation": 3,
+     "name": "Wei Egon"
+    }
+   ]
+  },
+  {
+   "map": 68420614,
+   "pos": [
+    9,
+    -1
+   ],
+   "spawns": [
+    {
+     "npc": 744,
+     "cell": 328,
+     "orientation": 1,
+     "name": "Malassen Alza"
+    }
+   ]
+  },
+  {
+   "map": 68420615,
+   "pos": [
+    9,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 300,
+     "cell": 345,
+     "orientation": 3,
+     "name": "Bhan Laka"
+    }
+   ]
+  },
+  {
+   "map": 68421122,
+   "pos": [
+    10,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 5767,
+     "cell": 382,
+     "orientation": 3,
+     "name": "Capitão Ghezen"
+    },
+    {
+     "npc": 5569,
+     "cell": 315,
+     "orientation": 3,
+     "criterion": "(Qa=2195&Qo>16307)|Qf=2195",
+     "name": "Ronald, o Sábio Laposa",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 68421124,
+   "pos": [
+    10,
+    -3
+   ],
+   "spawns": [
+    {
+     "npc": 6801,
+     "cell": 301,
+     "orientation": 3,
+     "name": "Capitã Isabella Utissier"
+    },
+    {
+     "npc": 2603,
+     "cell": 343,
+     "orientation": 1,
+     "criterion": "Qa=1561",
+     "name": "Estivador suspeito",
+     "kept": "quest [1561] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 68421125,
+   "pos": [
+    10,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68421126,
+   "pos": [
+    10,
+    -1
+   ],
+   "spawns": [
+    {
+     "npc": 739,
+     "cell": 298,
+     "orientation": 3,
+     "name": "Kwartel Tresme"
+    }
+   ]
+  },
+  {
+   "map": 68421127,
+   "pos": [
+    10,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68421633,
+   "pos": [
+    11,
+    -6
+   ],
+   "spawns": [
+    {
+     "npc": 1539,
+     "cell": 372,
+     "orientation": 1,
+     "criterion": "Qa=863",
+     "name": "Spik Izzy",
+     "kept": "quest [863] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 68421634,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 2967,
+     "cell": 244,
+     "orientation": 1,
+     "criterion": "Qa=1663&Qo=10066&PO=16889",
+     "name": "Kelpe",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 68421636,
+   "pos": [
+    11,
+    -3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68421637,
+   "pos": [
+    11,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68421638,
+   "pos": [
+    11,
+    -1
+   ],
+   "spawns": [
+    {
+     "npc": 2472,
+     "cell": 370,
+     "orientation": 1,
+     "name": "Nanoc Elyod"
+    }
+   ]
+  },
+  {
+   "map": 68421639,
+   "pos": [
+    11,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68421640,
+   "pos": [
+    11,
+    1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422145,
+   "pos": [
+    12,
+    -6
+   ],
+   "spawns": [
+    {
+     "npc": 3464,
+     "cell": 369,
+     "orientation": 3,
+     "name": "Capitão Tenereu"
+    }
+   ]
+  },
+  {
+   "map": 68422148,
+   "pos": [
+    12,
+    -3
+   ],
+   "spawns": [
+    {
+     "npc": 1359,
+     "cell": 289,
+     "orientation": 3,
+     "name": "John Loque"
+    }
+   ]
+  },
+  {
+   "map": 68422149,
+   "pos": [
+    12,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422150,
+   "pos": [
+    12,
+    -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422151,
+   "pos": [
+    12,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422152,
+   "pos": [
+    12,
+    1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422660,
+   "pos": [
+    13,
+    -3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68422661,
+   "pos": [
+    13,
+    -2
    ],
    "spawns": []
   },
@@ -379,6 +2345,48 @@
      "name": "Charles Tivador"
     }
    ]
+  },
+  {
+   "map": 68422663,
+   "pos": [
+    13,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 1470,
+     "cell": 300,
+     "orientation": 3,
+     "criterion": "Qa=892&Qo<5471",
+     "name": "Capitã Nebrosa",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 68422664,
+   "pos": [
+    13,
+    1
+   ],
+   "spawns": [
+    {
+     "npc": 2198,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=1444",
+     "name": "Zida Cocoma",
+     "kept": "quest [1444] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 68423168,
+   "pos": [
+    13,
+    -7
+   ],
+   "spawns": []
   },
   {
    "map": 68423176,
@@ -415,6 +2423,39 @@
    "pos": [
     6,
     -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68551171,
+   "pos": [
+    6,
+    -4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 68551172,
+   "pos": [
+    6,
+    -3
+   ],
+   "spawns": [
+    {
+     "npc": 1989,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=1266",
+     "name": "Aprendiz de cozinheira",
+     "kept": "quest [1266] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 68551173,
+   "pos": [
+    6,
+    -2
    ],
    "spawns": []
   },
@@ -682,6 +2723,140 @@
    "spawns": []
   },
   {
+   "map": 69206016,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 1432,
+     "cell": 466,
+     "orientation": 1,
+     "name": "Zakiana"
+    }
+   ]
+  },
+  {
+   "map": 69206274,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 69207040,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 1425,
+     "cell": 317,
+     "orientation": 3,
+     "name": "Armando Pel"
+    }
+   ]
+  },
+  {
+   "map": 69207298,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 69208064,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 1429,
+     "cell": 371,
+     "orientation": 3,
+     "name": "Ladero"
+    }
+   ]
+  },
+  {
+   "map": 69208322,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 69209088,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 1428,
+     "cell": 466,
+     "orientation": 3,
+     "name": "Per Plexo"
+    }
+   ]
+  },
+  {
+   "map": 69209346,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 69995522,
+   "pos": [
+    13,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 1470,
+     "cell": 300,
+     "orientation": 3,
+     "criterion": "Qa=891&Qo>5467&Qo<5469",
+     "name": "Capitã Nebrosa",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 69996546,
+   "pos": [
+    13,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 70778880,
+   "pos": [
+    1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 1900,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "(PL>19&Ad=224)|Qa=1196|Qf=1196",
+     "name": "Ewin Rolo",
+     "kept": "gives quest [1196] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
    "map": 74186754,
    "pos": [
     -32,
@@ -933,6 +3108,506 @@
    ]
   },
   {
+   "map": 84805377,
+   "pos": [
+    -3,
+    -23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805378,
+   "pos": [
+    -3,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 1920,
+     "cell": 330,
+     "orientation": 1,
+     "criterion": "Qa=1200&Qo=6760",
+     "name": "Xelor duvidoso",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 84805379,
+   "pos": [
+    -3,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805380,
+   "pos": [
+    -3,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805381,
+   "pos": [
+    -3,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805382,
+   "pos": [
+    -3,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805632,
+   "pos": [
+    -4,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805633,
+   "pos": [
+    -4,
+    -21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805634,
+   "pos": [
+    -4,
+    -20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805889,
+   "pos": [
+    -4,
+    -23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805890,
+   "pos": [
+    -4,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805891,
+   "pos": [
+    -4,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805892,
+   "pos": [
+    -4,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805893,
+   "pos": [
+    -4,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84805894,
+   "pos": [
+    -4,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806144,
+   "pos": [
+    -5,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806145,
+   "pos": [
+    -5,
+    -21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806146,
+   "pos": [
+    -5,
+    -20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806401,
+   "pos": [
+    -5,
+    -23
+   ],
+   "spawns": [
+    {
+     "npc": 6186,
+     "cell": 373,
+     "orientation": 3,
+     "name": "Porkasso à Espreita"
+    }
+   ]
+  },
+  {
+   "map": 84806402,
+   "pos": [
+    -5,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806403,
+   "pos": [
+    -5,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806404,
+   "pos": [
+    -5,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806405,
+   "pos": [
+    -5,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806406,
+   "pos": [
+    -5,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806656,
+   "pos": [
+    -6,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806657,
+   "pos": [
+    -6,
+    -21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806658,
+   "pos": [
+    -6,
+    -20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806913,
+   "pos": [
+    -6,
+    -23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806914,
+   "pos": [
+    -6,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806915,
+   "pos": [
+    -6,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806916,
+   "pos": [
+    -6,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806917,
+   "pos": [
+    -6,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 84806918,
+   "pos": [
+    -6,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87818753,
+   "pos": [
+    12,
+    -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87818755,
+   "pos": [
+    11,
+    -1
+   ],
+   "spawns": [
+    {
+     "npc": 165,
+     "cell": 315,
+     "orientation": 3,
+     "name": "Criada"
+    }
+   ]
+  },
+  {
+   "map": 87818757,
+   "pos": [
+    13,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87818759,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87819777,
+   "pos": [
+    9,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 90,
+     "cell": 272,
+     "orientation": 1,
+     "name": "Mori Arty"
+    }
+   ]
+  },
+  {
+   "map": 87819779,
+   "pos": [
+    11,
+    -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87819781,
+   "pos": [
+    13,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87819783,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 2602,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=1561",
+     "name": "Mulan Ruj",
+     "kept": "quest [1561] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 87820801,
+   "pos": [
+    8,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 91,
+     "cell": 272,
+     "orientation": 1,
+     "name": "Simgood, o marinheiro"
+    }
+   ]
+  },
+  {
+   "map": 87820803,
+   "pos": [
+    11,
+    -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87820805,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 2596,
+     "cell": 243,
+     "orientation": 3,
+     "name": "Otto Lero"
+    }
+   ]
+  },
+  {
+   "map": 87820807,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87821825,
+   "pos": [
+    11,
+    -1
+   ],
+   "spawns": [
+    {
+     "npc": 164,
+     "cell": 301,
+     "orientation": 3,
+     "name": "Cherlook Holmus"
+    }
+   ]
+  },
+  {
+   "map": 87821827,
+   "pos": [
+    9,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87821829,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 87821831,
+   "pos": [
+    11,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080651,
+   "pos": [
+    1,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080655,
+   "pos": [
+    1,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080656,
+   "pos": [
+    1,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080657,
+   "pos": [
+    1,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080658,
+   "pos": [
+    1,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88080659,
+   "pos": [
+    1,
+    4
+   ],
+   "spawns": []
+  },
+  {
    "map": 88080660,
    "pos": [
     1,
@@ -1026,6 +3701,100 @@
     -3
    ],
    "spawns": []
+  },
+  {
+   "map": 88081163,
+   "pos": [
+    2,
+    12
+   ],
+   "spawns": [
+    {
+     "npc": 4219,
+     "cell": 245,
+     "orientation": 3,
+     "name": "Papatudo"
+    },
+    {
+     "npc": 4219,
+     "cell": 262,
+     "orientation": 7,
+     "name": "Papatudo"
+    },
+    {
+     "npc": 4219,
+     "cell": 274,
+     "orientation": 5,
+     "name": "Papatudo"
+    },
+    {
+     "npc": 4219,
+     "cell": 233,
+     "orientation": 1,
+     "name": "Papatudo"
+    },
+    {
+     "npc": 6710,
+     "cell": 329,
+     "orientation": 3,
+     "name": "Yeleka Yrehn"
+    }
+   ]
+  },
+  {
+   "map": 88081168,
+   "pos": [
+    2,
+    7
+   ],
+   "spawns": [
+    {
+     "npc": 1760,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=1063",
+     "name": "Colhedora de maçãs",
+     "kept": "quest [1063] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 88081169,
+   "pos": [
+    2,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081170,
+   "pos": [
+    2,
+    5
+   ],
+   "spawns": [
+    {
+     "npc": 117,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Bolzano Velhamancha"
+    }
+   ]
+  },
+  {
+   "map": 88081171,
+   "pos": [
+    2,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 2150,
+     "cell": 230,
+     "orientation": 3,
+     "name": "Condutow de Pewfuwadowa"
+    }
+   ]
   },
   {
    "map": 88081172,
@@ -1184,6 +3953,55 @@
    "spawns": []
   },
   {
+   "map": 88081679,
+   "pos": [
+    3,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081680,
+   "pos": [
+    3,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081681,
+   "pos": [
+    3,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081682,
+   "pos": [
+    3,
+    5
+   ],
+   "spawns": [
+    {
+     "npc": 6280,
+     "cell": 271,
+     "orientation": 1,
+     "criterion": "Qa=2417",
+     "name": "Stohone",
+     "kept": "quest [2417] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 88081683,
+   "pos": [
+    3,
+    4
+   ],
+   "spawns": []
+  },
+  {
    "map": 88081684,
    "pos": [
     3,
@@ -1267,6 +4085,30 @@
    "pos": [
     3,
     -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081920,
+   "pos": [
+    4,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081921,
+   "pos": [
+    4,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88081922,
+   "pos": [
+    4,
+    25
    ],
    "spawns": []
   },
@@ -1365,6 +4207,46 @@
    ]
   },
   {
+   "map": 88082191,
+   "pos": [
+    4,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082192,
+   "pos": [
+    4,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082193,
+   "pos": [
+    4,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082194,
+   "pos": [
+    4,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082195,
+   "pos": [
+    4,
+    4
+   ],
+   "spawns": []
+  },
+  {
    "map": 88082196,
    "pos": [
     4,
@@ -1418,6 +4300,22 @@
    "pos": [
     4,
     -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082432,
+   "pos": [
+    5,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88082689,
+   "pos": [
+    5,
+    22
    ],
    "spawns": []
   },
@@ -1625,6 +4523,22 @@
    ]
   },
   {
+   "map": 88082944,
+   "pos": [
+    6,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88083201,
+   "pos": [
+    6,
+    22
+   ],
+   "spawns": []
+  },
+  {
    "map": 88083202,
    "pos": [
     6,
@@ -1822,6 +4736,31 @@
    "spawns": []
   },
   {
+   "map": 88083456,
+   "pos": [
+    7,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88083713,
+   "pos": [
+    7,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 2774,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=1608",
+     "name": "Maria Ride",
+     "kept": "quest [1608] sends the player to it on this map"
+    }
+   ]
+  },
+  {
    "map": 88083714,
    "pos": [
     7,
@@ -1943,6 +4882,22 @@
    ]
   },
   {
+   "map": 88084225,
+   "pos": [
+    8,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88084226,
+   "pos": [
+    8,
+    21
+   ],
+   "spawns": []
+  },
+  {
    "map": 88084227,
    "pos": [
     8,
@@ -2004,6 +4959,14 @@
      "name": "Guarda de Amakna"
     }
    ]
+  },
+  {
+   "map": 88084737,
+   "pos": [
+    9,
+    22
+   ],
+   "spawns": []
   },
   {
    "map": 88084738,
@@ -2075,6 +5038,14 @@
    "spawns": []
   },
   {
+   "map": 88085249,
+   "pos": [
+    10,
+    22
+   ],
+   "spawns": []
+  },
+  {
    "map": 88085250,
    "pos": [
     10,
@@ -2107,6 +5078,38 @@
    "spawns": []
   },
   {
+   "map": 88085761,
+   "pos": [
+    11,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88085762,
+   "pos": [
+    11,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88085763,
+   "pos": [
+    11,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88085764,
+   "pos": [
+    11,
+    19
+   ],
+   "spawns": []
+  },
+  {
    "map": 88085770,
    "pos": [
     11,
@@ -2123,10 +5126,138 @@
    "spawns": []
   },
   {
+   "map": 88086273,
+   "pos": [
+    12,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086274,
+   "pos": [
+    12,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086275,
+   "pos": [
+    12,
+    20
+   ],
+   "spawns": [
+    {
+     "npc": 3665,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qa=1823&Qo>12025&Qo<12026",
+     "name": "Coletor de Pães",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88086276,
+   "pos": [
+    12,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086277,
+   "pos": [
+    12,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086280,
+   "pos": [
+    12,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086281,
+   "pos": [
+    12,
+    14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086282,
+   "pos": [
+    12,
+    13
+   ],
+   "spawns": []
+  },
+  {
    "map": 88086283,
    "pos": [
     12,
     12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086785,
+   "pos": [
+    13,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086786,
+   "pos": [
+    13,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 1162,
+     "cell": 328,
+     "orientation": 3,
+     "name": "Nunvi Nenfiznada"
+    }
+   ]
+  },
+  {
+   "map": 88086787,
+   "pos": [
+    13,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086788,
+   "pos": [
+    13,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086789,
+   "pos": [
+    13,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88086790,
+   "pos": [
+    13,
+    17
    ],
    "spawns": []
   },
@@ -2176,6 +5307,355 @@
      "criterion": "Qa=1823&Qo>12028&Qo<12029",
      "name": "Coletor de Pães",
      "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88086796,
+   "pos": [
+    13,
+    11
+   ],
+   "spawns": [
+    {
+     "npc": 488,
+     "cell": 410,
+     "orientation": 1,
+     "name": "Três-Flores"
+    }
+   ]
+  },
+  {
+   "map": 88087297,
+   "pos": [
+    14,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 3244,
+     "cell": 259,
+     "orientation": 3,
+     "criterion": "(PL>179)|Qa=1732|Qf=1732",
+     "name": "Sered",
+     "kept": "gives quest [1732] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 88087298,
+   "pos": [
+    14,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087299,
+   "pos": [
+    14,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087300,
+   "pos": [
+    14,
+    19
+   ],
+   "spawns": [
+    {
+     "npc": 5192,
+     "cell": 273,
+     "orientation": 3,
+     "name": "Gobliko"
+    }
+   ]
+  },
+  {
+   "map": 88087301,
+   "pos": [
+    14,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087302,
+   "pos": [
+    14,
+    17
+   ],
+   "spawns": [
+    {
+     "npc": 2241,
+     "cell": 344,
+     "orientation": 3,
+     "criterion": "Qa=1464",
+     "name": "Sapateiro Sombrio",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88087303,
+   "pos": [
+    14,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087304,
+   "pos": [
+    14,
+    15
+   ],
+   "spawns": [
+    {
+     "npc": 3665,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qa=1823&Qo>12027&Qo<12028",
+     "name": "Coletor de Pães",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88087305,
+   "pos": [
+    14,
+    14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087306,
+   "pos": [
+    14,
+    13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087307,
+   "pos": [
+    14,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087810,
+   "pos": [
+    15,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087811,
+   "pos": [
+    15,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087812,
+   "pos": [
+    15,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087813,
+   "pos": [
+    15,
+    18
+   ],
+   "spawns": [
+    {
+     "npc": 3274,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=1732",
+     "name": "Kalafetha",
+     "kept": "quest [1732] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 88087814,
+   "pos": [
+    15,
+    17
+   ],
+   "spawns": [
+    {
+     "npc": 3665,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "Qa=1823&Qo>12026&Qo<12027",
+     "name": "Coletor de Pães",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88087815,
+   "pos": [
+    15,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087816,
+   "pos": [
+    15,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88087817,
+   "pos": [
+    15,
+    14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88088322,
+   "pos": [
+    16,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 5248,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "Qa=2108",
+     "name": "Escultor do Leste",
+     "kept": "quest [2108] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 88212235,
+   "pos": [
+    0,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212236,
+   "pos": [
+    0,
+    11
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212237,
+   "pos": [
+    0,
+    10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212238,
+   "pos": [
+    0,
+    9
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212239,
+   "pos": [
+    0,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212241,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7104,
+     "cell": 438,
+     "orientation": 7,
+     "name": "Jovem Tronknídeo"
+    },
+    {
+     "npc": 7098,
+     "cell": 439,
+     "orientation": 1,
+     "name": "[!] Arbre de Masse"
+    },
+    {
+     "npc": 7098,
+     "cell": 410,
+     "orientation": 1,
+     "name": "[!] Arbre de Masse"
+    },
+    {
+     "npc": 7046,
+     "cell": 411,
+     "orientation": 3,
+     "name": "Frondor"
+    }
+   ]
+  },
+  {
+   "map": 88212242,
+   "pos": [
+    0,
+    5
+   ],
+   "spawns": [
+    {
+     "npc": 124,
+     "cell": 216,
+     "orientation": 1,
+     "name": "Eowina Frasco"
+    }
+   ]
+  },
+  {
+   "map": 88212243,
+   "pos": [
+    0,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 3190,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=337",
+     "name": "Cláudia Chifre",
+     "kept": "quest [337] sends the player to it on this map"
+    },
+    {
+     "npc": 1168,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=337",
+     "name": "Prisioneira brakmariana",
+     "kept": "quest [337] sends the player to it on this map"
     }
    ]
   },
@@ -2289,6 +5769,122 @@
    ]
   },
   {
+   "map": 88212746,
+   "pos": [
+    -1,
+    13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212747,
+   "pos": [
+    -1,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212748,
+   "pos": [
+    -1,
+    11
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212749,
+   "pos": [
+    -1,
+    10
+   ],
+   "spawns": [
+    {
+     "npc": 66,
+     "cell": 116,
+     "orientation": 1,
+     "name": "Ralgut"
+    }
+   ]
+  },
+  {
+   "map": 88212750,
+   "pos": [
+    -1,
+    9
+   ],
+   "spawns": [
+    {
+     "npc": 2873,
+     "cell": 399,
+     "orientation": 3,
+     "name": "Guarda de Amakna"
+    }
+   ]
+  },
+  {
+   "map": 88212751,
+   "pos": [
+    -1,
+    8
+   ],
+   "spawns": [
+    {
+     "npc": 383,
+     "cell": 290,
+     "orientation": 3,
+     "name": "Girle Pylote"
+    },
+    {
+     "npc": 1268,
+     "cell": 413,
+     "orientation": 1,
+     "criterion": "Qa=527&Qo>3624&Qo<3625",
+     "name": "Hata Marie",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 88212752,
+   "pos": [
+    -1,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212753,
+   "pos": [
+    -1,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7101,
+     "cell": 314,
+     "orientation": 1,
+     "name": "Plutark"
+    }
+   ]
+  },
+  {
+   "map": 88212754,
+   "pos": [
+    -1,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88212755,
+   "pos": [
+    -1,
+    4
+   ],
+   "spawns": []
+  },
+  {
    "map": 88212756,
    "pos": [
     -1,
@@ -2354,6 +5950,85 @@
    "spawns": []
   },
   {
+   "map": 88213259,
+   "pos": [
+    -2,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213261,
+   "pos": [
+    -2,
+    10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213262,
+   "pos": [
+    -2,
+    9
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213264,
+   "pos": [
+    -2,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213265,
+   "pos": [
+    -2,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213266,
+   "pos": [
+    -2,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213267,
+   "pos": [
+    -2,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 6885,
+     "cell": 467,
+     "orientation": 1,
+     "name": "Freddy Rigível"
+    }
+   ]
+  },
+  {
+   "map": 88213268,
+   "pos": [
+    -2,
+    3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213269,
+   "pos": [
+    -2,
+    2
+   ],
+   "spawns": []
+  },
+  {
    "map": 88213270,
    "pos": [
     -2,
@@ -2369,16 +6044,16 @@
    ],
    "spawns": [
     {
-     "npc": 2435,
-     "cell": 328,
-     "orientation": 1,
-     "name": "Krosmoglob dos Viajantes"
-    },
-    {
      "npc": 7913,
      "cell": 249,
      "orientation": 3,
      "name": "Campeão dos Dragões"
+    },
+    {
+     "npc": 2435,
+     "cell": 328,
+     "orientation": 1,
+     "name": "Krosmoglob dos Viajantes"
     }
    ]
   },
@@ -2451,6 +6126,438 @@
    ]
   },
   {
+   "map": 88213773,
+   "pos": [
+    -3,
+    10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213774,
+   "pos": [
+    -3,
+    9
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213776,
+   "pos": [
+    -3,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213777,
+   "pos": [
+    -3,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213781,
+   "pos": [
+    -3,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213782,
+   "pos": [
+    -3,
+    1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213783,
+   "pos": [
+    -3,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213784,
+   "pos": [
+    -3,
+    -1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213785,
+   "pos": [
+    -3,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88213786,
+   "pos": [
+    -3,
+    -3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88214294,
+   "pos": [
+    -4,
+    1
+   ],
+   "spawns": []
+  },
+  {
+   "map": 88214295,
+   "pos": [
+    -4,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 2873,
+     "cell": 511,
+     "orientation": 1,
+     "name": "Guarda de Amakna"
+    }
+   ]
+  },
+  {
+   "map": 88214297,
+   "pos": [
+    -4,
+    -2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90701824,
+   "pos": [
+    10,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 3327,
+     "cell": 101,
+     "orientation": 1,
+     "name": "Fessyu"
+    }
+   ]
+  },
+  {
+   "map": 90701825,
+   "pos": [
+    10,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90701826,
+   "pos": [
+    10,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702081,
+   "pos": [
+    10,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702336,
+   "pos": [
+    11,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702337,
+   "pos": [
+    11,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702338,
+   "pos": [
+    11,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702593,
+   "pos": [
+    11,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702848,
+   "pos": [
+    12,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702849,
+   "pos": [
+    12,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90702850,
+   "pos": [
+    12,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703360,
+   "pos": [
+    13,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 1601,
+     "cell": 370,
+     "orientation": 1,
+     "name": "Mago Lhanz"
+    }
+   ]
+  },
+  {
+   "map": 90703362,
+   "pos": [
+    13,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703363,
+   "pos": [
+    13,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703364,
+   "pos": [
+    13,
+    29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703617,
+   "pos": [
+    13,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703872,
+   "pos": [
+    14,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703874,
+   "pos": [
+    14,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703875,
+   "pos": [
+    14,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90703876,
+   "pos": [
+    14,
+    29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704384,
+   "pos": [
+    15,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704385,
+   "pos": [
+    15,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 272,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Rupi Chipon"
+    }
+   ]
+  },
+  {
+   "map": 90704386,
+   "pos": [
+    15,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704641,
+   "pos": [
+    15,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704642,
+   "pos": [
+    15,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704643,
+   "pos": [
+    15,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 3664,
+     "cell": 132,
+     "orientation": 3,
+     "name": "Hussein Tido"
+    }
+   ]
+  },
+  {
+   "map": 90704896,
+   "pos": [
+    16,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704897,
+   "pos": [
+    16,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90704898,
+   "pos": [
+    16,
+    27
+   ],
+   "spawns": [
+    {
+     "npc": 1581,
+     "cell": 201,
+     "orientation": 1,
+     "name": "Laury Cullar"
+    }
+   ]
+  },
+  {
+   "map": 90704899,
+   "pos": [
+    16,
+    28
+   ],
+   "spawns": [
+    {
+     "npc": 3329,
+     "cell": 90,
+     "orientation": 3,
+     "name": "Du Benzaim"
+    }
+   ]
+  },
+  {
+   "map": 90705153,
+   "pos": [
+    16,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90705155,
+   "pos": [
+    16,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90705408,
+   "pos": [
+    17,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90705409,
+   "pos": [
+    17,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 356,
+     "cell": 122,
+     "orientation": 3,
+     "name": "Mahr"
+    }
+   ]
+  },
+  {
    "map": 90705410,
    "pos": [
     17,
@@ -2472,6 +6579,796 @@
      "kept": "quest [1792] sends the player to it on this map"
     }
    ]
+  },
+  {
+   "map": 90705411,
+   "pos": [
+    17,
+    28
+   ],
+   "spawns": [
+    {
+     "npc": 1605,
+     "cell": 232,
+     "orientation": 3,
+     "name": "Comandante Custou"
+    }
+   ]
+  },
+  {
+   "map": 90705412,
+   "pos": [
+    17,
+    29
+   ],
+   "spawns": [
+    {
+     "npc": 3290,
+     "cell": 242,
+     "orientation": 1,
+     "name": "Horácio Ranley"
+    }
+   ]
+  },
+  {
+   "map": 90705665,
+   "pos": [
+    17,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90705920,
+   "pos": [
+    18,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90706177,
+   "pos": [
+    18,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90706432,
+   "pos": [
+    19,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90706689,
+   "pos": [
+    19,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90706690,
+   "pos": [
+    19,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90707201,
+   "pos": [
+    20,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90707458,
+   "pos": [
+    22,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90707713,
+   "pos": [
+    21,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3300,
+     "cell": 188,
+     "orientation": 3,
+     "name": "Jett Sete"
+    }
+   ]
+  },
+  {
+   "map": 90707714,
+   "pos": [
+    21,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90707715,
+   "pos": [
+    21,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 3326,
+     "cell": 129,
+     "orientation": 3,
+     "name": "Petra Fikante"
+    },
+    {
+     "npc": 2966,
+     "cell": 328,
+     "orientation": 1,
+     "criterion": "Qa=1663&Qo=10065&PO=16889",
+     "name": "Nori",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 90708226,
+   "pos": [
+    22,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90708227,
+   "pos": [
+    22,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 1603,
+     "cell": 162,
+     "orientation": 1,
+     "name": "Ozen Orcamai"
+    },
+    {
+     "npc": 2186,
+     "cell": 237,
+     "orientation": 3,
+     "name": "Capitão Grog"
+    }
+   ]
+  },
+  {
+   "map": 90708481,
+   "pos": [
+    23,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3310,
+     "cell": 344,
+     "orientation": 3,
+     "name": "Guarda sufokiano"
+    },
+    {
+     "npc": 3310,
+     "cell": 242,
+     "orientation": 3,
+     "name": "Guarda sufokiano"
+    },
+    {
+     "npc": 3246,
+     "cell": 372,
+     "orientation": 3,
+     "criterion": "Qa=1424",
+     "name": "Rainha Viktoria",
+     "kept": "quest [1424] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 90708738,
+   "pos": [
+    23,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90833408,
+   "pos": [
+    9,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 90833409,
+   "pos": [
+    9,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 3328,
+     "cell": 354,
+     "orientation": 1,
+     "name": "Muss Taffa"
+    }
+   ]
+  },
+  {
+   "map": 90833410,
+   "pos": [
+    9,
+    27
+   ],
+   "spawns": [
+    {
+     "npc": 3667,
+     "cell": 368,
+     "orientation": 3,
+     "name": "Colin Guado"
+    }
+   ]
+  },
+  {
+   "map": 90833665,
+   "pos": [
+    9,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750913,
+   "pos": [
+    19,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750915,
+   "pos": [
+    21,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750917,
+   "pos": [
+    7,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 1589,
+     "cell": 342,
+     "orientation": 1,
+     "name": "Stiff Diob"
+    },
+    {
+     "npc": 1599,
+     "cell": 415,
+     "orientation": 3,
+     "name": "Mergul Yador"
+    }
+   ]
+  },
+  {
+   "map": 91750919,
+   "pos": [
+    21,
+    13
+   ],
+   "spawns": [
+    {
+     "npc": 1597,
+     "cell": 355,
+     "orientation": 1,
+     "name": "Pam Chollion"
+    }
+   ]
+  },
+  {
+   "map": 91750921,
+   "pos": [
+    13,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750923,
+   "pos": [
+    20,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750925,
+   "pos": [
+    14,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91750927,
+   "pos": [
+    22,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 7642,
+     "cell": 231,
+     "orientation": 1,
+     "name": "Frank Provok"
+    },
+    {
+     "npc": 7529,
+     "cell": 303,
+     "orientation": 3,
+     "name": "Fifi de Lificha"
+    }
+   ]
+  },
+  {
+   "map": 91751937,
+   "pos": [
+    15,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91751939,
+   "pos": [
+    22,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91751941,
+   "pos": [
+    16,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 1600,
+     "cell": 374,
+     "orientation": 3,
+     "name": "Jemas Kooc"
+    },
+    {
+     "npc": 3666,
+     "cell": 315,
+     "orientation": 1,
+     "name": "Gorda Ramessei"
+    }
+   ]
+  },
+  {
+   "map": 91751943,
+   "pos": [
+    21,
+    14
+   ],
+   "spawns": [
+    {
+     "npc": 1598,
+     "cell": 384,
+     "orientation": 1,
+     "name": "Gamo Davasca"
+    }
+   ]
+  },
+  {
+   "map": 91751945,
+   "pos": [
+    11,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91751947,
+   "pos": [
+    6,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91751949,
+   "pos": [
+    9,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91751951,
+   "pos": [
+    22,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752961,
+   "pos": [
+    12,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 1591,
+     "cell": 327,
+     "orientation": 3,
+     "name": "Alan Bombarda"
+    },
+    {
+     "npc": 711,
+     "cell": 312,
+     "orientation": 1,
+     "name": "Taberneiro do Ripata"
+    }
+   ]
+  },
+  {
+   "map": 91752963,
+   "pos": [
+    23,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752965,
+   "pos": [
+    22,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752967,
+   "pos": [
+    22,
+    14
+   ],
+   "spawns": [
+    {
+     "npc": 2187,
+     "cell": 341,
+     "orientation": 1,
+     "name": "Aprendiz de Mergul"
+    },
+    {
+     "npc": 1596,
+     "cell": 358,
+     "orientation": 3,
+     "name": "Obe Drecht"
+    }
+   ]
+  },
+  {
+   "map": 91752969,
+   "pos": [
+    19,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752971,
+   "pos": [
+    17,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752973,
+   "pos": [
+    18,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91752975,
+   "pos": [
+    19,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91753985,
+   "pos": [
+    14,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 100,
+     "cell": 372,
+     "orientation": 3,
+     "name": "Banqueiro"
+    }
+   ]
+  },
+  {
+   "map": 91753987,
+   "pos": [
+    24,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91753989,
+   "pos": [
+    20,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 1590,
+     "cell": 382,
+     "orientation": 1,
+     "name": "Doutor Wu"
+    }
+   ]
+  },
+  {
+   "map": 91753991,
+   "pos": [
+    25,
+    12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91753993,
+   "pos": [
+    10,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91753995,
+   "pos": [
+    16,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91753997,
+   "pos": [
+    11,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91889153,
+   "pos": [
+    23,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 91889155,
+   "pos": [
+    23,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 7860,
+     "cell": 361,
+     "orientation": 1,
+     "criterion": "",
+     "name": "Homer Cenário",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 91889157,
+   "pos": [
+    23,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 8014,
+     "cell": 290,
+     "orientation": 3,
+     "name": "Edgar Keólogo"
+    }
+   ]
+  },
+  {
+   "map": 91889409,
+   "pos": [
+    23,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95420416,
+   "pos": [
+    20,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95420418,
+   "pos": [
+    14,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95420420,
+   "pos": [
+    15,
+    28
+   ],
+   "spawns": [
+    {
+     "npc": 925,
+     "cell": 271,
+     "orientation": 1,
+     "name": "Capitão Kradoc"
+    }
+   ]
+  },
+  {
+   "map": 95421440,
+   "pos": [
+    16,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95421442,
+   "pos": [
+    16,
+    29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95422464,
+   "pos": [
+    22,
+    19
+   ],
+   "spawns": [
+    {
+     "npc": 1604,
+     "cell": 161,
+     "orientation": 1,
+     "name": "Lara Esgarael"
+    }
+   ]
+  },
+  {
+   "map": 95422466,
+   "pos": [
+    12,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95422468,
+   "pos": [
+    13,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 1592,
+     "cell": 329,
+     "orientation": 1,
+     "name": "Oceane"
+    }
+   ]
+  },
+  {
+   "map": 95422722,
+   "pos": [
+    19,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95423489,
+   "pos": [
+    6,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95423492,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95424000,
+   "pos": [
+    7,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95424001,
+   "pos": [
+    7,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95424512,
+   "pos": [
+    8,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95424513,
+   "pos": [
+    8,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 95424516,
+   "pos": [
+    12,
+    29
+   ],
+   "spawns": []
   },
   {
    "map": 95683073,
@@ -2811,6 +7708,99 @@
    "spawns": []
   },
   {
+   "map": 96469504,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 96469506,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 96470528,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 1593,
+     "cell": 386,
+     "orientation": 3,
+     "name": "Lugio Nerve"
+    }
+   ]
+  },
+  {
+   "map": 96470530,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 96470786,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 1595,
+     "cell": 410,
+     "orientation": 1,
+     "name": "Ada Blablage"
+    }
+   ]
+  },
+  {
+   "map": 96471552,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 1594,
+     "cell": 396,
+     "orientation": 1,
+     "name": "Calado Pel"
+    }
+   ]
+  },
+  {
+   "map": 96471554,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 96471810,
+   "pos": [
+    26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 97255951,
+   "pos": [
+    -2,
+    -5
+   ],
+   "spawns": []
+  },
+  {
    "map": 97255955,
    "pos": [
     0,
@@ -2826,12 +7816,57 @@
    ]
   },
   {
+   "map": 97255965,
+   "pos": [
+    10,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 830,
+     "cell": 356,
+     "orientation": 1,
+     "name": "Feldz Paf"
+    }
+   ]
+  },
+  {
+   "map": 97256975,
+   "pos": [
+    -2,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 830,
+     "cell": 304,
+     "orientation": 3,
+     "name": "Feldz Paf"
+    }
+   ]
+  },
+  {
    "map": 97256989,
    "pos": [
     10,
     21
    ],
    "spawns": []
+  },
+  {
+   "map": 97261085,
+   "pos": [
+    10,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 830,
+     "cell": 356,
+     "orientation": 1,
+     "name": "Feldz Paf"
+    }
+   ]
   },
   {
    "map": 99090945,
@@ -2952,6 +7987,21 @@
     2
    ],
    "spawns": []
+  },
+  {
+   "map": 99091973,
+   "pos": [
+    2,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 99,
+     "cell": 343,
+     "orientation": 1,
+     "name": "Lara Soft"
+    }
+   ]
   },
   {
    "map": 99091975,
@@ -3290,6 +8340,14 @@
    "spawns": []
   },
   {
+   "map": 99096075,
+   "pos": [
+    15,
+    21
+   ],
+   "spawns": []
+  },
+  {
    "map": 99096077,
    "pos": [
     5,
@@ -3309,6 +8367,29 @@
      "cell": 383,
      "orientation": 3,
      "name": "Harrys Corb"
+    }
+   ]
+  },
+  {
+   "map": 99352582,
+   "pos": [
+    4,
+    8
+   ],
+   "spawns": [
+    {
+     "npc": 59,
+     "cell": 270,
+     "orientation": 1,
+     "name": "Agrid Shakoku"
+    },
+    {
+     "npc": 3191,
+     "cell": 343,
+     "orientation": 1,
+     "criterion": "Qa=343",
+     "name": "Lenhador furioso",
+     "kept": "quest [343] sends the player to it on this map"
     }
    ]
   },
@@ -3343,6 +8424,14 @@
    ]
   },
   {
+   "map": 99353606,
+   "pos": [
+    4,
+    8
+   ],
+   "spawns": []
+  },
+  {
    "map": 99353610,
    "pos": [
     -1,
@@ -3366,12 +8455,67 @@
    "spawns": []
   },
   {
+   "map": 99353614,
+   "pos": [
+    11,
+    20
+   ],
+   "spawns": [
+    {
+     "npc": 3272,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=1732",
+     "name": "Sassina, a Surdina",
+     "kept": "quest [1732] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 99354626,
+   "pos": [
+    14,
+    20
+   ],
+   "spawns": []
+  },
+  {
    "map": 99354634,
    "pos": [
     -1,
     2
    ],
    "spawns": []
+  },
+  {
+   "map": 99354636,
+   "pos": [
+    -1,
+    5
+   ],
+   "spawns": [
+    {
+     "npc": 61,
+     "cell": 345,
+     "orientation": 3,
+     "name": "Casper Van Brushing"
+    }
+   ]
+  },
+  {
+   "map": 99354638,
+   "pos": [
+    14,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 7036,
+     "cell": 384,
+     "orientation": 3,
+     "name": "Demetra Fikante"
+    }
+   ]
   },
   {
    "map": 99355654,
@@ -3488,6 +8632,35 @@
     1
    ],
    "spawns": []
+  },
+  {
+   "map": 101450251,
+   "pos": [
+    -4,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 1626,
+     "cell": 285,
+     "orientation": 1,
+     "name": "Yacint Ax"
+    },
+    {
+     "npc": 1625,
+     "cell": 356,
+     "orientation": 3,
+     "name": "Theodorant Ax"
+    },
+    {
+     "npc": 1628,
+     "cell": 313,
+     "orientation": 1,
+     "criterion": "Qa=1770",
+     "name": "Xanamla",
+     "kept": "authored in Jondo, not shown to the capturing character; its conversation only serves these quests: shown while one is under way"
+    }
+   ]
   },
   {
    "map": 101712387,
@@ -3837,6 +9010,572 @@
      "name": "Pulgnus, o Vilinseto"
     }
    ]
+  },
+  {
+   "map": 104071168,
+   "pos": [
+    -6,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 1267,
+     "cell": 399,
+     "orientation": 3,
+     "criterion": "(Qa=526&Qo>3600&Qo<3604)|(Qa=527&Qo<3625)",
+     "name": "De Rorc",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 1268,
+     "cell": 373,
+     "orientation": 3,
+     "criterion": "Qa=527&Qo<3624",
+     "name": "Hata Marie",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 104071169,
+   "pos": [
+    -6,
+    7
+   ],
+   "spawns": [
+    {
+     "npc": 1120,
+     "cell": 216,
+     "orientation": 1,
+     "name": "Jibworknouille"
+    }
+   ]
+  },
+  {
+   "map": 104071170,
+   "pos": [
+    -6,
+    8
+   ],
+   "spawns": [
+    {
+     "npc": 844,
+     "cell": 203,
+     "orientation": 3,
+     "name": "Chefe Bworkestra"
+    }
+   ]
+  },
+  {
+   "map": 104071425,
+   "pos": [
+    -6,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071426,
+   "pos": [
+    -6,
+    4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071680,
+   "pos": [
+    -5,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 832,
+     "cell": 242,
+     "orientation": 1,
+     "name": "Bworkídio, o Paxífiko"
+    }
+   ]
+  },
+  {
+   "map": 104071681,
+   "pos": [
+    -5,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071682,
+   "pos": [
+    -5,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071937,
+   "pos": [
+    -5,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071938,
+   "pos": [
+    -5,
+    4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104071939,
+   "pos": [
+    -5,
+    3
+   ],
+   "spawns": [
+    {
+     "npc": 6674,
+     "cell": 354,
+     "orientation": 1,
+     "name": "Gobmélia"
+    }
+   ]
+  },
+  {
+   "map": 104072192,
+   "pos": [
+    -4,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 842,
+     "cell": 388,
+     "orientation": 3,
+     "name": "Bworkespinho"
+    }
+   ]
+  },
+  {
+   "map": 104072193,
+   "pos": [
+    -4,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104072194,
+   "pos": [
+    -4,
+    8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104072449,
+   "pos": [
+    -4,
+    5
+   ],
+   "spawns": [
+    {
+     "npc": 5195,
+     "cell": 222,
+     "orientation": 3,
+     "name": "Crutz"
+    },
+    {
+     "npc": 5193,
+     "cell": 179,
+     "orientation": 3,
+     "name": "Ans"
+    },
+    {
+     "npc": 5194,
+     "cell": 208,
+     "orientation": 3,
+     "name": "Fits"
+    }
+   ]
+  },
+  {
+   "map": 104072450,
+   "pos": [
+    -4,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 6696,
+     "cell": 260,
+     "orientation": 3,
+     "name": "Gob Ross"
+    },
+    {
+     "npc": 6704,
+     "cell": 300,
+     "orientation": 7,
+     "criterion": "Qo>18538&Qo<18539",
+     "name": "Gobilão Intrigado",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 6705,
+     "cell": 286,
+     "orientation": 7,
+     "criterion": "Qo>18538&Qo<18539",
+     "name": "Gobilão Gastrônomo",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 6706,
+     "cell": 285,
+     "orientation": 1,
+     "criterion": "Qo>18538&Qo<18539",
+     "name": "Engobelar Guloso",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 6707,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "Qo>18538&Qo<18539",
+     "name": "Gobalada Faminta",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 104072451,
+   "pos": [
+    -4,
+    3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104072452,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": [
+    {
+     "npc": 845,
+     "cell": 339,
+     "orientation": 1,
+     "name": "Gobriel"
+    },
+    {
+     "npc": 853,
+     "cell": 327,
+     "orientation": 3,
+     "name": "Gobritor"
+    }
+   ]
+  },
+  {
+   "map": 104072706,
+   "pos": [
+    -3,
+    8
+   ],
+   "spawns": [
+    {
+     "npc": 834,
+     "cell": 188,
+     "orientation": 3,
+     "name": "Gobatchef"
+    }
+   ]
+  },
+  {
+   "map": 104072961,
+   "pos": [
+    -3,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104072962,
+   "pos": [
+    -3,
+    4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104072963,
+   "pos": [
+    -3,
+    3
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104073218,
+   "pos": [
+    -2,
+    8
+   ],
+   "spawns": [
+    {
+     "npc": 6185,
+     "cell": 242,
+     "orientation": 1,
+     "name": "Mamãe Bwork Preocupada"
+    }
+   ]
+  },
+  {
+   "map": 104202753,
+   "pos": [
+    -7,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104858119,
+   "pos": [
+    -6,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104858121,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104859137,
+   "pos": [
+    -5,
+    3
+   ],
+   "spawns": [
+    {
+     "npc": 835,
+     "cell": 271,
+     "orientation": 1,
+     "name": "Raxitik"
+    }
+   ]
+  },
+  {
+   "map": 104859139,
+   "pos": [
+    -6,
+    5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104859143,
+   "pos": [
+    -7,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104859145,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104860161,
+   "pos": [
+    -6,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 836,
+     "cell": 299,
+     "orientation": 1,
+     "name": "Gobirswaper"
+    }
+   ]
+  },
+  {
+   "map": 104860165,
+   "pos": [
+    -6,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104860167,
+   "pos": [
+    -7,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104860169,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104861189,
+   "pos": [
+    -6,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104861191,
+   "pos": [
+    -7,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104861193,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104862209,
+   "pos": [
+    -4,
+    3
+   ],
+   "spawns": [
+    {
+     "npc": 837,
+     "cell": 303,
+     "orientation": 3,
+     "name": "Gobelo Plastik"
+    }
+   ]
+  },
+  {
+   "map": 104862213,
+   "pos": [
+    -6,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104862215,
+   "pos": [
+    -7,
+    7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 104862217,
+   "pos": [
+    -4,
+    2
+   ],
+   "spawns": []
+  },
+  {
+   "map": 106168320,
+   "pos": [
+    0,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 7580,
+     "cell": 384,
+     "orientation": 1,
+     "name": "Guilda"
+    }
+   ]
+  },
+  {
+   "map": 115081729,
+   "pos": [
+    14,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 115082753,
+   "pos": [
+    14,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 115083777,
+   "pos": [
+    13,
+    35
+   ],
+   "spawns": [
+    {
+     "npc": 6873,
+     "cell": 395,
+     "orientation": 7,
+     "name": "Hipotrokos"
+    },
+    {
+     "npc": 2184,
+     "cell": 264,
+     "orientation": 3,
+     "name": "Pepita"
+    },
+    {
+     "npc": 7030,
+     "cell": 249,
+     "orientation": 3,
+     "name": "Pepito"
+    },
+    {
+     "npc": 2142,
+     "cell": 255,
+     "orientation": 1,
+     "name": "Al Yansa"
+    }
+   ]
+  },
+  {
+   "map": 117703169,
+   "pos": [
+    22,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 117704202,
+   "pos": [
+    22,
+    19
+   ],
+   "spawns": []
   },
   {
    "map": 119013380,
@@ -4273,10 +10012,815 @@
    "spawns": []
   },
   {
+   "map": 121896964,
+   "pos": [
+    4,
+    4
+   ],
+   "spawns": [
+    {
+     "npc": 7416,
+     "cell": 247,
+     "orientation": 3,
+     "name": "Putch Ingball"
+    },
+    {
+     "npc": 2233,
+     "cell": 270,
+     "orientation": 1,
+     "name": "Funcionário do Kanojedo"
+    }
+   ]
+  },
+  {
    "map": 122946049,
    "pos": [
     0,
     -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126091264,
+   "pos": [
+    -5,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126091521,
+   "pos": [
+    -5,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126091522,
+   "pos": [
+    -5,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126091523,
+   "pos": [
+    -5,
+    -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126091776,
+   "pos": [
+    -4,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092033,
+   "pos": [
+    -4,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092034,
+   "pos": [
+    -4,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092035,
+   "pos": [
+    -4,
+    -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092036,
+   "pos": [
+    -4,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092037,
+   "pos": [
+    -4,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092038,
+   "pos": [
+    -4,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092039,
+   "pos": [
+    -4,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092040,
+   "pos": [
+    -4,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092288,
+   "pos": [
+    -3,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092545,
+   "pos": [
+    -3,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092546,
+   "pos": [
+    -3,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092547,
+   "pos": [
+    -3,
+    -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092548,
+   "pos": [
+    -3,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092549,
+   "pos": [
+    -3,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092550,
+   "pos": [
+    -3,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092551,
+   "pos": [
+    -3,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126092552,
+   "pos": [
+    -3,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093060,
+   "pos": [
+    -2,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093061,
+   "pos": [
+    -2,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093062,
+   "pos": [
+    -2,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093063,
+   "pos": [
+    -2,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093064,
+   "pos": [
+    -2,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093573,
+   "pos": [
+    -1,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093574,
+   "pos": [
+    -1,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093575,
+   "pos": [
+    -1,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126093576,
+   "pos": [
+    -1,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126094086,
+   "pos": [
+    0,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126094087,
+   "pos": [
+    0,
+    -36
+   ],
+   "spawns": [
+    {
+     "npc": 359,
+     "cell": 485,
+     "orientation": 3,
+     "name": "Esquilo Cativante"
+    }
+   ]
+  },
+  {
+   "map": 126094088,
+   "pos": [
+    0,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126094598,
+   "pos": [
+    1,
+    -35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126094599,
+   "pos": [
+    1,
+    -36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 126094600,
+   "pos": [
+    1,
+    -37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 130811393,
+   "pos": [
+    10,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147849216,
+   "pos": [
+    -14,
+    -15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147849217,
+   "pos": [
+    -14,
+    -14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147849218,
+   "pos": [
+    -14,
+    -13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147849219,
+   "pos": [
+    -14,
+    -12
+   ],
+   "spawns": [
+    {
+     "npc": 2859,
+     "cell": 301,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "Cepo da Floresta Sombria",
+     "kept": "quest [1621] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147849728,
+   "pos": [
+    -13,
+    -15
+   ],
+   "spawns": [
+    {
+     "npc": 3995,
+     "cell": 357,
+     "orientation": 1,
+     "criterion": "Qa=1879",
+     "name": "Veneta da Mata",
+     "kept": "quest [1879] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147849729,
+   "pos": [
+    -13,
+    -14
+   ],
+   "spawns": [
+    {
+     "npc": 1015,
+     "cell": 256,
+     "orientation": 1,
+     "name": "Breit Gnil"
+    }
+   ]
+  },
+  {
+   "map": 147849730,
+   "pos": [
+    -13,
+    -13
+   ],
+   "spawns": [
+    {
+     "npc": 2855,
+     "cell": 327,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "Arbusto da Floresta Sombria",
+     "kept": "quest [1621] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147849731,
+   "pos": [
+    -13,
+    -12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850240,
+   "pos": [
+    -12,
+    -15
+   ],
+   "spawns": [
+    {
+     "npc": 2856,
+     "cell": 301,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "Bulbo da Floresta Sombria",
+     "kept": "quest [1621] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147850241,
+   "pos": [
+    -12,
+    -14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850242,
+   "pos": [
+    -12,
+    -13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850243,
+   "pos": [
+    -12,
+    -12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850752,
+   "pos": [
+    -11,
+    -15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850753,
+   "pos": [
+    -11,
+    -14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850754,
+   "pos": [
+    -11,
+    -13
+   ],
+   "spawns": [
+    {
+     "npc": 2853,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qf=2445&Qf=1621&PL>159&Qa!2486&Qf!2486",
+     "name": "Krá",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 2854,
+     "cell": 285,
+     "orientation": 3,
+     "criterion": "(Qa=1620&Qo>9570)|Qf=1620",
+     "name": "Silvosse",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 147850755,
+   "pos": [
+    -11,
+    -12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147850756,
+   "pos": [
+    -11,
+    -11
+   ],
+   "spawns": [
+    {
+     "npc": 2860,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "A Conspiradora",
+     "kept": "quest [1621] sends the player to it on this map"
+    },
+    {
+     "npc": 2860,
+     "cell": 330,
+     "orientation": 3,
+     "criterion": "Qa=1621&Qo>9584&Qo<9586",
+     "name": "A Conspiradora",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 147850757,
+   "pos": [
+    -11,
+    -10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851264,
+   "pos": [
+    -10,
+    -15
+   ],
+   "spawns": [
+    {
+     "npc": 2857,
+     "cell": 315,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "Cogumelo da Floresta Sombria",
+     "kept": "quest [1621] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147851265,
+   "pos": [
+    -10,
+    -14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851266,
+   "pos": [
+    -10,
+    -13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851267,
+   "pos": [
+    -10,
+    -12
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851268,
+   "pos": [
+    -10,
+    -11
+   ],
+   "spawns": [
+    {
+     "npc": 1235,
+     "cell": 339,
+     "orientation": 1,
+     "name": "Fraud Huloso"
+    }
+   ]
+  },
+  {
+   "map": 147851269,
+   "pos": [
+    -10,
+    -10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851776,
+   "pos": [
+    -9,
+    -15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851777,
+   "pos": [
+    -9,
+    -14
+   ],
+   "spawns": [
+    {
+     "npc": 1619,
+     "cell": 358,
+     "orientation": 3,
+     "name": "Tronky Tranks"
+    }
+   ]
+  },
+  {
+   "map": 147851778,
+   "pos": [
+    -9,
+    -13
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851779,
+   "pos": [
+    -9,
+    -12
+   ],
+   "spawns": [
+    {
+     "npc": 2858,
+     "cell": 329,
+     "orientation": 1,
+     "criterion": "Qa=1621",
+     "name": "Sarça da Floresta Sombria",
+     "kept": "quest [1621] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 147851780,
+   "pos": [
+    -9,
+    -11
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147851781,
+   "pos": [
+    -9,
+    -10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147852033,
+   "pos": [
+    -9,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147852545,
+   "pos": [
+    -8,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147853057,
+   "pos": [
+    -7,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147853569,
+   "pos": [
+    -6,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147854081,
+   "pos": [
+    -5,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 147854593,
+   "pos": [
+    -4,
+    -16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 148112897,
+   "pos": [
+    -9,
+    -10
+   ],
+   "spawns": []
+  },
+  {
+   "map": 148636161,
+   "pos": [
+    15,
+    32
+   ],
+   "spawns": [
+    {
+     "npc": 2834,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Elnido Pel"
+    }
+   ]
+  },
+  {
+   "map": 148637185,
+   "pos": [
+    16,
+    32
+   ],
+   "spawns": [
+    {
+     "npc": 2826,
+     "cell": 453,
+     "orientation": 1,
+     "name": "Ellyot"
+    },
+    {
+     "npc": 2825,
+     "cell": 397,
+     "orientation": 3,
+     "name": "Aurélia"
+    }
+   ]
+  },
+  {
+   "map": 148637187,
+   "pos": [
+    16,
+    33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 148638209,
+   "pos": [
+    17,
+    32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 148638211,
+   "pos": [
+    16,
+    33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 149946370,
+   "pos": [
+    -13,
+    -15
    ],
    "spawns": []
   },
@@ -5292,10 +11836,4104 @@
    "spawns": []
   },
   {
+   "map": 165155856,
+   "pos": [
+    -6,
+    -19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 165156368,
+   "pos": [
+    -5,
+    -19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 165156880,
+   "pos": [
+    -4,
+    -19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 169083904,
+   "pos": [
+    23,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 170133504,
+   "pos": [
+    23,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 3294,
+     "cell": 385,
+     "orientation": 1,
+     "criterion": "Qa=1749",
+     "name": "Naturo Tresxis",
+     "kept": "quest [1749] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 170133506,
+   "pos": [
+    23,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3249,
+     "cell": 284,
+     "orientation": 1,
+     "name": "Kiara Bissal"
+    },
+    {
+     "npc": 3253,
+     "cell": 231,
+     "orientation": 3,
+     "name": "Pink Tada"
+    }
+   ]
+  },
+  {
+   "map": 170133510,
+   "pos": [
+    23,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3310,
+     "cell": 265,
+     "orientation": 3,
+     "name": "Guarda sufokiano"
+    },
+    {
+     "npc": 3310,
+     "cell": 192,
+     "orientation": 3,
+     "name": "Guarda sufokiano"
+    }
+   ]
+  },
+  {
+   "map": 170133512,
+   "pos": [
+    23,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3280,
+     "cell": 272,
+     "orientation": 3,
+     "name": "Nicole Portson"
+    },
+    {
+     "npc": 3248,
+     "cell": 345,
+     "orientation": 3,
+     "name": "Almirante Rakab"
+    },
+    {
+     "npc": 3250,
+     "cell": 283,
+     "orientation": 1,
+     "name": "Deks"
+    },
+    {
+     "npc": 3246,
+     "cell": 317,
+     "orientation": 3,
+     "name": "Rainha Viktoria"
+    },
+    {
+     "npc": 3245,
+     "cell": 302,
+     "orientation": 3,
+     "name": "Rei Talas"
+    },
+    {
+     "npc": 3261,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "(Qf=1756)|Qa=1758|Qf=1758",
+     "name": "Professor Nomis",
+     "kept": "gives quest [1758] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 171442176,
+   "pos": [
+    -17,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442177,
+   "pos": [
+    -17,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442178,
+   "pos": [
+    -17,
+    37
+   ],
+   "spawns": [
+    {
+     "npc": 3859,
+     "cell": 201,
+     "orientation": 1,
+     "name": "Clictus"
+    }
+   ]
+  },
+  {
+   "map": 171442179,
+   "pos": [
+    -17,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442180,
+   "pos": [
+    -17,
+    39
+   ],
+   "spawns": [
+    {
+     "npc": 973,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "Qa=290",
+     "name": "Comandante Kad",
+     "kept": "quest [290] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 171442182,
+   "pos": [
+    -17,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442688,
+   "pos": [
+    -16,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442689,
+   "pos": [
+    -16,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442690,
+   "pos": [
+    -16,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442691,
+   "pos": [
+    -16,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442692,
+   "pos": [
+    -16,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442693,
+   "pos": [
+    -16,
+    40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171442694,
+   "pos": [
+    -16,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443200,
+   "pos": [
+    -15,
+    35
+   ],
+   "spawns": [
+    {
+     "npc": 3860,
+     "cell": 417,
+     "orientation": 3,
+     "name": "Clikô"
+    }
+   ]
+  },
+  {
+   "map": 171443201,
+   "pos": [
+    -15,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443205,
+   "pos": [
+    -15,
+    40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443206,
+   "pos": [
+    -15,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443712,
+   "pos": [
+    -14,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443713,
+   "pos": [
+    -14,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171443717,
+   "pos": [
+    -14,
+    40
+   ],
+   "spawns": [
+    {
+     "npc": 993,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=335",
+     "name": "Espírito de luz",
+     "kept": "quest [335] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 171443718,
+   "pos": [
+    -14,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444224,
+   "pos": [
+    -13,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444225,
+   "pos": [
+    -13,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444229,
+   "pos": [
+    -13,
+    40
+   ],
+   "spawns": [
+    {
+     "npc": 3970,
+     "cell": 220,
+     "orientation": 1,
+     "name": "Ualdis Nêi"
+    }
+   ]
+  },
+  {
+   "map": 171444230,
+   "pos": [
+    -13,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444736,
+   "pos": [
+    -12,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444737,
+   "pos": [
+    -12,
+    36
+   ],
+   "spawns": [
+    {
+     "npc": 3861,
+     "cell": 306,
+     "orientation": 3,
+     "name": "Clikorn"
+    }
+   ]
+  },
+  {
+   "map": 171444738,
+   "pos": [
+    -12,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444739,
+   "pos": [
+    -12,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444740,
+   "pos": [
+    -12,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444741,
+   "pos": [
+    -12,
+    40
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171444742,
+   "pos": [
+    -12,
+    41
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445248,
+   "pos": [
+    -11,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445249,
+   "pos": [
+    -11,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445250,
+   "pos": [
+    -11,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445251,
+   "pos": [
+    -11,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445252,
+   "pos": [
+    -11,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445760,
+   "pos": [
+    -10,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445761,
+   "pos": [
+    -10,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445762,
+   "pos": [
+    -10,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171445763,
+   "pos": [
+    -10,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171446272,
+   "pos": [
+    -9,
+    35
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171446273,
+   "pos": [
+    -9,
+    36
+   ],
+   "spawns": []
+  },
+  {
+   "map": 171967506,
+   "pos": [
+    -25,
+    12
+   ],
+   "spawns": [
+    {
+     "npc": 978,
+     "cell": 215,
+     "orientation": 1,
+     "name": "Thanos"
+    },
+    {
+     "npc": 938,
+     "cell": 173,
+     "orientation": 3,
+     "name": "Kolibri"
+    }
+   ]
+  },
+  {
+   "map": 171967507,
+   "pos": [
+    -25,
+    13
+   ],
+   "spawns": [
+    {
+     "npc": 981,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=299",
+     "name": "Espião fugitivo",
+     "kept": "quest [299] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 171967508,
+   "pos": [
+    -25,
+    14
+   ],
+   "spawns": [
+    {
+     "npc": 3934,
+     "cell": 466,
+     "orientation": 1,
+     "name": "Sentinela brakmariana"
+    },
+    {
+     "npc": 7384,
+     "cell": 435,
+     "orientation": 3,
+     "name": "[!] PNJ décors- Soldat brâkmarien 2"
+    }
+   ]
+  },
+  {
+   "map": 172229135,
+   "pos": [
+    -31,
+    44
+   ],
+   "spawns": [
+    {
+     "npc": 4008,
+     "cell": 345,
+     "orientation": 5,
+     "name": "Guarda Montada"
+    }
+   ]
+  },
+  {
+   "map": 172230656,
+   "pos": [
+    -28,
+    29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172231168,
+   "pos": [
+    -27,
+    29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172231680,
+   "pos": [
+    -26,
+    29
+   ],
+   "spawns": [
+    {
+     "npc": 7384,
+     "cell": 220,
+     "orientation": 3,
+     "name": "[!] PNJ décors- Soldat brâkmarien 2"
+    },
+    {
+     "npc": 383,
+     "cell": 397,
+     "orientation": 1,
+     "name": "Girle Pylote"
+    }
+   ]
+  },
+  {
+   "map": 172233229,
+   "pos": [
+    -23,
+    42
+   ],
+   "spawns": [
+    {
+     "npc": 7384,
+     "cell": 62,
+     "orientation": 1,
+     "name": "[!] PNJ décors- Soldat brâkmarien 2"
+    },
+    {
+     "npc": 4008,
+     "cell": 137,
+     "orientation": 3,
+     "name": "Guarda Montada"
+    }
+   ]
+  },
+  {
+   "map": 172235272,
+   "pos": [
+    -19,
+    37
+   ],
+   "spawns": [
+    {
+     "npc": 7385,
+     "cell": 280,
+     "orientation": 1,
+     "name": "[!] PNJ décors- Soldat brâkmarien 3"
+    },
+    {
+     "npc": 7382,
+     "cell": 158,
+     "orientation": 1,
+     "name": "[!] PNJ décors- Soldat brâkmarien 1"
+    }
+   ]
+  },
+  {
+   "map": 172235784,
+   "pos": [
+    -18,
+    37
+   ],
+   "spawns": [
+    {
+     "npc": 1766,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "Qa=1064",
+     "name": "Brakmaratonista",
+     "kept": "quest [1064] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 172235785,
+   "pos": [
+    -18,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172235786,
+   "pos": [
+    -18,
+    39
+   ],
+   "spawns": [
+    {
+     "npc": 4008,
+     "cell": 206,
+     "orientation": 3,
+     "name": "Guarda Montada"
+    }
+   ]
+  },
+  {
+   "map": 172752901,
+   "pos": [
+    -19,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172752902,
+   "pos": [
+    -19,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172753413,
+   "pos": [
+    -18,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 172753414,
+   "pos": [
+    -18,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173015554,
+   "pos": [
+    -29,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173015555,
+   "pos": [
+    -29,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016064,
+   "pos": [
+    -28,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016065,
+   "pos": [
+    -28,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016066,
+   "pos": [
+    -28,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016067,
+   "pos": [
+    -28,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016068,
+   "pos": [
+    -28,
+    20
+   ],
+   "spawns": [
+    {
+     "npc": 3870,
+     "cell": 373,
+     "orientation": 1,
+     "name": "Pongosso, o Álmata"
+    },
+    {
+     "npc": 3871,
+     "cell": 385,
+     "orientation": 1,
+     "criterion": "Qa=1860",
+     "name": "Dawisada",
+     "kept": "quest [1860] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173016069,
+   "pos": [
+    -28,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016076,
+   "pos": [
+    -28,
+    28
+   ],
+   "spawns": [
+    {
+     "npc": 4251,
+     "cell": 187,
+     "orientation": 1,
+     "name": "Martinho Fontes"
+    }
+   ]
+  },
+  {
+   "map": 173016576,
+   "pos": [
+    -27,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016577,
+   "pos": [
+    -27,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016578,
+   "pos": [
+    -27,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016579,
+   "pos": [
+    -27,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016580,
+   "pos": [
+    -27,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016581,
+   "pos": [
+    -27,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173016588,
+   "pos": [
+    -27,
+    28
+   ],
+   "spawns": [
+    {
+     "npc": 4277,
+     "cell": 374,
+     "orientation": 1,
+     "name": "Elanna Obraian"
+    }
+   ]
+  },
+  {
+   "map": 173016833,
+   "pos": [
+    -27,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017088,
+   "pos": [
+    -26,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017089,
+   "pos": [
+    -26,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017090,
+   "pos": [
+    -26,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017091,
+   "pos": [
+    -26,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017092,
+   "pos": [
+    -26,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017093,
+   "pos": [
+    -26,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017095,
+   "pos": [
+    -26,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 4285,
+     "cell": 317,
+     "orientation": 1,
+     "name": "Osólio"
+    }
+   ]
+  },
+  {
+   "map": 173017098,
+   "pos": [
+    -26,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017099,
+   "pos": [
+    -26,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017100,
+   "pos": [
+    -26,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017345,
+   "pos": [
+    -26,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017600,
+   "pos": [
+    -25,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017601,
+   "pos": [
+    -25,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017602,
+   "pos": [
+    -25,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017603,
+   "pos": [
+    -25,
+    19
+   ],
+   "spawns": [
+    {
+     "npc": 345,
+     "cell": 187,
+     "orientation": 1,
+     "name": "Sentinela Yurig Ella"
+    }
+   ]
+  },
+  {
+   "map": 173017604,
+   "pos": [
+    -25,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017605,
+   "pos": [
+    -25,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 4276,
+     "cell": 491,
+     "orientation": 1,
+     "name": "Scott Pennar"
+    }
+   ]
+  },
+  {
+   "map": 173017606,
+   "pos": [
+    -25,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017607,
+   "pos": [
+    -25,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017609,
+   "pos": [
+    -25,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017610,
+   "pos": [
+    -25,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017611,
+   "pos": [
+    -25,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017612,
+   "pos": [
+    -25,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173017857,
+   "pos": [
+    -25,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018112,
+   "pos": [
+    -24,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018113,
+   "pos": [
+    -24,
+    17
+   ],
+   "spawns": [
+    {
+     "npc": 7656,
+     "cell": 229,
+     "orientation": 1,
+     "name": "Gobkart"
+    }
+   ]
+  },
+  {
+   "map": 173018114,
+   "pos": [
+    -24,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018115,
+   "pos": [
+    -24,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018116,
+   "pos": [
+    -24,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018117,
+   "pos": [
+    -24,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018118,
+   "pos": [
+    -24,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018119,
+   "pos": [
+    -24,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018120,
+   "pos": [
+    -24,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018121,
+   "pos": [
+    -24,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018122,
+   "pos": [
+    -24,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018123,
+   "pos": [
+    -24,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018124,
+   "pos": [
+    -24,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018369,
+   "pos": [
+    -24,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018624,
+   "pos": [
+    -23,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018625,
+   "pos": [
+    -23,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018626,
+   "pos": [
+    -23,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018627,
+   "pos": [
+    -23,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018628,
+   "pos": [
+    -23,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018629,
+   "pos": [
+    -23,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018630,
+   "pos": [
+    -23,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018631,
+   "pos": [
+    -23,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 4009,
+     "cell": 77,
+     "orientation": 1,
+     "name": "Sentinela Relsbéus"
+    }
+   ]
+  },
+  {
+   "map": 173018632,
+   "pos": [
+    -23,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018633,
+   "pos": [
+    -23,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018634,
+   "pos": [
+    -23,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 344,
+     "cell": 188,
+     "orientation": 3,
+     "name": "Sentinela Peg Aele"
+    }
+   ]
+  },
+  {
+   "map": 173018635,
+   "pos": [
+    -23,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018636,
+   "pos": [
+    -23,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173018881,
+   "pos": [
+    -23,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019136,
+   "pos": [
+    -22,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019137,
+   "pos": [
+    -22,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019138,
+   "pos": [
+    -22,
+    18
+   ],
+   "spawns": [
+    {
+     "npc": 343,
+     "cell": 232,
+     "orientation": 3,
+     "name": "Sentinela Tevi Lup"
+    }
+   ]
+  },
+  {
+   "map": 173019139,
+   "pos": [
+    -22,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019140,
+   "pos": [
+    -22,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019141,
+   "pos": [
+    -22,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 7656,
+     "cell": 430,
+     "orientation": 1,
+     "name": "Gobkart"
+    }
+   ]
+  },
+  {
+   "map": 173019142,
+   "pos": [
+    -22,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019143,
+   "pos": [
+    -22,
+    23
+   ],
+   "spawns": [
+    {
+     "npc": 3916,
+     "cell": 263,
+     "orientation": 1,
+     "criterion": "Qa=1868",
+     "name": "Kilorf Bem-Passado",
+     "kept": "quest [1868] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173019144,
+   "pos": [
+    -22,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019145,
+   "pos": [
+    -22,
+    25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019146,
+   "pos": [
+    -22,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019147,
+   "pos": [
+    -22,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019148,
+   "pos": [
+    -22,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019393,
+   "pos": [
+    -22,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019648,
+   "pos": [
+    -21,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019649,
+   "pos": [
+    -21,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019650,
+   "pos": [
+    -21,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019651,
+   "pos": [
+    -21,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019652,
+   "pos": [
+    -21,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019653,
+   "pos": [
+    -21,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019654,
+   "pos": [
+    -21,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019655,
+   "pos": [
+    -21,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019656,
+   "pos": [
+    -21,
+    24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019657,
+   "pos": [
+    -21,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 3869,
+     "cell": 115,
+     "orientation": 1,
+     "name": "Perro, o Ocker"
+    }
+   ]
+  },
+  {
+   "map": 173019658,
+   "pos": [
+    -21,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019659,
+   "pos": [
+    -21,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019660,
+   "pos": [
+    -21,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173019905,
+   "pos": [
+    -21,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020160,
+   "pos": [
+    -20,
+    16
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020161,
+   "pos": [
+    -20,
+    17
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020162,
+   "pos": [
+    -20,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020163,
+   "pos": [
+    -20,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020164,
+   "pos": [
+    -20,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020165,
+   "pos": [
+    -20,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020166,
+   "pos": [
+    -20,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020167,
+   "pos": [
+    -20,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020168,
+   "pos": [
+    -20,
+    24
+   ],
+   "spawns": [
+    {
+     "npc": 3868,
+     "cell": 312,
+     "orientation": 1,
+     "name": "Weiller"
+    }
+   ]
+  },
+  {
+   "map": 173020169,
+   "pos": [
+    -20,
+    25
+   ],
+   "spawns": [
+    {
+     "npc": 3867,
+     "cell": 115,
+     "orientation": 3,
+     "name": "Tybethano"
+    }
+   ]
+  },
+  {
+   "map": 173020170,
+   "pos": [
+    -20,
+    26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020171,
+   "pos": [
+    -20,
+    27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020172,
+   "pos": [
+    -20,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173020417,
+   "pos": [
+    -20,
+    15
+   ],
+   "spawns": []
+  },
+  {
+   "map": 173277184,
+   "pos": [
+    13,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 231,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173277185,
+   "pos": [
+    13,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 200,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 5553,
+     "cell": 361,
+     "orientation": 3,
+     "name": "Inten Poris"
+    }
+   ]
+  },
+  {
+   "map": 173277186,
+   "pos": [
+    13,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3551,
+     "cell": 284,
+     "orientation": 3,
+     "name": "ERRO2"
+    },
+    {
+     "npc": 3597,
+     "cell": 26,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3550,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=1802",
+     "name": "Airen Kraken",
+     "kept": "quest [1802] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173277696,
+   "pos": [
+    14,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 235,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3552,
+     "cell": 262,
+     "orientation": 3,
+     "name": "James Ayscof"
+    }
+   ]
+  },
+  {
+   "map": 173277697,
+   "pos": [
+    14,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 540,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173277698,
+   "pos": [
+    14,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 259,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173277699,
+   "pos": [
+    14,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 322,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173277700,
+   "pos": [
+    14,
+    -56
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 416,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3538,
+     "cell": 515,
+     "orientation": 3,
+     "name": "Carlos Darvin"
+    },
+    {
+     "npc": 3533,
+     "cell": 352,
+     "orientation": 1,
+     "name": "Tomas Sã"
+    },
+    {
+     "npc": 3537,
+     "cell": 121,
+     "orientation": 1,
+     "name": "Fori Nainers"
+    },
+    {
+     "npc": 3556,
+     "cell": 232,
+     "orientation": 1,
+     "name": "Bárbarra Kis"
+    }
+   ]
+  },
+  {
+   "map": 173277701,
+   "pos": [
+    14,
+    -55
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 304,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3523,
+     "cell": 120,
+     "orientation": 1,
+     "name": "Pescador de Espetárida"
+    },
+    {
+     "npc": 3464,
+     "cell": 188,
+     "orientation": 1,
+     "name": "Capitão Tenereu"
+    },
+    {
+     "npc": 3511,
+     "cell": 124,
+     "orientation": 3,
+     "name": "Skola Suk"
+    },
+    {
+     "npc": 3520,
+     "cell": 191,
+     "orientation": 1,
+     "criterion": "Qa=1803",
+     "name": "Max Louco",
+     "kept": "quest [1803] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173278208,
+   "pos": [
+    15,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3630,
+     "cell": 342,
+     "orientation": 1,
+     "name": "Mayko Zuzu"
+    },
+    {
+     "npc": 3597,
+     "cell": 136,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173278209,
+   "pos": [
+    15,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 261,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3558,
+     "cell": 329,
+     "orientation": 1,
+     "criterion": "Qa=1804",
+     "name": "Marco Lheita",
+     "kept": "quest [1804] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173278210,
+   "pos": [
+    15,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 136,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173278211,
+   "pos": [
+    15,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 341,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3535,
+     "cell": 385,
+     "orientation": 1,
+     "criterion": "Qa=1795",
+     "name": "Xu Pachups",
+     "kept": "quest [1795] sends the player to it on this map"
+    },
+    {
+     "npc": 4954,
+     "cell": 399,
+     "orientation": 1,
+     "criterion": "(PL>189&OA=6172&OA=1535&OA=6199&OA=1542&OA=6221&OA=1561&OA=6248&OA=1568&OA=1661)|Qa=2084|Qf=2084",
+     "name": "Sombra Duelista",
+     "kept": "gives quest [2084] here; shown once it can be started (its start criterion), under way or done"
+    },
+    {
+     "npc": 3598,
+     "cell": 400,
+     "orientation": 1,
+     "criterion": "Qa=1803",
+     "name": "Armário Carte",
+     "kept": "quest [1803] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173278212,
+   "pos": [
+    15,
+    -56
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 363,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3635,
+     "cell": 202,
+     "orientation": 3,
+     "name": "Haycar Amba"
+    },
+    {
+     "npc": 3524,
+     "cell": 427,
+     "orientation": 3,
+     "name": "Pioneira de Espetárida"
+    },
+    {
+     "npc": 3557,
+     "cell": 288,
+     "orientation": 3,
+     "name": "Bashar Daukar"
+    },
+    {
+     "npc": 3606,
+     "cell": 451,
+     "orientation": 1,
+     "name": "Gobodágua"
+    }
+   ]
+  },
+  {
+   "map": 173278720,
+   "pos": [
+    16,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 253,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173278721,
+   "pos": [
+    16,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 516,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173278722,
+   "pos": [
+    16,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3637,
+     "cell": 442,
+     "orientation": 3,
+     "name": "Bartolo Parvo"
+    },
+    {
+     "npc": 3597,
+     "cell": 164,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173278723,
+   "pos": [
+    16,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3522,
+     "cell": 174,
+     "orientation": 3,
+     "name": "Charlize Furiah"
+    },
+    {
+     "npc": 3597,
+     "cell": 539,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3591,
+     "cell": 460,
+     "orientation": 5,
+     "name": "Chani Men"
+    },
+    {
+     "npc": 3536,
+     "cell": 327,
+     "orientation": 1,
+     "criterion": "Qa=1795",
+     "name": "Pepê Enijota",
+     "kept": "quest [1795] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173279232,
+   "pos": [
+    17,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 545,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173279233,
+   "pos": [
+    17,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 282,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173279234,
+   "pos": [
+    17,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3548,
+     "cell": 287,
+     "orientation": 3,
+     "name": "Carl Errique"
+    },
+    {
+     "npc": 3597,
+     "cell": 90,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173279489,
+   "pos": [
+    17,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 213,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173279744,
+   "pos": [
+    18,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 549,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3465,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=1787",
+     "name": "Vedor Desvairado",
+     "kept": "quest [1787] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173279745,
+   "pos": [
+    18,
+    -59
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 457,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3560,
+     "cell": 381,
+     "orientation": 1,
+     "name": "Zecamargo Pedraviva"
+    }
+   ]
+  },
+  {
+   "map": 173280001,
+   "pos": [
+    18,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 1,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173280256,
+   "pos": [
+    19,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 488,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173280513,
+   "pos": [
+    19,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3646,
+     "cell": 398,
+     "orientation": 3,
+     "name": "Beto Carlosso"
+    },
+    {
+     "npc": 3607,
+     "cell": 382,
+     "orientation": 1,
+     "name": "Cormac Gargan"
+    }
+   ]
+  },
+  {
+   "map": 173281025,
+   "pos": [
+    20,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 494,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173408771,
+   "pos": [
+    12,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 27,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173409283,
+   "pos": [
+    11,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 317,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539328,
+   "pos": [
+    13,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 271,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539329,
+   "pos": [
+    13,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 392,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539330,
+   "pos": [
+    13,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3547,
+     "cell": 270,
+     "orientation": 3,
+     "name": "Ária do Sol"
+    },
+    {
+     "npc": 3597,
+     "cell": 255,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539331,
+   "pos": [
+    13,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 176,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539332,
+   "pos": [
+    13,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 391,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539840,
+   "pos": [
+    14,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 272,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539841,
+   "pos": [
+    14,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3543,
+     "cell": 303,
+     "orientation": 1,
+     "name": "Filipo Liglota"
+    },
+    {
+     "npc": 3597,
+     "cell": 136,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539842,
+   "pos": [
+    14,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 9,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173539843,
+   "pos": [
+    14,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 476,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3582,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qa=1815",
+     "name": "Anne Cadiss",
+     "kept": "quest [1815] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173539844,
+   "pos": [
+    14,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 271,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540352,
+   "pos": [
+    15,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3657,
+     "cell": 191,
+     "orientation": 3,
+     "name": "Enuby"
+    },
+    {
+     "npc": 3597,
+     "cell": 294,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540353,
+   "pos": [
+    15,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 106,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540354,
+   "pos": [
+    15,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3562,
+     "cell": 261,
+     "orientation": 3,
+     "name": "Rober Bere"
+    },
+    {
+     "npc": 3597,
+     "cell": 260,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540355,
+   "pos": [
+    15,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 337,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540356,
+   "pos": [
+    15,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 421,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540865,
+   "pos": [
+    16,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 489,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3572,
+     "cell": 329,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Ueste Colste",
+     "kept": "quest [1806] sends the player to it on this map"
+    },
+    {
+     "npc": 3576,
+     "cell": 330,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Hippie Hoppie",
+     "kept": "quest [1806] sends the player to it on this map"
+    },
+    {
+     "npc": 3569,
+     "cell": 344,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Windsor Feitiçolero",
+     "kept": "quest [1806] sends the player to it on this map"
+    },
+    {
+     "npc": 3575,
+     "cell": 357,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Lex Linger",
+     "kept": "quest [1806] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173540866,
+   "pos": [
+    16,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3583,
+     "cell": 529,
+     "orientation": 1,
+     "name": "Opis Tolero"
+    },
+    {
+     "npc": 3597,
+     "cell": 281,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540867,
+   "pos": [
+    16,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 334,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173540868,
+   "pos": [
+    16,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 314,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173541378,
+   "pos": [
+    17,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 540,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173541379,
+   "pos": [
+    17,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3549,
+     "cell": 145,
+     "orientation": 3,
+     "name": "Zuza Arolho"
+    },
+    {
+     "npc": 3597,
+     "cell": 512,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173541890,
+   "pos": [
+    18,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 536,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3561,
+     "cell": 315,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Billy Oblongley",
+     "kept": "quest [1806] sends the player to it on this map"
+    },
+    {
+     "npc": 3563,
+     "cell": 328,
+     "orientation": 1,
+     "criterion": "Qa=1806",
+     "name": "Cey Zagera",
+     "kept": "quest [1806] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173541891,
+   "pos": [
+    18,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 542,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173542403,
+   "pos": [
+    19,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 335,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3532,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "Qa=1796|Qa=1818",
+     "name": "Virgu Lampião",
+     "kept": "quest [1796, 1818] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173670912,
+   "pos": [
+    12,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 311,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3704,
+     "cell": 342,
+     "orientation": 1,
+     "criterion": "Qa=2097",
+     "name": "Iz-To",
+     "kept": "quest [2097] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173670913,
+   "pos": [
+    12,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 10,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173670914,
+   "pos": [
+    12,
+    -63
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 310,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173670915,
+   "pos": [
+    12,
+    -62
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 200,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173670916,
+   "pos": [
+    12,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 370,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3544,
+     "cell": 371,
+     "orientation": 3,
+     "name": "Cactorrendo"
+    }
+   ]
+  },
+  {
+   "map": 173934338,
+   "pos": [
+    15,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 401,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173934340,
+   "pos": [
+    14,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 444,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3659,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "Qa=1818",
+     "name": "Rafa Jeste",
+     "kept": "quest [1818] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173935106,
+   "pos": [
+    12,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 506,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173935362,
+   "pos": [
+    15,
+    -65
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 311,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173935364,
+   "pos": [
+    16,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173936128,
+   "pos": [
+    15,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3555,
+     "cell": 257,
+     "orientation": 1,
+     "name": "Idarfen Madjika"
+    },
+    {
+     "npc": 3597,
+     "cell": 231,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173936130,
+   "pos": [
+    15,
+    -56
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 230,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3605,
+     "cell": 288,
+     "orientation": 3,
+     "name": "Walker Tolky"
+    }
+   ]
+  },
+  {
+   "map": 173936386,
+   "pos": [
+    13,
+    -60
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 453,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3596,
+     "cell": 400,
+     "orientation": 1,
+     "name": "Rado Desenter"
+    }
+   ]
+  },
+  {
+   "map": 173936388,
+   "pos": [
+    16,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 384,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3584,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "Qa=1815",
+     "name": "Jacinto Pintho",
+     "kept": "quest [1815] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 173937152,
+   "pos": [
+    15,
+    -64
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 453,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3619,
+     "cell": 357,
+     "orientation": 7,
+     "name": "Dogree"
+    },
+    {
+     "npc": 3579,
+     "cell": 202,
+     "orientation": 1,
+     "name": "Ammar Shall"
+    },
+    {
+     "npc": 3534,
+     "cell": 263,
+     "orientation": 3,
+     "name": "Sidneia Fax"
+    },
+    {
+     "npc": 3561,
+     "cell": 295,
+     "orientation": 3,
+     "name": "Billy Oblongley"
+    },
+    {
+     "npc": 3618,
+     "cell": 247,
+     "orientation": 3,
+     "name": "Joaquim Mutreta"
+    },
+    {
+     "npc": 3521,
+     "cell": 328,
+     "orientation": 7,
+     "name": "Immortanou Piko"
+    },
+    {
+     "npc": 3627,
+     "cell": 317,
+     "orientation": 3,
+     "name": "Pikmama"
+    },
+    {
+     "npc": 3567,
+     "cell": 322,
+     "orientation": 7,
+     "name": "Sick Danders"
+    },
+    {
+     "npc": 3620,
+     "cell": 312,
+     "orientation": 3,
+     "name": "Allyson Cley"
+    },
+    {
+     "npc": 3566,
+     "cell": 323,
+     "orientation": 5,
+     "name": "Will Johnson"
+    }
+   ]
+  },
+  {
+   "map": 173937154,
+   "pos": [
+    15,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 370,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3658,
+     "cell": 275,
+     "orientation": 5,
+     "name": "Spice Pimienta"
+    },
+    {
+     "npc": 3516,
+     "cell": 246,
+     "orientation": 1,
+     "name": "Moneo"
+    }
+   ]
+  },
+  {
+   "map": 173937412,
+   "pos": [
+    15,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 324,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173938178,
+   "pos": [
+    15,
+    -57
+   ],
+   "spawns": [
+    {
+     "npc": 3598,
+     "cell": 261,
+     "orientation": 3,
+     "name": "Armário Carte"
+    },
+    {
+     "npc": 3517,
+     "cell": 218,
+     "orientation": 3,
+     "name": "Nety Virtuosa"
+    },
+    {
+     "npc": 3592,
+     "cell": 277,
+     "orientation": 3,
+     "name": "Joffre Men"
+    },
+    {
+     "npc": 3578,
+     "cell": 325,
+     "orientation": 3,
+     "name": "Dagmar Shall"
+    },
+    {
+     "npc": 3636,
+     "cell": 245,
+     "orientation": 7,
+     "name": "Raí Maturo"
+    },
+    {
+     "npc": 3597,
+     "cell": 159,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3589,
+     "cell": 352,
+     "orientation": 7,
+     "name": "Buck Ster"
+    },
+    {
+     "npc": 3590,
+     "cell": 367,
+     "orientation": 1,
+     "name": "Mani, o Totó"
+    },
+    {
+     "npc": 3527,
+     "cell": 314,
+     "orientation": 1,
+     "criterion": "(PL>59)|Qa=1795|Qf=1795",
+     "name": "Bill Ikid",
+     "kept": "gives quest [1795] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 173938436,
+   "pos": [
+    14,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 474,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173939202,
+   "pos": [
+    16,
+    -58
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 432,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 173939460,
+   "pos": [
+    13,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 351,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174850048,
+   "pos": [
+    7,
+    -70
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 440,
+     "orientation": 1,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3679,
+     "cell": 400,
+     "orientation": 1,
+     "name": "Goba Fett"
+    }
+   ]
+  },
+  {
+   "map": 174851072,
+   "pos": [
+    8,
+    -70
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 305,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174851074,
+   "pos": [
+    8,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 217,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174851076,
+   "pos": [
+    8,
+    -68
+   ],
+   "spawns": [
+    {
+     "npc": 3690,
+     "cell": 245,
+     "orientation": 3,
+     "name": "Fred Ricksen"
+    },
+    {
+     "npc": 3597,
+     "cell": 72,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174852096,
+   "pos": [
+    9,
+    -70
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 354,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174852098,
+   "pos": [
+    9,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 321,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174852100,
+   "pos": [
+    9,
+    -68
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 91,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3695,
+     "cell": 328,
+     "orientation": 1,
+     "criterion": "Qa=1836",
+     "name": "Oex Tremo",
+     "kept": "quest [1836] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 174852102,
+   "pos": [
+    9,
+    -67
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 239,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174853120,
+   "pos": [
+    10,
+    -70
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 343,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174853122,
+   "pos": [
+    10,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3709,
+     "cell": 338,
+     "orientation": 3,
+     "name": "Bulma Ionese"
+    },
+    {
+     "npc": 3597,
+     "cell": 259,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174853124,
+   "pos": [
+    10,
+    -68
+   ],
+   "spawns": [
+    {
+     "npc": 3674,
+     "cell": 346,
+     "orientation": 1,
+     "name": "Companheiro Choam"
+    },
+    {
+     "npc": 3597,
+     "cell": 315,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174853126,
+   "pos": [
+    10,
+    -67
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 265,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174854144,
+   "pos": [
+    11,
+    -70
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 303,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174854146,
+   "pos": [
+    11,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 135,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174854148,
+   "pos": [
+    11,
+    -68
+   ],
+   "spawns": [
+    {
+     "npc": 3673,
+     "cell": 287,
+     "orientation": 3,
+     "name": "Mercenária da Corporação"
+    },
+    {
+     "npc": 3597,
+     "cell": 173,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174854150,
+   "pos": [
+    11,
+    -67
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 258,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174854152,
+   "pos": [
+    11,
+    -66
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 66,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3678,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "(Qf=1829)|(Qf=1831&PL>179)|Qa=1831|Qa=1832|Qf=1831|Qf=1832",
+     "name": "Mahandos Suk",
+     "kept": "gives quest [1831, 1832] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 174855170,
+   "pos": [
+    12,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 278,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174855172,
+   "pos": [
+    12,
+    -68
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 271,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174855174,
+   "pos": [
+    12,
+    -67
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 241,
+     "orientation": 1,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174855176,
+   "pos": [
+    12,
+    -66
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 66,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 174856200,
+   "pos": [
+    13,
+    -66
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 219,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 175112192,
+   "pos": [
+    14,
+    -61
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 319,
+     "orientation": 3,
+     "name": "Drupik"
+    }
+   ]
+  },
+  {
+   "map": 175113220,
+   "pos": [
+    7,
+    -69
+   ],
+   "spawns": [
+    {
+     "npc": 3597,
+     "cell": 318,
+     "orientation": 3,
+     "name": "Drupik"
+    },
+    {
+     "npc": 3694,
+     "cell": 328,
+     "orientation": 1,
+     "criterion": "Qa=1836",
+     "name": "Janaína Praudimur",
+     "kept": "quest [1836] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 177079296,
+   "pos": [
+    -27,
+    17
+   ],
+   "spawns": [
+    {
+     "npc": 1410,
+     "cell": 217,
+     "orientation": 3,
+     "name": "Tassa"
+    },
+    {
+     "npc": 1408,
+     "cell": 297,
+     "orientation": 1,
+     "name": "Feruor Mitridates"
+    },
+    {
+     "npc": 1409,
+     "cell": 202,
+     "orientation": 1,
+     "name": "Yuzual, o Suspeito"
+    }
+   ]
+  },
+  {
+   "map": 178257920,
+   "pos": [
+    -15,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178257922,
+   "pos": [
+    -15,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178258178,
+   "pos": [
+    -15,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178258944,
+   "pos": [
+    -14,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178258946,
+   "pos": [
+    -14,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178259202,
+   "pos": [
+    -14,
+    37
+   ],
+   "spawns": [
+    {
+     "npc": 3862,
+     "cell": 467,
+     "orientation": 1,
+     "name": "Clicônico"
+    }
+   ]
+  },
+  {
+   "map": 178259968,
+   "pos": [
+    -13,
+    38
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178259970,
+   "pos": [
+    -13,
+    39
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178260226,
+   "pos": [
+    -13,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178520066,
+   "pos": [
+    -14,
+    35
+   ],
+   "spawns": [
+    {
+     "npc": 4045,
+     "cell": 384,
+     "orientation": 1,
+     "criterion": "Qa=1893|Qa=1894",
+     "name": "Lacame Arilla",
+     "kept": "quest [1893, 1894] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 178782208,
+   "pos": [
+    -25,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178782210,
+   "pos": [
+    -25,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 341,
+     "cell": 147,
+     "orientation": 3,
+     "name": "Raaga"
+    }
+   ]
+  },
+  {
+   "map": 178782214,
+   "pos": [
+    -26,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178782216,
+   "pos": [
+    -27,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178783232,
+   "pos": [
+    -24,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 8019,
+     "cell": 273,
+     "orientation": 3,
+     "name": null
+    }
+   ]
+  },
+  {
+   "map": 178783234,
+   "pos": [
+    -24,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178783236,
+   "pos": [
+    -24,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178784256,
+   "pos": [
+    -23,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 3214,
+     "cell": 204,
+     "orientation": 1,
+     "name": "Aspic Farnswotte"
+    },
+    {
+     "npc": 2150,
+     "cell": 163,
+     "orientation": 3,
+     "name": "Condutow de Pewfuwadowa"
+    }
+   ]
+  },
+  {
+   "map": 178784258,
+   "pos": [
+    -23,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178784260,
+   "pos": [
+    -23,
+    21
+   ],
+   "spawns": [
+    {
+     "npc": 830,
+     "cell": 217,
+     "orientation": 1,
+     "name": "Feldz Paf"
+    }
+   ]
+  },
+  {
+   "map": 178785280,
+   "pos": [
+    -28,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178785282,
+   "pos": [
+    -23,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 178785284,
+   "pos": [
+    -28,
+    28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 179177227,
+   "pos": [
+    -20,
+    22
+   ],
+   "spawns": [
+    {
+     "npc": 342,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "Qa=1726",
+     "name": "Raaga",
+     "kept": "quest [1726] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 179177738,
+   "pos": [
+    -20,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 179177739,
+   "pos": [
+    -20,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 179178250,
+   "pos": [
+    -20,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 180619268,
+   "pos": [
+    -25,
+    26
+   ],
+   "spawns": [
+    {
+     "npc": 3865,
+     "cell": 221,
+     "orientation": 3,
+     "name": "Drenba"
+    },
+    {
+     "npc": 3866,
+     "cell": 231,
+     "orientation": 1,
+     "name": "Irene Yllar"
+    },
+    {
+     "npc": 3875,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "(Qf=1860)|Qa=1861|Qf=1861",
+     "name": "Penny Sflorido",
+     "kept": "gives quest [1861] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
    "map": 183239170,
    "pos": [
     -1,
     -4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183240205,
+   "pos": [
+    -10,
+    35
    ],
    "spawns": []
   },
@@ -5613,6 +16251,450 @@
    ]
   },
   {
+   "map": 183766016,
+   "pos": [
+    1,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 40,
+     "cell": 257,
+     "orientation": 1,
+     "name": "Filgar Feel"
+    }
+   ]
+  },
+  {
+   "map": 183766018,
+   "pos": [
+    1,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 430,
+     "cell": 381,
+     "orientation": 3,
+     "name": "Feleny Grismina"
+    }
+   ]
+  },
+  {
+   "map": 183766020,
+   "pos": [
+    1,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 438,
+     "cell": 292,
+     "orientation": 3,
+     "name": "Ricardo Pel"
+    }
+   ]
+  },
+  {
+   "map": 183766022,
+   "pos": [
+    1,
+    -5
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183767048,
+   "pos": [
+    -3,
+    -4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183767050,
+   "pos": [
+    -3,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 443,
+     "cell": 302,
+     "orientation": 3,
+     "name": "Makdo Pel"
+    }
+   ]
+  },
+  {
+   "map": 183767052,
+   "pos": [
+    -3,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 384,
+     "cell": 314,
+     "orientation": 1,
+     "name": "Chaki Triss"
+    },
+    {
+     "npc": 427,
+     "cell": 303,
+     "orientation": 3,
+     "name": "Rihine Plehouverte"
+    }
+   ]
+  },
+  {
+   "map": 183767054,
+   "pos": [
+    -3,
+    -4
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183768064,
+   "pos": [
+    -4,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 5223,
+     "cell": 276,
+     "orientation": 3,
+     "name": "Gobskura"
+    },
+    {
+     "npc": 45,
+     "cell": 354,
+     "orientation": 1,
+     "name": "Rigal Mandigancho"
+    },
+    {
+     "npc": 962,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=248",
+     "name": "Exoram",
+     "kept": "quest [248] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 183768066,
+   "pos": [
+    -4,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 428,
+     "cell": 210,
+     "orientation": 1,
+     "name": "Sirmine Daguiero"
+    },
+    {
+     "npc": 441,
+     "cell": 286,
+     "orientation": 1,
+     "name": "Ninetenedo Pel"
+    }
+   ]
+  },
+  {
+   "map": 183768068,
+   "pos": [
+    -4,
+    0
+   ],
+   "spawns": [
+    {
+     "npc": 3013,
+     "cell": 246,
+     "orientation": 5,
+     "criterion": "Qa=1654&Qo>9971&Qo<9972",
+     "name": "Obscurantus solitário",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 183768070,
+   "pos": [
+    -4,
+    0
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183768072,
+   "pos": [
+    -1,
+    9
+   ],
+   "spawns": []
+  },
+  {
+   "map": 183768074,
+   "pos": [
+    -1,
+    9
+   ],
+   "spawns": [
+    {
+     "npc": 423,
+     "cell": 189,
+     "orientation": 3,
+     "name": "Silimote Fougaris"
+    }
+   ]
+  },
+  {
+   "map": 183768076,
+   "pos": [
+    -1,
+    9
+   ],
+   "spawns": [
+    {
+     "npc": 442,
+     "cell": 342,
+     "orientation": 3,
+     "name": "Dado Pel"
+    }
+   ]
+  },
+  {
+   "map": 183768078,
+   "pos": [
+    -1,
+    9
+   ],
+   "spawns": [
+    {
+     "npc": 43,
+     "cell": 371,
+     "orientation": 3,
+     "name": "Epop Tik"
+    },
+    {
+     "npc": 2850,
+     "cell": 330,
+     "orientation": 1,
+     "criterion": "Qo>9546|Qf=1618",
+     "name": "Simplício",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 185335808,
+   "pos": [
+    -15,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185335810,
+   "pos": [
+    -15,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185336832,
+   "pos": [
+    -15,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185337856,
+   "pos": [
+    -15,
+    37
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185860096,
+   "pos": [
+    -6,
+    -9
+   ],
+   "spawns": [
+    {
+     "npc": 4567,
+     "cell": 437,
+     "orientation": 1,
+     "name": "Bwak de Fogo"
+    }
+   ]
+  },
+  {
+   "map": 185860097,
+   "pos": [
+    -6,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185860098,
+   "pos": [
+    -6,
+    -7
+   ],
+   "spawns": [
+    {
+     "npc": 4648,
+     "cell": 271,
+     "orientation": 1,
+     "criterion": "Qa=2035&Qo>14583&Qo<14587",
+     "name": "Smagador de Vidro",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 185860608,
+   "pos": [
+    -5,
+    -9
+   ],
+   "spawns": [
+    {
+     "npc": 4570,
+     "cell": 443,
+     "orientation": 3,
+     "name": "Bwak de Água"
+    }
+   ]
+  },
+  {
+   "map": 185860609,
+   "pos": [
+    -5,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185860610,
+   "pos": [
+    -5,
+    -7
+   ],
+   "spawns": [
+    {
+     "npc": 4571,
+     "cell": 345,
+     "orientation": 1,
+     "name": "Bwak de Ar"
+    }
+   ]
+  },
+  {
+   "map": 185861122,
+   "pos": [
+    -4,
+    -7
+   ],
+   "spawns": [
+    {
+     "npc": 1404,
+     "cell": 259,
+     "orientation": 1,
+     "name": "Gentil Organizador Kwakerbak"
+    }
+   ]
+  },
+  {
+   "map": 185861123,
+   "pos": [
+    -4,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185861634,
+   "pos": [
+    -3,
+    -7
+   ],
+   "spawns": [
+    {
+     "npc": 772,
+     "cell": 216,
+     "orientation": 1,
+     "name": "Krunchie"
+    }
+   ]
+  },
+  {
+   "map": 185861635,
+   "pos": [
+    -3,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185861637,
+   "pos": [
+    -3,
+    -4
+   ],
+   "spawns": [
+    {
+     "npc": 2873,
+     "cell": 482,
+     "orientation": 1,
+     "name": "Guarda de Amakna"
+    }
+   ]
+  },
+  {
+   "map": 185862145,
+   "pos": [
+    -2,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185862146,
+   "pos": [
+    -2,
+    -7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185862147,
+   "pos": [
+    -2,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185862148,
+   "pos": [
+    -2,
+    -5
+   ],
+   "spawns": []
+  },
+  {
    "map": 185862149,
    "pos": [
     -2,
@@ -5626,6 +16708,45 @@
      "name": "Assistente de Otomai"
     }
    ]
+  },
+  {
+   "map": 185862657,
+   "pos": [
+    -1,
+    -8
+   ],
+   "spawns": [
+    {
+     "npc": 4572,
+     "cell": 386,
+     "orientation": 3,
+     "name": "Bwak de Terra"
+    }
+   ]
+  },
+  {
+   "map": 185862658,
+   "pos": [
+    -1,
+    -7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185862659,
+   "pos": [
+    -1,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185862660,
+   "pos": [
+    -1,
+    -5
+   ],
+   "spawns": []
   },
   {
    "map": 185862661,
@@ -5643,12 +16764,75 @@
    ]
   },
   {
+   "map": 185863169,
+   "pos": [
+    0,
+    -8
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185863170,
+   "pos": [
+    0,
+    -7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185863171,
+   "pos": [
+    0,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185863172,
+   "pos": [
+    0,
+    -5
+   ],
+   "spawns": []
+  },
+  {
    "map": 185863173,
    "pos": [
     0,
     -4
    ],
    "spawns": []
+  },
+  {
+   "map": 185863682,
+   "pos": [
+    1,
+    -7
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185863683,
+   "pos": [
+    1,
+    -6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 185863684,
+   "pos": [
+    1,
+    -5
+   ],
+   "spawns": [
+    {
+     "npc": 2873,
+     "cell": 399,
+     "orientation": 3,
+     "name": "Guarda de Amakna"
+    }
+   ]
   },
   {
    "map": 185863685,
@@ -5888,16 +17072,16 @@
    ],
    "spawns": [
     {
-     "npc": 4330,
-     "cell": 284,
-     "orientation": 3,
-     "name": "Tchu Flowa"
-    },
-    {
      "npc": 735,
      "cell": 278,
      "orientation": 3,
      "name": "Miliciana de Bonta"
+    },
+    {
+     "npc": 4330,
+     "cell": 284,
+     "orientation": 3,
+     "name": "Tchu Flowa"
     }
    ]
   },
@@ -6694,6 +17878,14 @@
      "kept": "authored in Jondo, not shown to the capturing character"
     }
    ]
+  },
+  {
+   "map": 189268737,
+   "pos": [
+    16,
+    -26
+   ],
+   "spawns": []
   },
   {
    "map": 189530112,
@@ -9421,10 +20613,10 @@
    ],
    "spawns": [
     {
-     "npc": 4369,
-     "cell": 341,
-     "orientation": 5,
-     "name": "Brakmariana Irritada"
+     "npc": 2274,
+     "cell": 389,
+     "orientation": 3,
+     "name": "Cavaleiro de Astrub"
     },
     {
      "npc": 1088,
@@ -9436,13 +20628,17 @@
      "npc": 4368,
      "cell": 312,
      "orientation": 1,
-     "name": "Bontariano Irritado"
+     "criterion": "",
+     "name": "Bontariano Irritado",
+     "kept": "measured in Jondo, not shown to the capturing character; shown by another capture of this map"
     },
     {
-     "npc": 2274,
-     "cell": 389,
-     "orientation": 3,
-     "name": "Cavaleiro de Astrub"
+     "npc": 4369,
+     "cell": 341,
+     "orientation": 5,
+     "criterion": "",
+     "name": "Brakmariana Irritada",
+     "kept": "measured in Jondo, not shown to the capturing character; shown by another capture of this map"
     }
    ]
   },
@@ -11051,6 +22247,1899 @@
    "pos": [
     -2,
     -14
+   ],
+   "spawns": []
+  },
+  {
+   "map": 196215816,
+   "pos": [
+    3,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 4893,
+     "cell": 381,
+     "orientation": 1,
+     "name": "Gobdomestik"
+    },
+    {
+     "npc": 4896,
+     "cell": 357,
+     "orientation": 1,
+     "criterion": "(Qf=2073)|(Qf=2074)|Qa=2074|Qa=2075|Qf=2074|Qf=2075",
+     "name": "Niut",
+     "kept": "gives quest [2074, 2075] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 204997377,
+   "pos": [
+    18,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 906,
+     "cell": 453,
+     "orientation": 3,
+     "name": "Bob Laposa"
+    }
+   ]
+  },
+  {
+   "map": 204997889,
+   "pos": [
+    19,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 204997890,
+   "pos": [
+    19,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 204997891,
+   "pos": [
+    19,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205258752,
+   "pos": [
+    22,
+    -26
+   ],
+   "spawns": [
+    {
+     "npc": 5947,
+     "cell": 259,
+     "orientation": 1,
+     "criterion": "Qa=2189",
+     "name": "Mestre Tartaruga",
+     "kept": "quest [2189] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 205258753,
+   "pos": [
+    22,
+    -25
+   ],
+   "spawns": [
+    {
+     "npc": 5705,
+     "cell": 261,
+     "orientation": 3,
+     "name": "Wotta"
+    },
+    {
+     "npc": 5704,
+     "cell": 288,
+     "orientation": 7,
+     "name": "Jiugwi"
+    },
+    {
+     "npc": 5706,
+     "cell": 290,
+     "orientation": 5,
+     "name": "Chiwhan"
+    },
+    {
+     "npc": 5708,
+     "cell": 331,
+     "orientation": 3,
+     "criterion": "Qa=2168&Qo>16584&Qo<16590",
+     "name": "Tanuwu Kang",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5707,
+     "cell": 359,
+     "orientation": 3,
+     "criterion": "Qa=2168&Qo>16582&Qo<16590",
+     "name": "Tanuli Huan",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205259264,
+   "pos": [
+    23,
+    -26
+   ],
+   "spawns": [
+    {
+     "npc": 5610,
+     "cell": 212,
+     "orientation": 7,
+     "name": "Tanukai Aiai"
+    }
+   ]
+  },
+  {
+   "map": 205259265,
+   "pos": [
+    23,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205259266,
+   "pos": [
+    23,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 5701,
+     "cell": 300,
+     "orientation": 3,
+     "name": "Pandawa Desnorteado"
+    },
+    {
+     "npc": 5720,
+     "cell": 315,
+     "orientation": 1,
+     "criterion": "Qa=2186",
+     "name": "Fantasma do Mestre Laogwo",
+     "kept": "quest [2186] sends the player to it on this map"
+    },
+    {
+     "npc": 5700,
+     "cell": 299,
+     "orientation": 3,
+     "criterion": "Qa=2167&Qo>16601&Qo<16602",
+     "name": "Ladrão Tanuki",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205259776,
+   "pos": [
+    24,
+    -26
+   ],
+   "spawns": [
+    {
+     "npc": 5703,
+     "cell": 170,
+     "orientation": 1,
+     "name": "Tanuya Shisa"
+    }
+   ]
+  },
+  {
+   "map": 205259777,
+   "pos": [
+    24,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205259778,
+   "pos": [
+    24,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 5615,
+     "cell": 358,
+     "orientation": 3,
+     "name": "Tanuha Ping"
+    },
+    {
+     "npc": 6073,
+     "cell": 425,
+     "orientation": 1,
+     "name": "Vaso Antigo"
+    }
+   ]
+  },
+  {
+   "map": 205259779,
+   "pos": [
+    24,
+    -23
+   ],
+   "spawns": [
+    {
+     "npc": 5609,
+     "cell": 284,
+     "orientation": 1,
+     "name": "Tanukipé Nussaku"
+    }
+   ]
+  },
+  {
+   "map": 205259780,
+   "pos": [
+    24,
+    -22
+   ],
+   "spawns": [
+    {
+     "npc": 5608,
+     "cell": 329,
+     "orientation": 1,
+     "name": "Mira Hagata"
+    }
+   ]
+  },
+  {
+   "map": 205260033,
+   "pos": [
+    24,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 1161,
+     "cell": 242,
+     "orientation": 1,
+     "name": "Ság Adratsom"
+    },
+    {
+     "npc": 5624,
+     "cell": 300,
+     "orientation": 1,
+     "criterion": "Qa=2183",
+     "name": "Nasumara",
+     "kept": "quest [2183] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 205260288,
+   "pos": [
+    25,
+    -26
+   ],
+   "spawns": [
+    {
+     "npc": 5630,
+     "cell": 199,
+     "orientation": 1,
+     "name": "Tanumu Zeu"
+    },
+    {
+     "npc": 5639,
+     "cell": 179,
+     "orientation": 3,
+     "name": "Expositora Tanuki"
+    },
+    {
+     "npc": 5614,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=2152",
+     "name": "Espírito da Rocha",
+     "kept": "quest [2152] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 205260289,
+   "pos": [
+    25,
+    -25
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205260290,
+   "pos": [
+    25,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205260291,
+   "pos": [
+    25,
+    -23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205260292,
+   "pos": [
+    25,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205260545,
+   "pos": [
+    25,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5700,
+     "cell": 241,
+     "orientation": 3,
+     "criterion": "Qa=2167&Qo>16599&Qo<16696",
+     "name": "Ladrão Tanuki",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205260800,
+   "pos": [
+    26,
+    -26
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205260801,
+   "pos": [
+    26,
+    -25
+   ],
+   "spawns": [
+    {
+     "npc": 5616,
+     "cell": 318,
+     "orientation": 3,
+     "name": "Tanutoki"
+    },
+    {
+     "npc": 5707,
+     "cell": 296,
+     "orientation": 1,
+     "name": "Tanuli Huan",
+     "criterion": "Qo<16582|Qo>16590|Qf=2168"
+    }
+   ]
+  },
+  {
+   "map": 205260802,
+   "pos": [
+    26,
+    -24
+   ],
+   "spawns": [
+    {
+     "npc": 5733,
+     "cell": 262,
+     "orientation": 3,
+     "name": "Tanugu Asuo"
+    }
+   ]
+  },
+  {
+   "map": 205261057,
+   "pos": [
+    26,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5613,
+     "cell": 369,
+     "orientation": 1,
+     "name": "Tanuki Eretin"
+    },
+    {
+     "npc": 5611,
+     "cell": 315,
+     "orientation": 1,
+     "criterion": "Qa=2152",
+     "name": "Tanuwang Yuanzhong",
+     "kept": "quest [2152] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 205261312,
+   "pos": [
+    27,
+    -26
+   ],
+   "spawns": [
+    {
+     "npc": 2150,
+     "cell": 235,
+     "orientation": 3,
+     "name": "Condutow de Pewfuwadowa"
+    },
+    {
+     "npc": 5708,
+     "cell": 244,
+     "orientation": 1,
+     "name": "Tanuwu Kang",
+     "criterion": "Qo<16584|Qo>16590|Qf=2168"
+    }
+   ]
+  },
+  {
+   "map": 205261569,
+   "pos": [
+    27,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 4102,
+     "cell": 178,
+     "orientation": 3,
+     "name": "Barqueiro de Grobe"
+    },
+    {
+     "npc": 6116,
+     "cell": 299,
+     "orientation": 1,
+     "criterion": "Qa=2407",
+     "name": "General Kozaru",
+     "kept": "quest [2407] sends the player to it on this map"
+    },
+    {
+     "npc": 5728,
+     "cell": 270,
+     "orientation": 1,
+     "criterion": "Qa=2168&Qo>16578&Qo<16579",
+     "name": "Bawo Rebelde",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205261570,
+   "pos": [
+    27,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 2218,
+     "cell": 400,
+     "orientation": 1,
+     "criterion": "(Qf=1464)|Qa=1465|Qf=1465|Qa=1464|Qf=1464|Qa=1791|Qf=1791",
+     "name": "Tungusa",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 2219,
+     "cell": 441,
+     "orientation": 1,
+     "criterion": "Qa=1465&Qo!8133&Qo=8135",
+     "name": "Espírito de Tualma Mipertens",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205520896,
+   "pos": [
+    24,
+    -35
+   ],
+   "spawns": [
+    {
+     "npc": 6686,
+     "cell": 383,
+     "orientation": 1,
+     "criterion": "(PL>129&Qf=2445)|Qa=2446|Qf=2446",
+     "name": "Espírito Sereno",
+     "kept": "gives quest [2446] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 205520897,
+   "pos": [
+    24,
+    -34
+   ],
+   "spawns": [
+    {
+     "npc": 5574,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=2164",
+     "name": "Caçador Clandestino Bêbado",
+     "kept": "authored in Jondo, not shown to the capturing character; its conversation only serves these quests: shown while one is under way"
+    }
+   ]
+  },
+  {
+   "map": 205520898,
+   "pos": [
+    24,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205520899,
+   "pos": [
+    24,
+    -32
+   ],
+   "spawns": [
+    {
+     "npc": 5812,
+     "cell": 314,
+     "orientation": 1,
+     "criterion": "Qa=2182",
+     "name": "Shinotake",
+     "kept": "quest [2182] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 205520900,
+   "pos": [
+    24,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5573,
+     "cell": 426,
+     "orientation": 3,
+     "name": "Flor Tímida"
+    }
+   ]
+  },
+  {
+   "map": 205520901,
+   "pos": [
+    24,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205520902,
+   "pos": [
+    24,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5671,
+     "cell": 330,
+     "orientation": 3,
+     "name": "Takeono"
+    },
+    {
+     "npc": 5602,
+     "cell": 272,
+     "orientation": 1,
+     "criterion": "(Qa!2151&Qf!2151)|(Qa=2151&Qo<16389)",
+     "name": "Kykori",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205520903,
+   "pos": [
+    24,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521409,
+   "pos": [
+    25,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521410,
+   "pos": [
+    25,
+    -33
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521411,
+   "pos": [
+    25,
+    -32
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521412,
+   "pos": [
+    25,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521413,
+   "pos": [
+    25,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521414,
+   "pos": [
+    25,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521415,
+   "pos": [
+    25,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 5576,
+     "cell": 246,
+     "orientation": 1,
+     "criterion": "Qa=2164",
+     "name": "Sapágua",
+     "kept": "authored in Jondo, not shown to the capturing character; its conversation only serves these quests: shown while one is under way"
+    }
+   ]
+  },
+  {
+   "map": 205521923,
+   "pos": [
+    26,
+    -32
+   ],
+   "spawns": [
+    {
+     "npc": 5676,
+     "cell": 384,
+     "orientation": 3,
+     "criterion": "Qa=2151&Qo>16403&Qo<16405",
+     "name": "Fruta da Árvore Goroku",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205521924,
+   "pos": [
+    26,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5578,
+     "cell": 469,
+     "orientation": 3,
+     "name": "Inataba",
+     "criterion": "PL>89&Qf=2149&Qo<16654&PO!23353"
+    }
+   ]
+  },
+  {
+   "map": 205521925,
+   "pos": [
+    26,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 5601,
+     "cell": 259,
+     "orientation": 3,
+     "name": "Vusi"
+    }
+   ]
+  },
+  {
+   "map": 205521926,
+   "pos": [
+    26,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205521927,
+   "pos": [
+    26,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 205522436,
+   "pos": [
+    27,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5567,
+     "cell": 331,
+     "orientation": 3,
+     "name": "Florzinha Azul"
+    },
+    {
+     "npc": 5567,
+     "cell": 482,
+     "orientation": 3,
+     "name": "Florzinha Azul"
+    },
+    {
+     "npc": 5567,
+     "cell": 313,
+     "orientation": 3,
+     "name": "Florzinha Azul"
+    },
+    {
+     "npc": 5556,
+     "cell": 344,
+     "orientation": 1,
+     "criterion": "Qo>16254|Qf=2164",
+     "name": "Flor-Espírito",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5558,
+     "cell": 374,
+     "orientation": 1,
+     "criterion": "Qa=2164&Qo>16262&Qo<16266",
+     "name": "Flowarawa, a Aprendiz",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5555,
+     "cell": 370,
+     "orientation": 1,
+     "criterion": "Qo<16254",
+     "name": "Flor Sedenta",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5568,
+     "cell": 360,
+     "orientation": 1,
+     "criterion": "Qo>16259|Qf=2164",
+     "name": "Broto Adormecido",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 205522437,
+   "pos": [
+    27,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 2980,
+     "cell": 271,
+     "orientation": 1,
+     "criterion": "(Qa=1657&Qo>10011)|Qa=1660|Qf=1660",
+     "name": "Discípulo de Viti",
+     "kept": "gives quest [1660] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 205522438,
+   "pos": [
+    27,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5578,
+     "cell": 341,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16665&Qo<16669",
+     "name": "Inataba",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5580,
+     "cell": 342,
+     "orientation": 1,
+     "criterion": "Qo>16669|Qf=2161",
+     "name": "Inataba",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5579,
+     "cell": 327,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16665&Qo<16666",
+     "name": "Yinagui",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5763,
+     "cell": 385,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16664&Qo<16665",
+     "name": "Lenhador Ameaçador",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5778,
+     "cell": 371,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16664&Qo<16665",
+     "name": "Lenhador Ameaçador",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5779,
+     "cell": 399,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16664&Qo<16665",
+     "name": "Lenhador Ameaçador",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 206045703,
+   "pos": [
+    18,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 5654,
+     "cell": 404,
+     "orientation": 3,
+     "name": "Kinshi Saweta"
+    },
+    {
+     "npc": 5640,
+     "cell": 428,
+     "orientation": 1,
+     "name": "Guarda de Fogodala"
+    }
+   ]
+  },
+  {
+   "map": 206307328,
+   "pos": [
+    19,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206307329,
+   "pos": [
+    19,
+    -30
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206307330,
+   "pos": [
+    19,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 1140,
+     "cell": 105,
+     "orientation": 1,
+     "name": "Jotacê Pandamme"
+    },
+    {
+     "npc": 1090,
+     "cell": 106,
+     "orientation": 3,
+     "name": "Pandaysa"
+    }
+   ]
+  },
+  {
+   "map": 206307331,
+   "pos": [
+    19,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 5605,
+     "cell": 245,
+     "orientation": 3,
+     "name": "Guarda Tomapijiu"
+    }
+   ]
+  },
+  {
+   "map": 206307332,
+   "pos": [
+    19,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206307840,
+   "pos": [
+    20,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206307841,
+   "pos": [
+    20,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 5814,
+     "cell": 241,
+     "orientation": 3,
+     "name": "Adepto de Nekineko"
+    }
+   ]
+  },
+  {
+   "map": 206307842,
+   "pos": [
+    20,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5910,
+     "cell": 471,
+     "orientation": 3,
+     "name": "Guarda Pandaliano"
+    }
+   ]
+  },
+  {
+   "map": 206307843,
+   "pos": [
+    20,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 663,
+     "cell": 293,
+     "orientation": 3,
+     "name": "Binzawa, o Mercador"
+    },
+    {
+     "npc": 5931,
+     "cell": 262,
+     "orientation": 1,
+     "name": "Flabonata, a Comerciante"
+    },
+    {
+     "npc": 660,
+     "cell": 324,
+     "orientation": 7,
+     "name": "Soukawa, o Mercador"
+    },
+    {
+     "npc": 5684,
+     "cell": 300,
+     "orientation": 3,
+     "name": "Artista Marcial"
+    },
+    {
+     "npc": 671,
+     "cell": 227,
+     "orientation": 1,
+     "name": "Camelotawa, o Mercador"
+    },
+    {
+     "npc": 5932,
+     "cell": 410,
+     "orientation": 1,
+     "name": "Belzoniwa, o Comerciante"
+    },
+    {
+     "npc": 661,
+     "cell": 121,
+     "orientation": 3,
+     "name": "Bazarwa, a Mercadora"
+    }
+   ]
+  },
+  {
+   "map": 206307844,
+   "pos": [
+    20,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206308353,
+   "pos": [
+    21,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 5960,
+     "cell": 450,
+     "orientation": 3,
+     "name": "Guarda da Taberna Proibida"
+    }
+   ]
+  },
+  {
+   "map": 206308354,
+   "pos": [
+    21,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5650,
+     "cell": 331,
+     "orientation": 3,
+     "name": "Ghao Zuo"
+    },
+    {
+     "npc": 5652,
+     "cell": 287,
+     "orientation": 1,
+     "criterion": "Qa=2150&Qo<16375&Ue=-2150002",
+     "name": "Yokai Voraz",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 206308355,
+   "pos": [
+    21,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 7857,
+     "cell": 382,
+     "orientation": 1,
+     "name": "Ziyuan"
+    },
+    {
+     "npc": 4046,
+     "cell": 534,
+     "orientation": 1,
+     "name": "Ella Stanua"
+    }
+   ]
+  },
+  {
+   "map": 206308356,
+   "pos": [
+    21,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5603,
+     "cell": 344,
+     "orientation": 3,
+     "criterion": "Qa=2151&Qo>16388&Qo<16389",
+     "name": "Chochi",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 206308866,
+   "pos": [
+    22,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206308867,
+   "pos": [
+    22,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 2484,
+     "cell": 315,
+     "orientation": 1,
+     "criterion": "Qa=1525",
+     "name": "Dlim Katchel",
+     "kept": "quest [1525] sends the player to it on this map"
+    },
+    {
+     "npc": 1543,
+     "cell": 328,
+     "orientation": 1,
+     "criterion": "(PL>140&Qf=868&Qf=869&(Qa=878|Qf=878))|Qa=870|Qf=870",
+     "name": "Adriana",
+     "kept": "gives quest [870] here; shown once it can be started (its start criterion), under way or done"
+    }
+   ]
+  },
+  {
+   "map": 206308868,
+   "pos": [
+    22,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206309378,
+   "pos": [
+    23,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206309379,
+   "pos": [
+    23,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206309380,
+   "pos": [
+    23,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206438914,
+   "pos": [
+    18,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 7926,
+     "cell": 299,
+     "orientation": 1,
+     "name": "[!] PNJ décor - Dragodinde émeraude"
+    },
+    {
+     "npc": 7983,
+     "cell": 258,
+     "orientation": 3,
+     "name": "[!] PNJ décor - Dragodinde amande sauvage"
+    },
+    {
+     "npc": 5602,
+     "cell": 344,
+     "orientation": 1,
+     "criterion": "Qa=2151&Qo>16398&Qo<16400",
+     "name": "Kykori",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5673,
+     "cell": 358,
+     "orientation": 5,
+     "criterion": "Qa=2151&Qo>16398&Qo<16400",
+     "name": "Negociante Amakniano",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 206439426,
+   "pos": [
+    17,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 206831621,
+   "pos": [
+    34,
+    -40
+   ],
+   "spawns": [
+    {
+     "npc": 4102,
+     "cell": 382,
+     "orientation": 1,
+     "name": "Barqueiro de Grobe"
+    },
+    {
+     "npc": 5895,
+     "cell": 388,
+     "orientation": 3,
+     "name": "Groblin Jardineiro"
+    }
+   ]
+  },
+  {
+   "map": 207618050,
+   "pos": [
+    23,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 5599,
+     "cell": 340,
+     "orientation": 1,
+     "name": "Teipang"
+    }
+   ]
+  },
+  {
+   "map": 207618052,
+   "pos": [
+    20,
+    -30
+   ],
+   "spawns": [
+    {
+     "npc": 5653,
+     "cell": 274,
+     "orientation": 3,
+     "name": "Ienedong"
+    }
+   ]
+  },
+  {
+   "map": 207618058,
+   "pos": [
+    24,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5702,
+     "cell": 316,
+     "orientation": 3,
+     "name": "Mona"
+    },
+    {
+     "npc": 5694,
+     "cell": 372,
+     "orientation": 7,
+     "name": "Vassoura de Sobomori"
+    },
+    {
+     "npc": 5557,
+     "cell": 314,
+     "orientation": 3,
+     "name": "Sobomori"
+    },
+    {
+     "npc": 5572,
+     "cell": 259,
+     "orientation": 3,
+     "name": "Flor Tagarela"
+    }
+   ]
+  },
+  {
+   "map": 207618060,
+   "pos": [
+    24,
+    -22
+   ],
+   "spawns": [
+    {
+     "npc": 5607,
+     "cell": 345,
+     "orientation": 3,
+     "name": "Anatakwa"
+    }
+   ]
+  },
+  {
+   "map": 207619072,
+   "pos": [
+    20,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5563,
+     "cell": 243,
+     "orientation": 1,
+     "name": "Assistente do Xamã"
+    },
+    {
+     "npc": 5561,
+     "cell": 357,
+     "orientation": 3,
+     "name": "Surivitna"
+    },
+    {
+     "npc": 1159,
+     "cell": 356,
+     "orientation": 1,
+     "criterion": "Qa=456",
+     "name": "Fê Lizardo",
+     "kept": "quest [456] sends the player to it on this map"
+    },
+    {
+     "npc": 5578,
+     "cell": 357,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16656&Qo<16665",
+     "name": "Inataba",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5579,
+     "cell": 358,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16655&Qo<16665",
+     "name": "Yinagui",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 207619074,
+   "pos": [
+    23,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5670,
+     "cell": 442,
+     "orientation": 3,
+     "name": "Phang"
+    },
+    {
+     "npc": 5578,
+     "cell": 400,
+     "orientation": 1,
+     "criterion": "Qa=2161&Qo>16653&Qo<16656",
+     "name": "Inataba",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 207619076,
+   "pos": [
+    20,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5595,
+     "cell": 217,
+     "orientation": 3,
+     "name": "Ungolin"
+    },
+    {
+     "npc": 5677,
+     "cell": 272,
+     "orientation": 3,
+     "name": "Dukwang"
+    }
+   ]
+  },
+  {
+   "map": 207619082,
+   "pos": [
+    18,
+    -24
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207619084,
+   "pos": [
+    25,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207620100,
+   "pos": [
+    20,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5677,
+     "cell": 370,
+     "orientation": 3,
+     "criterion": "Qa=2149&Qo>16324",
+     "name": "Dukwang",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 207620106,
+   "pos": [
+    25,
+    -34
+   ],
+   "spawns": [
+    {
+     "npc": 5719,
+     "cell": 413,
+     "orientation": 1,
+     "criterion": "Qa=2158",
+     "name": "Zangzang",
+     "kept": "quest [2158] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 207620108,
+   "pos": [
+    25,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207621122,
+   "pos": [
+    22,
+    -28
+   ],
+   "spawns": [
+    {
+     "npc": 5565,
+     "cell": 328,
+     "orientation": 1,
+     "name": "Escallate"
+    },
+    {
+     "npc": 5566,
+     "cell": 384,
+     "orientation": 1,
+     "name": "Vulpe"
+    }
+   ]
+  },
+  {
+   "map": 207621124,
+   "pos": [
+    19,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5784,
+     "cell": 301,
+     "orientation": 7,
+     "name": "Frequentadora da Taberna"
+    },
+    {
+     "npc": 5786,
+     "cell": 385,
+     "orientation": 7,
+     "name": "Frequentador da Taberna"
+    },
+    {
+     "npc": 5794,
+     "cell": 328,
+     "orientation": 5,
+     "name": "Espírito Sedento"
+    },
+    {
+     "npc": 5785,
+     "cell": 423,
+     "orientation": 1,
+     "name": "Frequentador da Taberna"
+    },
+    {
+     "npc": 5765,
+     "cell": 297,
+     "orientation": 1,
+     "name": "Ingradadu Dicerva"
+    }
+   ]
+  },
+  {
+   "map": 207621126,
+   "pos": [
+    22,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207621132,
+   "pos": [
+    25,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207621134,
+   "pos": [
+    20,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 207622146,
+   "pos": [
+    20,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5600,
+     "cell": 340,
+     "orientation": 1,
+     "name": "Mestre Kwatimbe"
+    },
+    {
+     "npc": 5583,
+     "cell": 385,
+     "orientation": 3,
+     "name": "Mestre do Pandawushu"
+    },
+    {
+     "npc": 1544,
+     "cell": 398,
+     "orientation": 1,
+     "criterion": "(PL>140&Qf=868&(Qa=878|Qf=878))|Qa=869|Qf=869",
+     "name": "Glupperkut",
+     "kept": "gives quest [869] here; shown once it can be started (its start criterion), under way or done"
+    },
+    {
+     "npc": 5723,
+     "cell": 399,
+     "orientation": 1,
+     "criterion": "Qa=2186",
+     "name": "Sen-Nossaum Nokawt",
+     "kept": "quest [2186] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 207622148,
+   "pos": [
+    21,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 704,
+     "cell": 330,
+     "orientation": 3,
+     "name": "Narber Rihen Levihawa"
+    },
+    {
+     "npc": 5906,
+     "cell": 304,
+     "orientation": 3,
+     "name": "Hahakigami"
+    },
+    {
+     "npc": 5727,
+     "cell": 329,
+     "orientation": 1,
+     "criterion": "Qa=2157",
+     "name": "Dicyokai",
+     "kept": "quest [2157] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 207623168,
+   "pos": [
+    22,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5596,
+     "cell": 261,
+     "orientation": 3,
+     "name": "Pandarim Sudopong"
+    },
+    {
+     "npc": 5585,
+     "cell": 160,
+     "orientation": 1,
+     "name": "Samurai Aiayh"
+    },
+    {
+     "npc": 5584,
+     "cell": 187,
+     "orientation": 1,
+     "name": "Samurai Holi"
+    }
+   ]
+  },
+  {
+   "map": 207623170,
+   "pos": [
+    22,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5562,
+     "cell": 161,
+     "orientation": 3,
+     "name": "Chonayu"
+    },
+    {
+     "npc": 5564,
+     "cell": 288,
+     "orientation": 3,
+     "criterion": "Qf!2192&(Qa!2192|Qo<16273)",
+     "name": "Pandawa no Brilho",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 207623172,
+   "pos": [
+    21,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 5603,
+     "cell": 313,
+     "orientation": 1,
+     "name": "Chochi"
+    },
+    {
+     "npc": 5647,
+     "cell": 340,
+     "orientation": 1,
+     "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+     "name": "Yokai Barulhento",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5648,
+     "cell": 398,
+     "orientation": 1,
+     "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+     "name": "Yokai Hilário",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    },
+    {
+     "npc": 5649,
+     "cell": 402,
+     "orientation": 3,
+     "criterion": "Qa=2150&Qo>16372&Qo<16373&Ue=-2150001",
+     "name": "Yokai Berrante",
+     "kept": "authored in Jondo, not shown to the capturing character"
+    }
+   ]
+  },
+  {
+   "map": 207624196,
+   "pos": [
+    23,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 681,
+     "cell": 329,
+     "orientation": 3,
+     "name": "Stayfun Bonnawa"
+    }
+   ]
+  },
+  {
+   "map": 207625216,
+   "pos": [
+    19,
+    -27
+   ],
+   "spawns": [
+    {
+     "npc": 7529,
+     "cell": 326,
+     "orientation": 1,
+     "name": "Fifi de Lificha"
+    },
+    {
+     "npc": 7644,
+     "cell": 387,
+     "orientation": 3,
+     "name": "Kaminoke"
+    },
+    {
+     "npc": 7645,
+     "cell": 373,
+     "orientation": 3,
+     "name": "Yokai de Kaminoke"
+    }
+   ]
+  },
+  {
+   "map": 207627264,
+   "pos": [
+    19,
+    -27
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209453060,
+   "pos": [
+    19,
+    -31
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209454084,
+   "pos": [
+    22,
+    -28
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209454086,
+   "pos": [
+    25,
+    -23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209455108,
+   "pos": [
+    25,
+    -34
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209455110,
+   "pos": [
+    20,
+    -31
+   ],
+   "spawns": [
+    {
+     "npc": 5976,
+     "cell": 329,
+     "orientation": 1,
+     "criterion": "Qa=2189",
+     "name": "Tai-Lee",
+     "kept": "quest [2189] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 209455112,
+   "pos": [
+    25,
+    -34
+   ],
+   "spawns": [
+    {
+     "npc": 5776,
+     "cell": 370,
+     "orientation": 1,
+     "criterion": "Qa=2162",
+     "name": "Nixie",
+     "kept": "quest [2162] sends the player to it on this map"
+    }
+   ]
+  },
+  {
+   "map": 209456132,
+   "pos": [
+    25,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 209456134,
+   "pos": [
+    23,
+    -29
+   ],
+   "spawns": [
+    {
+     "npc": 5558,
+     "cell": 285,
+     "orientation": 5,
+     "name": "Flowarawa, a Aprendiz",
+     "criterion": "(PL>89&Qf=2149&Qo<16262)|(Qa=2164&Qo<16262)|Qf=2164"
+    }
+   ]
+  },
+  {
+   "map": 209457156,
+   "pos": [
+    24,
+    -22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 211288064,
+   "pos": [
+    17,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 211289088,
+   "pos": [
+    17,
+    -29
+   ],
+   "spawns": []
+  },
+  {
+   "map": 211290114,
+   "pos": [
+    22,
+    -27
    ],
    "spawns": []
   },
@@ -12864,16 +25953,16 @@
      "name": "Ensh Ossako"
     },
     {
-     "npc": 7385,
-     "cell": 377,
-     "orientation": 3,
-     "name": "[!] PNJ décors- Soldat brâkmarien 3"
-    },
-    {
      "npc": 7382,
      "cell": 315,
      "orientation": 1,
      "name": "[!] PNJ décors- Soldat brâkmarien 1"
+    },
+    {
+     "npc": 7385,
+     "cell": 377,
+     "orientation": 3,
+     "name": "[!] PNJ décors- Soldat brâkmarien 3"
     }
    ]
   },
@@ -13173,13 +26262,13 @@
    "spawns": [
     {
      "npc": 7382,
-     "cell": 215,
+     "cell": 288,
      "orientation": 3,
      "name": "[!] PNJ décors- Soldat brâkmarien 1"
     },
     {
      "npc": 7382,
-     "cell": 288,
+     "cell": 215,
      "orientation": 3,
      "name": "[!] PNJ décors- Soldat brâkmarien 1"
     },
@@ -13520,12 +26609,6 @@
    ],
    "spawns": [
     {
-     "npc": 250,
-     "cell": 342,
-     "orientation": 1,
-     "name": "Guerreiro Jack Rottance"
-    },
-    {
      "npc": 7382,
      "cell": 396,
      "orientation": 1,
@@ -13536,6 +26619,12 @@
      "cell": 273,
      "orientation": 3,
      "name": "[!] PNJ décors- Soldat brâkmarien 4"
+    },
+    {
+     "npc": 250,
+     "cell": 342,
+     "orientation": 1,
+     "name": "Guerreiro Jack Rottance"
     },
     {
      "npc": 6624,
@@ -17263,6 +30352,42 @@
    ]
   },
   {
+   "map": 223347712,
+   "pos": [
+    37,
+    -76
+   ],
+   "spawns": [
+    {
+     "npc": 6801,
+     "cell": 371,
+     "orientation": 1,
+     "name": "Capitã Isabella Utissier"
+    },
+    {
+     "npc": 6890,
+     "cell": 403,
+     "orientation": 3,
+     "name": "Andör Kidälgya"
+    }
+   ]
+  },
+  {
+   "map": 223482635,
+   "pos": [
+    32,
+    -83
+   ],
+   "spawns": [
+    {
+     "npc": 6885,
+     "cell": 330,
+     "orientation": 1,
+     "name": "Freddy Rigível"
+    }
+   ]
+  },
+  {
    "map": 224920576,
    "pos": [
     4,
@@ -17276,6 +30401,165 @@
      "name": "Yvain Dykt"
     }
    ]
+  },
+  {
+   "map": 229900288,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7042,
+     "cell": 227,
+     "orientation": 3,
+     "name": "Lumino Star"
+    },
+    {
+     "npc": 2274,
+     "cell": 400,
+     "orientation": 5,
+     "name": "Cavaleiro de Astrub"
+    },
+    {
+     "npc": 7092,
+     "cell": 217,
+     "orientation": 3,
+     "name": "Gobreja"
+    }
+   ]
+  },
+  {
+   "map": 229900290,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 229900546,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 229900548,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7095,
+     "cell": 429,
+     "orientation": 5,
+     "name": "Trombadinha"
+    },
+    {
+     "npc": 7100,
+     "cell": 333,
+     "orientation": 3,
+     "name": "Sommelier Ébrio"
+    },
+    {
+     "npc": 7094,
+     "cell": 298,
+     "orientation": 3,
+     "name": "Nâcky"
+    }
+   ]
+  },
+  {
+   "map": 229901312,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7093,
+     "cell": 339,
+     "orientation": 5,
+     "name": "Caderneta de Clionora"
+    },
+    {
+     "npc": 7037,
+     "cell": 283,
+     "orientation": 3,
+     "name": "Clionora"
+    }
+   ]
+  },
+  {
+   "map": 229901570,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 229901572,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 229902594,
+   "pos": [
+    1,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7045,
+     "cell": 330,
+     "orientation": 3,
+     "name": "Korvox"
+    }
+   ]
+  },
+  {
+   "map": 230032384,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": [
+    {
+     "npc": 7099,
+     "cell": 240,
+     "orientation": 1,
+     "name": "Companheiro da Fanfão"
+    },
+    {
+     "npc": 7097,
+     "cell": 315,
+     "orientation": 3,
+     "name": "Nicole Hek"
+    }
+   ]
+  },
+  {
+   "map": 230032642,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
+  },
+  {
+   "map": 230032644,
+   "pos": [
+    0,
+    6
+   ],
+   "spawns": []
   },
   {
    "map": 240123904,
@@ -17387,6 +30671,254 @@
      "name": "Dardondakal"
     }
    ]
+  },
+  {
+   "map": 240386050,
+   "pos": [
+    18,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386051,
+   "pos": [
+    18,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386052,
+   "pos": [
+    18,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386053,
+   "pos": [
+    18,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386054,
+   "pos": [
+    18,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386055,
+   "pos": [
+    18,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386562,
+   "pos": [
+    19,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386563,
+   "pos": [
+    19,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386564,
+   "pos": [
+    19,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386565,
+   "pos": [
+    19,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386566,
+   "pos": [
+    19,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240386569,
+   "pos": [
+    19,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387074,
+   "pos": [
+    20,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387075,
+   "pos": [
+    20,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387076,
+   "pos": [
+    20,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387077,
+   "pos": [
+    20,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387078,
+   "pos": [
+    20,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387079,
+   "pos": [
+    20,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387587,
+   "pos": [
+    21,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387588,
+   "pos": [
+    21,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240387589,
+   "pos": [
+    21,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240388100,
+   "pos": [
+    22,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240388101,
+   "pos": [
+    22,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517634,
+   "pos": [
+    17,
+    18
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517635,
+   "pos": [
+    17,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517636,
+   "pos": [
+    17,
+    20
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517637,
+   "pos": [
+    17,
+    21
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517638,
+   "pos": [
+    17,
+    22
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240517639,
+   "pos": [
+    17,
+    23
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240518147,
+   "pos": [
+    16,
+    19
+   ],
+   "spawns": []
+  },
+  {
+   "map": 240518148,
+   "pos": [
+    16,
+    20
+   ],
+   "spawns": []
   },
   {
    "map": 241443329,
