@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -307,6 +307,19 @@ namespace Jondo.Unity.Tests.World
             Assert.Null(BonusSlots.CountDown(new[] { new Equipment.ItemEffect(124, 25, 0, 0) }, won: true));
             // Victories only when won.
             Assert.Null(BonusSlots.CountDown(new[] { new Equipment.ItemEffect(817, 3, 3, 3) }, won: false));
+        }
+
+        [Fact]
+        public void A_follower_walks_on_after_a_win_and_goes_after_a_defeat()
+        {
+            // A quest escort: the NPC it names and «1 combate restante».
+            var escort = new[] { new Equipment.ItemEffect(148, 21, 0, 3238), new Equipment.ItemEffect(811, 1, 1, 1) };
+
+            Assert.Null(BonusSlots.CountDown(escort, won: true, BonusSlots.FollowerType));
+            Assert.True(BonusSlots.CountDown(escort, won: false, BonusSlots.FollowerType)!.Value.Spent);
+            // A disguise is lost in the first fight, won or not.
+            Assert.True(BonusSlots.CountDown(new[] { new Equipment.ItemEffect(811, 1, 1, 1) }, won: true,
+                                             BonusSlots.RoleplayBuffType)!.Value.Spent);
         }
 
         // ─── The items ─────────────────────────────────────────────────────────────────

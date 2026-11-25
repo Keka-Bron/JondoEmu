@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -87,9 +87,15 @@ namespace Jondo.Unity.Server.Managers
         /// One fight over for an item: its fights one fewer, and its victories if it was won. Null when
         /// nothing in it counts; Spent when it has reached zero and goes.
         /// </summary>
+        /// <remarks>
+        /// A follower (type 32) counts only the fights lost: nearly every one carries «1 combate
+        /// restante», yet escorts fight beside the character and walk on after a win, and are gone
+        /// only when the fight is lost (Poly in «Le palais de Sassine», Dofus pour les noobs).
+        /// </remarks>
         public static (List<Equipment.ItemEffect> Effects, bool Spent)? CountDown(IReadOnlyList<Equipment.ItemEffect> effects,
-                                                                                bool won)
+                                                                                bool won, int type = 0)
         {
+            if (won && type == FollowerType) return null;
             bool counted = false, spent = false;
             var after = new List<Equipment.ItemEffect>();
             foreach (var effect in effects)

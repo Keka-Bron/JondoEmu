@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -149,7 +149,7 @@ namespace Jondo.Unity.Server.Handlers
             bool redraw = false;
             foreach (var item in Equipment.All.Where(i => BonusSlots.IsBonusSlot(i.Position)).ToList())
             {
-                var counted = BonusSlots.CountDown(item.Effects, won);
+                var counted = BonusSlots.CountDown(item.Effects, won, Forgemagic.TemplateOf(item.Template)?.Type ?? 0);
                 if (counted == null) continue;
 
                 var (effects, isSpent) = counted.Value;
