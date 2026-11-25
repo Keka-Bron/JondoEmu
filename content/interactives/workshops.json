@@ -135,6 +135,14 @@
       "type": 49,
       "skills": [22],
       "why": "Measured on the official server (2026-11-20/21): the map's contents declare it with type 49 and skill 22 «Descascar»; Jondo offered nothing on it."
+    },
+    {
+      "map": 221249536,
+      "element": 524200,
+      "gfx": 70688,
+      "type": 13,
+      "skills": [401],
+      "why": "The sylvan athanor of the cuerboks' clearing, where the enchanted amber (26369) is crafted (skill 401). Type copied from the other recipe stations."
     }
   ]
 }

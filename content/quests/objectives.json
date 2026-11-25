@@ -7636,12 +7636,99 @@
    "why": "«Ve al lugar acordado» (453635): the hidden map behind the house of Amakna village [1,0], where Vil Smis waits (Dofus pour les noobs («La cité de l'indicible mal»))."
   },
   {
+   "objective": 18476,
+   "quest": 2444,
+   "kind": "reply",
+   "replies": [67898, 67899],
+   "why": "«Interrumpe el ritual del Abráknido Ancestral neutralizando a sus servidores»: closed on the first words after his servants are beaten."
+  },
+  {
+   "objective": 18477,
+   "quest": 2444,
+   "kind": "reply",
+   "replies": [67900],
+   "why": "«Regatea con el mago más anciano del bosque»: closed when the deal is accepted."
+  },
+  {
+   "objective": 18478,
+   "quest": 2444,
+   "kind": "beat",
+   "monster": 3996,
+   "map": 149165056,
+   "afterObjectives": [18477],
+   "gives": [{"item": 26368, "count": 1}],
+   "why": "«Recupera el tesoro que robó Lasoberaña»: beating Lasobería in her lair drops the black egg automatically (Dofus pour les noobs)."
+  },
+  {
+   "objective": 18482,
+   "quest": 2444,
+   "kind": "reply",
+   "replies": [67879],
+   "why": "«Vence a los cuerboks ancestrales»: closed on the first reply after the fight."
+  },
+  {
+   "objective": 18483,
+   "quest": 2444,
+   "kind": "reply",
+   "replies": [67875],
+   "why": "«Insiste hasta que el Abráknido Ancestral cumpla su promesa»: closed when he finally hands the amber back."
+  },
+  {
+   "objective": 18484,
+   "quest": 2444,
+   "kind": "use",
+   "afterObjectives": [18483],
+   "why": "«Purifica el ámbar encantado con el poder del anillo ocre»: item 26369 used with the Ocre ring equipped (its own effect 30 closes this and 209 gives the purified amber 26370)."
+  },
+  {
+   "objective": 18485,
+   "quest": 2444,
+   "kind": "enter",
+   "map": 147850754,
+   "afterObjectives": [18484],
+   "why": "«Déjate guiar por la voz del Bosque Oscuro»: closed on reaching Silvosse's clearing [-11,-13]."
+  },
+  {
+   "objective": 8740,
+   "quest": 1531,
+   "kind": "reply",
+   "replies": [22421],
+   "why": "«Habla con el Carnicero» (453659): the last envelope is handed over when the player insists the letter is coded (22421, 'LA CARTA ESTÁ CODIFICADA'), DPLN «Messager clandestin»: «Informez-le alors du caractère codé de la lettre»."
+  },
+  {
+   "objective": 10983,
+   "quest": 1731,
+   "kind": "beat",
+   "monster": 4450,
+   "map": 168558592,
+   "afterObjectives": [10982],
+   "why": "«Defiende a Poly Perkin» (644121): Shokkoth (4450, «Shorrokh» in the client) and two Grofonds (4448) against the player with Poly as ally (Dofus pour les noobs: «un groupe de trois monstres vous agressent vous et Pollie»)."
+  },
+  {
+   "objective": 10985,
+   "quest": 1731,
+   "kind": "enter",
+   "map": 170133506,
+   "afterObjectives": [10984],
+   "overridesMap": true,
+   "why": "«Escolta a Poly Perkin hasta Sufokia» (644086): the surface basin at [23,24] is the palace map 170133506 (Dofus pour les noobs: «Ramenez Pollie à la surface devant le bassin en [23,24]»); stepping on it closes the escort."
+  },
+  {
+   "objective": 10975,
+   "quest": 1731,
+   "kind": "enter",
+   "map": 169083904,
+   "afterObjectives": [10974],
+   "why": "«Descend into the sea depths» (area 860): the objective is an area discovery, but the arrival on map 169083904 reaches the quest code with no subarea for this map, so the area never matched; the map itself is where the basin leads (Dofus pour les noobs: «Descendez dans les fonds marins en cliquant sur le bassin»)."
+  },
+  {
    "objective": 8721,
    "quest": 1530,
    "kind": "enter",
    "map": 134351108,
    "afterObjectives": [8720],
-   "why": "«Obtén el acceso a la dimensión Sramvil y preséntate ante el portal» (1132308): the portal lands on Sramvil's arrival map (TravelersTower Dimensions); Dofus pour les noobs («La cité de l'indicible mal»)."
+   "overridesMap": true,
+   "why": "«Obtén el acceso a la dimensión Sramvil y preséntate ante el portal» (1132308): the objective carries the Travelers Tower map, but the portal of the Amakna village lands on Sramvil's arrival map 134351108, so the enter row overrides the map (Dofus pour les noobs, «La cité de l'indicible mal»)."
   }
 ]
 }

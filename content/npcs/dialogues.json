@@ -18756,7 +18756,8 @@
           "choices": [
             { "reply": 24524, "next": 20500, "quest": 1618, "beforeObjective": 9536 },
             { "reply": 24560, "next": 20523, "quest": 1620, "beforeObjective": 9560 },
-            { "reply": 67861, "next": 50624, "quest": 2443, "beforeObjective": 18474, "completes": 18474, "params": [[30, 18474]] }
+            { "reply": 67861, "next": 50624, "quest": 2443, "beforeObjective": 18474, "completes": 18474, "params": [[30, 18474]] },
+            { "reply": 67866, "next": 50625, "criterion": "Qf=2443&PL>69", "beforeQuest": 2444 }
           ]
         },
         {
@@ -18851,10 +18852,37 @@
         },
         {
           "message": 50624,
-          "choices": []
+          "choices": [
+            { "reply": 67866, "next": 50625 }
+          ]
+        },
+        {
+          "message": 50625,
+          "choices": [
+            { "reply": 67865, "next": 50626 }
+          ]
+        },
+        {
+          "message": 50626,
+          "choices": [
+            { "reply": 67868, "next": 50627 }
+          ]
+        },
+        {
+          "message": 50627,
+          "choices": [
+            { "reply": 67870, "next": 50628, "criterion": "PL>69" }
+          ]
+        },
+        {
+          "message": 50628,
+          "choices": [
+            { "reply": 67862, "startsQuest": 2444, "params": [[34, 2444]] },
+            { "reply": 67869, "startsQuest": 2444, "params": [[34, 2444]] }
+          ]
         }
       ],
-      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539). «Después de él, el diluvio» (2443): «Evocar el ámbar encantado» with Hel Munster ends the quest (Dofus pour les noobs). Reply-to-message link INFERRED from the ids (67861, 50624)."
+      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539). «Después de él, el diluvio» (2443): «Evocar el ámbar encantado» with Hel Munster ends the quest (Dofus pour les noobs). Reply-to-message link INFERRED from the ids (67861, 50624). «Muchos cuerboks en la cabeza» (2444): Hel Munster has no time for the amber but points to the Ancestral Treechnid and Tronky's shortcut. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 2876,
@@ -18875,12 +18903,19 @@
       "map": 149689344,
       "opening": 50637,
       "openings": [
+        { "quest": 2444, "objective": 18478, "pending": 18479, "message": 50660 },
+        { "quest": 2444, "objective": 18479, "pending": 18578, "message": 50640 },
+        { "quest": 2444, "objective": 18477, "pending": 18478, "message": 50658 },
+        { "quest": 2444, "afterElement": -2444001, "message": 50650 },
+        { "quest": 2444, "objective": 18475, "pending": 18476, "message": 50647 },
         { "quest": 1620, "objective": 9566, "pending": 9567, "message": 20543 }
       ],
       "lines": [
         {
           "message": 50637,
-          "choices": []
+          "choices": [
+            { "reply": 67909, "teleport": 221249536, "criterion": "Qa=2444&Qo>18479&Qo<18484" }
+          ]
         },
         {
           "message": 20543,
@@ -18909,9 +18944,104 @@
         {
           "message": 20547,
           "choices": []
+        },
+        {
+          "message": 50647,
+          "choices": [
+            { "reply": 67892, "next": 50648 }
+          ]
+        },
+        {
+          "message": 50648,
+          "choices": [
+            { "reply": 67891, "next": 50649 }
+          ]
+        },
+        {
+          "message": 50649,
+          "choices": [
+            { "reply": 67885, "quest": 2444, "beforeElement": -2444001 }
+          ]
+        },
+        {
+          "message": 50650,
+          "choices": [
+            { "reply": 67898, "next": 50651 },
+            { "reply": 67899, "next": 50651 }
+          ]
+        },
+        {
+          "message": 50651,
+          "choices": [
+            { "reply": 67897, "next": 50652 }
+          ]
+        },
+        {
+          "message": 50652,
+          "choices": [
+            { "reply": 67896, "next": 50653 }
+          ]
+        },
+        {
+          "message": 50653,
+          "choices": [
+            { "reply": 67903, "next": 50654 }
+          ]
+        },
+        {
+          "message": 50654,
+          "choices": [
+            { "reply": 67894, "next": 50655 },
+            { "reply": 67904, "next": 50656 },
+            { "reply": 67906, "next": 50659 }
+          ]
+        },
+        {
+          "message": 50655,
+          "choices": [
+            { "reply": 67893, "next": 50654 }
+          ]
+        },
+        {
+          "message": 50659,
+          "choices": [
+            { "reply": 67905, "next": 50654 }
+          ]
+        },
+        {
+          "message": 50656,
+          "choices": [
+            { "reply": 67895, "next": 50657 }
+          ]
+        },
+        {
+          "message": 50657,
+          "choices": [
+            { "reply": 67902, "next": 50658 },
+            { "reply": 67900 },
+            { "reply": 67901 }
+          ]
+        },
+        {
+          "message": 50658,
+          "choices": [
+            { "reply": 67900 }
+          ]
+        },
+        {
+          "message": 50660,
+          "choices": [
+            { "reply": 67888, "next": 50640, "quest": 2444, "afterObjective": 18478, "beforeObjective": 18479, "completes": 18479, "params": [[30, 18479]] }
+          ]
+        },
+        {
+          "message": 50640,
+          "choices": [
+            { "reply": 67909, "teleport": 221249536 }
+          ]
         }
       ],
-      "why": "The Ancestral Treechnid in his domain's exit room [-9,-14]: the way out, Tronky will show it (50637). «Munster lève le mystère» of Dofus pour les noobs: why pick on him, the Soft Oak rules here (20543), «what do you know of the arakhais?», he prefers his cuerboks (20544), «menacez-le de plumer ses tendres corbacs» (20545), «the truth», an accident during a ritual (20546: 9567), Lasoberaña grew proud and took the woods (20547)."
+      "why": "The Ancestral Treechnid in his domain's exit room [-9,-14]: the way out, Tronky will show it (50637). «Munster lève le mystère» of Dofus pour les noobs: why pick on him, the Soft Oak rules here (20543), «what do you know of the arakhais?», he prefers his cuerboks (20544), «menacez-le de plumer ses tendres corbacs» (20545), «the truth», an accident during a ritual (20546: 9567), Lasoberaña grew proud and took the woods (20547). «Muchos cuerboks en la cabeza» (2444): the ritual interrupted by force (servants fight), the haggle with a Dofus as bait, the stolen black egg, and the way to the cuerboks' clearing. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 1619,
@@ -18920,10 +19050,19 @@
       "lines": [
         {
           "message": 11970,
-          "choices": []
+          "choices": [
+            { "reply": 67872, "next": 50632, "quest": 2444, "beforeObjective": 18475 },
+            { "reply": 67873, "next": 50632, "criterion": "Qa=2444&Qo>18475" }
+          ]
+        },
+        {
+          "message": 50632,
+          "choices": [
+            { "reply": 67871, "teleport": 149689344 }
+          ]
         }
       ],
-      "why": "Tronky Tranky before the Ancestral Domain [-9,-14]: dry wood for winter nights, the Ancestral Treechnid will not mind a few branches (11970). The door replies (key, keyring) are the dungeon's (DungeonHandler)."
+      "why": "Tronky Tranky before the Ancestral Domain [-9,-14]: dry wood for winter nights, the Ancestral Treechnid will not mind a few branches (11970). The door replies (key, keyring) are the dungeon's (DungeonHandler). «Muchos cuerboks en la cabeza» (2444): Tronky takes the visitor straight to the Ancestral Treechnid's clearing (50632), no dungeon needed; later he leads back directly. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 1619,
@@ -18944,6 +19083,7 @@
       "map": 0,
       "opening": 20550,
       "openings": [
+        { "quest": 2444, "objective": 18485, "pending": 18486, "message": 50667 },
         { "after": 1621, "holds": 16206, "message": 20595 },
         { "quest": 1621, "objective": 9582, "pending": 9583, "message": 20592 },
         { "quest": 1621, "objective": 9578, "pending": 9579, "message": 20563 },
@@ -19082,9 +19222,37 @@
           "choices": [
             { "reply": 24645 }
           ]
+        },
+        {
+          "message": 50667,
+          "choices": [
+            { "reply": 67924, "next": 50668 }
+          ]
+        },
+        {
+          "message": 50668,
+          "choices": [
+            { "reply": 67930, "next": 50669 }
+          ]
+        },
+        {
+          "message": 50669,
+          "choices": [
+            { "reply": 67922, "next": 50670 }
+          ]
+        },
+        {
+          "message": 50670,
+          "choices": [
+            { "reply": 67921, "next": 50671 }
+          ]
+        },
+        {
+          "message": 50671,
+          "choices": []
         }
       ],
-      "why": "Silvosse, protector of the month of Flovor, in the Dark Forest's clearing [-11,-13]: this forest was here before the twelvers (20550). «Munster lève le mystère» of Dofus pour les noobs: «was it you who asked to meet me?», it was (20551, «Presentarte»), he knows who you are (20552), Lasoberaña will never leave the forest, no soldiers (20553), he keeps the arakhais from Amakna if Allister keeps away (20554, «Sí, les transmitiré el mensaje»: 9571), the Tree of Life's sap protect you (20555). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598)."
+      "why": "Silvosse, protector of the month of Flovor, in the Dark Forest's clearing [-11,-13]: this forest was here before the twelvers (20550). «Munster lève le mystère» of Dofus pour les noobs: «was it you who asked to meet me?», it was (20551, «Presentarte»), he knows who you are (20552), Lasoberaña will never leave the forest, no soldiers (20553), he keeps the arakhais from Amakna if Allister keeps away (20554, «Sí, les transmitiré el mensaje»: 9571), the Tree of Life's sap protect you (20555). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598). «L'art de la langue de bois» (1621) of Dofus pour les noobs: a war avoided, the forest no battlefield (20558), the plants no longer talk to him (20559), they would open up to a stranger (20560), a touch on the forehead, the wood tongue (20561, 20562: the roleplay enchantment 16334, lost in a fight; «La verdad es que he perdido la labia palítica» gives it again); a bwork mage around, does the Soft Oak bear a grudge? (20563), fight the forest's guardian (20564, 20565); a pact with the bontarians? a doll sent by Sadida (20592), this stone to lure her into the Dark Forest's well bucket (20593: the enchanted stone 16206), friends to help (20594); «she attacked me», the stone? (20595), one of the most fearsome foes he knows (20596: 9587), a fragment for you (20597), «may the Tree of Life protect you» (20598). «Muchos cuerboks en la cabeza» (2444): Silvosse's warning about the evil of the Dark Forest. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 2855,
@@ -63254,7 +63422,7 @@
         {
           "message": 24443,
           "choices": [
-            { "reply": 29359, "startsQuest": 1750, "params": [[34, 1750]] }
+            { "reply": 29359, "startsQuest": 1750, "params": [[34, 1750]], "next": 24444 }
           ]
         },
         {
@@ -63554,19 +63722,56 @@
       "npc": 2454,
       "map": 0,
       "opening": 18723,
+      "openings": [
+        { "before": 1531, "criterion": "Qf=1530", "message": 18724 },
+        { "quest": 1530, "message": 18723 }
+      ],
       "lines": [
         {
           "message": 18723,
           "choices": [
-            { "reply": 22370, "quest": 1530, "completes": 8724, "params": [[30, 8724]], "next": 18724 }
+            { "reply": 22370, "quest": 1530, "completes": 8724, "params": [[30, 8724]], "next": 18724 },
+            { "reply": 22430, "quest": 1531, "criterion": "Qo<8741", "afterObjectives": [8643, 8729, 8733, 8736, 8737, 8742, 8738, 8739, 8740], "completes": 8741, "params": [[30, 8741]], "next": 18783 }
           ]
         },
         {
           "message": 18724,
-          "choices": []
+          "choices": [
+            { "reply": 22369, "criterion": "Qf=1530&Qa!1531&Qf!1531", "next": 18725 }
+          ]
+        },
+        {
+          "message": 18725,
+          "choices": [
+            { "reply": 22368, "next": 18726 }
+          ]
+        },
+        {
+          "message": 18726,
+          "choices": [
+            { "reply": 22367, "startsQuest": 1531, "params": [[34, 1531]] }
+          ]
+        },
+        {
+          "message": 18783,
+          "choices": [
+            { "reply": 22429, "next": 18784 }
+          ]
+        },
+        {
+          "message": 18784,
+          "choices": [
+            { "reply": 22428, "next": 18785 }
+          ]
+        },
+        {
+          "message": 18785,
+          "choices": [
+            { "reply": 22427 }
+          ]
         }
       ],
-      "why": "Mundy Smis, cousin of Vil, in the dark summit for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): showing Vil's glove (22370, not spent) is 8724 and she answers 18724. Her letters quest (1531) adds its lines."
+      "why": "Mundy Smis, cousin of Vil, in the dark summit for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): showing Vil's glove (22370, not spent) is 8724 and she answers 18724. Her letters quest (1531) adds its lines. «Messager clandestin» (1531; Dofus pour les noobs («Messager clandestin»)): after the glove (18724) «¿El qué?» (22369) and «Seguir escuchando» (22368) lead to the letters (18725, 18726) and «Ir a repartir los sobres» (22367) starts 1531; with the nine deliveries done «Ya he cumplido la tarea que me confiaste» (22430) is 8741 and she tells of the queen's mother (18783-18785). INFERRED order. Fix: whoever finished 1530 and has not begun 1531 meets her on the 18724 line (she wants a favour), so the start is reachable again later."
     },
     {
       "npc": 3326,
@@ -63597,7 +63802,7 @@
         {
           "message": 24236,
           "choices": [
-            { "reply": 29132, "startsQuest": 1752, "params": [[34, 1752]] }
+            { "reply": 29132, "startsQuest": 1752, "params": [[34, 1752]], "next": 24237 }
           ]
         },
         {
@@ -63868,6 +64073,531 @@
         }
       ],
       "why": "Colonel Ilkor (3333) [10,29]: 1752: his smuggling for the Collector (24268 to 24272, objective 11203). Colonel Ilkor (3333) [10,29]: 1752: his smuggling for the Collector (24268 to 24272, objective 11203)."
+    },
+    {
+      "npc": 2863,
+      "map": 221249536,
+      "opening": 50640,
+      "openings": [
+        { "quest": 2444, "objective": 18484, "pending": 18485, "message": 50637 },
+        { "quest": 2444, "objective": 18483, "pending": 18484, "message": 50637 },
+        { "quest": 2444, "afterElement": -2444002, "message": 50635 },
+        { "quest": 2444, "objective": 18481, "pending": 18482, "message": 50646 },
+        { "quest": 2444, "objective": 18578, "pending": 18481, "message": 50643 },
+        { "quest": 2444, "objective": 18479, "pending": 18578, "message": 50640 }
+      ],
+      "lines": [
+        {
+          "message": 50640,
+          "choices": [
+            { "reply": 67884, "next": 50641 }
+          ]
+        },
+        {
+          "message": 50641,
+          "choices": [
+            { "reply": 67883, "next": 50642 }
+          ]
+        },
+        {
+          "message": 50642,
+          "choices": [
+            { "reply": 67882, "next": 50643 }
+          ]
+        },
+        {
+          "message": 50643,
+          "choices": [
+            { "reply": 67881 },
+            { "reply": 67889, "next": 50644, "quest": 2444, "afterObjective": 18578, "beforeObjective": 18481, "completes": 18481, "params": [[30, 18481]] }
+          ]
+        },
+        {
+          "message": 50644,
+          "choices": [
+            { "reply": 67887, "next": 50645 }
+          ]
+        },
+        {
+          "message": 50645,
+          "choices": [
+            { "reply": 67876, "next": 50646 }
+          ]
+        },
+        {
+          "message": 50646,
+          "choices": [
+            { "reply": 67890, "quest": 2444, "afterObjective": 18481, "beforeElement": -2444002 }
+          ]
+        },
+        {
+          "message": 50635,
+          "choices": [
+            { "reply": 67879, "next": 50636 }
+          ]
+        },
+        {
+          "message": 50636,
+          "choices": [
+            { "reply": 67878, "next": 50638 },
+            { "reply": 67877, "next": 50638 }
+          ]
+        },
+        {
+          "message": 50638,
+          "choices": [
+            { "reply": 67875, "next": 50639, "quest": 2444, "afterObjective": 18482, "beforeObjective": 18483, "gives": 26369 }
+          ]
+        },
+        {
+          "message": 50639,
+          "choices": [
+            { "reply": 67886, "next": 50637 }
+          ]
+        },
+        {
+          "message": 50637,
+          "choices": [
+            { "reply": 68303, "teleport": 149689344 }
+          ]
+        }
+      ],
+      "why": "«Muchos cuerboks en la cabeza» (2444): the athanor lit, the enchanted amber shown and snatched, the cuerboks beaten, the amber given back. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 2456,
+      "map": 0,
+      "opening": 18682,
+      "lines": [
+        {
+          "message": 18682,
+          "choices": [
+            { "reply": 22379, "quest": 1531, "criterion": "Qo<8643", "next": 18735 }
+          ]
+        },
+        {
+          "message": 18735,
+          "choices": [
+            { "reply": 22378, "quest": 1531, "completes": 8643, "params": [[30, 8643]], "next": 18736 }
+          ]
+        },
+        {
+          "message": 18736,
+          "choices": [
+            { "reply": 22377 }
+          ]
+        }
+      ],
+      "why": "Shandía Darkeyed (Sinedia Zieunoir), the thieves' guild envoy of Muerte-al-Kwan [5,-2]: the envelope (22379), waiting while she reads it (22378 = 8643), leave (22377). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2452,
+      "map": 0,
+      "opening": 18737,
+      "lines": [
+        {
+          "message": 18737,
+          "choices": [
+            { "reply": 22383, "quest": 1531, "criterion": "Qo<8729", "next": 18738 }
+          ]
+        },
+        {
+          "message": 18738,
+          "choices": [
+            { "reply": 22381, "quest": 1531, "completes": 8729, "params": [[30, 8729]], "next": 18739 },
+            { "reply": 22380, "quest": 1531, "completes": 8729, "params": [[30, 8729]] }
+          ]
+        },
+        {
+          "message": 18739,
+          "choices": [
+            { "reply": 22382 }
+          ]
+        }
+      ],
+      "why": "Mamá Fia [5,0]: the envelope (22383); she reads it and the delivery is closed when the player answers (22381 or 22380 = 8729). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2453,
+      "map": 0,
+      "opening": 18749,
+      "lines": [
+        {
+          "message": 18749,
+          "choices": [
+            { "reply": 22394, "quest": 1531, "criterion": "Qo<8733", "next": 18750 }
+          ]
+        },
+        {
+          "message": 18750,
+          "choices": [
+            { "reply": 22393, "quest": 1531, "completes": 8733, "params": [[30, 8733]] }
+          ]
+        }
+      ],
+      "why": "Madame Hyrda [5,3]: pockets the envelope unopened (22394, 18750; the leave reply 22393 = 8733). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2455,
+      "map": 0,
+      "opening": 18751,
+      "lines": [
+        {
+          "message": 18751,
+          "choices": [
+            { "reply": 22398, "quest": 1531, "criterion": "Qo<8736", "next": 18752 }
+          ]
+        },
+        {
+          "message": 18752,
+          "choices": [
+            { "reply": 22397, "next": 18753 }
+          ]
+        },
+        {
+          "message": 18753,
+          "choices": [
+            { "reply": 22396, "next": 18754 }
+          ]
+        },
+        {
+          "message": 18754,
+          "choices": [
+            { "reply": 22395, "quest": 1531, "completes": 8736, "params": [[30, 8736]] }
+          ]
+        }
+      ],
+      "why": "Goblío (Goboukhan) [4,3]: cannot read the letter (22398, 18752), threatens the messenger (22397, 18753) until Zap Gobdon turns up (22396, 18754); «Girarse hacia Zap Gobdon» (22395) is 8736. Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2451,
+      "map": 0,
+      "opening": 18683,
+      "lines": [
+        {
+          "message": 18683,
+          "choices": [
+            { "reply": 22411, "quest": 1531, "criterion": "Qo<8742", "next": 18766 }
+          ]
+        },
+        {
+          "message": 18766,
+          "choices": [
+            { "reply": 22410, "quest": 1531, "completes": 8742, "params": [[30, 8742]], "next": 18767 }
+          ]
+        },
+        {
+          "message": 18767,
+          "choices": [
+            { "reply": 22409 }
+          ]
+        }
+      ],
+      "why": "Al Capote at the tavern [5,2]: reads the invitation with ill grace (22411, 18766) and lets the messenger go (22410 = 8742, 18767). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2473,
+      "map": 0,
+      "opening": 18711,
+      "lines": [
+        {
+          "message": 18711,
+          "choices": [
+            { "reply": 22414, "quest": 1531, "criterion": "Qo<8738", "next": 18769 }
+          ]
+        },
+        {
+          "message": 18769,
+          "choices": [
+            { "reply": 22413, "quest": 1531, "completes": 8738, "params": [[30, 8738]] }
+          ]
+        }
+      ],
+      "why": "Rufiana [8,4]: decodes the message and accepts (22414, 18769; the leave reply 22413 = 8738). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2541,
+      "map": 0,
+      "opening": 18772,
+      "lines": [
+        {
+          "message": 18772,
+          "choices": [
+            { "reply": 22418, "quest": 1531, "criterion": "Qo<8739", "next": 18773 }
+          ]
+        },
+        {
+          "message": 18773,
+          "choices": [
+            { "reply": 22417, "quest": 1531, "completes": 8739, "params": [[30, 8739]] }
+          ]
+        }
+      ],
+      "why": "Venenosa [8,8], the necrotics hunter: she will think over the invitation (22418, 18773; the leave reply 22417 = 8739). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2535,
+      "map": 0,
+      "opening": 18777,
+      "lines": [
+        {
+          "message": 18777,
+          "choices": [
+            { "reply": 22423, "quest": 1531, "criterion": "Qo<8740", "next": 18778 }
+          ]
+        },
+        {
+          "message": 18778,
+          "choices": [
+            { "reply": 22422, "next": 18779 }
+          ]
+        },
+        {
+          "message": 18779,
+          "choices": [
+            { "reply": 22421, "quest": 1531, "next": 18780 }
+          ]
+        },
+        {
+          "message": 18780,
+          "choices": [
+            { "reply": 22420 }
+          ]
+        }
+      ],
+      "why": "El Carnicero [6,7]: the letter (22423, 18778); told it is coded (22422, 22421 shouted) he reads it later (18780); 22421 is 8740 (binding). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 2344,
+      "map": 134219778,
+      "opening": 18757,
+      "lines": [
+        {
+          "message": 18757,
+          "names": true,
+          "choices": [
+            { "reply": 22406, "quest": 1531, "criterion": "Qo<8737", "next": 18762 }
+          ]
+        },
+        {
+          "message": 18762,
+          "choices": [
+            { "reply": 22405, "next": 18763 }
+          ]
+        },
+        {
+          "message": 18763,
+          "choices": [
+            { "reply": 22404, "quest": 1531, "completes": 8737, "params": [[30, 8737]] }
+          ]
+        }
+      ],
+      "why": "Zap Gobdon, arrived to the rescue of the messenger on the goblins' map [4,3]: thanks (22406), the mission (22405) and his hint to meet at the tavern (18763, 22404 = 8737). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+    },
+    {
+      "npc": 3238,
+      "map": 0,
+      "opening": 23848,
+      "openings": [
+        { "quest": 1731, "pending": 10973, "message": 23852 },
+        { "quest": 1731, "pending": 10974, "message": 23861, "objective": 10973 },
+        { "quest": 1731, "pending": 10975, "message": 23862, "objective": 10974 },
+        { "quest": 1731, "pending": 10977, "message": 23861, "objective": 10976 },
+        { "quest": 1731, "pending": 10978, "message": 23880, "objective": 10977 },
+        { "quest": 1731, "pending": 10980, "message": 23861, "objective": 10979 },
+        { "quest": 1731, "pending": 10981, "message": 23881, "objective": 10980 },
+        { "quest": 1731, "pending": 10984, "message": 23883, "objective": 10983 },
+        { "quest": 1731, "pending": 10985, "message": 23884, "objective": 10984 },
+        { "quest": 1731, "pending": 10986, "message": 23824, "objective": 10985 }
+      ],
+      "lines": [
+        {
+          "message": 23848,
+          "choices": [
+            { "reply": 28662, "next": 23849 }
+          ]
+        },
+        {
+          "message": 23849,
+          "choices": [
+            { "reply": 28663, "next": 23850 }
+          ]
+        },
+        {
+          "message": 23850,
+          "choices": [
+            { "reply": 28661, "next": 23851 }
+          ]
+        },
+        {
+          "message": 23851,
+          "choices": [
+            { "reply": 28659, "next": 23852, "startsQuest": 1731, "gives": 18045, "params": [[34, 1731]] },
+            { "reply": 28660 }
+          ]
+        },
+        {
+          "message": 23852,
+          "choices": [
+            { "reply": 28658 }
+          ]
+        },
+        {
+          "message": 23861,
+          "choices": [
+            { "reply": 28674, "quest": 1731, "next": 23862, "afterObjective": 10973, "beforeObjective": 10974, "completes": 10974, "params": [[30, 10974]] },
+            { "reply": 28707, "quest": 1731, "next": 23880, "afterObjective": 10976, "beforeObjective": 10977, "completes": 10977, "params": [[30, 10977]] },
+            { "reply": 28709, "quest": 1731, "next": 23881, "afterObjective": 10979, "beforeObjective": 10980, "completes": 10980, "params": [[30, 10980]] }
+          ]
+        },
+        {
+          "message": 23862,
+          "choices": [
+            { "reply": 28673 }
+          ]
+        },
+        {
+          "message": 23880,
+          "choices": [
+            { "reply": 28706 }
+          ]
+        },
+        {
+          "message": 23881,
+          "choices": [
+            { "reply": 28708 }
+          ]
+        },
+        {
+          "message": 23883,
+          "choices": [
+            { "reply": 28713, "next": 24530 }
+          ]
+        },
+        {
+          "message": 24530,
+          "choices": [
+            { "reply": 29465, "next": 24531 }
+          ]
+        },
+        {
+          "message": 24531,
+          "names": true,
+          "choices": [
+            { "reply": 28712, "quest": 1731, "next": 23884, "afterObjective": 10983, "beforeObjective": 10984, "completes": 10984, "params": [[30, 10984]] }
+          ]
+        },
+        {
+          "message": 23884,
+          "choices": [
+            { "reply": 28714 }
+          ]
+        },
+        {
+          "message": 23824,
+          "choices": [
+            { "reply": 28627, "quest": 1731, "next": 23825, "afterObjective": 10985, "beforeObjective": 10986, "completes": 10986, "params": [[30, 10986]] }
+          ]
+        },
+        {
+          "message": 23825,
+          "choices": [
+            { "reply": 28626 }
+          ]
+        }
+      ],
+      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage)."
+    },
+    {
+      "npc": 3249,
+      "map": 0,
+      "opening": 23885,
+      "lines": [
+        {
+          "message": 23885,
+          "choices": [
+            { "reply": 28716, "next": 23886 },
+            { "reply": 28718, "quest": 1731, "next": 23888, "beforeObjective": 10973, "completes": 10973, "params": [[30, 10973]] }
+          ]
+        },
+        {
+          "message": 23886,
+          "choices": [
+            { "reply": 28715, "next": 23887 }
+          ]
+        },
+        {
+          "message": 23887,
+          "choices": []
+        },
+        {
+          "message": 23888,
+          "choices": [
+            { "reply": 28717 }
+          ]
+        }
+      ],
+      "why": "Kiara Bismal (3249), Sufokia palace: 1731, the first interview (28718, 23888). Kiara Bismal (3249), Sufokia palace: 1731, the first interview (28718, 23888)."
+    },
+    {
+      "npc": 3266,
+      "map": 0,
+      "opening": 23960,
+      "lines": [
+        {
+          "message": 23960,
+          "choices": [
+            { "reply": 28817, "quest": 1731, "next": 23966, "afterObjective": 10975, "beforeObjective": 10976, "completes": 10976, "params": [[30, 10976]] }
+          ]
+        },
+        {
+          "message": 23966,
+          "choices": [
+            { "reply": 28812 }
+          ]
+        }
+      ],
+      "why": "Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966). Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966)."
+    },
+    {
+      "npc": 3268,
+      "map": 0,
+      "opening": 23999,
+      "lines": [
+        {
+          "message": 23999,
+          "choices": [
+            { "reply": 28869, "quest": 1731, "next": 24000, "afterObjective": 10978, "beforeObjective": 10979, "completes": 10979, "params": [[30, 10979]] }
+          ]
+        },
+        {
+          "message": 24000,
+          "choices": [
+            { "reply": 28864 }
+          ]
+        }
+      ],
+      "why": "Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000). Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000)."
+    },
+    {
+      "npc": 3276,
+      "map": 0,
+      "opening": 24003,
+      "lines": [
+        {
+          "message": 24003,
+          "choices": [
+            { "reply": 28871, "quest": 1731, "next": 24004, "afterObjective": 10981, "beforeObjective": 10982, "completes": 10982, "params": [[30, 10982]] }
+          ]
+        },
+        {
+          "message": 24004,
+          "choices": [
+            { "reply": 28870, "quest": 1731, "afterObjective": 10982 }
+          ]
+        }
+      ],
+      "why": "Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights). Comerciante misterioso (3276), Plateau [25,26]: 1731: 28871 is the third interview, 28870 «¿Podrías vocalizar?» starts the fight against the group that attacks Poly and the player (npc_fights)."
     }
   ]
 }

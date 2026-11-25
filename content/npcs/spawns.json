@@ -7180,12 +7180,89 @@
       "why": "Colonel Ilkor (3333) is on the Peninsula of the Gelatins [10,29] (Dofus pour les noobs, «Competencia desleal»: «Allez en [10,29]... le Colonel»); the client's map data holds no placement, so he stands on a free cell in the open, in sight of the arrival."
     },
     {
+      "map": 221249536,
+      "npc": 2863,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2444&Qo>18479",
+      "why": "The Ancestral Treechnid in the cuerboks' clearing once the egg is handed over (Dofus pour les noobs, «Comme un corbac sur sa branche»). INFERRED cell."
+    },
+    {
+      "map": 134219778,
+      "npc": 2344,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=1531&Qo>8736&Qo<8737",
+      "why": "Zap Gobdon comes to the messenger's rescue beside Goblío once the letter is handed over (DPLN «Messager clandestin»). INFERRED cell."
+    },
+    {
+      "map": 135269891,
+      "npc": 2541,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1531",
+      "why": "Venenosa, the necrotics hunter of [8,8], receives an envelope (DPLN «Messager clandestin»). No capture lists her: INFERRED cell."
+    },
+    {
       "map": 136052736,
       "npc": 2454,
       "cell": 296,
       "orientation": 1,
-      "criterion": "Qa=1530|Qa=1531",
-      "why": "Mundy Smis (Franche Smisse in French), «Dirigez vous en [5,1!] en montant les escaliers des Hauts Ténébreux» (Dofus pour les noobs («La cité de l'indicible mal» / «Messager clandestin»)). No capture lists her: INFERRED cell on open floor."
+      "criterion": "Qa=1530|Qa=1531|Qf=1530",
+      "why": "Mundy Smis (Franche Smisse in French), «Dirigez vous en [5,1!] en montant les escaliers des Hauts Ténébreux» (Dofus pour les noobs («La cité de l'indicible mal» / «Messager clandestin»)). No capture lists her: INFERRED cell on open floor; she stays once 1530 is done (1531 starts and ends with her)."
+    },
+    {
+      "map": 90708481,
+      "npc": 3238,
+      "cell": 283,
+      "orientation": 3,
+      "why": "Poly Perkin (3238), quest launch position of 1731 (Sufokia [23,24], Dofus pour les noobs); no client placement, a free cell beside the arrival."
+    },
+    {
+      "map": 170133506,
+      "npc": 3238,
+      "cell": 298,
+      "orientation": 3,
+      "criterion": "Qa=1731",
+      "why": "Poly Perkin waits at the palace [23,24] for the first interview and the final thanks (1731, Dofus pour les noobs); INFERRED cell."
+    },
+    {
+      "map": 170131458,
+      "npc": 3238,
+      "cell": 328,
+      "orientation": 3,
+      "criterion": "Qa=1731",
+      "why": "Poly Perkin beside the arrival of the underwater house [22,28] (1731, objective 10977); INFERRED cell."
+    },
+    {
+      "map": 168822786,
+      "npc": 3238,
+      "cell": 273,
+      "orientation": 3,
+      "criterion": "Qa=1731",
+      "why": "Poly Perkin beside Dama Askina at [21,27] (1731, objective 10980); INFERRED cell."
+    },
+    {
+      "map": 168558592,
+      "npc": 3238,
+      "cell": 344,
+      "orientation": 3,
+      "criterion": "Qa=1731",
+      "why": "Poly Perkin beside the mysterious merchant at [25,26] (1731, objective 10984); INFERRED cell."
+    },
+    {
+      "map": 170131458,
+      "npc": 3266,
+      "cell": 342,
+      "orientation": 3,
+      "why": "Prosper Maramado (3266) in the underwater house [22,28] (Dofus pour les noobs, 1731); the client's map data holds no placement, INFERRED cell."
+    },
+    {
+      "map": 168822786,
+      "npc": 3268,
+      "cell": 271,
+      "orientation": 3,
+      "why": "Dama Askina (3268) at the trithon domain entrance [21,27] (Dofus pour les noobs, 1731); no placement in the client data, INFERRED cell."
     }
   ]
 }

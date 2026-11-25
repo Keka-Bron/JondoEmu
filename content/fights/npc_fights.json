@@ -1650,6 +1650,17 @@
       "why": "«Qui a la plus grosse ?» (1750): «Proteger al ayudante mientras repara la máquina», Tryde (4441) alone against the character (Dofus pour les noobs: the fight is solo)." },
     { "npc": 3330, "map": 0, "reply": 29147, "solo": true,
       "monsters": [ { "monster": 4498, "grade": 0 } ],
-      "why": "«Competencia desleal» (1752): Sharky (4498), solo (Dofus pour les noobs: «Un combat seul se lance»)." }
+      "why": "«Competencia desleal» (1752): Sharky (4498), solo (Dofus pour les noobs: «Un combat seul se lance»)." },
+    { "npc": 2863, "map": 149689344, "reply": 67885,
+      "solo": true, "monsters": [ { "monster": 6909, "grade": 0 }, { "monster": 6910, "grade": 0 } ], "marks": -2444001,
+      "why": "«Muchos cuerboks en la cabeza» (2444): the Ancestral Treechnid's servants attack the one who shakes him from his ritual (alone). INFERRED composition: one of each servant (6909, 6910)." },
+    { "npc": 2863, "map": 221249536, "reply": 67890,
+      "solo": true, "monsters": [ { "monster": 6911, "grade": 0 }, { "monster": 6911, "grade": 0 }, { "monster": 6911, "grade": 0 } ], "marks": -2444002,
+      "why": "«Muchos cuerboks en la cabeza» (2444): the ancestral cuerboks ordered to attack after he snatches the amber (alone). INFERRED composition: three of them." },
+    { "npc": 3276, "map": 0, "reply": 28870, "solo": true,
+      "monsters": [ { "monster": 4450, "grade": 0 }, { "monster": 4448, "grade": 0 }, { "monster": 4448, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 4429, "grade": 0 } ],
+      "why": "«La pêche aux infos» (1731): Shokkoth plus two Grofonds, solo, Poly Perkin (4429) as ally." }
   ]
 }
