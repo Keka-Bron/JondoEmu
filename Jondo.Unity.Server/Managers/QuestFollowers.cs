@@ -36,7 +36,18 @@ namespace Jondo.Unity.Server.Managers
             {
                 var slots = BonusSlots.SlotsFor(Forgemagic.TemplateOf(template)!.Type);
                 bool free = slots.Any(s => !Equipment.All.Any(i => i.Position == s));
-                if (free && await BonusItemHandler.PlaceAsync(stream, template, slots) != null) return true;
+                var placed = free ? await BonusItemHandler.PlaceAsync(stream, template, slots) : null;
+                if (placed != null)
+                {
+                    // What using it from the bag sends too (BonusItemHandler): the new look on the
+                    // map, the sheet -- which carries the buff the client draws up top, «1 combate»
+                    // -- and the weight. The official server, Papai Fusão's gift (2026-11-20): iqx
+                    // into slot 26, jns with the light ball, lof 21, iqq, kjm, krg.
+                    if (SlotLooks.ChangesTheLook(placed.Effects)) await SlotLookHandler.RedrawAsync(stream);
+                    await CharacteristicsMessages.Live.SendAsync(SessionContext.Current);
+                    await ItemUseHandler.WeighAsync(stream);
+                    return true;
+                }
                 Console.WriteLine($"[QuestFollowers] Item {template}: its slot is {(free ? "refused" : "taken")}, to the bag.");
             }
             return await Equipment.GiveAsync(stream, template, count);

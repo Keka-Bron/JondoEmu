@@ -375,9 +375,117 @@
       "map": 157553664,
       "element": 528873,
       "message": 0,
-      "gives": [{ "item": 27416, "count": 1 }],
+      "gives": [
+        { "item": 27416, "count": 1 }
+      ],
       "criterion": "PT!24015&PT!24016",
       "what": "Kanniball Village - Exit [29,9]: the urn at the back of the room, left of the throne (cell 191, graphic 34898), hands the Kannibubble Scroll (27416), which teaches the common spell Kannibubble (24015). Dofus pour les noobs, «Village Kanniboul»: «Il faut commencer par vaincre le Boss», then «cliquer sur l'urne au fond de la map à gauche du Trône»; the scroll is bound to the character. The winners only reach this room past Kanniball Andchain, so the boss is beaten by being here. The criterion is the scroll's own (PT!24015&PT!24016): not to a character who already knows the spell, and not a second one while one is carried. Neither the urn's skill nor whether a run gives more than one scroll is measured: «Usar» 184 as the other urns and statues here."
+    },
+    {
+      "map": 87818755,
+      "element": 467764,
+      "message": 127,
+      "params": [
+        "14",
+        "53"
+      ],
+      "what": "pressed on the official server: lof 127"
+    },
+    {
+      "map": 99091973,
+      "element": 474229,
+      "message": 120,
+      "params": [
+        "hour",
+        "minute"
+      ],
+      "what": "pressed on the official server: lof 120"
+    },
+    {
+      "map": 171442176,
+      "element": 511363,
+      "message": 842,
+      "what": "pressed on the official server: lof 842"
+    },
+    {
+      "map": 171442179,
+      "element": 511358,
+      "message": 844,
+      "what": "pressed on the official server: lof 844"
+    },
+    {
+      "map": 171442688,
+      "element": 511359,
+      "message": 839,
+      "what": "pressed on the official server: lof 839"
+    },
+    {
+      "map": 171443712,
+      "element": 511360,
+      "message": 841,
+      "what": "pressed on the official server: lof 841"
+    },
+    {
+      "map": 171444224,
+      "element": 511361,
+      "message": 843,
+      "what": "pressed on the official server: lof 843"
+    },
+    {
+      "map": 171444741,
+      "element": 511365,
+      "message": 845,
+      "what": "pressed on the official server: lof 845"
+    },
+    {
+      "map": 171445761,
+      "element": 540802,
+      "message": 465,
+      "what": "pressed on the official server: lof 465"
+    },
+    {
+      "map": 171445763,
+      "element": 511364,
+      "message": 838,
+      "what": "pressed on the official server: lof 838"
+    },
+    {
+      "map": 189531147,
+      "element": 540797,
+      "message": 465,
+      "what": "pressed on the official server: lof 465"
+    },
+    {
+      "map": 205520898,
+      "element": 518647,
+      "message": 1200,
+      "what": "pressed on the official server: lof 1200"
+    },
+    {
+      "map": 91750913,
+      "element": 472519,
+      "message": 0,
+      "skill": 184,
+      "emote": 5,
+      "what": "pressed on the official server: keo { 5 }, the emote learned, nothing said"
+    },
+    {
+      "map": 130811393,
+      "element": 488044,
+      "message": 0,
+      "skill": 184,
+      "emote": 28,
+      "what": "pressed on the official server: keo { 28 }, the emote learned, nothing said"
+    },
+    {
+      "map": 91751951,
+      "element": 538581,
+      "message": 0,
+      "skill": 184,
+      "gives": [
+        { "item": 31477, "count": 1 }
+      ],
+      "what": "pressed on the official server: iqx 31477 (roleplay buff, put on), lof 21, kjm; a second press was not measured, so it is given only to who has none"
     }
   ]
 }
