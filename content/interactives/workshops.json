@@ -143,6 +143,14 @@
       "type": 13,
       "skills": [401],
       "why": "The sylvan athanor of the cuerboks' clearing, where the enchanted amber (26369) is crafted (skill 401). Type copied from the other recipe stations."
-    }
+    },
+  {
+   "map": 168559616,
+   "element": 508406,
+   "gfx": 53900,
+   "type": 13,
+   "skills": [346],
+   "why": "The workshop of the plateau of R'lyugluglu [26,26] beside Umra Tawil: «Utilisez l'atelier pour craft les objets» (Dofus pour les noobs, «L'odeur devant le seuil»). Skill 346 has only the iridescent globes (18082) and the protoplasmic flesh (18083); INFERRED which element."
+  }
   ]
 }

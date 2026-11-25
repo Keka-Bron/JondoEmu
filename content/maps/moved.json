@@ -13,6 +13,8 @@
   "moved": [
     { "from": 153093380, "to": 241440769, "measured": "1629's jobs room: in the tutorial capture Master Curro (2895) stands on 241440769 and the talk, the gathering and the ring are done there" },
     { "from": 153092356, "to": 241441793, "measured": "1630's room of Master Darmas (2896): 241441793 in the tutorial capture" },
-    { "from": 153092354, "to": 241441793, "measured": "1630's chafers and Ganymed's appearance after the fight: the chafers are NPCs on 241441793 (2930, 2927), the fight goes to 241441797 and back, and Ganymed comes in on 241441793 (actor -20004) in the tutorial capture" }
+    { "from": 153092354, "to": 241441793, "measured": "1630's chafers and Ganymed's appearance after the fight: the chafers are NPCs on 241441793 (2930, 2927), the fight goes to 241441797 and back, and Ganymed comes in on 241441793 (actor -20004) in the tutorial capture" },
+    { "from": 59515138, "to": 59516928, "measured": "623 objective 4142: the old Snowfoux Den room the player entered after the fourth fight; dungeon 58 now ends in the transition room 59516928 (Dofus pour les noobs, Taniere Givrefoux: after room 4 you reach a transition room)" },
+    { "from": 59516162, "to": 205787160, "measured": "623 objective 4143: Tengu 2967 is fought alone in room 205787160 of dungeon 9007, entered from the transition room 59516928" }
   ]
 }

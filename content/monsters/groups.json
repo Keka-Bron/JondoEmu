@@ -952,6 +952,46 @@
    "orientation": 3,
    "members": [{"monster": 4445, "grade": 0}],
    "why": "The guardian of Leonora in the sanctuary (1744, 11105): fought after clicking the documents in the middle; INFERRED cell and grade."
+  },
+  {
+   "map": 191104000,
+   "group": -2064001,
+   "cell": 289,
+   "orientation": 3,
+   "members": [{"monster": 5768, "grade": 0}, {"monster": 5768, "grade": 0}, {"monster": 5769, "grade": 0}],
+   "why": "Time elementals of Astrub [4,-19] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
+  },
+  {
+   "map": 188745218,
+   "group": -2064002,
+   "cell": 289,
+   "orientation": 3,
+   "members": [{"monster": 5768, "grade": 0}, {"monster": 5768, "grade": 0}, {"monster": 5770, "grade": 0}],
+   "why": "Time elementals of Astrub [4,-20] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
+  },
+  {
+   "map": 188744706,
+   "group": -2064003,
+   "cell": 441,
+   "orientation": 3,
+   "members": [{"monster": 5769, "grade": 0}, {"monster": 5770, "grade": 0}, {"monster": 5770, "grade": 0}],
+   "why": "Time elementals of Astrub [3,-20] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
+  },
+  {
+   "map": 88081174,
+   "group": -2064004,
+   "cell": 261,
+   "orientation": 3,
+   "members": [{"monster": 5769, "grade": 0}, {"monster": 5770, "grade": 0}],
+   "why": "Time elementals of Amakna village [2,1] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
+  },
+  {
+   "map": 88081686,
+   "group": -2064005,
+   "cell": 260,
+   "orientation": 3,
+   "members": [{"monster": 5768, "grade": 0}, {"monster": 5769, "grade": 0}],
+   "why": "Time elementals of Amakna [3,1] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
   }
   ]
 }

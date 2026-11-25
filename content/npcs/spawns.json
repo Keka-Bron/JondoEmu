@@ -8084,6 +8084,349 @@
       "orientation": 3,
       "criterion": "Qa=1745&Qo>11122|Qf=1745",
       "why": "Captain Skyluza in the throne room of Sufokia's palace [23,24] (1745, 11123: Dofus pour les noobs); INFERRED cell."
+    },
+    {
+      "map": 91752961,
+      "npc": 1591,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1746",
+      "why": "Alain Bombardas in the Ripata tavern for 1746 (11126); INFERRED cell, the one he has for 1608."
+    },
+    {
+      "map": 90702336,
+      "npc": 3265,
+      "cell": 259,
+      "orientation": 3,
+      "criterion": "Qa=1746&Qo>11128&Qo<11136",
+      "why": "Captain Skyluza at [11,25] (1746, 11129, 11131, 11134); INFERRED cell."
+    },
+    {
+      "map": 170132490,
+      "npc": 3265,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qa=1746&Qo>11136",
+      "why": "Captain Skyluza visiting the cell (1746, 11137; 1747's prison); INFERRED cell."
+    },
+    {
+      "map": 90702336,
+      "npc": 3308,
+      "cell": 287,
+      "orientation": 3,
+      "criterion": "Qa=1746&Qo>11132&Qo<11134",
+      "why": "The adept left standing after the fight (1746, 11133); INFERRED cell."
+    },
+    {
+      "map": 90703360,
+      "npc": 3309,
+      "cell": 220,
+      "orientation": 3,
+      "criterion": "Qa=1746&Qo>11135&Qo<11136",
+      "why": "The sergeant of Sufokia's guard who arrests the player at Llanes's (1746, 11136); INFERRED cell."
+    },
+    {
+      "map": 143139847,
+      "npc": 4830,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2062&Qo>14838&Qo<14841",
+      "why": "Fraktal in her sanctum while the pixel is to be presented (Dofus pour les noobs, Chaque chose en son temps). INFERRED cell."
+    },
+    {
+      "map": 143139847,
+      "npc": 4821,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=2062&Qo>14839&Qo<14842",
+      "why": "Entropix, born from the touched pixel (14840 talk). INFERRED cell."
+    },
+    {
+      "map": 145229323,
+      "npc": 4821,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=2062&Qo>14841&Qo<14844",
+      "why": "Entropix at Doctor Braun's side, stand-in for the follower the engine lacks. INFERRED cell."
+    },
+    {
+      "map": 90703360,
+      "npc": 3309,
+      "cell": 220,
+      "orientation": 3,
+      "criterion": "Qf=1746&Qa!1747&Qf!1747",
+      "why": "The sergeant (3309) who takes the player to the cell after 1746 and before 1747; INFERRED cell."
+    },
+    {
+      "map": 170132490,
+      "npc": 3265,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qf=1746&Qa!1747&Qf!1747",
+      "why": "Captain Skyluza in the cell block after 1746 and before 1747 (11137, 1747's prison); INFERRED cell."
+    },
+    {
+      "map": 170132490,
+      "npc": 3308,
+      "cell": 360,
+      "orientation": 3,
+      "criterion": "Qa=1747&Qo<11207",
+      "why": "The adept of the depths in the cell block, the other prisoner of 1747 (11138); INFERRED cell."
+    },
+    {
+      "map": 170132480,
+      "npc": 3262,
+      "cell": 342,
+      "orientation": 3,
+      "criterion": "Qa=1747&Qo>11138&Qo<11209",
+      "why": "The priest in yellow of the ritual room (1747, 11207); INFERRED room and cell."
+    },
+    {
+      "map": 90702336,
+      "npc": 3265,
+      "cell": 259,
+      "orientation": 3,
+      "criterion": "Qa=1747&Qo>11209&Qo<11213",
+      "why": "Captain Skyluza at [11,25] (1747, 11210 and 11212); INFERRED cell."
+    },
+    {
+      "map": 168559620,
+      "npc": 3323,
+      "cell": 207,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11150&Qo<11151",
+      "why": "The violent shorrokh guarding the toklium ore (1749, 11151); INFERRED cell."
+    },
+    {
+      "map": 54789135,
+      "npc": 3292,
+      "cell": 297,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11153&Qo<11159",
+      "why": "Naroto in the tavern of Frigost's village (1749, 11157); INFERRED cell."
+    },
+    {
+      "map": 170133504,
+      "npc": 3294,
+      "cell": 304,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11156&Qo<11159",
+      "why": "Naroto waiting at the entrance of Sufokia's underwater zone (1749, 11158); INFERRED cell."
+    },
+    {
+      "map": 170131456,
+      "npc": 3305,
+      "cell": 354,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11153",
+      "why": "Mi-To in the cave of the madmen after the jars (1749, 11154); INFERRED cell."
+    },
+    {
+      "map": 170131458,
+      "npc": 3291,
+      "cell": 371,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11164",
+      "why": "Markaris at the steamer camp's clinic (1749, 11172); INFERRED cell."
+    },
+    {
+      "map": 168558594,
+      "npc": 3291,
+      "cell": 241,
+      "orientation": 3,
+      "criterion": "PL>179&Qa!1749&Qf!1749|Qa=1749&Qo<11160",
+      "why": "Markaris on the plateau of Ryluglugl (1749, start and objective 11160); INFERRED cell."
+    },
+    {
+      "map": 170131456,
+      "npc": 3291,
+      "cell": 331,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11159&Qo<11165",
+      "why": "Markaris in the cave of the madmen (1749, 11162 and 11164); INFERRED cell."
+    },
+    {
+      "map": 169082884,
+      "npc": 3296,
+      "cell": 259,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo<11167",
+      "why": "Jack Donmul at the steamer camp (1749, 11167); INFERRED cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3296,
+      "cell": 232,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11166&Qo<11171",
+      "why": "Jack Donmul at the siphon (1749, 11168 and 11170); INFERRED cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3325,
+      "cell": 269,
+      "orientation": 3,
+      "criterion": "Qa=1749&Qo>11167&Qo<11169",
+      "why": "The damaged turret of the siphon (1749, 11169); INFERRED cell."
+    },
+    {
+      "map": 130023939,
+      "npc": 2339,
+      "cell": 270,
+      "orientation": 1,
+      "criterion": "Qa=2063&Qo>14870&Qo<14877",
+      "why": "Commander Qu in the travellers' tower (14875 and the talks before). INFERRED cell."
+    },
+    {
+      "map": 165152772,
+      "npc": 4887,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2063&Qo>14871&Qo<14878",
+      "why": "The experimental portal at [-12,-31] (14873, 14877; Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 165152772,
+      "npc": 4840,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=2063&Qo>14873&Qo<14877",
+      "why": "Krashtes Damy as a walking sausage, from the portal's grunt (14874) to the cure (14876). INFERRED cell."
+    },
+    {
+      "map": 165152772,
+      "npc": 2838,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=2063&Qo>14876&Qo<14878",
+      "why": "Krashtes Damy himself again (14979). INFERRED cell."
+    },
+    {
+      "map": 196083722,
+      "npc": 4824,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2063&Qo>14867&Qo<14869",
+      "why": "A Goblin de la Aurora Purpura of the past (14868). INFERRED cell."
+    },
+    {
+      "map": 196215812,
+      "npc": 4841,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=2063&Qo>14876&Qo<14880",
+      "why": "Agent Goggett in the Hormonde (14878, 14879). INFERRED cell."
+    },
+    {
+      "map": 168559616,
+      "npc": 3299,
+      "cell": 258,
+      "orientation": 3,
+      "criterion": "PL>179&Qa!1751&Qf!1751|Qa=1751",
+      "why": "Umra Tawil on the plateau of R'lyugluglu [26,26] (1751, start and hand-overs); INFERRED cell."
+    },
+    {
+      "map": 168559620,
+      "npc": 3334,
+      "cell": 249,
+      "orientation": 3,
+      "criterion": "Qa=1751&Qo>11184&Qo<11185",
+      "why": "Miska, the sadida wearing the ring of stones, in Ugo's abyss [26,28] (1751, 11185); INFERRED cell."
+    },
+    {
+      "map": 179308544,
+      "npc": 3749,
+      "cell": 410,
+      "orientation": 3,
+      "why": "Mama Kolala (the guide's Mama Wawa) on [-63,28], «Ne tirez pas sur le messager» (1845). INFERRED cell."
+    },
+    {
+      "map": 179308545,
+      "npc": 3743,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=1845",
+      "why": "A Cancan (the guide's Gobisou) on [-63,29], who has the dunce cap of 1845. INFERRED cell."
+    },
+    {
+      "map": 180093954,
+      "npc": 3740,
+      "cell": 358,
+      "orientation": 3,
+      "criterion": "Qa=1845",
+      "why": "The giant kasrakol caged in Gerard's storeroom (1845). INFERRED cell."
+    },
+    {
+      "map": 180093954,
+      "npc": 3742,
+      "cell": 385,
+      "orientation": 3,
+      "criterion": "Qa=1845",
+      "why": "The dwarf leaf scarab caged in Gerard's storeroom (1845). INFERRED cell."
+    },
+    {
+      "map": 180093954,
+      "npc": 3741,
+      "cell": 400,
+      "orientation": 3,
+      "criterion": "Qa=1845",
+      "why": "The crowned gull caged in Gerard's storeroom (1845). INFERRED cell."
+    },
+    {
+      "map": 179308545,
+      "npc": 3739,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1845&Qo>12282&Qo<12283",
+      "why": "The alchemist escorted to Kaskarina (1845, 12282): spawned beside her instead of following. INFERRED cell."
+    },
+    {
+      "map": 120062979,
+      "npc": 4821,
+      "cell": 301,
+      "orientation": 3,
+      "criterion": "Qa=2064&Qo>14893&Qo<14894",
+      "why": "Entropix at the Tainela zaap, waiting for the player to wear the diving gear (14894). INFERRED cell."
+    },
+    {
+      "map": 196215814,
+      "npc": 4822,
+      "cell": 246,
+      "orientation": 3,
+      "criterion": "Qa=2064",
+      "why": "Martalo trapped in the temporal loop of the anomaly (34967) (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 196215814,
+      "npc": 4823,
+      "cell": 275,
+      "orientation": 3,
+      "criterion": "Qa=2064&Qo>14895&Qo<14896",
+      "why": "Ganymed, the guardian of the anomaly, who the player attacks (Dofus pour les noobs). INFERRED cell."
+    },
+    {
+      "map": 170133508,
+      "npc": 3335,
+      "cell": 269,
+      "orientation": 3,
+      "criterion": "Qa=1756&Qo>11235&Qo<11236",
+      "why": "Li-Fo, the collector mie-do, in the deep room under the slab [21,22] (1756, Dofus pour les noobs: talk to him and attack); INFERRED cell."
+    },
+    {
+      "map": 170133508,
+      "npc": 3260,
+      "cell": 255,
+      "orientation": 3,
+      "criterion": "Qa=1756&Qo>11236&Qo<11238",
+      "why": "The lucid brain (Professor Nomis' brain) in its jar in the deep room (1756, 11237); INFERRED cell."
+    },
+    {
+      "map": 88081174,
+      "npc": 4821,
+      "cell": 439,
+      "criterion": "Qa=2064&Qo<14882",
+      "orientation": 3,
+      "why": "Entropix beside the Envoyee de Xelor while 2064 is under way and before her questions (14881 talk). INFERRED cell."
     }
   ]
 }

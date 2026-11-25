@@ -215,6 +215,33 @@
       "monsters": [2848],
       "criterion": "Qa=591&Qo>3761&PO!11245",
       "why": "Los cazadores (591): Gerard's family jewels drop automatically at the end of the Royal Mansot Excavation (Dofus pour les noobs: «A la fin du donjon, vous dropez automatiquement les Bijoux de famille de Gerard»; client item 11245 drops from monster 2848)."
+    },
+    {
+      "item": 11182,
+      "percent": 100,
+      "monsters": [2854],
+      "criterion": "Qa=619&PO!11182",
+      "why": "Antiroyaliste: the Royalmouth's fleece (item 11182) drops at the end of the Royalmouth Greenhouse boss fight (Dofus pour les noobs: «Sur le combat final vous droperez une Moumoute du Royalmouth»)."
+    },
+    {
+      "item": 11183,
+      "percent": 100,
+      "monsters": [2848],
+      "criterion": "Qa=620&PO!11183",
+      "why": "Las joyas de la corona (620): the Royal Morsaguino's royal icefish item (11183) drops from the Excavation boss while the quest is active. INFERRED: the walkthrough names the boss reward item."
+    },
+    {
+      "item": 11184,
+      "percent": 100,
+      "monsters": [2877],
+      "criterion": "Qa=621&PO!11184",
+      "why": "Duerme y tendras un pastel (621): the quest item (11184) drops from the Roca Negra boss (2877) while the quest is active. INFERRED from the step's bring objective."
+    },
+    {
+      "item": 20822,
+      "percent": 35,
+      "criterion": "Qa=2062&Qo<14834&PO!20822",
+      "why": "2062 (Cada cosa a su tiempo): the perpetual pixel off monsters (Dofus pour les noobs: 100% from an anomaly's boss, otherwise a chance per fight; here any monster, INFERRED 35%)."
     }
   ]
 }

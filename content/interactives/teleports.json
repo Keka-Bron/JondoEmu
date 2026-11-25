@@ -1556,6 +1556,42 @@
       "refusal": 449,
       "refusalType": 1,
       "why": "The basin of Justine's house (508125, 1745): down to the pit only with the fear-catcher, after learning of it (11117)."
+    },
+    {
+      "map": 215744778,
+      "element": 522274,
+      "cell": 329,
+      "gfx": 61108,
+      "type": 0,
+      "skill": 114,
+      "toMap": 196083722,
+      "toCell": 300,
+      "criterion": "Qa=2063&Qo>14866&Qo<14868",
+      "why": "2063: reading the Dechronomicon's ritual with the sacred hourglass (14867) throws the player into the Aurore Pourpre. INFERRED destination cell."
+    },
+    {
+      "map": 196083722,
+      "element": 517210,
+      "cell": 274,
+      "gfx": 48642,
+      "type": 0,
+      "skill": 114,
+      "toMap": 215744778,
+      "toCell": 296,
+      "criterion": "Qa=2063&Qo>14869",
+      "why": "2063: once the agent's report is read, the skeleton's element takes the player back to the tower (the guide does not say how the return happens). INFERRED."
+    },
+    {
+      "map": 170132484,
+      "element": 508127,
+      "cell": 386,
+      "gfx": 53747,
+      "type": 0,
+      "skill": 114,
+      "toMap": 170133508,
+      "toCell": 283,
+      "criterion": "Qf=1756|(Qa=1756&Qo>11234&PO=17968)",
+      "why": "The sealed slab of the pit (508127, 1756): down to the deep room only with the Snedon statuette, after learning of it (11234)."
     }
   ]
 }

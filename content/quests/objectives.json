@@ -8817,6 +8817,410 @@
    "afterObjectives": [11117],
    "elements": [{"map": 170131460, "element": 508125}],
    "why": "«Desciende la fosa protegiéndote con un atrapamiedos» (644041): the basin (508125) with the fear-catcher."
+  },
+  {
+   "objective": 11132,
+   "quest": 1746,
+   "kind": "beat",
+   "monster": 4478,
+   "map": 90702336,
+   "why": "«Vence a los adeptos de las profundidades» (649737): the adepts (4478) at the quay [11,25]."
+  },
+  {
+   "objective": 14832,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43299],
+   "why": "Fight anomaly creatures and show the Envoyee what was found: closed when the pixel is shown (43299)."
+  },
+  {
+   "objective": 14837,
+   "quest": 2062,
+   "kind": "beat",
+   "monster": 5889,
+   "map": 144969990,
+   "afterObjectives": [14836],
+   "why": "Fight the disturbed xeloformes: the fight at the megalith's door."
+  },
+  {
+   "objective": 14839,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43338],
+   "why": "Enter the megalith and watch Fraktal react: closed when she touches the pixel (43338)."
+  },
+  {
+   "objective": 14842,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43313],
+   "why": "Present Entropix to Emeterio Braun: closed when the talk with Doc ends (43313)."
+  },
+  {
+   "objective": 11150,
+   "quest": 1749,
+   "kind": "click",
+   "afterObjectives": [11149],
+   "elements": [{"map": 168559620, "element": 508193}],
+   "why": "«Explora el abismo de Ugo» (886820): the stone at the centre of the map [26,28] (508193)."
+  },
+  {
+   "objective": 11151,
+   "quest": 1749,
+   "kind": "beat",
+   "monster": 4515,
+   "map": 168559620,
+   "why": "«Vence a los guardianes del mineral de toklio» (886821): the violent shorrokh (4515)."
+  },
+  {
+   "objective": 11153,
+   "quest": 1749,
+   "kind": "click",
+   "afterObjectives": [11152],
+   "elements": [{"map": 170131456, "element": 508195}],
+   "requires": [{"item": 18071, "count": 8}],
+   "spends": true,
+   "why": "«Consigue 8 cerebros de trithones y llévalos a la gruta de los dementes» (886823): the jars of the cave (508195) take the 8 trithon brains (18071)."
+  },
+  {
+   "objective": 11169,
+   "quest": 1749,
+   "kind": "beat",
+   "monster": 4520,
+   "map": 168560642,
+   "why": "«Protege el sifón» (886827): the insensitive shorrokhs (4520) of the turret fight."
+  },
+  {
+   "objective": 14833,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43312],
+   "afterObjectives": [14832],
+   "why": "Go to the Xelorium dimension (no map of its own, so no enter binding): closed when the pixel is shown to Doctor Braun at the outpost (43312)."
+  },
+  {
+   "objective": 14835,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43318],
+   "afterObjectives": [14834],
+   "why": "Go to the megalith's entrance (Dofus pour les noobs): the door map [7,3]; closed by asking Hyperia for entry (43318) -- a map-arrival tick does not fire for a teleported character."
+  },
+  {
+   "objective": 14841,
+   "quest": 2062,
+   "kind": "reply",
+   "replies": [43343],
+   "afterObjectives": [14840],
+   "why": "Back to the travellers' camp with Entropix: the follower is not modelled, so the walk is closed by the decision to take it to Doctor Braun (43343)."
+  },
+  {
+   "objective": 11152,
+   "quest": 1749,
+   "kind": "click",
+   "afterObjectives": [11151],
+   "elements": [{"map": 168559620, "element": 508381}],
+   "gives": [{"item": 18070, "count": 1}],
+   "why": "Toklium ore pickup (886822): the second stone of the abyss (508381) hands over the ore (18070) and closes the objective."
+  },
+  {
+   "objective": 14864,
+   "quest": 2063,
+   "kind": "click",
+   "elements": [{"map": 215744778, "element": 522273}],
+   "why": "Find the Xelor sectarians' traces in the Brakmar tower: the skeleton on the chair (Dofus pour les noobs). INFERRED element (graphic 300259)."
+  },
+  {
+   "objective": 14866,
+   "quest": 2063,
+   "kind": "click",
+   "elements": [{"map": 183763982, "element": 517209}],
+   "afterObjectives": [14865],
+   "gives": [{"item": 21014, "count": 1}],
+   "why": "Get the sacred hourglass under the great clock of the Xelor temple [3,1] (Dofus pour les noobs). INFERRED element 517209 (graphic 31849)."
+  },
+  {
+   "objective": 14867,
+   "quest": 2063,
+   "kind": "click",
+   "elements": [{"map": 215744778, "element": 522274}],
+   "afterObjectives": [14866],
+   "requires": [{"item": 21014, "count": 1}],
+   "spends": true,
+   "why": "Read the ritual again and break the hourglass: the passage in teleports.json carries the player to the Aurore Pourpre."
+  },
+  {
+   "objective": 14868,
+   "quest": 2063,
+   "kind": "beat",
+   "monster": 5764,
+   "map": 196083722,
+   "afterObjectives": [14867],
+   "why": "Beat the goblins of the Aurore Pourpre: the fight started by the goblin's reply (43362)."
+  },
+  {
+   "objective": 14871,
+   "quest": 2063,
+   "kind": "enter",
+   "map": 164496396,
+   "afterObjectives": [14870],
+   "why": "Go to the dimensional travellers' tower (Dofus pour les noobs: [-22,-24])."
+  },
+  {
+   "objective": 14872,
+   "quest": 2063,
+   "kind": "reply",
+   "replies": [43381],
+   "why": "Find the place of the experimental portal: Qu's last answer (43381)."
+  },
+  {
+   "objective": 14873,
+   "quest": 2063,
+   "kind": "reply",
+   "replies": [43419],
+   "why": "Examine the portal: its talk (43419)."
+  },
+  {
+   "objective": 14876,
+   "quest": 2063,
+   "kind": "reply",
+   "replies": [43433],
+   "why": "Solve Krashtes' problem: the separator pointed at his head (43433)."
+  },
+  {
+   "objective": 14877,
+   "quest": 2063,
+   "kind": "reply",
+   "replies": [43420],
+   "why": "Cross the experimental portal (43420)."
+  },
+  {
+   "objective": 14865,
+   "quest": 2063,
+   "kind": "click",
+   "elements": [{"map": 215744778, "element": 522274}],
+   "afterObjectives": [14864],
+   "why": "Read the book with the Dechronomicon fragments on the stone table (Dofus pour les noobs). A click: no document of the client is tied to this prop. INFERRED element."
+  },
+  {
+   "objective": 14869,
+   "quest": 2063,
+   "kind": "click",
+   "elements": [{"map": 196083722, "element": 517210}],
+   "afterObjectives": [14868],
+   "why": "Find and read the FBA agent's report on the skeleton (Dofus pour les noobs). A click: no document of the client is tied to this prop."
+  },
+  {
+   "objective": 11185,
+   "quest": 1751,
+   "kind": "beat",
+   "monster": 4497,
+   "map": 168559620,
+   "why": "«Consigue el anillo de piedras» (886818): beating Miska (4497) yields the ring."
+  },
+  {
+   "objective": 12201,
+   "quest": 1845,
+   "kind": "enter",
+   "map": 191102980,
+   "afterObjectives": [12200],
+   "why": "«Comprueba si el talismán de Kerubim te va a traer suerte» (720911): going out of the shop onto the doorstep [3,-17], where the gull waits (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12202,
+   "quest": 1845,
+   "kind": "use",
+   "afterObjectives": [12201],
+   "why": "«Lee el mensaje de la botella» (720914): the shell-studded bottle (18653) used (its effect 30 is this objective) (Dofus pour les noobs («Ne tirez pas sur le messager»): «Double-cliquez sur la Bouteille incrustée de coquillages»)."
+  },
+  {
+   "objective": 12203,
+   "quest": 1845,
+   "kind": "enter",
+   "map": 179308545,
+   "afterObjectives": [12202],
+   "why": "«Ve a la isla mencionada en el mensaje» (720930): reaching Animatopia by the muldobus (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12246,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32295],
+   "afterObjectives": [12203],
+   "why": "«Enséñale el mensaje a Kaskarina y pide información sobre la isla» (721127): her 32295 after the bottle's message (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12249,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32343],
+   "afterObjectives": [12246],
+   "why": "«Registra el campamento de los cazadores» (721325): the talk with Bernardino ends with «Irte y pensar en algún truco...» (32343) (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12250,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32337],
+   "afterObjectives": [12249],
+   "why": "«Busca la manera de engañar a Bernardiño» (721358): Mama Kolala's advice, «La idea no está tan mal...» (32337) (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12251,
+   "quest": 1845,
+   "elements": [{"map": 179308544, "element": 509877}],
+   "afterObjectives": [12250],
+   "anyOrder": true,
+   "gives": [{"item": 18705, "count": 1}],
+   "why": "«Consigue pintura» (722827): the paint pots beside Mama Kolala on [-63,28] (Dofus pour les noobs («Ne tirez pas sur le messager»): «Pots de peinture ... sur la même map où se trouve Mama Wawa»). INFERRED: which of the map's two elements."
+  },
+  {
+   "objective": 12252,
+   "quest": 1845,
+   "elements": [{"map": 179308032, "element": 509879}],
+   "afterObjectives": [12250],
+   "anyOrder": true,
+   "gives": [{"item": 18706, "count": 1}],
+   "why": "«Consigue lana» (721361): the thick wool on [-64,28] (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED: which of the map's two elements."
+  },
+  {
+   "objective": 12253,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32306],
+   "afterObjectives": [12250],
+   "anyOrder": true,
+   "gives": [{"item": 18704, "count": 1}],
+   "why": "«Consigue una cabeza falsa de jalató» (721362): the Cancan's dunce cap (18704), «Sacarle la lengua.» (32306) (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12254,
+   "quest": 1845,
+   "elements": [{"map": 179308033, "element": 509880}],
+   "afterObjectives": [12250],
+   "anyOrder": true,
+   "gives": [{"item": 18707, "count": 1}],
+   "why": "«Consigue piedras planas para hacer los cascos de jalató» (721363): the flat stones on [-64,29] (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12255,
+   "quest": 1845,
+   "elements": [{"map": 179306499, "element": 509881}],
+   "afterObjectives": [12251, 12252, 12253, 12254],
+   "requires": [{"item": 18705, "count": 1}, {"item": 18706, "count": 1}, {"item": 18704, "count": 1}, {"item": 18707, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 18708, "count": 1}],
+   "why": "«Encuentra un taller y fabrica el peluche» (721379): the four pieces put together at the workbench on [-67,31] make the rainbow jalato plush (18708) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED: the workbench element."
+  },
+  {
+   "objective": 12256,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32349],
+   "afterObjectives": [12255],
+   "why": "«Enséñale a Bernardiño el jalató arcoíris que has fabricado...» (721378): the plush shown to Bernardino, 32349 (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12277,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32360],
+   "afterObjectives": [12276],
+   "why": "«Encuentra al autor del mensaje» (721460): freeing the alchemist, 32360 (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12278,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32366],
+   "afterObjectives": [12277],
+   "anyOrder": true,
+   "why": "«Libera al kasrakol» (721893): 32366 (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12279,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32367],
+   "afterObjectives": [12277],
+   "anyOrder": true,
+   "why": "«Libera a la gaviota» (721463): 32367 (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12280,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32368],
+   "afterObjectives": [12277],
+   "anyOrder": true,
+   "why": "«Libera al escarahoja» (721892): 32368 (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 12282,
+   "quest": 1845,
+   "kind": "reply",
+   "replies": [32362],
+   "afterObjectives": [12281],
+   "why": "«Escolta al alquimista hasta Kaskarina» (721505): 32362 sends him with the character; he is spawned by Kaskarina (no follower) (Dofus pour les noobs («Ne tirez pas sur le messager»))."
+  },
+  {
+   "objective": 14878,
+   "quest": 2063,
+   "kind": "beat",
+   "monster": 5767,
+   "map": 196215812,
+   "afterObjectives": [14877],
+   "why": "Free the FBA agent: beat the demons that besiege him in the Hormonde (the fight his reply 43438 starts)."
+  },
+  {
+   "objective": 14896,
+   "quest": 2064,
+   "kind": "beat",
+   "monster": 5771,
+   "map": 196215814,
+   "afterObjectives": [14895],
+   "why": "Destroy the guardian of the anomaly (14896): Ganymed, from the fight 45201 starts."
+  },
+  {
+   "objective": 11229,
+   "quest": 1756,
+   "kind": "click",
+   "afterObjectives": [11214],
+   "elements": [{"map": 91753989, "element": 508168}],
+   "why": "«Consulta los archivos de Sufokia» (651375): the archives lying on the floor of the library [20,25] (508168)."
+  },
+  {
+   "objective": 11232,
+   "quest": 1756,
+   "kind": "click",
+   "afterObjectives": [11231],
+   "elements": [{"map": 91753989, "element": 508169}],
+   "why": "«Descubre dónde vivía el hechicero osamodas» (649706): the pile of books on the floor of the library (508169)."
+  },
+  {
+   "objective": 11233,
+   "quest": 1756,
+   "kind": "enter",
+   "map": 170132484,
+   "afterObjectives": [11232],
+   "why": "«Explora las entrañas de la casa» (649725): the pit under the house of [21,22]."
+  },
+  {
+   "objective": 11240,
+   "quest": 1756,
+   "kind": "use",
+   "afterObjectives": [11233],
+   "requires": [{"item": 18038, "count": 1}],
+   "why": "«Desbloquea la losa» (649707): the unspeakable object (18038) used from the inventory unseals the slab."
+  },
+  {
+   "objective": 11235,
+   "quest": 1756,
+   "kind": "click",
+   "afterObjectives": [11234],
+   "elements": [{"map": 170132484, "element": 508127}],
+   "requires": [{"item": 17968, "count": 1}],
+   "why": "«Sumérgete en las aguas bajo la losa protegiéndote con una estatuilla de Snedon» (649711): the slab (508127) with the statuette in hand."
   }
 ]
 }
