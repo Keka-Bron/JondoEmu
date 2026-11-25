@@ -131,6 +131,12 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>Buy and sell: the action that answers with the catalogue.</summary>
         public const int Trade = 1;
 
+        /// <summary>
+        /// «Trocar»: the exchange window with the NPC (3.7, 2026-11-21: Trok, Kwaker Vans, Farle Ingals and
+        /// the dragons' champion answer it with jyp, the exchange opened, and nothing else).
+        /// </summary>
+        public const int Exchange = 2;
+
         /// <summary>Talk: the one that opens the dialogue.</summary>
         public const int Talk = 3;
 

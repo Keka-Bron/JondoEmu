@@ -16,6 +16,51 @@
         { "gives": [ { "item": 8519, "count": 1 } ], "takes": [ { "item": 8145, "count": 20 } ] }
       ],
       "why": "Gobiere Trokeur in his hut [-6,4] of the goblins' camp, «Tú dar II o III meados bworks, yo dar a ti buen ñam ñam» (3501): «2 x Bière de Bwork donne 1 x Oeuf de piou, 3 x Bière de Bwork donne 1 x Pain du Pinchaut, 16 x Bière de Bwork donne 1 x Gratrooll Industriel, 20 x Bière de Bwork donne 1 x Gâtrool Industriel» (Dofus pour les noobs, «Gobmichet vibre pour Gobrose»)."
+    },
+    {
+      "npc": 1080,
+      "recipes": [],
+      "why": "Measured on the official server (20261121-082849, map 68552194): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 94,
+      "recipes": [],
+      "why": "Measured on the official server (20261121-093546, map 88212248): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 7913,
+      "recipes": [],
+      "why": "Measured on the official server (20261121-093546, map 88213271): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 53,
+      "recipes": [],
+      "why": "Measured on the official server (20261121-103927, map 88082705): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 2142,
+      "recipes": [],
+      "why": "Measured on the official server (20261121-185305, map 115083777): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 91,
+      "recipes": [],
+      "why": "Measured on the official server (20261122-144456, map 87820801): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 90,
+      "recipes": [],
+      "why": "Measured on the official server (20261122-144456, map 87819777): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 99,
+      "recipes": [],
+      "why": "Measured on the official server (20261124-194849, map 99091973): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
+    },
+    {
+      "npc": 59,
+      "recipes": [],
+      "why": "Measured on the official server (20261124-194849, map 99352582): «Trocar» opened the exchange window. Its recipes are not measured: none yet."
     }
   ]
 }
