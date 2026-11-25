@@ -429,7 +429,10 @@ namespace Jondo.Unity.Server.Handlers
             state.Jobs[job] = new JobExperience.Progress { JobId = job, Experience = experience };
             DatabaseManager.SaveJobExperience(state.CharacterId, job, experience);
 
-            if (level != before) await WorkshopHandler.SendLevelUpAsync(Network.SessionContext.Current, job, level);
+            // The client words the level-up window from its own previous level: lowering a job
+            // made it announce (new - old) * 5 pods as an unsigned number (2^32 - 360 for 122 -> 50).
+            // A lowered job only gets its new experience bar.
+            if (level > before) await WorkshopHandler.SendLevelUpAsync(Network.SessionContext.Current, job, level);
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
                 ConnectionProtocol.Push(Op.Irq, ConnectionProtocol.BuildJobExperience(
                     job, JobExperience.Next(level), level, JobExperience.Floor(level), experience)));
