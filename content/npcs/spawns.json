@@ -7887,6 +7887,110 @@
       "orientation": 1,
       "criterion": "Qa=1612&Qo>9481&Qo<9484",
       "why": "Dofus pour les noobs («C'est dans la boîte»): Olivia outside the megalith after the rescue. INFERRED cell."
+    },
+    {
+      "map": 168820746,
+      "npc": 3286,
+      "cell": 325,
+      "orientation": 3,
+      "criterion": "Qa=1740&Qo>11065&Qo<11069",
+      "why": "Pulpalas in the trithon rift [19,31] (1740, 11067/11068); the client data holds no placement, INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2335,
+      "cell": 179,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9485&Qo<9496&Qo<9495",
+      "why": "Dofus pour les noobs («Crise d'identité»): Exploranciana in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2823,
+      "cell": 216,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9487&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Lonyon Plata in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2337,
+      "cell": 244,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Colonel Onil in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2339,
+      "cell": 270,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Commander Qu in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2340,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Gladis in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2338,
+      "cell": 339,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Doctor Boing Boing in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2343,
+      "cell": 368,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Deil Harden in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2344,
+      "cell": 422,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "why": "Dofus pour les noobs («Crise d'identité»): Zap Gobdon in the information room. INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2803,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9495&Qo<9498",
+      "why": "Dofus pour les noobs («Crise d'identité»): Exploranciana in her true form (Eco). INFERRED cell."
+    },
+    {
+      "map": 130025987,
+      "npc": 2802,
+      "cell": 466,
+      "orientation": 1,
+      "criterion": "Qa=1613&Qo>9496&Qo<9499",
+      "why": "Dofus pour les noobs («Crise d'identité»): Septango appears when the fight is won. INFERRED cell."
+    },
+    {
+      "map": 168821766,
+      "npc": 3286,
+      "cell": 353,
+      "orientation": 3,
+      "criterion": "Qa=1741&Qo>11070&Qo<11074",
+      "why": "Pulpalas in the rift [20,29] (1741, 11071-11073); the client data holds no placement, INFERRED cell."
+    },
+    {
+      "map": 60034566,
+      "npc": 6685,
+      "cell": 297,
+      "orientation": 3,
+      "criterion": "Qa=2447&Qo>18510&Qo<18512",
+      "why": "The Fire Spirit waiting in the Petrified Forest [-77,-67] (Dofus pour les noobs, «Quand les esprits s'échauffent»), from the character's arrival until he is bluffed and flees. INFERRED cell."
     }
   ]
 }

@@ -37909,7 +37909,8 @@
             { "reply": 52803, "quest": 2192, "completes": 16279, "params": [[30, 16279]], "next": 40532, "afterObjective": 16278 },
             { "reply": 52764, "next": 40505, "quest": 1654, "afterObjective": 9973, "beforeObjective": 9974, "criterion": "PO!17000" },
             { "reply": 53314, "next": 40936, "quest": 2150, "afterObjective": 16369, "beforeObjective": 16370, "completes": 16370, "params": [[30, 16370]] },
-            { "quest": 2161, "completes": 16658, "params": [[30, 16658]], "afterObjective": 16657, "beforeObjective": 16658, "next": 41929, "reply": 54551 }
+            { "quest": 2161, "completes": 16658, "params": [[30, 16658]], "afterObjective": 16657, "beforeObjective": 16658, "next": 41929, "reply": 54551 },
+            { "reply": 68048, "quest": 2447, "afterObjective": 18512, "beforeObjective": 18513, "next": 50759 }
           ]
         },
         {
@@ -38080,9 +38081,39 @@
           "choices": [
             { "reply": 54552 }
           ]
+        },
+        {
+          "message": 50759,
+          "choices": [
+            { "reply": 68051, "next": 50760 }
+          ]
+        },
+        {
+          "message": 50760,
+          "choices": [
+            { "reply": 68050, "next": 50761 }
+          ]
+        },
+        {
+          "message": 50761,
+          "choices": [
+            { "reply": 68049, "next": 50762 }
+          ]
+        },
+        {
+          "message": 50762,
+          "choices": [
+            { "reply": 68053, "next": 50763 }
+          ]
+        },
+        {
+          "message": 50763,
+          "choices": [
+            { "reply": 68052, "quest": 2447 }
+          ]
         }
       ],
-      "why": "Surivitna, the shaman of the Pandala village [20,-27]. «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: «Hola, estoy buscando los seis dofus.» (52761) does 16270; one more would-be hero (40500), but with a brighter aura (40501): the receptacle, a dragon idol waiting for the six dofus (40502); to glimpse what awaits, the eyes must open (40503): a visionary's pint from the Fermenté tavern, drunk before the stone dragon, and his assistant waiting by the Airedala stairs (40504). Back with «Precisamente he sido testigo de una llama crepitante.» (52803, 16279): rare revelations (40532); the path is unclear (52802, 40533); could he guide? (52801) not his role, but a sage whose fate is tied to a dofus (40534); «Háblame más de ese personaje.» (52800): Zoyo, in the zollos' great house (40535), and «Gracias por la información. Adiós.» (52799) hands over «Un sabio entre los sabios» (2193), «en continuant votre conversation avec Surivitna». Whoever finished «El receptáculo de los dofus» and closed the window before taking «Un sabio entre los sabios» is met again with 40532, the revelation's line, and its replies to 52799. «En la encrucijada de los mundos» (2150): after Pantruku has heard of the vision (16369) he greets with 40499, ahead of 2193's offer, and «Hablar de tu visión y de Pandawelo.» (53314) does 16370: the guide and the flames of the wukin and the wukang (40936, 40937), go back where they wait, Pandawelo will guide (40938), the Daimia Hikomi can grant the right (40939), ask a pandarin in the bamboo palace (40940; replies 53313-53309). Dofus pour les noobs («À la croisée des mondes»): «Allez donc en [20,-27] pour parler à Surivitna « Discuter de votre vision et du Grandapan »». «El sauce del paseante» (2161): «Explicar la situación de Inataba al chamán» (54551, 16658, DPLN's quote) -> 41929 (54550, 54549, 54548) -> 41932 «¿Te ves capaz?» (54547); the five spores and the bulb (16659, 16660, the engine's own bring objectives) are handed over by 54560 -> 41933-41940 (the trance, 54559-54553) and «Aceptar ir al bosque a investigar» (54552). The order is INFERRED from the client's ids (reply ids descend along the talk)."
+      "why": "Surivitna, the shaman of the Pandala village [20,-27]. «El receptáculo de los dofus» (2192), as Dofus pour les noobs, «Le réceptacle des Dofus» has it: «Hola, estoy buscando los seis dofus.» (52761) does 16270; one more would-be hero (40500), but with a brighter aura (40501): the receptacle, a dragon idol waiting for the six dofus (40502); to glimpse what awaits, the eyes must open (40503): a visionary's pint from the Fermenté tavern, drunk before the stone dragon, and his assistant waiting by the Airedala stairs (40504). Back with «Precisamente he sido testigo de una llama crepitante.» (52803, 16279): rare revelations (40532); the path is unclear (52802, 40533); could he guide? (52801) not his role, but a sage whose fate is tied to a dofus (40534); «Háblame más de ese personaje.» (52800): Zoyo, in the zollos' great house (40535), and «Gracias por la información. Adiós.» (52799) hands over «Un sabio entre los sabios» (2193), «en continuant votre conversation avec Surivitna». Whoever finished «El receptáculo de los dofus» and closed the window before taking «Un sabio entre los sabios» is met again with 40532, the revelation's line, and its replies to 52799. «En la encrucijada de los mundos» (2150): after Pantruku has heard of the vision (16369) he greets with 40499, ahead of 2193's offer, and «Hablar de tu visión y de Pandawelo.» (53314) does 16370: the guide and the flames of the wukin and the wukang (40936, 40937), go back where they wait, Pandawelo will guide (40938), the Daimia Hikomi can grant the right (40939), ask a pandarin in the bamboo palace (40940; replies 53313-53309). Dofus pour les noobs («À la croisée des mondes»): «Allez donc en [20,-27] pour parler à Surivitna « Discuter de votre vision et du Grandapan »». «El sauce del paseante» (2161): «Explicar la situación de Inataba al chamán» (54551, 16658, DPLN's quote) -> 41929 (54550, 54549, 54548) -> 41932 «¿Te ves capaz?» (54547); the five spores and the bulb (16659, 16660, the engine's own bring objectives) are handed over by 54560 -> 41933-41940 (the trance, 54559-54553) and «Aceptar ir al bosque a investigar» (54552). The order is INFERRED from the client's ids (reply ids descend along the talk). «Cuando se caldean las ánimas» (2447): «Dire que vous avez un problème avec un esprit qui nourrit des flammes spectrales»: Surivitna thinks of a kitsu and sends the character to the nine-tailed kitsune of Grobe. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 5562,
@@ -63812,6 +63843,9 @@
       "npc": 3253,
       "map": 0,
       "opening": 23889,
+      "openings": [
+        { "quest": 1740, "objective": 11062, "message": 23890 }
+      ],
       "lines": [
         {
           "message": 23889,
@@ -63847,9 +63881,25 @@
           "choices": [
             { "reply": 28737 }
           ]
+        },
+        {
+          "message": 23890,
+          "choices": [
+            { "reply": 28893, "quest": 1740, "next": 24016, "beforeObjective": 11063, "completes": 11063, "params": [[30, 11063]] }
+          ]
+        },
+        {
+          "message": 24016,
+          "choices": [
+            { "reply": 28892, "next": 24017 }
+          ]
+        },
+        {
+          "message": 24017,
+          "choices": []
         }
       ],
-      "why": "Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452). Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452). Pink Tada, «Corrientes acuaticas» (1733): shown the purple crystal (28740, objective 11014, 23903), she explains it (28739, 23904), tells of Deks (28738, 23905) and sends the player to him (28737)."
+      "why": "Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452). Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452). Pink Tada, «Corrientes acuaticas» (1733): shown the purple crystal (28740, objective 11014, 23903), she explains it (28739, 23904), tells of Deks (28738, 23905) and sends the player to him (28737). Pink Tada (3253), «En el fondo de la crisis» (1740): the player asks about the access to the trithon rift (28893, 11063); she points to Stim Power."
     },
     {
       "npc": 2350,
@@ -65031,6 +65081,9 @@
       "map": 0,
       "opening": 23999,
       "openings": [
+        { "canStart": 1741, "message": 24020 },
+        { "quest": 1741, "message": 24000 },
+        { "quest": 1740, "message": 24000 },
         { "quest": 1738, "message": 24000 }
       ],
       "lines": [
@@ -65044,15 +65097,48 @@
           "message": 24000,
           "choices": [
             { "reply": 28864 },
-            { "reply": 28894, "quest": 1738, "next": 24018, "beforeObjective": 11059, "completes": 11059, "params": [[30, 11059]] }
+            { "reply": 28894, "quest": 1738, "next": 24018, "beforeObjective": 11059, "completes": 11059, "params": [[30, 11059]] },
+            { "reply": 28895, "quest": 1740, "next": 24019, "afterObjective": 11069, "beforeObjective": 11070, "completes": 11070, "params": [[30, 11070]] },
+            { "reply": 28900, "quest": 1741, "next": 24022, "beforeObjective": 11075, "completes": 11075, "params": [[30, 11075]] },
+            { "reply": 28901, "quest": 1741, "next": 24024, "afterObjective": 11079, "beforeObjective": 11080, "completes": 11080, "params": [[30, 11080]] }
           ]
         },
         {
           "message": 24018,
           "choices": []
+        },
+        {
+          "message": 24019,
+          "choices": [
+            { "reply": 28902, "next": 24020, "criterion": "Qf=1740&Qa!1741" }
+          ]
+        },
+        {
+          "message": 24020,
+          "choices": [
+            { "reply": 28896, "next": 24021, "startsQuest": 1741, "params": [[34, 1741]] }
+          ]
+        },
+        {
+          "message": 24021,
+          "choices": []
+        },
+        {
+          "message": 24022,
+          "choices": [
+            { "reply": 28897, "quest": 1741, "next": 24023 }
+          ]
+        },
+        {
+          "message": 24023,
+          "choices": []
+        },
+        {
+          "message": 24024,
+          "choices": []
         }
       ],
-      "why": "Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000). Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000). Dama Askina (3268), «Rançon nage» (1738): at the camp she thanks the player for freeing her (11059)."
+      "why": "Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000). Dama Askina (3268), the trithon domain entrance [21,27]: 1731, the third interview (28869, 24000). Dama Askina (3268), «Rançon nage» (1738): at the camp she thanks the player for freeing her (11059). Dama Askina (3268), «En el fondo de la crisis» (1740): the player recounts the fight (28895, 11070). Dama Askina (3268), «Apostarse un ojo de la cara» (1741): she starts the quest (28896), hears the trithon history (28900, 11075) and receives the eye of Ansoh (28901, 11080)."
     },
     {
       "npc": 3276,
@@ -65541,7 +65627,9 @@
           "choices": [
             { "reply": 22873, "next": 19196, "criterion": "Qf=1532&Qa!1571&Qf!1571" },
             { "reply": 23778, "quest": 1610, "criterion": "Qo>9419&Qo<9420", "next": 19831 },
-            { "reply": 23787, "quest": 1610, "criterion": "Qo>9423&Qo<9424", "completes": 9424, "params": [[30, 9424]], "next": 19840 }
+            { "reply": 23787, "quest": 1610, "criterion": "Qo>9423&Qo<9424", "completes": 9424, "params": [[30, 9424]], "next": 19840 },
+            { "reply": 24070, "criterion": "Qa=1613&Qo=9485", "quest": 1613, "completes": 9485, "params": [[30, 9485]], "next": 20102 },
+            { "reply": 24070, "criterion": "Qa=1613&Qo=9485", "quest": 1613, "completes": 9485, "params": [[30, 9485]], "next": 20102 }
           ]
         },
         {
@@ -65571,9 +65659,21 @@
         {
           "message": 19840,
           "choices": []
+        },
+        {
+          "message": 20102,
+          "choices": [
+            { "reply": 24067, "quest": 1613, "next": 20104 }
+          ]
+        },
+        {
+          "message": 20104,
+          "choices": [
+            { "reply": 24066, "quest": 1613, "teleport": 130025987 }
+          ]
         }
       ],
-      "why": "Colonel Onil of the Travelers' Tower vestibule, giver of «La encargada de los zaaps» (1571; Dofus pour les noobs («Le maître des zaaps»): «Parlez au Colonel Oneuil afin qu'il vous donne plus de détail sur le voyage de certains voyageurs dimensionnels en dimension divine Xélorium»). «Me gustaría saber más sobre la llegada de los viajeros a Xelorium» (22873) leads to 19196-19197, «Proponerle tu ayuda» (22875) starts the quest and 19198 is the step's own dialog. INFERRED order of the replies: the client carries sentences and answers but not which go together. «Secreto de producción» (1610; Dofus pour les noobs («Secret de fabrication»)): «¿Has visto a la agente Dublia?» (23778 -> 19831) and, with the potion brewed, «¿Cuándo estará de servicio el agente Yvan Du?» (23787 -> 19840: he is on guard now) closes 9424."
+      "why": "Colonel Onil of the Travelers' Tower vestibule, giver of «La encargada de los zaaps» (1571; Dofus pour les noobs («Le maître des zaaps»): «Parlez au Colonel Oneuil afin qu'il vous donne plus de détail sur le voyage de certains voyageurs dimensionnels en dimension divine Xélorium»). «Me gustaría saber más sobre la llegada de los viajeros a Xelorium» (22873) leads to 19196-19197, «Proponerle tu ayuda» (22875) starts the quest and 19198 is the step's own dialog. INFERRED order of the replies: the client carries sentences and answers but not which go together. «Secreto de producción» (1610; Dofus pour les noobs («Secret de fabrication»)): «¿Has visto a la agente Dublia?» (23778 -> 19831) and, with the potion brewed, «¿Cuándo estará de servicio el agente Yvan Du?» (23787 -> 19840: he is on guard now) closes 9424. «Crise d'identité» (1613; Dofus pour les noobs («Crise d'identité»)): «Tengo importantes revelaciones que hacer» (24070) closes 9485; asking for Harden and Zap (24067) and going to the information room (24066) teleports into it. «Crise d'identité» (1613; Dofus pour les noobs («Crise d'identité»)): «Tengo importantes revelaciones que hacer» (24070) closes 9485; asking for Harden and Zap (24067) and going to the information room (24066) teleports into it."
     },
     {
       "npc": 2655,
@@ -66905,6 +67005,7 @@
           "message": 20003,
           "choices": [
             { "reply": 23954 },
+            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613" },
             { "reply": 23921, "quest": 1609, "completes": 9469, "params": [[30, 9469]], "next": 20004 }
           ]
         },
@@ -66915,6 +67016,8 @@
             { "reply": 23995, "next": 20006, "criterion": "Qa=1609&Qa!1611&Qf!1611" },
             { "reply": 24000, "next": 20007, "criterion": "Qa=1609&Qa!1612&Qf!1612" },
             { "reply": 24007, "next": 20055, "criterion": "Qa=1609&PO=16059|PO=16063|PO=16062" },
+            { "reply": 24011, "next": 20059, "criterion": "Qa=1609&Qf=1610&Qf=1611&Qf=1612" },
+            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613" },
             { "reply": 23953 }
           ]
         },
@@ -66990,7 +67093,7 @@
           ]
         }
       ],
-      "why": "Lonyon the Silent in the Sram temple's crypt (Dofus pour les noobs («Rendez-vous avec la mort»)): he reads out his papers (19995-20003: 'a fine day to die', the Forgotten Brotherhood, the orichor box) and «Te ayudaré» (23921 = 9469) makes the player his spokesman; 20004 is where he hands out the three messages (the three sub-quests add their own replies) and, with the three proofs in, the evidence is shown (20055-20059; 24011 = 9470). INFERRED order of the replies: the client carries sentences and answers but not which go together. The three messages (Dofus pour les noobs («Rendez-vous avec la mort», «Secret de fabrication»)): «Leer el mensaje que lleva la palabra Anutropía/Sramvil/Xelorium» (23991, 23995, 24000) open 20005 / 20006 / 20007-20008, whose accept replies (23988/23989, 23992/23993, 23996/23997) start 1610 / 1611 / 1612. The proofs (24002, 24004, 24006) are the three sub-quests' own hand-overs (9440, 9466, 9484); 24012 closes 9470 and 24014 on line 20060 (the step line of 1613) starts «Crisis de identidad». INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Lonyon the Silent in the Sram temple's crypt (Dofus pour les noobs («Rendez-vous avec la mort»)): he reads out his papers (19995-20003: 'a fine day to die', the Forgotten Brotherhood, the orichor box) and «Te ayudaré» (23921 = 9469) makes the player his spokesman; 20004 is where he hands out the three messages (the three sub-quests add their own replies) and, with the three proofs in, the evidence is shown (20055-20059; 24011 = 9470). INFERRED order of the replies: the client carries sentences and answers but not which go together. The three messages (Dofus pour les noobs («Rendez-vous avec la mort», «Secret de fabrication»)): «Leer el mensaje que lleva la palabra Anutropía/Sramvil/Xelorium» (23991, 23995, 24000) open 20005 / 20006 / 20007-20008, whose accept replies (23988/23989, 23992/23993, 23996/23997) start 1610 / 1611 / 1612. The proofs (24002, 24004, 24006) are the three sub-quests' own hand-overs (9440, 9466, 9484); 24012 closes 9470 and 24014 on line 20060 (the step line of 1613) starts «Crisis de identidad». INFERRED order of the replies: the client carries sentences and answers but not which go together. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open."
     },
     {
       "npc": 6680,
@@ -67069,6 +67172,9 @@
       "npc": 6685,
       "map": 221250564,
       "opening": 50745,
+      "openings": [
+        { "canStart": 2447, "message": 50747 }
+      ],
       "lines": [
         {
           "message": 50745,
@@ -67081,9 +67187,21 @@
           "choices": [
             { "reply": 68031, "quest": 2446, "afterObjective": 18508, "beforeObjective": 18509, "completes": 18509, "params": [[30, 18509]] }
           ]
+        },
+        {
+          "message": 50747,
+          "choices": [
+            { "reply": 68027, "next": 50748 }
+          ]
+        },
+        {
+          "message": 50748,
+          "choices": [
+            { "reply": 68028, "startsQuest": 2447, "params": [[34, 2447]] }
+          ]
         }
       ],
-      "why": "«No hay humo sin fuego» (2446): the Fire Spirit on his pyre of cold flames tells the intruder he does not belong to the world of spirits. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "«No hay humo sin fuego» (2446): the Fire Spirit on his pyre of cold flames tells the intruder he does not belong to the world of spirits. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «Cuando se caldean las ánimas» (2447): the spirit admits he feeds the cold fire that eats the seal of Terrakurial and flees to the enchanted wood (step line 50748, Dofus pour les noobs). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 2794,
@@ -67439,7 +67557,9 @@
         },
         {
           "message": 24310,
-          "choices": []
+          "choices": [
+            { "reply": 29203, "startsQuest": 1738, "params": [[34, 1738]] }
+          ]
         }
       ],
       "why": "Queen Victoria (3246), «Reina de la belleza» (1737): the player relays Dientinea's demands (11046). Queen Victoria (3246), «Reina de la belleza» (1737): the player relays Dientinea's demands (11046)."
@@ -67755,7 +67875,7 @@
     {
       "npc": 3280,
       "map": 0,
-      "opening": null,
+      "opening": 23838,
       "openings": [
         { "quest": 1738, "message": 23838 }
       ],
@@ -67875,6 +67995,8 @@
       "map": 0,
       "opening": 23864,
       "openings": [
+        { "quest": 1740, "objective": 11068, "message": 23871 },
+        { "canStart": 1740, "message": 23871 },
         { "quest": 1739, "objective": 11061, "message": 23869 },
         { "quest": 1739, "objective": 11060, "message": 23868 },
         { "quest": 1739, "message": 23867 }
@@ -67925,9 +68047,30 @@
           "choices": [
             { "reply": 28694, "quest": 1739, "afterObjective": 11061, "beforeObjective": 11062 }
           ]
+        },
+        {
+          "message": 23871,
+          "choices": [
+            { "reply": 28697, "next": 23872, "startsQuest": 1740, "params": [[34, 1740]], "criterion": "Qf=1739&Qa!1740" },
+            { "reply": 28736, "quest": 1740, "next": 23901, "afterObjective": 11068, "beforeObjective": 11069, "completes": 11069, "params": [[30, 11069]] }
+          ]
+        },
+        {
+          "message": 23872,
+          "choices": []
+        },
+        {
+          "message": 23901,
+          "choices": [
+            { "reply": 28735, "quest": 1740, "next": 23902 }
+          ]
+        },
+        {
+          "message": 23902,
+          "choices": []
         }
       ],
-      "why": "Lieutenant Namiento (3269, Trenne in the guide), «Estrategia en trithiempo real» (1739, Dofus pour les noobs): she asks about the Trithons' tactics (28679, 28678), 28677 «Acepto» starts the quest on its declared line 23866; then three training fights with her as ally: a duo of the player's choice (23867), another duo (23868) and the four kinds together (23869). Lieutenant Namiento (3269, Trenne in the guide), «Estrategia en trithiempo real» (1739, Dofus pour les noobs): she asks about the Trithons' tactics (28679, 28678), 28677 «Acepto» starts the quest on its declared line 23866; then three training fights with her as ally: a duo of the player's choice (23867), another duo (23868) and the four kinds together (23869)."
+      "why": "Lieutenant Namiento (3269, Trenne in the guide), «Estrategia en trithiempo real» (1739, Dofus pour les noobs): she asks about the Trithons' tactics (28679, 28678), 28677 «Acepto» starts the quest on its declared line 23866; then three training fights with her as ally: a duo of the player's choice (23867), another duo (23868) and the four kinds together (23869). Lieutenant Namiento (3269, Trenne in the guide), «Estrategia en trithiempo real» (1739, Dofus pour les noobs): she asks about the Trithons' tactics (28679, 28678), 28677 «Acepto» starts the quest on its declared line 23866; then three training fights with her as ally: a duo of the player's choice (23867), another duo (23868) and the four kinds together (23869). Lieutenant Namiento (3269), «En el fondo de la crisis» (1740): she starts the quest (28697), sends the player to Pink Tada, and later receives the propulsion accelerator (28736 shown, 11069) and sends the player to Dama Askina."
     },
     {
       "npc": 2656,
@@ -68241,6 +68384,453 @@
         }
       ],
       "why": "Olivia Frinch outside the megalith (Dofus pour les noobs («C'est dans la boîte»)): she refuses to go to the outpost and leaves the order of travellers for the Well of Souls (20098-20100); 24064 closes 9483. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 3285,
+      "map": 0,
+      "opening": 23873,
+      "openings": [
+        { "quest": 1740, "objective": 11065, "message": 23879 },
+        { "quest": 1740, "objective": 11063, "message": 23873 }
+      ],
+      "lines": [
+        {
+          "message": 23873,
+          "choices": [
+            { "reply": 28700, "quest": 1740, "next": 23875, "beforeObjective": 11064 },
+            { "reply": 28705, "quest": 1740, "next": 23879, "afterObjective": 11064, "beforeObjective": 11065, "completes": 11065, "params": [[30, 11065]] }
+          ]
+        },
+        {
+          "message": 23875,
+          "choices": [
+            { "reply": 28703, "quest": 1740, "next": 23877, "beforeObjective": 11064 }
+          ]
+        },
+        {
+          "message": 23877,
+          "choices": [
+            { "reply": 28702, "quest": 1740, "next": 23878, "beforeObjective": 11064, "gives": 17867 }
+          ]
+        },
+        {
+          "message": 23878,
+          "choices": []
+        },
+        {
+          "message": 23879,
+          "choices": [
+            { "reply": 28704, "quest": 1740, "next": 23876, "afterObjective": 11065, "beforeObjective": 11066 }
+          ]
+        },
+        {
+          "message": 23876,
+          "choices": []
+        }
+      ],
+      "why": "Stim Power (3285), «En el fondo de la crisis» (1740): he explains the propulsion accelerator and gives the brass propeller (28700, 28703, 28702), checks the finished accelerator (28705, 11065) and tells how to explore the rift (28704). Stim Power (3285), «En el fondo de la crisis» (1740): he explains the propulsion accelerator and gives the brass propeller (28700, 28703, 28702), checks the finished accelerator (28705, 11065) and tells how to explore the rift (28704)."
+    },
+    {
+      "npc": 3286,
+      "map": 0,
+      "opening": 23896,
+      "openings": [
+        { "quest": 1741, "objective": 11072, "message": 23910 },
+        { "quest": 1741, "message": 23906 },
+        { "quest": 1740, "objective": 11067, "message": 23897 },
+        { "quest": 1740, "objective": 11066, "message": 23896 }
+      ],
+      "lines": [
+        {
+          "message": 23896,
+          "choices": [
+            { "reply": 28730, "quest": 1740, "beforeObjective": 11067 }
+          ]
+        },
+        {
+          "message": 23897,
+          "choices": [
+            { "reply": 28733, "quest": 1740, "next": 23898, "afterObjective": 11067, "beforeObjective": 11068 }
+          ]
+        },
+        {
+          "message": 23898,
+          "choices": [
+            { "reply": 28732, "quest": 1740, "next": 23899, "afterObjective": 11067, "beforeObjective": 11068, "completes": 11068, "params": [[30, 11068]] }
+          ]
+        },
+        {
+          "message": 23899,
+          "choices": []
+        },
+        {
+          "message": 23906,
+          "choices": [
+            { "reply": 28744, "quest": 1741, "next": 23907, "beforeObjective": 11071 }
+          ]
+        },
+        {
+          "message": 23907,
+          "choices": [
+            { "reply": 28743, "quest": 1741, "next": 23908, "beforeObjective": 11072 }
+          ]
+        },
+        {
+          "message": 23908,
+          "choices": [
+            { "reply": 28742, "quest": 1741, "next": 23909, "beforeObjective": 11072 }
+          ]
+        },
+        {
+          "message": 23909,
+          "choices": [
+            { "reply": 28741, "quest": 1741, "next": 23910, "beforeObjective": 11072 }
+          ]
+        },
+        {
+          "message": 23910,
+          "choices": [
+            { "reply": 28753, "quest": 1741, "next": 23917, "afterObjective": 11072, "beforeObjective": 11073, "gives": 17950, "completes": 11073, "params": [[30, 11073]] }
+          ]
+        },
+        {
+          "message": 23917,
+          "choices": [
+            { "reply": 28752, "quest": 1741, "next": 23918 }
+          ]
+        },
+        {
+          "message": 23918,
+          "choices": [
+            { "reply": 28751, "quest": 1741, "next": 23919 }
+          ]
+        },
+        {
+          "message": 23919,
+          "choices": []
+        }
+      ],
+      "why": "Pulpalas (3286), «En el fondo de la crisis» (1740): she asks for help against a giant deep octopus (28730, fight 11067); afterwards the player thanks her (28733, 28732, 11068). Pulpalas (3286), «En el fondo de la crisis» (1740): she asks for help against a giant deep octopus (28730, fight 11067); afterwards the player thanks her (28733, 28732, 11068). Pulpalas (3286), «Apostarse un ojo de la cara» (1741): she tells of the conflict (28744..28741), then cooks the toxic liver (17950) from the resources the player brings (28753, 11073)."
+    },
+    {
+      "npc": 2335,
+      "map": 130025987,
+      "opening": 20110,
+      "lines": [
+        {
+          "message": 20110,
+          "choices": [
+            { "reply": 24078, "criterion": "Qa=1613&Qo>9486&Qo<9487", "quest": 1613, "completes": 9487, "params": [[30, 9487]], "next": 20113 },
+            { "reply": 24080, "criterion": "Qa=1613&Qo>9494&Qo<9495", "quest": 1613, "completes": 9495, "params": [[30, 9495]], "next": 20117 }
+          ]
+        },
+        {
+          "message": 20113,
+          "names": true,
+          "choices": [
+            { "reply": 24076, "quest": 1613, "next": 20111 }
+          ]
+        },
+        {
+          "message": 20111,
+          "choices": []
+        },
+        {
+          "message": 20117,
+          "choices": [
+            { "reply": 24079, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Exploranciana in the information room (Dofus pour les noobs («Crise d'identité»)): «Tengo cosas importantes que revelar» (24078) closes 9487 and leads to the vial (24076); once every traveller has heard the proofs «No eres quién para hablar de confianza» (24080) closes 9495 and she shows her true form (20117). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2823,
+      "map": 130025987,
+      "opening": 20061,
+      "lines": [
+        {
+          "message": 20061,
+          "choices": [
+            { "reply": 24017, "criterion": "Qa=1613&Qo>9487&Qo<9488", "quest": 1613, "completes": 9488, "params": [[30, 9488]], "next": 20062 }
+          ]
+        },
+        {
+          "message": 20062,
+          "choices": [
+            { "reply": 24016, "quest": 1613, "next": 20063 }
+          ]
+        },
+        {
+          "message": 20063,
+          "choices": [
+            { "reply": 24015, "quest": 1613, "next": 20065 }
+          ]
+        },
+        {
+          "message": 20065,
+          "choices": []
+        }
+      ],
+      "why": "Lonyon Plata in the information room (Dofus pour les noobs («Crise d'identité»)): the vial makes him appear; «Leer en alto el mensaje» (24017) closes 9488, he reads the revelations (20062-20063) and shows the proofs (24015). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2803,
+      "map": 130025987,
+      "opening": 20118,
+      "lines": [
+        {
+          "message": 20118,
+          "choices": [
+            { "reply": 24082, "criterion": "Qa=1613&Qo>9495&Qo<9496", "quest": 1613, "completes": 9496, "params": [[30, 9496]], "next": 20119 }
+          ]
+        },
+        {
+          "message": 20119,
+          "choices": [
+            { "reply": 24083, "quest": 1613, "criterion": "Qo>9496&Qo<9497" }
+          ]
+        }
+      ],
+      "why": "Eco (Dofus pour les noobs («Crise d'identité»)): the travellers are frozen in time (24082 closes 9496); «Atacar a Eco con la ayuda de Lonyon, el Silencioso» (24083) starts the fight with Lonyon (3977) as ally. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2802,
+      "map": 130025987,
+      "opening": 20144,
+      "lines": [
+        {
+          "message": 20144,
+          "choices": [
+            { "reply": 24107, "quest": 1613, "criterion": "Qa=1613&Qo>9497&Qo<9498", "next": 20145 }
+          ]
+        },
+        {
+          "message": 20145,
+          "choices": [
+            { "reply": 24106, "quest": 1613, "next": 20146 }
+          ]
+        },
+        {
+          "message": 20146,
+          "choices": [
+            { "reply": 24104, "quest": 1613, "next": 20147 }
+          ]
+        },
+        {
+          "message": 20147,
+          "choices": [
+            { "reply": 24104, "quest": 1613, "next": 20148 }
+          ]
+        },
+        {
+          "message": 20148,
+          "names": true,
+          "choices": [
+            { "reply": 24104, "quest": 1613, "next": 20149 }
+          ]
+        },
+        {
+          "message": 20149,
+          "choices": [
+            { "reply": 24105, "gives": 16061, "quest": 1613, "completes": 9498, "params": [[30, 9498]] }
+          ]
+        }
+      ],
+      "why": "Septango, guide of the watchers and the former Olivia Frinch (Dofus pour les noobs («Crise d'identité»)): she explains the watchers' role and that Xelor will take the Box in due time; the last reply (24105) closes 9498 and gives the Dofus of the Watchers (16061: the guide's reward). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 3287,
+      "map": 0,
+      "opening": 23924,
+      "openings": [
+        { "quest": 1741, "objective": 11073, "message": 23924 }
+      ],
+      "lines": [
+        {
+          "message": 23924,
+          "choices": [
+            { "reply": 28766, "quest": 1741, "next": 23925, "afterObjective": 11073, "beforeObjective": 11074, "completes": 11074, "params": [[30, 11074]] }
+          ]
+        },
+        {
+          "message": 23925,
+          "choices": [
+            { "reply": 28765, "next": 23926 }
+          ]
+        },
+        {
+          "message": 23926,
+          "choices": [
+            { "reply": 28764, "next": 23927 }
+          ]
+        },
+        {
+          "message": 23927,
+          "choices": [
+            { "reply": 28763, "next": 23928 }
+          ]
+        },
+        {
+          "message": 23928,
+          "choices": [
+            { "reply": 28762, "next": 23929 }
+          ]
+        },
+        {
+          "message": 23929,
+          "choices": [
+            { "reply": 28761, "next": 23930 }
+          ]
+        },
+        {
+          "message": 23930,
+          "choices": [
+            { "reply": 28760, "next": 23931 }
+          ]
+        },
+        {
+          "message": 23931,
+          "choices": [
+            { "reply": 28759, "next": 23932 }
+          ]
+        },
+        {
+          "message": 23932,
+          "choices": []
+        }
+      ],
+      "why": "Carpausanias (3287), «Apostarse un ojo de la cara» (1741): he eats the toxic liver (28766, 11074) and tells the old conflict. Carpausanias (3287), «Apostarse un ojo de la cara» (1741): he eats the toxic liver (28766, 11074) and tells the old conflict."
+    },
+    {
+      "npc": 3288,
+      "map": 0,
+      "opening": 23936,
+      "openings": [
+        { "quest": 1741, "objective": 11075, "message": 23936 }
+      ],
+      "lines": [
+        {
+          "message": 23936,
+          "choices": [
+            { "reply": 28776, "quest": 1741, "next": 23937, "afterObjective": 11075, "beforeObjective": 11076 }
+          ]
+        },
+        {
+          "message": 23937,
+          "choices": [
+            { "reply": 28775, "next": 23938 }
+          ]
+        },
+        {
+          "message": 23938,
+          "choices": [
+            { "reply": 28774, "quest": 1741, "next": 23939, "afterObjective": 11075, "beforeObjective": 11076 }
+          ]
+        },
+        {
+          "message": 23939,
+          "choices": [
+            { "reply": 28773, "next": 23940 }
+          ]
+        },
+        {
+          "message": 23940,
+          "choices": [
+            { "reply": 28772, "next": 23941 }
+          ]
+        },
+        {
+          "message": 23941,
+          "choices": [
+            { "reply": 28771, "quest": 1741, "next": 23942, "afterObjective": 11075, "beforeObjective": 11076, "completes": 11076, "params": [[30, 11076]] }
+          ]
+        },
+        {
+          "message": 23942,
+          "choices": []
+        }
+      ],
+      "why": "Johan Gusstafen (3288), «Apostarse un ojo de la cara» (1741): he tells of the chapel and the eye (28776..28771, 11076). Johan Gusstafen (3288), «Apostarse un ojo de la cara» (1741): he tells of the chapel and the eye (28776..28771, 11076)."
+    },
+    {
+      "npc": 3289,
+      "map": 0,
+      "opening": 23945,
+      "openings": [
+        { "quest": 1741, "objective": 11079, "message": 23948 },
+        { "quest": 1741, "objective": 11078, "message": 23946 },
+        { "quest": 1741, "objective": 11077, "message": 23945 }
+      ],
+      "lines": [
+        {
+          "message": 23945,
+          "choices": [
+            { "reply": 28785, "quest": 1741, "next": 23946, "afterObjective": 11077, "beforeObjective": 11078, "completes": 11078, "params": [[30, 11078]] }
+          ]
+        },
+        {
+          "message": 23946,
+          "choices": [
+            { "reply": 28783, "quest": 1741, "afterObjective": 11078, "beforeObjective": 11079 },
+            { "reply": 28784, "quest": 1741, "afterObjective": 11078, "beforeObjective": 11079 }
+          ]
+        },
+        {
+          "message": 23948,
+          "choices": [
+            { "reply": 28788, "quest": 1741, "afterObjective": 11079, "gives": 18097, "criterion": "PO>28455,0" },
+            { "reply": 28787, "quest": 1741, "next": 23947 }
+          ]
+        },
+        {
+          "message": 23947,
+          "choices": []
+        }
+      ],
+      "why": "Chaplain of Ansoh (3289), «Apostarse un ojo de la cara» (1741): the player asks for the eye (28785, 11078) and defends himself (28783, fight 11079); after it he takes the eye with the Hulhu idol in the bag (28788). Chaplain of Ansoh (3289), «Apostarse un ojo de la cara» (1741): the player asks for the eye (28785, 11078) and defends himself (28783, fight 11079); after it he takes the eye with the Hulhu idol in the bag (28788)."
+    },
+    {
+      "npc": 6685,
+      "map": 60034566,
+      "opening": 50750,
+      "openings": [
+        { "quest": 2447, "objective": 18511, "pending": 18512, "message": 50751 },
+        { "quest": 2447, "objective": 18510, "pending": 18511, "message": 50750 }
+      ],
+      "lines": [
+        {
+          "message": 50750,
+          "choices": [
+            { "reply": 68037, "quest": 2447, "afterObjective": 18510, "beforeObjective": 18511, "next": 50752 }
+          ]
+        },
+        {
+          "message": 50752,
+          "choices": [
+            { "reply": 68035, "quest": 2447, "afterObjective": 18510, "beforeObjective": 18511 }
+          ]
+        },
+        {
+          "message": 50751,
+          "choices": [
+            { "reply": 68040, "quest": 2447, "afterObjective": 18511, "beforeObjective": 18512, "next": 50753 }
+          ]
+        },
+        {
+          "message": 50753,
+          "choices": [
+            { "reply": 68039, "quest": 2447, "afterObjective": 18511, "beforeObjective": 18512, "next": 50757 }
+          ]
+        },
+        {
+          "message": 50757,
+          "choices": [
+            { "reply": 68036 }
+          ]
+        }
+      ],
+      "why": "«Cuando se caldean las ánimas» (2447): in the Petrified Forest [-77,-67] the spirit refuses to bargain and calls the forest creatures («Marchander pour qu'il cesse d'alimenter le feu des sorcières»), then, after the fight, is bluffed («Dire à l'esprit qu'il a gagné») and slips away. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     }
   ]
 }

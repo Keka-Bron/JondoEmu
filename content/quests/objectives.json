@@ -8287,14 +8287,6 @@
    "why": "«Averigua adónde han transportado el oricor»: the refinery's first hall (Dofus pour les noobs («Secret de fabrication»): «Franchissez la première salle»)."
   },
   {
-   "objective": 11039,
-   "quest": 1736,
-   "kind": "enter",
-   "map": 91753989,
-   "afterObjectives": [11038],
-   "why": "«Dirígete a la biblioteca» (644056): the library [20,25], the objective's own map."
-  },
-  {
    "objective": 9426,
    "quest": 1610,
    "kind": "reply",
@@ -8310,21 +8302,6 @@
    "map": 131858951,
    "afterObjectives": [9433],
    "why": "«Roba el oricor refinado»: the three safe-guardians beaten in the inner hall (Dofus pour les noobs («Secret de fabrication»))."
-  },
-  {
-   "objective": 9438,
-   "quest": 1610,
-   "kind": "enter",
-   "map": 131860999,
-   "afterObjectives": [9437],
-   "why": "«Sal de la refinería»: the refinery's entrance (Dofus pour les noobs («Secret de fabrication»))."
-  },
-  {
-   "objective": 11043,
-   "quest": 1737,
-   "kind": "enter",
-   "map": 168820736,
-   "why": "«Dirígete a la entrada del palacio de Dientinea» (649710): [19,26], the objective's own map."
   },
   {
    "objective": 9442,
@@ -8526,6 +8503,83 @@
    "why": "«Recupera 4 fragmentos de tiempo»: the four hunters' fragments, shown to Hyperia (Dofus pour les noobs («C'est dans la boîte»)).",
    "replies": [24045],
    "afterObjectives": [9478]
+  },
+  {
+   "objective": 11064,
+   "quest": 1740,
+   "kind": "reply",
+   "replies": [28702],
+   "why": "«Encuentra a Stim Power en la base abisal» (886841): he hands over the brass propeller (28702)."
+  },
+  {
+   "objective": 11066,
+   "quest": 1740,
+   "kind": "reply",
+   "replies": [28704],
+   "why": "«Explora la falla de los trithones» (886842): Stim tells how to go down (28704)."
+  },
+  {
+   "objective": 9497,
+   "quest": 1613,
+   "kind": "beat",
+   "monsters": [3978],
+   "map": 130025987,
+   "afterObjectives": [9496],
+   "why": "«Ayuda a Lonyon Plata a derrotar a Eco»: the fight against Eco (Dofus pour les noobs («Crise d'identité»))."
+  },
+  {
+   "objective": 11071,
+   "quest": 1741,
+   "kind": "reply",
+   "replies": [28744],
+   "why": "«Encuentra a Pulpalas en la falla de los trithones» (886835): the player questions her about the conflict (28744)."
+  },
+  {
+   "objective": 11072,
+   "quest": 1741,
+   "kind": "reply",
+   "replies": [28741],
+   "why": "«Lleva 5 muestras de algas a Pulpalas» (886836): she accepts to cook for him (28741); the resources are shown with the bring objective."
+  },
+  {
+   "objective": 11079,
+   "quest": 1741,
+   "kind": "beat",
+   "monsters": [4472],
+   "map": 170132486,
+   "why": "«Derrota al capellán de Ansoh para robarle el ojo» (886837): the fight in the chapel."
+  },
+  {
+   "objective": 18510,
+   "quest": 2447,
+   "kind": "enter",
+   "map": 60034566,
+   "why": "«Explora el antiguo bosque encantado en busca del espíritu»: arriving at the Petrified Forest [-77,-67] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 18511,
+   "quest": 2447,
+   "kind": "beat",
+   "monster": 6922,
+   "map": 60034566,
+   "afterObjectives": [18510],
+   "why": "«Enfréntate a las criaturas del bosque»: the forest's mystified creatures called by the spirit."
+  },
+  {
+   "objective": 18512,
+   "quest": 2447,
+   "kind": "reply",
+   "replies": [68039],
+   "afterObjectives": [18511],
+   "why": "«Trata de capturar al espíritu»: the pounce after pretending to leave (68039); he escapes."
+  },
+  {
+   "objective": 18513,
+   "quest": 2447,
+   "kind": "reply",
+   "replies": [68052],
+   "afterObjectives": [18512],
+   "why": "«Pídele ayuda a un especialista en espíritus»: Surivitna's last line, after which the character sets out for Grobe (68052)."
   }
 ]
 }

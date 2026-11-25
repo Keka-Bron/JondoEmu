@@ -1844,6 +1844,36 @@
     { "npc": 2830, "map": 144703490, "reply": 24112,
       "monsters": [ { "monster": 3975, "grade": 0 } ] },
     { "npc": 2827, "map": 144836610, "reply": 24025,
-      "monsters": [ { "monster": 3971, "grade": 0 } ] }
+      "monsters": [ { "monster": 3971, "grade": 0 } ] },
+    { "npc": 3286, "map": 0, "reply": 28730,
+      "monsters": [ { "monster": 4471, "grade": 0 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 4504, "grade": 0 } ],
+      "why": "«En el fondo de la crisis» (1740): Pulpalas (4504) fights beside the player against a giant deep octopus (4471); the fight ends if she dies (Dofus pour les noobs)." },
+    {
+      "npc": 2803,
+      "map": 130025987,
+      "reply": 24083,
+      "monsters": [
+        {
+          "monster": 3978,
+          "grade": 0
+        }
+      ],
+      "allies": [
+        {
+          "monster": 3977,
+          "grade": 0
+        }
+      ],
+      "criterion": "Qa=1613&Qo>9496&Qo<9497",
+      "why": "«Ayuda a Lonyon Plata a derrotar a Eco» (1613), objective 9497: Dofus pour les noobs («Crise d'identité»): the fight is alone with Lonyon at the player's side (ally 3977). The guide's special rules (the player invulnerable, only Lonyon able to hit Eco, Eco hitting only in melee) are not modelled."
+    },
+    { "npc": 3289, "map": 0, "reply": 28783,
+      "monsters": [ { "monster": 4472, "grade": 0 } ],
+      "why": "«Apostarse un ojo de la cara» (1741): the chaplain of Ansoh (4472) in his chapel; several players may fight (Dofus pour les noobs)." },
+    { "npc": 6685, "map": 60034566, "reply": 68035,
+      "monsters": [ { "monster": 6922, "grade": 2 }, { "monster": 6923, "grade": 2 }, { "monster": 6924, "grade": 2 } ], "marks": -2447001,
+      "why": "«Cuando se caldean las ánimas» (2447): the creatures of the Petrified Forest (Abrazif, Fongeur and Fistulor mystifiés: Spore d'oeuvre/Taporte, Volve Hérine/Spore Tafaux/Higami, Cèpe Tique/Ami Célium) attack. Dofus pour les noobs: «Un combat se lance, il peut se faire à plusieurs»." }
   ]
 }
