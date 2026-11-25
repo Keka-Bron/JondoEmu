@@ -223,6 +223,7 @@ namespace Jondo.Unity.Server
             Managers.Quests.Load();
             Managers.Readables.Load();
             Managers.InteractiveMessages.Load();
+            Managers.FloorRiddles.Load();
             Managers.DungeonExitRooms.Load();
             Managers.FightWinAlterations.Load();
             Managers.IdolRules.Load();

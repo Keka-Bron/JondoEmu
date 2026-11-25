@@ -747,6 +747,7 @@
     { "map": 214436866, "element": 539571, "document": 695, "why": "Clicked on the official server: opens document 695. official server packet captures, 2026-11-17 to 11-21" },
     { "map": 214695940, "element": 522246, "document": 241, "why": "Clicked on the official server: opens document 241. official server packet captures, 2026-11-17 to 11-21" },
     { "map": 215876610, "element": 522299, "document": 254, "why": "Clicked on the official server: opens document 254. official server packet captures, 2026-11-17 to 11-21" },
-    { "map": 217062400, "element": 522839, "document": 241, "why": "Clicked on the official server: opens document 241. official server packet captures, 2026-11-17 to 11-21" }
+    { "map": 217062400, "element": 522839, "document": 241, "why": "Clicked on the official server: opens document 241. official server packet captures, 2026-11-17 to 11-21" },
+    {"map": 187172354, "element": 511765, "documents": [519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542], "why": "Quest 1934: the toxins' scrolls (gfx 61706). The riddle is «différente d'une personnage à l'autre, il en existe un total de 24» (Dofus pour les noobs, «La bande des Toxines»): documents 519-542, one per character, always the same one."}
   ]
 }

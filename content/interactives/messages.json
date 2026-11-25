@@ -378,6 +378,23 @@
       "gives": [{ "item": 27416, "count": 1 }],
       "criterion": "PT!24015&PT!24016",
       "what": "Kanniball Village - Exit [29,9]: the urn at the back of the room, left of the throne (cell 191, graphic 34898), hands the Kannibubble Scroll (27416), which teaches the common spell Kannibubble (24015). Dofus pour les noobs, «Village Kanniboul»: «Il faut commencer par vaincre le Boss», then «cliquer sur l'urne au fond de la map à gauche du Trône»; the scroll is bound to the character. The winners only reach this room past Kanniball Andchain, so the boss is beaten by being here. The criterion is the scroll's own (PT!24015&PT!24016): not to a character who already knows the spell, and not a second one while one is carried. Neither the urn's skill nor whether a run gives more than one scroll is measured: «Usar» 184 as the other urns and statues here."
-    }
+    },
+    {"map": 187304450, "element": 511766, "cases": [{"criterion": "PO=19476", "lacks": ["watched", "padlock"], "message": 867, "mark": "padlock"}, {"lacks": "padlock", "message": 866, "mark": "watched", "for": 120}], "what": "Quest 1934: the cell's padlock (gfx 62305). With the lockpick it opens without a sound (867) and stays open; without it the chains rattle and the guardian comes back to watch (866, two minutes). Order from the guide."},
+    {"map": 187304450, "element": 511708, "cases": [{"needs": "watched", "message": 862}, {"needs": "padlock", "toMap": 187303426, "toCell": 199}], "what": "Quest 1934: the cell's grille. Once the padlock is open it leads out (to 187303426, by the box 511759 at 198; arrival 199 the walkable cell beside it); while the guardian watches, 862. Locked, nothing."},
+    {"map": 187304450, "element": 511767, "cases": [{"message": [869, 868], "mark": "watched", "for": 120}], "what": "Quest 1934: the cell's bell (gfx 3313): «¡DING, DING!», then the guardian comes and stays to watch (868)."},
+    {"map": 187304450, "element": 511771, "message": 870, "what": "Quest 1934 cell: the potatoes (gfx 46566)."},
+    {"map": 187304450, "element": 511768, "message": 871, "what": "Quest 1934 cell: the latrine (gfx 59453)."},
+    {"map": 187304450, "element": 511769, "message": 873, "what": "Quest 1934 cell: the empty plate (gfx 59456)."},
+    {"map": 187304450, "element": 511770, "message": 874, "what": "Quest 1934 cell: the bowl of stale water (gfx 32871)."},
+    {"map": 187304450, "element": 511772, "message": 875, "what": "Quest 1934 cell: the skeleton by the view of the sea of clouds (gfx 54643)."},
+    {"map": 187171330, "element": 511773, "message": 876, "what": "Quest 1934 islets: the caught prisoner's skeleton (gfx 58703)."},
+    {"map": 187303426, "element": 511759, "cases": [{"criterion": "PO=19437", "gives": [{"item": 19472}]}, {"message": 861, "toMap": 187304450, "toCell": 300}], "what": "Quest 1934: the creaking box past the cell (gfx 40690). Oiled (oil can 19437) it gives Venin dilué 19472; otherwise it creaks, the guardian is alerted, back to the cell (861)."},
+    {"map": 187302402, "element": 511757, "cases": [{"criterion": "PO=19437", "gives": [{"item": 19473}]}, {"message": 861, "toMap": 187304450, "toCell": 300}], "what": "Quest 1934: the creaking box of the three-door room (gfx 40690): Pincée de fourberie 19473 once oiled; 861 otherwise."},
+    {"map": 187171330, "element": 511764, "cases": [{"criterion": "PO=19437", "gives": [{"item": 19474}]}, {"message": 861, "toMap": 187304450, "toCell": 300}], "what": "Quest 1934: the creaking box by the upper-left islet (gfx 40690): Eau de Nivunikonu 19474 once oiled; 861 otherwise."},
+    {"map": 187171330, "element": 511758, "cases": [{"gives": [{"item": 19437}]}], "what": "Quest 1934: the oil flask on the crate of the last islet (gfx 15911): the oil can 19437 that opens the creaking boxes."},
+    {"map": 187171330, "element": 511763, "cases": [{"message": 865, "toMap": 187304450, "toCell": 300}], "what": "Quest 1934: the mulou trap of the islets (gfx 57489): 865, the guardian takes you to the cell."},
+    {"map": 187303426, "element": 511753, "cases": [{"gives": [{"item": 19471}]}], "what": "Quest 1934: the chest on the platform past the last islet's door (gfx 16867): Venimeuse's key 19471."},
+    {"map": 187172354, "element": 511762, "cases": [{"mark": "recipe"}], "what": "Quest 1934: the alchemy book (gfx 60806): the volatile espionage potion's recipe, remembered."},
+    {"map": 187172354, "element": 511754, "cases": [{"criterion": "PO=19470", "message": 859}, {"needs": "recipe", "criterion": "PO=19472&PO=19473&PO=19474", "takes": [{"item": 19472}, {"item": 19473}, {"item": 19474}], "gives": [{"item": 19470}]}, {"message": 858}], "what": "Quest 1934: the toxins' alembic (gfx 53713). Already holding the potion, 859; with the recipe read and the three ingredients it brews the volatile espionage potion 19470; otherwise 858."}
   ]
 }

@@ -581,6 +581,24 @@
       "npc": 4655,
       "replies": [39544],
       "why": "Cocabulia's lair: after the boss the winners are in the fifth room's second map (198972418) where Cocabulia (4655) lies; Retroceder y asegurarte de que la sed de la espada ha sido saciada antes de abandonar el lugar (39544) leaves. Moja la espada con la sangre de Cocabulia (2036) is her other reply (39545). Dofus pour les noobs (Le forgeur de légende): ne sortez pas tout de suite du donjon... Parlez a la Crocabulia."
+    },
+    {
+      "dungeon": 97,
+      "bossRoom": 169873408,
+      "room": 169874432,
+      "cell": 425,
+      "npc": 3258,
+      "replies": [28923, 28559, 28933],
+      "why": "Captain Meno's Ship (dungeon 97): after the boss the winners are in «Capitán Meno - Salida» (169874432), where Captain Meno stands beside the ship's wheel (DPLN «Piège de crystal»: «Une fois le donjon terminé, parlez au Capitaine Meno avant de sortir», screenshot titled «Capitaine Meno - Sortie»; the client's own data puts quest 1735's objective 11037 and 1736's hand-over 11042 on this map). His «Leave the submarine» (28923), «Leave Captain Meno's Ship» (28559) and «Shrug your shoulders and leave the submarine» (28933) leave. Cell 425: where the character stands in that screenshot, measured against tools/dibujar_mapa.py; +-1 cell."
+    },
+    {
+      "dungeon": 99,
+      "bossRoom": 169611264,
+      "room": 169612288,
+      "cell": 491,
+      "npc": 3257,
+      "replies": [28635, 28639],
+      "why": "Dientinea's Palace (dungeon 99): after Dientinea the winners are in her throne room (169612288, screenshot titled «Palais de Dantinéa - Sortie»), where she dictates her demands (1737, objective 11045). «Note down her demands and leave the palace.» (28635) and «Leave the palace.» (28639) leave. Cell 491: where the character stands in the DPLN «Reine de beauté» screenshot of that room, measured against tools/dibujar_mapa.py; +-1 cell."
     }
   ]
 }

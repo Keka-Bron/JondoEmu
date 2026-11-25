@@ -7757,14 +7757,6 @@
    "why": "«Habla con el Rebanacuellos» (453810): showing him the glove (22482) and «Entrar» (22481) lets the player through to the alley (Dofus pour les noobs («La voix de son maître»))."
   },
   {
-   "objective": 10987,
-   "quest": 1732,
-   "kind": "click",
-   "elements": [{"map": 99096075, "element": 497312}],
-   "gives": [{"item": 17860, "count": 1}],
-   "why": "«Busca a Rykke Zane por los alrededores de Sufokia» (644038): the rock of the shipwreck [15,21] hands over Rykke's old lute (17860) (Dofus pour les noobs: Cliquez sur le rocher au milieu de la map afin d'obtenir un Vieux luth); element 497312, the only one of the room without a skill, is INFERRED."
-  },
-  {
    "objective": 10999,
    "quest": 1732,
    "kind": "enter",
@@ -8720,22 +8712,6 @@
    "why": "«Charla con los supervivientes»: greeting Reltux Richards in the wood (Dofus pour les noobs («Promenons nous dans les bois»))."
   },
   {
-   "objective": 3746,
-   "quest": 590,
-   "kind": "talk",
-   "npc": 1293,
-   "map": 54163252,
-   "why": "«Acompaña a Ally Storm hasta Adalid»: the follower is not authored; Reltux's second greeting stands for taking Ally along (Dofus pour les noobs («Promenons nous dans les bois»))."
-  },
-  {
-   "objective": 3749,
-   "quest": 590,
-   "kind": "talk",
-   "npc": 1293,
-   "map": 54163252,
-   "why": "«Acompaña a DaLny Storm hasta Adalid»: as 3746, the third greeting (Dofus pour les noobs («Promenons nous dans les bois»))."
-  },
-  {
    "objective": 3760,
    "quest": 591,
    "kind": "walk",
@@ -9318,37 +9294,6 @@
    "why": "«Esconde los cebos» (649712): the flower-like element of Old Sufokia [22,30] where the bait goes (Dofus pour les noobs: click on the sort of flower, then stand next to the goblin); element INFERRED."
   },
   {
-   "objective": 12449,
-   "quest": 1867,
-   "kind": "click",
-   "elements": [{"map": 171707400, "element": 510904}],
-   "gives": [{"item": 18821, "count": 1}],
-   "why": "«Consigue un recuerdo de Azrim en la gruta en la que el chamán meditaba» (725023): the camp-fire remains in Azrim's cave [-22,-3] (element 510904) capture the memory with the crystal globe (Dofus pour les noobs («Dernier contact»))."
-  },
-  {
-   "objective": 12451,
-   "quest": 1867,
-   "kind": "enter",
-   "map": 171835915,
-   "why": "«Encuentra a los merodeadores milubos» (725076): their camp [-29,0] (Dofus pour les noobs («Dernier contact»))."
-  },
-  {
-   "objective": 12452,
-   "quest": 1867,
-   "kind": "beat",
-   "monsters": [4903, 4904, 4905],
-   "map": 171835915,
-   "afterObjectives": [12451],
-   "why": "«Vence a los merodeadores milubos» (725077): the rabid, hungry and cruel marauders beaten in one solo fight (Dofus pour les noobs («Dernier contact»)); the rabid one drops the bone totem (18822) through its client drop."
-  },
-  {
-   "objective": 12448,
-   "quest": 1867,
-   "kind": "enter",
-   "map": 171707400,
-   "why": "«Gruta de Azrim» (725019), a «discover the map» objective that carries no map in the client's data (it names the cave only as text) and so stays open: Azrim's cave [-22,-3] (Dofus pour les noobs, «Dernier contact»)."
-  },
-  {
    "objective": 11274,
    "quest": 1765,
    "kind": "enter",
@@ -9696,6 +9641,49 @@
    "kind": "objectives",
    "afterObjectives": [13173],
    "why": "«Descubre más cosas sobre Hyrkul»: «El Guerrero Negro» (1914) done, 13173 its last objective."
+  },
+  {
+   "objective": 12449,
+   "quest": 1867,
+   "kind": "click",
+   "elements": [{"map": 171707400, "element": 510904}],
+   "gives": [{"item": 18821, "count": 1}],
+   "why": "«Consigue un recuerdo de Azrim en la gruta en la que el chamán meditaba» (725023): the camp-fire remains in Azrim's cave [-22,-3] (element 510904) capture the memory with the crystal globe (Dofus pour les noobs («Dernier contact»)).",
+   "anyOrder": true
+  },
+  {
+   "objective": 12451,
+   "quest": 1867,
+   "kind": "enter",
+   "map": 171835915,
+   "why": "«Encuentra a los merodeadores milubos» (725076): their camp [-29,0] (Dofus pour les noobs («Dernier contact»)).",
+   "anyOrder": true
+  },
+  {
+   "objective": 12452,
+   "quest": 1867,
+   "kind": "beat",
+   "monsters": [4903, 4904, 4905],
+   "map": 171835915,
+   "afterObjectives": [12451],
+   "why": "«Vence a los merodeadores milubos» (725077): the rabid, hungry and cruel marauders beaten in one solo fight (Dofus pour les noobs («Dernier contact»)); the rabid one drops the bone totem (18822) through its client drop.",
+   "anyOrder": true
+  },
+  {
+   "objective": 12448,
+   "quest": 1867,
+   "kind": "enter",
+   "map": 171707400,
+   "why": "«Gruta de Azrim» (725019), a «discover the map» objective that carries no map in the client's data (it names the cave only as text) and so stays open: Azrim's cave [-22,-3] (Dofus pour les noobs, «Dernier contact»).",
+   "anyOrder": true
+  },
+  {
+   "objective": 10987,
+   "quest": 1732,
+   "kind": "click",
+   "elements": [{"map": 99096075, "element": 474399}],
+   "gives": [{"item": 17860, "count": 1}],
+   "why": "«Busca a Rykke Zane por los alrededores de Sufokia» (644038): the DPLN screenshot circles the round hatch on the right wall of the shipwreck [15,21] (element 474399, gfx 36222, cell 249 in the client's map data), which hands over Rykke's old lute (17860); the barrel 497312 the earlier pass used is not what DPLN shows (Dofus pour les noobs: Cliquez sur le rocher au milieu de la map)."
   }
 ]
 }

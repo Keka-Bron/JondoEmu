@@ -182,6 +182,9 @@ namespace Jondo.Unity.Server.Handlers
             await Managers.Quests.OnWalkedAsync(session, mapId, cellId);
             // A plate of a gate that wants characters on all its plates at once.
             await Managers.PlateGates.SteppedAsync(mapId, cellId);
+            // A puzzle's cell: the lockpick under the vent, a riddle's numbered tiles.
+            if (await PuzzleHandler.SteppedAsync(stream, mapId, cellId))
+                return;
             if (await AlmanaxTempleHandler.WalkAsync(stream, mapId, cellId))
                 return;
             if (!Managers.TeleportManager.TryGetCellTrigger(mapId, cellId, out var found))

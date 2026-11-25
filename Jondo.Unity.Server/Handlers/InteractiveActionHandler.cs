@@ -72,9 +72,9 @@ namespace Jondo.Unity.Server.Handlers
                 // A plain document awaits its close button; one that asks closes as the question does.
                 if (lectura.Asks)
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,
-                        ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, lectura.Document).Build()));
+                        ConnectionProtocol.Push(Op.Kkt, Pb.New().Var(2, lectura.DocumentFor(SessionContext.State.CharacterId)).Build()));
                 else
-                    await ReadingItemHandler.OpenAsync(stream, lectura.Document);
+                    await ReadingItemHandler.OpenAsync(stream, lectura.DocumentFor(SessionContext.State.CharacterId));
 
                 // And after it, if it asks, the question. After the document because first one reads
                 // and then decides, which is the order a person does it in.
@@ -88,7 +88,7 @@ namespace Jondo.Unity.Server.Handlers
                             ConnectionProtocol.BuildNpcQuestion(lectura.Question, respuestas)));
                 }
 
-                Console.WriteLine($"[Readables] Document {lectura.Document} of element " +
+                Console.WriteLine($"[Readables] Document {lectura.DocumentFor(SessionContext.State.CharacterId)} of element " +
                                   $"{elementId} is read{(lectura.Asks ? ", with a question" : "")}.");
 
                 // And a quest that asked to read it (the Dofusarium's statues, the temple's book).
@@ -113,6 +113,11 @@ namespace Jondo.Unity.Server.Handlers
             {
                 // A statue prayed at no longer offers «Rezar».
                 if (InteractiveWays.Has(mapId, elementId)) await InteractiveWaysHandler.RefreshAsync(stream, mapId);
+                // A way the quest asked to take still takes the character: the mine's cart ticks
+                // «get in the cart» and then rides down, as any other use of it does.
+                if (InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out var way, out var ride)
+                    && ride.Kind == InteractiveActionKind.Teleport)
+                    await TeleportHandler.UseAsync(stream, way.Element.Id, ride.SkillId);
                 return;
             }
 
@@ -127,6 +132,15 @@ namespace Jondo.Unity.Server.Handlers
             {
                 await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Iwn,
                     ConnectionProtocol.BuildElementInUse(elementId, said.Skill, SessionContext.State.CharacterId)));
+                // A puzzle's element answers by what the character carries and has done: the prison's
+                // padlock rattles without the lockpick and opens with it (PuzzleCase). With no case
+                // that holds it says what the row says.
+                var answer = said.Cases.Length > 0 ? PuzzleHandler.Pick(said.Cases) : null;
+                if (answer != null)
+                {
+                    await PuzzleHandler.PlayAsync(stream, answer, $"element {elementId} of {mapId}");
+                    return;
+                }
                 if (said.Message != 0)
                     await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Lqn,
                         ConnectionProtocol.BuildInfoMessage(InfoMessages.Info, said.Message,

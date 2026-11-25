@@ -1,0 +1,109 @@
+{
+  "_comment": [
+    "Cells that answer whoever stops on them (Managers/FloorRiddles.cs).",
+    "spots: a cell with PuzzleCase cases (criterion, needs/lacks marks, message, gives, takes, mark, unmark, for, toMap, toCell).",
+    "riddles: numbered floor tiles, one step per island; the right digit of a step sends the character to that",
+    "step's toCell, any other plays «wrong». The digits come from the document the readable gave the character",
+    "(answers keyed by document id)."
+  ],
+  "spots": [
+    {
+      "map": 187304450,
+      "cell": 353,
+      "cases": [
+        {
+          "criterion": "PO!19476",
+          "lacks": "watched",
+          "message": 863,
+          "gives": [
+            {
+              "item": 19476
+            }
+          ]
+        }
+      ],
+      "why": "Quest 1934, the cell: «Allez dans le coin en bas à gauche de la carte, au-dessus de la bouche d'aération» (Dofus pour les noobs, «La bande des Toxines»); message 863 «Encuentras una vieja llave maestra escondida bajo la rejilla de ventilación». Cell 353 is the floor's left corner on the lower-left edge, INFERRED; not while the guardian watches."
+    },
+    {
+      "map": 187171330,
+      "cell": 120,
+      "cases": [
+        {
+          "toMap": 187171330,
+          "toCell": 547
+        }
+      ],
+      "why": "Quest 1934, the islets: the skull tile (gfx 57819) on the last islet «returns you to the other side» (Dofus pour les noobs, «La bande des Toxines»): back to the first islet by the door to the three-door room. Landing cell 547 INFERRED."
+    }
+  ],
+  "riddles": [
+    {
+      "map": 187171330,
+      "readable": {
+        "map": 187172354,
+        "element": 511765
+      },
+      "answers": {
+        "519": "245",
+        "520": "248",
+        "521": "254",
+        "522": "258",
+        "523": "284",
+        "524": "285",
+        "525": "425",
+        "526": "428",
+        "527": "452",
+        "528": "458",
+        "529": "482",
+        "530": "485",
+        "531": "524",
+        "532": "528",
+        "533": "542",
+        "534": "548",
+        "535": "582",
+        "536": "584",
+        "537": "824",
+        "538": "825",
+        "539": "842",
+        "540": "845",
+        "541": "852",
+        "542": "854"
+      },
+      "steps": [
+        {
+          "tiles": {
+            "421": 4,
+            "450": 2,
+            "479": 5,
+            "508": 8
+          },
+          "toCell": 268
+        },
+        {
+          "tiles": {
+            "143": 4,
+            "186": 8,
+            "210": 2,
+            "254": 5
+          },
+          "toCell": 530
+        },
+        {
+          "tiles": {
+            "388": 5,
+            "417": 8,
+            "429": 2,
+            "458": 4
+          },
+          "toCell": 235
+        }
+      ],
+      "wrong": {
+        "message": 860,
+        "toMap": 187304450,
+        "toCell": 300
+      },
+      "why": "Quest 1934: «marchez sur les dalles dans l'ordre de la solution» (Dofus pour les noobs, «La bande des Toxines»); the riddle the scrolls give is «différente d'une personnage à l'autre, il en existe un total de 24», documents 519-542, each solved by three digits (the guide's table). The digit tiles are the client's sprites 13532/13534/13535/13538 (2/4/5/8) on each islet; the islets in order: the door's (lower left), upper left, lower right, then the islet of the last door. Landing cells (268, 530, 235) are INFERRED: walkable cells of the next islet off its tiles. A wrong tile is message 860, back to the cell."
+    }
+  ]
+}

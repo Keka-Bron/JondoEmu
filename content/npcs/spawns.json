@@ -7236,20 +7236,6 @@
       "why": "Poly Perkin beside the mysterious merchant at [25,26] (1731, objective 10984); INFERRED cell."
     },
     {
-      "map": 170131458,
-      "npc": 3266,
-      "cell": 342,
-      "orientation": 3,
-      "why": "Prosper Maramado (3266) in the underwater house [22,28] (Dofus pour les noobs, 1731); the client's map data holds no placement, INFERRED cell."
-    },
-    {
-      "map": 168822786,
-      "npc": 3268,
-      "cell": 271,
-      "orientation": 3,
-      "why": "Dama Askina (3268) at the trithon domain entrance [21,27] (Dofus pour les noobs, 1731); no placement in the client data, INFERRED cell."
-    },
-    {
       "map": 137367552,
       "npc": 2344,
       "cell": 300,
@@ -7319,22 +7305,6 @@
       "orientation": 3,
       "criterion": "Qa=1732",
       "why": "Sered at the plateau of Ryluglugló [25,26] (1732, objective 11000); INFERRED cell."
-    },
-    {
-      "map": 168560642,
-      "npc": 3244,
-      "cell": 402,
-      "orientation": 3,
-      "criterion": "Qa=1732",
-      "why": "Sered at [27,27] by the ghost (1732, objectives 11003 to 11005); INFERRED cell."
-    },
-    {
-      "map": 168560642,
-      "npc": 3275,
-      "cell": 388,
-      "orientation": 3,
-      "criterion": "Qa=1732",
-      "why": "Espiritu melancolico (3275): Rykke Zane's ghost at [27,27] (1732, Dofus pour les noobs: Montrez le luth a l'esprit melancolique); the client's map data holds no placement, INFERRED cell."
     },
     {
       "map": 147850754,
@@ -7674,14 +7644,6 @@
     },
     {
       "map": 169084930,
-      "npc": 3258,
-      "cell": 245,
-      "orientation": 3,
-      "criterion": "Qf=1735|Qo=11037",
-      "why": "Captain Meno on the ship's entrance (1735 objective 11037, then 1736): the dungeon's exit leaves the player there, not in his room 169874432; INFERRED cell."
-    },
-    {
-      "map": 169084930,
       "npc": 3281,
       "cell": 232,
       "orientation": 3,
@@ -7743,14 +7705,6 @@
       "orientation": 1,
       "criterion": "Qa=1610&Qo>9437&Qo<9440",
       "why": "Dofus pour les noobs («Secret de fabrication»): Agent Dublia outside the refinery. INFERRED cell."
-    },
-    {
-      "map": 168820736,
-      "npc": 3257,
-      "cell": 331,
-      "orientation": 3,
-      "criterion": "Qa=1737&Qo>11044&Qo<11046",
-      "why": "Dientinea at the palace entrance after the dungeon (1737, objective 11045): the engine's dungeon exit leaves the player here, not in her room 169612288; INFERRED cell."
     },
     {
       "map": 134222852,
@@ -8045,13 +7999,6 @@
       "orientation": 3,
       "criterion": "Qa=1744&Qo>11105&Qo<11108",
       "why": "Captain Meno in the sanctuary of Leonora (1744, 11106/11107: he appears after the guardian); INFERRED cell."
-    },
-    {
-      "map": 54163252,
-      "npc": 1293,
-      "cell": 301,
-      "orientation": 1,
-      "why": "Dofus pour les noobs («Promenons nous dans les bois»): Richard Rouge (Reltux Richards, the blue Xelor) in the wood [-59,-52]. INFERRED cell."
     },
     {
       "map": 221251586,
@@ -8373,14 +8320,6 @@
       "why": "The crowned gull caged in Gerard's storeroom (1845). INFERRED cell."
     },
     {
-      "map": 179308545,
-      "npc": 3739,
-      "cell": 300,
-      "orientation": 3,
-      "criterion": "Qa=1845&Qo>12282&Qo<12283",
-      "why": "The alchemist escorted to Kaskarina (1845, 12282): spawned beside her instead of following. INFERRED cell."
-    },
-    {
       "map": 120062979,
       "npc": 4821,
       "cell": 301,
@@ -8508,22 +8447,6 @@
       "why": "The second magicorrinco of the ruffians' cage on the Rocky Roads (1853). INFERRED cell."
     },
     {
-      "map": 179308545,
-      "npc": 3812,
-      "cell": 288,
-      "orientation": 3,
-      "criterion": "Qa=1853&Qo>12329&Qo<12332",
-      "why": "A magicorrinco brought to Animatopia (1853, 12329): spawned beside Kaskarina instead of following. INFERRED cell."
-    },
-    {
-      "map": 179308545,
-      "npc": 3812,
-      "cell": 301,
-      "orientation": 3,
-      "criterion": "Qa=1853&Qo>12329&Qo<12332",
-      "why": "The second magicorrinco brought to Animatopia (1853, 12329). INFERRED cell."
-    },
-    {
       "map": 171443205,
       "npc": 3971,
       "cell": 300,
@@ -8631,6 +8554,102 @@
       "orientation": 1,
       "criterion": "Qa=1909&Qo>13101&Qo<13102",
       "why": "Spirit of Menalt at the Ilyzaelle viewpoint once Hyrkul is beaten (1909, 13102; Dofus pour les noobs «Nordalie»); cell INFERRED next to Hyrkul's."
+    },
+    {
+      "map": 170131458,
+      "npc": 3266,
+      "cell": 327,
+      "orientation": 3,
+      "why": "Prosper Maramado (3266) in the underwater house [22,28] (Dofus pour les noobs, 1731); the client's map data holds no placement Cell 327 measured on the DPLN screenshot of the talk (Prosper standing right of the clay pot beside his desk, under the hanging yellow sheet) against tools/dibujar_mapa.py: the pot is on the drawing at the cell left of 327; +-1 cell."
+    },
+    {
+      "map": 168822786,
+      "npc": 3268,
+      "cell": 457,
+      "orientation": 3,
+      "why": "Dama Askina (3268) at the trithon domain entrance [21,27] (Dofus pour les noobs, 1731); no placement in the client data Cell 457 measured on the DPLN screenshot of her talk (she stands in front of the glowing console beside the ruined arch, right of it) against the numbered drawing of the map: the console is on 428-441 and she is two cells right and one row down; +-1 cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3275,
+      "cell": 453,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Espiritu melancolico (3275): Rykke Zane's ghost at [27,27] (1732, Dofus pour les noobs: Montrez le luth a l'esprit melancolique); the client's map data holds no placement Cell 453 measured on the DPLN screenshot of the lute scene (the ghost floats in front of the large fossil shell, below its cave opening) against the numbered drawing; +-1 cell."
+    },
+    {
+      "map": 168560642,
+      "npc": 3244,
+      "cell": 454,
+      "orientation": 3,
+      "criterion": "Qa=1732",
+      "why": "Sered at [27,27] by the ghost (1732, objectives 11003 to 11005) Cell 454 measured on the same DPLN screenshot (the banner bearer standing right beside the ghost); +-1 cell."
+    },
+    {
+      "map": 169874432,
+      "npc": 3258,
+      "cell": 371,
+      "orientation": 3,
+      "why": "Captain Meno in his exit room, beside the ship's wheel (DPLN «Piège de crystal» screenshot «Capitaine Meno - Sortie»: he stands left of the wheel with the pink coral at his feet), cell 371 measured against the numbered drawing of the map; +-1 cell. The client's data puts 1735's 11037 and 1736's 11042 here."
+    },
+    {
+      "map": 169612288,
+      "npc": 3257,
+      "cell": 373,
+      "orientation": 3,
+      "why": "Dientinea on her throne room's dais in front of the great statue (DPLN «Reine de beauté» screenshot «Palais de Dantinéa - Sortie»: red-haired octopus queen right of the dark fallen seaweed), cell 373 measured against the numbered drawing; +-1 cell."
+    },
+    {
+      "map": 169084930,
+      "npc": 3278,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=1736&Qo>11041&Qo<11042",
+      "why": "Meno's Snapper (Pichon kloune de Meno, 3278) at the ship's entrance [24,27] after the organ score (1736, DPLN «Son nom est Personne»: «Parlez au Pichon kloune de Meno pour retourner voir Meno»); cell 313 measured on that screenshot against the numbered drawing (the small orange Snapper in the middle of the square, left of the glass-windowed house); +-1 cell."
+    },
+    {
+      "map": 168822786,
+      "npc": 3268,
+      "cell": 287,
+      "remove": true
+    },
+    {
+      "map": 169612288,
+      "npc": 3257,
+      "cell": 426,
+      "remove": true
+    },
+    {
+      "map": 54163252,
+      "npc": 1294,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qf!590&Qo<3746",
+      "why": "Dofus pour les noobs («Promenons nous dans les bois»): Ally Storm (Staurme Sioux, the Sram) in the wood [-59,-52] until she is escorted. INFERRED cell."
+    },
+    {
+      "map": 54163252,
+      "npc": 1295,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qf!590&Qo<3749",
+      "why": "Dofus pour les noobs («Promenons nous dans les bois»): DaLny Storm (Staurme Jauni, the Iop) in the wood until he is escorted. INFERRED cell."
+    },
+    {
+      "map": 54163252,
+      "npc": 1293,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qf!590&Qo<3752",
+      "why": "Dofus pour les noobs («Promenons nous dans les bois»): Richard Rouge (Reltux Richards, the blue Xelor) in the wood [-59,-52] until he is escorted. INFERRED cell."
+    },
+    {
+      "map": 54163252,
+      "npc": 1296,
+      "cell": 287,
+      "orientation": 1,
+      "criterion": "Qf!590&Qo<3755",
+      "why": "Dofus pour les noobs («Promenons nous dans les bois»): Grimebène (Bern Grim) in the wood until he is escorted. INFERRED cell."
     }
   ]
 }

@@ -28911,7 +28911,7 @@
             { "reply": 36229, "next": 30111, "criterion": "PL<50" },
             { "reply": 32139, "next": 26822, "beforeQuest": 1845, "criterion": "Qf=1607&PL>29" },
             { "reply": 33181, "next": 27642, "criterion": "Qf=1853&PL>29&Qa!1867&Qf!1867" },
-            { "reply": 33187, "next": 27646, "quest": 1867, "afterObjective": 12454, "beforeObjective": 12455, "completes": 12455, "params": [[30, 12455]] },
+            { "reply": 33187, "next": 27646, "quest": 1867, "afterObjective": 12454, "beforeObjective": 12455, "completes": 12455, "params": [[30, 12455]], "takes": 19051 },
             { "reply": 33189, "next": 27647, "quest": 1867, "afterObjective": 12456, "beforeObjective": 12457, "completes": 12457, "params": [[30, 12457]] },
             { "reply": 33407, "next": 27838, "quest": 1869, "afterObjective": 12491, "beforeObjective": 12492, "completes": 12492, "params": [[30, 12492]] }
           ]
@@ -29055,7 +29055,7 @@
           "choices": []
         }
       ],
-      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36229), the towers' lair (30109), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36225) starts the quest and sends the character to pray before the class statue (30110, «Encontrar la estatua»); under level 50 he is told to wait (30111) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). «Ne tirez pas sur le messager» (1845, Dofus pour les noobs («Ne tirez pas sur le messager»)): «Háblame de los uginaks.» (32139, with 1607 finished and level 30) -> 26822..26824 (a mage called Imaguni, the Brotherhood, the newcomers of Incarnam); 26825, the line the quest's first step names, starts it with «Puedo ayudarte con eso.» (32225), 26826 and 26827 hand over the parchment (18650) with «Agarrar el mensaje e irte.» (32223). INFERRED order of the replies (32228, 32226 and the second copy 26828-26833 are not used). «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): after 1853 «Tienes novedades con respecto a Imaguni?» (33181) tells of Azrim's murder (27642..27644) and asks the character to fetch the necromancer Relik; «Aceptar y marcharte a Brakmar.» (33182) on 27645 starts it. Back with Relik (12454 done) «He vuelto con el nigromante.» (33187) is 12455 (27646, 33188 sends him to the dead god's room); after the ritual «Contarle lo que pasó en la sala del dios muerto.» (33189) is 12457 and ends the quest (27647). INFERRED reply order. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Nosya podría tener razón...» (27647) is the step's own line, reached after the ritual and again as the opening once 1867 is done; «Puedo traer a Imaguni por las buenas o por las malas.» (33191) starts it. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Mostrar el puñal envenenado y decir lo que has averiguado.» (33407) hands over the Puñal envenenado (12492) -> 27838 «¿Qué aspecto tenía la sram...?» -> «Describir a la cazadora con quien luchaste.» (33406) -> 27839 -> «Seguir escuchando.» (33403) -> 27840 -> 33405 -> 27841 (he sends the character to Sramvil). INFERRED reply order."
+      "why": "Chalcas, master of the class-18 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 1842, objective 12175). «Protección divina» (2194), for the class-18 temple's own: «Estoy de camino al Bosque Maléfico» (53001), madness to go without protection, train against a dopeul and pray to the statue (40692); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40693); then Trimpize at the forest's edge (40694), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52998) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36229), the towers' lair (30109), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36225) starts the quest and sends the character to pray before the class statue (30110, «Encontrar la estatua»); under level 50 he is told to wait (30111) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). «Ne tirez pas sur le messager» (1845, Dofus pour les noobs («Ne tirez pas sur le messager»)): «Háblame de los uginaks.» (32139, with 1607 finished and level 30) -> 26822..26824 (a mage called Imaguni, the Brotherhood, the newcomers of Incarnam); 26825, the line the quest's first step names, starts it with «Puedo ayudarte con eso.» (32225), 26826 and 26827 hand over the parchment (18650) with «Agarrar el mensaje e irte.» (32223). INFERRED order of the replies (32228, 32226 and the second copy 26828-26833 are not used). «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): after 1853 «Tienes novedades con respecto a Imaguni?» (33181) tells of Azrim's murder (27642..27644) and asks the character to fetch the necromancer Relik; «Aceptar y marcharte a Brakmar.» (33182) on 27645 starts it. Back with Relik (12454 done) «He vuelto con el nigromante.» (33187) is 12455 (27646, 33188 sends him to the dead god's room); after the ritual «Contarle lo que pasó en la sala del dios muerto.» (33189) is 12457 and ends the quest (27647). INFERRED reply order. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Nosya podría tener razón...» (27647) is the step's own line, reached after the ritual and again as the opening once 1867 is done; «Puedo traer a Imaguni por las buenas o por las malas.» (33191) starts it. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Mostrar el puñal envenenado y decir lo que has averiguado.» (33407) hands over the Puñal envenenado (12492) -> 27838 «¿Qué aspecto tenía la sram...?» -> «Describir a la cazadora con quien luchaste.» (33406) -> 27839 -> «Seguir escuchando.» (33403) -> 27840 -> 33405 -> 27841 (he sends the character to Sramvil). INFERRED reply order. Announcing Relik's arrival (33187) takes the follower item 19051: Relik waits in the dead god's room."
     },
     {
       "npc": 6837,
@@ -32718,6 +32718,7 @@
       "npc": 1408,
       "map": 0,
       "opening": 8662,
+      "sulkLine": 27855,
       "lines": [
         {
           "message": 8662,
@@ -32734,7 +32735,7 @@
           "message": 27854,
           "choices": [
             { "reply": 33429, "next": 27856 },
-            { "reply": 33425, "next": 27855 }
+            { "reply": 33425, "next": 27855, "sulks": 5 }
           ]
         },
         {
@@ -32762,7 +32763,7 @@
           ]
         }
       ],
-      "why": "Feruor Mitrídates, a customer of the Number Anticroist inn, for «¿Dónde se ha ido la 7.ª compañía?» (703): «Hacer preguntas sobre la séptima compañía» (8702) does «Pregunta a los clientes» (4551) once the inn is entered -- the Iops questioned the customers and went to the suspect, the big Sadida (8663; Dofus pour les noobs: «parlez à Feruor Mithridate qui vous apprendra que la 7ème compagnie a interrogé le Sadida»). «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Preguntarle acerca de una viajera que viene de lejos.» (33430) -> 27854 (he fears reprisals): «No te preocupes, te prometo que te protegeré.» (33429) -> 27856, 27857, 27858 (the toxic mushroom of the Fungus region); «Gracias, ¡hasta luego!» (33426) is 12489. «Amenazarle para que hable.» (33425) -> 27855 and he refuses (the five-minute wait of the guide is not implemented). INFERRED reply order."
+      "why": "Feruor Mitrídates, a customer of the Number Anticroist inn, for «¿Dónde se ha ido la 7.ª compañía?» (703): «Hacer preguntas sobre la séptima compañía» (8702) does «Pregunta a los clientes» (4551) once the inn is entered -- the Iops questioned the customers and went to the suspect, the big Sadida (8663; Dofus pour les noobs: «parlez à Feruor Mithridate qui vous apprendra que la 7ème compagnie a interrogé le Sadida»). «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Preguntarle acerca de una viajera que viene de lejos.» (33430) -> 27854 (he fears reprisals): «No te preocupes, te prometo que te protegeré.» (33429) -> 27856, 27857, 27858 (the toxic mushroom of the Fungus region); «Gracias, ¡hasta luego!» (33426) is 12489. «Amenazarle para que hable.» (33425) -> 27855 and he refuses (the five-minute wait of the guide is not implemented). INFERRED reply order. 1869 redo: threatening him (33425) makes him sulk for 5 minutes (DPLN: wait 5 minutes before speaking to him again); while it lasts he only says 27855."
     },
     {
       "npc": 1409,
@@ -61976,7 +61977,7 @@
         {
           "message": 27771,
           "choices": [
-            { "reply": 33327, "gives": 18829, "completes": 12473, "params": [[30, 12473]] },
+            { "reply": 33327, "gives": 18829, "completes": 12473, "params": [[30, 12473]], "buyPrice": 2000 },
             { "reply": 33328 }
           ]
         },
@@ -62017,7 +62018,7 @@
           ]
         }
       ],
-      "why": "As the official server says it, with no quest under way. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Necesito urgentemente un frasco de ungüento del herrero.» (33330) -> 27771 «Te vendo uno por 2000 kamas»; «Comprar un frasco de ungüento por 2000 kamas.» (33327) is 12473 and gives 18829 (the price is not charged: no reply can take kamas yet). «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Decirle que vienes de parte de Nosya y enseñarle la daga.» (33338) hands over the Puñal inalterable (12484; offered only carrying it) -> 27775, the story of the foreman Búril (27776-27779: 33337, 33336, 33335, 33334) and «¿Dónde se encuentra la mina?» (33341) -> 27781. INFERRED reply order."
+      "why": "As the official server says it, with no quest under way. «La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): «Necesito urgentemente un frasco de ungüento del herrero.» (33330) -> 27771 «Te vendo uno por 2000 kamas»; «Comprar un frasco de ungüento por 2000 kamas.» (33327) is 12473 and gives 18829 (the price is not charged: no reply can take kamas yet). «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): «Decirle que vienes de parte de Nosya y enseñarle la daga.» (33338) hands over the Puñal inalterable (12484; offered only carrying it) -> 27775, the story of the foreman Búril (27776-27779: 33337, 33336, 33335, 33334) and «¿Dónde se encuentra la mina?» (33341) -> 27781. INFERRED reply order. The ointment costs 2000 kamas (33327, DPLN: buy a flask of ointment for 2000 kamas): buyPrice is the fee, taken from the character."
     },
     {
       "npc": 255,
@@ -62292,7 +62293,7 @@
             { "reply": 33206, "next": 27660, "quest": 1867, "beforeObjective": 12445, "completes": 12445, "params": [[30, 12445]] },
             { "reply": 33209, "next": 27661, "quest": 1867, "afterObjective": 12445, "beforeObjective": 12446, "completes": 12446, "params": [[30, 12446]] },
             { "reply": 33208, "next": 27662, "quest": 1867, "afterObjective": 12446, "beforeObjective": 12447 },
-            { "reply": 33211, "next": 27663, "quest": 1867, "afterObjectives": [12449, 12452], "beforeObjective": 12453, "completes": 12454, "completesAll": [12453, 12454], "params": [[30, 12454]] }
+            { "reply": 33211, "next": 27663, "quest": 1867, "afterObjectives": [12449, 12452], "beforeObjective": 12453, "completes": 12453, "completesAll": [12453, 12454], "params": [[30, 12453]], "gives": 19051 }
           ]
         },
         {
@@ -62386,7 +62387,7 @@
           ]
         }
       ],
-      "why": "As the official server says it, with no quest under way. «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): Brakmar tavern: «Decirle que el gran maestro Chalcas necesita sus servicios» (33206) is 12445 (27660 asks for the cursed bone); «Toma, el hueso maldito.» (33209) hands it over (12446, 27661/27662, the crystal globe 18820 with 33207); with the memory and the sacred object (12449, 12452) «He encontrado el recuerdo y el objeto sagrado.» (33211) hands over 18821 and 18822 (12453, 12454; 27663, 27664). In the temple's dead-god room (12455 done, 12456 pending) the ritual runs 27665..27674 and 33216 is 12456. INFERRED reply order."
+      "why": "As the official server says it, with no quest under way. «Dernier contact» (1867, Dofus pour les noobs («Dernier contact»)): Brakmar tavern: «Decirle que el gran maestro Chalcas necesita sus servicios» (33206) is 12445 (27660 asks for the cursed bone); «Toma, el hueso maldito.» (33209) hands it over (12446, 27661/27662, the crystal globe 18820 with 33207); with the memory and the sacred object (12449, 12452) «He encontrado el recuerdo y el objeto sagrado.» (33211) hands over 18821 and 18822 (12453, 12454; 27663, 27664). In the temple's dead-god room (12455 done, 12456 pending) the ritual runs 27665..27674 and 33216 is 12456. INFERRED reply order. Relik walks behind the character after the hand-over (33211): follower item 19051 (type 32, effect 148 npc 3905), as in the game («il accepte alors de vous suivre jusqu'au temple Ouginak et vous l'obtenez en personnage suiveur», Dofus pour les noobs «Dernier contact»). 1867: reply 33211 does 12453 then 12454 (the engine only ticks an objective once the one before it is done) and then hands over the follower item 19051. 1867: reply 33211 does 12453 then 12454 (the engine only ticks an objective once the one before it is done) and then hands over the follower item 19051."
     },
     {
       "npc": 1095,
@@ -66160,7 +66161,7 @@
         {
           "message": 23824,
           "choices": [
-            { "reply": 28627, "quest": 1731, "next": 23825, "afterObjective": 10985, "beforeObjective": 10986, "completes": 10986, "params": [[30, 10986]] }
+            { "reply": 28627, "quest": 1731, "next": 23825, "afterObjective": 10985, "beforeObjective": 10986, "completes": 10986, "params": [[30, 10986]], "takes": 18045 }
           ]
         },
         {
@@ -66170,7 +66171,7 @@
           ]
         }
       ],
-      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530, 24531, 29466). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530); looser criterion."
+      "why": "Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Poly Perkin (Pollie Perkine, 3238), Sufokia [23,24]: «La pêche aux infos» (1731, Dofus pour les noobs): 23848 to 23851 are her proposal, 28659 hires the player as bodyguard (startsQuest, gives the follower 18045); after each interview she is asked «¿Has terminado tu entrevista?» (28674, 28707, 28709) and answers 23862, 23880 and 23881; after the fight she is checked (28713, 29465, 28712) and the final thanks are 23824, 23825. Openings: \"pending\" is the objective now due, \"objective\" the one just done (the opening shows only for that stage). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530, 24531, 29466). Poly Perkin (3238), «De mal en impie» (1759, Dofus pour les noobs): freed after the fight (24530); looser criterion. Redo 25/11: the closing reply (28627) takes the follower item 18045 back (the escort ends at the basin, Dofus pour les noobs: Poly stops following)."
     },
     {
       "npc": 3249,
@@ -66809,7 +66810,7 @@
         {
           "message": 23800,
           "choices": [
-            { "reply": 28602, "quest": 1732, "next": 23801, "beforeObjective": 11005, "completes": 11005, "params": [[30, 11005]], "afterObjective": 11004 }
+            { "reply": 28602, "quest": 1732, "next": 23801, "beforeObjective": 11005, "completes": 11005, "params": [[30, 11005]], "afterObjective": 11004, "takes": 18044 }
           ]
         },
         {
@@ -66820,7 +66821,7 @@
           ]
         }
       ],
-      "why": "Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602). Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602)."
+      "why": "Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602). Sered (3244), Rykke Zane's friend, Sufokian shore [14,22]: «La musique de Rykke Zane» (1732, Dofus pour les noobs): 23775 to 23778 are the meeting and the request (28569 starts), then every later conversation follows the objective due (openings pending/objective): the lute shown (28579, objective 10988), the sram (28575), the report (28582), the palace (28584), the flare (28585 gives 17861), the first contact (28590), the fight against the flautist (28595, npc_fights, ally Sered 4465) and the remains handed over (28602). Redo 25/11: the last reply (28602) hands the remains of Rykke Zane (18044, dropped by the pied piper 4466) over; Dofus pour les noobs: Donnez-les a Sered."
     },
     {
       "npc": 3272,
@@ -68301,7 +68302,8 @@
           "message": 24040,
           "choices": [
             { "reply": 28925, "next": 24041, "quest": 1735, "beforeObjective": 11037, "completes": 11037, "params": [[30, 11037]] },
-            { "reply": 28925, "next": 24041, "beforeQuest": 1736, "criterion": "Qf=1735" }
+            { "reply": 28925, "next": 24041, "beforeQuest": 1736, "criterion": "Qf=1735" },
+            { "reply": 28559 }
           ]
         },
         {
@@ -68960,7 +68962,8 @@
         {
           "message": 23834,
           "choices": [
-            { "reply": 28638, "quest": 1737, "next": 23835, "afterObjective": 11044 }
+            { "reply": 28638, "quest": 1737, "next": 23835, "afterObjective": 11044 },
+            { "reply": 28639 }
           ]
         },
         {
@@ -70723,14 +70726,19 @@
         },
         {
           "message": 7812,
-          "choices": []
+          "choices": [
+            { "reply": 7832, "quest": 590, "completes": 3747, "params": [[30, 3747]], "takes": 11235, "criterion": "Qa=590&PO=11235" },
+            { "reply": 7832, "quest": 590, "completes": 3750, "params": [[30, 3750]], "takes": 11236, "criterion": "Qa=590&PO=11236" },
+            { "reply": 7832, "quest": 590, "completes": 3753, "params": [[30, 3753]], "takes": 11234, "criterion": "Qa=590&PO=11234" },
+            { "reply": 7838, "quest": 590, "completes": 3756, "params": [[30, 3756]], "takes": 11237, "next": 7820, "criterion": "Qa=590&PO=11237" }
+          ]
         },
         {
           "message": 7820,
           "choices": []
         }
       ],
-      "why": "Adalid Esvergunzao (chief Rhonte) in the Frigost harbour [-76,-33] (Dofus pour les noobs («Promenons nous dans les bois»)): «¿Necesitas que te ayude?» (7829) leads to the step line 7807 (his men have not come back from the wood), and the quest starts there. 7812 while it runs; 7820 once the last survivor is home. INFERRED: the escorted survivors (followers) are not authored; each escort leg is closed by the greetings that the client's step lines name."
+      "why": "Adalid Esvergunzao (chief Rhonte) in the Frigost harbour [-76,-33] (Dofus pour les noobs («Promenons nous dans les bois»)): «¿Necesitas que te ayude?» (7829) leads to the step line 7807 (his men have not come back from the wood), and the quest starts there. 7812 while it runs; 7820 once the last survivor is home. INFERRED: the escorted survivors (followers) are not authored; each escort leg is closed by the greetings that the client's step lines name. Hand-overs (Dofus pour les noobs («Promenons nous dans les bois»)): each survivor brought home is taken back from his follower slot by «Explicar la situación de los cuatro desaparecidos» (7832) closing 3747/3750/3753; the last, Bern, by «Todo el mundo está sano y salvo» (7838) closing 3756 (7820). INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
     },
     {
       "npc": 1293,
@@ -70738,8 +70746,8 @@
       "opening": 7808,
       "openings": [
         { "after": 590, "message": 16538 },
-        { "quest": 590, "objective": 3751, "message": 7816 },
-        { "quest": 590, "objective": 3748, "message": 7813 }
+        { "quest": 590, "objective": 3750, "message": 7816 },
+        { "quest": 590, "objective": 3747, "message": 7813 }
       ],
       "lines": [
         {
@@ -70753,7 +70761,7 @@
         {
           "message": 7816,
           "choices": [
-            { "reply": 7834, "quest": 590, "completes": 3752, "params": [[30, 3752]], "criterion": "Qo=3752" }
+            { "reply": 7834, "quest": 590, "completes": 3752, "params": [[30, 3752]], "gives": 11234, "criterion": "Qa=590&Qo>3750&Qo=3752" }
           ]
         },
         {
@@ -70761,7 +70769,7 @@
           "choices": []
         }
       ],
-      "why": "Reltux Richards (the Xelor) in the Pinos Perdidos wood [-59,-52] (Dofus pour les noobs («Promenons nous dans les bois»)): 7808 sends the player off with Ally Storm first, 7813 asks for her brother DaLny, 7816 («Acompañar a Reltux a Frigost», 7834) is the third trip; 16538 afterwards. INFERRED: the escorted survivors (followers) are not authored; each escort leg is closed by the greetings that the client's step lines name."
+      "why": "Reltux Richards (Richard Rouge, the Xelor) in the wood [-59,-52] (Dofus pour les noobs («Promenons nous dans les bois»)): 7808 sends the player off with Ally first, 7813 (after Ally is home) asks for DaLny, 7816 once DaLny is home: «Acompañar a Reltux a Frigost» (7834) hands over his follower item (11234, effect 148 = npc 1293) and closes 3752; 16538 afterwards. INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
     },
     {
       "npc": 1296,
@@ -70769,8 +70777,8 @@
       "opening": 7811,
       "openings": [
         { "after": 590, "message": 7819 },
-        { "quest": 590, "objective": 3755, "message": 7819 },
-        { "quest": 590, "objective": 3754, "message": 7818 }
+        { "quest": 590, "objective": 3754, "message": 7819 },
+        { "quest": 590, "objective": 3753, "message": 7818 }
       ],
       "lines": [
         {
@@ -70780,16 +70788,18 @@
         {
           "message": 7818,
           "choices": [
-            { "reply": 7835, "quest": 590, "completes": 3755, "params": [[30, 3755]], "next": 7819 },
-            { "reply": 7836, "quest": 590, "completes": 3755, "params": [[30, 3755]], "next": 7819 }
+            { "reply": 7835, "quest": 590, "completes": 3754, "params": [[30, 3754]], "criterion": "Qa=590&Qo>3753&Qo=3754" },
+            { "reply": 7836, "quest": 590, "completes": 3754, "params": [[30, 3754]], "teleport": 54162740, "criterion": "Qa=590&Qo>3753&Qo=3754" }
           ]
         },
         {
           "message": 7819,
-          "choices": []
+          "choices": [
+            { "reply": 7837, "quest": 590, "completes": 3755, "params": [[30, 3755]], "gives": 11237, "criterion": "Qa=590&Qo>3754&Qo=3755" }
+          ]
         }
       ],
-      "why": "Bern Grim in the wood (Dofus pour les noobs («Promenons nous dans les bois»): «Combattre les smilomouths» or «S'enfuir comme un tofu»): the horde line 7818 offers 7835 (fight the three smielodons left over) and 7836 (flee, no fight); either closes the escort (3755), 7819 follows. INFERRED: the escorted survivors (followers) are not authored; each escort leg is closed by the greetings that the client's step lines name."
+      "why": "Bern Grim (Grimebène) in the wood (Dofus pour les noobs («Promenons nous dans les bois»)): once Reltux is home the horde line 7818 offers «Luchar contra los smielodones» (7835, a fight alone against 3 smielodons) or «Huir como un Tofu» (7836, the character lands on the map to the left, no fight); either closes 3754. Back at him, 7819 «Vale, volvamos al burgo» (7837) hands over his follower item (11237, effect 148 = npc 1296) and closes 3755 (DPLN: «il faudra quand même retourner ... reparler à Grimebène afin qu'il vous suive»). INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
     },
     {
       "npc": 1282,
@@ -72094,7 +72104,7 @@
         {
           "message": 26868,
           "choices": [
-            { "reply": 32712, "next": 27239, "quest": 1853, "completes": 12331, "params": [[30, 12331]], "afterObjective": 12329, "beforeObjective": 12331 },
+            { "reply": 32712, "next": 27239, "quest": 1853, "completes": 12331, "params": [[30, 12331]], "afterObjective": 12329, "beforeObjective": 12331, "takes": 18753 },
             { "reply": 32298, "next": 26869 },
             { "reply": 32294 }
           ]
@@ -72128,7 +72138,7 @@
         {
           "message": 26873,
           "choices": [
-            { "quest": 1845, "completes": 12283, "params": [[30, 12283]], "reply": 32304, "next": 26874 }
+            { "quest": 1845, "completes": 12283, "params": [[30, 12283]], "reply": 32304, "next": 26874, "takes": 18727 }
           ]
         },
         {
@@ -72205,7 +72215,7 @@
           "choices": []
         }
       ],
-      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): after 1845, 26874 (what the magicorrincos are, will you rescue them) is her greeting until 1853 starts; «Acepto.» (32299) starts it on that line or after the family questions (32302 -> 26875 -> 26876 -> 26877). With the magicorrincos brought to safety (12329) «Los magicorrincos están sanos y salvos.» (32712) does 12331 and opens the Brotherhood questions 27239..27245 (Dofus pour les noobs («A la rescousse des magypus»): Coqueline tells of the Brotherhood of the Forgotten). INFERRED reply order."
+      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): after 1845, 26874 (what the magicorrincos are, will you rescue them) is her greeting until 1853 starts; «Acepto.» (32299) starts it on that line or after the family questions (32302 -> 26875 -> 26876 -> 26877). With the magicorrincos brought to safety (12329) «Los magicorrincos están sanos y salvos.» (32712) does 12331 and opens the Brotherhood questions 27239..27245 (Dofus pour les noobs («A la rescousse des magypus»): Coqueline tells of the Brotherhood of the Forgotten). INFERRED reply order. Presenting the alchemist (32304) ends the escort: follower item 18727 is taken. REDO (1853): 32712 ends the escort, follower item 18753 is taken."
     },
     {
       "npc": 3749,
@@ -72393,11 +72403,11 @@
         {
           "message": 26936,
           "choices": [
-            { "reply": 32362, "quest": 1845, "afterObjective": 12281, "beforeObjective": 12282 }
+            { "reply": 32362, "quest": 1845, "afterObjective": 12281, "beforeObjective": 12282, "gives": 18727 }
           ]
         }
       ],
-      "why": "The talking Poohoyo (an alchemist of Otomai's) in Gerard's storeroom, «Ne tirez pas sur le messager» (1845): «Tranquilo, recibí tu mensaje.» (32361) -> 26933, «Liberar al alquimista.» (32360) does 12277 with 26934; once the others are free the same greeting asks what happened (32364 -> 26935), to be escorted to Kaskarina (32365 -> 26936) and «De acuerdo, te escoltaré.» (32362) is 12282; the alchemist then stands by Kaskarina (spawns.json) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies."
+      "why": "The talking Poohoyo (an alchemist of Otomai's) in Gerard's storeroom, «Ne tirez pas sur le messager» (1845): «Tranquilo, recibí tu mensaje.» (32361) -> 26933, «Liberar al alquimista.» (32360) does 12277 with 26934; once the others are free the same greeting asks what happened (32364 -> 26935), to be escorted to Kaskarina (32365 -> 26936) and «De acuerdo, te escoltaré.» (32362) is 12282; the alchemist then stands by Kaskarina (spawns.json) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. Freed, the alchemist follows the character (32362 hands over follower item 18727: type 32, effect 148 npc 3739) to Kaskarina («Il vous demandera alors de le conduire auprès de Coqueline», Dofus pour les noobs «Ne tirez pas sur le messager»)."
     },
     {
       "npc": 3740,
@@ -73012,11 +73022,11 @@
         {
           "message": 27192,
           "choices": [
-            { "reply": 32651, "teleport": 179308545, "quest": 1853, "afterObjective": 12330, "beforeObjective": 12329 }
+            { "reply": 32651, "quest": 1853, "afterObjective": 12330, "beforeObjective": 12329, "gives": 18753 }
           ]
         }
       ],
-      "why": "A magicorrinco (the guide's magypus) in the ruffians' cage on the Rocky Roads, «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «Rassurez-les ... les reconduire à Nimotopia ... personnages suiveurs»): «Tranquilizar a los magicorrincos y llevarlos a Animatopía.» (32651) takes the character to Animatopia [-63,29], which is 12329. GAP: the animals do not follow, they stand by Kaskarina."
+      "why": "A magicorrinco (the guide's magypus) in the ruffians' cage on the Rocky Roads, «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»): «Rassurez-les ... les reconduire à Nimotopia ... personnages suiveurs»): «Tranquilizar a los magicorrincos y llevarlos a Animatopía.» (32651) takes the character to Animatopia [-63,29], which is 12329. GAP: the animals do not follow, they stand by Kaskarina. REDO: no teleport and no stand-in animals; 32651 hands over follower item 18753 (type 32, effect 148 npc 3812) and the character leads them to Animatopia on foot, where objective 12329 (enter) ticks."
     },
     {
       "npc": 3264,
@@ -73230,7 +73240,8 @@
       "map": 179176718,
       "opening": 27631,
       "openings": [
-        { "quest": 1868, "objective": 12482, "message": 27594 }
+        { "quest": 1868, "objective": 12482, "message": 27594 },
+        { "criterion": "Qf=1868&PL>29&Qa!1869&Qf!1869", "message": 27652 }
       ],
       "lines": [
         {
@@ -73276,7 +73287,7 @@
           ]
         }
       ],
-      "why": "«La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): Nosya la Roa called with the whistle in the sanctuary. «Anunciar orgullosamente que has encontrado a Imaguni.» (33168) -> 27632 -> «Imaguni no parece dispuesta a obedecer.» (33167) -> 27633 -> «Ayudar a Nosya en su combate contra Imaguni.» (33166) starts the fight beside her. After it, «Mostrarle el puñal que Imaguni llevaba en el cinturón.» (33199) is 12483 (27652, 27653) and 27654 is 1869's own line: «Partir inmediatamente hacia Brakmar.» (33196) starts «Le fléau de Burin». INFERRED reply order."
+      "why": "«La voix des morts» (1868, Dofus pour les noobs («La voix des morts»)): Nosya la Roa called with the whistle in the sanctuary. «Anunciar orgullosamente que has encontrado a Imaguni.» (33168) -> 27632 -> «Imaguni no parece dispuesta a obedecer.» (33167) -> 27633 -> «Ayudar a Nosya en su combate contra Imaguni.» (33166) starts the fight beside her. After it, «Mostrarle el puñal que Imaguni llevaba en el cinturón.» (33199) is 12483 (27652, 27653) and 27654 is 1869's own line: «Partir inmediatamente hacia Brakmar.» (33196) starts «Le fléau de Burin». INFERRED reply order. 1869: once 1868 is done Nosya opens with the end of that conversation (27652 -> 27653 -> 27654, 33196 starts «Le fléau de Burin»), so a player who closed the dialogue can pick it up again."
     },
     {
       "npc": 3912,
@@ -73608,45 +73619,48 @@
         {
           "message": 27847,
           "choices": [
+            { "reply": 33418, "next": 27849 },
             { "reply": 33423, "next": 27848 }
           ]
         },
         {
           "message": 27848,
           "choices": [
-            { "reply": 38591, "next": 27849 }
+            { "reply": 33420, "next": 27849 }
           ]
         },
         {
           "message": 27849,
           "choices": [
-            { "reply": 38591, "next": 27850 }
+            { "reply": 33419, "next": 27850 }
           ]
         },
         {
           "message": 27850,
           "choices": [
-            { "reply": 38591, "next": 27851 }
+            { "reply": 33417, "next": 27851 }
           ]
         },
         {
           "message": 27851,
           "choices": [
-            { "reply": 38591, "next": 27852 }
+            { "reply": 33416, "next": 27852 }
           ]
         },
         {
           "message": 27852,
           "choices": [
-            { "reply": 38591, "next": 27853 }
+            { "reply": 33415, "next": 27853 }
           ]
         },
         {
           "message": 27853,
-          "choices": []
+          "choices": [
+            { "reply": 33414 }
+          ]
         }
       ],
-      "why": "El forjador de leyenda (2036, Dofus pour les noobs (Le forgeur de légende)): Volkaragnar the dragon smith at his forge (173015560, reached through the anvil of the mine [-28,24]). His greeting (27640) holds: Partir hacia el puente de piedra (33180), the way back to the mine; and for the quest, in order: Me han dicho que fuiste tu el que creo la espada (39449) and Evocar a Cocobur (39450), the account of the sword (32500-32504) and the condition Aceptar esta condicion (39443, or 39454: its twin lines 32505-32507 / 32508-32510 end with the three places to temper it); Mostrarle la Cocobur al dragon herrero (39459) once the blade is tempered in the lake, the furnace and the crater, then Acercarte al yunque (39458); Darle el agua magificadora (39463) hands over the flask (32512-32518, the jade); Ensenarle la empunadura de Cocobur con el jade engastado (39470, 32519-32520: Cocabulia's blood); Mostrarle a Cocobur (39473, 32521-32522: the guardians' skulls); No habia terminado el interrogatorio (39476, 32523-32525) ends the quest. The other quests of this NPC (1869, 1937, 2044, 2113) have no lines written yet. INFERRED which reply leads where, from the order of the reply ids; the lines are the NPC's own. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): the dragon in the crater (greeting him ticks 12488). «No me impresionas. ¿Para quién fabricaste el puñal?» (33422) -> 27846, he will not name his clients -> «Esta arma se usó para asesinar a un chamán...» (33421) -> 27847 -> «Acusar a Volkaragnar...» (33423) -> 27848; his monologue goes on to 27853 (the friend of Brumen). The client lists no reply for 27848-27852: «Seguir escuchando.» (38591) of his other trees stands in. INFERRED reply order."
+      "why": "El forjador de leyenda (2036, Dofus pour les noobs (Le forgeur de légende)): Volkaragnar the dragon smith at his forge (173015560, reached through the anvil of the mine [-28,24]). His greeting (27640) holds: Partir hacia el puente de piedra (33180), the way back to the mine; and for the quest, in order: Me han dicho que fuiste tu el que creo la espada (39449) and Evocar a Cocobur (39450), the account of the sword (32500-32504) and the condition Aceptar esta condicion (39443, or 39454: its twin lines 32505-32507 / 32508-32510 end with the three places to temper it); Mostrarle la Cocobur al dragon herrero (39459) once the blade is tempered in the lake, the furnace and the crater, then Acercarte al yunque (39458); Darle el agua magificadora (39463) hands over the flask (32512-32518, the jade); Ensenarle la empunadura de Cocobur con el jade engastado (39470, 32519-32520: Cocabulia's blood); Mostrarle a Cocobur (39473, 32521-32522: the guardians' skulls); No habia terminado el interrogatorio (39476, 32523-32525) ends the quest. The other quests of this NPC (1869, 1937, 2044, 2113) have no lines written yet. INFERRED which reply leads where, from the order of the reply ids; the lines are the NPC's own. «Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): the dragon in the crater (greeting him ticks 12488). «No me impresionas. ¿Para quién fabricaste el puñal?» (33422) -> 27846, he will not name his clients -> «Esta arma se usó para asesinar a un chamán...» (33421) -> 27847 -> «Acusar a Volkaragnar...» (33423) -> 27848; his monologue goes on to 27853 (the friend of Brumen). The client lists no reply for 27848-27852: «Seguir escuchando.» (38591) of his other trees stands in. INFERRED reply order. 1869 redo: the stand-in continue reply 38591 is gone; 27847-27853 use the dragon's own replies of the client template (33418 show disappointment -> 27849 -> 33419 pretend you may help -> 27850 -> 33417, 33416, 33415 -> 27853 -> 33414 shrug and go to Brumen's friend; 33423 accuse him -> 27848 -> 33420 reprisals joins at 27849). INFERRED: the template gives the replies, not which line each follows."
     },
     {
       "npc": 3922,
@@ -73971,6 +73985,99 @@
         }
       ],
       "why": "«Le fléau de Burin» (1869, Dofus pour les noobs («Le fléau de Burin»)): the Sram hunter of Srambad in the Fungus caverns [-12,31]: «Defenderte para salvar la vida.» (33434) starts the solo fight against her (4910, 12491)."
+    },
+    {
+      "npc": 3913,
+      "map": 0,
+      "opening": 27693,
+      "lines": [
+        {
+          "message": 27693,
+          "choices": [
+            { "reply": 33244, "next": 27694 },
+            { "reply": 33317 }
+          ]
+        },
+        {
+          "message": 27694,
+          "choices": [
+            { "reply": 33243 }
+          ]
+        }
+      ],
+      "why": "1868 (DPLN La voix des morts): the bermanes captain [-29,5]. Asking about Imaguni (33244) -> 27694 (she has not been here for a while, one of her disciples is still here, ask him; if nothing comes of it go to the clans of the south), 33243 goes to see the partisan. INFERRED reply order: the client template lists the replies, not their order."
+    },
+    {
+      "npc": 3914,
+      "map": 0,
+      "opening": 27705,
+      "lines": [
+        {
+          "message": 27705,
+          "choices": [
+            { "reply": 33257, "next": 27706 }
+          ]
+        },
+        {
+          "message": 27706,
+          "choices": [
+            { "reply": 33255 },
+            { "reply": 33256 }
+          ]
+        }
+      ],
+      "why": "1868 (DPLN La voix des morts): the Imaguni partisan [-29,4]. Asking where Imaguni is (33257) -> 27706 (renounce your faith and give your goods to the cause); shrugging and leaving (33256) is the quest's way, threatening him (33255) starts the useless fight (npc_fights). INFERRED reply order."
+    },
+    {
+      "npc": 3278,
+      "map": 0,
+      "opening": 24053,
+      "lines": [
+        {
+          "message": 24053,
+          "choices": [
+            { "reply": 28938, "passage": 3278001 }
+          ]
+        }
+      ],
+      "why": "Meno's Snapper: «Ask the Snapper to take you to Meno.» (28938) leads to Meno's exit room (169874432); 1736 (DPLN «Son nom est Personne»). Meno's Snapper: «Ask the Snapper to take you to Meno.» (28938) leads to Meno's exit room (169874432); 1736 (DPLN «Son nom est Personne»)."
+    },
+    {
+      "npc": 1294,
+      "map": 54163252,
+      "opening": 7809,
+      "lines": [
+        {
+          "message": 7809,
+          "choices": [
+            { "reply": 7831, "quest": 590, "completes": 3746, "params": [[30, 3746]], "gives": 11235, "criterion": "Qa=590&Qo>3745&Qo=3746" }
+          ]
+        }
+      ],
+      "why": "Ally Storm (Staurme Sioux, the Sram) in the Lost Pines wood [-59,-52] (Dofus pour les noobs («Promenons nous dans les bois»)): «Acompañar a Ally al burgo» (7831) hands over her follower item (11235, effect 148 = npc 1294) and closes «Acompaña a Ally Storm hasta Adalid» (3746). She walks behind the character until Adalid takes her back. INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
+    },
+    {
+      "npc": 1295,
+      "map": 54163252,
+      "opening": 7810,
+      "openings": [
+        { "quest": 590, "objective": 3746, "message": 7815 }
+      ],
+      "lines": [
+        {
+          "message": 7810,
+          "choices": [
+            { "reply": 7833, "quest": 590, "completes": 3749, "params": [[30, 3749]], "gives": 11236, "criterion": "Qa=590&Qo>3748&Qo=3749" }
+          ]
+        },
+        {
+          "message": 7815,
+          "choices": [
+            { "reply": 7833, "quest": 590, "completes": 3749, "params": [[30, 3749]], "gives": 11236, "criterion": "Qa=590&Qo>3748&Qo=3749" }
+          ]
+        }
+      ],
+      "why": "DaLny Storm (Staurme Jauni, the Iop) in the wood (Dofus pour les noobs («Promenons nous dans les bois»)): «Acompañar al joven hasta Adalid Esvergunzao» (7833) hands over his follower item (11236, effect 148 = npc 1295) and closes 3749; 7815 once his sister is home. INFERRED: the order of the replies (the client carries sentences and answers but not which go together)."
     }
   ]
 }

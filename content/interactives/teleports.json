@@ -1617,6 +1617,18 @@
       "why": "The way back from the forge: Volkaragnar's Partir hacia el puente de piedra (33180) leaves to the mine anvil room. INFERRED: the client gives no other exit; the forge has no neighbour maps."
     },
     {"map": 178783244, "element": 3922001, "npc": 3922, "cell": 458, "gfx": 3922001, "type": -1, "skill": 339, "toMap": 173015560, "toCell": 282, "why": "«Poner la mano sobre el yunque.» (33373) of Volkaragnar's smith shape takes the character to the crater (Dofus pour les noobs («Le fléau de Burin»))."},
-    {"map": 178783236, "element": 510383, "cell": 309, "gfx": 56079, "type": -1, "skill": 114, "toMap": 178782214, "toCell": 206, "criterion": "PO=18855", "refusal": 449, "refusalType": 1, "why": "The stairs down to the burning room [-26,22]: without Búril's talisman (18855) the heat is deadly («Tentez de franchir la prochaine pièce mais c'est impossible il fait trop chaud», Dofus pour les noobs («Le fléau de Burin»))."}
+    {"map": 178783236, "element": 510383, "cell": 309, "gfx": 56079, "type": -1, "skill": 114, "toMap": 178782214, "toCell": 206, "criterion": "PO=18855", "refusal": 449, "refusalType": 1, "why": "The stairs down to the burning room [-26,22]: without Búril's talisman (18855) the heat is deadly («Tentez de franchir la prochaine pièce mais c'est impossible il fait trop chaud», Dofus pour les noobs («Le fléau de Burin»))."},
+    {
+      "map": 169084930,
+      "element": 3278001,
+      "npc": 3278,
+      "cell": 313,
+      "gfx": 0,
+      "type": -1,
+      "skill": 0,
+      "toMap": 169874432,
+      "toCell": 425
+    },
+    {"map": 187171330, "element": 511712, "cell": 108, "gfx": 62310, "type": 0, "skill": 114, "toMap": 187303426, "toCell": 333, "why": "Quest 1934: the door of the last islet leads to the chest's platform of 187303426 (the 21 walkable cells that hold chest 511753, reachable no other way; their right edge scrolls back to the islets). Skill 114 like the prison's other doors; arrival 333, the platform's middle, INFERRED."}
   ]
 }

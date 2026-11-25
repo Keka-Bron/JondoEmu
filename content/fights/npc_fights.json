@@ -1663,8 +1663,8 @@
       "allies": [ { "monster": 4429, "grade": 0 } ],
       "why": "«La pêche aux infos» (1731): Shokkoth plus two Grofonds, solo, Poly Perkin (4429) as ally." },
     { "npc": 3272, "map": 0, "reply": 28610, "solo": true,
-      "monsters": [ { "monster": 4430, "grade": 0 } ],
-      "why": "«La musique de Rykke Zane» (1732): Sesina la Sordina (4430), alone (Dofus pour les noobs)." },
+      "monsters": [ { "monster": 4430, "grade": 0 }, { "monster": 4431, "grade": 0 }, { "monster": 4431, "grade": 0 } ],
+      "why": "«La musique de Rykke Zane» (1732): Sesina la Sordina (4430) with two of her henchmen (4431, «Sbire de Sassine»), alone (Dofus pour les noobs: the fight screenshot shows the timeline with the character, Sassine and two identical henchmen)." },
     { "npc": 3274, "map": 0, "reply": 28616, "solo": true,
       "monsters": [ { "monster": 4428, "grade": 0 } ],
       "why": "«La musique de Rykke Zane» (1732): Kalahfate (4428), alone (Dofus pour les noobs)." },
@@ -1992,6 +1992,9 @@
       "allies": [ { "monster": 4992, "grade": 0 }, { "monster": 4992, "grade": 0 } ],
       "why": "Hyrkul (4991) at the Ilyzaelle viewpoint, with two Valiant Heart centaurs (4992) as allies (1909, 13101; Dofus pour les noobs «Nordalie»)." },
     { "npc": 3925, "map": 181404676, "reply": 33434, "solo": true, "byLevel": true,
-      "monsters": [ { "monster": 4910, "grade": 1 } ] }
+      "monsters": [ { "monster": 4910, "grade": 1 } ] },
+    { "npc": 3914, "map": 172098570, "reply": 33255, "solo": true, "byLevel": true,
+      "monsters": [ { "monster": 4931, "grade": 1 } ],
+      "why": "1868 (DPLN La voix des morts): threatening the partisan (33255) starts the useless fight against the Imaguni follower of the bermanes camp [-29,4] (DPLN: the other choice launches a useless fight, no more information). Monster 4931, solo; win or defeat changes nothing in the quest." }
   ]
 }

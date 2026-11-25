@@ -192,10 +192,10 @@
     },
     {
       "map": 54165815,
-      "cell": 184,
+      "cell": 199,
       "toMap": 55836672,
       "toCell": 478,
-      "why": "Down the frozen lake's crane [-64,-55]: «Dans les profondeurs du lac gelé, parlez à Waldos» (Dofus pour les noobs, «Les joyeux de la couronne»), «Descendez comme pour aller dans le donjon» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The planks' end under the crane, the only way the surface's drawing gives down; no element is drawn on it and the 2.73 graph has no transition into the depths (55836672, 55837184 and 55837696 only lead to one another). Lands at the foot of the depths' winch. INFERRED cells."
+      "why": "Down the frozen lake's crane [-64,-55]: «Dans les profondeurs du lac gelé, parlez à Waldos» (Dofus pour les noobs, «Les joyeux de la couronne»), «Descendez comme pour aller dans le donjon» («Ejército de las sombras» (L'armée des ombres, Dofus pour les noobs)). The planks' end under the crane (cell 199: the last cell the client lets the character walk to; 184 is not reachable), the only way the surface's drawing gives down; no element is drawn on it and the 2.73 graph has no transition into the depths (55836672, 55837184 and 55837696 only lead to one another). Lands at the foot of the depths' winch. INFERRED cells."
     },
     {
       "map": 55836672,
@@ -206,10 +206,10 @@
     },
     {
       "map": 55836672,
-      "cell": 503,
+      "cell": 487,
       "toMap": 55837184,
       "toCell": 464,
-      "why": "The depths' right edge into the cave where Reltux's bag lies: the 2.73 graph's walk from 55836672 to 55837184 leaves on cell 503, and the client's own map data draws no arrow there. Lands by the cave's left wall. INFERRED landing."
+      "why": "The depths' right edge into the cave where Reltux's bag lies: the 2.73 graph's walk from 55836672 to 55837184 leaves on cell 503 (moved to 487, the nearest cell the quest tracker does not cover on the client's screen), and the client's own map data draws no arrow there. Lands by the cave's left wall. INFERRED landing."
     },
     {
       "map": 55837184,

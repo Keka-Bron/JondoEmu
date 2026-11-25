@@ -36,6 +36,16 @@ namespace Jondo.Unity.Server.Managers
         {
             public int Document { get; init; }
 
+            /// <summary>
+            /// The versions a character is given one of, always the same one (<see cref="PuzzleMarks.Variant"/>):
+            /// the prison's scrolls show one of 24 riddles, «différente d'une personnage à l'autre».
+            /// Empty for a reading everyone gets alike, <see cref="Document"/>.
+            /// </summary>
+            public int[] Documents { get; init; } = System.Array.Empty<int>();
+
+            public int DocumentFor(long character)
+                => Documents.Length == 0 ? Document : Documents[PuzzleMarks.Variant(character, Documents.Length)];
+
             /// <summary>The question's sentence. Zero when the reading asks nothing.</summary>
             public int Question { get; init; }
 
@@ -132,11 +142,16 @@ namespace Jondo.Unity.Server.Managers
                     long map = Number(row, "map");
                     int element = (int)Number(row, "element");
                     int document = (int)Number(row, "document");
+                    var documents = new List<int>();
+                    if (row.TryGetProperty("documents", out var versions) && versions.ValueKind == JsonValueKind.Array)
+                        foreach (var version in versions.EnumerateArray())
+                            if (version.TryGetInt32(out int d) && d > 0) documents.Add(d);
 
-                    if (element == 0 || document == 0) continue;
+                    if (element == 0 || (document == 0 && documents.Count == 0)) continue;
                     into[(map, element)] = new Readable
                     {
-                        Document = document,
+                        Document = document != 0 ? document : documents[0],
+                        Documents = documents.ToArray(),
                         Question = (int)Number(row, "question"),
                         Accept = (int)Number(row, "accept"),
                         Decline = (int)Number(row, "decline"),

@@ -56,6 +56,12 @@ namespace Jondo.Unity.Server.Managers
             /// the scroll's own «PT!24015&amp;PT!24016», not to whoever already knows the spell.
             /// </summary>
             public string Criterion { get; init; } = "";
+
+            /// <summary>
+            /// The answers a puzzle's element picks from (<see cref="PuzzleCase"/>), the first that
+            /// holds played instead of the row; none, or none that holds, and the row speaks.
+            /// </summary>
+            public PuzzleCase[] Cases { get; init; } = Array.Empty<PuzzleCase>();
         }
 
         /// <summary>
@@ -124,7 +130,9 @@ namespace Jondo.Unity.Server.Managers
                     int opens = (int)Number(row, "opens");
                     int skill = (int)Number(row, "skill");
                     var gives = Gifts(row);
-                    if (map == 0 || element == 0 || (message == 0 && opens == 0 && skill == 0 && gives.Length == 0)) continue;
+                    var cases = PuzzleCase.Read(row);
+                    if (map == 0 || element == 0
+                        || (message == 0 && opens == 0 && skill == 0 && gives.Length == 0 && cases.Length == 0)) continue;
                     var frees = Cells(row, "frees");
                     var blocks = Cells(row, "blocks");
                     var names = new List<string>();
@@ -138,6 +146,7 @@ namespace Jondo.Unity.Server.Managers
                                                      (int)Number(row, "order"))
                     {
                         Gives = gives,
+                        Cases = cases,
                         Criterion = row.TryGetProperty("criterion", out var criterion)
                                     && criterion.ValueKind == JsonValueKind.String ? criterion.GetString() ?? "" : "",
                     };
