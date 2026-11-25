@@ -18755,7 +18755,8 @@
           "message": 664,
           "choices": [
             { "reply": 24524, "next": 20500, "quest": 1618, "beforeObjective": 9536 },
-            { "reply": 24560, "next": 20523, "quest": 1620, "beforeObjective": 9560 }
+            { "reply": 24560, "next": 20523, "quest": 1620, "beforeObjective": 9560 },
+            { "reply": 67861, "next": 50624, "quest": 2443, "beforeObjective": 18474, "completes": 18474, "params": [[30, 18474]] }
           ]
         },
         {
@@ -18847,9 +18848,13 @@
           "choices": [
             { "reply": 24579 }
           ]
+        },
+        {
+          "message": 50624,
+          "choices": []
         }
       ],
-      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539)."
+      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539). «Después de él, el diluvio» (2443): «Evocar el ámbar encantado» with Hel Munster ends the quest (Dofus pour les noobs). Reply-to-message link INFERRED from the ids (67861, 50624)."
     },
     {
       "npc": 2876,
@@ -22764,7 +22769,7 @@
         {
           "message": 50561,
           "choices": [
-            { "reply": 67780, "gives": 26669 }
+            { "reply": 67780, "gives": 26669, "quest": 2442, "afterObjective": 18461, "beforeObjective": 18462, "completes": 18462, "params": [[30, 18462]] }
           ]
         }
       ],
@@ -32949,6 +32954,8 @@
           "message": 11916,
           "choices": [
             { "reply": 19587, "next": 16445, "quest": 1444, "afterObjective": 7994, "beforeObjective": 7995 },
+            { "reply": 19513, "next": 16400, "beforeQuest": 1442 },
+            { "reply": 19540, "next": 16411, "quest": 1443, "completes": 7977, "params": [[30, 7977]] },
             { "reply": 19539 }
           ]
         },
@@ -32982,11 +32989,41 @@
           "message": 16449,
           "names": true,
           "choices": [
-            { "reply": 19588, "startsQuest": 1442, "params": [[34, 1442]] }
+            { "reply": 19588, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815 }
           ]
+        },
+        {
+          "message": 16400,
+          "choices": [
+            { "reply": 19518, "next": 16401 }
+          ]
+        },
+        {
+          "message": 16401,
+          "choices": [
+            { "reply": 19517, "next": 16402 }
+          ]
+        },
+        {
+          "message": 16402,
+          "choices": [
+            { "reply": 19515, "next": 16403 },
+            { "reply": 19516 }
+          ]
+        },
+        {
+          "message": 16403,
+          "names": true,
+          "choices": [
+            { "reply": 19514, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815 }
+          ]
+        },
+        {
+          "message": 16411,
+          "choices": []
         }
       ],
-      "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank."
+      "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank. Pam Chollion (Tekar Howar, 1597), Sufokia [22,19]: «Relevez les niveaux» (1442, Dofus pour les noobs): 19513 asks about the excavations, 16401 the elevator, 19517 offers help (16402), 19515 accepts and 19514 takes the topographic device (14815) and starts 1442; the other way is 1444's own chain (19588). «Prise de notes» (1443): 19540 hands Teo's report over (16411)."
     },
     {
       "npc": 1596,
@@ -33069,11 +33106,50 @@
         {
           "message": 16404,
           "choices": [
+            { "reply": 19526, "quest": 1442, "completes": 7970, "params": [[30, 7970]], "next": 16405 },
+            { "reply": 19534, "quest": 1443, "completes": 7976, "params": [[30, 7976]], "next": 16410, "gives": 14821 },
+            { "reply": 19524, "quest": 1442, "afterQuest": true, "beforeQuest": 1443, "next": 16408 },
             { "reply": 19532, "quest": 1444, "completes": 7998, "params": [[30, 7998]], "next": 16404, "afterObjective": 7997, "beforeObjective": 7998 }
+          ]
+        },
+        {
+          "message": 16405,
+          "choices": [
+            { "reply": 19524, "next": 16406 },
+            { "reply": 19525 }
+          ]
+        },
+        {
+          "message": 16406,
+          "choices": [
+            { "reply": 19522, "startsQuest": 1443, "params": [[34, 1443]], "next": 16407 },
+            { "reply": 19523 }
+          ]
+        },
+        {
+          "message": 16407,
+          "choices": []
+        },
+        {
+          "message": 16408,
+          "choices": [
+            { "reply": 19530, "startsQuest": 1443, "params": [[34, 1443]], "next": 16409 },
+            { "reply": 19531 }
+          ]
+        },
+        {
+          "message": 16409,
+          "choices": []
+        },
+        {
+          "message": 16410,
+          "names": true,
+          "choices": [
+            { "reply": 19533 }
           ]
         }
       ],
-      "why": "Teo Dolito, the Sea Council's agent at the Aquadome's door. «Pollution, je dis non» (Dofus pour les noobs): «Maintenant il vous suffit de suivre le chemin pour accéder au Merkator puis parlez à Théo Dolith». «Tengo previsto ir a ver a Merkator.» (19532) is 7998 and brings his line back, with the key and the keyring the door offers by itself (DungeonDoor)."
+      "why": "Teo Dolito, the Sea Council's agent at the Aquadome's door. «Pollution, je dis non» (Dofus pour les noobs): «Maintenant il vous suffit de suivre le chemin pour accéder au Merkator puis parlez à Théo Dolith». «Tengo previsto ir a ver a Merkator.» (19532) is 7998 and brings his line back, with the key and the keyring the door offers by itself (DungeonDoor). Teo Dolito (2196), Aquadome entrance [21,18]: «Relevez les niveaux» (1442): 19526 hands the topographic device over (the engine's own bring of 14815, objective 7970) and 16405 asks whether he would explore the Aquadome (19524, 16406, 19522 accepts and starts «Prise de notes» 1443; 16408 and 19530 are the same offer once 1442 is done); 19534 hands over the five notes of 1443 (7976) and 16410 gives the report for Pam Chollion (19533)."
     },
     {
       "npc": 2197,
@@ -62162,7 +62238,7 @@
     {
       "npc": 1244,
       "map": 0,
-      "opening": null,
+      "opening": 7731,
       "lines": [
         {
           "message": 7731,
@@ -62289,6 +62365,10 @@
           "choices": [
             { "reply": 34881, "next": 29085, "quest": 1909, "completes": 13075, "params": [[30, 13075]] }
           ]
+        },
+        {
+          "message": 29085,
+          "choices": []
         }
       ],
       "why": "Eme the Cursed, in the exit room of the Tal Kasha chamber, tells his story (Ivory quest 1909). Eme the Cursed, in the exit room of the Tal Kasha chamber, tells his story (Ivory quest 1909)."
@@ -62315,6 +62395,10 @@
           "choices": [
             { "reply": 34886, "next": 29088, "quest": 1909, "completes": 13076, "params": [[30, 13076]] }
           ]
+        },
+        {
+          "message": 29088,
+          "choices": []
         }
       ],
       "why": "Cronan the Merio talks about his fight against destiny and sends the player to Hyrini (Ivory quest 1909). Cronan the Merio talks about his fight against destiny and sends the player to Hyrini (Ivory quest 1909)."
@@ -62341,6 +62425,10 @@
           "choices": [
             { "reply": 34892, "next": 29092, "quest": 1909, "completes": 13077, "params": [[30, 13077]] }
           ]
+        },
+        {
+          "message": 29092,
+          "choices": []
         }
       ],
       "why": "Hyrini on destiny and the ancients' sacred fire (Ivory quest 1909). Hyrini on destiny and the ancients' sacred fire (Ivory quest 1909)."
@@ -62430,6 +62518,10 @@
             { "reply": 34601, "next": 28846, "gives": 19170, "criterion": "Qf=1910" },
             { "reply": 34597 }
           ]
+        },
+        {
+          "message": 28846,
+          "choices": []
         }
       ],
       "why": "The fisher gives the ghost inverluza to the one who finished his quest, for the raft offering of Ivory quest 1909. The fisher gives the ghost inverluza to the one who finished his quest, for the raft offering of Ivory quest 1909."
@@ -62475,6 +62567,10 @@
           "choices": [
             { "reply": 34953, "next": 29149 }
           ]
+        },
+        {
+          "message": 29149,
+          "choices": []
         }
       ],
       "why": "Galaethiel as a goddess: the ice block that shows the player's reflection (Ivory quest 1909). Galaethiel as a goddess: the ice block that shows the player's reflection (Ivory quest 1909)."
@@ -62514,6 +62610,10 @@
           "choices": [
             { "reply": 34929, "next": 29121, "quest": 1909, "completes": 13093, "params": [[30, 13093]] }
           ]
+        },
+        {
+          "message": 29121,
+          "choices": []
         }
       ],
       "why": "Maewin as a goddess sends the player back to the nornes (Ivory quest 1909). Maewin as a goddess sends the player back to the nornes (Ivory quest 1909)."
@@ -62528,7 +62628,7 @@
           "choices": [
             { "reply": 3543, "next": 6161 },
             { "reply": 67325, "next": 50415, "criterion": "Qf=1781&PL>39&Qa=439", "beforeQuest": 2442 },
-            { "reply": 67840, "next": 50605, "criterion": "Qf=2442&PL>39", "beforeQuest": 2443, "startsQuest": 2443, "params": [[34, 2443]] }
+            { "reply": 67840, "next": 50605, "criterion": "Qf=2442&PL>39", "beforeQuest": 2443 }
           ]
         },
         {
@@ -62586,14 +62686,7 @@
         {
           "message": 50423,
           "choices": [
-            { "reply": 67312, "next": 50424 }
-          ]
-        },
-        {
-          "message": 50424,
-          "choices": [
-            { "reply": 67311, "next": 50409, "startsQuest": 2442, "params": [[34, 2442]] },
-            { "reply": 67310, "next": 50410, "startsQuest": 2442, "params": [[34, 2442]] }
+            { "reply": 67312, "next": 50394 }
           ]
         },
         {
@@ -62613,7 +62706,7 @@
         {
           "message": 50606,
           "choices": [
-            { "reply": 67842, "next": 50607, "gives": 26366 }
+            { "reply": 67842, "next": 50607 }
           ]
         },
         {
@@ -62655,13 +62748,20 @@
         {
           "message": 50613,
           "choices": [
-            { "reply": 67845, "next": 50614 }
+            { "reply": 67845, "next": 50614, "startsQuest": 2443, "params": [[34, 2443]], "gives": 26366 }
           ]
         },
         {
           "message": 50614,
           "choices": [
             { "reply": 67844 }
+          ]
+        },
+        {
+          "message": 50394,
+          "choices": [
+            { "reply": 67311, "next": 50409, "startsQuest": 2442, "params": [[34, 2442]] },
+            { "reply": 67310, "next": 50410, "startsQuest": 2442, "params": [[34, 2442]] }
           ]
         }
       ],
@@ -62781,6 +62881,8 @@
         { "quest": 737, "message": 9261 },
         { "quest": 738, "message": 9268 },
         { "quest": 739, "message": 9269 },
+        { "after": 739, "message": 9266, "criterion": "Qa!740&Qf!740" },
+        { "quest": 740, "message": 9270 },
         { "after": 742, "message": 9047 },
         { "message": 9036 }
       ],
@@ -62898,9 +63000,28 @@
           "choices": [
             { "reply": 9177, "startsQuest": 740, "params": [[34, 740]], "next": 9270 }
           ]
+        },
+        {
+          "message": 9270,
+          "choices": [
+            { "reply": 9511, "quest": 740, "criterion": "(Qo=4794|Qo=4795|Qo=4796|Qo=4797|Qo=4798)", "completesAll": [4794, 4795, 4796, 4797, 4798], "partial": true, "params": [[30, 4794]], "next": 9271 },
+            { "reply": 10064, "quest": 740, "criterion": "Qo=4799", "completes": 4799, "completesAll": [4799, 4800, 4801, 4802], "takesAll": [12560, 12561, 12562, 12563, 12564, 12565, 12566, 12567, 12568, 12569, 12570, 12571, 12572, 12573, 12574, 12575, 12576, 12577, 12578, 12579], "params": [[30, 4799]], "next": 9572 }
+          ]
+        },
+        {
+          "message": 9271,
+          "choices": [
+            { "reply": 9235 }
+          ]
+        },
+        {
+          "message": 9572,
+          "choices": [
+            { "reply": 9235 }
+          ]
         }
       ],
-      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270)."
+      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270). «El safari de las almas» 740 (Dofus pour les noobs («Le Safari des âmes»)): the last tier. The five full soul stones go by 9511 (partial); the four optional steps (the laska of each rare krokille, items 12560-12579, INFERRED order 3178-3197) by 10064, which takes the twenty. Lines 9270/9271/9572 INFERRED ids."
     },
     {
       "npc": 1442,
@@ -62913,7 +63034,7 @@
         {
           "message": 50590,
           "choices": [
-            { "reply": 67824, "next": 50593, "quest": 2442, "afterObjective": 18464, "beforeObjective": 18465 }
+            { "reply": 67824, "next": 50593, "quest": 2442, "afterObjective": 18464, "beforeObjective": 18465, "completes": 18465, "params": [[30, 18465]] }
           ]
         },
         {
@@ -63004,7 +63125,7 @@
         {
           "message": 50587,
           "choices": [
-            { "reply": 67812, "gives": 26364 }
+            { "reply": 67812, "gives": 26364, "quest": 2442, "afterObjective": 18466, "beforeObjective": 18551, "completes": 18551, "params": [[30, 18551]] }
           ]
         }
       ],
@@ -63056,6 +63177,697 @@
         }
       ],
       "why": "«La razón del más fuerte» (2442): Jykel at the master's house ends the quest. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 2340,
+      "map": 0,
+      "opening": 17736,
+      "lines": [
+        {
+          "message": 17736,
+          "choices": [
+            { "reply": 80599, "quest": 1484, "completes": 8352, "params": [[30, 8352]] },
+            { "reply": 21252, "startsQuest": 1485, "params": [[34, 1485]], "criterion": "Qf=1484&Qa!1485&Qf!1485", "next": 17737 },
+            { "reply": 21251, "next": 17738 },
+            { "reply": 22332, "criterion": "Qf=1486&Qa!1530&Qf!1530", "next": 18686 }
+          ]
+        },
+        {
+          "message": 17737,
+          "choices": [
+            { "reply": 21250, "next": 17738 }
+          ]
+        },
+        {
+          "message": 17738,
+          "choices": [
+            { "reply": 21254, "next": 17739 }
+          ]
+        },
+        {
+          "message": 17739,
+          "choices": [
+            { "reply": 21249, "quest": 1485, "completes": 8344, "params": [[30, 8344]] }
+          ]
+        },
+        {
+          "message": 18686,
+          "choices": [
+            { "reply": 22331, "next": 18687 }
+          ]
+        },
+        {
+          "message": 18687,
+          "choices": [
+            { "reply": 22330, "startsQuest": 1530, "params": [[34, 1530]] }
+          ]
+        }
+      ],
+      "why": "Gladis, the portal officer of the travellers' tower, by «Voyage, voyage» (1484, her report 80599) and «La puerta de Anutropía» (1485; Dofus pour les noobs («Voyage, voyage» / «La porte d'Enutrosor»)): «Estoy deseando partir en mi primera misión para descubrir la dimensión Anutropía» (21252) starts 1485 and she explains the portal (17737-17739, 21249-21251 and 21254 INFERRED order from the client's lines). «Acercarte a la consola de Anutropía» (21249) does the first objective of 1485 (8344, access to the dimension), INFERRED. «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «¿Puedes hablarme sobre el descubrimiento de la dimensión Sramvil?» (22332) leads to the attack on Exploranciana (18686, 22331, 18687) and «Voy a hablar con Exploranciana» (22330) starts 1530 (criterion Qf=1486). Reply-to-line order INFERRED from the client's lines."
+    },
+    {
+      "npc": 3297,
+      "map": 0,
+      "opening": 24440,
+      "openings": [
+        { "quest": 1750, "message": 24444 }
+      ],
+      "lines": [
+        {
+          "message": 24440,
+          "choices": [
+            { "reply": 29360, "next": 24441 }
+          ]
+        },
+        {
+          "message": 24441,
+          "choices": [
+            { "reply": 29361, "next": 24442 }
+          ]
+        },
+        {
+          "message": 24442,
+          "choices": [
+            { "reply": 29362, "next": 24443 }
+          ]
+        },
+        {
+          "message": 24443,
+          "choices": [
+            { "reply": 29359, "startsQuest": 1750, "params": [[34, 1750]] }
+          ]
+        },
+        {
+          "message": 24444,
+          "choices": [
+            { "reply": 29381, "quest": 1750, "afterObjective": 11180, "completes": 11181, "params": [[30, 11181]], "next": 24459 }
+          ]
+        },
+        {
+          "message": 24459,
+          "choices": []
+        }
+      ],
+      "why": "Adr'aglb Narref (Frédyglb Rardé, 3297), Bay of Sufokia [20,27]: «Qui a la plus grosse ?» (1750, Dofus pour les noobs): he needs a steamer to repair his cooking machine; 24440 to 24443 are the contest speech, 29359 starts it, 24444 is the step line and its reply 29381 reports the repair (objective 11181), 24459 the thanks. Adr'aglb Narref (Frédyglb Rardé, 3297), Bay of Sufokia [20,27]: «Qui a la plus grosse ?» (1750, Dofus pour les noobs): he needs a steamer to repair his cooking machine; 24440 to 24443 are the contest speech, 29359 starts it, 24444 is the step line and its reply 29381 reports the repair (objective 11181), 24459 the thanks."
+    },
+    {
+      "npc": 3298,
+      "map": 0,
+      "opening": 24445,
+      "openings": [
+        { "quest": 1750, "objective": 11174, "message": 24448 }
+      ],
+      "lines": [
+        {
+          "message": 24445,
+          "choices": [
+            { "reply": 29365, "next": 24446 }
+          ]
+        },
+        {
+          "message": 24446,
+          "choices": [
+            { "reply": 29364, "next": 24447 }
+          ]
+        },
+        {
+          "message": 24447,
+          "choices": [
+            { "reply": 29363 }
+          ]
+        },
+        {
+          "message": 24448,
+          "choices": [
+            { "reply": 29367, "quest": 1750, "next": 24449 },
+            { "reply": 29371, "quest": 1750, "afterObjective": 11177, "completesAll": [11178, 11179], "params": [[30, 11179]], "next": 24458 },
+            { "reply": 29370, "quest": 1750, "afterObjective": 11179 }
+          ]
+        },
+        {
+          "message": 24449,
+          "choices": [
+            { "reply": 29366, "next": 24450, "gives": 18119 }
+          ]
+        },
+        {
+          "message": 24450,
+          "choices": [
+            { "reply": 29380 }
+          ]
+        },
+        {
+          "message": 24458,
+          "choices": [
+            { "reply": 29370 }
+          ]
+        }
+      ],
+      "why": "Ayudante de Deks (3298), Sufokia: «Qui a la plus grosse ?» (1750): he agrees to help the trithon (29363), repairs when given the spare parts crate (18120) and the sheet metal (18121) (29371, bring objectives 11178 and 11179), writes the bearer bond (18119) at 29366; 29370 starts the solo fight against Tryde while he repairs (objective 11180). Ayudante de Deks (3298), Sufokia: «Qui a la plus grosse ?» (1750): he agrees to help the trithon (29363), repairs when given the spare parts crate (18120) and the sheet metal (18121) (29371, bring objectives 11178 and 11179), writes the bearer bond (18119) at 29366; 29370 starts the solo fight against Tryde while he repairs (objective 11180)."
+    },
+    {
+      "npc": 3253,
+      "map": 0,
+      "opening": 23889,
+      "lines": [
+        {
+          "message": 23889,
+          "choices": [
+            { "reply": 29369, "quest": 1750, "afterObjective": 11175, "beforeObjective": 11176, "next": 24451 }
+          ]
+        },
+        {
+          "message": 24451,
+          "choices": [
+            { "reply": 29368, "quest": 1750, "completes": 11176, "params": [[30, 11176]], "gives": 18120, "next": 24452 }
+          ]
+        },
+        {
+          "message": 24452,
+          "choices": []
+        }
+      ],
+      "why": "Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452). Pink Tada (3253), Sufokia palace [23,24]: «Qui a la plus grosse ?» (1750): the bearer bond (18119) for spare parts: she has none (24451), told it is urgent (29368) she hands over the crate (18120, 24452)."
+    },
+    {
+      "npc": 2350,
+      "map": 0,
+      "opening": 17749,
+      "openings": [
+        { "quest": 1486, "afterObjective": 8362, "message": 17760 },
+        { "quest": 1486, "message": 17756 }
+      ],
+      "lines": [
+        {
+          "message": 17749,
+          "choices": [
+            { "reply": 21271, "quest": 1485, "completes": 8354, "params": [[30, 8354]] },
+            { "reply": 21268, "next": 17750 },
+            { "reply": 21274, "criterion": "Qf=1485&Qa!1486&Qf!1486", "next": 17755 },
+            { "reply": 21267 }
+          ]
+        },
+        {
+          "message": 17750,
+          "choices": [
+            { "reply": 21273, "next": 17987 }
+          ]
+        },
+        {
+          "message": 17987,
+          "choices": [
+            { "reply": 21582 }
+          ]
+        },
+        {
+          "message": 17755,
+          "choices": [
+            { "reply": 21272, "startsQuest": 1486, "params": [[34, 1486]], "next": 17756 },
+            { "reply": 21267 }
+          ]
+        },
+        {
+          "message": 17756,
+          "choices": [
+            { "reply": 21277 }
+          ]
+        },
+        {
+          "message": 17760,
+          "names": true,
+          "choices": [
+            { "reply": 21278, "quest": 1486, "completes": 8363, "params": [[30, 8363]], "next": 17987 }
+          ]
+        }
+      ],
+      "why": "Glaya, the orichor collector of the travellers' outpost, by «La puerta de Anutropía» (1485, 21271) and «Orichomania» (1486; Dofus pour les noobs («Orichomania»)): «Me envía el sargento Frinklan» (21274) leads to her request (17755) and «Aceptar ayudarla» (21272) starts 1486 (17756, the oricometer); back with Gobdon safe (21278) closes it (8363). Reply-to-line order INFERRED from the client's lines."
+    },
+    {
+      "npc": 2344,
+      "map": 0,
+      "opening": 17766,
+      "openings": [
+        { "quest": 1486, "afterObjective": 8361, "message": 17766 }
+      ],
+      "lines": [
+        {
+          "message": 17766,
+          "choices": [
+            { "reply": 21288, "quest": 1486, "next": 17767 }
+          ]
+        },
+        {
+          "message": 17767,
+          "choices": [
+            { "reply": 21287, "next": 17768 }
+          ]
+        },
+        {
+          "message": 17768,
+          "names": true,
+          "choices": [
+            { "reply": 21286, "quest": 1486, "completes": 8362, "params": [[30, 8362]] }
+          ]
+        }
+      ],
+      "why": "Zap Gobdon, hidden in a chest costume on map 129236995 by «Orichomania» (1486; Dofus pour les noobs («Orichomania»)): once the Berserkoffre (3671) is down, «¿Qué ha pasado?» (21288), «Seguir escuchando» (21287) and «Despedirte antes de irte» (21286) do 8362. INFERRED order and the line ids."
+    },
+    {
+      "npc": 2335,
+      "map": 0,
+      "opening": 17676,
+      "openings": [
+        { "quest": 1530, "objective": 8719, "message": 17678 },
+        { "quest": 1530, "message": 18700 }
+      ],
+      "lines": [
+        {
+          "message": 17676,
+          "choices": [
+            { "reply": 21183 }
+          ]
+        },
+        {
+          "message": 18700,
+          "choices": [
+            { "reply": 22348, "next": 18701 }
+          ]
+        },
+        {
+          "message": 18701,
+          "choices": [
+            { "reply": 22346, "next": 18702 }
+          ]
+        },
+        {
+          "message": 18702,
+          "choices": [
+            { "reply": 22345, "gives": 15463, "quest": 1530, "completes": 8642, "params": [[30, 8642]] }
+          ]
+        },
+        {
+          "message": 17678,
+          "choices": [
+            { "reply": 22356, "quest": 1530, "criterion": "Qo<8720", "next": 18710 }
+          ]
+        },
+        {
+          "message": 18710,
+          "choices": [
+            { "reply": 22355, "quest": 1530, "completes": 8720, "params": [[30, 8720]] }
+          ]
+        }
+      ],
+      "why": "Exploranciana, founder of the travellers' order, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): the first talk is 18700 (Lonyon Plata and the Queen of Thieves), 22348 / 22346 lead to 18702 where she gives the Lingote de Anutropía (15463) for Vil Smis; back with Vil's news (22356) she sends you to Sramvil (18710, 22355 = objective 8720). The line order and the return opening (17678) are INFERRED; the greeting 17676 with 21183 is the plain one. Fix: the greeting must not tick 8642 (a talk objective): «Voy al pueblo de Amakna» (22345) completes it, and the opening is 18700 for the whole quest until Vil's news is in."
+    },
+    {
+      "npc": 2540,
+      "map": 0,
+      "opening": 18705,
+      "lines": [
+        {
+          "message": 18705,
+          "choices": [
+            { "reply": 22354, "quest": 1530, "criterion": "Qa=1530", "next": 18706 }
+          ]
+        },
+        {
+          "message": 18706,
+          "choices": [
+            { "reply": 22353, "quest": 1530, "criterion": "PO=15463", "takes": 15463, "next": 18707 }
+          ]
+        },
+        {
+          "message": 18707,
+          "choices": [
+            { "reply": 22352, "next": 18708 }
+          ]
+        },
+        {
+          "message": 18708,
+          "choices": [
+            { "reply": 22351, "next": 18709 }
+          ]
+        },
+        {
+          "message": 18709,
+          "choices": [
+            { "reply": 22350, "quest": 1530, "completes": 8719, "params": [[30, 8719]], "gives": 15464 }
+          ]
+        }
+      ],
+      "why": "Vil Smis, the rogue behind the house of Amakna village [1,0], for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Vengo de parte de Exploranciana» (22354), the ingot is handed over (22353, takes 15463), he tells the Queen of Thieves may not be of divine blood and sends you to his cousin; «Agarrar el guante e irte» (22350) gives his glove (15464) and is 8719. Reply order INFERRED from the client's lines."
+    },
+    {
+      "npc": 2437,
+      "map": 0,
+      "opening": 18028,
+      "lines": [
+        {
+          "message": 18028,
+          "choices": [
+            { "reply": 22363, "quest": 1530, "completes": 8723, "params": [[30, 8723]], "next": 18715 }
+          ]
+        },
+        {
+          "message": 18715,
+          "choices": [
+            { "reply": 22362, "next": 18716 }
+          ]
+        },
+        {
+          "message": 18716,
+          "choices": [
+            { "reply": 22361, "next": 18717 }
+          ]
+        },
+        {
+          "message": 18717,
+          "choices": [
+            { "reply": 22360 }
+          ]
+        }
+      ],
+      "why": "Sergeant Raskzac of the travellers' outpost in Sramvil, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Estoy en misión especial para Exploranciana» (22363) is 8723; he tells Mundy lives in the dark summit and offers an escort that is declined (22361, 18717). Reply order INFERRED. Other quests of the sergeant add their lines here."
+    },
+    {
+      "npc": 2454,
+      "map": 0,
+      "opening": 18723,
+      "lines": [
+        {
+          "message": 18723,
+          "choices": [
+            { "reply": 22370, "quest": 1530, "completes": 8724, "params": [[30, 8724]], "next": 18724 }
+          ]
+        },
+        {
+          "message": 18724,
+          "choices": []
+        }
+      ],
+      "why": "Mundy Smis, cousin of Vil, in the dark summit for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): showing Vil's glove (22370, not spent) is 8724 and she answers 18724. Her letters quest (1531) adds its lines."
+    },
+    {
+      "npc": 3326,
+      "map": 0,
+      "opening": 24233,
+      "openings": [
+        { "quest": 1752, "message": 24237 }
+      ],
+      "lines": [
+        {
+          "message": 24233,
+          "choices": [
+            { "reply": 29135, "next": 24234 }
+          ]
+        },
+        {
+          "message": 24234,
+          "choices": [
+            { "reply": 29134, "next": 24235 }
+          ]
+        },
+        {
+          "message": 24235,
+          "choices": [
+            { "reply": 29133, "next": 24236 }
+          ]
+        },
+        {
+          "message": 24236,
+          "choices": [
+            { "reply": 29132, "startsQuest": 1752, "params": [[34, 1752]] }
+          ]
+        },
+        {
+          "message": 24237,
+          "choices": [
+            { "reply": 29167, "next": 24273, "quest": 1752, "afterObjective": 11203, "completes": 11204, "params": [[30, 11204]] }
+          ]
+        },
+        {
+          "message": 24273,
+          "choices": [
+            { "reply": 29166, "next": 24274 }
+          ]
+        },
+        {
+          "message": 24274,
+          "choices": []
+        }
+      ],
+      "why": "Petra Fikante (3326), Sufokia [21,22]: «Competencia desleal» / «Concurrence déloyale» (1752, Dofus pour les noobs): the treasure hunter explains her trade (24233 to 24235), 29132 accepts and starts the quest, 24237 is the step line with the list of contacts; 29167 names the only competitor (objective 11204) and 29166 asks for the pay (24274). Petra Fikante (3326), Sufokia [21,22]: «Competencia desleal» / «Concurrence déloyale» (1752, Dofus pour les noobs): the treasure hunter explains her trade (24233 to 24235), 29132 accepts and starts the quest, 24237 is the step line with the list of contacts; 29167 names the only competitor (objective 11204) and 29166 asks for the pay (24274)."
+    },
+    {
+      "npc": 3327,
+      "map": 0,
+      "opening": 24238,
+      "lines": [
+        {
+          "message": 24238,
+          "choices": [
+            { "reply": 29136, "next": 24239, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24239,
+          "choices": []
+        }
+      ],
+      "why": "Fessyou (3327) [10,25]: 1752, the investigation Petra assigned (29136) brings Sharky's name (24239). Fessyou (3327) [10,25]: 1752, the investigation Petra assigned (29136) brings Sharky's name (24239)."
+    },
+    {
+      "npc": 3328,
+      "map": 0,
+      "opening": 24243,
+      "lines": [
+        {
+          "message": 24243,
+          "choices": [
+            { "reply": 29141, "next": 24244, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24244,
+          "choices": [
+            { "reply": 29140, "next": 24245 }
+          ]
+        },
+        {
+          "message": 24245,
+          "choices": []
+        }
+      ],
+      "why": "Mousse Taffa (3328) [9,26]: 1752, the looters' methods (24244) and Kaje (24245). Mousse Taffa (3328) [9,26]: 1752, the looters' methods (24244) and Kaje (24245)."
+    },
+    {
+      "npc": 3329,
+      "map": 0,
+      "opening": 24246,
+      "lines": [
+        {
+          "message": 24246,
+          "choices": [
+            { "reply": 29143, "next": 24247, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24247,
+          "choices": [
+            { "reply": 29142, "next": 24248 }
+          ]
+        },
+        {
+          "message": 24248,
+          "choices": []
+        }
+      ],
+      "why": "Benit Zaim (3329) [16,28]: 1752, the competition (24247) and Lazur's denunciation (24248). Benit Zaim (3329) [16,28]: 1752, the competition (24247) and Lazur's denunciation (24248)."
+    },
+    {
+      "npc": 3330,
+      "map": 0,
+      "opening": 24251,
+      "openings": [
+        { "quest": 1752, "objective": 11196, "message": 24253 }
+      ],
+      "lines": [
+        {
+          "message": 24251,
+          "choices": [
+            { "reply": 29148, "next": 24252, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24252,
+          "choices": [
+            { "reply": 29147, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24253,
+          "choices": [
+            { "reply": 29149, "next": 24254, "quest": 1752, "completes": 11197, "params": [[30, 11197]] }
+          ]
+        },
+        {
+          "message": 24254,
+          "choices": []
+        }
+      ],
+      "why": "Sharky (3330) [22,27]: 1752: the threat (24251, 24252), 29147 «Defenderte» starts the solo fight (npc_fights), then 24253 and the boss's description (24254, 29149, objective 11197). Sharky (3330) [22,27]: 1752: the threat (24251, 24252), 29147 «Defenderte» starts the solo fight (npc_fights), then 24253 and the boss's description (24254, 29149, objective 11197)."
+    },
+    {
+      "npc": 3331,
+      "map": 0,
+      "opening": 24255,
+      "lines": [
+        {
+          "message": 24255,
+          "choices": [
+            { "reply": 29154, "next": 24256, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24256,
+          "choices": [
+            { "reply": 29153, "next": 24257 }
+          ]
+        },
+        {
+          "message": 24257,
+          "choices": [
+            { "reply": 29152, "next": 24258 }
+          ]
+        },
+        {
+          "message": 24258,
+          "choices": [
+            { "reply": 29150, "next": 24259, "buyPrice": 10000, "completes": 11199, "params": [[30, 11199]] },
+            { "reply": 29151 }
+          ]
+        },
+        {
+          "message": 24259,
+          "choices": []
+        }
+      ],
+      "why": "Kaje (3331) [23,27]: 1752: 10,000 kamas (a fee, buyPrice) buy his employer's rank (24259, objective 11199). Kaje (3331) [23,27]: 1752: 10,000 kamas (a fee, buyPrice) buy his employer's rank (24259, objective 11199)."
+    },
+    {
+      "npc": 3332,
+      "map": 0,
+      "opening": 24260,
+      "lines": [
+        {
+          "message": 24260,
+          "choices": [
+            { "reply": 29156, "next": 24261, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24261,
+          "choices": [
+            { "reply": 29155, "next": 24262, "completes": 11201, "params": [[30, 11201]] }
+          ]
+        },
+        {
+          "message": 24262,
+          "choices": []
+        }
+      ],
+      "why": "Lazur (3332) [24,26]: 1752: Benit's denunciation (24261) and Ilkor's name (24262, objective 11201). Lazur (3332) [24,26]: 1752: Benit's denunciation (24261) and Ilkor's name (24262, objective 11201)."
+    },
+    {
+      "npc": 711,
+      "map": 0,
+      "opening": 4557,
+      "lines": [
+        {
+          "message": 4557,
+          "choices": [
+            { "reply": 28970, "next": 24582, "buyItem": 7517, "buyPrice": 20 },
+            { "reply": 29160, "next": 24263, "quest": 1752, "holds": 7517 }
+          ]
+        },
+        {
+          "message": 24582,
+          "choices": []
+        },
+        {
+          "message": 24263,
+          "choices": [
+            { "reply": 29159, "next": 24264 }
+          ]
+        },
+        {
+          "message": 24264,
+          "choices": [
+            { "reply": 29158, "next": 24265 }
+          ]
+        },
+        {
+          "message": 24265,
+          "choices": [
+            { "reply": 29157, "next": 24266, "completes": 11202, "params": [[30, 11202]] }
+          ]
+        },
+        {
+          "message": 24266,
+          "choices": []
+        }
+      ],
+      "why": "Ripate Inkeeper (711) [12,24]: «Competencia desleal» (1752, Dofus pour les noobs: buy a Ripate beer (7517, 20 kamas as in his shop), then ask about Ilkor «il faut avoir la bière sur soi»): 29160 needs the beer, 24263 to 24266 the colonel at the peninsula (objective 11202). Ripate Inkeeper (711) [12,24]: «Competencia desleal» (1752, Dofus pour les noobs: buy a Ripate beer (7517, 20 kamas as in his shop), then ask about Ilkor «il faut avoir la bière sur soi»): 29160 needs the beer, 24263 to 24266 the colonel at the peninsula (objective 11202)."
+    },
+    {
+      "npc": 3333,
+      "map": 0,
+      "opening": 24267,
+      "lines": [
+        {
+          "message": 24267,
+          "choices": [
+            { "reply": 29215, "next": 24316, "quest": 1752 },
+            { "reply": 29165, "next": 24268, "quest": 1752 }
+          ]
+        },
+        {
+          "message": 24316,
+          "choices": [
+            { "reply": 29165, "next": 24268 }
+          ]
+        },
+        {
+          "message": 24268,
+          "choices": [
+            { "reply": 29164, "next": 24269 }
+          ]
+        },
+        {
+          "message": 24269,
+          "choices": [
+            { "reply": 29163, "next": 24270 }
+          ]
+        },
+        {
+          "message": 24270,
+          "choices": [
+            { "reply": 29162, "next": 24271 }
+          ]
+        },
+        {
+          "message": 24271,
+          "choices": [
+            { "reply": 29161, "next": 24272, "completes": 11203, "params": [[30, 11203]] }
+          ]
+        },
+        {
+          "message": 24272,
+          "choices": []
+        }
+      ],
+      "why": "Colonel Ilkor (3333) [10,29]: 1752: his smuggling for the Collector (24268 to 24272, objective 11203). Colonel Ilkor (3333) [10,29]: 1752: his smuggling for the Collector (24268 to 24272, objective 11203)."
     }
   ]
 }

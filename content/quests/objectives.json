@@ -7404,13 +7404,6 @@
    "why": "«Caverna del Destino» (732406): the cave of the three nornes, 111673344. Dofus pour les noobs «Nordalie»: «parler au Gardien du Destin pour entrer dans la caverne»."
   },
   {
-   "objective": 13073,
-   "quest": 1909,
-   "kind": "enter",
-   "map": 176160768,
-   "why": "Enter the Chamber of Tal Kasha (732413): its first room, 176160768, entered through the keeper on 175637504."
-  },
-  {
    "objective": 13080,
    "quest": 1909,
    "kind": "enter",
@@ -7458,22 +7451,6 @@
    "why": "«Entra en la Akademia de los Goblins»: the dungeon's entrance map itself carries the objective."
   },
   {
-   "objective": 18462,
-   "quest": 2442,
-   "kind": "reply",
-   "replies": [67780],
-   "why": "Grunob's last reply hands over the notebook; the talk with him closes there rather than on the greeting."
-  },
-  {
-   "objective": 18461,
-   "quest": 2442,
-   "kind": "beat",
-   "monster": 6903,
-   "map": 221778432,
-   "afterObjectives": [18460],
-   "why": "«Derrota al director Grunob»: monster 6903 is the Akademia dungeon's boss (Dungeons row 138). The objective names the Laboratory side room (221777410), an indoor map where no group stands, so it is closed in the boss room, which is where 6903 is fought."
-  },
-  {
    "objective": 4724,
    "quest": 742,
    "kind": "reply",
@@ -7489,25 +7466,11 @@
    "why": "«Encuentra al bwork al que Jykel ha embaucado»: the notes lead to Richards' lab, where the cybwork is. INFERRED: closed on entering it."
   },
   {
-   "objective": 18465,
-   "quest": 2442,
-   "kind": "reply",
-   "replies": [67824],
-   "why": "«Habla con Jykel»: closed when the notebook is handed back."
-  },
-  {
    "objective": 18466,
    "quest": 2442,
    "kind": "reply",
    "replies": [67859],
    "why": "«Pregunta a Bwodiguardh por lo sucedido en el Bosque Maléfico»: closed on his answer about the attacks. INFERRED reply."
-  },
-  {
-   "objective": 18551,
-   "quest": 2442,
-   "kind": "reply",
-   "replies": [67812],
-   "why": "«Habla con Jykel»: closed when he has handed over the brain and the potion."
   },
   {
    "objective": 18469,
@@ -7522,6 +7485,163 @@
    "kind": "reply",
    "replies": [67844],
    "why": "«Habla sobre lo que has descubierto con Otomai» (type 0): closed when Otomai's explanation ends (reply 67844, put the ring away and head for the coral cave). INFERRED reply; Dofus pour les noobs."
+  },
+  {
+   "objective": 18473,
+   "quest": 2443,
+   "kind": "use",
+   "afterObjectives": [18472],
+   "why": "«Purifica el ámbar antediluviano con el poder del anillo ocre»: the amber 26365 used with the Ocre ring 26366 equipped (the item's own criterion POE26366; its effect 30 is this objective and its effect 209 gives the purified amber 26367)."
+  },
+  {
+   "objective": 11173,
+   "quest": 1750,
+   "kind": "reply",
+   "replies": [29363],
+   "why": "«Encuentra un steamer dispuesto a ayudar a un trithón» (886828): the Deks assistant agrees to help (29363, «Cuidaré de ti», Dofus pour les noobs: «L'assistant accepte d'aider le Trithon»)."
+  },
+  {
+   "objective": 11177,
+   "quest": 1750,
+   "kind": "click",
+   "afterObjectives": [11176],
+   "elements": [{"map": 169084930, "element": 508209}],
+   "gives": [{"item": 18121, "count": 1}],
+   "why": "«Recupera trozos de chapa» (886830): «Cliquez sur la tôle accrochée au mur» at [24,27] (Dofus pour les noobs); the sheet metal (18121) is what the assistant asks for."
+  },
+  {
+   "objective": 11180,
+   "quest": 1750,
+   "kind": "beat",
+   "monster": 4441,
+   "map": 168821762,
+   "afterObjectives": [11179],
+   "why": "«Protege al ayudante de Deks mientras repara la máquina» (886831): solo fight against Tryde (4441), Dofus pour les noobs («Un combat qui s'effectue seul se lance»)."
+  },
+  {
+   "objective": 18472,
+   "quest": 2443,
+   "kind": "click",
+   "elements": [{"map": 5244422, "element": 524203}],
+   "gives": [{"item": 26365, "count": 1}],
+   "afterObjectives": [18580],
+   "why": "«Encuentra ámbar antediluviano en la Gruta Grut'Hesqua»: after the Corailleur Magistral (the boss room hands the character to 5244422), a big coral of the cave (element 524203, cell 193, graphic 17578) gives the antediluvian amber 26365 and closes the objective (Dofus pour les noobs «Après lui, le déluge»). INFERRED element, the only one of the map."
+  },
+  {
+   "objective": 11174,
+   "quest": 1750,
+   "kind": "reply",
+   "replies": [29363],
+   "afterObjectives": [11173],
+   "why": "«Escolta al ayudante de Deks hasta la máquina» (886829): the assistant already stands at the machine's map in the client data (3298 and 3297 share map 168821762), so his agreement (29363) also closes the escort."
+  },
+  {
+   "objective": 8355,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 130285568,
+   "why": "«Mide la tasa de oricor...» (Malefiscof factory): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 8356,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 130547712,
+   "why": "«Mide la tasa de oricor...» (Perfisil's gallery): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 8357,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 129499136,
+   "why": "«Mide la tasa de oricor...» (King Nidas's palace bench): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 8358,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 128977920,
+   "why": "«Mide la tasa de oricor...» (gold quarry panorama): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 8360,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 131862017,
+   "why": "«Mide la tasa de oricor...» (the eternals' retreat panorama): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 8359,
+   "quest": 1486,
+   "kind": "enter",
+   "map": 129236995,
+   "why": "«Mide la tasa de oricor...» (Gobdon): the oricometer reads on entering the map (DPLN «Orichomania»: «à chaque map visitée»)."
+  },
+  {
+   "objective": 7971,
+   "quest": 1443,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 119276033, "element": 483344}],
+   "gives": [{"item": 14820, "count": 1}],
+   "givesEach": true,
+   "why": "«Consigue las notas de la sala del bathyscaphe room» (Dofus pour les noobs, «Prise de notes»: «cliquez sur chaque objet nécessaire dans chaque salle»): the one element of that Aquadome room gives one note of Merkator (14820); five are handed to Teo Dolito."
+  },
+  {
+   "objective": 7972,
+   "quest": 1443,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 119277057, "element": 483349}],
+   "gives": [{"item": 14820, "count": 2}],
+   "givesEach": true,
+   "why": "«Consigue las notas de la sala del bubble room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (2), so each room adds one and five go to Teo Dolito."
+  },
+  {
+   "objective": 7973,
+   "quest": 1443,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 119278081, "element": 483345}],
+   "gives": [{"item": 14820, "count": 3}],
+   "givesEach": true,
+   "why": "«Consigue las notas de la sala del orb room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (3), so each room adds one and five go to Teo Dolito."
+  },
+  {
+   "objective": 7974,
+   "quest": 1443,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 119276035, "element": 483346}],
+   "gives": [{"item": 14820, "count": 4}],
+   "givesEach": true,
+   "why": "«Consigue las notas de la sala del periscope room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (4), so each room adds one and five go to Teo Dolito."
+  },
+  {
+   "objective": 7975,
+   "quest": 1443,
+   "kind": "click",
+   "anyOrder": true,
+   "elements": [{"map": 119277059, "element": 483347}],
+   "gives": [{"item": 14820, "count": 5}],
+   "givesEach": true,
+   "why": "«Consigue las notas de la sala del treasure room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (5), so each room adds one and five go to Teo Dolito."
+  },
+  {
+   "objective": 8712,
+   "quest": 1530,
+   "kind": "enter",
+   "map": 99090947,
+   "afterObjectives": [8642],
+   "why": "«Ve al lugar acordado» (453635): the hidden map behind the house of Amakna village [1,0], where Vil Smis waits (Dofus pour les noobs («La cité de l'indicible mal»))."
+  },
+  {
+   "objective": 8721,
+   "quest": 1530,
+   "kind": "enter",
+   "map": 134351108,
+   "afterObjectives": [8720],
+   "why": "«Obtén el acceso a la dimensión Sramvil y preséntate ante el portal» (1132308): the portal lands on Sramvil's arrival map (TravelersTower Dimensions); Dofus pour les noobs («La cité de l'indicible mal»)."
   }
 ]
 }

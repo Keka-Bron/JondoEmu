@@ -7163,6 +7163,29 @@
       "orientation": 1,
       "criterion": "Qa=2442&Qo>18463&Qo<18466",
       "why": "Jykel beside his cybwork in Richards' lab, on clear floor. INFERRED cell."
+    },
+    {
+      "map": 129236995,
+      "npc": 2344,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1486",
+      "why": "Zap Gobdon, in the chest costume, from «Orichomania» (1486): «Parlez à Zap Gobdon qui a l'apparence d'un coffre» (Dofus pour les noobs («Orichomania»)). INFERRED cell."
+    },
+    {
+      "map": 98567681,
+      "npc": 3333,
+      "cell": 312,
+      "orientation": 3,
+      "why": "Colonel Ilkor (3333) is on the Peninsula of the Gelatins [10,29] (Dofus pour les noobs, «Competencia desleal»: «Allez en [10,29]... le Colonel»); the client's map data holds no placement, so he stands on a free cell in the open, in sight of the arrival."
+    },
+    {
+      "map": 136052736,
+      "npc": 2454,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1530|Qa=1531",
+      "why": "Mundy Smis (Franche Smisse in French), «Dirigez vous en [5,1!] en montant les escaliers des Hauts Ténébreux» (Dofus pour les noobs («La cité de l'indicible mal» / «Messager clandestin»)). No capture lists her: INFERRED cell on open floor."
     }
   ]
 }

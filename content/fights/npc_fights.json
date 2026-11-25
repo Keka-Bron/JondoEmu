@@ -1644,6 +1644,12 @@
       "why": "«La razón del más fuerte» (2442): «Desafiar al coloso verde para hacer que hable» -- the cybwork Bwodiguardh (6906) is fought, after which he talks. INFERRED composition: him alone." },
     { "npc": 1442, "map": 24119823, "reply": 67811,
       "solo": true, "monsters": [ { "monster": 6907, "grade": 0 }, { "monster": 6907, "grade": 0 }, { "monster": 6908, "grade": 0 }, { "monster": 6908, "grade": 0 } ], "marks": -2442002,
-      "why": "«La razón del más fuerte» (2442): «Desplumar a las aves» -- the Tufos obtusos and Pohoyos cerriles (6907, 6908) of the nest, whose names the quest's objective gives. INFERRED: two of each." }
+      "why": "«La razón del más fuerte» (2442): «Desplumar a las aves» -- the Tufos obtusos and Pohoyos cerriles (6907, 6908) of the nest, whose names the quest's objective gives. INFERRED: two of each." },
+    { "npc": 3298, "map": 0, "reply": 29370, "solo": true,
+      "monsters": [ { "monster": 4441, "grade": 0 } ],
+      "why": "«Qui a la plus grosse ?» (1750): «Proteger al ayudante mientras repara la máquina», Tryde (4441) alone against the character (Dofus pour les noobs: the fight is solo)." },
+    { "npc": 3330, "map": 0, "reply": 29147, "solo": true,
+      "monsters": [ { "monster": 4498, "grade": 0 } ],
+      "why": "«Competencia desleal» (1752): Sharky (4498), solo (Dofus pour les noobs: «Un combat seul se lance»)." }
   ]
 }

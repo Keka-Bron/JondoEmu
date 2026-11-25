@@ -920,6 +920,14 @@
       "map": 98568705,
       "group": -1012892,
       "remove": true
-    }
+    },
+  {
+   "map": 129236995,
+   "group": -1486001,
+   "cell": 200,
+   "orientation": 3,
+   "members": [{"monster": 3671, "grade": 0}],
+   "why": "The Berserkoffre Affectueux of «Orichomania» (1486, 8361; Dofus pour les noobs («Orichomania»): «Combattez alors ce dernier», alone). INFERRED cell and grade."
+  }
   ]
 }
