@@ -46,7 +46,8 @@ namespace Jondo.Unity.Tests.World
 
             var apertura = charla.Line(32574);
             Assert.NotNull(apertura);
-            Assert.Equal(5, apertura!.Choices.Count);
+            // The five the capture shows; a quest may add its own replies behind a criterion.
+            Assert.Equal(5, apertura!.Choices.Count(c => c.Criterion.Length == 0));
 
             // «Intentar comprender dónde estás» opens the chain of six sentences up to the well.
             Assert.Equal(32599, apertura.Choice(39607)!.Next);
