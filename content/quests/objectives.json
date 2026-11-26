@@ -7576,8 +7576,7 @@
    "anyOrder": true,
    "elements": [{"map": 119276033, "element": 483344}],
    "gives": [{"item": 14820, "count": 1}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del bathyscaphe room» (Dofus pour les noobs, «Prise de notes»: «cliquez sur chaque objet nécessaire dans chaque salle»): the one element of that Aquadome room gives one note of Merkator (14820); five are handed to Teo Dolito."
+   "why": "«Consigue las notas de la sala del bathyscaphe room» (Dofus pour les noobs, «Prise de notes»: «cliquez sur chaque objet nécessaire dans chaque salle»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7972,
@@ -7585,9 +7584,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119277057, "element": 483349}],
-   "gives": [{"item": 14820, "count": 2}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del bubble room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (2), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del bubble room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7973,
@@ -7595,9 +7593,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119278081, "element": 483345}],
-   "gives": [{"item": 14820, "count": 3}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del orb room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (3), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del orb room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7974,
@@ -7605,9 +7602,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119276035, "element": 483346}],
-   "gives": [{"item": 14820, "count": 4}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del periscope room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (4), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del periscope room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7975,
@@ -7615,9 +7611,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119277059, "element": 483347}],
-   "gives": [{"item": 14820, "count": 5}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del treasure room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (5), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del treasure room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 8712,
