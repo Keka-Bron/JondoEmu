@@ -10088,32 +10088,101 @@
    "why": "«Defiéndete de los guardias» (886816): the fight that Paula Rice's reply 29332 starts against the Gobvio servil."
   },
   {
+   "objective": 13591,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13589],
+   "why": "«Cumple la misión que la sacerdotisa de Uginak te ha confiado» (741292): her quest «La guerra de los Peldaños» (1940) done, 13589 its last objective (Dofus pour les noobs («Les cœurs livides»): «Une fois ces trois quêtes terminées»)."
+  },
+  {
+   "objective": 13593,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13742],
+   "why": "«Confirma la relación entre las fuerzas elementales y los corazones lívidos» (745739): the Sram priest's quest «Toda el agua al molino» (1955) done, 13742 its last objective."
+  },
+  {
+   "objective": 13695,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13725],
+   "why": "«Haz que lata el corazón de un crujidor ancestral» (744167): the Yopuka priest's quest «Crujidos de corazón» (1956) done, 13725 its last objective."
+  },
+  {
+   "objective": 13560,
+   "quest": 1940,
+   "kind": "use",
+   "afterObjectives": [13559],
+   "why": "«Lee la obra sobre la guerra de los Peldaños» (741250): the book 19527, used (its effect 30 is this objective) (Dofus pour les noobs («La guerre des Marches»): «double-cliquer dessus»)."
+  },
+  {
+   "objective": 13562,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 182978061, "element": 511926}],
+   "afterObjectives": [13560],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13562): the sign of [-28,27] (element 511926); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»."
+  },
+  {
+   "objective": 13563,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 183108104, "element": 511928}],
+   "afterObjectives": [13562],
+   "spawns": {"monster": 3098, "count": 1, "attacks": true},
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13563): the sign of [-31,22] (element 511928); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»; its click starts a fight against an Uginak (INFERRED monster 3098, the guide names no id)."
+  },
+  {
+   "objective": 13564,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 182977032, "element": 511925}],
+   "afterObjectives": [13563],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13564): the sign of [-30,20] (element 511925); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»."
+  },
+  {
+   "objective": 13565,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 183109635, "element": 511927}],
+   "afterObjectives": [13564],
+   "gives": [{"item": 19523, "count": 1}],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13565): the sign of [-33,15] (element 511927); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»; the fourth sign hands over the vitrified eye 19523 («Vous obtenez un Œil vitrifié»)."
+  },
+  {
+   "objective": 13577,
+   "quest": 1940,
+   "kind": "use",
+   "afterObjectives": [13565],
+   "why": "«Examina el ojo vitrificado» (741265): the vitrified eye 19523, used (its effect 30 is this objective) (Dofus pour les noobs («La guerre des Marches»): «Il faudra double-cliquer dessus»)."
+  },
+  {
    "objective": 4010,
    "quest": 649,
    "kind": "objectives",
-   "afterObjectives": [4065],
-   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+   "afterObjectives": [3700],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «La tierra banquisa» (612). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
   },
   {
    "objective": 4062,
    "quest": 649,
    "kind": "objectives",
-   "afterObjectives": [4065],
-   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+   "afterObjectives": [3669],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Una alcaldesa de hielo» (613). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
   },
   {
    "objective": 4063,
    "quest": 649,
    "kind": "objectives",
-   "afterObjectives": [4065],
-   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+   "afterObjectives": [3696],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Full contact» (614). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
   },
   {
    "objective": 4064,
    "quest": 649,
    "kind": "objectives",
-   "afterObjectives": [4065],
-   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+   "afterObjectives": [3728],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Los monólogos de la vacuna» (615). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
   }
 ]
 }

@@ -7947,14 +7947,6 @@
       "why": "Dofus pour les noobs («Bricole Girl»): Valy (Kristina Pielhova) is back once the snowman has melted. INFERRED cell."
     },
     {
-      "map": 54791183,
-      "npc": 1254,
-      "cell": 300,
-      "orientation": 1,
-      "criterion": "Qa=589&Qo=3741",
-      "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]. INFERRED cell."
-    },
-    {
       "map": 170132480,
       "npc": 3266,
       "cell": 373,
@@ -8953,6 +8945,14 @@
       "orientation": 3,
       "criterion": "Qa=1766&Qo>11300&Qo<11303",
       "why": "Markaris at [22,6] (1766); INFERRED cell."
+    },
+    {
+      "map": 54791183,
+      "npc": 1254,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "(Qa=589&Qo=3741)|(Qa=614&Qo=3686)",
+      "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]; also «Full contact» (614, «Jean-Pierre Kofkof à la taverne en [-77,-38]»), objective 3686. INFERRED cell."
     }
   ]
 }

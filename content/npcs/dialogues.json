@@ -32125,7 +32125,8 @@
             { "reply": 62873, "next": 47369, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" },
             { "reply": 62880, "next": 47376, "quest": 1521, "beforeObjective": 8633 },
             { "reply": 62915, "next": 47402, "criterion": "Qa=2063" },
-            { "reply": 62920, "next": 47407, "quest": 1914, "beforeObjective": 13165 }
+            { "reply": 62920, "next": 47407, "quest": 1914, "beforeObjective": 13165 },
+            { "reply": 62905, "next": 47398, "quest": 1940, "afterObjective": null, "beforeObjective": 13559 }
           ]
         },
         {
@@ -32206,9 +32207,15 @@
           "choices": [
             { "reply": 62921 }
           ]
+        },
+        {
+          "message": 47398,
+          "choices": [
+            { "reply": 62898, "quest": 1940, "completes": 13559, "params": [[30, 13559]], "gives": 19527 }
+          ]
         }
       ],
-      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue. «Le livre des Taures», Brakmar's library [-24,39] (Dofus pour les noobs: «Parlez à Jean-Sol Patre du livre des Taures. Celui-ci vous affirme qu'il l'a dans sa bibliothèque mais qu'une personne le lui a emprunté»): 62880, 47376, 62879, 47377, and «Adiós» (62878) is objective 8633. 2063 (En la frontera de lo real): the librarian's answers about the Xelors who asked for a second Aurore Pourpre (47402-47406). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «El Guerrero Negro» (1914, 13161): «Murmurar que buscas obras que traten sobre la historia de Hyrkul» (62920): three books for sale (47408, the shop reply 62918), the fourth burnt (47409), at Gisgul (47410); «Gracias por la valiosa información. Adiós.» (62921) is 13161. INFERRED reply order and the shop reply."
+      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue. «Le livre des Taures», Brakmar's library [-24,39] (Dofus pour les noobs: «Parlez à Jean-Sol Patre du livre des Taures. Celui-ci vous affirme qu'il l'a dans sa bibliothèque mais qu'une personne le lui a emprunté»): 62880, 47376, 62879, 47377, and «Adiós» (62878) is objective 8633. 2063 (En la frontera de lo real): the librarian's answers about the Xelors who asked for a second Aurore Pourpre (47402-47406). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «El Guerrero Negro» (1914, 13161): «Murmurar que buscas obras que traten sobre la historia de Hyrkul» (62920): three books for sale (47408, the shop reply 62918), the fourth burnt (47409), at Gisgul (47410); «Gracias por la valiosa información. Adiós.» (62921) is 13161. INFERRED reply order and the shop reply. The Brakmar librarian (6383): «La guerra de los Peldaños» (1940), objective 13559: «Estoy buscando un libro sobre la guerra de los Peldaños.» (62905), his answer (47398: «tengo una antigua obra que trata sobre ello... Cuídala») and «Bien. Adiós.» (62898; INFERRED), which hands over the book 19527 (Dofus pour les noobs («La guerre des Marches»): «Vous obtenez alors un livre dans votre inventaire de quête»)."
     },
   {
       "npc": 1266,
@@ -44247,7 +44254,7 @@
             { "reply": 7723, "quest": 613, "completes": 3669, "params": [[30, 3669]], "next": 7709 },
             { "reply": 7738, "next": 7709, "criterion": "Qf=613", "beforeQuest": 614 },
             { "reply": 8149, "next": 8156, "criterion": "Qf=613", "beforeQuest": 649 },
-            { "reply": 8151, "next": 8157, "quest": 649, "completes": 4065, "params": [[30, 4065]], "criterion": "Qf=612&Qf=613&Qf=614&Qf=615" },
+            { "reply": 8151, "next": 8157, "quest": 649, "params": [[30, 4065]], "criterion": "Qf=612&Qf=613&Qf=614&Qf=615", "completesAll": [4065] },
             { "reply": 7846 }
           ]
         },
@@ -63066,7 +63073,10 @@
         {
           "message": 29853,
           "choices": [
-            { "reply": 36569, "next": 29854, "quest": 1938, "beforeObjective": 13471 }
+            { "reply": 36569, "next": 29854, "quest": 1938, "beforeObjective": 13471 },
+            { "reply": 36231, "next": 30147, "criterion": "Qf=1938&PL>179&Qa!1954&Qf!1954", "beforeQuest": 1954 },
+            { "reply": 36449, "next": 30269, "quest": 1954, "afterObjective": 13695, "beforeObjective": 13726 },
+            { "reply": 36451, "next": 30271, "quest": 1954, "afterObjective": 13736, "beforeObjective": 13737 }
           ]
         },
         {
@@ -63080,9 +63090,45 @@
           "choices": [
             { "reply": 36230, "quest": 1938, "completes": 13471, "params": [[30, 13471]] }
           ]
+        },
+        {
+          "message": 30147,
+          "choices": [
+            { "reply": 36275, "next": 30148 }
+          ]
+        },
+        {
+          "message": 30148,
+          "choices": [
+            { "reply": 36274, "next": 30149 }
+          ]
+        },
+        {
+          "message": 30149,
+          "choices": [
+            { "reply": 36273, "startsQuest": 1954, "params": [[34, 1954]] }
+          ]
+        },
+        {
+          "message": 30269,
+          "choices": [
+            { "reply": 36448, "next": 30270 }
+          ]
+        },
+        {
+          "message": 30270,
+          "choices": [
+            { "reply": 36447, "quest": 1954, "completes": 13726, "params": [[30, 13726]] }
+          ]
+        },
+        {
+          "message": 30271,
+          "choices": [
+            { "reply": 36450, "quest": 1954, "completes": 13737, "params": [[30, 13737]] }
+          ]
         }
       ],
-      "why": "The Voice of the Twelve (4197) in the gods' territory: «La colère des dieux» (1938), objective 13471: the call to arms (29853, 29854), «Estoy dispuesto a luchar por los Doce.» (36276) and the way to the priestess of Feca (30112, «Ir a ver a la sacerdotisa.» 36230) (Dofus pour les noobs («La colère des dieux»): «Parlez alors à La Voix des Douze pour lui demander l'accès aux zones des Trépamorts»)."
+      "why": "The Voice of the Twelve (4197) in the gods' territory: «La colère des dieux» (1938), objective 13471: the call to arms (29853, 29854), «Estoy dispuesto a luchar por los Doce.» (36276) and the way to the priestess of Feca (30112, «Ir a ver a la sacerdotisa.» 36230) (Dofus pour les noobs («La colère des dieux»): «Parlez alors à La Voix des Douze pour lui demander l'accès aux zones des Trépamorts»). The Voice of the Twelve (4197): «Los corazones lívidos» (1954). «Estoy aquí para dar con la forma de entrar en las torres de los mediomuertos.» (36231) after «La cólera de los dioses», the livid hearts (30147, 30148: «Preguntar más acerca de los corazones lívidos.» 36275, «¿Por dónde puedo empezar?» 36274) and «Ir a hablar con los sacerdotes.» (36273, the step's dialog 30149, starts the quest). Objective 13726: «He cumplido con las misiones que me encomendaron los sacerdotes.» (36449) and the guards of the towers (30269, 30270; «Marcharte a las torres de los Olvidados.» 36447). The end, 13737: «He intentado destruir los corazones lívidos, pero he fracasado.» (36451), 30271 and «Hasta luego.» (36450) (Dofus pour les noobs («Les cœurs livides»))."
     },
   {
       "npc": 4207,
@@ -81219,6 +81265,65 @@
         }
       ],
       "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). The hurt Gobvio: threaten, ask about Paula Rice, look at his dress, he says the Maquinador (24424-24429); 29338 leaves to look for Markaris."
+    },
+    {
+      "npc": 4247,
+      "map": 0,
+      "opening": 30150,
+      "lines": [
+        {
+          "message": 30150,
+          "choices": [
+            { "reply": 36281, "next": 30151, "criterion": "Qa=1954&Qo>13590&Qa!1940&Qf!1940", "beforeQuest": 1940 },
+            { "reply": 36299, "next": 30162, "quest": 1940, "afterObjective": 13579, "beforeObjective": 13580 },
+            { "reply": 36331, "next": 30186, "quest": 1940, "afterObjective": 13588, "beforeObjective": 13589 }
+          ]
+        },
+        {
+          "message": 30151,
+          "choices": [
+            { "reply": 36280, "next": 30152 }
+          ]
+        },
+        {
+          "message": 30152,
+          "choices": [
+            { "reply": 36278, "next": 30153 },
+            { "reply": 36279 }
+          ]
+        },
+        {
+          "message": 30153,
+          "choices": [
+            { "reply": 36277, "startsQuest": 1940, "params": [[34, 1940]] }
+          ]
+        },
+        {
+          "message": 30162,
+          "choices": [
+            { "reply": 36298, "next": 30163 }
+          ]
+        },
+        {
+          "message": 30163,
+          "choices": [
+            { "reply": 36297, "next": 30164 }
+          ]
+        },
+        {
+          "message": 30164,
+          "choices": [
+            { "reply": 36296, "quest": 1940, "completes": 13580, "params": [[30, 13580]] }
+          ]
+        },
+        {
+          "message": 30186,
+          "choices": [
+            { "reply": 36330, "quest": 1940, "completes": 13589, "params": [[30, 13589]] }
+          ]
+        }
+      ],
+      "why": "The Priestess of Uginak (4247): «La guerra de los Peldaños» (1940). «Cuéntame más cosas sobre los peldaños magmáticos.» (36281) after talking to her inside «Los corazones lívidos» (1954, objective 13590), the war's story (30151, «Seguir escuchando.» 36280), the offer (30152, «Aceptar sin dudar.» 36278, or «Rechazar e irte.» 36279) and the step's line 30153 («Dirigirte a Brakmar.» 36277 starts the quest). Objective 13580: «Aludir al Asesino de Muerte.» (36299) with her answers 30162-30164 («Va a ser difícil convencerlo...» 36298, «Hacer que aparezca un demonio me parece peligroso.» 36297, «Lo haré lo mejor que pueda.» 36296). End, 13589: «Relatar brevemente los últimos acontecimientos.» (36331), 30186 and «Hasta luego.» (36330) (Dofus pour les noobs («La guerre des Marches»)). Reply order INFERRED from the message and reply ids."
     }
   ]
 }
