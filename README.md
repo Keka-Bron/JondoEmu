@@ -719,11 +719,11 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
-| Frigost Island | `███░░░░░░░` **27%** | 62/228 |
+| Frigost Island | `███░░░░░░░` **30%** | 68/228 |
+| World Quests | `████░░░░░░` **38%** | 55/145 |
 | Astrub | `██████████` **100%** | 51/51 |
-| World Quests | `████░░░░░░` **35%** | 51/145 |
+| Sufokia | `███████░░░` **72%** | 41/57 |
 | Class Temple | `██████████` **100%** | 39/39 |
-| Sufokia | `███████░░░` **68%** | 39/57 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
 | Incarnam | `██████████` **100%** | 24/24 |
@@ -747,7 +747,7 @@ played through.
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Evil Forest | `████████░░` **75%** | 3/4 |
 | Xelorium | `█░░░░░░░░░` **7%** | 2/28 |
-| **All quests** | **26.6%** | **525/1976** |
+| **All quests** | **27.2%** | **537/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
