@@ -13545,7 +13545,11 @@ namespace Jondo.Unity.Server.Handlers
                 // the same room forever.
                 // Nor on a guild raid's floor: inside a raid what is beaten stays beaten (the guides),
                 // and the floors stand again only when the next raid starts.
-                if (!DreamHandler.SalaLimpiada(session.CharacterId, muerto, fight.RoleplayMapId)
+                // Nor on a map a quest asks to clear (the barracks piano of 1912): a group put back
+                // at once kept it full forever. It stays empty a while once its last group falls.
+                bool toClear = Managers.Quests.Bindings.OnMap(fight.RoleplayMapId).Any(b => b.MapCleared);
+                if (toClear) MobSpawnManager.LeaveClearedFor(fight.RoleplayMapId, TimeSpan.FromMinutes(10));
+                else if (!DreamHandler.SalaLimpiada(session.CharacterId, muerto, fight.RoleplayMapId)
                     && !Managers.GuildRaidManager.IsRaidMap(fight.RoleplayMapId))
                 {
                     // A dungeon room comes back as itself -- its eight, its boss -- and not as a

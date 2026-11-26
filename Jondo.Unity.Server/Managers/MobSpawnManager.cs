@@ -1656,6 +1656,35 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// A beaten group is not replaced on a map a quest asks to clear (the barracks of «Une voix
+        /// de crystal», 1912): once its last group falls the map stays empty for
+        /// <paramref name="howLong"/>, and only then do its monsters come back -- as the world loaded
+        /// them where it has written groups, from its subarea on the next load where it has none.
+        /// </summary>
+        public static void LeaveClearedFor(long mapId, TimeSpan howLong)
+        {
+            lock (_candado)
+            {
+                if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0) return;
+                _mapMobs[mapId] = new List<MobGroup>();
+                _emptiedByHand.Add(mapId);
+            }
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(howLong);
+                lock (_candado)
+                {
+                    if (!_emptiedByHand.Contains(mapId) || (_mapMobs.TryGetValue(mapId, out var now) && now.Count > 0)) return;
+                    if (_asLoaded.TryGetValue(mapId, out var loaded) && loaded.Count > 0)
+                        _mapMobs[mapId] = loaded.Select(CloneOf).ToList();
+                    else
+                        _mapMobs.Remove(mapId);
+                    _emptiedByHand.Remove(mapId);
+                }
+            });
+        }
+
         /// <summary>Whether a monster group stands on the map now.</summary>
         public static bool HasGroups(long mapId)
         {
