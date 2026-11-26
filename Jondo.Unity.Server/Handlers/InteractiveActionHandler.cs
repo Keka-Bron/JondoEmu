@@ -42,6 +42,10 @@ namespace Jondo.Unity.Server.Handlers
 
             var lectura = Readables.Of(mapId, elementId);
 
+            // A document guarded by a written fight: the first click on Gisgul's book sets the Bwork
+            // bibliophile on the reader (1914), and only after the win does the book read.
+            if (lectura != null && await ScriptedFightHandler.TryElementAsync(stream, mapId, elementId)) return;
+
             // It is noted before deciding what it does, and on purpose: there are conversations
             // that depend on having read something, and if this went after the dispatch an element
             // that ends up in «unknown use» -- like the tavern's notice, which is neither a zaap nor

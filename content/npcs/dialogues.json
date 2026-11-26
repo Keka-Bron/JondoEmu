@@ -32124,7 +32124,8 @@
             { "reply": 62873, "next": 47369, "quest": 525, "afterObjective": 3593, "completesAll": [3594, 3618], "params": [[30, 3618]] },
             { "reply": 62873, "next": 47369, "afterQuest": 525, "criterion": "Qa!526&Qf!526&Qa!527&Qf!527" },
             { "reply": 62880, "next": 47376, "quest": 1521, "beforeObjective": 8633 },
-            { "reply": 62915, "next": 47402, "criterion": "Qa=2063" }
+            { "reply": 62915, "next": 47402, "criterion": "Qa=2063" },
+            { "reply": 62920, "next": 47407, "quest": 1914, "beforeObjective": 13165 }
           ]
         },
         {
@@ -32180,9 +32181,34 @@
           "choices": [
             { "reply": 62910 }
           ]
+        },
+        {
+          "message": 47407,
+          "choices": [
+            { "reply": 62919, "next": 47408 }
+          ]
+        },
+        {
+          "message": 47408,
+          "choices": [
+            { "reply": 62917, "next": 47409 },
+            { "reply": 62918, "shop": true }
+          ]
+        },
+        {
+          "message": 47409,
+          "choices": [
+            { "reply": 62916, "next": 47410 }
+          ]
+        },
+        {
+          "message": 47410,
+          "choices": [
+            { "reply": 62921 }
+          ]
         }
       ],
-      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue. «Le livre des Taures», Brakmar's library [-24,39] (Dofus pour les noobs: «Parlez à Jean-Sol Patre du livre des Taures. Celui-ci vous affirme qu'il l'a dans sa bibliothèque mais qu'une personne le lui a emprunté»): 62880, 47376, 62879, 47377, and «Adiós» (62878) is objective 8633. 2063 (En la frontera de lo real): the librarian's answers about the Xelors who asked for a second Aurore Pourpre (47402-47406). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "Fulgencio Ramiro, the librarian of Brakmar, and the end of «El hijo pródigo»: «Pedir el libro sobre la infancia de Gúltar» (62873) closes «Ve a visitar la biblioteca de una de las grandes ciudades» and «Habla con el bibliotecario»; his 47369 says Letalina Sigisbul has the copy, «¿Dónde está?» (62871) gets 47370 (at the militia), and «Ir a la milicia» (67161) starts «No dejes que tus hijos vaguen» (526), whose giver he is in the catalogue. «Le livre des Taures», Brakmar's library [-24,39] (Dofus pour les noobs: «Parlez à Jean-Sol Patre du livre des Taures. Celui-ci vous affirme qu'il l'a dans sa bibliothèque mais qu'une personne le lui a emprunté»): 62880, 47376, 62879, 47377, and «Adiós» (62878) is objective 8633. 2063 (En la frontera de lo real): the librarian's answers about the Xelors who asked for a second Aurore Pourpre (47402-47406). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «El Guerrero Negro» (1914, 13161): «Murmurar que buscas obras que traten sobre la historia de Hyrkul» (62920): three books for sale (47408, the shop reply 62918), the fourth burnt (47409), at Gisgul (47410); «Gracias por la valiosa información. Adiós.» (62921) is 13161. INFERRED reply order and the shop reply."
     },
   {
       "npc": 1266,
@@ -44334,7 +44360,8 @@
           "message": 21669,
           "choices": [
             { "reply": 26044, "next": 21670, "beforeQuest": 1665 },
-            { "reply": 34423, "next": 28706, "quest": 1905, "beforeObjective": 13010 }
+            { "reply": 34423, "next": 28706, "quest": 1905, "beforeObjective": 13010 },
+            { "reply": 35281, "next": 29397, "quest": 1914, "beforeObjective": 13161 }
           ]
         },
         {
@@ -44418,9 +44445,51 @@
           "choices": [
             { "reply": 34419, "quest": 1905, "beforeObjective": 13010, "completes": 13010, "params": [[30, 13010]] }
           ]
+        },
+        {
+          "message": 29397,
+          "choices": [
+            { "reply": 35282, "next": 29398 }
+          ]
+        },
+        {
+          "message": 29398,
+          "choices": [
+            { "reply": 35280, "next": 29399 }
+          ]
+        },
+        {
+          "message": 29399,
+          "choices": [
+            { "reply": 35279, "next": 29400 }
+          ]
+        },
+        {
+          "message": 29400,
+          "choices": [
+            { "reply": 35278, "next": 29401 }
+          ]
+        },
+        {
+          "message": 29401,
+          "choices": [
+            { "reply": 35277, "next": 29402 }
+          ]
+        },
+        {
+          "message": 29402,
+          "choices": [
+            { "reply": 35276, "next": 29403 }
+          ]
+        },
+        {
+          "message": 29403,
+          "choices": [
+            { "reply": 35275 }
+          ]
         }
       ],
-      "why": "Joris Jurgen by the entrance of the palace of Bonta: «Te has embarcado en la larga misión de buscar el dofus primordial...» (21669). «Esto parece el Sur» (1656), Pulguita's way followed (9996): «Una sombra planea sobre ti, #1... y está amenazando tu misión» (21661), «Hola, Joris» (26038) is 9997: the master of the obscuranti noticed the character and Joris can lift his hold (21662); «Buena suerte y ¡hasta otra!» (26043) leaves. Dofus pour les noobs («On dirait le Sud»): «Joris vous apprendra que vous avez attiré l'attention du maître des Obscuranti... vous pouvez continuer votre quête actuelle tranquillement ou bien lancer la quête L'ombre et la proie en continuant à parler à Joris». «La sombra del reino» (1665), open once 9997 is done: right after it, «¿Qué pides a cambio de tu ayuda?» (26037) -> the astral veil (21663, 26036, 21664), «Gracias por tu ayuda» (26035, 21665), «¿Qué haces aquí?» (26034): the eye of Grugalorasalar stolen by Sombra (21666), «¿Puedo ayudar en algo?» (26032) -> 21667, the step's own line, where «Muy bien. Voy a ver al hipermago.» (26030) starts it and 21668 sends the character to Gabi Lan in the palace. Any later visit opens on 21669 and «¿Qué haces aquí?» (26044) runs the same words a second time (21670-21672, 26042, 26040 starts it, 26039). Dofus pour les noobs («L'ombre et la proie»): «La quête On dirait le Sud vous conduit à Joris à un moment, c'est à partir de cet endroit que vous pouvez lancer la quête». Which reply goes with which line is INFERRED from the ids and texts. «El dragón blanco» (1905), objective 13010: «Elle vous demande de retourner voir Joris qui se trouve à Bonta en [-36,-60] pour lui annoncer que vous souhaitez rencontrer Dardondakal. Malheureusement vous apprendrez que ce dernier est mort depuis belle lurette» (Dofus pour les noobs): «Tengo la intención de reunirme con Dardondakal» (34423) -> only he can grant the egg, but dead dragons only show... (28706) -> «Meriana no me había dicho que el dragón blanco había perdido la vida» (34422) -> (28707) -> «Seguir escuchando» (34421) -> pay him homage first (28708) -> «¿Cómo puedo honrar a Dardondakal?» (34420) -> «Reza delante de sus restos... en la ciudad de Brakmar» (28709) -> «Gracias. Me voy a la ciudad oscura» (34419) does 13010."
+      "why": "Joris Jurgen by the entrance of the palace of Bonta: «Te has embarcado en la larga misión de buscar el dofus primordial...» (21669). «Esto parece el Sur» (1656), Pulguita's way followed (9996): «Una sombra planea sobre ti, #1... y está amenazando tu misión» (21661), «Hola, Joris» (26038) is 9997: the master of the obscuranti noticed the character and Joris can lift his hold (21662); «Buena suerte y ¡hasta otra!» (26043) leaves. Dofus pour les noobs («On dirait le Sud»): «Joris vous apprendra que vous avez attiré l'attention du maître des Obscuranti... vous pouvez continuer votre quête actuelle tranquillement ou bien lancer la quête L'ombre et la proie en continuant à parler à Joris». «La sombra del reino» (1665), open once 9997 is done: right after it, «¿Qué pides a cambio de tu ayuda?» (26037) -> the astral veil (21663, 26036, 21664), «Gracias por tu ayuda» (26035, 21665), «¿Qué haces aquí?» (26034): the eye of Grugalorasalar stolen by Sombra (21666), «¿Puedo ayudar en algo?» (26032) -> 21667, the step's own line, where «Muy bien. Voy a ver al hipermago.» (26030) starts it and 21668 sends the character to Gabi Lan in the palace. Any later visit opens on 21669 and «¿Qué haces aquí?» (26044) runs the same words a second time (21670-21672, 26042, 26040 starts it, 26039). Dofus pour les noobs («L'ombre et la proie»): «La quête On dirait le Sud vous conduit à Joris à un moment, c'est à partir de cet endroit que vous pouvez lancer la quête». Which reply goes with which line is INFERRED from the ids and texts. «El dragón blanco» (1905), objective 13010: «Elle vous demande de retourner voir Joris qui se trouve à Bonta en [-36,-60] pour lui annoncer que vous souhaitez rencontrer Dardondakal. Malheureusement vous apprendrez que ce dernier est mort depuis belle lurette» (Dofus pour les noobs): «Tengo la intención de reunirme con Dardondakal» (34423) -> only he can grant the egg, but dead dragons only show... (28706) -> «Meriana no me había dicho que el dragón blanco había perdido la vida» (34422) -> (28707) -> «Seguir escuchando» (34421) -> pay him homage first (28708) -> «¿Cómo puedo honrar a Dardondakal?» (34420) -> «Reza delante de sus restos... en la ciudad de Brakmar» (28709) -> «Gracias. Me voy a la ciudad oscura» (34419) does 13010. «El Guerrero Negro» (1914, 13160): «Unos servidores de Hyrkul me han atacado.» (35281) opens 29397; the black dragon, Hyrkul's host, 29398-29402; study his history at Brakmar's library, 29403. INFERRED reply order."
     },
   {
       "npc": 2979,
@@ -60733,6 +60802,7 @@
       "npc": 6310,
       "map": 0,
       "opening": 46874,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 46874,
@@ -60740,7 +60810,9 @@
             { "reply": 62111, "next": 46890 },
             { "reply": 62123, "next": 46896 },
             { "reply": 62148, "next": 46909 },
-            { "reply": 62115 }
+            { "reply": 62115 },
+            { "reply": 62110, "next": 46885, "quest": 1914, "afterObjective": 13167, "beforeObjective": 13168 },
+            { "reply": 62104, "next": 46884, "quest": 1914, "afterObjective": 13168, "beforeObjective": 13171, "completes": 13171, "completesAll": [13169, 13170, 13171], "params": [[30, 13171]] }
           ]
         },
         {
@@ -60760,10 +60832,45 @@
           "choices": [
             { "reply": 62168, "next": 46874 }
           ]
+        },
+        {
+          "message": 46885,
+          "choices": [
+            { "reply": 62109, "next": 46886 }
+          ]
+        },
+        {
+          "message": 46886,
+          "choices": [
+            { "reply": 62108, "next": 46887 }
+          ]
+        },
+        {
+          "message": 46887,
+          "choices": [
+            { "reply": 62107, "next": 46888 }
+          ]
+        },
+        {
+          "message": 46888,
+          "choices": [
+            { "reply": 62106, "next": 46889 }
+          ]
+        },
+        {
+          "message": 46889,
+          "choices": [
+            { "reply": 62105 }
+          ]
+        },
+        {
+          "message": 46884,
+          "choices": [
+            { "reply": 62103 }
+          ]
         }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «El Guerrero Negro» (1914): «Necesito que me ayudes a enfrentarme a Hyrkul, el verdugo de Menalt.» (62110), the vision (62109), the skulls of the Valiant Heart centaurs (46888, 46889) and «Partir en busca de los cráneos» (62105) is 13168; «Darle los cráneos de los centauroros.» (62104) hands the three kinds over (13169-13171) and 46884 sends the player back to Menalt's grave. Bonta/neutral variant only (the Brakmar variant 46875-46883, replies 62092-62101, is not written). INFERRED reply order."
     },
   {
       "npc": 1112,
@@ -67227,7 +67334,7 @@
       "opening": 14604,
       "openings": [
         { "criterion": "Qa=1914", "message": 29043 },
-        { "criterion": "Qa=1909&Qo>13096&Qo<13159&Qf=1913", "message": 29048 },
+        { "criterion": "Qa=1909&Qo>13097&Qo<13159&Qf=1913", "message": 29048 },
         { "criterion": "Qa=1913", "message": 29044 },
         { "criterion": "Qa=1909&Qo>13094&Qo<13097&Qf!1913", "message": 29040 }
       ],
@@ -79927,6 +80034,66 @@
         }
       ],
       "why": "«Toucher le fond» (1945, 13761): the monolith of the grotto [-45,-80], monster 5211 (Monolito). «Intentar acercarte» (36482): a force pushes the character (30297); «Insistir» (36480) starts the fight; «Mantenerte al margen» (36481, 36483) walks away (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 733,
+      "map": 0,
+      "opening": 3024,
+      "lines": [
+        {
+          "message": 3024,
+          "choices": [
+            { "reply": 37785 },
+            { "reply": 35295, "next": 29412, "quest": 1914, "beforeObjective": 13165 },
+            { "reply": 35295, "next": 29410, "quest": 1914, "afterObjective": 13165, "beforeObjective": 13166 }
+          ]
+        },
+        {
+          "message": 29412,
+          "choices": [
+            { "reply": 35292 }
+          ]
+        },
+        {
+          "message": 29410,
+          "choices": [
+            { "reply": 35293, "next": 29411 }
+          ]
+        },
+        {
+          "message": 29411,
+          "choices": [
+            { "reply": 35294 }
+          ]
+        }
+      ],
+      "why": "«El Guerrero Negro» (1914, 13166): «Hablar de Menalt y de Hyrkul.» (35295): before the four books are read he sends the player to them and to the Field of Rest's spirits (29412, 35292); after, Menalt's fury, Raval and Hyrkul (29410), then the allied centaur spirits (29411), and «Seguiré tu consejo.» (35294) is 13166. INFERRED reply order."
+    },
+    {
+      "npc": 4086,
+      "map": 190842882,
+      "opening": 29413,
+      "lines": [
+        {
+          "message": 29413,
+          "choices": [
+            { "reply": 35031, "next": 29414 }
+          ]
+        },
+        {
+          "message": 29414,
+          "choices": [
+            { "reply": 35297, "next": 29415 }
+          ]
+        },
+        {
+          "message": 29415,
+          "choices": [
+            { "reply": 35296 }
+          ]
+        }
+      ],
+      "why": "«El Guerrero Negro» (1914, 13173): the spirit shows himself at the grave again: Hyrkul's servants will not trouble the player any more (29413, 29414), good luck (29415). INFERRED reply order."
     }
   ]
 }

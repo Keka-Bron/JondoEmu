@@ -10036,6 +10036,15 @@
    "elements": [{"map": 187433986, "element": 512003}],
    "afterObjectives": [13762],
    "why": "«Busca una salida»: the tower's stairs (element 512003) bring the character back to Zrid's map [-47,-80] (Dofus pour les noobs, «Toucher le fond»)."
-  }
+  },
+  {"objective": 13161, "quest": 1914, "kind": "reply", "replies": [62921], "afterObjectives": [13160], "why": "«Habla con el bibliotecario de Brakmar» (732679): the librarian's last line about Hyrkul (62921). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13162, "quest": 1914, "kind": "read", "item": 7879, "afterObjectives": [13161], "why": "«Lee el libro sobre la llegada de Hyrkul» (732680): item 7879 «La Llegada de Hyrkul», 10 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13163, "quest": 1914, "kind": "read", "item": 12772, "afterObjectives": [13162], "why": "«Lee el tomo IX de Fragmentos Encontrados» (732684): item 12772, 2000 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13164, "quest": 1914, "kind": "read", "item": 12773, "afterObjectives": [13163], "why": "«Lee el tomo X de Fragmentos Encontrados» (732685): item 12773, 2000 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13165, "quest": 1914, "kind": "read", "elements": [{"map": 176817155, "element": 511310}], "afterObjectives": [13164], "why": "«Lee el libro sobre el final de Hyrkul» (732686): the book at the back of Gisgul's room [-18,16] (element 511310 INFERRED, gfx 43836), read again once the Bwork bibliophile is beaten (the fight row). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13166, "quest": 1914, "kind": "reply", "replies": [35294], "afterObjectives": [13165], "why": "«Pregunta a un centauroro sobre Menalt» (732705): Arpagnagrobis [2,-9], «Seguiré tu consejo.» (35294). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13167, "quest": 1914, "kind": "click", "elements": [{"map": 190842882, "element": 515699}], "afterObjectives": [13166], "why": "«Medita delante de la tumba de Menalt» (732706): Menalt's grave in the Field of Rest [1,-12] (element 515699 INFERRED, the map's only element); he does not show. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13168, "quest": 1914, "kind": "reply", "replies": [62105], "afterObjectives": [13167], "why": "«Habla con el maestro de la Orden del Corazón Valiente» (732707): Medah Larisa (6310), «Partir en busca de los cráneos de los centauroros.» (62105). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13172, "quest": 1914, "kind": "click", "elements": [{"map": 190842882, "element": 515699}], "afterObjectives": [13171], "why": "«Vuelve a meditar delante de la tumba de Menalt» (732747): the same grave; the spirit shows. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"}
 ]
 }

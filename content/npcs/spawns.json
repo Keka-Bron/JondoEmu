@@ -8852,6 +8852,7 @@
       "orientation": 1,
       "criterion": "Qa=1945&Qo>13760&Qo<13762",
       "why": "Monolito in the grotto [-45,-80] once the grotto is searched (1945, 13760-13761) (Dofus pour les noobs, «Toucher le fond»). INFERRED: cell 285 (the quest-only element 512000's)."
-    }
+    },
+  {"map": 190842882, "npc": 4086, "cell": 304, "orientation": 1, "criterion": "Qa=1914&Qo>13172&Qo<13173", "why": "Spirit of Menalt at his grave of the Field of Rest [1,-12] after the second meditation (1914, 13173); cell next to the grave, INFERRED. INFERRED cell."}
   ]
 }
