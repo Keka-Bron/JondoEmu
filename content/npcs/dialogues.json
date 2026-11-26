@@ -74311,6 +74311,7 @@
       "map": 0,
       "opening": 24165,
       "openings": [
+        { "criterion": "Qa=1749&Qo>11171", "message": 24224 },
         { "criterion": "Qa=1749&Qo>11158&Qo<11165", "message": 24203 }
       ],
       "lines": [
@@ -74373,9 +74374,43 @@
           "choices": [
             { "reply": 29113, "quest": 1749 }
           ]
+        },
+        {
+          "message": 24224,
+          "choices": [
+            { "reply": 29126, "quest": 1749, "next": 24225 }
+          ]
+        },
+        {
+          "message": 24225,
+          "choices": [
+            { "reply": 29129, "quest": 1749, "next": 24226 }
+          ]
+        },
+        {
+          "message": 24226,
+          "choices": [
+            { "reply": 29130, "quest": 1749, "next": 24228 }
+          ]
+        },
+        {
+          "message": 24228,
+          "choices": [
+            { "reply": 29131, "quest": 1749, "next": 24229 }
+          ]
+        },
+        {
+          "message": 24229,
+          "choices": [
+            { "reply": 29127, "quest": 1749, "next": 24230 }
+          ]
+        },
+        {
+          "message": 24230,
+          "choices": []
         }
       ],
-      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies."
+      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred."
     },
   {
       "npc": 3252,
