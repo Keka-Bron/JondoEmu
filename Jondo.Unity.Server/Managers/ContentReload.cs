@@ -49,6 +49,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.IdolRules.Forget();
             Managers.IdolRules.Load();
             Managers.MonsterSummonCaps.Reload();
+            Managers.MonsterStandoffs.Reload();
             Managers.MonsterSpellGates.Reload();
             Managers.MonsterLentSpells.Reload();
             Managers.MonsterPartyGrades.Reload();

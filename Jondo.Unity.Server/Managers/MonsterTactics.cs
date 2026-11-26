@@ -794,8 +794,11 @@ namespace Jondo.Unity.Server.Managers
             }
             else if (ranged)
             {
-                // At the reach of its best spell from the nearest enemy, no closer than it must be.
-                int want = attack!.ReachFor(monster);
+                // At the reach of its best spell from the nearest enemy, no closer than it must be;
+                // or at the distance its own row keeps (MonsterStandoffs): the library yokais push
+                // from two cells and are only beaten by reaching all five at once.
+                int standoff = MonsterStandoffs.For(monster.MonsterId);
+                int want = standoff > 0 ? standoff : attack!.ReachFor(monster);
                 chosen = cells.OrderBy(kv => Math.Abs(Nearest(kv.Key) - want)
                                              + (Seen(kv.Key) ? HiddenWorth : 0) + (Stuck(kv.Key) ? StuckCost : 0))
                               .ThenByDescending(kv => Nearest(kv.Key))
