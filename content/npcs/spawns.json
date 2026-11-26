@@ -7193,6 +7193,7 @@
       "npc": 3238,
       "cell": 283,
       "orientation": 3,
+      "criterion": "PL>179&Qa!1731&Qf!1731",
       "why": "Poly Perkin (3238), quest launch position of 1731 (Sufokia [23,24], Dofus pour les noobs); no client placement, a free cell beside the arrival."
     },
     {
@@ -7506,14 +7507,7 @@
       "criterion": "Qa=1734&Qo>11027&Qo<11030",
       "why": "Topo hidden behind the big tank (1734, objectives 11028 to 11030, Dofus pour les noobs: Il faut retrouver ou a fui Topo); INFERRED cell."
     },
-    {
-      "map": 91752961,
-      "npc": 1591,
-      "cell": 327,
-      "orientation": 1,
-      "criterion": "Qa=1608",
-      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Alain Bombardas in the tavern. INFERRED cell."
-    },
+    
     {
       "map": 88083713,
       "npc": 2779,
@@ -8021,7 +8015,7 @@
       "npc": 1591,
       "cell": 327,
       "orientation": 1,
-      "criterion": "Qa=1746",
+      "criterion": "Qa=1608|Qa=1746",
       "why": "Alain Bombardas in the Ripata tavern for 1746 (11126); INFERRED cell, the one he has for 1608."
     },
     {
@@ -8029,7 +8023,7 @@
       "npc": 3265,
       "cell": 259,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11128&Qo<11136",
+      "criterion": "(Qa=1746&Qo>11128&Qo<11136)|(Qa=1747&Qo>11209&Qo<11213)",
       "why": "Captain Skyluza at [11,25] (1746, 11129, 11131, 11134); INFERRED cell."
     },
     {
@@ -8037,7 +8031,7 @@
       "npc": 3265,
       "cell": 358,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11136",
+      "criterion": "(Qa=1746&Qo>11136)|(Qf=1746&Qa!1747&Qf!1747)",
       "why": "Captain Skyluza visiting the cell (1746, 11137; 1747's prison); INFERRED cell."
     },
     {
@@ -8053,7 +8047,7 @@
       "npc": 3309,
       "cell": 220,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11135&Qo<11136",
+      "criterion": "(Qa=1746&Qo>11135&Qo<11136)|(Qf=1746&Qa!1747&Qf!1747)",
       "why": "The sergeant of Sufokia's guard who arrests the player at Llanes's (1746, 11136); INFERRED cell."
     },
     {
@@ -8080,22 +8074,8 @@
       "criterion": "Qa=2062&Qo>14841&Qo<14844",
       "why": "Entropix at Doctor Braun's side, stand-in for the follower the engine lacks. INFERRED cell."
     },
-    {
-      "map": 90703360,
-      "npc": 3309,
-      "cell": 220,
-      "orientation": 3,
-      "criterion": "Qf=1746&Qa!1747&Qf!1747",
-      "why": "The sergeant (3309) who takes the player to the cell after 1746 and before 1747; INFERRED cell."
-    },
-    {
-      "map": 170132490,
-      "npc": 3265,
-      "cell": 358,
-      "orientation": 3,
-      "criterion": "Qf=1746&Qa!1747&Qf!1747",
-      "why": "Captain Skyluza in the cell block after 1746 and before 1747 (11137, 1747's prison); INFERRED cell."
-    },
+    
+    
     {
       "map": 170132490,
       "npc": 3308,
@@ -8112,14 +8092,7 @@
       "criterion": "Qa=1747&Qo>11138&Qo<11209",
       "why": "The priest in yellow of the ritual room (1747, 11207); INFERRED room and cell."
     },
-    {
-      "map": 90702336,
-      "npc": 3265,
-      "cell": 259,
-      "orientation": 3,
-      "criterion": "Qa=1747&Qo>11209&Qo<11213",
-      "why": "Captain Skyluza at [11,25] (1747, 11210 and 11212); INFERRED cell."
-    },
+    
     {
       "map": 168559620,
       "npc": 3323,
