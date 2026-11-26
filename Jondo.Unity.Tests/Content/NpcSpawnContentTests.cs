@@ -234,5 +234,49 @@ namespace Jondo.Unity.Tests.Content
             Assert.Equal(1, store.Count);
             Assert.Equal(0, store.ErasedCount);
         }
+
+        [Fact]
+        public void Two_authored_rows_on_one_cell_show_the_npc_when_either_criterion_holds()
+        {
+            // One NPC standing on one cell for two different stretches of a quest chain: the
+            // second row must not wipe out the first, or he vanishes during the first stretch.
+            string authored = Write("a.json",
+                "{ \"spawns\": [ { \"map\": 100, \"npc\": 7, \"cell\": 260, \"criterion\": \"Qf=1|Qa=2\" }," +
+                "                { \"map\": 100, \"npc\": 7, \"cell\": 260, \"criterion\": \"Qf=2\", \"orientation\": 5 } ] }");
+
+            var store = NpcSpawnContent.Load(null, authored);
+
+            Assert.Equal(1, store.Count);
+            Assert.True(store.TryGet(new NpcSpawnKey(100, 7, 260), out var row));
+            Assert.Equal("(Qf=1|Qa=2)|(Qf=2)", row.Value.Criterion);
+            Assert.Equal(5, row.Value.Orientation);
+        }
+
+        [Fact]
+        public void An_authored_row_without_a_condition_beside_a_conditioned_one_always_shows_the_npc()
+        {
+            string authored = Write("a.json",
+                "{ \"spawns\": [ { \"map\": 100, \"npc\": 7, \"cell\": 260, \"criterion\": \"Qa=2\" }," +
+                "                { \"map\": 100, \"npc\": 7, \"cell\": 260, \"criterion\": \"\" } ] }");
+
+            var store = NpcSpawnContent.Load(null, authored);
+
+            Assert.True(store.TryGet(new NpcSpawnKey(100, 7, 260), out var row));
+            Assert.Equal("", row.Value.Criterion);
+        }
+
+        [Fact]
+        public void A_second_row_that_only_turns_the_npc_keeps_the_first_row_s_criterion()
+        {
+            string authored = Write("a.json",
+                "{ \"spawns\": [ { \"map\": 100, \"npc\": 7, \"cell\": 260, \"criterion\": \"Qa=2\" }," +
+                "                { \"map\": 100, \"npc\": 7, \"cell\": 260, \"orientation\": 3 } ] }");
+
+            var store = NpcSpawnContent.Load(null, authored);
+
+            Assert.True(store.TryGet(new NpcSpawnKey(100, 7, 260), out var row));
+            Assert.Equal("Qa=2", row.Value.Criterion);
+            Assert.Equal(3, row.Value.Orientation);
+        }
     }
 }

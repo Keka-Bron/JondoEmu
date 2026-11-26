@@ -198,6 +198,18 @@ namespace Jondo.Unity.World.Content
             }
         }
 
+        /// <summary>
+        /// A criterion met when either one is: «(a)|(b)». An empty one is «always», and so is
+        /// whatever it is joined to.
+        /// </summary>
+        internal static string EitherCriterion(string? first, string? second)
+        {
+            first ??= ""; second ??= "";
+            if (first.Length == 0 || second.Length == 0) return "";
+            if (first == second) return first;
+            return $"({first})|({second})";
+        }
+
         /// <summary>Whether a criterion asks for a yearly event or content switch, «Sc=…».</summary>
         internal static bool NamesAnEvent(string? criterion)
             => !string.IsNullOrEmpty(criterion) && criterion.Contains("Sc=", StringComparison.Ordinal);
@@ -306,6 +318,8 @@ namespace Jondo.Unity.World.Content
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
                 if (!doc.RootElement.TryGetProperty("spawns", out var list)) return;
 
+                // The placements this file has already written, for two rows on one key.
+                var written = new HashSet<NpcSpawnKey>();
                 foreach (var entry in list.EnumerateArray())
                 {
                     long mapId = Long(entry, "map");
@@ -330,12 +344,23 @@ namespace Jondo.Unity.World.Content
                         gone.ValueKind == JsonValueKind.True)
                     {
                         store.Erase(key, from);
+                        written.Remove(key);
                         continue;
                     }
 
                     // Whatever the row leaves out is taken from the placement underneath, if there
                     // is one: a row that only turns an NPC around does not have to repeat the rest.
                     store.TryGet(key, out var below);
+                    string criterion = entry.TryGetProperty("criterion", out var shown) && shown.ValueKind == JsonValueKind.String
+                        ? shown.GetString() ?? ""
+                        : below.Value.Criterion ?? "";
+                    // A second row of this file on the same NPC and cell is another time he stands
+                    // there, not a correction of the first: NPC 6682 on map 220729859 stands on
+                    // 426 «Qf=2446|Qa=2447» and again «Qf=2447». One NPC cannot stand twice on one
+                    // cell, so the two become one placement shown when either criterion holds;
+                    // the later row overwriting the earlier hid him for the whole of 2447.
+                    if (written.Contains(key) && shown.ValueKind == JsonValueKind.String)
+                        criterion = EitherCriterion(below.Value.Criterion, criterion);
                     store.Put(key, new NpcSpawn
                     {
                         MapId = mapId,
@@ -344,10 +369,9 @@ namespace Jondo.Unity.World.Content
                         Orientation = entry.TryGetProperty("orientation", out var o) && o.TryGetInt32(out int f)
                             ? f
                             : (below.Value.Orientation != 0 ? below.Value.Orientation : DefaultOrientation),
-                        Criterion = entry.TryGetProperty("criterion", out var shown) && shown.ValueKind == JsonValueKind.String
-                            ? shown.GetString() ?? ""
-                            : below.Value.Criterion ?? "",
+                        Criterion = criterion,
                     }, from);
+                    written.Add(key);
                 }
             }
             catch (Exception ex)
