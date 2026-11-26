@@ -4,7 +4,8 @@
   "tipo y habilidad los manda el servidor en el jss; oficio, objeto y nivel salen de",
   "skills.json (gatheredRessourceItem). Ver tools/recursos_recoleccion.py.",
   "porElemento: mapa -> elemento -> recurso, lo que el servidor oficial declara para cada elemento en los mapas que entraron las capturas de paquetes (2026-11), donde el grafico no basta: cada punto de pesca de agua dulce es el grafico 1018 y cada uno tiene su pez. Gana sobre el grafico.",
-  "Sea bass (1779) shares sea fishing drawing 1839 with other fish, so it is placed per element: only on maps where DofusDB /recoltable counts as many sea bass as the map has 1839 spots and lists no other fish of that drawing (interactive 271, skill 325)."
+  "Sea bass (1779) shares sea fishing drawing 1839 with other fish, so it is placed per element: only on maps where DofusDB /recoltable counts as many sea bass as the map has 1839 spots and lists no other fish of that drawing (interactive 271, skill 325).",
+  "Shells of quest 1758 (objective 11248): drawing 36326 carries no skill in any capture, so the five shells are placed per element as Shell (interactive 136, DofusDB) with skill 345 'Pick Up a Shell' (base job 1, item 18087)."
  ],
  "recursos": {
   "2204": {
@@ -14212,6 +14213,51 @@
     "oficio": 36,
     "objeto": 1779,
     "nivel": 160
+   }
+  },
+  "168560650": {
+   "508382": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168560646": {
+   "508350": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168558598": {
+   "508379": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168558600": {
+   "508357": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168559624": {
+   "508375": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
    }
   }
  }
