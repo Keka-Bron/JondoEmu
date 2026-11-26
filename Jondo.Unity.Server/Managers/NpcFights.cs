@@ -159,6 +159,15 @@ namespace Jondo.Unity.Server.Managers
             public int ElementType { get; init; }
 
             /// <summary>
+            /// Whether the fight starts as the character comes onto <see cref="MapId"/> («enter»), for a
+            /// row with no NPC, reply or element: the monsters waiting on the way of an escort, «Dès que
+            /// vous arrivez sur la map vous vous faites agresser par un groupe de monstres» (Dofus pour
+            /// les noobs, «Il est frais mon pichon»). Its criterion says when it waits there, and its
+            /// «marks» that it is behind him once won; without a mark, a won ambush would wait again.
+            /// </summary>
+            public bool OnEnter { get; init; }
+
+            /// <summary>
             /// The fight that starts as soon as this one is won and the character is back on the
             /// map («then», a row of its own without npc, reply or element): the Xelorium chest's
             /// second ambush, right after the first one's waves.
@@ -191,7 +200,7 @@ namespace Jondo.Unity.Server.Managers
             Load();
             foreach (var fight in _fights!)
             {
-                if (fight.ElementId != 0) continue;
+                if (fight.ElementId != 0 || fight.OnEnter) continue;
                 if (fight.NpcId != npcId || fight.Reply != reply || (fight.MapId != 0 && fight.MapId != mapId)) continue;
                 if (fight.Criterion.Length > 0 && !PlayerCriteria.Met(fight.Criterion, mapId)) continue;
                 return fight;
@@ -215,6 +224,21 @@ namespace Jondo.Unity.Server.Managers
             }
             return null;
         }
+
+        /// <summary>
+        /// The fight that waits for the session's character on this map as he comes onto it, or null:
+        /// a row with «enter», its criterion met and its chain not yet behind him.
+        /// </summary>
+        public static Fight? ForEntry(long mapId, Func<int, bool> marked)
+        {
+            Load();
+            return EntryAmong(_fights!, mapId, marked, criterion => PlayerCriteria.Met(criterion, mapId));
+        }
+
+        /// <summary>The «enter» row of <paramref name="fights"/> for this map, with the criterion tested by <paramref name="met"/>.</summary>
+        internal static Fight? EntryAmong(IEnumerable<Fight> fights, long mapId, Func<int, bool> marked, Func<string, bool> met)
+            => fights.FirstOrDefault(f => f.OnEnter && f.MapId == mapId && !f.Done(marked)
+                                          && (f.Criterion.Length == 0 || met(f.Criterion)));
 
         /// <summary>The element rows of a map, to declare their elements usable.</summary>
         public static IEnumerable<Fight> OnMap(long mapId)
@@ -294,6 +318,7 @@ namespace Jondo.Unity.Server.Managers
                 Rules = RulesOf(row),
                 ElementId = (int)Long(row, "element"),
                 ElementType = (int)Long(row, "type"),
+                OnEnter = row.TryGetProperty("enter", out var enter) && enter.ValueKind == JsonValueKind.True,
                 Then = row.TryGetProperty("then", out var then) && then.ValueKind == JsonValueKind.Object ? Parse(then) : null,
             };
         }

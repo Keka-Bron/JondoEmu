@@ -45254,7 +45254,8 @@
             { "reply": 7879, "next": 7865, "criterion": "Qf=580&PL>99&(PO!11267|DD>6,11267)" },
             { "reply": 7897, "next": 7882, "criterion": "Qf=580&PL>109" },
             { "reply": 7846 },
-            { "reply": 7843, "quest": 591, "completes": 3758, "params": [[30, 3758]], "next": 7827, "criterion": "Qa=591&Qo=3758" }
+            { "reply": 7843, "quest": 591, "completes": 3758, "params": [[30, 3758]], "next": 7827, "criterion": "Qa=591&Qo=3758" },
+            { "reply": 7874, "quest": 579, "completes": 3791, "params": [[30, 3791]], "next": 7856, "takes": 11265, "criterion": "Qa=579&Qo>3790&Qo<3791" }
           ]
         },
         {
@@ -45288,9 +45289,13 @@
         {
           "message": 7827,
           "choices": []
+        },
+        {
+          "message": 7856,
+          "choices": []
         }
       ],
-      "why": "Aurora Boreal at the frozen lake [-61,-58]: «Vacaciones en el hielo» (580) and «Hotel de hielo» (581, Dofus pour les noobs «Vacances sur glace»). «¿Qué proyectos tenéis?» (7879) leads to the ice village and its hotel (7865), «Hablar de las soluciones para remediar a la penuria.» (7880) to the wood she needs (7866: 70 maderas de álamo temblón and a tabla de grabado), «Aceptar.» (7881) is 580 and «Toma la madera y las tablas.» (7882) hands both over (3795, 3796) for her thanks (7867, the hotel discount). Once it is done «Saber más acerca del hotel.» (7897) offers the steam blowtorches (7882: sierra de hielo, plancha de acero, máscara de protección and guantes de protección, five each), «Aceptar.» (7898) is 581 and «Toma las herramientas para la construcción del hotel.» (7899) the hand-in (3806-3809, thanks 7883). Review fix: a finished 580 keeps Finished in the log, which hides the beforeQuest reply 7879; a second 7879 gated by the quest's own repeat condition (Qf=580 and the item 11267 not held or held more than 6 days) keeps the weekly redo reachable. «Los cazadores» (591; Dofus pour les noobs («Les chasseurs»)): «¿Has visto a Gerard, el cazador?» (7843) at the ice village closes 3758 (7827)."
+      "why": "Aurora Boreal at the frozen lake [-61,-58]: «Vacaciones en el hielo» (580) and «Hotel de hielo» (581, Dofus pour les noobs «Vacances sur glace»). «¿Qué proyectos tenéis?» (7879) leads to the ice village and its hotel (7865), «Hablar de las soluciones para remediar a la penuria.» (7880) to the wood she needs (7866: 70 maderas de álamo temblón and a tabla de grabado), «Aceptar.» (7881) is 580 and «Toma la madera y las tablas.» (7882) hands both over (3795, 3796) for her thanks (7867, the hotel discount). Once it is done «Saber más acerca del hotel.» (7897) offers the steam blowtorches (7882: sierra de hielo, plancha de acero, máscara de protección and guantes de protección, five each), «Aceptar.» (7898) is 581 and «Toma las herramientas para la construcción del hotel.» (7899) the hand-in (3806-3809, thanks 7883). Review fix: a finished 580 keeps Finished in the log, which hides the beforeQuest reply 7879; a second 7879 gated by the quest's own repeat condition (Qf=580 and the item 11267 not held or held more than 6 days) keeps the weekly redo reachable. «Los cazadores» (591; Dofus pour les noobs («Les chasseurs»)): «¿Has visto a Gerard, el cazador?» (7843) at the ice village closes 3758 (7827). «Get Your Fresh Snapper Here!» (579): «Toma las inverluzas.» (7874) hands over the pingwobble (11265, taken) to close 3791; her thanks are 7856 (7857, the spoiled-fish line, is for a late delivery and never reachable because the follower leaves its slot after 30 minutes). INFERRED reply/line pairing."
     },
   {
       "npc": 3664,
@@ -46054,13 +46059,24 @@
           "message": 7719,
           "choices": [
             { "reply": 8205, "quest": 666, "completes": 4049, "params": [[30, 4049]], "next": 8197, "holds": 11542 },
-            { "reply": 8158, "next": 8162 }
+            { "reply": 8158, "next": 8162 },
+            { "reply": 7877, "quest": 579, "completes": 3793, "params": [[30, 3793]], "next": 7862, "takes": 11265, "criterion": "Qa=579&Qo>3792&Qo<3793" }
           ]
         },
-        { "message": 8197, "choices": [] },
-        { "message": 8162, "choices": [] }
+        {
+          "message": 8197,
+          "choices": []
+        },
+        {
+          "message": 8162,
+          "choices": []
+        },
+        {
+          "message": 7862,
+          "choices": []
+        }
       ],
-      "why": "«Envío» (666): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8205 (4049) and his thanks (8197) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage»"
+      "why": "«Envío» (666): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8205 (4049) and his thanks (8197) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» «Get Your Fresh Snapper Here!» (579): «Toma las inverluzas.» (7877) hands over the third pingwobble (11265, taken), 3793; her thanks 7862 (7863, wrong delivery, is not reachable). INFERRED pairing."
     },
   {
       "npc": 1281,
@@ -74437,7 +74453,8 @@
             { "reply": 7857, "next": 7845, "criterion": "PL>109&Qa!577&Qf!577" },
             { "reply": 7859, "quest": 577, "completes": 3777, "completesAll": [3771, 3772, 3773, 3774, 3775, 3776, 3777], "params": [[30, 3777]], "next": 7846 },
             { "reply": 7861, "quest": 577, "completes": 3779, "params": [[30, 3779]], "criterion": "Qa=577&Qo=3779", "next": 7848 },
-            { "reply": 7863, "quest": 577, "completes": 3781, "params": [[30, 3781]], "criterion": "Qa=577&Qo>3778&Qo=3781", "next": 7850 }
+            { "reply": 7863, "quest": 577, "completes": 3781, "params": [[30, 3781]], "criterion": "Qa=577&Qo>3778&Qo=3781", "next": 7850 },
+            { "reply": 7872, "quest": 579, "completes": 3788, "params": [[30, 3788]], "next": 7854, "criterion": "Qa=579&Qo=3788" }
           ]
         },
         {
@@ -74461,9 +74478,13 @@
         {
           "message": 7850,
           "choices": []
+        },
+        {
+          "message": 7854,
+          "choices": []
         }
       ],
-      "why": "Damar, chief of the fishermen [-67,-54] (Dofus pour les noobs («Les chasseurs»)): asked about Gerard (7844) he has not seen him (7825) and closes 3757. INFERRED order of the replies: the client carries sentences and answers but not which go together. 577 «Pesca en aguas congeladas» (Dofus pour les noobs): asked «¿Necesitas ayuda?» (7857) he lists the materials (7845, the quest's first dialog) and 7858 starts it; 7859 hands over the 7 bring objectives at once («il faut tout donner d'un coup») and he sends you to Kristina (7846); 7861 brings Kristina's answer and he tells of the lost alliance (7848); 7863 brings her answer to the ring and he gives the reward (7850). INFERRED reply order: the client carries sentences and answers, not which go together."
+      "why": "Damar, chief of the fishermen [-67,-54] (Dofus pour les noobs («Les chasseurs»)): asked about Gerard (7844) he has not seen him (7825) and closes 3757. INFERRED order of the replies: the client carries sentences and answers but not which go together. 577 «Pesca en aguas congeladas» (Dofus pour les noobs): asked «¿Necesitas ayuda?» (7857) he lists the materials (7845, the quest's first dialog) and 7858 starts it; 7859 hands over the 7 bring objectives at once («il faut tout donner d'un coup») and he sends you to Kristina (7846); 7861 brings Kristina's answer and he tells of the lost alliance (7848); 7863 brings her answer to the ring and he gives the reward (7850). INFERRED reply order: the client carries sentences and answers, not which go together. «Get Your Fresh Snapper Here!» (579): «El asalto güino ha sido un fracaso.» (7872) closes 3788 and he says the güinos are under control and sends the character to Ordenalfabetist (7854) (Dofus pour les noobs «Il est frais mon pichon»). INFERRED: the reply is the client's only unused one of his that fits."
     },
   {
       "npc": 1273,
@@ -81964,6 +81985,53 @@
         }
       ],
       "why": "Raval the Terrible (4292), «Los corazones lívidos» (1954), Bethel tower: 30276-30279 and the replies 36460, 36459, 36458, 36457 (the last ends 13736) (Dofus pour les noobs («Les coeurs livides»)). Reply order INFERRED from the ids."
+    },
+    {
+      "npc": 1297,
+      "map": 0,
+      "opening": 7859,
+      "lines": [
+        {
+          "message": 7859,
+          "choices": [
+            { "reply": 7876, "quest": 579, "completes": 3792, "params": [[30, 3792]], "next": 7860, "takes": 11265, "criterion": "Qa=579&Qo>3791&Qo<3792" }
+          ]
+        },
+        {
+          "message": 7860,
+          "choices": []
+        }
+      ],
+      "why": "Dillas (Bambelle) at the sawmill [-64,-51]. «Get Your Fresh Snapper Here!» (579): «Toma las inverluzas.» (7876) hands over the second pingwobble (11265, taken), 3792; his thanks 7860 (7861, the spoiled fish, is not reachable). His hello (7859) is the opening; the lines of his other quests (pipes, 617/595/631) are not authored here. Dofus pour les noobs («Il est frais mon pichon»). INFERRED pairing."
+    },
+    {
+      "npc": 1274,
+      "map": 54166838,
+      "opening": 7705,
+      "lines": [
+        {
+          "message": 7705,
+          "choices": [
+            { "reply": 7873, "quest": 579, "completes": 3790, "completesAll": [3789, 3790], "params": [[30, 3790]], "gives": 11265, "next": 7855, "criterion": "Qa=579&Qo>3788&Qo<3790" },
+            { "reply": 7873, "next": 7858, "gives": 11265, "criterion": "Qa=579&Qo>3790&Qo<3791&PO!11265" },
+            { "reply": 7875, "next": 7858, "gives": 11265, "criterion": "Qa=579&Qo>3791&Qo<3793&PO!11265" },
+            { "reply": 7878, "quest": 579, "completes": 3794, "params": [[30, 3794]], "next": 7864, "criterion": "Qa=579&Qo>3793&Qo<3794" }
+          ]
+        },
+        {
+          "message": 7855,
+          "choices": []
+        },
+        {
+          "message": 7858,
+          "choices": []
+        },
+        {
+          "message": 7864,
+          "choices": []
+        }
+      ],
+      "why": "Ordenalfabetist (Al Fabeticorder) at the fishermen's stall [-67,-54]. «Get Your Fresh Snapper Here!» (579, Dofus pour les noobs «Il est frais mon pichon»): «Vuelvo a hacer el reparto.» (7873) hands the first domesticated pingwobble (11265, a follower item that lasts 30 minutes) with his speech (7855) and closes 3789/3790; the same reply again hands a new one if it was lost before Aurora Boreal, with the reminder 7858. «Dame otro barrigüino.» (7875) hands the next one for Dillas and Clarys. «Ya he acabado el reparto.» (7878) closes 3794 and ends with 7864. INFERRED: 7858 as the answer to a repeated hand-over."
     }
   ]
 }

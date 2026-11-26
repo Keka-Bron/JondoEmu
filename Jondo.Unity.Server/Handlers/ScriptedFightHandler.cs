@@ -99,15 +99,27 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The character is back on a map: the chained fight that was ready starts here, if this
-        /// is the map it was to be fought on; anywhere else, the chain is left.
+        /// is the map it was to be fought on; anywhere else, the chain is left. With no chain
+        /// waiting, the ambush of the map's «enter» row, when one waits for him there.
         /// </summary>
         public static async Task OnMapLoadedAsync(NetworkStream stream, long characterId, long mapId)
         {
-            if (!_pending.TryGetValue(characterId, out var pending) || !pending.Ready) return;
-            _pending.TryRemove(characterId, out _);
-            if (pending.MapId != mapId) return;
-            Console.WriteLine($"[ScriptedFight] The next fight of the chain starts on {mapId}.");
-            await StartAsync(stream, pending.Next, mapId);
+            if (_pending.TryGetValue(characterId, out var pending))
+            {
+                if (!pending.Ready) return;
+                _pending.TryRemove(characterId, out _);
+                if (pending.MapId != mapId) return;
+                Console.WriteLine($"[ScriptedFight] The next fight of the chain starts on {mapId}.");
+                await StartAsync(stream, pending.Next, mapId);
+                return;
+            }
+
+            var state = SessionContext.State;
+            if (state.IsInFight || state.FightId != 0) return;
+            var ambush = NpcFights.ForEntry(mapId, state.ElementsUsed.Contains);
+            if (ambush == null) return;
+            Console.WriteLine($"[ScriptedFight] {state.CharacterName} is ambushed coming onto {mapId}.");
+            await StartAsync(stream, ambush, mapId);
         }
 
         /// <summary>Whether a chained fight waits for this character, ready or not; for the tests.</summary>

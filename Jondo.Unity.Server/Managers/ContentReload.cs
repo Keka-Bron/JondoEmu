@@ -24,6 +24,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.Bankers.Initialize();
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();
+            Managers.FollowerLifetimes.Forget();
             Handlers.NpcBarterHandler.Forget();
             Managers.MapStagings.Forget();
             Managers.PlateGates.Forget();

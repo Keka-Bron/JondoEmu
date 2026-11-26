@@ -1,0 +1,12 @@
+{
+  "_comment": [
+    "Followers that walk with the character for so many minutes from the moment he is given them (their",
+    "805, «Recibido el»), with nothing on the item the client would show: the minutes are written in the",
+    "item's description or said by whoever hands it over. FollowerLifetimes reads it; AlterationHandler",
+    "takes the follower out of his slot when they are up."
+  ],
+  "followers": [
+    { "item": 11265, "minutes": 30,
+      "why": "«Get Your Fresh Snapper Here!» (579): the domesticated pingwobble's description, «su digestión comienza al cabo de treinta minutos» (37776), and Al Fabeticorder handing it over (7858). Dofus pour les noobs: «Vous avez cependant 30 minutes maximum pour arriver à destination»." }
+  ]
+}

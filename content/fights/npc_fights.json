@@ -2149,6 +2149,7 @@
       "why": "1956: the third ritual, four sacrificed sentinels; the shaman must live (Dofus pour les noobs («Craquements de cœur»))." },
     { "npc": 4291, "map": 187695108, "reply": 36410,
       "monsters": [ { "monster": 5190, "grade": 0 } ],
-      "why": "1956: the ancestral crujidor (5190) alone; may be done in a group (Dofus pour les noobs («Craquements de cœur»): «Claque Monumentale», «Lancer de Rocher»)." }
+      "why": "1956: the ancestral crujidor (5190) alone; may be done in a group (Dofus pour les noobs («Craquements de cœur»): «Claque Monumentale», «Lancer de Rocher»)." },
+    {"map": 54165811, "enter": true, "criterion": "Qa=579&Qo>3791&Qo<3792&PO=11265", "monsters": [{"monster": 2859, "grade": 0}, {"monster": 2860, "grade": 0}, {"monster": 2847, "grade": 0}], "marks": -579001, "why": "«Get Your Fresh Snapper Here!» (579), second delivery: «dès que vous arrivez sur la map vous vous faites agresser par un groupe de monstres» (Dofus pour les noobs «Il est frais mon pichon»), at the sawmill map [-64,-51] with the pingwobble in tow. INFERRED monsters: three of that map's own Frigost mobs (2859, 2860, 2847, level 132, the lowest grades of its group 3312); the guide does not name them."}
   ]
 }
