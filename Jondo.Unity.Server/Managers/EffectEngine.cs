@@ -1725,7 +1725,7 @@ namespace Jondo.Unity.Server.Managers
         /// the blow. The Uginak's class sheet: "cuando el uginak y sus aliados infligen daños a
         /// una presa, se curan una parte de los daños que han ocasionado".
         /// </summary>
-        private const int CuraAlAtacante = 786;
+        private const int CuraAlAtacante = Jondo.Unity.World.Combat.EffectSupport.HealsTheAttacker;
 
         /// <summary>
         /// 788, «Castigo de #2 #1 durante #3 turnos»: a row under "D" on the bearer (the Mane

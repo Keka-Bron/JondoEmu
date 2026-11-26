@@ -129,6 +129,40 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         /// <summary>
+        /// Pushed in the first round, as the live check did, and pushed again once his first 2610
+        /// is over and its four-round interval has gone by: each push sets 2212 off. The listener
+        /// is Salagüino's for the whole fight, not for his next turn alone.
+        /// </summary>
+        [Fact]
+        public async Task Every_push_of_the_fight_sets_off_his_heal_on_the_attacker()
+        {
+            if (!HasData || SpellEffects.De(2212, 1).Count == 0 || SpellEffects.De(2610, 1).Count == 0) return;
+            if (!SpellEffects.De(PushSpell, 1).Any(row => row.EffectId == 5)) return;
+            var (fight, boss, _, character) = await BoardAsync();
+
+            async Task PushAsync()
+            {
+                boss.CellId = 330;
+                character.CellId = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(330).First();
+                await FightHandler.AplicarEfectosAsync(null, fight, character, PushSpell, 1, boss,
+                                                       EffectEngine.AlLanzar, boss.CellId);
+                Assert.NotEqual(330, boss.CellId);
+            }
+
+            await PushAsync();
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+
+            int round = fight.RoundNumber;
+            while (fight.RoundNumber < round + 5) fight.NextTurn();
+            boss.Buffs.BarrerEnganches(fight.RoundNumber);
+            Assert.DoesNotContain(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2212);
+
+            await PushAsync();
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+        }
+
+        /// <summary>
         /// How his shell (state 56, Salagüino's for good) comes off: Salagüino arms Refresgüino
         /// (2608) on each enemy, whose 1160 under H casts its grade 2 when that enemy is healed --
         /// 96 water to the enemies around and 952 of state 56 on «a,F2848» for six rounds, only

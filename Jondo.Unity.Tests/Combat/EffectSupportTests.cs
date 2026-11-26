@@ -35,6 +35,18 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Contains(EffectSupport.FireHeal, EffectSupport.HandledDirectly);
         }
 
+        /// <summary>
+        /// 786, the heal on the attacker, has no characteristic: before the engine's own effect was
+        /// listed here, spell_info showed the Royal Pingwin's 2610 as panel-only although the engine
+        /// heals whoever hits him after a push.
+        /// </summary>
+        [Fact]
+        public void The_heal_on_the_attacker_is_reported_as_applied()
+        {
+            Assert.Equal(786, EffectSupport.HealsTheAttacker);
+            Assert.Equal(EffectSupportKind.Direct, EffectSupport.Classify(786, 0, 0));
+        }
+
         [Theory]
         [InlineData(EffectSupport.Push)]
         [InlineData(EffectSupport.Pull)]
@@ -50,6 +62,8 @@ namespace Jondo.Unity.Tests.Combat
         [InlineData(EffectSupport.Summon)]
         [InlineData(EffectSupport.FireHeal)]
         [InlineData(EffectSupport.HealPercent)]
+        [InlineData(EffectSupport.HealsTheAttacker)]
+        [InlineData(EffectSupport.DisableState)]
         [InlineData(EffectSupport.Kill)]
         public void The_effects_with_code_are_reported_as_such(int effectId)
         {
