@@ -73598,14 +73598,13 @@
         {
           "message": 7792,
           "choices": [
-            { "reply": 7821, "next": 7795, "criterion": "PL>99&Qa!589&Qf!589" }
+            { "reply": 7821, "startsQuest": 589, "params": [[34, 589]], "next": 7795, "criterion": "PL>99&Qa!589&Qf!589" },
+            { "reply": 81633 }
           ]
         },
         {
           "message": 7795,
-          "choices": [
-            { "reply": 81633, "startsQuest": 589, "params": [[34, 589]] }
-          ]
+          "choices": []
         },
         {
           "message": 7793,
@@ -73628,7 +73627,7 @@
           "choices": []
         }
       ],
-      "why": "Igoi Algueros (Francky) at the workshop in the Frigost village [-75,-38] (Dofus pour les noobs («Bricole Girl»)): 7792 «Aceptar» (7821) leads to the step line 7795, which starts the quest; after looking around the farmers' workshop he is asked «Hablar del muñeco de nieve» (7823) which closes 3740 and sends the player to Txumari Alfuego (7798, 7824). 7794 while the second step runs, 7797 after. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Igoi Algueros (Francky) at the workshop in the Frigost village [-75,-38] (Dofus pour les noobs («Bricole Girl»)): 7792 offers «Aceptar.» (7821), which starts the quest and leads to the step line 7795, and «Marcharte.» (81633), as the official server's 7792 does (the map-0 entry); after looking around the farmers' workshop he is asked «Hablar del muñeco de nieve» (7823) which closes 3740 and sends the player to Txumari Alfuego (7798, 7824). 7794 while the second step runs, 7797 after. INFERRED order of the replies: the client carries sentences and answers but not which go together."
     },
   {
       "npc": 1290,

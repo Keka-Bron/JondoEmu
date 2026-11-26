@@ -1,0 +1,17 @@
+{
+  "_comment": [
+    "Spells a fight against a monster lends the characters facing it, for that fight",
+    "(Managers.MonsterLentSpells). The client's data has the spell and nobody who casts it; a guide",
+    "says each character gets it when the fight starts. Each row is a guide's word, quoted in its why.",
+    "",
+    "  monster   the monster template whose presence lends the spell",
+    "  spell     the spell put on each enemy character's bar",
+    "  grade     its grade (1 when left out)"
+  ],
+  "lent": [
+    {
+      "monster": 3370, "spell": 3449, "grade": 1,
+      "why": "The Crujidor de hielo (Frigost; «La marcha de la emperatriz» fights him) wraps himself in Cura Glacial (3443): Invulnerable (state 56) for good. Grieta (3449, French «Craquelure»: 4 AP, range 1, once every 5 turns) deactivates state 56 on him alone (952 on «A,F3370») for a turn, at the cost of 1 MP and 3 range to its caster. «Chaque personnage reçoit au début du combat le sort Craquelure» (JeuxOnLine, «Lumière sur l'ombre»)."
+    }
+  ]
+}

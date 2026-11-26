@@ -3032,6 +3032,10 @@ namespace Jondo.Unity.Server.Handlers
             // now that the people who fight are known.
             PlanDimensionWaves(fight);
 
+            // And the spells a monster of the fight lends its enemies (MonsterLentSpells): the
+            // Crujidor de hielo's Grieta, before the bursts that carry each bar.
+            Managers.MonsterLentSpells.OnFightStarts(fight);
+
             // The placement is over: the swords go from the map (hpr). Nobody joins any more.
             await SwordsGoneAsync(fight);
 
