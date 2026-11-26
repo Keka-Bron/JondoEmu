@@ -9864,6 +9864,112 @@
   {"objective": 13526, "quest": 1944, "kind": "click", "elements": [{"map": 186647556, "element": 511907}], "afterObjectives": [13525], "showsNpc": 4243, "gives": [{"item": 19548, "count": 1}], "why": "«Explora los restos» (743978): the violet aquatic plant at [-46,-81] (Dofus pour les noobs). INFERRED: element 511907 and that it hands over the Piedra de restos (19548)."},
   {"objective": 13528, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511908}], "afterObjectives": [13527], "showsNpc": 4244, "why": "«Explora los restos» (743980): the wooden barrel left of the stairs at [-47,-83] (Dofus pour les noobs). INFERRED: element 511908."},
   {"objective": 13530, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511909}], "afterObjectives": [13529], "gives": [{"item": 19549, "count": 1}], "why": "«Continua la exploración de los restos» (743981): the three small crates at [-47,-83] (Dofus pour les noobs). INFERRED: element 511909 and that it hands over the Caja de restos (19549)."},
-  {"objective": 13498, "quest": 1942, "kind": "beat", "monsters": [5147, 5147, 5147, 5147, 5146, 5146, 5146, 5145], "map": 186385924, "afterObjectives": [13497], "why": "«Caza a los inoportunos» (740603): the Trepamuertos fanatics' ambush at Zrid's camp, 4 Ocra amenazador, 3 Yopuka amenazadora and Bibak (Dofus pour les noobs: «un combat contre 4 Crâs, 3 Iops et 1 Zobal»)."}
+  {"objective": 13498, "quest": 1942, "kind": "beat", "monsters": [5147, 5147, 5147, 5147, 5146, 5146, 5146, 5145], "map": 186385924, "afterObjectives": [13497], "why": "«Caza a los inoportunos» (740603): the Trepamuertos fanatics' ambush at Zrid's camp, 4 Ocra amenazador, 3 Yopuka amenazadora and Bibak (Dofus pour les noobs: «un combat contre 4 Crâs, 3 Iops et 1 Zobal»)."},
+  {
+   "objective": 13125,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 183502850, "element": 511306}],
+   "afterObjectives": [13124],
+   "showsNpc": 4094,
+   "mapCleared": true,
+   "why": "«Cliquez sur le piano afin de faire apparaitre le Fantôme mélomane» (Dofus pour les noobs, «Une voix de crystal»): the piano of the barracks [-75,-80] (element 511306, one of the elements added for this quest) brings the ghost in. The guide asks for a map empty of monsters, so the piano counts only once no group stands on the barracks («mapCleared»)."
+  },
+  {
+   "objective": 13127,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35179],
+   "afterObjectives": [13126],
+   "why": "«Parler du chant de Kallishindri» (35179) (Dofus pour les noobs, «Une voix de crystal»): Nileza, in the exit room of his laboratory."
+  },
+  {
+   "objective": 13128,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35174, 35183],
+   "afterObjectives": [13127],
+   "why": "«Averigua quién creó el cristal»: Nileza has told of the crystal and of a sailor of Sufokia; the player remembers Captain Meno, crystal maker and admirer (35174 first visit, 35183 second). (Dofus pour les noobs, «Une voix de crystal»)"
+  },
+  {
+   "objective": 13130,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35197],
+   "afterObjectives": [13129],
+   "gives": [{"item": 19180, "count": 1}],
+   "why": "«Concerto pour limonade» (Dofus pour les noobs, «Une voix de crystal»): André Rieur gives a copy of the score on thanking him (35197)."
+  },
+  {
+   "objective": 13131,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 95683075, "element": 511299}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19181, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the royal concerto: the piano of Amakna castle [4,-6]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13132,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 173938178, "element": 511300}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19182, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the spicy concerto: the piano of Saharach's Sabloon [15,-57]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13133,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 149160960, "element": 511301}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19183, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the cloth concerto: the piano of the Rac Queen's first room [-6,-15]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13134,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 99092999, "element": 511302}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19184, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the meow-meow concerto: the piano at the top of the house of the secret map of [3,17]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13135,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 192677888, "element": 515320}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19185, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the mercenaries' concerto: the piano of Astrub's right house [6,-21]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13136,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 99095049, "element": 511304}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19186, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the Amakna concerto: the piano of the ballroom of Amakna's tavern [2,-1]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13137,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35196],
+   "afterObjectives": [13130, 13131, 13132, 13133, 13134, 13135, 13136],
+   "requires": [{"item": 19180, "count": 1}, {"item": 19181, "count": 1}, {"item": 19182, "count": 1}, {"item": 19183, "count": 1}, {"item": 19184, "count": 1}, {"item": 19185, "count": 1}, {"item": 19186, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 19187, "count": 1}],
+   "why": "«Donner les partitions demandées» (Dofus pour les noobs, «Une voix de crystal»): Meno takes the seven scores and gives the Cristal de Kallishindri (19187, text 29336)."
+  }
 ]
 }

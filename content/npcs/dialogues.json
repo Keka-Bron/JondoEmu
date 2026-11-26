@@ -67365,16 +67365,19 @@
         {
           "message": 29026,
           "choices": [
-            { "reply": 34807, "startsQuest": 1912, "params": [[34, 1912]] }
+            { "reply": 34807, "startsQuest": 1912, "params": [[34, 1912]] },
+            { "reply": 34813, "quest": 1912, "afterObjective": 13137, "beforeObjective": 13138, "completes": 13138, "params": [[30, 13138]], "next": 29027 }
           ]
         },
         {
           "message": 29027,
           "names": true,
-          "choices": []
+          "choices": [
+            { "reply": 34810, "quest": 1912 }
+          ]
         }
       ],
-      "why": "Nordalie (1909): Lachandi says the dragon's fate is in Atroskuld's hands (29021, 29022). Nordalie (1909): Lachandi says the dragon's fate is in Atroskuld's hands (29021, 29022). Lachandi asks for Kallishindri's voice (Ivory quest 1912, step dialog 29026) (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies)."
+      "why": "Nordalie (1909): Lachandi says the dragon's fate is in Atroskuld's hands (29021, 29022). Nordalie (1909): Lachandi says the dragon's fate is in Atroskuld's hands (29021, 29022). Lachandi asks for Kallishindri's voice (Ivory quest 1912, step dialog 29026) (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies). «Une voix de crystal» (1912, 13138): «Donner le crystal» to Lachandi at [-76,-80] (Dofus pour les noobs, «Une voix de crystal») (34813, her thanks 29027)."
     },
   {
       "npc": 3702,
@@ -71396,7 +71399,10 @@
           "choices": [
             { "reply": 28925, "next": 24041, "quest": 1735, "beforeObjective": 11037, "completes": 11037, "params": [[30, 11037]] },
             { "reply": 28925, "next": 24041, "beforeQuest": 1736, "criterion": "Qf=1735" },
-            { "reply": 28559 }
+            { "reply": 28559 },
+            { "reply": 35190, "quest": 1912, "beforeObjective": 13129, "next": 29328 },
+            { "reply": 35189, "quest": 1912, "afterObjective": 13129, "beforeObjective": 13137, "next": 29332 },
+            { "reply": 35196, "quest": 1912, "afterObjective": 13136, "beforeObjective": 13137, "criterion": "PO>19180,0&PO>19181,0&PO>19182,0&PO>19183,0&PO>19184,0&PO>19185,0&PO>19186,0", "next": 29336 }
           ]
         },
         {
@@ -71441,9 +71447,63 @@
           "choices": [
             { "reply": 28920, "quest": 1744, "afterObjective": 11106, "beforeObjective": 11107 }
           ]
+        },
+        {
+          "message": 29328,
+          "choices": [
+            { "reply": 35194, "quest": 1912, "next": 29329 }
+          ]
+        },
+        {
+          "message": 29329,
+          "choices": [
+            { "reply": 35187, "quest": 1912, "next": 29330 }
+          ]
+        },
+        {
+          "message": 29330,
+          "choices": [
+            { "reply": 35186, "quest": 1912, "completes": 13129, "params": [[30, 13129]], "next": 29331 }
+          ]
+        },
+        {
+          "message": 29331,
+          "choices": [
+            { "reply": 35185 }
+          ]
+        },
+        {
+          "message": 29332,
+          "choices": [
+            { "reply": 35188, "quest": 1912, "next": 29333 }
+          ]
+        },
+        {
+          "message": 29333,
+          "choices": [
+            { "reply": 35193, "quest": 1912, "next": 29334 }
+          ]
+        },
+        {
+          "message": 29334,
+          "choices": [
+            { "reply": 35192, "quest": 1912, "next": 29335 }
+          ]
+        },
+        {
+          "message": 29335,
+          "choices": [
+            { "reply": 35191 }
+          ]
+        },
+        {
+          "message": 29336,
+          "choices": [
+            { "reply": 35195 }
+          ]
         }
       ],
-      "why": "Captain Meno, «Selva de cristal» (1735): after the dungeon he is talked to (11037); 24042 leaves his message for the steamers and starts «Su nombre es Ninguno» (1736). Captain Meno, «Selva de cristal» (1735): after the dungeon he is talked to (11037); 24042 leaves his message for the steamers and starts «Su nombre es Ninguno» (1736). Captain Meno, «Su nombre es Ninguno» (1736, Dofus pour les noobs): the player tells him the steamers got his message (28932), then gives the organ score as a gift (28930, 11042). Captain Meno (3258), «Puerta al pasado» (1744): after the guardian he speaks (28922, 11106) and the crystals' will annihilator fights the player (28920, fight 11107)."
+      "why": "Captain Meno, «Selva de cristal» (1735): after the dungeon he is talked to (11037); 24042 leaves his message for the steamers and starts «Su nombre es Ninguno» (1736). Captain Meno, «Selva de cristal» (1735): after the dungeon he is talked to (11037); 24042 leaves his message for the steamers and starts «Su nombre es Ninguno» (1736). Captain Meno, «Su nombre es Ninguno» (1736, Dofus pour les noobs): the player tells him the steamers got his message (28932), then gives the organ score as a gift (28930, 11042). Captain Meno (3258), «Puerta al pasado» (1744): after the guardian he speaks (28922, 11106) and the crystals' will annihilator fights the player (28920, fight 11107). «Une voix de crystal» (1912, 13129-13137): after the dungeon Meno talks about Kallishindri and the crystals (35190, 29328-29331: he wants seven concerto scores; 13129 is done at 35186); asked again (35189, 29332-29335); and the hand-over of the seven scores (35196, 29336), after which he gives the crystal (Dofus pour les noobs, «Une voix de crystal»). Reply order INFERRED from the message ids (the guide gives the story, not the replies). 24040 is his greeting after the fight."
     },
   {
       "npc": 2822,
@@ -78991,6 +79051,196 @@
         }
       ],
       "why": "Mi-To (3305), «Memorias de un amnesico» (1749, Dofus pour les noobs): the cave talks of the quest, 29290-29295 / 24381-24387; the others keep his generic greeting (29355)."
+    },
+    {
+      "npc": 1372,
+      "map": 0,
+      "opening": 8314,
+      "lines": [
+        {
+          "message": 8314,
+          "choices": [
+            { "reply": 35163, "quest": 1912, "beforeObjective": 13123, "next": 29310 }
+          ]
+        },
+        {
+          "message": 29310,
+          "choices": [
+            { "reply": 35162, "quest": 1912, "next": 29311 }
+          ]
+        },
+        {
+          "message": 29311,
+          "choices": [
+            { "reply": 35161, "quest": 1912, "next": 29312 }
+          ]
+        },
+        {
+          "message": 29312,
+          "choices": [
+            { "reply": 35160, "quest": 1912, "completes": 13123, "params": [[30, 13123]] }
+          ]
+        }
+      ],
+      "why": "«Une voix de crystal» (1912, 13123): Asselo at [-76,-71], «Évoquer sa sœur Kallishindri» (Dofus pour les noobs, «Une voix de crystal»): 35163 starts it, 29310-29312 are her sister's story and 35160 closes it. Reply order INFERRED from the message ids (the guide gives the story, not the replies). Her default line is 8314 (the sick-villager line 8219 needs a state the data does not give)."
+    },
+    {
+      "npc": 1999,
+      "map": 0,
+      "opening": 14809,
+      "lines": [
+        {
+          "message": 14809,
+          "choices": [
+            { "reply": 35166, "quest": 1912, "afterObjective": 13123, "beforeObjective": 13124, "next": 29313 }
+          ]
+        },
+        {
+          "message": 29313,
+          "choices": [
+            { "reply": 35165, "quest": 1912, "completes": 13124, "params": [[30, 13124]], "next": 29314 }
+          ]
+        },
+        {
+          "message": 29314,
+          "choices": []
+        }
+      ],
+      "why": "«Une voix de crystal» (1912, 13124): the guard captain of Frigost III's militia, «Savoir si le nom de Kallishindri lui est familier» (Dofus pour les noobs, «Une voix de crystal»): 35166 asks (29313: she died in the barracks), 35165 asks whether she left something (29314: her best friend's ghost may still haunt the place). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4094,
+      "map": 0,
+      "opening": 28916,
+      "lines": [
+        {
+          "message": 28916,
+          "choices": [
+            { "reply": 35170, "quest": 1912, "afterObjective": 13125, "beforeObjective": 13126, "next": 29315 }
+          ]
+        },
+        {
+          "message": 29315,
+          "choices": [
+            { "reply": 35169, "quest": 1912, "next": 29316 }
+          ]
+        },
+        {
+          "message": 29316,
+          "choices": [
+            { "reply": 35168, "quest": 1912, "next": 29317 }
+          ]
+        },
+        {
+          "message": 29317,
+          "choices": [
+            { "reply": 35167, "quest": 1912, "completes": 13126, "params": [[30, 13126]] }
+          ]
+        }
+      ],
+      "why": "«Une voix de crystal» (1912, 13126): the ghost that appears when the piano of the barracks is played («Parlez au Fantôme») (Dofus pour les noobs, «Une voix de crystal»): it tells how Kallishindri sang for Nileza (29317). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 2028,
+      "map": 0,
+      "opening": 14780,
+      "openings": [
+        { "criterion": "Qa=1912&Qo>13127", "message": 29327 }
+      ],
+      "lines": [
+        {
+          "message": 14780,
+          "choices": [
+            { "reply": 35179, "quest": 1912, "afterObjective": 13126, "beforeObjective": 13127, "next": 29318 },
+            { "reply": 17538 }
+          ]
+        },
+        {
+          "message": 29318,
+          "choices": [
+            { "reply": 35178, "quest": 1912, "next": 29319 }
+          ]
+        },
+        {
+          "message": 29319,
+          "choices": [
+            { "reply": 35177, "quest": 1912, "next": 29320 }
+          ]
+        },
+        {
+          "message": 29320,
+          "choices": [
+            { "reply": 35176, "quest": 1912, "next": 29321 }
+          ]
+        },
+        {
+          "message": 29321,
+          "choices": [
+            { "reply": 35175, "quest": 1912, "next": 29322 }
+          ]
+        },
+        {
+          "message": 29322,
+          "choices": [
+            { "reply": 35172, "quest": 1912, "next": 29323 }
+          ]
+        },
+        {
+          "message": 29323,
+          "choices": [
+            { "reply": 35174, "quest": 1912, "next": 29324 },
+            { "reply": 35171 }
+          ]
+        },
+        {
+          "message": 29324,
+          "choices": [
+            { "reply": 35173 }
+          ]
+        },
+        {
+          "message": 29327,
+          "choices": [
+            { "reply": 35184, "quest": 1912, "next": 29325 },
+            { "reply": 17538 }
+          ]
+        },
+        {
+          "message": 29325,
+          "choices": [
+            { "reply": 35181, "quest": 1912, "next": 29326 },
+            { "reply": 35180 }
+          ]
+        },
+        {
+          "message": 29326,
+          "choices": [
+            { "reply": 35183, "quest": 1912 },
+            { "reply": 35182 }
+          ]
+        }
+      ],
+      "why": "«Une voix de crystal» (1912, 13127/13128): Nileza in his laboratory's exit room, «Parler du chant de Kallishindri» (Dofus pour les noobs, «Une voix de crystal»): the name does not ring a bell (29318, 29319), then he remembers the singer of crystals (29320), the crystal she gave him broke (29321), a fan had bound her voice to a stone (29322) and is an old sailor from Sufokia (29323). Second visit: 29327 with the same story again (29325, 29326, the client's duplicated lines). 35171/35173/35180/35182 are «Abandonar el laboratorio para ir a Sufokia». Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 2942,
+      "map": 0,
+      "opening": 20945,
+      "lines": [
+        {
+          "message": 20945,
+          "choices": [
+            { "reply": 35198, "quest": 1912, "afterObjective": 13129, "beforeObjective": 13130, "next": 29337 }
+          ]
+        },
+        {
+          "message": 29337,
+          "choices": [
+            { "reply": 35197, "quest": 1912 }
+          ]
+        }
+      ],
+      "why": "«Une voix de crystal» (1912, 13130): André Rieur in Incarnam's tavern [0,-3] gives a copy of the «Concierto para limonada» (Dofus pour les noobs, «Une voix de crystal»)."
     }
-]
+  ]
 }

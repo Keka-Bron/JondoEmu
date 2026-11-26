@@ -578,6 +578,12 @@ namespace Jondo.Unity.Server.Managers
                 if (binding.SkillName != 0
                     && (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out _, out var picked)
                         || picked.SkillNameId != binding.SkillName)) continue;
+                // A room to clear first: with a group still on the map the element does nothing.
+                if (binding.MapCleared && MobSpawnManager.HasGroups(mapId))
+                {
+                    Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: element {elementId} of map {mapId} pressed with monsters still there.");
+                    continue;
+                }
                 // One item per element, up to the row's count: a leaf from each of the four bushes.
                 if (binding.GivesEach)
                 {

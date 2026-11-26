@@ -1656,6 +1656,12 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>Whether a monster group stands on the map now.</summary>
+        public static bool HasGroups(long mapId)
+        {
+            lock (_candado) return _mapMobs.TryGetValue(mapId, out var groups) && groups.Count > 0;
+        }
+
         /// <summary>How many groups a map had when the world was loaded.</summary>
         public static int LoadedGroups(long mapId)
         {

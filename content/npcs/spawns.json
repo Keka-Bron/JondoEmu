@@ -8561,8 +8561,8 @@
       "npc": 3278,
       "cell": 313,
       "orientation": 1,
-      "criterion": "Qa=1736&Qo>11041&Qo<11042",
-      "why": "Meno's Snapper (Pichon kloune de Meno, 3278) at the ship's entrance [24,27] after the organ score (1736, DPLN «Son nom est Personne»: «Parlez au Pichon kloune de Meno pour retourner voir Meno»); cell 313 measured on that screenshot against the numbered drawing (the small orange Snapper in the middle of the square, left of the glass-windowed house); +-1 cell."
+      "criterion": "Qa=1736&Qo>11041&Qo<11042|Qa=1912&Qo>13129&Qo<13138",
+      "why": "Meno's Snapper (Pichon kloune de Meno, 3278) at the ship's entrance [24,27] after the organ score (1736, DPLN «Son nom est Personne»: «Parlez au Pichon kloune de Meno pour retourner voir Meno»); cell 313 measured on that screenshot against the numbered drawing (the small orange Snapper in the middle of the square, left of the glass-windowed house); +-1 cell. Also for «Une voix de crystal» (1912, DPLN «Une fois les sept partitions récupérées, retournez [...] et parlez au Pichon kloune de Meno pour retourner auprès de Meno sans avoir à refaire le donjon»), from the deal until the hand-over."
     },
     {
       "map": 168822786,
@@ -8831,6 +8831,7 @@
   {"map": 186647556, "npc": 4243, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13526&Qo<13528", "why": "Pau Breton at [-46,-81] (1944, 13527). INFERRED cell."},
   {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."},
   {"map": 54789135, "npc": 3292, "cell": 297, "remove": true, "why": "Naroto stood twice in the Frigost tavern; the inferred placement goes and the other one stays."},
-  {"map": 168560656, "npc": 3349, "cell": 284, "orientation": 1, "why": "Pacific Klutist, giver and hand-over of Fhtagn (1765) at the Abyss of R'lyugluglu [27,34] (Dofus pour les noobs); he had no placement. Cell INFERRED (open floor next to the arrival cell)."}
+  {"map": 168560656, "npc": 3349, "cell": 284, "orientation": 1, "why": "Pacific Klutist, giver and hand-over of Fhtagn (1765) at the Abyss of R'lyugluglu [27,34] (Dofus pour les noobs); he had no placement. Cell INFERRED (open floor next to the arrival cell)."},
+  {"map": 183502850, "npc": 4094, "cell": 410, "orientation": 1, "criterion": "Qa=1912&Qo>13125", "why": "The melomaniac ghost of the barracks [-75,-80] (1912, 13126), who appears after the piano is played (13125) (Dofus pour les noobs, «Une voix de crystal»). Cell 410 is the derived placement of the quest data («wanted by quest 1912»)."}
   ]
 }

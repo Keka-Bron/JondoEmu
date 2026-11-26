@@ -382,6 +382,12 @@ namespace Jondo.Unity.World.Quests
         public bool OnlyGives { get; init; }
 
         /// <summary>
+        /// The element counts only on a map no monster group stands on: the barracks piano of «Une
+        /// voix de crystal» (1912) brings its ghost in once the room has been cleared.
+        /// </summary>
+        public bool MapCleared { get; init; }
+
+        /// <summary>
         /// Each of the row's elements hands its item over once, up to the count the row gives -- the
         /// four bushes of sea enchalada of «Un parfum de vacances», a leaf each, four in all. With
         /// <see cref="OnlyGives"/> the objective stays; without it, it is done once every element's
@@ -709,6 +715,7 @@ namespace Jondo.Unity.World.Quests
                     ? (Int(carrying, "item"), Int(carrying, "says"))
                     : (0, 0),
                 OnlyGives = row.TryGetProperty("onlyGives", out var only) && only.ValueKind == JsonValueKind.True,
+                MapCleared = row.TryGetProperty("mapCleared", out var cleared) && cleared.ValueKind == JsonValueKind.True,
                 GivesEach = row.TryGetProperty("givesEach", out var each) && each.ValueKind == JsonValueKind.True,
                 AllMaps = row.TryGetProperty("all", out var allMaps) && allMaps.ValueKind == JsonValueKind.True,
                 OverridesMap = row.TryGetProperty("overridesMap", out var overrides)
