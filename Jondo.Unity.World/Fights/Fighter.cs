@@ -389,6 +389,13 @@ namespace Jondo.Unity.World.Fights
         public bool ImmuneToAllies { get; set; }
 
         /// <summary>
+        /// The spells that take no hold on it: nothing of theirs lands, now or on a trigger. The
+        /// toxin immunity potion (19507) held into Toxina's fight of «Le piège se referme» leaves
+        /// her poison, Toxinistrose, nothing to work on (QuestRules.Antidotes).
+        /// </summary>
+        public HashSet<int> SpellImmunities { get; } = new();
+
+        /// <summary>
         /// The companion this fighter is (the client's companions table), zero for anybody else: a
         /// creature its master brought by wearing it, played by him by hand as a played ally
         /// (<see cref="DrivenBy"/> is the master), and told to the clients as a companion -- the

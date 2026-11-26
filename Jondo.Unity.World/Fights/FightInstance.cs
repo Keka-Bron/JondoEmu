@@ -1176,9 +1176,16 @@ namespace Jondo.Unity.World.Fights
             /// </summary>
             public IReadOnlyList<int> AllyProof { get; init; } = Array.Empty<int>();
 
+            /// <summary>
+            /// An item held into the fight that makes the player immune to some spells («antidotes»:
+            /// [{ item, spells }]): Otomai's toxin immunity potion (19507) against Toxina's poison.
+            /// </summary>
+            public IReadOnlyList<(int Item, IReadOnlyList<int> Spells)> Antidotes { get; init; }
+                = Array.Empty<(int, IReadOnlyList<int>)>();
+
             /// <summary>Whether there is nothing to apply.</summary>
             public bool IsEmpty => Grants.Count == 0 && Passives.Count == 0 && States.Count == 0 && WinState == 0
-                                   && SacrificeAlly == 0 && WinMessage == 0 && AllyProof.Count == 0;
+                                   && SacrificeAlly == 0 && WinMessage == 0 && AllyProof.Count == 0 && Antidotes.Count == 0;
         }
 
         /// <summary>The ally that dies in the player's place (<see cref="QuestRules.SacrificeAlly"/>), or zero.</summary>

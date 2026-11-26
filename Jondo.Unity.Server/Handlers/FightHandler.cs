@@ -1520,7 +1520,11 @@ namespace Jondo.Unity.Server.Handlers
                 WaterResPct = dbStats?.WaterResistance ?? Math.Min(50, monLevel / 4),
                 AirResPct = dbStats?.AirResistance ?? Math.Min(50, monLevel / 4),
                 LookBoneId = boneId,
-                SpellIds = dbStats?.SpellIds ?? new List<int>(),
+                // Not the spells its template gives level 0 at this grade: they are not its own
+                // there. Toxina (5187) holds Rassemblement du gang twice, 10116 at levels 40-80
+                // («1,40;2,60;3,80;0,100...») and 10115 from 100 («0,40;0,60;0,80;1,100...»);
+                // both were kept, the absent one at a made-up grade 1.
+                SpellIds = dbStats?.SpellIds.Where(s => !dbStats.SpellsAbsentAtGrade.Contains(s)).ToList() ?? new List<int>(),
                 SpellGrades = dbStats?.SpellGrades ?? new Dictionary<int, int>(),
                 // gradeXp from the monster template: the experience it awards on death, the
                 // same figure the client shows when hovering over the group.

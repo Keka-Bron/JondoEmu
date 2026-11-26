@@ -517,9 +517,24 @@ namespace Jondo.Unity.Server.Managers
                 if (opener != null) return opener;
             }
 
-            Action? best = null;
+            Action? best = null, summon = null;
             foreach (var option in Options(board, monster, spells))
+            {
                 if (best == null || option.Score > best.Score) best = option;
+                if (option.Spell.Summons && !option.Spell.Offensive && option.Score > 0
+                    && (summon == null || option.Score > summon.Score)) summon = option;
+            }
+
+            // Its creature before the blow that would leave no AP for it: one that comes out plays
+            // the rest of the fight, and weighed per AP against a single blow it never came out.
+            // Toxina (5187) spent seven rounds on her Vengeance aiguisée and never cast her
+            // Rassemblement du gang (10115/10116), which «invoque une Chasseuse de poison» (Dofus
+            // pour les noobs, «Le piège se referme»). While both can be paid the best goes first:
+            // the Shin Larva still sinks the enemies (506) before it calls its larva (507).
+            // One a turn all the same (Options), and only while the summon limit has room (Board.CanSummon).
+            // A JondoBot plans its turn whole and weighs its creatures by their standing (PlanTurn).
+            if (summon != null && !monster.IsBot && best != summon && best!.ActionPoints - best.Spell.Cost < summon.Spell.Cost)
+                return summon;
 
             // Power before the blow: a buff that raises its damage goes first when both can be
             // paid -- "lancer puissance le tour d'avant", as the players' own advice goes.

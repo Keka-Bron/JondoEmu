@@ -7932,7 +7932,7 @@
     {
       "map": 170132480,
       "npc": 3266,
-      "cell": 373,
+      "cell": 374,
       "orientation": 3,
       "criterion": "Qa=1743&Qo>11099&Qo<11102",
       "why": "Prosper in the hidden room behind the big tank (1743, 11101: «pass the secret passage then show the key to Prosper»); INFERRED cell."
@@ -8788,6 +8788,26 @@
 {"map": 88214297, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=17", "why": "The Asesino mediomuerto at the Huppermage temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
 {"map": 176555010, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=18", "why": "The Asesino mediomuerto at the Ouginak temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
 {"map": 88212755, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=19", "why": "The Asesino mediomuerto at the Forgelance temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
-{"map": 177209344, "npc": 4200, "cell": 413, "orientation": 1, "criterion": "Qa=1936&Qo>13449&Qo<13450", "why": "The guardian molocan (4200) Chalcas lends once the character has taught him the lullaby (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): Chalcas hands over a molosk after smelling the magypus). INFERRED cell: beside Chalcas."}
+{"map": 177209344, "npc": 4200, "cell": 413, "orientation": 1, "criterion": "Qa=1936&Qo>13449&Qo<13450", "why": "The guardian molocan (4200) Chalcas lends once the character has taught him the lullaby (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): Chalcas hands over a molosk after smelling the magypus). INFERRED cell: beside Chalcas."},
+  {"map": 176555008, "npc": 3502, "cell": 324, "orientation": 1, "criterion": "(Qa=1937&Qo<13454)|(Qa=1937&Qo>13456&Qo<13457)", "why": "Incognita outside the Ouginak temple [8,-67] (1937, 13453 and 13457; Chalcas: «Incógnita está aquí»). INFERRED cell."},
+  {"map": 177212416, "npc": 3919, "cell": 298, "orientation": 1, "criterion": "Qa=1937&Qo>13453&Qo<13454", "why": "Imaguni in the temple's prison (1937, 13454; Dofus pour les noobs: «la salle sur la gauche»). INFERRED cell."},
+  {"map": 99095049, "npc": 3173, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13453&Qo<13456", "why": "Ush Galesh on the Amakna tavern's upper floor [2,-1] (1937, 13456). INFERRED cell."},
+  {"map": 63964424, "npc": 4203, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Fécorce [-54,12] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 63965449, "npc": 4204, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Floribonde [-52,11] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 63964427, "npc": 4205, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Chiendent [-54,9] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 171707400, "npc": 4191, "cell": 342, "orientation": 1, "criterion": "Qa=1937&Qo>13463&Qo<13465", "why": "Toxina steps out at the fire of Azrim's cave (1937, 13464). INFERRED cell."},
+  {"map": 171707400, "npc": 2803, "cell": 356, "orientation": 1, "criterion": "Qa=1937&Qo>13465&Qo<13466", "why": "Echo, with the Brotherhood, in Azrim's cave after the fight (1937, 13466). INFERRED cell."},
+  {"map": 171707400, "npc": 2447, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13467&Qo<13469", "why": "The Queen of Thieves in Azrim's cave (1937, 13468). INFERRED cell."},
+  {"map": 182978060, "npc": 4252, "cell": 300, "orientation": 1, "criterion": "Qa=1948&Qo>13595&Qo<13596", "why": "The corpse looter on the magmatic steps [-28,26] (1948, 13596). INFERRED cell."},
+  {"map": 182977548, "npc": 4253, "cell": 304, "orientation": 1, "criterion": "Qa=1948&Qo>13596&Qo<13597", "why": "The corpse looter [-29,26] (1948, 13597). INFERRED cell."},
+  {"map": 180619268, "npc": 4252, "cell": 298, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "The male looter in the Brakdad Cafe [-25,26] (1948, 13605). INFERRED cell."},
+  {"map": 180619268, "npc": 4253, "cell": 305, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "The female looter in the Brakdad Cafe (1948, 13605). INFERRED cell."},
+  {"map": 180619268, "npc": 4254, "cell": 312, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "Brak Pitt in the Brakdad Cafe (1948, 13605). INFERRED cell."},
+  {"map": 173019659, "npc": 4256, "cell": 300, "orientation": 1, "criterion": "Qa=1948&Qo>13606&Qo<13609", "why": "The discreet individual at the delivery place [-21,27] (1948, 13608). INFERRED cell."},
+  {"map": 183108105, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "(Qf=1939&PL>179&Qa!1949&Qf!1949)|(Qa=1949&Qo<13614)", "why": "Triki Guest offers the fire-stones plan at [-31,23] (1949). INFERRED cell."},
+  {"map": 184288260, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13617&Qo<13620", "why": "Triki Guest waits at [-30,24] (1949, 13619). INFERRED cell."},
+  {"map": 184289284, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13619&Qo<13624", "why": "Triki Guest at [-29,24] (1949, 13621 and 13623). INFERRED cell."},
+  {"map": 182978058, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13623&Qo<13628", "why": "Triki Guest faces the bandits at [-28,24] (1949, 13625 and 13627). INFERRED cell."},
+  {"map": 182978568, "npc": 4258, "cell": 296, "orientation": 1, "criterion": "Qa=1949&Qo>13627&Qo<13630", "why": "Triki Guest beside the lava tongue at [-27,22] (1949, 13629). INFERRED cell."}
   ]
 }

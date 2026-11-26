@@ -31,8 +31,16 @@ internal static class MapInteractiveMessages
             states.Add(Placement(element, (int)ResourceState.Full));
         }
 
+        // An element the registry already offers something to do on keeps that declaration: its
+        // click is what the quest hears (Quests.OnInteractiveUsedAsync). A class temple's statue is
+        // the way «Hacia el territorio de los dioses» (48) that «La colère des dieux» asks to take;
+        // declared a second time, as a bare element with a placement, the client had nothing to
+        // offer on it.
         foreach (var (binding, elementId) in questElements)
+        {
+            if (elements.Any(e => e.ElementId == elementId && e.EnabledSkills.Count > 0)) continue;
             Add(elementId, binding.SkillId, binding.TypeId);
+        }
         foreach (int elementId in Readables.OnMap(mapId))
             Add(elementId, Readables.Skill, Readables.Of(mapId, elementId)?.Type is int own && own != 0 ? own : QuestBinding.DefaultType);
         // What only speaks when pressed, unless a quest or the registry has declared it already with

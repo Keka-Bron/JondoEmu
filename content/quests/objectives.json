@@ -8517,7 +8517,9 @@
    "quest": 1741,
    "kind": "reply",
    "replies": [28741],
-   "why": "«Lleva 5 muestras de algas a Pulpalas» (886836): she accepts to cook for him (28741); the resources are shown with the bring objective."
+   "requires": [{"item": 17944, "count": 1}, {"item": 17946, "count": 1}, {"item": 17947, "count": 1}, {"item": 17948, "count": 1}, {"item": 17949, "count": 1}],
+   "spends": true,
+   "why": "«Lleva 5 muestras de algas a Pulpalas» (886836): she accepts to cook for him (28741) once the five algae samples (17944, 17946-17949, picked on the rift maps, messages.json) are handed over; the mercury goes with the next objective."
   },
   {
    "objective": 11079,
@@ -8639,8 +8641,9 @@
    "objective": 11098,
    "quest": 1743,
    "kind": "enter",
-   "map": 169082890,
-   "why": "«Utiliza un volante hidráulico para accionar el ascensor» (644033): the sunken ruins' map; the elevator's use is not modelled, INFERRED."
+   "map": 169082892,
+   "overridesMap": true,
+   "why": "«Utiliza un volante hidráulico para accionar el ascensor» (644033): the lift of [22,31] (element 508182, open only with the hydraulic wheel in the bag, teleports.json) lands on 169082892; arriving there closes the objective, as with the lift of 1734."
   },
   {
    "objective": 3739,
@@ -9763,6 +9766,21 @@
   },
   {"objective": 13444, "quest": 1936, "kind": "click", "elements": [{"map": 179307011, "element": 509881}], "gives": [{"item": 19496, "count": 1}], "why": "«Consigue pelos de magicorrinco» (739750): the hole at the foot of the tree left of the river on [-66,31] gives a few magicorrinco hairs (Dofus pour les noobs («Le jour des assassins»): «cliquez sur le trou au pied du tronc d'arbre à gauche de la rivière»). INFERRED element: the map's graphic 40689 on cell 294."},
   {"objective": 13450, "quest": 1936, "kind": "talk", "npc": 4202, "afterObjectives": [13449], "why": "«Patrulla en los alrededores de tu templo con el molocán guardián» (744922): the patrol ends on finding the Asesino mediomuerto around the class temple (Dofus pour les noobs («Le jour des assassins»): «Une fois que vous avez trouvé l'assassin, le molosk qui vous suivait prend peur et se sauve»); speaking to him ticks it."},
-  {"objective": 13451, "quest": 1936, "kind": "beat", "monster": 5174, "afterObjectives": [13450], "why": "«Vence al asesino enviado por Toxina» (739849): the Asesino mediomuerto fought alone (Dofus pour les noobs («Le jour des assassins»))."}
+  {"objective": 13451, "quest": 1936, "kind": "beat", "monster": 5174, "afterObjectives": [13450], "why": "«Vence al asesino enviado por Toxina» (739849): the Asesino mediomuerto fought alone (Dofus pour les noobs («Le jour des assassins»))."},
+  {"objective": 13462, "quest": 1937, "kind": "enter", "map": 171707400, "afterObjectives": [13460], "why": "«Entra en la gruta de Azrim» (739888): Azrim's cave [-22,-3] (Dofus pour les noobs («Le piège se referme»))."},
+  {"objective": 13463, "quest": 1937, "kind": "click", "elements": [{"map": 171707400, "element": 510904}], "afterObjectives": [13462], "why": "«Haz como si meditaras cerca del fuego apagado» (744241): the cave's camp-fire remains (element 510904, the one of 1867) (Dofus pour les noobs («Le piège se referme»): «cliquez sur le feu de camp au centre de la grotte pour faire semblant de méditer»)."},
+  {"objective": 13465, "quest": 1937, "kind": "beat", "monster": 5187, "afterObjectives": [13464], "why": "«Vence a Toxina» (739890): Toxina fought with the Queen of Thieves as an ally (Dofus pour les noobs («Le piège se referme»))."},
+  {"objective": 13607, "quest": 1948, "kind": "enter", "map": 173019659, "afterObjectives": [13606], "why": "Lugar de la entrega (741385): the delivery place [-21,27] (map named by the guide; the objective carries no map in the data). Dofus pour les noobs («Coeur de pierre»)."},
+  {"objective": 13610, "quest": 1948, "kind": "click", "elements": [{"map": 179179786, "element": 511991}, {"map": 179179786, "element": 511992}], "afterObjectives": [13609], "why": "Registra la guarida (744320): the sacks in the middle of the den (Dofus pour les noobs: click the sacks). INFERRED: elements 511991/511992 (cell 212) as the sacks."},
+  {"objective": 13616, "quest": 1949, "kind": "beat", "monsters": [5102, 5103, 5104, 5105], "map": 184287236, "afterObjectives": [13615], "why": "Combate a los calcinados (744691): eight calcined ones fought at [-31,24] (Dofus pour les noobs («Les pierres à feu»): 8 Calcinés, may be done in a group)."},
+  {"objective": 13622, "quest": 1949, "kind": "beat", "monsters": [5102, 5103, 5104, 5105, 5216], "map": 184289284, "afterObjectives": [13621], "why": "Ocupa los objetivos (744697): four calcined ones and four Lave Magique at [-29,24] (Dofus pour les noobs («Les pierres à feu»))."},
+  {"objective": 13626, "quest": 1949, "kind": "beat", "monsters": [5193, 5194, 5195, 5196, 5197, 5198, 5199, 5200], "map": 182978058, "afterObjectives": [13625], "why": "Vence a los bandidos (744700): the Magma Steps bandits at [-28,24] (Dofus pour les noobs («Les pierres à feu»))."},
+  {
+   "objective": 13073,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 175637504,
+   "why": "Enter the Chamber of Tal Kasha (732413): its first room 176160768, reached through the keeper's keyring on 175637504. Dofus pour les noobs «Nordalie». The binding of the first pass was gone from objectives.json, re-added."
+  }
 ]
 }

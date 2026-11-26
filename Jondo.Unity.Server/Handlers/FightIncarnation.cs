@@ -111,9 +111,12 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A quest's rules put on a fight just built: its winning state, the spells lent to the
-        /// player and, on each monster of the template named, its passive and its states.
+        /// player and, on each monster of the template named, its passive and its states. An
+        /// antidote the character holds (<paramref name="held"/> counts it, the bag by default)
+        /// makes the player immune to the spells it names.
         /// </summary>
-        internal static void ApplyRules(FightInstance fight, Fighter player, FightInstance.QuestRules? rules)
+        internal static void ApplyRules(FightInstance fight, Fighter player, FightInstance.QuestRules? rules,
+                                        Func<int, int>? held = null)
         {
             if (rules == null || rules.IsEmpty) return;
             fight.WinState = rules.WinState;
@@ -123,6 +126,9 @@ namespace Jondo.Unity.Server.Handlers
             fight.WinMessage = rules.WinMessage;
             foreach (var ally in fight.Azul.Where(f => f.IsMonster && rules.AllyProof.Contains(f.MonsterId)))
                 ally.ImmuneToAllies = true;
+            held ??= Managers.Equipment.HowMany;
+            foreach (var (item, spells) in rules.Antidotes)
+                if (held(item) > 0) player.SpellImmunities.UnionWith(spells);
             foreach (int spell in rules.Grants)
             {
                 player.GrantedSpells.RemoveAll(g => g.Spell == spell);

@@ -2881,6 +2881,8 @@ namespace Jondo.Unity.Server.Managers
         {
             if (hondo > HondoMaximo) return new List<Outcome>();
             if (!armar) combate.SinArmar++;
+            int spellOutside = _spellOfTheRows;
+            _spellOfTheRows = hechizo;
             var raizDeFuera = combate.RootCaster;
             int hechizoRaizDeFuera = combate.CastRootSpell, filasDeFuera = combate.CastRowsAfter;
             var struckDownOutside = combate.StruckDownThisCast;
@@ -2919,6 +2921,7 @@ namespace Jondo.Unity.Server.Managers
             }
             finally
             {
+                _spellOfTheRows = spellOutside;
                 if (!armar) combate.SinArmar--;
                 // Cast: from now on its triggered rows can answer for an attitude (see
                 // Buffs.GradosLanzados). After its rows, so a 406 of its own clears the older
@@ -4170,6 +4173,14 @@ namespace Jondo.Unity.Server.Managers
                                       int desde = -1)
             => AQuien(combate, quienLanza, quien, efecto, desde >= 0 ? desde : quien.CellId).Contains(quien);
 
+        /// <summary>
+        /// The spell whose rows are being resolved (Resolver), so that a fighter immune to it is
+        /// nobody its rows can name: Otomai's toxin immunity potion (19507) leaves Toxina's
+        /// Toxinistrose no hold on its holder, neither a hit nor a poison set to tick
+        /// (Fighter.SpellImmunities). Resolver is synchronous, so the thread carries it.
+        /// </summary>
+        [ThreadStatic] private static int _spellOfTheRows;
+
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
                                                    Fighter objetivo, SpellEffect efecto,
                                                    int celdaApuntada = -1,
@@ -4177,6 +4188,20 @@ namespace Jondo.Unity.Server.Managers
                                                    IReadOnlyDictionary<Fighter, int> celdas = null,
                                                    bool soloAlObjetivo = false,
                                                    bool includeDeadTarget = false)
+        {
+            var named = NamedByTheMask(combate, quienLanza, objetivo, efecto, celdaApuntada, estados, celdas,
+                                       soloAlObjetivo, includeDeadTarget);
+            int spell = _spellOfTheRows;
+            return spell == 0 ? named : named.Where(f => f == null || !f.SpellImmunities.Contains(spell));
+        }
+
+        private static IEnumerable<Fighter> NamedByTheMask(FightInstance combate, Fighter quienLanza,
+                                                   Fighter objetivo, SpellEffect efecto,
+                                                   int celdaApuntada,
+                                                   IReadOnlyDictionary<Fighter, HashSet<int>> estados,
+                                                   IReadOnlyDictionary<Fighter, int> celdas,
+                                                   bool soloAlObjetivo,
+                                                   bool includeDeadTarget)
         {
             var mascara = efecto.TargetMask ?? "";
 

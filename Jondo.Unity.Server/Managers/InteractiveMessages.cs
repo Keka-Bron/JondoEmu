@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -53,6 +53,13 @@ namespace Jondo.Unity.Server.Managers
             /// Kanniball Village's exit room and its Kannibubble Scroll.
             /// </summary>
             public (int Item, int Count)[] Gives { get; init; } = Array.Empty<(int, int)>();
+
+            /// <summary>
+            /// The items of <see cref="Gives"/> that several elements hand out one share each («upTo» on the
+            /// gift): given while fewer than this are carried, each element once per character -- the six
+            /// opaline corals of the sunken ruins, one per coral (quest 1743).
+            /// </summary>
+            public IReadOnlyDictionary<int, int> UpTo { get; init; } = new Dictionary<int, int>();
 
             /// <summary>
             /// The interactive type it is declared with («type»), the client's name for it on hover;
@@ -156,6 +163,7 @@ namespace Jondo.Unity.Server.Managers
                                                      (int)Number(row, "order"), (int)Number(row, "emote"))
                     {
                         Gives = gives,
+                        UpTo = Caps(row),
                         Cases = cases,
                         Type = (int)Number(row, "type"),
                         Criterion = row.TryGetProperty("criterion", out var criterion)
@@ -180,15 +188,32 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// What of <see cref="Said.Gives"/> goes in the bag of whoever holds <paramref name="held"/>
         /// of each item: only what he carries none of, so pressing the urn again with the scroll still
-        /// in the bag gives no second one.
+        /// in the bag gives no second one. An item with an <see cref="Said.UpTo"/> goes in while fewer than that are carried, never past it,
+        /// and not at all from an element this character <paramref name="alreadyTook"/> from.
         /// </summary>
-        public static (int Item, int Count)[] HandOut(Said said, Func<int, int> held)
+        public static (int Item, int Count)[] HandOut(Said said, Func<int, int> held, bool alreadyTook = false)
         {
             var handed = new List<(int, int)>();
             foreach (var (item, count) in said.Gives)
-                if (held(item) <= 0) handed.Add((item, count));
+            {
+                int has = held(item);
+                if (said.UpTo.TryGetValue(item, out int cap))
+                {
+                    if (!alreadyTook && has < cap) handed.Add((item, Math.Min(count, cap - has)));
+                }
+                else if (has <= 0) handed.Add((item, count));
+            }
             return handed.ToArray();
         }
+
+        private static readonly ConcurrentDictionary<(long Character, long Map, int Element), bool> _took = new();
+
+        /// <summary>
+        /// Whether this character already took his share from this element; marks it taken. Kept for
+        /// the server's life, as the opened elements are.
+        /// </summary>
+        public static bool Took(long character, long mapId, int elementId)
+            => !_took.TryAdd((character, mapId, elementId), true);
 
         private static readonly ConcurrentDictionary<(long Character, long Map), int> _pulled = new();
 
@@ -246,6 +271,21 @@ namespace Jondo.Unity.Server.Managers
                     if (item > 0) gifts.Add((item, count > 0 ? count : 1));
                 }
             return gifts.ToArray();
+        }
+
+        /// <summary>A row's «upTo» per gift: item -> how many may be carried from all its elements.</summary>
+        private static IReadOnlyDictionary<int, int> Caps(JsonElement row)
+        {
+            var caps = new Dictionary<int, int>();
+            if (row.TryGetProperty("gives", out var list) && list.ValueKind == JsonValueKind.Array)
+                foreach (var gift in list.EnumerateArray())
+                {
+                    if (gift.ValueKind != JsonValueKind.Object) continue;
+                    int item = (int)Number(gift, "item");
+                    int cap = (int)Number(gift, "upTo");
+                    if (item > 0 && cap > 0) caps[item] = cap;
+                }
+            return caps;
         }
 
         private static long Number(JsonElement row, string name)
