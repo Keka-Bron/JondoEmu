@@ -8889,6 +8889,70 @@
       "orientation": 3,
       "criterion": "Qa=1757&Qo>11225&Qo<11228",
       "why": "Rilur Intrigant in Neptoon's cave (1757, 11227); INFERRED cell."
+    },
+    {
+      "map": 168560650,
+      "npc": 3351,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11283&Qo<11285",
+      "why": "Diver of the Black Star at [27,31] (1766); INFERRED cell."
+    },
+    {
+      "map": 168560640,
+      "npc": 3351,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11285&Qo<11288",
+      "why": "Diver at the temple entrance [27,26] (1766); INFERRED cell."
+    },
+    {
+      "map": 88088322,
+      "npc": 3345,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11287&Qo<11289",
+      "why": "Victor Schubert at [16,21] (1766); INFERRED cell."
+    },
+    {
+      "map": 156894216,
+      "npc": 3352,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11288&Qo<11291",
+      "why": "Black Star minion on the Turtle beach [33,12] (1766); INFERRED cell."
+    },
+    {
+      "map": 168558598,
+      "npc": 3305,
+      "cell": 289,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11291",
+      "why": "Mi-To at [25,29] (1766); INFERRED cell."
+    },
+    {
+      "map": 117964800,
+      "npc": 3353,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11296&Qo<11302",
+      "why": "Paula Rice on Kartonpath [21,8] (1766); INFERRED cell."
+    },
+    {
+      "map": 117964800,
+      "npc": 3354,
+      "cell": 287,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11299&Qo<11301",
+      "why": "The hurt Gobvio on Kartonpath (1766); INFERRED cell."
+    },
+    {
+      "map": 117965570,
+      "npc": 3291,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11300&Qo<11303",
+      "why": "Markaris at [22,6] (1766); INFERRED cell."
     }
   ]
 }

@@ -10062,6 +10062,58 @@
    "spawns": {"monster": 4490, "count": 1, "with": [4491, 4492, 4493, 4494, 4495, 4496], "attacks": true},
    "afterObjectives": [11145],
    "why": "«Enfréntate a los saboteadores»: the seven Mercemers, monsters 4490-4496 (Krisadam, Vintaner, Chiko, Doreilly, Ly, Brittney, Ryluck), whose spells are the ones Dofus pour les noobs lists in this order; they wait on the surface of the dive room [23,24]. Krisadam's own drop (criterion Qo=11146) is the contract 18063."
+  },
+  {
+   "objective": 11286,
+   "quest": 1766,
+   "kind": "enter",
+   "map": 168560640,
+   "requires": [{"item": 18112, "count": 1}],
+   "why": "«Conduce a la buceadora hasta la entrada del Templo de Kutulú» (886814): ticks on reaching [27,26] with the diver following (item 18112, effect 148)."
+  },
+  {
+   "objective": 11295,
+   "quest": 1766,
+   "kind": "enter",
+   "map": 168560640,
+   "gives": [{"item": 18114, "count": 1}],
+   "why": "«Atrae a una polilla de Kutulú» (886815): Dofus pour les noobs «Une fois arrivé sur la map, vous obtenez directement la Mite de Koutoulou»."
+  },
+  {
+   "objective": 11299,
+   "quest": 1766,
+   "kind": "beat",
+   "monster": 4521,
+   "map": 117964800,
+   "why": "«Defiéndete de los guardias» (886816): the fight that Paula Rice's reply 29332 starts against the Gobvio servil."
+  },
+  {
+   "objective": 4010,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [4065],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+  },
+  {
+   "objective": 4062,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [4065],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+  },
+  {
+   "objective": 4063,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [4065],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
+  },
+  {
+   "objective": 4064,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [4065],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: the mayor's four quests, «La tierra banquisa» (612), «Una alcaldesa de hielo» (613), «Full contact» (614) and «Los monólogos de la vacuna» (615), done; 4065, going back to her, is the last objective. Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes... retournez voir la Maire Cantile... vaccin provisoire»; the hand-over reply 8151 is offered only with the four finished."
   }
 ]
 }

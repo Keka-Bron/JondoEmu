@@ -44246,6 +44246,8 @@
           "choices": [
             { "reply": 7723, "quest": 613, "completes": 3669, "params": [[30, 3669]], "next": 7709 },
             { "reply": 7738, "next": 7709, "criterion": "Qf=613", "beforeQuest": 614 },
+            { "reply": 8149, "next": 8156, "criterion": "Qf=613", "beforeQuest": 649 },
+            { "reply": 8151, "next": 8157, "quest": 649, "completes": 4065, "params": [[30, 4065]], "criterion": "Qf=612&Qf=613&Qf=614&Qf=615" },
             { "reply": 7846 }
           ]
         },
@@ -44253,6 +44255,24 @@
           "message": 7709,
           "choices": [
             { "reply": 8156, "startsQuest": 614, "params": [[34, 614]] }
+          ]
+        },
+        {
+          "message": 8156,
+          "choices": [
+            { "reply": 8150, "startsQuest": 649, "params": [[34, 649]] }
+          ]
+        },
+        {
+          "message": 8157,
+          "choices": [
+            { "reply": 8152, "next": 8158 }
+          ]
+        },
+        {
+          "message": 8158,
+          "choices": [
+            { "reply": 8153, "startsQuest": 650, "params": [[34, 650]] }
           ]
         }
       ],
@@ -74884,7 +74904,8 @@
         { "criterion": "Qa=1749&Qo>11159&Qo<11160", "message": 24202 },
         { "canStart": 1757, "message": 24341 },
         { "quest": 1757, "pending": 11215, "message": 24342 },
-        { "quest": 1757, "pending": 11216, "message": 24343 }
+        { "quest": 1757, "pending": 11216, "message": 24343 },
+        { "criterion": "Qa=1766&Qo>11301&Qo<11302", "message": 24432 }
       ],
       "lines": [
         {
@@ -75020,9 +75041,21 @@
         {
           "message": 24358,
           "choices": []
+        },
+        {
+          "message": 24432,
+          "choices": [
+            { "reply": 29349, "quest": 1766, "next": 24433 }
+          ]
+        },
+        {
+          "message": 24433,
+          "choices": [
+            { "reply": 29348, "quest": 1766, "completes": 11302, "params": [[30, 11302]] }
+          ]
         }
       ],
-      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred. Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Markaris: help (24341), fight the divers (24342), thanks (24343), why they attacked (24344, 24358)."
+      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred. Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Markaris: help (24341), fight the divers (24342), thanks (24343), why they attacked (24344, 24358). El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). Markaris, rescued on [22,6]: «¿Nos vamos?» (29349, 24432, 24433), back to the Ryluglugl trench (29348)."
     },
   {
       "npc": 3252,
@@ -79685,7 +79718,10 @@
             { "reply": 29292, "quest": 1749, "next": 24384, "afterObjective": 11158, "beforeObjective": 11159, "completes": 11159, "params": [[30, 11159]] },
             { "reply": 29294, "quest": 1749, "next": 24385, "afterObjective": 11160, "beforeObjective": 11161, "completes": 11161, "params": [[30, 11161]] },
             { "reply": 29295, "quest": 1749, "next": 24387, "afterObjective": 11162, "beforeObjective": 11163, "completes": 11163, "params": [[30, 11163]] },
-            { "reply": 29355 }
+            { "reply": 29355 },
+            { "reply": 29325, "quest": 1766, "next": 24412, "afterObjective": 11292, "beforeObjective": 11293, "completes": 11293, "params": [[30, 11293]] },
+            { "reply": 29329, "quest": 1766, "next": 24413, "afterObjective": 11295, "beforeObjective": 11296, "completes": 11296, "params": [[30, 11296]] },
+            { "reply": 29358, "quest": 1766, "next": 24437, "afterObjective": 11303, "beforeObjective": 11304 }
           ]
         },
         {
@@ -79715,9 +79751,51 @@
         {
           "message": 24387,
           "choices": []
+        },
+        {
+          "message": 24413,
+          "choices": [
+            { "reply": 29328, "quest": 1766, "next": 24414 }
+          ]
+        },
+        {
+          "message": 24414,
+          "choices": [
+            { "reply": 29327, "quest": 1766, "next": 24415 }
+          ]
+        },
+        {
+          "message": 24415,
+          "choices": [
+            { "reply": 29326, "quest": 1766, "next": 24416 }
+          ]
+        },
+        {
+          "message": 24416,
+          "choices": []
+        },
+        {
+          "message": 24437,
+          "choices": [
+            { "reply": 29357, "quest": 1766, "next": 24438 }
+          ]
+        },
+        {
+          "message": 24438,
+          "choices": [
+            { "reply": 29356, "quest": 1766, "next": 24439, "completes": 11304, "params": [[30, 11304]] }
+          ]
+        },
+        {
+          "message": 24439,
+          "choices": []
+        },
+        {
+          "message": 24412,
+          "choices": []
         }
       ],
-      "why": "Mi-To (3305), «Memorias de un amnesico» (1749, Dofus pour les noobs): the cave talks of the quest, 29290-29295 / 24381-24387; the others keep his generic greeting (29355)."
+      "why": "Mi-To (3305), «Memorias de un amnesico» (1749, Dofus pour les noobs): the cave talks of the quest, 29290-29295 / 24381-24387; the others keep his generic greeting (29355). El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). Mi-To [25,29]: the problem (29325, 24412), the moth handed over and implanted (29329, 24413-24416), and its removal (29358, 24437-24439)."
     },
     {
       "npc": 1372,
@@ -80889,6 +80967,258 @@
         }
       ],
       "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Rilur in Neptoon's cave: «Impedir que los trithones ejecuten su plan» starts the fight with two Riluros (24373)."
+    },
+    {
+      "npc": 3350,
+      "map": 168559624,
+      "opening": 24395,
+      "lines": [
+        {
+          "message": 24395,
+          "choices": [
+            { "reply": 29314, "next": 24396, "beforeQuest": 1766 },
+            { "reply": 29324, "quest": 1766, "next": 24409, "afterObjective": 11290, "beforeObjective": 11291 },
+            { "reply": 29330, "quest": 1766, "next": 24417, "afterObjective": 11296, "beforeObjective": 11297, "completes": 11297, "params": [[30, 11297]] },
+            { "reply": 29353, "quest": 1766, "next": 24434, "afterObjective": 11302, "beforeObjective": 11303 }
+          ]
+        },
+        {
+          "message": 24396,
+          "choices": [
+            { "reply": 29313, "next": 24397, "beforeQuest": 1766 }
+          ]
+        },
+        {
+          "message": 24397,
+          "choices": [
+            { "reply": 29312, "next": 24398, "beforeQuest": 1766 }
+          ]
+        },
+        {
+          "message": 24398,
+          "choices": [
+            { "reply": 29311, "next": 24399, "beforeQuest": 1766 }
+          ]
+        },
+        {
+          "message": 24399,
+          "choices": [
+            { "reply": 29310, "next": 24400, "beforeQuest": 1766 }
+          ]
+        },
+        {
+          "message": 24400,
+          "choices": [
+            { "reply": 29309, "startsQuest": 1766, "params": [[34, 1766]] }
+          ]
+        },
+        {
+          "message": 24409,
+          "choices": [
+            { "reply": 29323, "quest": 1766, "next": 24410 }
+          ]
+        },
+        {
+          "message": 24410,
+          "choices": [
+            { "reply": 29322, "quest": 1766, "next": 24411 }
+          ]
+        },
+        {
+          "message": 24411,
+          "choices": [
+            { "reply": 29321, "quest": 1766, "completes": 11291, "params": [[30, 11291]] }
+          ]
+        },
+        {
+          "message": 24417,
+          "choices": []
+        },
+        {
+          "message": 24434,
+          "choices": [
+            { "reply": 29352, "quest": 1766, "next": 24435 }
+          ]
+        },
+        {
+          "message": 24435,
+          "choices": [
+            { "reply": 29351, "quest": 1766, "next": 24436, "completes": 11303, "params": [[30, 11303]] }
+          ]
+        },
+        {
+          "message": 24436,
+          "choices": []
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). Calamarcus: the pre-quest chain 24395-24400 (start 29309), the Markaris transfer 24409-24411, the information 24417, the identity 24434-24436."
+    },
+    {
+      "npc": 3351,
+      "map": 0,
+      "opening": 24401,
+      "openings": [
+        { "criterion": "Qa=1766&Qo>11286&Qo<11287", "message": 24403 }
+      ],
+      "lines": [
+        {
+          "message": 24401,
+          "choices": [
+            { "reply": 29316, "quest": 1766, "next": 24402, "afterObjective": 11284, "beforeObjective": 11285 }
+          ]
+        },
+        {
+          "message": 24402,
+          "choices": [
+            { "reply": 29315, "quest": 1766, "gives": 18112, "completes": 11285, "params": [[30, 11285]] }
+          ]
+        },
+        {
+          "message": 24403,
+          "choices": [
+            { "reply": 29318, "quest": 1766, "next": 24404, "afterObjective": 11286, "beforeObjective": 11287 }
+          ]
+        },
+        {
+          "message": 24404,
+          "choices": [
+            { "reply": 29317, "quest": 1766, "takes": 18112, "completes": 11287, "params": [[30, 11287]] }
+          ]
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). The diver: pass for an agent (24401, 24402), guide her (29315 hands her over as a follower, 18112), and at the temple entrance (24403, 24404, 29317 takes her back)."
+    },
+    {
+      "npc": 3352,
+      "map": 0,
+      "opening": 24407,
+      "lines": [
+        {
+          "message": 24407,
+          "choices": [
+            { "reply": 29320, "quest": 1766, "next": 24408, "completes": 11290, "params": [[30, 11290]] }
+          ]
+        },
+        {
+          "message": 24408,
+          "choices": []
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). The minion on the Turtle beach: where is the prisoner (29320, 24408)."
+    },
+    {
+      "npc": 3345,
+      "map": 88088322,
+      "opening": 24405,
+      "lines": [
+        {
+          "message": 24405,
+          "choices": [
+            { "reply": 29319, "quest": 1766, "next": 24406, "completes": 11288, "params": [[30, 11288]] }
+          ]
+        },
+        {
+          "message": 24406,
+          "choices": []
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). Victor at [16,21]: asking about Markaris (29319), he handed him to Paula Rice (24406)."
+    },
+    {
+      "npc": 3353,
+      "map": 117964800,
+      "opening": 24418,
+      "openings": [
+        { "criterion": "Qa=1766&Qo>11300", "message": 24430 }
+      ],
+      "lines": [
+        {
+          "message": 24418,
+          "choices": [
+            { "reply": 29336, "quest": 1766, "next": 24419, "afterObjective": 11297, "beforeObjective": 11299 }
+          ]
+        },
+        {
+          "message": 24419,
+          "choices": [
+            { "reply": 29335, "quest": 1766, "next": 24420 }
+          ]
+        },
+        {
+          "message": 24420,
+          "choices": [
+            { "reply": 29334, "quest": 1766, "next": 24421 }
+          ]
+        },
+        {
+          "message": 24421,
+          "choices": [
+            { "reply": 29333, "quest": 1766, "next": 24422 }
+          ]
+        },
+        {
+          "message": 24422,
+          "choices": [
+            { "reply": 29332, "quest": 1766 }
+          ]
+        },
+        {
+          "message": 24430,
+          "choices": [
+            { "reply": 29345, "quest": 1766, "next": 24431, "afterObjective": 11300, "beforeObjective": 11301, "completes": 11301, "params": [[30, 11301]] }
+          ]
+        },
+        {
+          "message": 24431,
+          "choices": []
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). Paula Rice: the excuse (24418-24421), the guards fight (reply 29332 on 24422), then the demand for Markaris (24430, 29345, 24431)."
+    },
+    {
+      "npc": 3354,
+      "map": 117964800,
+      "opening": 24424,
+      "lines": [
+        {
+          "message": 24424,
+          "choices": [
+            { "reply": 29343, "quest": 1766, "next": 24425 }
+          ]
+        },
+        {
+          "message": 24425,
+          "choices": [
+            { "reply": 29342, "quest": 1766, "next": 24426 }
+          ]
+        },
+        {
+          "message": 24426,
+          "choices": [
+            { "reply": 29344, "quest": 1766, "next": 24427 }
+          ]
+        },
+        {
+          "message": 24427,
+          "choices": [
+            { "reply": 29340, "quest": 1766, "next": 24428 },
+            { "reply": 29341, "quest": 1766, "next": 24428 }
+          ]
+        },
+        {
+          "message": 24428,
+          "choices": [
+            { "reply": 29339, "quest": 1766, "next": 24429 }
+          ]
+        },
+        {
+          "message": 24429,
+          "choices": [
+            { "reply": 29338, "quest": 1766, "completes": 11300, "params": [[30, 11300]] }
+          ]
+        }
+      ],
+      "why": "El efecto Paula Rice (1766), Dofus pour les noobs «L'effet Paula Rice». Link order of lines INFERRED from the texts (no capture). The hurt Gobvio: threaten, ask about Paula Rice, look at his dress, he says the Maquinador (24424-24429); 29338 leaves to look for Markaris."
     }
   ]
 }

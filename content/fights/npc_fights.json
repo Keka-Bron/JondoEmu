@@ -2113,6 +2113,9 @@
       "why": "1757: «Un combat se lance contre 2 x Plongeuse Agressive» (Dofus pour les noobs)." },
     { "npc": 3347, "map": 168820752, "reply": 29275,
       "monsters": [ { "monster": 4512, "grade": 0 }, { "monster": 4512, "grade": 0 } ],
-      "why": "1757: «Un combat se lance alors contre 2 x Rilur Intrigant» (Dofus pour les noobs)." }
+      "why": "1757: «Un combat se lance alors contre 2 x Rilur Intrigant» (Dofus pour les noobs)." },
+    { "npc": 3353, "map": 117964800, "reply": 29332,
+      "monsters": [ { "monster": 4521, "grade": 0 }, { "monster": 4521, "grade": 0 }, { "monster": 4521, "grade": 0 } ],
+      "why": "1766: «Un combat se lance contre des monstres de la zone» (Dofus pour les noobs); the Gobvio servil (4521), INFERRED count of 3." }
   ]
 }
