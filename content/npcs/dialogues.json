@@ -45116,7 +45116,7 @@
             { "reply": 35577, "next": 29613, "quest": 1942, "afterObjective": 13499, "beforeObjective": 13500, "completes": 13500, "params": [[30, 13500]] },
             { "reply": 35580, "next": 29614, "quest": 1942, "afterObjective": 13500, "beforeObjective": 13502, "completes": 13502, "completesAll": [13501, 13502], "params": [[30, 13502]] },
             { "reply": 36443, "quest": 1945, "afterObjective": 13752, "beforeObjective": 13753, "next": 30265 },
-            { "reply": 36446, "quest": 1945, "afterObjective": 13753, "beforeObjective": 13755, "completesAll": [13754, 13755], "completes": 13755, "params": [[30, 13755]], "next": 30267 }
+            { "reply": 36446, "quest": 1945, "afterObjective": 13753, "beforeObjective": 13755, "completesAll": [13754, 13755], "completes": 13755, "params": [[30, 13755]], "gives": 19564, "givesCount": 2, "next": 30267 }
           ]
         },
         {
@@ -45190,7 +45190,7 @@
         {
           "message": 30267,
           "choices": [
-            { "reply": 36445, "quest": 1945, "gives": 19564, "givesCount": 2, "next": 30268 }
+            { "reply": 36445, "quest": 1945, "next": 30268 }
           ]
         },
         {

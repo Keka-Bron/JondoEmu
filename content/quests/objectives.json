@@ -10005,20 +10005,12 @@
    "why": "«Pregunta a los steamers» (744965): «Intentar que entre en razón» (36431) to the steamer of the hold's bottom, who thinks she is in a nightmare (Dofus pour les noobs, «Toucher le fond»)."
   },
   {
-   "objective": 13758,
-   "quest": 1945,
-   "kind": "enter",
-   "map": 186387972,
-   "afterObjectives": [13757],
-   "why": "«Encuentra el vórtice» (type 4): arriving at [-45,-80] (186387972), the vortex's map (Dofus pour les noobs, «Toucher le fond»)."
-  },
-  {
    "objective": 13759,
    "quest": 1945,
-   "kind": "enter",
-   "map": 186646534,
+   "kind": "click",
+   "elements": [{"map": 186387972, "element": 511916}],
    "afterObjectives": [13758],
-   "why": "«Toma el vórtice submarino»: the vortex (passage of element 511916) brings the character to the grotto (186646534) (Dofus pour les noobs, «Toucher le fond»)."
+   "why": "«Toma el vórtice submarino»: the vortex of [-45,-80] (element 511916 of 186387972) is taken, and it sweeps the character into the grotto (186646534) (Dofus pour les noobs, «Toucher le fond»)."
   },
   {
    "objective": 13760,
@@ -10030,27 +10022,18 @@
    "why": "«Registra la gruta»: the element 512000 of the grotto (gfx 62180, cell 285: INFERRED to be the monolith's seat among the grotto's three quest-only elements) brings Monolito in (Dofus pour les noobs, «Toucher le fond»)."
   },
   {
-   "objective": 13761,
-   "quest": 1945,
-   "kind": "beat",
-   "monster": 5211,
-   "map": 186646534,
-   "afterObjectives": [13760],
-   "why": "«Vence a 1 x Monolito»: the monolith of the grotto, in a solo fight (Dofus pour les noobs, «Toucher le fond»)."
-  },
-  {
    "objective": 13762,
    "quest": 1945,
-   "kind": "enter",
-   "map": 187433986,
+   "kind": "click",
+   "elements": [{"map": 186646534, "element": 512002}],
    "afterObjectives": [13761],
    "why": "«Toma el pasadizo subterráneo»: the passage of the grotto (element 512002) ends at Bethel's Tower (187433986) (Dofus pour les noobs, «Toucher le fond»)."
   },
   {
    "objective": 13763,
    "quest": 1945,
-   "kind": "enter",
-   "map": 186385924,
+   "kind": "click",
+   "elements": [{"map": 187433986, "element": 512003}],
    "afterObjectives": [13762],
    "why": "«Busca una salida»: the tower's stairs (element 512003) bring the character back to Zrid's map [-47,-80] (Dofus pour les noobs, «Toucher le fond»)."
   }

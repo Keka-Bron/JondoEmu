@@ -1707,6 +1707,18 @@ namespace Jondo.Unity.Server.Handlers
             // lqn 56 and ied 1633 in the capture.
             int questNpcId = SessionContext.State.OpenDialogueNpcId;
             int completesAfterClosing = 0;
+            // A «completes» that is one of its own «completesAll» waits behind the others: they go
+            // first, so it is open when its turn comes and the reply's gift goes with it (Albert's
+            // cakes in «1945»).
+            bool othersDone = false;
+            if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.CompletesAll.Contains(elegidaAhora.Completes)
+                && elegidaAhora.StartsQuest == 0 && !sinPagar)
+            {
+                foreach (int objective in elegidaAhora.CompletesAll)
+                    if (objective != elegidaAhora.Completes)
+                        await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
+                othersDone = true;
+            }
             if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
@@ -1725,7 +1737,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // The other objectives the reply does, all at once: Vey Gana's four slobbers.
-            if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
+            if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar && !othersDone)
             {
                 foreach (int objective in elegidaAhora.CompletesAll)
                     await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
