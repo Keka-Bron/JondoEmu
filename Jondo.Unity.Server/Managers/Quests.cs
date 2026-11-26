@@ -1823,6 +1823,11 @@ namespace Jondo.Unity.Server.Managers
             await SendStepAsync(session, questId);
             if (!session.HasTransport) return true;
 
+            // Objectives that wait on others already done: «Bienvenido a Frigost» (649) is taken once
+            // the mayor's four quests are finished, and their four objectives close as it starts, since
+            // no later tick will ever come to close them.
+            await AfterObjectivesAsync(session);
+
             // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(session, session.MapId);
             await RedrawQuestElementsAsync(session, questId);
