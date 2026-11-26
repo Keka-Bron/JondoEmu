@@ -78679,6 +78679,7 @@
           "message": 27188,
           "choices": [
             { "reply": 32671, "quest": 1911, "afterObjective": 13118, "beforeObjective": 13120, "completes": 13119, "params": [[30, 13119]], "criterion": "PO>19177,0" },
+            { "reply": 32671, "quest": 1911, "afterObjective": 13119, "beforeObjective": 13120 },
             { "reply": 32672 }
           ]
         },
@@ -78695,7 +78696,7 @@
           ]
         }
       ],
-      "why": "«Le bonheur est dans le spray» (1911): Lady Urikoíris (Rainikrone) in the hidden room: the remedy is sprayed on her (32671, the tactical fight, 13119/13120), then the portion of happiness is asked for (35159, 35158; 13121). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+      "why": "«Le bonheur est dans le spray» (1911): Lady Urikoíris (Rainikrone) in the hidden room: the remedy is sprayed on her (32671, the tactical fight, 13119/13120), then the portion of happiness is asked for (35159, 35158; 13121). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies). Retry of the tactical fight: with 13119 done and 13120 pending the same reply (32671) is offered again, without spending the remedy, so a lost fight can be replayed."
     },
     {
       "npc": 4093,
