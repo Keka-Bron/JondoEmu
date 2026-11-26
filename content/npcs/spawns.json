@@ -8953,6 +8953,117 @@
       "orientation": 1,
       "criterion": "(Qa=589&Qo=3741)|(Qa=614&Qo=3686)",
       "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]; also «Full contact» (614, «Jean-Pierre Kofkof à la taverne en [-77,-38]»), objective 3686. INFERRED cell."
+    },
+    {
+      "map": 54531097,
+      "npc": 1290,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "Qa=577",
+      "why": "Dofus pour les noobs («Pêche en eaux gelées»): Valy Domidat (Kristina Pielhova) in the Frigost workshop [-75,-38], beside Francky. INFERRED cell."
+    },
+    {
+      "map": 184287494,
+      "npc": 4238,
+      "cell": 356,
+      "orientation": 1,
+      "remove": true,
+      "why": "1940: the Death Slayer only stands in the tomb room once the tomb was prayed at; the derived placement stood always."
+    },
+    {
+      "map": 184287494,
+      "npc": 4238,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=1940&Qo>13585&Qo<13588",
+      "why": "«Reza ante la tumba del Asesino de Muerte» (13585): after praying at the tomb the Death Slayer appears; he leaves after his last words (13588) (Dofus pour les noobs («La guerre des Marches»)). Cell beside the tomb, INFERRED."
+    },
+    {
+      "map": 184290562,
+      "npc": 4239,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1940&Qo>13585&Qo<13587",
+      "why": "Arak'Imperitax (NPC 4239) in the annex room of the Infernal Well, until beaten (13587) (Dofus pour les noobs («La guerre des Marches»): «parler à l'Arak'Imperitax: Affronter l'arakne démoniaque»). Cell INFERRED."
+    },
+    {
+      "map": 163054594,
+      "npc": 3428,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Rimanda, dean of the hypermages, in the Temple of the Hypermages [38,-21] (map 163054594), where every later step of hers is catalogued (2421, 2473, 2701, 3078). 1955's step 13741 lists a map id (30334) that does not exist in the client, so this placement is INFERRED from those steps; no capture places her. Cell 300 INFERRED."
+    },
+    {
+      "map": 165154311,
+      "npc": 4287,
+      "cell": 329,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: the shaman only waits here until he agrees to follow."
+    },
+    {
+      "map": 165154311,
+      "npc": 4287,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa!1956|Qo<13713",
+      "why": "The crujidor shaman waits at [-9,-28] until the character agrees to guide him (13713) (Dofus pour les noobs («Craquements de cœur»)); the derived placement."
+    },
+    {
+      "map": 186908930,
+      "npc": 4287,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13713&Qo<13717",
+      "why": "The shaman at the tower's foot [-10,-30] from when he is guided there until he is taken into the cave (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695104,
+      "npc": 4287,
+      "cell": 282,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13717&Qo<13719",
+      "why": "The shaman on the cave's top floor for the second ritual (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695108,
+      "npc": 4287,
+      "cell": 283,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13719&Qo<13722",
+      "why": "The shaman in the depths for the third ritual and the last stone (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695108,
+      "npc": 4291,
+      "cell": 328,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: the ancestral crujidor only appears after the last ritual."
+    },
+    {
+      "map": 187695108,
+      "npc": 4291,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13721&Qo<13723",
+      "why": "The ancestral crujidor appears when the ritual ends (13721) until it is beaten (13723) (Dofus pour les noobs («Craquements de cœur»): «Un Craqueleur ancestral fait alors son apparition»)."
+    },
+    {
+      "map": 188219392,
+      "npc": 4295,
+      "cell": 315,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: Yopuka only appears when the priest has seen the heart."
+    },
+    {
+      "map": 188219392,
+      "npc": 4295,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13724&Qo<13725",
+      "why": "The god Yopuka appears once the priest has seen the ancestral heart (13724) until the character has talked to him (Dofus pour les noobs («Craquements de cœur»): «Le Dieu Iop fait alors son apparition»). The derived cell."
     }
   ]
 }

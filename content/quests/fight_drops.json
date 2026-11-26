@@ -253,6 +253,13 @@
   {"item": 18108, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168559628&PO!18108", "why": "1765 (Fhtagn): P'Koutoulou Ch'ton drops only from the klutist (4452) at [26,32], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."},
   {"item": 18109, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168558606&PO!18109", "why": "1765 (Fhtagn): P'Koutoulou Zothoth drops only from the klutist (4452) at [25,33], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."},
   {"item": 18110, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168559632&PO!18110", "why": "1765 (Fhtagn): P'Koutoulou Glaakiph drops only from the klutist (4452) at [26,34], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."},
-  {"item": 19276, "percent": 100, "monsters": [5022], "criterion": "Qa=1915&Qo>13180&Qo<13181&PO!19276", "why": "1915 «Es hora de morir» (13181): the old siegalak (5022) drops the old siegalak cloth (19276) while it is wanted (Dofus pour les noobs, «Il est temps de mourir»: fight the macabre riders and the old siegalak). 100 percent INFERRED."}
+  {"item": 19276, "percent": 100, "monsters": [5022], "criterion": "Qa=1915&Qo>13180&Qo<13181&PO!19276", "why": "1915 «Es hora de morir» (13181): the old siegalak (5022) drops the old siegalak cloth (19276) while it is wanted (Dofus pour les noobs, «Il est temps de mourir»: fight the macabre riders and the old siegalak). 100 percent INFERRED."},
+    {
+      "item": 11261,
+      "percent": 100,
+      "monsters": [2848],
+      "criterion": "Qs=1150&Qo>3779&PO!11261",
+      "why": "577: «vous droperez l'anneau automatiquement sur le combat de la dernière salle» (Dofus pour les noobs, Pêche en eaux gelées); the last room of the Mansot Royal dungeon is the Morsagüino Real (2848). The ring is Damar's alliance (11261), once he has told of it."
+    }
   ]
 }

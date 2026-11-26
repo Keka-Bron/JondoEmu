@@ -74433,15 +74433,37 @@
         {
           "message": 7823,
           "choices": [
-            { "reply": 7844, "quest": 591, "completes": 3757, "params": [[30, 3757]], "next": 7825, "criterion": "Qa=591&Qo=3757" }
+            { "reply": 7844, "quest": 591, "completes": 3757, "params": [[30, 3757]], "next": 7825, "criterion": "Qa=591&Qo=3757" },
+            { "reply": 7857, "next": 7845, "criterion": "PL>109&Qa!577&Qf!577" },
+            { "reply": 7859, "quest": 577, "completes": 3777, "completesAll": [3771, 3772, 3773, 3774, 3775, 3776, 3777], "params": [[30, 3777]], "next": 7846 },
+            { "reply": 7861, "quest": 577, "completes": 3779, "params": [[30, 3779]], "criterion": "Qa=577&Qo=3779", "next": 7848 },
+            { "reply": 7863, "quest": 577, "completes": 3781, "params": [[30, 3781]], "criterion": "Qa=577&Qo>3778&Qo=3781", "next": 7850 }
           ]
         },
         {
           "message": 7825,
           "choices": []
+        },
+        {
+          "message": 7845,
+          "choices": [
+            { "reply": 7858, "startsQuest": 577, "params": [[34, 577]] }
+          ]
+        },
+        {
+          "message": 7846,
+          "choices": []
+        },
+        {
+          "message": 7848,
+          "choices": []
+        },
+        {
+          "message": 7850,
+          "choices": []
         }
       ],
-      "why": "Damar, chief of the fishermen [-67,-54] (Dofus pour les noobs («Les chasseurs»)): asked about Gerard (7844) he has not seen him (7825) and closes 3757. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Damar, chief of the fishermen [-67,-54] (Dofus pour les noobs («Les chasseurs»)): asked about Gerard (7844) he has not seen him (7825) and closes 3757. INFERRED order of the replies: the client carries sentences and answers but not which go together. 577 «Pesca en aguas congeladas» (Dofus pour les noobs): asked «¿Necesitas ayuda?» (7857) he lists the materials (7845, the quest's first dialog) and 7858 starts it; 7859 hands over the 7 bring objectives at once («il faut tout donner d'un coup») and he sends you to Kristina (7846); 7861 brings Kristina's answer and he tells of the lost alliance (7848); 7863 brings her answer to the ring and he gives the reward (7850). INFERRED reply order: the client carries sentences and answers, not which go together."
     },
   {
       "npc": 1273,
@@ -74451,15 +74473,46 @@
         {
           "message": 7828,
           "choices": [
-            { "reply": 7844, "quest": 591, "completes": 3759, "params": [[30, 3759]], "next": 7829, "criterion": "Qa=591&Qo=3759" }
+            { "reply": 7844, "quest": 591, "completes": 3759, "params": [[30, 3759]], "next": 7829, "criterion": "Qa=591&Qo=3759" },
+            { "reply": 7864, "next": 51004, "criterion": "PL>109&Qf=577&Qa!578&Qf!578" },
+            { "reply": 7866, "criterion": "Qa=578&Qo=3782" },
+            { "reply": 68336, "next": 51005, "criterion": "Qa=578&Qo>3782&Qo=3783" },
+            { "reply": 7868, "criterion": "Qa=628&Qo=3784" },
+            { "reply": 68338, "next": 51006, "criterion": "Qa=628&Qo>3784&Qo=3785" },
+            { "reply": 7870, "criterion": "Qa=629&Qo=3786" },
+            { "reply": 7871, "next": 7853, "criterion": "Qa=629&Qo>3786&Qo=3787" }
           ]
         },
         {
           "message": 7829,
           "choices": []
+        },
+        {
+          "message": 51004,
+          "choices": [
+            { "reply": 68332, "startsQuest": 578, "params": [[34, 578]] }
+          ]
+        },
+        {
+          "message": 51005,
+          "choices": [
+            { "reply": 68335, "startsQuest": 628, "params": [[34, 628]] }
+          ]
+        },
+        {
+          "message": 51006,
+          "choices": [
+            { "reply": 68337, "startsQuest": 629, "params": [[34, 629]] }
+          ]
+        },
+        {
+          "message": 7853,
+          "choices": [
+            { "reply": 68339, "startsQuest": 579, "params": [[34, 579]] }
+          ]
         }
       ],
-      "why": "Mel at the Mansot dungeon entrance [-64,-55] (Dofus pour les noobs («Les chasseurs»)): «¿Sabes algo de Gerard, el cazador?» (7844) closes 3759; he left for the cavern (7829). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Mel at the Mansot dungeon entrance [-64,-55] (Dofus pour les noobs («Les chasseurs»)): «¿Sabes algo de Gerard, el cazador?» (7844) closes 3759; he left for the cavern (7829). INFERRED order of the replies: the client carries sentences and answers but not which go together. 578/628/629 (Dofus pour les noobs «La pêche à Mel», «Mel odieuse», «Mel au drame»): «Parlez à Mel pour lancer la quête... combattre un groupe de mansots... retournez voir Mel et annoncez lui la mort»; finishing one starts the next («la quête se lance automatiquement»), the last starts 579 on the step dialog 7853. Start replies 7864 (offer help) then 68332/68335/68337, fights 7866/7868/7870, reports 68336/68338/7871. INFERRED order of the replies."
     },
   {
       "npc": 6689,
@@ -80360,6 +80413,10 @@
       "npc": 4174,
       "map": 0,
       "opening": 29523,
+      "openings": [
+        { "quest": 1955, "objective": 13739, "message": 30328 },
+        { "quest": 1955, "objective": 13738, "message": 30335 }
+      ],
       "lines": [
         {
           "message": 29523,
@@ -80367,7 +80424,9 @@
             { "reply": 35451, "next": 29524 },
             { "reply": 36409, "quest": 1945, "beforeObjective": 13743, "completes": 13743, "params": [[30, 13743]], "next": 30235 },
             { "reply": 36435, "quest": 1945, "afterObjective": 13751, "beforeObjective": 13752, "next": 30258 },
-            { "reply": 36490, "quest": 1945, "afterObjective": 13764, "beforeObjective": 13765, "next": 30300 }
+            { "reply": 36490, "quest": 1945, "afterObjective": 13764, "beforeObjective": 13765, "next": 30300 },
+            { "reply": 36519, "next": 30316, "quest": 1955, "beforeObjective": 13594 },
+            { "reply": 36521, "next": 30336, "quest": 1955, "afterObjective": 13594, "beforeObjective": 13738, "completes": 13738, "params": [[30, 13738]] }
           ]
         },
         {
@@ -80423,9 +80482,93 @@
           "choices": [
             { "reply": 36487, "quest": 1945, "completes": 13765, "params": [[30, 13765]] }
           ]
+        },
+        {
+          "message": 30316,
+          "choices": [
+            { "reply": 36518, "next": 30317 }
+          ]
+        },
+        {
+          "message": 30317,
+          "choices": [
+            { "reply": 36517, "quest": 1955, "completes": 13594, "params": [[30, 13594]] }
+          ]
+        },
+        {
+          "message": 30336,
+          "choices": [
+            { "reply": 36544, "next": 30337 }
+          ]
+        },
+        {
+          "message": 30337,
+          "choices": [
+            { "reply": 36543, "next": 30338 }
+          ]
+        },
+        {
+          "message": 30338,
+          "choices": [
+            { "reply": 36542, "next": 30339 }
+          ]
+        },
+        {
+          "message": 30339,
+          "choices": [
+            { "reply": 36541 }
+          ]
+        },
+        {
+          "message": 30335,
+          "choices": [
+            { "reply": 36540, "quest": 1955, "afterObjective": 13738, "beforeObjective": 13739 }
+          ]
+        },
+        {
+          "message": 30328,
+          "choices": [
+            { "reply": 36539, "next": 30329 }
+          ]
+        },
+        {
+          "message": 30329,
+          "choices": [
+            { "reply": 36538, "next": 30330 }
+          ]
+        },
+        {
+          "message": 30330,
+          "choices": [
+            { "reply": 36537, "next": 30331 }
+          ]
+        },
+        {
+          "message": 30331,
+          "choices": [
+            { "reply": 36536, "next": 30332 }
+          ]
+        },
+        {
+          "message": 30332,
+          "choices": [
+            { "reply": 36535, "next": 30333 }
+          ]
+        },
+        {
+          "message": 30333,
+          "choices": [
+            { "reply": 36534, "next": 30334, "quest": 1955, "afterObjective": 13739, "beforeObjective": 13740, "completes": 13740, "params": [[30, 13740]] }
+          ]
+        },
+        {
+          "message": 30334,
+          "choices": [
+            { "reply": 36533 }
+          ]
         }
       ],
-      "why": "«Toucher le fond» (1945, 13743, 13752, 13765): Lilia Nha in the hold of the ship [-48,-78] (Dofus pour les noobs, «Toucher le fond»). «Se renseigner sur l'auteur du carnet» (36409): he drowned himself in a rum barrel (30235), a waste of time unless it matters (30257), his mind is shut (30236). «Demander des suggestions pour réussir à discuter avec les Steamers fous» (36435): benzo cake (30258), from the doctor of Frigost (30259). «Discuter des découvertes concernant le carnet» (36490, 30300-30302) at the end. Reply order INFERRED from the message ids (the guide gives the story, not the replies). 29523 is her own greeting; 35451 «¿Qué haces en el barco?» keeps her plain talk (29524, 35452 to leave)."
+      "why": "«Toucher le fond» (1945, 13743, 13752, 13765): Lilia Nha in the hold of the ship [-48,-78] (Dofus pour les noobs, «Toucher le fond»). «Se renseigner sur l'auteur du carnet» (36409): he drowned himself in a rum barrel (30235), a waste of time unless it matters (30257), his mind is shut (30236). «Demander des suggestions pour réussir à discuter avec les Steamers fous» (36435): benzo cake (30258), from the doctor of Frigost (30259). «Discuter des découvertes concernant le carnet» (36490, 30300-30302) at the end. Reply order INFERRED from the message ids (the guide gives the story, not the replies). 29523 is her own greeting; 35451 «¿Qué haces en el barco?» keeps her plain talk (29524, 35452 to leave). Lilia Nha (4174), «Toda el agua al molino» (1955): sent by the Sram priest (36519, 30316, 36518, 30317, 36517 ends 13594); the ten shards handed over (36521) and the ritual (30336 «Darle el rollo de pergamino.» 36544, 30337, 36543, 30338, 36542, 30339, 36541); the spirit fight (30335, 36540); after it (30328, 36539, 30329, 36538, 30330, 36537, 30331, 36536, 30332, 36535, 30333) and the pearl shown (36534 ends 13740, 30334, 36533) (Dofus pour les noobs («Toute l'eau au moulin»)). Reply order INFERRED from the message and reply ids."
     },
     {
       "npc": 4303,
@@ -81324,6 +81467,503 @@
         }
       ],
       "why": "The Priestess of Uginak (4247): «La guerra de los Peldaños» (1940). «Cuéntame más cosas sobre los peldaños magmáticos.» (36281) after talking to her inside «Los corazones lívidos» (1954, objective 13590), the war's story (30151, «Seguir escuchando.» 36280), the offer (30152, «Aceptar sin dudar.» 36278, or «Rechazar e irte.» 36279) and the step's line 30153 («Dirigirte a Brakmar.» 36277 starts the quest). Objective 13580: «Aludir al Asesino de Muerte.» (36299) with her answers 30162-30164 («Va a ser difícil convencerlo...» 36298, «Hacer que aparezca un demonio me parece peligroso.» 36297, «Lo haré lo mejor que pueda.» 36296). End, 13589: «Relatar brevemente los últimos acontecimientos.» (36331), 30186 and «Hasta luego.» (36330) (Dofus pour les noobs («La guerre des Marches»)). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 1290,
+      "map": 54531097,
+      "opening": 7806,
+      "lines": [
+        {
+          "message": 7806,
+          "choices": [
+            { "reply": 7860, "criterion": "Qa=577&Qo=3779", "next": 7847 },
+            { "reply": 7862, "quest": 577, "completes": 3778, "params": [[30, 3778]], "criterion": "Qa=577&Qo>3780&Qo=3778", "next": 7849 },
+            { "reply": 7846 }
+          ]
+        },
+        {
+          "message": 7847,
+          "choices": []
+        },
+        {
+          "message": 7849,
+          "choices": []
+        }
+      ],
+      "why": "Kristina Pielhova (the guide's Valy Domidat) in her workshop [-75,-38]: 577 «Pesca en aguas congeladas», «Parlez alors à Valy Domidat qui refusera d'aider Damar dans un premier temps» (7860 gives Damar's list, 7847 she refuses) and «Rapportez l'alliance de Damar à Valy Domidat» (7862 hands over the ring 11261, 7849). INFERRED order of the replies."
+    },
+    {
+      "npc": 4248,
+      "map": 0,
+      "opening": 30173,
+      "lines": [
+        {
+          "message": 30173,
+          "choices": [
+            { "reply": 36315, "next": 30174, "quest": 1940, "afterObjective": 13580, "beforeObjective": 13581 },
+            { "reply": 36316, "next": 30182, "quest": 1940, "afterObjective": 13581, "beforeObjective": 13582 }
+          ]
+        },
+        {
+          "message": 30174,
+          "choices": [
+            { "reply": 36314, "next": 30175 }
+          ]
+        },
+        {
+          "message": 30175,
+          "choices": [
+            { "reply": 36313, "next": 30176 }
+          ]
+        },
+        {
+          "message": 30176,
+          "choices": [
+            { "reply": 36312, "next": 30177 }
+          ]
+        },
+        {
+          "message": 30177,
+          "choices": [
+            { "reply": 36311, "quest": 1940, "completes": 13581, "params": [[30, 13581]] }
+          ]
+        },
+        {
+          "message": 30182,
+          "choices": [
+            { "reply": 36325, "quest": 1940, "completes": 13582, "params": [[30, 13582]], "gives": 19545 }
+          ]
+        }
+      ],
+      "why": "Efigienia (4248), «La guerra de los Peldaños» (1940): the tree's story (30173-30177: «Pedir más información sobre el árbol.» 36315, «Necesitaría un poco de sangre.» 36314, «Confirmar sin entrar demasiado en detalles.» 36313, «¿Qué tipo de regalo le agradaría al árbol?» 36312, «Ir en busca de restos demoníacos.» 36311 ends 13581), then the four horns shown («Mostrarle los cuernos de demonio.» 36316, 30182, «Agarrar el cuenco.» 36325 hands the wooden bowl 19545 and ends 13582) (Dofus pour les noobs («La guerre des Marches»)). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 4238,
+      "map": 0,
+      "opening": 30187,
+      "lines": [
+        {
+          "message": 30187,
+          "choices": [
+            { "reply": 36334, "next": 30189, "quest": 1940, "afterObjective": 13585, "beforeObjective": 13586 },
+            { "reply": 36341, "next": 30191, "quest": 1940, "afterObjective": 13587, "beforeObjective": 13588 }
+          ]
+        },
+        {
+          "message": 30189,
+          "choices": [
+            { "reply": 36333, "next": 30190 }
+          ]
+        },
+        {
+          "message": 30190,
+          "choices": [
+            { "reply": 36332, "quest": 1940, "completes": 13586, "params": [[30, 13586]] }
+          ]
+        },
+        {
+          "message": 30191,
+          "choices": [
+            { "reply": 36335, "next": 30188 }
+          ]
+        },
+        {
+          "message": 30188,
+          "choices": [
+            { "reply": 36340, "next": 30192 }
+          ]
+        },
+        {
+          "message": 30192,
+          "choices": [
+            { "reply": 36339, "next": 30193 }
+          ]
+        },
+        {
+          "message": 30193,
+          "choices": [
+            { "reply": 36338, "next": 30194 }
+          ]
+        },
+        {
+          "message": 30194,
+          "choices": [
+            { "reply": 36337, "next": 30195 }
+          ]
+        },
+        {
+          "message": 30195,
+          "choices": [
+            { "reply": 36336, "quest": 1940, "completes": 13588, "params": [[30, 13588]] }
+          ]
+        }
+      ],
+      "why": "The Death Slayer (4238), «La guerra de los Peldaños» (1940): summoned by the tomb. First talk (13586): 30187, «Confesar que debías encontrar un modo de hacer que volviera al Mundo de los Doce.» 36334, 30189, «Necesito tu ayuda para vencer a Arak'Imperitax.» 36333, 30190, «Enviaré al demonio al lugar de donde vino, lo prometo.» 36332. After the fight (13588): «El demonio del pozo ha sido derrotado.» 36341, 30191, the talk about the undead and the livid heart (36335, 30188, 36340, 30192, 36339, 30193, 36338, 30194, 36337, 30195) and «Despedirte por última vez...» 36336 (Dofus pour les noobs («La guerre des Marches»)). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 4239,
+      "map": 0,
+      "opening": 30196,
+      "lines": [
+        {
+          "message": 30196,
+          "choices": [
+            { "reply": 36342 },
+            { "reply": 36343, "quest": 1940, "afterObjective": 13586, "beforeObjective": 13587 }
+          ]
+        }
+      ],
+      "why": "Arak'Imperitax (NPC 4239), 1940: «Retroceder.» 36342 or «Enfrentarte a la arakna demoníaca.» 36343, which starts the fight (Dofus pour les noobs («La guerre des Marches»))."
+    },
+    {
+      "npc": 4249,
+      "map": 0,
+      "opening": 30292,
+      "lines": [
+        {
+          "message": 30292,
+          "choices": [
+            { "reply": 36479, "next": 30293, "criterion": "Qa=1954&Qo>13592&Qa!1955&Qf!1955", "beforeQuest": 1955 },
+            { "reply": 36525, "next": 30320, "quest": 1955, "afterObjective": 13741, "beforeObjective": 13742 }
+          ]
+        },
+        {
+          "message": 30293,
+          "choices": [
+            { "reply": 36478, "next": 30294 }
+          ]
+        },
+        {
+          "message": 30294,
+          "choices": [
+            { "reply": 36476, "next": 30295 },
+            { "reply": 36477 }
+          ]
+        },
+        {
+          "message": 30295,
+          "choices": [
+            { "reply": 36524, "startsQuest": 1955, "params": [[34, 1955]] }
+          ]
+        },
+        {
+          "message": 30320,
+          "choices": [
+            { "reply": 36475, "quest": 1955, "completes": 13742, "params": [[30, 13742]] }
+          ]
+        }
+      ],
+      "why": "The Sram priest (4249), «Toda el agua al molino» (1955): the start (30292 about the half-dead, «Preguntar más acerca de los restos silenciosos.» 36479, 30293, «Seguir escuchando.» 36478, 30294 about Lilia Nha, «Vale.» 36476, step line 30295, «Bueno, ¡hasta luego!» 36524 starts the quest; 36477 declines) and the end (36525 «Lilia Nha y la hipermaga Rimanda han descubierto un vínculo...», 30320, 36475 ends 13742) (Dofus pour les noobs («Toute l'eau au moulin»)). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 4250,
+      "map": 0,
+      "opening": 30197,
+      "lines": [
+        {
+          "message": 30197,
+          "choices": [
+            { "reply": 36351, "next": 30198, "criterion": "Qa=1954&Qo>13694&Qa!1956&Qf!1956", "beforeQuest": 1956 },
+            { "reply": 36391, "next": 30222, "quest": 1956, "afterObjective": 13723, "beforeObjective": 13724, "completes": 13724, "params": [[30, 13724]] }
+          ]
+        },
+        {
+          "message": 30198,
+          "choices": [
+            { "reply": 36350, "next": 30199 }
+          ]
+        },
+        {
+          "message": 30199,
+          "choices": [
+            { "reply": 36347, "next": 30200 }
+          ]
+        },
+        {
+          "message": 30200,
+          "choices": [
+            { "reply": 36348, "next": 30201 }
+          ]
+        },
+        {
+          "message": 30201,
+          "choices": [
+            { "reply": 36349, "next": 30202 }
+          ]
+        },
+        {
+          "message": 30202,
+          "choices": [
+            { "reply": 36345, "next": 30203 },
+            { "reply": 36346 }
+          ]
+        },
+        {
+          "message": 30203,
+          "choices": [
+            { "reply": 36344, "startsQuest": 1956, "params": [[34, 1956]] }
+          ]
+        },
+        {
+          "message": 30222,
+          "choices": [
+            { "reply": 36390, "next": 30223 }
+          ]
+        },
+        {
+          "message": 30223,
+          "choices": [
+            { "reply": 36389 }
+          ]
+        }
+      ],
+      "why": "The Iop priest (4250), «Crujidos de corazón» (1956): the start (30197, «Cuéntame más cosas sobre los cantos petrificados.» 36351, 30198, «Seguir escuchando.» 36350, 30199, 36347, 30200, 36348, 30201, 36349, 30202 the shaman's idea, «Bueno, vale.» 36345 or «No, gracias.» 36346, step line 30203, «Ir a Cania.» 36344 starts the quest) and the heart shown (36391, 30222, «Estoy listo.» 36390, 30223, 36389) (Dofus pour les noobs («Craquements de cœur»)). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 4287,
+      "map": 165154311,
+      "opening": 30224,
+      "lines": [
+        {
+          "message": 30224,
+          "choices": [
+            { "reply": 36392, "quest": 1956, "beforeObjective": 13713, "completes": 13713, "params": [[30, 13713]] }
+          ]
+        }
+      ],
+      "why": "The crujidor shaman (4287) at [-9,-28], 1956: bows (30224) and «Conducir al chamán hasta la torre quebrada.» (36392) ends 13713, after which he follows (Dofus pour les noobs («Craquements de cœur»))."
+    },
+    {
+      "npc": 4287,
+      "map": 186908930,
+      "opening": 30226,
+      "openings": [
+        { "quest": 1956, "objective": 13714, "message": 30231 }
+      ],
+      "lines": [
+        {
+          "message": 30226,
+          "choices": [
+            { "reply": 36393, "next": 30229 }
+          ]
+        },
+        {
+          "message": 30229,
+          "choices": [
+            { "reply": 36403, "next": 30232 }
+          ]
+        },
+        {
+          "message": 30232,
+          "choices": [
+            { "reply": 36398 }
+          ]
+        },
+        {
+          "message": 30231,
+          "choices": [
+            { "reply": 36396 }
+          ]
+        }
+      ],
+      "why": "The shaman (4287) at the tower's foot, 1956: the first ritual (30226 stones, 36393 «Hola. Estoy aquí para protegerte durante el ritual.», 30229, 36403 «Vigilar los alrededores.», 30232, 36398 «Prepararte para defender al chamán en caso de ataque.» starts the fight) and, once beaten, 30231 and 36396 «Escoltar al chamán hasta la parte más alta de la torre.» (Dofus pour les noobs («Craquements de cœur»)). Message and reply order INFERRED."
+    },
+    {
+      "npc": 4287,
+      "map": 187695104,
+      "opening": 30227,
+      "openings": [
+        { "quest": 1956, "objective": 13718, "message": 30225 }
+      ],
+      "lines": [
+        {
+          "message": 30227,
+          "choices": [
+            { "reply": 36401, "next": 30230 }
+          ]
+        },
+        {
+          "message": 30230,
+          "choices": [
+            { "reply": 36402, "next": 30233 }
+          ]
+        },
+        {
+          "message": 30233,
+          "choices": [
+            { "reply": 36400 }
+          ]
+        },
+        {
+          "message": 30225,
+          "choices": [
+            { "reply": 36399 }
+          ]
+        }
+      ],
+      "why": "The shaman (4287) on the cave's top floor, 1956: the second ritual (30227, 36401 «Vigilar los alrededores.», 30230, 36402 «Estar atento.», 30233, 36400 «Prepararte para defender al chamán...» starts the fight) and after it 30225, 36399 «Escoltar al chamán hasta las profundidades de la torre.» (Dofus pour les noobs («Craquements de cœur»)). Order INFERRED."
+    },
+    {
+      "npc": 4287,
+      "map": 187695108,
+      "opening": 30226,
+      "openings": [
+        { "quest": 1956, "objective": 13720, "message": 30228 }
+      ],
+      "lines": [
+        {
+          "message": 30226,
+          "choices": [
+            { "reply": 36395, "next": 30229 }
+          ]
+        },
+        {
+          "message": 30229,
+          "choices": [
+            { "reply": 36406, "next": 30232 }
+          ]
+        },
+        {
+          "message": 30232,
+          "choices": [
+            { "reply": 36405, "next": 30233 }
+          ]
+        },
+        {
+          "message": 30233,
+          "choices": [
+            { "reply": 36397 }
+          ]
+        },
+        {
+          "message": 30228,
+          "choices": [
+            { "reply": 36404, "next": 30234 }
+          ]
+        },
+        {
+          "message": 30234,
+          "choices": []
+        }
+      ],
+      "why": "The shaman (4287) in the depths, 1956: the third ritual (30226, 36395 «Vigilar los alrededores.», 30229, 36406 «Seguir vigilando...», 30232, 36405 «Mantenerte vigilante.», 30233, 36397 «Mantenerte alerta.» starts the fight) and the last stone (30228, 36404 «Observar lo que ocurre.» ends 13721, 30234) (Dofus pour les noobs («Craquements de cœur»)). Order INFERRED."
+    },
+    {
+      "npc": 4291,
+      "map": 0,
+      "opening": 30237,
+      "lines": [
+        {
+          "message": 30237,
+          "choices": [
+            { "reply": 36410, "quest": 1956, "afterObjective": 13721, "beforeObjective": 13723 },
+            { "reply": 36411 }
+          ]
+        }
+      ],
+      "why": "The ancestral crujidor (4291), 1956: «Dar un paso adelante.» (36410) starts its fight, «Retroceder y esperar refuerzos.» (36411) leaves (Dofus pour les noobs («Craquements de cœur»): «parlez-lui Faire un pas en avant»)."
+    },
+    {
+      "npc": 4295,
+      "map": 0,
+      "opening": 30260,
+      "lines": [
+        {
+          "message": 30260,
+          "choices": [
+            { "reply": 36440, "next": 30261 }
+          ]
+        },
+        {
+          "message": 30261,
+          "choices": [
+            { "reply": 36439, "next": 30262 }
+          ]
+        },
+        {
+          "message": 30262,
+          "choices": [
+            { "reply": 36438, "next": 30263 }
+          ]
+        },
+        {
+          "message": 30263,
+          "choices": [
+            { "reply": 36437, "next": 30264 }
+          ]
+        },
+        {
+          "message": 30264,
+          "choices": [
+            { "reply": 36436, "quest": 1956, "completes": 13725, "params": [[30, 13725]] }
+          ]
+        }
+      ],
+      "why": "The god Yopuka (4295), 1956: bow (36440), the heart handed (30261, 36439), it beats (30262, 36438), taken back (30263, 36437), farewell (30264, 36436 ends 13725) (Dofus pour les noobs («Craquements de cœur»)). Reply order INFERRED."
+    },
+    {
+      "npc": 4296,
+      "map": 0,
+      "opening": 30285,
+      "lines": [
+        {
+          "message": 30285,
+          "choices": [
+            { "reply": 36470, "next": 30286, "quest": 1954, "afterObjective": 13730, "beforeObjective": 13731 }
+          ]
+        },
+        {
+          "message": 30286,
+          "choices": [
+            { "reply": 36469, "next": 30287 }
+          ]
+        },
+        {
+          "message": 30287,
+          "choices": [
+            { "reply": 36468, "next": 30288 }
+          ]
+        },
+        {
+          "message": 30288,
+          "choices": [
+            { "reply": 36467, "quest": 1954, "completes": 13731, "params": [[30, 13731]] }
+          ]
+        }
+      ],
+      "why": "The god Sram (4296), «Los corazones lívidos» (1954), Solar tower: his words (30285-30288) with «Extrañarte de la presencia de Sram en el lugar.» 36470, 36469, 36468 and «No te preocupes. Sé guardar un secreto.» 36467, which ends 13731 (Dofus pour les noobs («Les coeurs livides»)). Reply order INFERRED from the ids."
+    },
+    {
+      "npc": 4292,
+      "map": 0,
+      "opening": 30276,
+      "lines": [
+        {
+          "message": 30276,
+          "choices": [
+            { "reply": 36460, "next": 30277, "quest": 1954, "afterObjective": 13735, "beforeObjective": 13736 }
+          ]
+        },
+        {
+          "message": 30277,
+          "choices": [
+            { "reply": 36459, "next": 30278 }
+          ]
+        },
+        {
+          "message": 30278,
+          "choices": [
+            { "reply": 36458, "next": 30279 }
+          ]
+        },
+        {
+          "message": 30279,
+          "choices": [
+            { "reply": 36457, "quest": 1954, "completes": 13736, "params": [[30, 13736]] }
+          ]
+        }
+      ],
+      "why": "Raval the Terrible (4292), «Los corazones lívidos» (1954), Bethel tower: 30276-30279 and the replies 36460, 36459, 36458, 36457 (the last ends 13736) (Dofus pour les noobs («Les coeurs livides»)). Reply order INFERRED from the ids."
     }
   ]
 }
