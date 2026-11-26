@@ -12771,7 +12771,8 @@ namespace Jondo.Unity.Server.Handlers
                 fight.Join(monster);
                 arrivals.Add(monster);
             }
-            var leader = fight.Azul.FirstOrDefault(f => f.IsAlive && !f.IsMonster) ?? fight.Azul.FirstOrDefault();
+            var leader = fight.Todos.FirstOrDefault(f => f.TeamId == 0 && f.IsAlive && !f.IsMonster)
+                ?? fight.Todos.FirstOrDefault(f => f.TeamId == 0);
             foreach (var member in allies ?? Array.Empty<MobSpawnManager.MobMember>())
             {
                 int cell = fight.BluePlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
