@@ -617,6 +617,7 @@
       "npc": 3963,
       "replies": [33178, 33503, 33542, 33495],
       "why": "Mansion of Kuatropatas (dungeon 106): after Anerice the winners are in the exit room (182719488, the map's own name 'Mansion de Kuatropatas - Salida'), where Anerice stands (Dofus pour les noobs, Le mort dans l'ame: 'Une fois dans la salle de sortie, parlez a Anerice la Shushess'). Her 'Abandonar la Mansion de Kuatropatas' (33178, 33503, 33542) and 'Hacer una reverencia y despedirte' (33495) leave. Cell 282: the arrival cell the map gives."
-    }
+    },
+  {"dungeon": 67, "bossRoom": 110101506, "room": 110102530, "cell": 358, "npc": 2046, "replies": [17332, 17485], "why": "Sylargh's Transporter (dungeon 67): after Sylargh the winners are in the exit room (110102530) where Sylargh stands (1915, 13178). His 17332/17485 leaves. Cell 358 INFERRED."}
   ]
 }

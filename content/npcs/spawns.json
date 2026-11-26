@@ -6243,7 +6243,7 @@
       "npc": 4053,
       "cell": 343,
       "orientation": 1,
-      "criterion": "(Qa=1905&Qo>13024)|(Qf=1905&Qf!1915&Qo<13185)",
+      "criterion": "(Qa=1905&Qo>13024)|(Qf=1905&Qf!1915&Qo<13185)|(Qa=1915&Qo>13185&Qo<13186)",
       "why": "Dardondakal (4053), the white dragon's soul in the Ivory Room: «cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs, «Le dragon blanc»), so he shows from that click (13024) on, and stays for the quests he gives after -- until «Es hora de morir» (1915) sees «el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna» (reply 35357) with 13185, after which the incarnate dragon (4054) stands there instead. The cell is the derived one (343); its derived criterion showed him from the start of 1905."
     },
     {
@@ -6251,7 +6251,7 @@
       "npc": 4054,
       "cell": 356,
       "orientation": 1,
-      "criterion": "(Qa=1915&Qo>13185)|Qf=1915",
+      "criterion": "(Qa=1915&Qo>13186)|Qf=1915",
       "why": "Dardondakal incarnate (4054), the dragon 1915 sends you back to (13186) once his soul has taken flesh (13185, «Ver cómo el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna», 35357). The derived row had no criterion, so he stood in the Ivory Room from the start of «El dragón blanco» (1905): a solid dragon before the bramble was clicked, on top of the ghost once it was, and the click meant for the ghost opened his line instead."
     },
     {
@@ -8509,7 +8509,7 @@
       "npc": 4086,
       "cell": 386,
       "orientation": 1,
-      "criterion": "Qa=1909&Qo>13101&Qo<13102",
+      "criterion": "(Qa=1909&Qo>13101&Qo<13102)|(Qf=1909&Qa!1915&Qf!1915)|(Qa=1915&Qo<13174)",
       "why": "Spirit of Menalt at the Ilyzaelle viewpoint once Hyrkul is beaten (1909, 13102; Dofus pour les noobs «Nordalie»); cell INFERRED next to Hyrkul's."
     },
     {
@@ -8852,6 +8852,43 @@
       "criterion": "Qa=1945&Qo>13760&Qo<13762",
       "why": "Monolito in the grotto [-45,-80] once the grotto is searched (1945, 13760-13761) (Dofus pour les noobs, «Toucher le fond»). INFERRED: cell 285 (the quest-only element 512000's)."
     },
-  {"map": 190842882, "npc": 4086, "cell": 304, "orientation": 1, "criterion": "Qa=1914&Qo>13172&Qo<13173", "why": "Spirit of Menalt at his grave of the Field of Rest [1,-12] after the second meditation (1914, 13173); cell next to the grave, INFERRED. INFERRED cell."}
+  {"map": 190842882, "npc": 4086, "cell": 304, "orientation": 1, "criterion": "Qa=1914&Qo>13172&Qo<13173", "why": "Spirit of Menalt at his grave of the Field of Rest [1,-12] after the second meditation (1914, 13173); cell next to the grave, INFERRED. INFERRED cell."},
+  {"map": 185074176, "npc": 4076, "cell": 329, "orientation": 1, "criterion": "Qa=1915&Qo>13184&Qo<13185", "why": "Queen Thanatena at the Gates of Onekros once Hyrkul is beaten (1915, 13185). INFERRED cell."},
+  {"map": 185075200, "npc": 4100, "cell": 300, "orientation": 1, "criterion": "Qa=1915&Qo<13176", "why": "The gloomy mane (Agonía) on Externam's second map (1915, 13174). INFERRED cell."},
+  {"map": 63308288, "npc": 4125, "cell": 326, "orientation": 1, "criterion": "Qa=1915&Qo>13178&Qo<13181", "why": "The macabre rider of the Morh'Kitu valley (1915, 13181). INFERRED cell."},
+  {"map": 183241229, "npc": 4085, "cell": 340, "orientation": 1, "criterion": "Qa=1915&Qo>13182&Qo<13184", "why": "Hyrkul in his cave (1915, 13184). INFERRED cell."},
+  {"map": 110102530, "npc": 4116, "cell": 345, "orientation": 1, "criterion": "Qa=1915&Qo>13177&Qo<13178", "why": "The unstable nekrolérico in Sylargh's exit room (1915, 13178). INFERRED cell."},
+    {
+      "map": 168820748,
+      "npc": 3291,
+      "cell": 314,
+      "orientation": 3,
+      "criterion": "PL>179&Qf=1748&Qf=1749&PO>17965,0&Qa!1757&Qf!1757|Qa=1757&Qo<11217",
+      "why": "Markaris at the Trithon depths [19,32] (1757, start and 11215/11216); INFERRED cell."
+    },
+    {
+      "map": 88083976,
+      "npc": 3345,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11220&Qo<11223",
+      "why": "Victor Schubert on the frozen peninsula (1757, 11222); INFERRED cell."
+    },
+    {
+      "map": 88084485,
+      "npc": 3345,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11222&Qo<11225",
+      "why": "Victor Schubert at [9,28], the bay of Sufokia (1757, 11224); INFERRED cell."
+    },
+    {
+      "map": 168820752,
+      "npc": 3347,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11225&Qo<11228",
+      "why": "Rilur Intrigant in Neptoon's cave (1757, 11227); INFERRED cell."
+    }
   ]
 }

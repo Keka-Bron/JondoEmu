@@ -2105,6 +2105,14 @@
     { "npc": 4308, "map": 186646534, "reply": 36480,
       "monsters": [ { "monster": 5211, "grade": 1 } ],
       "why": "«Toucher le fond» (1945, 13761): «Insistir» (36480) against Monolito (monster 5211, level 200, 5500 life; its starting spell level 35952 puts the state 56 on it and summons the monsters 5210) alone, as the objective asks («Vence 1 x Monolito») (Dofus pour les noobs, «Toucher le fond»). INFERRED: grade 1 (the five grades hold the same figures)." },
-  {"map": 176817155, "element": 511310, "byLevel": true, "criterion": "Qa=1914&Qo>13164&Qo<13165", "monsters": [{"monster": 5004, "grade": 0}], "marks": -1914165, "why": "«Lee el libro sobre el final de Hyrkul» (13165): the first click on the book at the back of Gisgul's room sets the Bwork bibliophile (5004) on the player, a fight that may be done in a group; the second click, after the win, reads it (Dofus pour les noobs «Le guerrier noir»)."}
+  {"map": 176817155, "element": 511310, "byLevel": true, "criterion": "Qa=1914&Qo>13164&Qo<13165", "monsters": [{"monster": 5004, "grade": 0}], "marks": -1914165, "why": "«Lee el libro sobre el final de Hyrkul» (13165): the first click on the book at the back of Gisgul's room sets the Bwork bibliophile (5004) on the player, a fight that may be done in a group; the second click, after the win, reads it (Dofus pour les noobs «Le guerrier noir»)."},
+  {"npc": 4125, "map": 63308288, "reply": 34607, "monsters": [{"monster": 5023, "grade": 1}, {"monster": 5023, "grade": 1}, {"monster": 5022, "grade": 1}], "why": "1915: two Macabre Riders (5023) and an Old Siegalak (5022, carries the cloth 19276)."},
+  {"npc": 4085, "map": 183241229, "reply": 35352, "solo": true, "monsters": [{"monster": 4974, "grade": 1}], "why": "1915: Hyrkul (4974) alone in his cave."},
+    { "npc": 3291, "map": 168820748, "reply": 29244,
+      "monsters": [ { "monster": 4511, "grade": 0 }, { "monster": 4511, "grade": 0 } ],
+      "why": "1757: «Un combat se lance contre 2 x Plongeuse Agressive» (Dofus pour les noobs)." },
+    { "npc": 3347, "map": 168820752, "reply": 29275,
+      "monsters": [ { "monster": 4512, "grade": 0 }, { "monster": 4512, "grade": 0 } ],
+      "why": "1757: «Un combat se lance alors contre 2 x Rilur Intrigant» (Dofus pour les noobs)." }
   ]
 }

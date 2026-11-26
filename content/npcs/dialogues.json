@@ -33593,8 +33593,238 @@
       ],
       "why": "Buuky at the river mouth [10,3], once the scout machangrejo is beaten. «Pollution, je dis non» (Dofus pour les noobs): «Une fois le combat terminé, parlez à Beurky... Il vous annonce que d'autre méchants arrivent et il va vous aider à les vaincre». «He vencido a los adversarios más tenaces.» (19575) gets the mercenarinos coming (16439) and «Prepararte para el combate.» (19574) is 7992 and the fight beside him (npc_fights.json). Once they are beaten (7993): «Gracias por tu ayuda. ¿Qué haces aquí?» (19579) gets the Captain's errand (16440-16441), «Acepto esta peligrosa misión.» (19578) Tekar Howar in Sufokia (16442), «Comprobar que la pikosonda ha conseguido tomar las muestras y, luego, darle el objeto a Buuky.» (19577) with the dented pikosonda (16443), and «Despedirte e ir a Sufokia.» (19576) hands it over and is 7994."
     },
-  {"npc": 1597, "map": 0, "opening": 11916, "lines": [{"message": 11916, "choices": [{"reply": 19587, "next": 16445, "quest": 1444, "afterObjective": 7994, "beforeObjective": 7995}, {"reply": 19539}, {"reply": 19513, "next": 16400, "beforeQuest": 1442}, {"reply": 19540, "next": 16411, "quest": 1443, "completes": 7977, "params": [[30, 7977]]}, {"reply": 23656, "next": 19746, "criterion": "Qa=1608", "quest": 1608, "completes": 9402, "params": [[30, 9402]]}, {"reply": 28980, "quest": 1746, "next": 24080, "beforeObjective": 11128}]}, {"message": 16445, "choices": [{"reply": 19586, "next": 16446}]}, {"message": 16446, "choices": [{"reply": 19585, "quest": 1444, "completes": 7995, "params": [[30, 7995]], "next": 16447}]}, {"message": 16447, "choices": [{"reply": 19584, "next": 16448, "beforeQuest": 1442}, {"reply": 19581}]}, {"message": 16448, "choices": [{"reply": 19582, "next": 16449}, {"reply": 19583}]}, {"message": 16449, "names": true, "choices": [{"reply": 19588, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815}]}, {"message": 16400, "choices": [{"reply": 19518, "next": 16401}]}, {"message": 16401, "choices": [{"reply": 19517, "next": 16402}]}, {"message": 16402, "choices": [{"reply": 19515, "next": 16403}, {"reply": 19516}]}, {"message": 16403, "names": true, "choices": [{"reply": 19514, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815}]}, {"message": 16411, "choices": []}, {"message": 19746, "choices": [{"reply": 23655, "next": 19747}]}, {"message": 19747, "choices": [{"reply": 23654}]}, {"message": 24080, "choices": [{"reply": 28979, "quest": 1746, "next": 24081}]}, {"message": 24081, "choices": [{"reply": 28978, "quest": 1746, "next": 24082}]}, {"message": 24082, "choices": [{"reply": 28977, "quest": 1746, "next": 24083}]}, {"message": 24083, "choices": [{"reply": 28976, "quest": 1746, "completes": 11128, "params": [[30, 11128]]}]}], "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank. Pam Chollion (Tekar Howar, 1597), Sufokia [22,19]: «Relevez les niveaux» (1442, Dofus pour les noobs): 19513 asks about the excavations, 16401 the elevator, 19517 offers help (16402), 19515 accepts and 19514 takes the topographic device (14815) and starts 1442; the other way is 1444's own chain (19588). «Prise de notes» (1443): 19540 hands Teo's report over (16411). «El desaparecido de Sufokia» (1608; Dofus pour les noobs («Le disparu de Sufokia»)): «Busco a un tal Vardo» (23656) closes 9402; 19746 she dislikes him, 19747 the lower level is where he worked. INFERRED order of the replies: the client carries sentences and answers but not which go together. Pam Chollion (1597), «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): Poly showed her the statuette (28980, 24080-24083, 11128). INFERRED order of the replies."},
-  {"npc": 1596, "map": 0, "opening": 11915, "lines": [{"message": 11915, "choices": [{"reply": 19592, "next": 16450, "quest": 1444, "afterObjective": 7995, "beforeObjective": 7996}, {"reply": 19503}, {"reply": 19502, "next": 16390}, {"reply": 19504, "next": 16394, "quest": 1439, "completes": 7956, "params": [[30, 7956]]}, {"reply": 19506, "next": 16395}]}, {"message": 16450, "choices": [{"reply": 19591, "next": 16451}]}, {"message": 16451, "choices": [{"reply": 19590, "next": 16452}]}, {"message": 16452, "choices": [{"reply": 19589, "quest": 1444, "completes": 7996, "params": [[30, 7996]], "gives": 14795, "givesCount": 12}]}, {"message": 16390, "choices": [{"reply": 19501, "next": 16391}, {"reply": 19499, "next": 16392}]}, {"message": 16391, "choices": [{"reply": 19500}]}, {"message": 16392, "choices": [{"reply": 19498, "next": 16393}]}, {"message": 16393, "choices": [{"reply": 19497, "startsQuest": 1439, "params": [[34, 1439]]}]}, {"message": 16394, "choices": [{"reply": 19593}]}, {"message": 16395, "choices": [{"reply": 19505, "startsQuest": 1439, "params": [[34, 1439]]}]}], "why": "Gustavo Hifel on the way down to the abyssal base. «Pollution, je dis non» (Dofus pour les noobs): «Allez voir Estave Guiffel... parlez à Estave afin de l'interroger sur l'accès à l'Aquadôme de Merkator... il faut actionner des leviers qui ouvriront des portes. Cependant pour faire fonctionner ces leviers il faut des piles Steamers... Estave vous donne quelques piles». «Interrogarle acerca del acceso al Acuadomo de Merkator.» (19592) gets the key he made (16450), «¿Qué me puedes contar sobre el acceso a los diferentes niveles de la base?» (19591) the lifts and the levers (16451), «¿No tienes algunas pilas guardadas, por casualidad?» (19590) «puedo darte algunas» (16452), and «Gracias. Hasta luego.» (19589) is 7996 with the batteries. INFERRED count: twelve, what «Chemin vers le donjon Aquadôme de Merkator» (Dofus pour les noobs) says the long way spends. Estave Guiffel (Gustavo Hifel, 1596), Sufokia [22,19]: «Pêche aux krabouilleurs» (1439, Dofus pour les noobs): «Parlez à Estave Guiffel afin d'obtenir des informations sur la base abyssale... il vous demande de lui ramener des automates»: 19502 (the base), 19499 (the automata), 19498 (how to help), 19497 starts it; four Machangrejo specimens (14816, 100% from the Machangrejos of the Undertow and Abyss rooms) are handed over with 19504; 19506 and 19505 repeat the daily."},
+  {
+      "npc": 1597,
+      "map": 0,
+      "opening": 11916,
+      "lines": [
+        {
+          "message": 11916,
+          "choices": [
+            { "reply": 19587, "next": 16445, "quest": 1444, "afterObjective": 7994, "beforeObjective": 7995 },
+            { "reply": 19539 },
+            { "reply": 19513, "next": 16400, "beforeQuest": 1442 },
+            { "reply": 19540, "next": 16411, "quest": 1443, "completes": 7977, "params": [[30, 7977]] },
+            { "reply": 23656, "next": 19746, "criterion": "Qa=1608", "quest": 1608, "completes": 9402, "params": [[30, 9402]] },
+            { "reply": 28980, "quest": 1746, "next": 24080, "beforeObjective": 11128 },
+            { "reply": 29032, "quest": 1748, "next": 24125, "beforeObjective": 11139 },
+            { "reply": 29043, "quest": 1748, "next": 24135, "afterObjective": 11141, "beforeObjective": 11142 }
+          ]
+        },
+        {
+          "message": 16445,
+          "choices": [
+            { "reply": 19586, "next": 16446 }
+          ]
+        },
+        {
+          "message": 16446,
+          "choices": [
+            { "reply": 19585, "quest": 1444, "completes": 7995, "params": [[30, 7995]], "next": 16447 }
+          ]
+        },
+        {
+          "message": 16447,
+          "choices": [
+            { "reply": 19584, "next": 16448, "beforeQuest": 1442 },
+            { "reply": 19581 }
+          ]
+        },
+        {
+          "message": 16448,
+          "choices": [
+            { "reply": 19582, "next": 16449 },
+            { "reply": 19583 }
+          ]
+        },
+        {
+          "message": 16449,
+          "names": true,
+          "choices": [
+            { "reply": 19588, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815 }
+          ]
+        },
+        {
+          "message": 16400,
+          "choices": [
+            { "reply": 19518, "next": 16401 }
+          ]
+        },
+        {
+          "message": 16401,
+          "choices": [
+            { "reply": 19517, "next": 16402 }
+          ]
+        },
+        {
+          "message": 16402,
+          "choices": [
+            { "reply": 19515, "next": 16403 },
+            { "reply": 19516 }
+          ]
+        },
+        {
+          "message": 16403,
+          "names": true,
+          "choices": [
+            { "reply": 19514, "startsQuest": 1442, "params": [[34, 1442]], "gives": 14815 }
+          ]
+        },
+        {
+          "message": 16411,
+          "choices": []
+        },
+        {
+          "message": 19746,
+          "choices": [
+            { "reply": 23655, "next": 19747 }
+          ]
+        },
+        {
+          "message": 19747,
+          "choices": [
+            { "reply": 23654 }
+          ]
+        },
+        {
+          "message": 24080,
+          "choices": [
+            { "reply": 28979, "quest": 1746, "next": 24081 }
+          ]
+        },
+        {
+          "message": 24081,
+          "choices": [
+            { "reply": 28978, "quest": 1746, "next": 24082 }
+          ]
+        },
+        {
+          "message": 24082,
+          "choices": [
+            { "reply": 28977, "quest": 1746, "next": 24083 }
+          ]
+        },
+        {
+          "message": 24083,
+          "choices": [
+            { "reply": 28976, "quest": 1746, "completes": 11128, "params": [[30, 11128]] }
+          ]
+        },
+        {
+          "message": 24125,
+          "choices": [
+            { "reply": 29031, "quest": 1748, "next": 24126, "completes": 11139, "params": [[30, 11139]] }
+          ]
+        },
+        {
+          "message": 24126,
+          "choices": []
+        },
+        {
+          "message": 24135,
+          "choices": [
+            { "reply": 29042, "quest": 1748, "next": 24136 }
+          ]
+        },
+        {
+          "message": 24136,
+          "choices": [
+            { "reply": 29041, "quest": 1748, "next": 24137, "completes": 11142, "params": [[30, 11142]] }
+          ]
+        },
+        {
+          "message": 24137,
+          "choices": []
+        }
+      ],
+      "why": "Tekar Howar at the dig site of Sufokia. «Pollution, je dis non» (Dofus pour les noobs): «Commencez par vous rendre en Sufokia... Apprenez alors à Pam que vous êtes envoyé par le Captain pour rencontrer le Merkator. Demandez à Pam comment vous rendre auprès du Merkator». «Capitán Amakna me envía para decirle un par de palabras a Merkator.» (19587) gets 16445, «¿Cómo puedo ir a ver a Merkator?» (19586) the lift to the abyssal base and Gustavo Hifel (16446), and «Gracias por la información.» (19585) is 7995 — and her «Antes de que te vayas...» (16447), whose «Pedir más información.» (19584) leads to her own quest, «Profundímetro» (1442, 16448-16449). The template's replies, each to the message of its rank. Pam Chollion (Tekar Howar, 1597), Sufokia [22,19]: «Relevez les niveaux» (1442, Dofus pour les noobs): 19513 asks about the excavations, 16401 the elevator, 19517 offers help (16402), 19515 accepts and 19514 takes the topographic device (14815) and starts 1442; the other way is 1444's own chain (19588). «Prise de notes» (1443): 19540 hands Teo's report over (16411). «El desaparecido de Sufokia» (1608; Dofus pour les noobs («Le disparu de Sufokia»)): «Busco a un tal Vardo» (23656) closes 9402; 19746 she dislikes him, 19747 the lower level is where he worked. INFERRED order of the replies: the client carries sentences and answers but not which go together. Pam Chollion (1597), «L'affaire Pollie Perkine» (1746, Dofus pour les noobs): Poly showed her the statuette (28980, 24080-24083, 11128). INFERRED order of the replies. Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Pam: sabotages (24125, 24126 -> Isa), then Maxime's report (24135-24137 -> Prosper)."
+    },
+  {
+      "npc": 1596,
+      "map": 0,
+      "opening": 11915,
+      "lines": [
+        {
+          "message": 11915,
+          "choices": [
+            { "reply": 19592, "next": 16450, "quest": 1444, "afterObjective": 7995, "beforeObjective": 7996 },
+            { "reply": 19503 },
+            { "reply": 19502, "next": 16390 },
+            { "reply": 19504, "next": 16394, "quest": 1439, "completes": 7956, "params": [[30, 7956]] },
+            { "reply": 19506, "next": 16395 },
+            { "reply": 29030, "next": 24123, "beforeQuest": 1748, "criterion": "PL>179" }
+          ]
+        },
+        {
+          "message": 16450,
+          "choices": [
+            { "reply": 19591, "next": 16451 }
+          ]
+        },
+        {
+          "message": 16451,
+          "choices": [
+            { "reply": 19590, "next": 16452 }
+          ]
+        },
+        {
+          "message": 16452,
+          "choices": [
+            { "reply": 19589, "quest": 1444, "completes": 7996, "params": [[30, 7996]], "gives": 14795, "givesCount": 12 }
+          ]
+        },
+        {
+          "message": 16390,
+          "choices": [
+            { "reply": 19501, "next": 16391 },
+            { "reply": 19499, "next": 16392 }
+          ]
+        },
+        {
+          "message": 16391,
+          "choices": [
+            { "reply": 19500 }
+          ]
+        },
+        {
+          "message": 16392,
+          "choices": [
+            { "reply": 19498, "next": 16393 }
+          ]
+        },
+        {
+          "message": 16393,
+          "choices": [
+            { "reply": 19497, "startsQuest": 1439, "params": [[34, 1439]] }
+          ]
+        },
+        {
+          "message": 16394,
+          "choices": [
+            { "reply": 19593 }
+          ]
+        },
+        {
+          "message": 16395,
+          "choices": [
+            { "reply": 19505, "startsQuest": 1439, "params": [[34, 1439]] }
+          ]
+        },
+        {
+          "message": 24123,
+          "choices": [
+            { "reply": 29029, "next": 24124 }
+          ]
+        },
+        {
+          "message": 24124,
+          "choices": [
+            { "reply": 29028, "startsQuest": 1748, "params": [[34, 1748]] }
+          ]
+        }
+      ],
+      "why": "Gustavo Hifel on the way down to the abyssal base. «Pollution, je dis non» (Dofus pour les noobs): «Allez voir Estave Guiffel... parlez à Estave afin de l'interroger sur l'accès à l'Aquadôme de Merkator... il faut actionner des leviers qui ouvriront des portes. Cependant pour faire fonctionner ces leviers il faut des piles Steamers... Estave vous donne quelques piles». «Interrogarle acerca del acceso al Acuadomo de Merkator.» (19592) gets the key he made (16450), «¿Qué me puedes contar sobre el acceso a los diferentes niveles de la base?» (19591) the lifts and the levers (16451), «¿No tienes algunas pilas guardadas, por casualidad?» (19590) «puedo darte algunas» (16452), and «Gracias. Hasta luego.» (19589) is 7996 with the batteries. INFERRED count: twelve, what «Chemin vers le donjon Aquadôme de Merkator» (Dofus pour les noobs) says the long way spends. Estave Guiffel (Gustavo Hifel, 1596), Sufokia [22,19]: «Pêche aux krabouilleurs» (1439, Dofus pour les noobs): «Parlez à Estave Guiffel afin d'obtenir des informations sur la base abyssale... il vous demande de lui ramener des automates»: 19502 (the base), 19499 (the automata), 19498 (how to help), 19497 starts it; four Machangrejo specimens (14816, 100% from the Machangrejos of the Undertow and Abyss rooms) are handed over with 19504; 19506 and 19505 repeat the daily. Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Estave worried (29030), the sabotages (24123), go to Tekar Howar (24124 = the step line, starts the quest)."
+    },
   {
       "npc": 2196,
       "map": 0,
@@ -45376,6 +45606,8 @@
       "map": 169082884,
       "opening": 24027,
       "openings": [
+        { "quest": 1748, "pending": 11144, "message": 24027 },
+        { "quest": 1748, "pending": 11147, "message": 24027 },
         { "criterion": "Qa=1749&Qo<11165", "message": 24210 },
         { "criterion": "Qa=1749&Qo>11148&Qo<11165", "message": 24210 },
         { "quest": 1733, "objective": 11015, "message": 24027 },
@@ -45397,7 +45629,9 @@
           "choices": [
             { "reply": 29182, "next": 24287, "beforeQuest": 1755 },
             { "reply": 28907, "quest": 1733, "next": 24028, "beforeObjective": 11006 },
-            { "reply": 28914, "quest": 1733, "next": 24034, "beforeObjective": 11016, "completes": 11016, "params": [[30, 11016]], "afterObjective": 11015 }
+            { "reply": 28914, "quest": 1733, "next": 24034, "beforeObjective": 11016, "completes": 11016, "params": [[30, 11016]], "afterObjective": 11015 },
+            { "reply": 29047, "quest": 1748, "next": 24140, "afterObjective": 11143, "beforeObjective": 11144 },
+            { "reply": 29075, "quest": 1748, "next": 24162, "afterObjective": 11146, "beforeObjective": 11147 }
           ]
         },
         {
@@ -45486,9 +45720,31 @@
           "choices": [
             { "reply": 29115, "quest": 1749, "completes": 11165, "params": [[30, 11165]] }
           ]
+        },
+        {
+          "message": 24140,
+          "choices": [
+            { "reply": 29046, "quest": 1748, "next": 24141, "completes": 11144, "params": [[30, 11144]] }
+          ]
+        },
+        {
+          "message": 24141,
+          "choices": []
+        },
+        {
+          "message": 24162,
+          "choices": [
+            { "reply": 29074, "quest": 1748, "next": 24163 }
+          ]
+        },
+        {
+          "message": 24163,
+          "choices": [
+            { "reply": 29073, "quest": 1748, "completes": 11147, "params": [[30, 11147]] }
+          ]
         }
       ],
-      "why": "Marina Anclanaje (Marine Ancrenage in Dofus pour les noobs («Nos chairs voisines»)), submerged city [22,28]. Her opening 24027 (shared with the previous chain, quest 1734, whose replies are not written here) offers «Hablemos de ocupaciones» (29182): the Sea Council and the regulation of the species (24287, 24288), «Suponer que es la afortunada ganadora» (29180), 24289 asks for a volunteer, «Acepto» (29179, PL>179) starts the quest; 24290 asks for the aquatic meat (18076 x40); «Aquí tienes las carnes acuáticas» (29183) hands it over, line 24291. INFERRED: the opening line 24027 for 29182. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). «Corrientes acuaticas» (1733, Dofus pour les noobs): Prosper sends the player (28907, 24028 to 24030, 28904 closes the first talk), the patrol is on the four maps around, then 28910 «Ya he terminado mi ronda» (24033), 28909 shows the crystal (24032: go to Pink Tada), and after Deks 28914 carries his message (24034); 24035 once the quest is done. Openings: \"objective\" is the latest one done (the patrol talk 24030 from 11006 on). The «objective» openings are listed latest stage first: the first one whose objective is done wins. «Topo, el pequeño robot» (1734) is handed over by her: 28915 right after 28914, or 28911 on 24035 later (28916 / 28912 refuse); Dofus pour les noobs: Marine Ancrenage asks to see Prosper. Marina Anclanaje (3252), Memorias de un amnesico (1749): at the camp she hears of Markaris (24210, 29115, 11165); the camp's own tree outranks the anywhere tree."
+      "why": "Marina Anclanaje (Marine Ancrenage in Dofus pour les noobs («Nos chairs voisines»)), submerged city [22,28]. Her opening 24027 (shared with the previous chain, quest 1734, whose replies are not written here) offers «Hablemos de ocupaciones» (29182): the Sea Council and the regulation of the species (24287, 24288), «Suponer que es la afortunada ganadora» (29180), 24289 asks for a volunteer, «Acepto» (29179, PL>179) starts the quest; 24290 asks for the aquatic meat (18076 x40); «Aquí tienes las carnes acuáticas» (29183) hands it over, line 24291. INFERRED: the opening line 24027 for 29182. The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). «Corrientes acuaticas» (1733, Dofus pour les noobs): Prosper sends the player (28907, 24028 to 24030, 28904 closes the first talk), the patrol is on the four maps around, then 28910 «Ya he terminado mi ronda» (24033), 28909 shows the crystal (24032: go to Pink Tada), and after Deks 28914 carries his message (24034); 24035 once the quest is done. Openings: \"objective\" is the latest one done (the patrol talk 24030 from 11006 on). The «objective» openings are listed latest stage first: the first one whose objective is done wins. «Topo, el pequeño robot» (1734) is handed over by her: 28915 right after 28914, or 28911 on 24035 later (28916 / 28912 refuse); Dofus pour les noobs: Marine Ancrenage asks to see Prosper. Marina Anclanaje (3252), Memorias de un amnesico (1749): at the camp she hears of Markaris (24210, 29115, 11165); the camp's own tree outranks the anywhere tree. Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Marina: the risks (24140, 24141), then the contract (24162, 24163; 29073 hands over 18063)."
     },
   {"npc": 3246, "map": 170133512, "opening": 24536, "openings": [{"criterion": "Qa=1759&Qo>11262&Qo<11259", "message": 24536}, {"quest": 1760, "message": 24537}, {"canStart": 1756, "message": 24249}, {"quest": 1742, "objective": 11090, "message": 24331}, {"quest": 1737, "message": 24240}, {"canStart": 1738, "message": 24309}], "lines": [{"message": 24536, "names": true, "choices": [{"reply": 29477, "startsQuest": 1760, "params": [[34, 1760]], "next": 24538}, {"reply": 29430, "quest": 1756, "next": 24501, "afterObjective": 11237, "beforeObjective": 11238}, {"reply": 29458, "criterion": "Qf=1758&Qa!1759&Qf!1759", "next": 24524}, {"reply": 29475, "quest": 1759, "afterObjective": 11262, "beforeObjective": 11259, "next": 24534}]}, {"message": 24537, "choices": []}, {"message": 24538, "choices": []}, {"message": 24240, "choices": [{"reply": 29514, "next": 24573}, {"reply": 29202, "quest": 1737, "next": 24309, "afterObjective": 11045, "beforeObjective": 11046, "completes": 11046, "params": [[30, 11046]]}]}, {"message": 24573, "choices": [{"reply": 29513, "next": 24574}]}, {"message": 24574, "choices": [{"reply": 29512, "next": 24575}]}, {"message": 24575, "choices": [{"reply": 29511}]}, {"message": 24309, "choices": [{"reply": 29204, "next": 24310}]}, {"message": 24310, "choices": [{"reply": 29203, "startsQuest": 1738, "params": [[34, 1738]]}]}, {"message": 24331, "choices": [{"reply": 29238, "quest": 1742, "next": 24333, "afterObjective": 11090, "beforeObjective": 11091, "completes": 11091, "params": [[30, 11091]]}]}, {"message": 24333, "names": true, "choices": []}, {"message": 24249, "choices": [{"reply": 29457, "next": 24250}]}, {"message": 24250, "choices": [{"reply": 29458, "startsQuest": 1756, "params": [[34, 1756]]}]}, {"message": 24501, "choices": [{"reply": 29429, "quest": 1756, "next": 24502}]}, {"message": 24502, "choices": [{"reply": 29428, "quest": 1756, "afterObjective": 11237, "beforeObjective": 11238, "completes": 11238, "params": [[30, 11238]]}]}, {"message": 24524, "choices": [{"reply": 29457, "next": 24525}]}, {"message": 24525, "choices": [{"reply": 29456, "startsQuest": 1759, "params": [[34, 1759]]}]}, {"message": 24534, "choices": [{"reply": 29476, "quest": 1759, "completes": 11259, "params": [[30, 11259]]}]}], "why": "Queen Victoria in the throne room [23,24], Dofus pour les noobs («Le héros de Sufokia»): «Demander si elle a encore besoin de vos services» (29477, «¿Me necesitas para algo más?») after the thanks of 24536 starts the quest and 24538 (the step's text) sends the character to King Talas; 24537 is her reminder while it is open. INFERRED: the opening 24536 (her thanks) for the reply. Queen Victoria, «Reina de la belleza» (1737): while it is open her opening is 24240; 29202 relays Dientinea's demands (11046), 24309 and 24310 are her answer. 1738 «Rançon nage» (Dofus pour les noobs): once the demands are relayed she sends the character to the treasurer; 29203 «Obedecer» on her declared line 24310 starts the quest; she greets a character who may start it with 24309. Queen Victoria (3246), «En la boca del infierno» (1742): the player gives her the eye of Ansoh (29238, 11091). Queen Victoria (3246), «Quand les astres seront propices» (1756, Dofus pour les noobs): the start line is 24250 (the stars and Mage Llanes), reached from 24249; the report of the brain (29430, 24501-24502, 29428) closes 11238. Queen Victoria (3246), «De mal en impie» (1759, Dofus pour les noobs): ready to face Kutulu (29458, 24524) and the order to go to the temple (24525, 29456); the order of the replies is inferred. Queen Victoria (3246), «De mal en impie» (1759, Dofus pour les noobs): the end is the reply 29475 «I announce proudly that I beat the priest in yellow», her thanks 24534 and 29476 (bow and leave to the king); the greeting alone must not close 11259."},
   {
@@ -54238,7 +54494,8 @@
             { "reply": 34445, "next": 28724, "quest": 1905, "afterObjective": 13024, "beforeObjective": 13025 },
             { "reply": 34450, "next": 28730, "criterion": "Qf=1905", "beforeQuest": 1906 },
             { "reply": 34793, "next": 29010, "quest": 1908, "afterObjective": 13066, "beforeObjective": 13067, "completes": 13067, "params": [[30, 13067]] },
-            { "reply": 34794, "next": 29015, "criterion": "Qf=1908", "beforeQuest": 1909, "startsQuest": 1909, "params": [[34, 1909]] }
+            { "reply": 34794, "next": 29015, "criterion": "Qf=1908", "beforeQuest": 1909, "startsQuest": 1909, "params": [[34, 1909]] },
+            { "reply": 35358, "next": 29462, "quest": 1915, "afterObjective": 13185, "beforeObjective": 13186 }
           ]
         },
         {
@@ -54339,9 +54596,15 @@
           "choices": [
             { "reply": 34795 }
           ]
+        },
+        {
+          "message": 29462,
+          "choices": [
+            { "reply": 35357, "quest": 1915, "afterObjective": 13185, "beforeObjective": 13186, "completes": 13186, "params": [[30, 13186]] }
+          ]
         }
       ],
-      "why": "Dardondakal (4053) in the Ivory Room: «El murmullo de tu voz ha llegado hasta mis oídos, mortal. Habla, te escucho» (28723). «El dragón blanco» (1905), objective 13025: «Parlez à Dardondakal « S'incliner respectueusement devant le dragon » puis « Répondre que la quête des Dofus est la destinée des héros » afin de terminer la quête» (Dofus pour les noobs): «Inclinarte con respeto ante el dragón» (34445) -> «¿Por qué buscas...?» (28724) -> «La búsqueda de los dofus es el destino de los héroes» (34443; INFERRED: «Quiero preservar la armonía...» 34442 and «Busco la gloria y el poder» 34444 end it the same) does 13025 -> «Si cumples con la tarea...» (28725). «La quête se termine mais en poursuivant votre discussion avec Dardondakal, vous obtiendrez la prochaine quête : Examen de passage»: «Estoy en condiciones de cumplir la tarea que deseas encomendarme» (34455) -> tired of death, Thanatena (28726) -> «¿Quién es Thanatena?» (34454) -> the queen of Externam (28727) -> «Yo podría interceder a tu favor ante Thanatena» (34453) -> (28728) -> «Seguir escuchando» (34452) -> «El rey Galdarion de Bonta conoce ese camino» (28729, the step line of «Examen de paso», 1906) -> «Partir inmediatamente hacia Bonta» (34451) starts 1906. Whoever left before: «Cuéntame más» (34450) -> the client's second copy of that chain (28730-28733, 34449-34446) starts it too. «Golpe en Anutropía» (1908, 13067), back in the Ivory Room: «reparler à Dardondakal « Résumer votre rencontre avec la reine Thanatena ». Dardondakla reconnait avoir eu tort d'accorder sa confiance à un mortel et il vous parlera aussi d'Hyrkul ... Le seul moyen de sauver Dardondakal serait de changer son destin et seul les Nordes en sont capable. La quête se termine et en continuant votre dialogue vous débloquez la prochaine quête : Nordalie» (Dofus pour les noobs, «Casse en Enutrosor»). «Resumir tu encuentro con la reina Thanatena.» (34793) is 13067, the end of 1908: so be it (29010); «Mencionar tus altercados con los secuaces de Hyrkul.» (34792): Hyrkul the lich (29011); «Thanatena e Ilyzaelle han hablado del destino.» (34791): not master of his fate (29012); «Tiene que haber una manera de cambiar las cosas.» (34790): only the norns (29013); «Estoy dispuesto a negociar con las nordes.» (34789) starts «Nordalía» (1909) on its step dialog (29014), «No regresaré hasta haber hablado con las nordes y convencido a la reina.» (34788). Who left before that is offered the twin pair (34794, 29015, 34795)."
+      "why": "Dardondakal (4053) in the Ivory Room: «El murmullo de tu voz ha llegado hasta mis oídos, mortal. Habla, te escucho» (28723). «El dragón blanco» (1905), objective 13025: «Parlez à Dardondakal « S'incliner respectueusement devant le dragon » puis « Répondre que la quête des Dofus est la destinée des héros » afin de terminer la quête» (Dofus pour les noobs): «Inclinarte con respeto ante el dragón» (34445) -> «¿Por qué buscas...?» (28724) -> «La búsqueda de los dofus es el destino de los héroes» (34443; INFERRED: «Quiero preservar la armonía...» 34442 and «Busco la gloria y el poder» 34444 end it the same) does 13025 -> «Si cumples con la tarea...» (28725). «La quête se termine mais en poursuivant votre discussion avec Dardondakal, vous obtiendrez la prochaine quête : Examen de passage»: «Estoy en condiciones de cumplir la tarea que deseas encomendarme» (34455) -> tired of death, Thanatena (28726) -> «¿Quién es Thanatena?» (34454) -> the queen of Externam (28727) -> «Yo podría interceder a tu favor ante Thanatena» (34453) -> (28728) -> «Seguir escuchando» (34452) -> «El rey Galdarion de Bonta conoce ese camino» (28729, the step line of «Examen de paso», 1906) -> «Partir inmediatamente hacia Bonta» (34451) starts 1906. Whoever left before: «Cuéntame más» (34450) -> the client's second copy of that chain (28730-28733, 34449-34446) starts it too. «Golpe en Anutropía» (1908, 13067), back in the Ivory Room: «reparler à Dardondakal « Résumer votre rencontre avec la reine Thanatena ». Dardondakla reconnait avoir eu tort d'accorder sa confiance à un mortel et il vous parlera aussi d'Hyrkul ... Le seul moyen de sauver Dardondakal serait de changer son destin et seul les Nordes en sont capable. La quête se termine et en continuant votre dialogue vous débloquez la prochaine quête : Nordalie» (Dofus pour les noobs, «Casse en Enutrosor»). «Resumir tu encuentro con la reina Thanatena.» (34793) is 13067, the end of 1908: so be it (29010); «Mencionar tus altercados con los secuaces de Hyrkul.» (34792): Hyrkul the lich (29011); «Thanatena e Ilyzaelle han hablado del destino.» (34791): not master of his fate (29012); «Tiene que haber una manera de cambiar las cosas.» (34790): only the norns (29013); «Estoy dispuesto a negociar con las nordes.» (34789) starts «Nordalía» (1909) on its step dialog (29014), «No regresaré hasta haber hablado con las nordes y convencido a la reina.» (34788). Who left before that is offered the twin pair (34794, 29015, 34795). «Es hora de morir» (1915): the norns and the queen are convinced (35358); 35357 closes 13186 and the dragon is reborn (4054). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
     },
   {
       "npc": 2933,
@@ -54598,11 +54861,13 @@
           "choices": [
             { "reply": 35037, "quest": 1906, "afterObjective": 13046, "beforeObjective": 13048, "teleport": 184685313 },
             { "reply": 34507, "door": "key" },
-            { "reply": 34510, "door": "keyring" }
+            { "reply": 34510, "door": "keyring" },
+            { "reply": 35037, "quest": 1915, "beforeObjective": 13174, "teleport": 184685313 },
+            { "reply": 35037, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185, "teleport": 184685313 }
           ]
         }
       ],
-      "why": "The Endless Day guard at the gate of Ilyzaelle's Lookout [-73,-76]: give him the key (34507) or use the keyring (34510) to go in, as at every keeper's door. «Examen de paso» (1906): Dofus pour les noobs, «Direction l'entrée du donjon d'Ilyzaelle en [-73,-76!]. Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle» -- the king had promised the guard would let you by (28741). The map in front of her, «Herida de Nas Orazal», is 13047."
+      "why": "The Endless Day guard at the gate of Ilyzaelle's Lookout [-73,-76]: give him the key (34507) or use the keyring (34510) to go in, as at every keeper's door. «Examen de paso» (1906): Dofus pour les noobs, «Direction l'entrée du donjon d'Ilyzaelle en [-73,-76!]. Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle» -- the king had promised the guard would let you by (28741). The map in front of her, «Herida de Nas Orazal», is 13047. «Es hora de morir» (1915): the guard's «Dire que vous avez l'appui du roi Beldarion» (35037) before Agonía is found (13174) and on the way back to the queen (13184). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
     },
   {
       "npc": 4057,
@@ -57142,7 +57407,8 @@
         {
           "message": 28996,
           "choices": [
-            { "reply": 34779, "next": 28997, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 }
+            { "reply": 34779, "next": 28997, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064 },
+            { "reply": 35356, "next": 29459, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185 }
           ]
         },
         {
@@ -57186,9 +57452,27 @@
           "choices": [
             { "reply": 34772, "quest": 1908, "afterObjective": 13063, "beforeObjective": 13064, "completes": 13064, "params": [[30, 13064]] }
           ]
+        },
+        {
+          "message": 29459,
+          "choices": [
+            { "reply": 35355, "next": 29460, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185 }
+          ]
+        },
+        {
+          "message": 29460,
+          "choices": [
+            { "reply": 35354, "next": 29461, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185 }
+          ]
+        },
+        {
+          "message": 29461,
+          "choices": [
+            { "reply": 35353, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185, "completes": 13185, "params": [[30, 13185]] }
+          ]
         }
       ],
-      "why": "Thanatena, queen of Externam, near the Gates of Onekros (Khebesto: «Ahora mismo se encuentra cerca de las puertas de Onekros», 28995), for «Golpe en Anutropía» (1908, 13064): «Revenez à l'entrée d'Externam et parlez à la Reine Thanatena qui vous apprend qu'elle refuse la réincarnation du dragon car celui-ci a été trop crédule» (Dofus pour les noobs, «Casse en Enutrosor»). The black fire (28996); «Arrodillarte delante de la reina Thanatena.» (34779): «Álzate» (28997); «Levantarte y explicar la razón de tu visita.» (34778): the white dragon who behaves like a child (28998); «Desconozco la razón de esa decisión.» (34777): fooled by Leorictus (28999); «Seguir escuchando.» (34776): not a victim (29000); «Intentar defender al dragón.» (34775): you also want the Ivory Dofus (29001); «Reconocer que no conoces los secretos de los dioses.» (34774): he endangered the World of Twelve (29002); «Me parece un castigo muy severo.» (34773): she is not the only one to decide, speak with Ilyzaelle (29003); «Inclinarte e irte.» (34772) is 13064. The eight messages and eight replies run in one line, each reply's id one below the last."
+      "why": "Thanatena, queen of Externam, near the Gates of Onekros (Khebesto: «Ahora mismo se encuentra cerca de las puertas de Onekros», 28995), for «Golpe en Anutropía» (1908, 13064): «Revenez à l'entrée d'Externam et parlez à la Reine Thanatena qui vous apprend qu'elle refuse la réincarnation du dragon car celui-ci a été trop crédule» (Dofus pour les noobs, «Casse en Enutrosor»). The black fire (28996); «Arrodillarte delante de la reina Thanatena.» (34779): «Álzate» (28997); «Levantarte y explicar la razón de tu visita.» (34778): the white dragon who behaves like a child (28998); «Desconozco la razón de esa decisión.» (34777): fooled by Leorictus (28999); «Seguir escuchando.» (34776): not a victim (29000); «Intentar defender al dragón.» (34775): you also want the Ivory Dofus (29001); «Reconocer que no conoces los secretos de los dioses.» (34774): he endangered the World of Twelve (29002); «Me parece un castigo muy severo.» (34773): she is not the only one to decide, speak with Ilyzaelle (29003); «Inclinarte e irte.» (34772) is 13064. The eight messages and eight replies run in one line, each reply's id one below the last. «Es hora de morir» (1915, 13185): the queen hears Hyrkul is beaten and reconsiders; 35353 ends 13185. INFERRED reply order. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
     },
   {
       "npc": 7120,
@@ -63552,17 +63836,37 @@
       "npc": 3290,
       "map": 0,
       "opening": 24130,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 24130,
           "choices": [
-            { "reply": 29205, "next": 24311 }
+            { "reply": 29205, "next": 24311 },
+            { "reply": 29039, "quest": 1748, "next": 24131, "afterObjective": 11140, "beforeObjective": 11141 }
           ]
         },
-        { "message": 24311, "choices": [] }
+        {
+          "message": 24311,
+          "choices": []
+        },
+        {
+          "message": 24131,
+          "choices": [
+            { "reply": 29038, "quest": 1748, "next": 24132 }
+          ]
+        },
+        {
+          "message": 24132,
+          "choices": [
+            { "reply": 29037, "quest": 1748, "next": 24133, "completes": 11141, "params": [[30, 11141]] }
+          ]
+        },
+        {
+          "message": 24133,
+          "choices": []
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Maxime: shadows round the materials (24131-24133)."
     },
   {
       "npc": 1605,
@@ -69543,7 +69847,8 @@
         { "quest": 1734, "objective": 11018, "message": 23975 },
         { "quest": 1734, "objective": 11017, "message": 23974 },
         { "quest": 1734, "message": 23971 },
-        { "quest": 1733, "message": 23968 }
+        { "quest": 1733, "message": 23968 },
+        { "quest": 1748, "pending": 11143, "message": 23960 }
       ],
       "lines": [
         {
@@ -69555,7 +69860,8 @@
             { "reply": 28836, "next": 23980, "beforeQuest": 1735, "criterion": "Qf=1734" },
             { "reply": 28836, "quest": 1736, "next": 23983, "afterObjective": 11093, "beforeObjective": 11094, "completes": 11094, "params": [[30, 11094]] },
             { "reply": 28849, "next": 23989, "beforeQuest": 1743, "criterion": "Qf=1736" },
-            { "reply": 29082, "quest": 1749, "next": 24171, "beforeObjective": 11148, "completes": 11148, "params": [[30, 11148]] }
+            { "reply": 29082, "quest": 1749, "next": 24171, "beforeObjective": 11148, "completes": 11148, "params": [[30, 11148]] },
+            { "reply": 29045, "quest": 1748, "next": 24138, "afterObjective": 11142, "beforeObjective": 11143 }
           ]
         },
         {
@@ -69714,9 +70020,19 @@
         {
           "message": 24171,
           "choices": []
+        },
+        {
+          "message": 24138,
+          "choices": [
+            { "reply": 29044, "quest": 1748, "next": 24139, "completes": 11143, "params": [[30, 11143]] }
+          ]
+        },
+        {
+          "message": 24139,
+          "choices": []
         }
       ],
-      "why": "Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966). Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966). Prosper Maramado (3266), «Corrientes acuaticas» (1733, Dofus pour les noobs: he tells of the trouble that disturbs the digs): 28823 «Estoy buscando trabajo» to 23967, 28816 to the step dialog 23969, 28826 «Acepto la misión» starts the quest (23968), 28827 declines. Prosper Maramado, «Topo, el pequeño robot» (1734, Dofus pour les noobs): 28829 «Me envía Marina Anclanaje» (11017), the pikosonda mission 23971 to 23973, 28824 takes the Marca de los grandes fondos (17865), 28831 shows the Sello de los fundadores (11018, gives the Pizarra tecnomagica 18064), 28830 hands Topo over as the follower (17871); 28837 reports the success (11030). Prosper Maramado, «Selva de cristal» (1735, Dofus pour les noobs: tell Prosper about the strange corridor and the symbols, he translates the copied message): 28836/28835/28809 then 28838 (or 28833 later) sends the player to Deks and starts the quest; 28839 / 28834 decline. The later variant (23980, 23981) ends on the same 23979 line that starts «Selva de cristal» (1735): the engine starts a quest only on the step's declared dialog line. Prosper, «Su nombre es Ninguno» (1736): the closing report (11094), 23983 translates the sanctuary's word. Prosper Maramado (3266), «La llave del enigma» (1743): after the first Leonora hint he explains the key (28849..28850, starts the quest on line 23992) and finally receives the shown key (28807, 11101). Prosper Maramado (3266), «Puerta al pasado» (1744): he tells the player to look for where the key works (28806, starts the quest) and later is amazed by the first steam machine (28810, 11109). Prosper (3266), Memorias de un amnesico (1749): his closing line after the Mie-do question (24171). 1731: Prosper greets with his own line (23960) while Poly's interview is pending, ahead of the 1744 offer. 1749 (Memoires d'un amnesique): Prosper greets with 23960 while the steamers' step (11148) is pending, ahead of the 1744 offer, so reply 29082 (line 23960 of his template) is reachable without 1744 done."
+      "why": "Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966). Prosper Maramado (3266), underwater house [22,28]: 1731, the second interview (28817, 23966). Prosper Maramado (3266), «Corrientes acuaticas» (1733, Dofus pour les noobs: he tells of the trouble that disturbs the digs): 28823 «Estoy buscando trabajo» to 23967, 28816 to the step dialog 23969, 28826 «Acepto la misión» starts the quest (23968), 28827 declines. Prosper Maramado, «Topo, el pequeño robot» (1734, Dofus pour les noobs): 28829 «Me envía Marina Anclanaje» (11017), the pikosonda mission 23971 to 23973, 28824 takes the Marca de los grandes fondos (17865), 28831 shows the Sello de los fundadores (11018, gives the Pizarra tecnomagica 18064), 28830 hands Topo over as the follower (17871); 28837 reports the success (11030). Prosper Maramado, «Selva de cristal» (1735, Dofus pour les noobs: tell Prosper about the strange corridor and the symbols, he translates the copied message): 28836/28835/28809 then 28838 (or 28833 later) sends the player to Deks and starts the quest; 28839 / 28834 decline. The later variant (23980, 23981) ends on the same 23979 line that starts «Selva de cristal» (1735): the engine starts a quest only on the step's declared dialog line. Prosper, «Su nombre es Ninguno» (1736): the closing report (11094), 23983 translates the sanctuary's word. Prosper Maramado (3266), «La llave del enigma» (1743): after the first Leonora hint he explains the key (28849..28850, starts the quest on line 23992) and finally receives the shown key (28807, 11101). Prosper Maramado (3266), «Puerta al pasado» (1744): he tells the player to look for where the key works (28806, starts the quest) and later is amazed by the first steam machine (28810, 11109). Prosper (3266), Memorias de un amnesico (1749): his closing line after the Mie-do question (24171). 1731: Prosper greets with his own line (23960) while Poly's interview is pending, ahead of the 1744 offer. 1749 (Memoires d'un amnesique): Prosper greets with 23960 while the steamers' step (11148) is pending, ahead of the 1744 offer, so reply 29082 (line 23960 of his template) is reachable without 1744 done. Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Prosper refuses to cancel (24138, 24139)."
     },
   {
       "npc": 3268,
@@ -71316,7 +71632,8 @@
           "message": 19787,
           "choices": [
             { "reply": 23722, "next": 19786, "criterion": "Qa=1608", "quest": 1608, "completes": 9411, "params": [[30, 9411]] },
-            { "reply": 28959, "quest": 1742, "next": 24068, "criterion": "Qa=1742" }
+            { "reply": 28959, "quest": 1742, "next": 24068, "criterion": "Qa=1742" },
+            { "reply": 29035, "quest": 1748, "next": 24127, "afterObjective": 11139, "beforeObjective": 11140 }
           ]
         },
         {
@@ -71369,9 +71686,21 @@
         {
           "message": 24067,
           "choices": []
+        },
+        {
+          "message": 24127,
+          "choices": [
+            { "reply": 29034, "quest": 1748, "next": 24128, "completes": 11140, "params": [[30, 11140]] }
+          ]
+        },
+        {
+          "message": 24128,
+          "choices": [
+            { "reply": 29033 }
+          ]
         }
       ],
-      "why": "Isa Hakperal in the Steamer submarine at [22,19] (Dofus pour les noobs («Le disparu de Sufokia»)): the parchment (23722 = 9411), her refusal and then her guilt (19786-19791) and «Entrar en el submarino» (23716) takes the player to the undersea cave; after the escort she brings the player back to the surface (23724). INFERRED order of the replies: the client carries sentences and answers but not which go together. Isa Hakperal (1604), «En la boca del infierno» (1742): the player trades five smoked sausages for diving weights (28959, 28960, 11081)."
+      "why": "Isa Hakperal in the Steamer submarine at [22,19] (Dofus pour les noobs («Le disparu de Sufokia»)): the parchment (23722 = 9411), her refusal and then her guilt (19786-19791) and «Entrar en el submarino» (23716) takes the player to the undersea cave; after the escort she brings the player back to the surface (23724). INFERRED order of the replies: the client carries sentences and answers but not which go together. Isa Hakperal (1604), «En la boca del infierno» (1742): the player trades five smoked sausages for diving weights (28959, 28960, 11081). Los siete mercenarinos (1748), Dofus pour les noobs «Les sept Mercemers». Rita: the explosion near the overhaul workshop (24127, 24128)."
     },
   {
       "npc": 2778,
@@ -74552,7 +74881,10 @@
         { "criterion": "Qa=1749&Qo>11171", "message": 24224 },
         { "criterion": "Qa=1749&Qo>11163&Qo<11164", "message": 24209 },
         { "criterion": "Qa=1749&Qo>11161&Qo<11162", "message": 24203 },
-        { "criterion": "Qa=1749&Qo>11159&Qo<11160", "message": 24202 }
+        { "criterion": "Qa=1749&Qo>11159&Qo<11160", "message": 24202 },
+        { "canStart": 1757, "message": 24341 },
+        { "quest": 1757, "pending": 11215, "message": 24342 },
+        { "quest": 1757, "pending": 11216, "message": 24343 }
       ],
       "lines": [
         {
@@ -74660,9 +74992,37 @@
           "choices": [
             { "reply": 29114, "quest": 1749, "completes": 11164, "params": [[30, 11164]] }
           ]
+        },
+        {
+          "message": 24341,
+          "choices": [
+            { "reply": 29245, "next": 24342, "startsQuest": 1757, "params": [[34, 1757]] }
+          ]
+        },
+        {
+          "message": 24342,
+          "choices": [
+            { "reply": 29244, "quest": 1757, "beforeObjective": 11215 }
+          ]
+        },
+        {
+          "message": 24343,
+          "choices": [
+            { "reply": 29247, "quest": 1757, "next": 24344, "afterObjective": 11215, "beforeObjective": 11216 }
+          ]
+        },
+        {
+          "message": 24344,
+          "choices": [
+            { "reply": 29246, "quest": 1757, "next": 24358, "completes": 11216, "params": [[30, 11216]] }
+          ]
+        },
+        {
+          "message": 24358,
+          "choices": []
         }
       ],
-      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred."
+      "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred. Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Markaris: help (24341), fight the divers (24342), thanks (24343), why they attacked (24344, 24358)."
     },
   {
       "npc": 3252,
@@ -77188,6 +77548,10 @@
       "npc": 4086,
       "map": 183501836,
       "opening": 29413,
+      "openings": [
+        { "criterion": "Qa=1915&Qo<13174", "message": 29208 },
+        { "criterion": "Qf=1909&Qa!1915&Qf!1915", "message": 29201 }
+      ],
       "lines": [
         {
           "message": 29413,
@@ -77198,9 +77562,51 @@
         {
           "message": 29414,
           "choices": []
+        },
+        {
+          "message": 29201,
+          "choices": [
+            { "reply": 35030, "next": 29202 }
+          ]
+        },
+        {
+          "message": 29202,
+          "choices": [
+            { "reply": 35028, "next": 29203 }
+          ]
+        },
+        {
+          "message": 29203,
+          "choices": [
+            { "reply": 35029, "next": 29204 }
+          ]
+        },
+        {
+          "message": 29204,
+          "choices": [
+            { "reply": 35034, "next": 29205 }
+          ]
+        },
+        {
+          "message": 29205,
+          "choices": [
+            { "reply": 35027, "next": 29206 }
+          ]
+        },
+        {
+          "message": 29206,
+          "choices": [
+            { "reply": 35035, "startsQuest": 1915, "params": [[34, 1915]] }
+          ]
+        },
+        {
+          "message": 29208,
+          "choices": [
+            { "reply": 35026 }
+          ]
         }
       ],
-      "why": "Spirit of Menalt thanks the player after the fight against Hyrkul (1909, 13102). Spirit of Menalt thanks the player after the fight against Hyrkul (1909, 13102)."
+      "why": "Spirit of Menalt thanks the player after the fight against Hyrkul (1909, 13102). Spirit of Menalt thanks the player after the fight against Hyrkul (1909, 13102). «Es hora de morir» (1915): Menalt's spirit after Hyrkul's defeat (1909 finished): 29201-29205, the step line 29206 started by 35035; 29208 is the same advice while the quest is open (35026). INFERRED reply order. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
     },
   {
       "npc": 3922,
@@ -80094,6 +80500,395 @@
         }
       ],
       "why": "«El Guerrero Negro» (1914, 13173): the spirit shows himself at the grave again: Hyrkul's servants will not trouble the player any more (29413, 29414), good luck (29415). INFERRED reply order."
+    },
+    {
+      "npc": 4100,
+      "map": 0,
+      "opening": 29436,
+      "lines": [
+        {
+          "message": 29436,
+          "choices": [
+            { "reply": 35334, "next": 29437, "quest": 1915, "beforeObjective": 13174 }
+          ]
+        },
+        {
+          "message": 29437,
+          "choices": [
+            { "reply": 35333, "next": 29438, "quest": 1915, "beforeObjective": 13174 }
+          ]
+        },
+        {
+          "message": 29438,
+          "choices": [
+            { "reply": 35332, "next": 29439, "quest": 1915, "beforeObjective": 13175 }
+          ]
+        },
+        {
+          "message": 29439,
+          "choices": [
+            { "reply": 35331, "next": 29440, "quest": 1915 }
+          ]
+        },
+        {
+          "message": 29440,
+          "choices": [
+            { "reply": 35330, "next": 29441, "quest": 1915 }
+          ]
+        },
+        {
+          "message": 29441,
+          "choices": [
+            { "reply": 35329, "next": 29442, "quest": 1915 }
+          ]
+        },
+        {
+          "message": 29442,
+          "choices": [
+            { "reply": 35328, "next": 29443, "quest": 1915 }
+          ]
+        },
+        {
+          "message": 29443,
+          "choices": [
+            { "reply": 35327, "quest": 1915, "teleport": 183501836 }
+          ]
+        }
+      ],
+      "why": "The gloomy mane of Externam's second map is Agonía in disguise (1915, 13174): 35333 is the reveal (29438); then Menalt (35332), the price (35331), Sylargh (35330), the lich (35329), «Sí, ya lo he hecho antes» (35328) and the way back (35327). INFERRED reply order. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 4101,
+      "map": 0,
+      "opening": 29450,
+      "lines": [
+        {
+          "message": 29450,
+          "choices": [
+            { "reply": 35348, "next": 29451, "quest": 1915, "afterObjective": 13178, "beforeObjective": 13179 }
+          ]
+        },
+        {
+          "message": 29451,
+          "choices": [
+            { "reply": 35347, "next": 29452, "quest": 1915, "afterObjective": 13178, "beforeObjective": 13179, "gives": 19273 }
+          ]
+        },
+        {
+          "message": 29452,
+          "choices": [
+            { "reply": 35346, "next": 29453, "quest": 1915, "afterObjective": 13178, "beforeObjective": 13179 }
+          ]
+        },
+        {
+          "message": 29453,
+          "choices": [
+            { "reply": 35345, "quest": 1915, "afterObjective": 13178, "beforeObjective": 13179, "completes": 13179, "params": [[30, 13179]] }
+          ]
+        }
+      ],
+      "why": "Agonía at Sylargh's transporter (1915, 13179): the automaton is scrap, she sends the player for Hyrkul's phylactery (bone 19273), where the tomb is, and the farewell (35345) ends 13179. INFERRED reply order. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 4116,
+      "map": 110102530,
+      "opening": 29449,
+      "lines": [
+        {
+          "message": 29449,
+          "choices": [
+            { "reply": 35341, "quest": 1915, "afterObjective": 13177, "beforeObjective": 13178, "teleport": 128059398, "phantom": 128059398 },
+            { "reply": 35344, "quest": 1915 }
+          ]
+        }
+      ],
+      "why": "The unstable nekrolérico of Sylargh's exit room (1915, 13178; Dofus pour les noobs: the explosion kills the player, who resurrects and returns before the entrance): 35341 destroys it and the explosion kills the player into a soul; 35344 leaves it be. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 2046,
+      "map": 110102530,
+      "opening": 14800,
+      "lines": [
+        {
+          "message": 14800,
+          "choices": [
+            { "reply": 17332 }
+          ]
+        }
+      ],
+      "why": "Sylargh in his exit room (dungeon 67): 17332 leaves through the dungeon's own way out (world/dungeon_exits.json). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 4125,
+      "map": 63308288,
+      "opening": 28850,
+      "lines": [
+        {
+          "message": 28850,
+          "choices": [
+            { "reply": 34607, "quest": 1915, "afterObjective": 13179, "beforeObjective": 13181 }
+          ]
+        }
+      ],
+      "why": "The macabre rider of the Morh'Kitu valley (1915, 13181): 34607 starts the fight with two riders and an old siegalak. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 4085,
+      "map": 183241229,
+      "opening": 29458,
+      "lines": [
+        {
+          "message": 29458,
+          "choices": [
+            { "reply": 35352, "quest": 1915, "afterObjective": 13182, "beforeObjective": 13184 }
+          ]
+        }
+      ],
+      "why": "Hyrkul in the cave (1915, 13184): 35352 starts the solo fight. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 4054,
+      "map": 183242244,
+      "opening": 29456,
+      "lines": [
+        {
+          "message": 29456,
+          "choices": [
+            { "reply": 35351, "next": 29457, "quest": 1915 }
+          ]
+        },
+        {
+          "message": 29457,
+          "choices": [
+            { "reply": 35350, "quest": 1915 }
+          ]
+        }
+      ],
+      "why": "Dardondakal reborn (1915): 35351 then 35350 sends the player to the pedestal (13387). INFERRED reply order. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+    },
+    {
+      "npc": 3342,
+      "map": 0,
+      "opening": 24346,
+      "lines": [
+        {
+          "message": 24346,
+          "choices": [
+            { "reply": 29249, "quest": 1757, "afterObjective": 11216, "beforeObjective": 11217, "teleport": 168821776, "completes": 11217, "params": [[30, 11217]] }
+          ]
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). The curious tritaceo: «Seguir al tritaceo» teleports to Nea (168821776)."
+    },
+    {
+      "npc": 3343,
+      "map": 0,
+      "opening": 24347,
+      "lines": [
+        {
+          "message": 24347,
+          "choices": [
+            { "reply": 29259, "quest": 1757, "next": 24352, "afterObjective": 11217, "beforeObjective": 11218 },
+            { "reply": 29274, "quest": 1757, "next": 24372, "afterObjective": 11224, "beforeObjective": 11225, "completes": 11225, "params": [[30, 11225]] },
+            { "reply": 29283, "quest": 1757, "next": 24374, "afterObjective": 11227, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24352,
+          "choices": [
+            { "reply": 29257, "quest": 1757, "next": 24354, "afterObjective": 11217, "beforeObjective": 11218 }
+          ]
+        },
+        {
+          "message": 24354,
+          "choices": [
+            { "reply": 29256, "quest": 1757, "next": 24355, "afterObjective": 11217, "beforeObjective": 11218 }
+          ]
+        },
+        {
+          "message": 24355,
+          "choices": [
+            { "reply": 29254, "quest": 1757, "next": 24356, "afterObjective": 11217, "beforeObjective": 11218 }
+          ]
+        },
+        {
+          "message": 24356,
+          "choices": [
+            { "reply": 29255, "quest": 1757, "next": 24357, "gives": 18104, "completes": 11218, "params": [[30, 11218]] }
+          ]
+        },
+        {
+          "message": 24357,
+          "choices": []
+        },
+        {
+          "message": 24372,
+          "choices": []
+        },
+        {
+          "message": 24374,
+          "choices": [
+            { "reply": 29282, "quest": 1757, "next": 24375, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24375,
+          "choices": [
+            { "reply": 29281, "quest": 1757, "next": 24376, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24376,
+          "choices": [
+            { "reply": 29280, "quest": 1757, "next": 24377, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24377,
+          "choices": [
+            { "reply": 29279, "quest": 1757, "next": 24378, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24378,
+          "choices": [
+            { "reply": 29278, "quest": 1757, "next": 24379, "beforeObjective": 11228 }
+          ]
+        },
+        {
+          "message": 24379,
+          "choices": [
+            { "reply": 29277, "quest": 1757, "next": 24380, "completes": 11228, "params": [[30, 11228]] }
+          ]
+        },
+        {
+          "message": 24380,
+          "choices": [
+            { "reply": 29276, "quest": 1757 }
+          ]
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Nea: the Astro Negro (24352-24357, suit 18104), the threat to Neptoon (24372), the Tridon lore and Markaris (24374-24380)."
+    },
+    {
+      "npc": 3344,
+      "map": 0,
+      "opening": 24359,
+      "lines": [
+        {
+          "message": 24359,
+          "choices": [
+            { "reply": 29262, "quest": 1757, "afterObjective": 11219, "beforeObjective": 11220, "teleport": 88083976, "completes": 11220, "params": [[30, 11220]] }
+          ]
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). The diver of the Black Star: «Seguir a los buceadores» teleports to the frozen peninsula (88083976)."
+    },
+    {
+      "npc": 3345,
+      "map": 88083976,
+      "opening": 24360,
+      "lines": [
+        {
+          "message": 24360,
+          "choices": [
+            { "reply": 29268, "quest": 1757, "next": 24361, "afterObjective": 11221, "beforeObjective": 11222 }
+          ]
+        },
+        {
+          "message": 24361,
+          "choices": [
+            { "reply": 29267, "quest": 1757, "next": 24362 }
+          ]
+        },
+        {
+          "message": 24362,
+          "choices": [
+            { "reply": 29264, "quest": 1757, "next": 24363 }
+          ]
+        },
+        {
+          "message": 24363,
+          "choices": [
+            { "reply": 29265, "quest": 1757, "next": 24364 }
+          ]
+        },
+        {
+          "message": 24364,
+          "choices": [
+            { "reply": 29266, "quest": 1757, "next": 24365 }
+          ]
+        },
+        {
+          "message": 24365,
+          "choices": [
+            { "reply": 29263, "quest": 1757, "next": 24366, "gives": 18105, "completes": 11222, "params": [[30, 11222]] }
+          ]
+        },
+        {
+          "message": 24366,
+          "choices": []
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Victor, frozen peninsula: show the prisoner, the mission, documents 18105 (24360-24366)."
+    },
+    {
+      "npc": 3345,
+      "map": 88084485,
+      "opening": 24360,
+      "lines": [
+        {
+          "message": 24360,
+          "choices": [
+            { "reply": 29273, "quest": 1757, "next": 24370, "afterObjective": 11223, "beforeObjective": 11224, "completes": 11224, "params": [[30, 11224]] }
+          ]
+        },
+        {
+          "message": 24370,
+          "choices": [
+            { "reply": 29271, "quest": 1757, "next": 24371 }
+          ]
+        },
+        {
+          "message": 24371,
+          "choices": []
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Victor at [9,28]: the tablets chest 18106 handed over (29273), the plan (24370, 24371)."
+    },
+    {
+      "npc": 3347,
+      "map": 168822794,
+      "opening": 24368,
+      "lines": [
+        {
+          "message": 24368,
+          "choices": [
+            { "reply": 29270, "quest": 1757, "next": 24369, "afterObjective": 11222, "beforeObjective": 11223, "completes": 11223, "params": [[30, 11223]] }
+          ]
+        },
+        {
+          "message": 24369,
+          "choices": [
+            { "reply": 29269, "quest": 1757, "gives": 18106, "afterObjective": 11223, "criterion": "PO!18106" }
+          ]
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Rilur in the fault: documents 18105 taken (29270), tablets 18106 given (29269)."
+    },
+    {
+      "npc": 3347,
+      "map": 168820752,
+      "opening": 24373,
+      "lines": [
+        {
+          "message": 24373,
+          "choices": [
+            { "reply": 29275, "quest": 1757, "afterObjective": 11226, "beforeObjective": 11227 }
+          ]
+        }
+      ],
+      "why": "Ya raspa por hoy (1757), Dofus pour les noobs «Demain, j'arête». Link order of lines INFERRED from the texts (no capture). Rilur in Neptoon's cave: «Impedir que los trithones ejecuten su plan» starts the fight with two Riluros (24373)."
     }
   ]
 }
