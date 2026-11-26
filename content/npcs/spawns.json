@@ -8711,6 +8711,13 @@
       "why": "Teo Dolito stands at the foot of the arched door on the left of the Aquadome entrance [22,30], right of its base (Dofus pour les noobs, «Relevez les niveaux», last two screenshots; cell read off tools/dibujar_mapa.py drawing of the map). INFERRED to one cell."
     },
     {
+      "map": 117706767,
+      "npc": 2196,
+      "cell": 356,
+      "remove": true,
+      "why": "The derived placement of Teo Dolito; he stands on 242, as the row above says, and was shown twice."
+    },
+    {
       "map": 135269891,
       "npc": 2541,
       "cell": 300,
