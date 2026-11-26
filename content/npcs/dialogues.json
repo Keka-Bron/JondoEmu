@@ -45282,7 +45282,7 @@
       "opening": 24027,
       "openings": [
         { "criterion": "Qa=1749&Qo<11165", "message": 24210 },
-        { "criterion": "Qa=1749&Qo>11147&Qo<11165", "message": 24210 },
+        { "criterion": "Qa=1749&Qo>11148&Qo<11165", "message": 24210 },
         { "quest": 1733, "objective": 11015, "message": 24027 },
         { "quest": 1733, "objective": 11013, "message": 24032 },
         { "quest": 1733, "objective": 11012, "message": 24031 },
@@ -63493,7 +63493,7 @@
       "why": "As the official server says it, with no quest under way.",
       "_source": "official server packet captures, 2026-11-17 to 11-21"
     },
-  {"npc": 1601, "map": 0, "opening": 11918, "lines": [{"message": 11918, "choices": [{"reply": 13511, "next": 12020}, {"reply": 28397, "next": 23640}, {"reply": 29489, "quest": 1758, "next": 24544}]}, {"message": 12020, "choices": [{"reply": 13513, "next": 12021}]}, {"message": 12021, "choices": [{"reply": 13512, "startsQuest": 949, "params": [[34, 949]], "next": 12020}, {"reply": 13514}]}, {"message": 23640, "choices": [{"reply": 28396, "next": 23641}]}, {"message": 23641, "choices": [{"reply": 28391, "next": 23642, "buyItem": 17810, "buyPrice": 1}, {"reply": 28392}, {"reply": 28395}]}, {"message": 23642, "choices": [{"reply": 28390}]}, {"message": 24172, "choices": [{"reply": 29087, "quest": 1749, "next": 24173}]}, {"message": 24173, "choices": [{"reply": 29086, "quest": 1749, "next": 24174}]}, {"message": 24174, "choices": [{"reply": 29085, "quest": 1749, "next": 24175}]}, {"message": 24175, "choices": [{"reply": 29084, "quest": 1749, "next": 24176}]}, {"message": 24176, "choices": [{"reply": 29083, "quest": 1749}]}, {"message": 24317, "choices": [{"reply": 29221, "quest": 1756, "next": 24318}]}, {"message": 24318, "choices": [{"reply": 29220, "quest": 1756, "next": 24319}]}, {"message": 24319, "choices": [{"reply": 29219, "quest": 1756, "next": 24320}]}, {"message": 24320, "choices": [{"reply": 29218, "quest": 1756, "next": 24321}]}, {"message": 24321, "choices": [{"reply": 29217, "quest": 1756, "next": 24322}]}, {"message": 24322, "choices": [{"reply": 29216, "quest": 1756}]}, {"message": 24544, "choices": [{"reply": 29488, "quest": 1758, "next": 24545}]}, {"message": 24545, "choices": [{"reply": 29487, "quest": 1758, "next": 24546}]}, {"message": 24546, "choices": [{"reply": 29486, "quest": 1758, "next": 24547}]}, {"message": 24547, "choices": [{"reply": 29484, "quest": 1758, "next": 24548, "buyPrice": 5000}]}, {"message": 24548, "choices": [{"reply": 29483, "quest": 1758, "gives": 18086}]}], "why": "As the official server says it, with no quest under way.", "_source": "official server packet captures, 2026-11-17 to 11-21", "openings": [{"criterion": "Qa=1758&Qo<11246", "message": 11918}, {"criterion": "Qa=1749&Qo>11147&Qo<11150", "message": 24172}, {"criterion": "Qa=1756&Qo<11229", "message": 24317}]},
+  {"npc": 1601, "map": 0, "opening": 11918, "lines": [{"message": 11918, "choices": [{"reply": 13511, "next": 12020}, {"reply": 28397, "next": 23640}, {"reply": 29489, "quest": 1758, "next": 24544}]}, {"message": 12020, "choices": [{"reply": 13513, "next": 12021}]}, {"message": 12021, "choices": [{"reply": 13512, "startsQuest": 949, "params": [[34, 949]], "next": 12020}, {"reply": 13514}]}, {"message": 23640, "choices": [{"reply": 28396, "next": 23641}]}, {"message": 23641, "choices": [{"reply": 28391, "next": 23642, "buyItem": 17810, "buyPrice": 1}, {"reply": 28392}, {"reply": 28395}]}, {"message": 23642, "choices": [{"reply": 28390}]}, {"message": 24172, "choices": [{"reply": 29087, "quest": 1749, "next": 24173}]}, {"message": 24173, "choices": [{"reply": 29086, "quest": 1749, "next": 24174}]}, {"message": 24174, "choices": [{"reply": 29085, "quest": 1749, "next": 24175}]}, {"message": 24175, "choices": [{"reply": 29084, "quest": 1749, "next": 24176}]}, {"message": 24176, "choices": [{"reply": 29083, "quest": 1749}]}, {"message": 24317, "choices": [{"reply": 29221, "quest": 1756, "next": 24318}]}, {"message": 24318, "choices": [{"reply": 29220, "quest": 1756, "next": 24319}]}, {"message": 24319, "choices": [{"reply": 29219, "quest": 1756, "next": 24320}]}, {"message": 24320, "choices": [{"reply": 29218, "quest": 1756, "next": 24321}]}, {"message": 24321, "choices": [{"reply": 29217, "quest": 1756, "next": 24322}]}, {"message": 24322, "choices": [{"reply": 29216, "quest": 1756}]}, {"message": 24544, "choices": [{"reply": 29488, "quest": 1758, "next": 24545}]}, {"message": 24545, "choices": [{"reply": 29487, "quest": 1758, "next": 24546}]}, {"message": 24546, "choices": [{"reply": 29486, "quest": 1758, "next": 24547}]}, {"message": 24547, "choices": [{"reply": 29484, "quest": 1758, "next": 24548, "buyPrice": 5000}]}, {"message": 24548, "choices": [{"reply": 29483, "quest": 1758, "gives": 18086}]}], "why": "As the official server says it, with no quest under way.", "_source": "official server packet captures, 2026-11-17 to 11-21", "openings": [{"criterion": "Qa=1758&Qo<11246", "message": 11918}, {"criterion": "Qa=1749&Qo>11148&Qo<11150", "message": 24172}, {"criterion": "Qa=1756&Qo<11229", "message": 24317}]},
   {"npc": 711, "map": 0, "opening": 4557, "lines": [{"message": 4557, "choices": [{"reply": 23658, "next": 19748}, {"reply": 23661, "next": 19750}, {"reply": 28970, "next": 24582, "buyItem": 7517, "buyPrice": 20}, {"reply": 29160, "next": 24263, "quest": 1752, "holds": 7517}, {"reply": 28972, "quest": 1746, "next": 24075, "beforeObjective": 11126}]}, {"message": 19748, "choices": [{"reply": 23657}]}, {"message": 19750, "choices": [{"reply": 23660, "next": 19751}]}, {"message": 19751, "choices": []}, {"message": 24582, "choices": []}, {"message": 24263, "choices": [{"reply": 29159, "next": 24264}]}, {"message": 24264, "choices": [{"reply": 29158, "next": 24265}]}, {"message": 24265, "choices": [{"reply": 29157, "next": 24266, "completes": 11202, "params": [[30, 11202]]}]}, {"message": 24266, "choices": []}, {"message": 24075, "choices": [{"reply": 28970, "quest": 1746, "next": 24076, "buyItem": 7517, "buyPrice": 5}, {"reply": 28971, "quest": 1746}]}, {"message": 24076, "choices": [{"reply": 28969, "quest": 1746, "next": 24077}]}, {"message": 24077, "choices": [{"reply": 28968, "quest": 1746}]}], "why": "As the official server says it, with no quest under way.", "_source": "official server packet captures, 2026-11-17 to 11-21"},
   {
       "npc": 1591,
@@ -74312,7 +74312,9 @@
       "opening": 24165,
       "openings": [
         { "criterion": "Qa=1749&Qo>11171", "message": 24224 },
-        { "criterion": "Qa=1749&Qo>11158&Qo<11165", "message": 24203 }
+        { "criterion": "Qa=1749&Qo>11163&Qo<11164", "message": 24209 },
+        { "criterion": "Qa=1749&Qo>11161&Qo<11162", "message": 24203 },
+        { "criterion": "Qa=1749&Qo>11159&Qo<11160", "message": 24202 }
       ],
       "lines": [
         {
@@ -74372,7 +74374,7 @@
         {
           "message": 24207,
           "choices": [
-            { "reply": 29113, "quest": 1749 }
+            { "reply": 29113, "quest": 1749, "completes": 11162, "params": [[30, 11162]] }
           ]
         },
         {
@@ -74402,12 +74404,24 @@
         {
           "message": 24229,
           "choices": [
-            { "reply": 29127, "quest": 1749, "next": 24230 }
+            { "reply": 29127, "quest": 1749, "next": 24230, "completes": 11172, "params": [[30, 11172]] }
           ]
         },
         {
           "message": 24230,
           "choices": []
+        },
+        {
+          "message": 24202,
+          "choices": [
+            { "reply": 29109, "quest": 1749, "completes": 11160, "params": [[30, 11160]] }
+          ]
+        },
+        {
+          "message": 24209,
+          "choices": [
+            { "reply": 29114, "quest": 1749, "completes": 11164, "params": [[30, 11164]] }
+          ]
         }
       ],
       "why": "Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. Markaris (3291), «Memorias de un amnesico» (1749, Dofus pour les noobs): the start on the plateau of Ryluglugl [25,27] (24165-24169, 29114) and the memories the Mi-To brings back in the cave (24203-24207). INFERRED order of the replies. 1749 (Memorias de un amnesico): last objective 11172, Markaris at the clinic after Lisa has the samples (24224-24230: swimming, breathing under water, the laboratory and the leviathan; Dofus pour les noobs 'Markaris vous apprend se souvenir de pourquoi il peut respirer sous l eau'). Reply ids are the NPC template's own, order inferred."
@@ -74417,7 +74431,7 @@
       "map": 0,
       "opening": 0,
       "openings": [
-        { "criterion": "Qa=1749&Qo>11147&Qo<11165", "message": 24210 }
+        { "criterion": "Qa=1749&Qo>11148&Qo<11165", "message": 24210 }
       ],
       "lines": [
         {
@@ -74501,7 +74515,7 @@
         {
           "message": 24201,
           "choices": [
-            { "reply": 29107, "quest": 1749, "completes": 11159, "params": [[30, 11159]] }
+            { "reply": 29107, "quest": 1749 }
           ]
         }
       ],
@@ -74571,8 +74585,7 @@
       "map": 168560642,
       "opening": 24217,
       "openings": [
-        { "criterion": "Qa=1749&Qo>11169&Qo<11171", "message": 24221 },
-        { "criterion": "Qa=1749&Qo>11168&Qo<11171", "message": 24221 }
+        { "criterion": "Qa=1749&Qo>11169&Qo<11171", "message": 24221 }
       ],
       "lines": [
         {
@@ -74584,7 +74597,7 @@
         {
           "message": 24218,
           "choices": [
-            { "reply": 29120, "quest": 1749, "next": 24219 }
+            { "reply": 29120, "quest": 1749, "next": 24219, "completes": 11168, "params": [[30, 11168]] }
           ]
         },
         {
@@ -78931,6 +78944,52 @@
         }
       ],
       "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»)."
+    },
+    {
+      "npc": 3305,
+      "map": 0,
+      "opening": 24381,
+      "lines": [
+        {
+          "message": 24381,
+          "choices": [
+            { "reply": 29291, "quest": 1749, "next": 24382, "afterObjective": 11153, "beforeObjective": 11155 },
+            { "reply": 29292, "quest": 1749, "next": 24384, "afterObjective": 11158, "beforeObjective": 11159, "completes": 11159, "params": [[30, 11159]] },
+            { "reply": 29294, "quest": 1749, "next": 24385, "afterObjective": 11160, "beforeObjective": 11161, "completes": 11161, "params": [[30, 11161]] },
+            { "reply": 29295, "quest": 1749, "next": 24387, "afterObjective": 11162, "beforeObjective": 11163, "completes": 11163, "params": [[30, 11163]] },
+            { "reply": 29355 }
+          ]
+        },
+        {
+          "message": 24382,
+          "choices": [
+            { "reply": 29290, "quest": 1749, "next": 24383 }
+          ]
+        },
+        {
+          "message": 24383,
+          "choices": []
+        },
+        {
+          "message": 24384,
+          "choices": []
+        },
+        {
+          "message": 24385,
+          "choices": [
+            { "reply": 29293, "quest": 1749, "next": 24386 }
+          ]
+        },
+        {
+          "message": 24386,
+          "choices": []
+        },
+        {
+          "message": 24387,
+          "choices": []
+        }
+      ],
+      "why": "Mi-To (3305), «Memorias de un amnesico» (1749, Dofus pour les noobs): the cave talks of the quest, 29290-29295 / 24381-24387; the others keep his generic greeting (29355)."
     }
 ]
 }

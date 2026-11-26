@@ -8829,6 +8829,7 @@
   {"map": 186646532, "npc": 4242, "cell": 383, "orientation": 1, "criterion": "Qa=1944&Qo>13522&Qo<13524", "why": "Hermana Sonrisa at [-45,-82] (1944, 13523). INFERRED cell."},
   {"map": 186646532, "npc": 4245, "cell": 384, "orientation": 1, "criterion": "Qa=1944&Qo>13523&Qo<13526", "why": "Caterina at [-45,-82] after the fight (1944, 13525). INFERRED cell."},
   {"map": 186647556, "npc": 4243, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13526&Qo<13528", "why": "Pau Breton at [-46,-81] (1944, 13527). INFERRED cell."},
-  {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."}
+  {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."},
+  {"map": 54789135, "npc": 3292, "cell": 297, "remove": true, "why": "Naroto stood twice in the Frigost tavern; the inferred placement goes and the other one stays."}
   ]
 }
