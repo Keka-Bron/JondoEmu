@@ -6662,6 +6662,13 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda,
                                                                        deConducta && !CountsItsRoundsOffATrigger(c.Efecto, offATrigger));
                     if (suya < 0) { hasta = -1; break; }
+                    // A monster row with no duration of its own and a delay waits for its round:
+                    // Solar's Zenith (9437, cast by Aurora's hook) casts Twilight three turns later,
+                    // "792 9438 under TB, delay 3". Held for the round after the cast only, the hook
+                    // fell first, and he stayed in Zenith, invulnerable, for the rest of the fight.
+                    if (c.Efecto is { Duration: 0, Delay: > 0 } delayed)
+                        suya = Math.Max(suya, ronda + delayed.Delay
+                                              + (Managers.EffectEngine.CountsItsTriggerRounds(delayed) ? delayed.TriggerDuration : 1));
                     hasta = Math.Max(hasta, suya);
                     // A row's trigger duration is a duration of its own too, when it is a real count
                     // and the row is on its caster: the Sacurador's Tact, cast in his turn, is «when I
@@ -6738,6 +6745,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (armables.Count == 0) continue;
                 if (deConducta && hasta < 0 && grupo.Key.Sobre.Id == grupo.Key.Quien && !offATrigger)
                     Managers.EffectEngine.NoteBehaviourHook(grupo.Key.Sobre, grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen);
+                else if (offATrigger && grupo.Key.Sobre.Id == grupo.Key.Quien)
+                    Managers.EffectEngine.GiveTheChainItsGoOffsBack(grupo.Key.Sobre, grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen);
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, armables.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: (inItsCastersTurn || afterItsCastersTurn) && hasta >= 0

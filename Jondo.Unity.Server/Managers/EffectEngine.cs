@@ -1327,6 +1327,23 @@ namespace Jondo.Unity.Server.Managers
                     goOffs.Remove(key);
         }
 
+        /// <summary>
+        /// Gives a spell of the behaviour's chain its go-offs back when the monster's own hooks cast
+        /// it again: Solar's Nadir (9439) casts Aurora (9436) once more, and Aurora's single
+        /// "792 9437 under TB" must go off again three turns later. Still counted from the fight's
+        /// start, the second Aurora never ended and the cycle stopped there.
+        /// </summary>
+        public static void GiveTheChainItsGoOffsBack(Fighter monster, int spell, int grade)
+        {
+            if (monster == null || monster.Conducta == (spell, grade)) return;
+            if (!BehaviourChain.TryGetValue(monster, out var chain)) return;
+            lock (chain) if (!chain.Contains((spell, grade))) return;
+            var goOffs = BehaviourGoOffs.GetOrCreateValue(monster);
+            lock (goOffs)
+                foreach (var key in goOffs.Keys.Where(k => k.Spell == spell && k.Grade == grade).ToList())
+                    goOffs.Remove(key);
+        }
+
         /// <summary>Whether a spell is the monster's behaviour or one that behaviour chains and hooks on it.</summary>
         private static bool IsTheBehaviourOrItsChain(Fighter monster, int spell, int grade)
         {
