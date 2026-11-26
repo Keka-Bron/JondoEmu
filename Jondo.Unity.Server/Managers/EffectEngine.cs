@@ -1672,7 +1672,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Whether a spell that lays runes also sets them off in one of its grades: Capitan Meno's
         /// 6804 lays them in grades 1-5 and its "792 grade 6" sets them all off (2023) at once.
-        /// Such runes are there to be set off, not stepped on.
+        /// Such runes are there to be set off, not stepped on. So are the ones whose OWN spell sets
+        /// runes off: Rainikron's behaviour (8917) and its 8915 lay the runes of 8916, whose red
+        /// grade activates the four round it, and the Minikron's step (8922) makes her activate the
+        /// one he lands on -- fired on the step too, each pink took two of her four life points.
         /// </summary>
         private static bool SetsOffItsOwnRunes(int hechizo)
         {
@@ -5364,7 +5367,8 @@ namespace Jondo.Unity.Server.Managers
                     Trampa => Jondo.Unity.World.Fights.Disparo.AlPisar,
                     GlifoDeInicioDeTurno => Jondo.Unity.World.Fights.Disparo.AlEmpezarElTurno,
                     GlifoDeFinDeTurno => Jondo.Unity.World.Fights.Disparo.AlAcabarElTurno,
-                    Runa when !PlayerSpells.Contains(hechizo) && SetsOffItsOwnRunes(hechizo)
+                    Runa when !PlayerSpells.Contains(hechizo)
+                              && (SetsOffItsOwnRunes(hechizo) || SetsOffItsOwnRunes(efecto.DiceNum))
                         => Jondo.Unity.World.Fights.Disparo.AlActivarse,
                     _ => Jondo.Unity.World.Fights.Disparo.AlPisarYAlEmpezar,
                 };

@@ -41,11 +41,13 @@ namespace Jondo.Unity.Server.Handlers
             long characterId = GameState.CharacterId;
             // The monster he fights as: the Entrenador of «Barnabé en el espacio».
             if (fight.Incarnates != 0)
-                FightHandler.IncarnateInNextFight(characterId, fight.Incarnates, fight.IncarnationGrade, fight.IncarnationInvulnerable);
-            // And the waves that come in later (Dark Vlad's chafers), at his level as the first ones are.
+                FightHandler.IncarnateInNextFight(characterId, fight.Incarnates, fight.IncarnationGrade, fight.IncarnationInvulnerable,
+                                                  fight.IncarnationActionPoints);
+            // And the waves that come in later (Dark Vlad's chafers, the allies some bring), at his
+            // level as the first ones are.
             if (fight.Waves.Count > 0)
                 FightHandler.WavesInNextFight(characterId, fight.ByLevel
-                    ? fight.Waves.Select(w => w with { Monsters = AtHisLevel(w.Monsters) }).ToList()
+                    ? fight.Waves.Select(w => w with { Monsters = AtHisLevel(w.Monsters), Allies = AtHisLevel(w.Allies) }).ToList()
                     : fight.Waves);
             // And what the quest adds to it: the Yokai Nana lent, Kuatinbe's Pandasiman.
             if (!fight.Rules.IsEmpty) FightHandler.RulesInNextFight(characterId, fight.Rules);

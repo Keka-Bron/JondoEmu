@@ -884,7 +884,7 @@ namespace Jondo.Unity.Server.Handlers
             // Or the one a quest's fight makes him, at the template's own sheet: the Entrenador of
             // «Barnabé en el espacio» (NpcFights).
             var questIncarnation = TakeNextIncarnation(GameState.CharacterId);
-            if (questIncarnation is { } asked && !Incarnate(playerFighter, asked.Monster, 0, asked.Grade - 1))
+            if (questIncarnation is { } asked && !Incarnate(playerFighter, asked.Monster, 0, asked.Grade - 1, asked.ActionPoints))
                 questIncarnation = null;
 
             var dream = Managers.Dreams.De(GameState.CharacterId);
@@ -12625,11 +12625,13 @@ namespace Jondo.Unity.Server.Handlers
             fight.TimedWaves.RemoveAt(0);
 
             var group = MobSpawnManager.ComposeOffMap(next.Monsters);
-            if (group == null || group.Members.Count == 0) return false;
+            // And who comes in with it on the players' side: the Refuerzo steamers of 1943.
+            var allies = MobSpawnManager.ComposeMembers(next.Allies);
+            if ((group == null || group.Members.Count == 0) && allies.Count == 0) return false;
 
             int wave = fight.WaveNumber + 1;
             int turnsBeforeNext = fight.TimedWaves.Count > 0 ? fight.TimedWaves[0].Turns : 0;
-            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, monster =>
+            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, allies: allies, shape: monster =>
             {
                 // A dimension dungeon's later waves come with a quarter less life.
                 if (fight.WaveLifePercent is > 0 and < 100)
@@ -12745,13 +12747,19 @@ namespace Jondo.Unity.Server.Handlers
         /// draws them one by one, each with the light falling on its cell
         /// (see <see cref="Network.FightProtocol.BuildNewWave"/>). How many came in.
         /// </summary>
+        /// <remarks>
+        /// <paramref name="allies"/> come in with it on the players' side, on a free attacker cell
+        /// or the nearest free one to the first player, and are drawn the same way: the client's
+        /// current wave is one for the whole board, and their blocks carry it too.
+        /// </remarks>
         private static async Task<int> BringWaveAsync(NetworkStream stream, FightInstance fight,
-                                                      MobSpawnManager.MobGroup group, int wave,
-                                                      int turnsBeforeNext, Action<Fighter> shape)
+                                                      MobSpawnManager.MobGroup? group, int wave,
+                                                      int turnsBeforeNext, Action<Fighter> shape,
+                                                      IReadOnlyList<MobSpawnManager.MobMember>? allies = null)
         {
             var fallen = fight.Rojo.LastOrDefault();
             var arrivals = new List<Fighter>();
-            foreach (var member in group.Members)
+            foreach (var member in group?.Members ?? new List<MobSpawnManager.MobMember>())
             {
                 int cell = fight.RedPlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
                 if (cell < 0) cell = CasillaLibreCerca(fight, fallen?.CellId ?? fight.RedPlacementCells.FirstOrDefault());
@@ -12762,6 +12770,18 @@ namespace Jondo.Unity.Server.Handlers
                 monster.Wave = wave;
                 fight.Join(monster);
                 arrivals.Add(monster);
+            }
+            var leader = fight.Azul.FirstOrDefault(f => f.IsAlive && !f.IsMonster) ?? fight.Azul.FirstOrDefault();
+            foreach (var member in allies ?? Array.Empty<MobSpawnManager.MobMember>())
+            {
+                int cell = fight.BluePlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
+                if (cell < 0) cell = CasillaLibreCerca(fight, leader?.CellId ?? fight.BluePlacementCells.FirstOrDefault());
+                if (cell < 0) break;
+
+                var ally = BuildMonsterFighter(member, fight.SiguienteIdDeInvocado(), cell);
+                ally.Wave = wave;
+                fight.JoinBeside(ally);
+                arrivals.Add(ally);
             }
             if (arrivals.Count == 0) return 0;
 

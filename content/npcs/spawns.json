@@ -8808,6 +8808,47 @@
   {"map": 184288260, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13617&Qo<13620", "why": "Triki Guest waits at [-30,24] (1949, 13619). INFERRED cell."},
   {"map": 184289284, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13619&Qo<13624", "why": "Triki Guest at [-29,24] (1949, 13621 and 13623). INFERRED cell."},
   {"map": 182978058, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13623&Qo<13628", "why": "Triki Guest faces the bandits at [-28,24] (1949, 13625 and 13627). INFERRED cell."},
-  {"map": 182978568, "npc": 4258, "cell": 296, "orientation": 1, "criterion": "Qa=1949&Qo>13627&Qo<13630", "why": "Triki Guest beside the lava tongue at [-27,22] (1949, 13629). INFERRED cell."}
+  {"map": 182978568, "npc": 4258, "cell": 296, "orientation": 1, "criterion": "Qa=1949&Qo>13627&Qo<13630", "why": "Triki Guest beside the lava tongue at [-27,22] (1949, 13629). INFERRED cell."},
+    {
+      "map": 179308545,
+      "npc": 3733,
+      "cell": 246,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): Kaskarina (Coqueline), met at [-63,29] (13105) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 179306499,
+      "npc": 4091,
+      "cell": 232,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): the chatty hunter (Chasseur bavard), met at [-67,31] (13106, 13107) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 179306499,
+      "npc": 4090,
+      "cell": 245,
+      "orientation": 1,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): the stupid hunter (Chasseur stupide), met at [-67,31] (13106, 13107) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 180356609,
+      "npc": 4093,
+      "cell": 246,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): Michazrael (Chazrael), met at [-10,30] to drop the cat's moustache stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+  {"map": 186515968, "npc": 4220, "cell": 344, "orientation": 1, "criterion": "Qa=1943&Qo>13509&Qo<13510", "why": "Mortisparo aullador who rallies the sumergidos at [-49,-82] (1943, 13510). INFERRED cell."},
+  {"map": 186515968, "npc": 4212, "cell": 315, "orientation": 1, "criterion": "Qa=1943&Qo>13510&Qo<13512", "why": "Bibak after the capture fight (1943, 13511); the base spawn carries no criterion. INFERRED cell."},
+  {"map": 186515970, "npc": 4222, "cell": 241, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Maremorto reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4224, "cell": 243, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Funespada reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4225, "cell": 255, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Mortisparo reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4226, "cell": 257, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Cangreno reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4228, "cell": 298, "orientation": 1, "criterion": "Qa=1943&Qo>13512&Qo<13514", "why": "Simon Kara after the waves (1943, 13513). INFERRED cell."},
+  {"map": 186515970, "npc": 4229, "cell": 300, "orientation": 1, "criterion": "Qa=1943&Qo>13512&Qo<13514", "why": "Serge Mazov after the waves (1943, 13513). INFERRED cell."},
+  {"map": 186648582, "npc": 4241, "cell": 399, "orientation": 1, "criterion": "Qa=1944&Qo>13520&Qo<13522", "why": "Pepe Dea at [-48,-84] (1944, 13521). INFERRED cell."},
+  {"map": 186646532, "npc": 4242, "cell": 383, "orientation": 1, "criterion": "Qa=1944&Qo>13522&Qo<13524", "why": "Hermana Sonrisa at [-45,-82] (1944, 13523). INFERRED cell."},
+  {"map": 186646532, "npc": 4245, "cell": 384, "orientation": 1, "criterion": "Qa=1944&Qo>13523&Qo<13526", "why": "Caterina at [-45,-82] after the fight (1944, 13525). INFERRED cell."},
+  {"map": 186647556, "npc": 4243, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13526&Qo<13528", "why": "Pau Breton at [-46,-81] (1944, 13527). INFERRED cell."},
+  {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."}
   ]
 }

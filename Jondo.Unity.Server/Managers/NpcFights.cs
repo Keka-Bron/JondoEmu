@@ -94,6 +94,13 @@ namespace Jondo.Unity.Server.Managers
             public bool IncarnationInvulnerable { get; init; }
 
             /// <summary>
+            /// The AP the incarnation fights with instead of its grade's («actionPoints»), zero for
+            /// the grade's: the Minikron of «Le bonheur est dans le spray» (4947) carries 20 in every
+            /// grade, where the fight gives «1 PV, 12 PA, 0 PM» (Dofus pour les noobs).
+            /// </summary>
+            public int IncarnationActionPoints { get; init; }
+
+            /// <summary>
             /// Whether the character plays the allies by hand («alliesPlayed»): Barnabé,
             /// «contrôlable depuis la màj 2.70» (Fighter.IsPlayedAlly).
             /// </summary>
@@ -126,7 +133,8 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>
             /// Monsters that come in later, each wave so many rounds after the one before
-            /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers.
+            /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers. An ally with a «wave»
+            /// comes in with that wave instead of at the start (see <see cref="WaveOf"/>).
             /// </summary>
             public IReadOnlyList<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves { get; init; }
                 = Array.Empty<Jondo.Unity.World.Fights.FightInstance.TimedWave>();
@@ -260,9 +268,9 @@ namespace Jondo.Unity.Server.Managers
                 Reply = Long(row, "reply"),
                 ArenaMapId = Long(row, "arena"),
                 Monsters = Members(row, "monsters"),
-                Allies = Members(row, "allies"),
+                Allies = StartAllies(row),
                 PlayerCell = Math.Max(0, (int)Long(row, "playerCell")),
-                AllyCells = Cells(row),
+                AllyCells = StartAllyCells(row),
                 MonsterCells = MemberCells(row, "monsters"),
                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                 WinMapId = Long(row, "winMap"),
@@ -275,6 +283,7 @@ namespace Jondo.Unity.Server.Managers
                 IncarnationGrade = incarnates ? Math.Max(1, (int)Long(incarnation, "grade")) : 1,
                 IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
                                           && invulnerable.ValueKind == JsonValueKind.True,
+                IncarnationActionPoints = incarnates ? Math.Max(0, (int)Long(incarnation, "actionPoints")) : 0,
                 AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
                 DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
@@ -299,7 +308,65 @@ namespace Jondo.Unity.Server.Managers
                 if (members.Count > 0)
                     waves.Add(new Jondo.Unity.World.Fights.FightInstance.TimedWave(Math.Max(1, (int)Long(wave, "turns")), members));
             }
+            // The allies that arrive with a wave, on the players' side of it.
+            var late = new Dictionary<int, List<(int, int)>>();
+            foreach (var (ally, at) in AlliesWithWave(row))
+            {
+                int index = at - 2;
+                if (index < 0 || index >= waves.Count) continue;
+                if (!late.TryGetValue(index, out var joining)) late[index] = joining = new List<(int, int)>();
+                joining.Add(ally);
+            }
+            foreach (var (index, allies) in late) waves[index] = waves[index] with { Allies = allies };
             return waves;
+        }
+
+        /// <summary>
+        /// The wave an ally comes in with («wave» on an «allies» entry), counted as the guides
+        /// count them: 1 is the group the fight starts with, 2 the first of the «waves», and so on.
+        /// 0, 1 or a wave the row does not have puts the ally on the board from the start.
+        /// «Vence a la horda de sumergidos» (1943): the two Refuerzo steamers come at wave 3.
+        /// </summary>
+        internal static int WaveOf(int waveCount, JsonElement ally)
+        {
+            int at = (int)Long(ally, "wave");
+            return at >= 2 && at - 2 < waveCount ? at : 1;
+        }
+
+        /// <summary>Each «allies» entry with the wave it comes in with (<see cref="WaveOf"/>), in order.</summary>
+        private static List<((int, int) Ally, int Wave)> AlliesWithWave(JsonElement row)
+        {
+            var found = new List<((int, int), int)>();
+            if (!row.TryGetProperty("allies", out var list) || list.ValueKind != JsonValueKind.Array) return found;
+            int waveCount = WaveCount(row);
+            foreach (var member in list.EnumerateArray())
+            {
+                int monster = (int)Long(member, "monster");
+                if (monster != 0) found.Add(((monster, (int)Long(member, "grade")), WaveOf(waveCount, member)));
+            }
+            return found;
+        }
+
+        /// <summary>How many of a row's «waves» bring someone in: the ones <see cref="Waves"/> keeps.</summary>
+        private static int WaveCount(JsonElement row)
+        {
+            if (!row.TryGetProperty("waves", out var list) || list.ValueKind != JsonValueKind.Array) return 0;
+            return list.EnumerateArray().Count(wave => Members(wave, "monsters").Count > 0);
+        }
+
+        /// <summary>The allies on the board from the start: those with no later wave.</summary>
+        private static List<(int, int)> StartAllies(JsonElement row)
+            => AlliesWithWave(row).Where(a => a.Wave <= 1).Select(a => a.Ally).ToList();
+
+        /// <summary>The «allyCells» of the allies on the board from the start, in their order.</summary>
+        private static List<int> StartAllyCells(JsonElement row)
+        {
+            var cells = Cells(row);
+            var all = AlliesWithWave(row);
+            var found = new List<int>();
+            for (int i = 0; i < all.Count && i < cells.Count; i++)
+                if (all[i].Wave <= 1) found.Add(cells[i]);
+            return found;
         }
 
         /// <summary>

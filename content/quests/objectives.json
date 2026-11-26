@@ -9781,6 +9781,97 @@
    "kind": "enter",
    "map": 175637504,
    "why": "Enter the Chamber of Tal Kasha (732413): its first room 176160768, reached through the keeper's keyring on 175637504. Dofus pour les noobs «Nordalie». The binding of the first pass was gone from objectives.json, re-added."
-  }
+  },
+  {"objective": 13510, "quest": 1943, "kind": "beat", "monsters": [5148, 5149, 5112, 5112, 5113, 5113, 5114, 5115], "map": 186515968, "afterObjectives": [13509], "why": "«Captura un sumergido» (740675): the eight sumergidos fought at [-49,-82] after «Atacar» (Dofus pour les noobs: «Un combat se lance contre 8 x Submergés»)."},
+  {"objective": 13512, "quest": 1943, "kind": "beat", "monsters": [5112, 5112, 5113, 5113, 5114, 5114, 5115, 5115], "map": 186515970, "afterObjectives": [13511], "why": "«Vence a la horda de sumergidos» (740676): three waves of eight at [-49,-81] (Dofus pour les noobs)."},
+  {"objective": 13513, "quest": 1943, "kind": "talk", "npc": 4228, "map": 186515970, "afterObjectives": [13512], "why": "«Habla con los steamers» (740677): Simon Kara after the wave fight (Dofus pour les noobs)."},
+  {
+   "objective": 13103,
+   "quest": 1911,
+   "kind": "talk",
+   "npc": 4092
+  },
+  {
+   "objective": 13104,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 180094978,
+   "afterObjectives": [13103]
+  },
+  {
+   "objective": 13106,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [35110],
+   "afterObjectives": [13105]
+  },
+  {
+   "objective": 13107,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4993, 4994],
+   "map": 179306499,
+   "afterObjectives": [13106]
+  },
+  {
+   "objective": 13108,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 180092928,
+   "afterObjectives": [13107]
+  },
+  {
+   "objective": 13109,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [35154],
+   "afterObjectives": [13108]
+  },
+  {
+   "objective": 13110,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4995, 4996, 4997],
+   "map": 180092928,
+   "afterObjectives": [13109]
+  },
+  {
+   "objective": 13113,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 181404680,
+   "afterObjectives": [13112]
+  },
+  {
+   "objective": 13114,
+   "quest": 1911,
+   "kind": "click",
+   "elements": [{"map": 181403656, "element": 511294}],
+   "afterObjectives": [13113],
+   "gives": [{"item": 19176, "count": 1}]
+  },
+  {
+   "objective": 13119,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [32671],
+   "afterObjectives": [13115, 13116, 13117, 13118],
+   "requires": [{"item": 19177, "count": 1}],
+   "spends": true
+  },
+  {
+   "objective": 13120,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4946],
+   "map": 180094978,
+   "afterObjectives": [13119]
+  },
+  {"objective": 13520, "quest": 1944, "kind": "click", "elements": [{"map": 186648582, "element": 511905}], "afterObjectives": [13519], "showsNpc": 4241, "gives": [{"item": 19546, "count": 1}], "why": "«Explora los restos» (743974): the small barrels at [-48,-84] (Dofus pour les noobs: «cliquez sur les trois petits tonneaux»), which brings Pepe Dea out. INFERRED: element 511905 and that it hands over the Tonel de restos (19546)."},
+  {"objective": 13522, "quest": 1944, "kind": "click", "elements": [{"map": 186646532, "element": 511906}], "afterObjectives": [13521], "showsNpc": 4242, "why": "«Explora los restos» (743976): the plant in the top right corner at [-45,-82] (Dofus pour les noobs). INFERRED: element 511906."},
+  {"objective": 13526, "quest": 1944, "kind": "click", "elements": [{"map": 186647556, "element": 511907}], "afterObjectives": [13525], "showsNpc": 4243, "gives": [{"item": 19548, "count": 1}], "why": "«Explora los restos» (743978): the violet aquatic plant at [-46,-81] (Dofus pour les noobs). INFERRED: element 511907 and that it hands over the Piedra de restos (19548)."},
+  {"objective": 13528, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511908}], "afterObjectives": [13527], "showsNpc": 4244, "why": "«Explora los restos» (743980): the wooden barrel left of the stairs at [-47,-83] (Dofus pour les noobs). INFERRED: element 511908."},
+  {"objective": 13530, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511909}], "afterObjectives": [13529], "gives": [{"item": 19549, "count": 1}], "why": "«Continua la exploración de los restos» (743981): the three small crates at [-47,-83] (Dofus pour les noobs). INFERRED: element 511909 and that it hands over the Caja de restos (19549)."},
+  {"objective": 13498, "quest": 1942, "kind": "beat", "monsters": [5147, 5147, 5147, 5147, 5146, 5146, 5146, 5145], "map": 186385924, "afterObjectives": [13497], "why": "«Caza a los inoportunos» (740603): the Trepamuertos fanatics' ambush at Zrid's camp, 4 Ocra amenazador, 3 Yopuka amenazadora and Bibak (Dofus pour les noobs: «un combat contre 4 Crâs, 3 Iops et 1 Zobal»)."}
 ]
 }

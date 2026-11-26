@@ -45111,10 +45111,16 @@
           "choices": [
             { "reply": 8580, "startsQuest": 685, "params": [[34, 685]], "next": 8533, "criterion": "Qf=674&Sc=702" },
             { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 },
-            { "reply": 7764, "startsQuest": 615, "params": [[34, 615]], "next": 7760 }
+            { "reply": 7764, "startsQuest": 615, "params": [[34, 615]], "next": 7760 },
+            { "reply": 35563, "next": 29600, "criterion": "PL>179&PO=19414&Qa!1942&Qf!1942" },
+            { "reply": 35577, "next": 29613, "quest": 1942, "afterObjective": 13499, "beforeObjective": 13500, "completes": 13500, "params": [[30, 13500]] },
+            { "reply": 35580, "next": 29614, "quest": 1942, "afterObjective": 13500, "beforeObjective": 13502, "completes": 13502, "completesAll": [13501, 13502], "params": [[30, 13502]] }
           ]
         },
-        { "message": 8198, "choices": [] },
+        {
+          "message": 8198,
+          "choices": []
+        },
         {
           "message": 8533,
           "choices": [
@@ -45122,10 +45128,53 @@
             { "reply": 8206, "quest": 667, "completes": 4050, "params": [[30, 4050]], "next": 8198, "holds": 11542 }
           ]
         },
-        { "message": 8534, "choices": [] },
-        { "message": 7760, "choices": [] }
+        {
+          "message": 8534,
+          "choices": []
+        },
+        {
+          "message": 7760,
+          "choices": []
+        },
+        {
+          "message": 29600,
+          "choices": [
+            { "reply": 35559, "next": 29601 }
+          ]
+        },
+        {
+          "message": 29601,
+          "choices": [
+            { "reply": 35557, "next": 29602, "startsQuest": 1942, "params": [[34, 1942]] },
+            { "reply": 35558 }
+          ]
+        },
+        {
+          "message": 29602,
+          "choices": [
+            { "reply": 35578 }
+          ]
+        },
+        {
+          "message": 29613,
+          "choices": [
+            { "reply": 35578 }
+          ]
+        },
+        {
+          "message": 29614,
+          "choices": [
+            { "reply": 35579, "next": 29615, "quest": 1942 }
+          ]
+        },
+        {
+          "message": 29615,
+          "choices": [
+            { "reply": 35578 }
+          ]
+        }
       ],
-      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Review fix: the start carries the quest's own Sc=702 switch (no PL clause); the weekly renewal is NOT modelled: quest 685 has no repeatType in the client data, so the engine treats it as done once (CanStart refuses it after the first run); it needs a repeatType 2 override in the quest catalogue (engine data)."
+      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Review fix: the start carries the quest's own Sc=702 switch (no PL clause); the weekly renewal is NOT modelled: quest 685 has no repeatType in the client data, so the engine treats it as done once (CanStart refuses it after the first run); it needs a repeatType 2 override in the quest catalogue (engine data). Albert Pess (1942): «Montrer la mycose» starts the quest (step line 29602, the guide's «Suivre son conseil»); the parasites hand-over ticks 13500 and the potions and limpets 13501/13502 (guide: 5 Potion Torboyo, 3 Patelle). INFERRED: the order of 35559/35557/35558 and 35579. Dofus pour les noobs («Algue au rythme»)."
     },
   {
       "npc": 3300,
@@ -45945,6 +45994,7 @@
       "map": 0,
       "opening": 7712,
       "openings": [
+        { "quest": 1942, "message": 7712 },
         { "after": 571, "before": 572, "message": 8125 },
         { "quest": 572, "message": 8125 },
         { "after": 572, "before": 573, "message": 8299 },
@@ -45961,7 +46011,8 @@
           "message": 7712,
           "choices": [
             { "reply": 7725, "next": 7733 },
-            { "reply": 7846 }
+            { "reply": 7846 },
+            { "reply": 35582, "next": 29616, "quest": 1942, "afterObjective": 13502, "beforeObjective": 13503, "completes": 13503, "params": [[30, 13503]] }
           ]
         },
         {
@@ -46020,9 +46071,15 @@
         {
           "message": 7734,
           "choices": []
+        },
+        {
+          "message": 29616,
+          "choices": [
+            { "reply": 35581, "quest": 1942, "gives": 19421 }
+          ]
         }
       ],
-      "why": "Eric Azaraille's botanical favours (572 «Feliz como un lirio», 573 «En el nombre de la micosis», 574 «El colmo de Los Colmillos», 575 «Villa floreada», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): after 571 his opening is the offer of 572 (8125, lilies; thanks 8128), then 573 (offer 8299, no thanks line of its own: the client folds it into the next offer), 574 (offer 8301, thanks 8302) and 575 (offer 8303, thanks 8304). The offers double as reminders (no separate client line). Accept replies (8114, 8332, 8335, 8337) are inferred: the client's «Aceptar.» precedes each hand-in reply (8115, 8333, 8336, 8338). Server criterion Sc=702 not modelled. Review fix: his default opening is the client's line 7712 (7725 «¿Puedo ayudarte en algo?» -> 7733, the pitch of «Panecillos floreados» 531, accept 7726; hand-in 7727 with 10 of 13108 -> thanks 7734; 7846 «Hasta luego.»); 7725 is also offered on the lines of 572-575 so 531 stays reachable. Start criteria of 572/573/574 now PL>149/159/169 as in the quests. Re-review fix: 531 is daily in the client data (repeatType 1) and Finished stays true after the first hand-in, so Qf!531 on 7725 and 7726 hid the pitch for good; both now carry only the quest's own PL>99&PJ>26,199 plus Qa!531 and CanStart decides when it opens again."
+      "why": "Eric Azaraille's botanical favours (572 «Feliz como un lirio», 573 «En el nombre de la micosis», 574 «El colmo de Los Colmillos», 575 «Villa floreada», Dofus pour les noobs «Ciento veintitrés flores que no son como las demás»): after 571 his opening is the offer of 572 (8125, lilies; thanks 8128), then 573 (offer 8299, no thanks line of its own: the client folds it into the next offer), 574 (offer 8301, thanks 8302) and 575 (offer 8303, thanks 8304). The offers double as reminders (no separate client line). Accept replies (8114, 8332, 8335, 8337) are inferred: the client's «Aceptar.» precedes each hand-in reply (8115, 8333, 8336, 8338). Server criterion Sc=702 not modelled. Review fix: his default opening is the client's line 7712 (7725 «¿Puedo ayudarte en algo?» -> 7733, the pitch of «Panecillos floreados» 531, accept 7726; hand-in 7727 with 10 of 13108 -> thanks 7734; 7846 «Hasta luego.»); 7725 is also offered on the lines of 572-575 so 531 stays reachable. Start criteria of 572/573/574 now PL>149/159/169 as in the quests. Re-review fix: 531 is daily in the client data (repeatType 1) and Finished stays true after the first hand-in, so Qf!531 on 7725 and 7726 hid the pitch for good; both now carry only the quest's own PL>99&PJ>26,199 plus Qa!531 and CanStart decides when it opens again. Eric Azaraille (1942): takes Zrid's list (13503) and hands over the crate of potions (19421). INFERRED: that 35581 gives the crate. Dofus pour les noobs («Algue au rythme»). Eric Azaraille (1942): while the quest is under way he opens on the menu line that carries Zrid's list reply."
     },
   {
       "npc": 1461,
@@ -64708,11 +64765,79 @@
       "npc": 4216,
       "map": 0,
       "opening": 29620,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 29620, "choices": [] }
+        {
+          "message": 29620,
+          "choices": [
+            { "reply": 35590, "next": 29621, "criterion": "PL>179&Qa!1943&Qf!1943", "beforeQuest": 1943 },
+            { "reply": 35622, "next": 29643, "quest": 1943, "afterObjective": 13514, "beforeObjective": 13515, "completes": 13515, "params": [[30, 13515]] },
+            { "reply": 35624, "next": 29645, "quest": 1943, "afterObjective": 13517, "beforeObjective": 13518, "completes": 13518, "params": [[30, 13518]] },
+            { "reply": 35642, "next": 29663, "criterion": "PL>179&Qf=1943&Qa!1944&Qf!1944", "beforeQuest": 1944 },
+            { "reply": 35667, "next": 29685, "quest": 1944, "afterObjective": 13534, "beforeObjective": 13535 }
+          ]
+        },
+        {
+          "message": 29621,
+          "choices": [
+            { "reply": 35589, "next": 29622 }
+          ]
+        },
+        {
+          "message": 29622,
+          "choices": [
+            { "reply": 35588, "next": 29623 }
+          ]
+        },
+        {
+          "message": 29623,
+          "choices": [
+            { "reply": 35587, "next": 29624 }
+          ]
+        },
+        {
+          "message": 29624,
+          "choices": [
+            { "reply": 35586, "next": 29625, "startsQuest": 1943, "params": [[34, 1943]], "gives": 19422 }
+          ]
+        },
+        {
+          "message": 29625,
+          "choices": []
+        },
+        {
+          "message": 29663,
+          "choices": [
+            { "reply": 35641, "next": 29664 }
+          ]
+        },
+        {
+          "message": 29664,
+          "choices": [
+            { "reply": 35640, "startsQuest": 1944, "params": [[34, 1944]], "gives": 19429 }
+          ]
+        },
+        {
+          "message": 29685,
+          "choices": [
+            { "reply": 35666, "next": 29686, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29686,
+          "choices": [
+            { "reply": 35665, "quest": 1944, "completes": 13535, "params": [[30, 13535]] }
+          ]
+        },
+        {
+          "message": 29643,
+          "choices": [
+            { "reply": 35621 }
+          ]
+        },
+        { "message": 29645, "choices": [] }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 1943 «Más allá de la costa»: Zrons (Sroness in the guide) at the town hall [-77,-42] offers the quest, takes the prisoner's machine (13515) and tells of the meeting (13518). Dofus pour les noobs («Au-delà de la Côte»). 1943 «Más allá de la costa»: Zrons (Sroness in the guide) at the town hall [-77,-42] offers the quest, takes the prisoner's machine (13515) and tells of the meeting (13518). Dofus pour les noobs («Au-delà de la Côte»). 1944 «La croisière, ça m'use»: Zrons offers the weapons errand (the step line 29664) and hears the report (13535). Dofus pour les noobs («La croisière, ça m'use»). INFERRED from the client's texts: 29643 (sends him to the Silver Tavern) takes 35621 «Suivre son conseil», the one reply of the template no line had; 29645 (the meeting's outcome) has none."
     },
   {
       "npc": 1246,
@@ -67177,15 +67302,18 @@
         {
           "message": 29019,
           "choices": [
-            { "reply": 34798, "startsQuest": 1911, "params": [[34, 1911]] }
+            { "reply": 34798, "startsQuest": 1911, "params": [[34, 1911]] },
+            { "reply": 34803, "quest": 1911, "afterObjective": 13121, "beforeObjective": 13122, "completes": 13122, "params": [[30, 13122]], "next": 29020 }
           ]
         },
         {
           "message": 29020,
-          "choices": []
+          "choices": [
+            { "reply": 17295 }
+          ]
         }
       ],
-      "why": "Nordalie (1909): Clothurd finds the dragon's tale boring and points to her sisters (29016). Nordalie (1909): Clothurd finds the dragon's tale boring and points to her sisters (29016). Clothurd asks for a portion of happiness (Ivory quest 1911, step dialog 29019) (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies)."
+      "why": "Nordalie (1909): Clothurd finds the dragon's tale boring and points to her sisters (29016). Nordalie (1909): Clothurd finds the dragon's tale boring and points to her sisters (29016). Clothurd asks for a portion of happiness (Ivory quest 1911, step dialog 29019) (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies). «Le bonheur est dans le spray» (1911): «Lui donner sa part de bonheur» (34803) hands over the portion of happiness 19179; her thanks are 29020. (Dofus pour les noobs, «Le bonheur est dans le spray»)"
     },
   {
       "npc": 2019,
@@ -74831,7 +74959,8 @@
             { "reply": 35930, "next": 29891, "quest": 1936, "afterObjective": 13443, "beforeObjective": 13446 },
             { "reply": 32712, "next": 27239, "quest": 1853, "completes": 12331, "params": [[30, 12331]], "afterObjective": 12329, "beforeObjective": 12331, "takes": 18753 },
             { "reply": 32298, "next": 26869 },
-            { "reply": 32294 }
+            { "reply": 32294 },
+            { "reply": 35077, "quest": 1911, "afterObjective": 13104, "beforeObjective": 13105, "completes": 13105, "params": [[30, 13105]], "next": 29241 }
           ]
         },
         {
@@ -74986,9 +75115,27 @@
           "choices": [
             { "reply": 35931, "quest": 1936 }
           ]
+        },
+        {
+          "message": 29241,
+          "choices": [
+            { "reply": 35076, "next": 29242 }
+          ]
+        },
+        {
+          "message": 29242,
+          "choices": [
+            { "reply": 35075, "next": 29253 }
+          ]
+        },
+        {
+          "message": 29253,
+          "choices": [
+            { "reply": 35090 }
+          ]
         }
       ],
-      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): after 1845, 26874 (what the magicorrincos are, will you rescue them) is her greeting until 1853 starts; «Acepto.» (32299) starts it on that line or after the family questions (32302 -> 26875 -> 26876 -> 26877). With the magicorrincos brought to safety (12329) «Los magicorrincos están sanos y salvos.» (32712) does 12331 and opens the Brotherhood questions 27239..27245 (Dofus pour les noobs («A la rescousse des magypus»): Coqueline tells of the Brotherhood of the Forgotten). INFERRED reply order. Presenting the alchemist (32304) ends the escort: follower item 18727 is taken. REDO (1853): 32712 ends the escort, follower item 18753 is taken."
+      "why": "Kaskarina (Coqueline in the guide) on Animatopia [-63,29] (179308545): her lessons 26869/26870 (the animals, the Arcaíris), then «Enseñarle el mensaje de la botella.» (32296) -> 26871 and «¿Tienes alguna idea de dónde está encerrado el autor del mensaje?» (32295) -> 26872 (the hunters' camp in the west) is 12246 in «Ne tirez pas sur le messager» (1845). With the alchemist escorted (12282) her greeting is 26873 and «Cuéntame más sobre esos animales raros desaparecidos.» (32304) ends the quest (12283) with 26874 (the magypus; the next quest's start is not written yet) (Dofus pour les noobs («Ne tirez pas sur le messager»)). INFERRED order of the replies. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): after 1845, 26874 (what the magicorrincos are, will you rescue them) is her greeting until 1853 starts; «Acepto.» (32299) starts it on that line or after the family questions (32302 -> 26875 -> 26876 -> 26877). With the magicorrincos brought to safety (12329) «Los magicorrincos están sanos y salvos.» (32712) does 12331 and opens the Brotherhood questions 27239..27245 (Dofus pour les noobs («A la rescousse des magypus»): Coqueline tells of the Brotherhood of the Forgotten). INFERRED reply order. Presenting the alchemist (32304) ends the escort: follower item 18727 is taken. REDO (1853): 32712 ends the escort, follower item 18753 is taken. «Le bonheur est dans le spray» (1911): Kaskarina is told about Lady Urikoíris's state (35077, 29241-29253; 13105) and sends the character to the hunters' camp. (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 3749,
@@ -77957,6 +78104,797 @@
         }
       ],
       "why": "Triki Guest (guide: Claude M'Se) leading the fire-stones escort (1949): start at [-31,23], one stop and one talk per map. INFERRED: the pairing of the guide's replies to lines (the guide names the choices, not the ids); the walk-through flavour replies (why come here / wait for reinforcements) are offered beside the fight reply. Dofus pour les noobs («Les pierres à feu»)."
+    },
+    {
+      "npc": 4215,
+      "map": 0,
+      "opening": 29618,
+      "lines": [
+        {
+          "message": 29618,
+          "choices": [
+            { "reply": 35593, "next": 29626, "quest": 1943, "beforeObjective": 13505, "completes": 13505, "params": [[30, 13505]] },
+            { "reply": 35599, "next": 29632, "quest": 1943, "afterObjective": 13508, "beforeObjective": 13509, "completes": 13509, "params": [[30, 13509]] }
+          ]
+        },
+        {
+          "message": 29626,
+          "choices": [
+            { "reply": 35592, "next": 29627, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29627,
+          "choices": [
+            { "reply": 35591, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29632,
+          "choices": []
+        }
+      ],
+      "why": "Gueymoff at the Silent Wrecks [-48,-78] (1943): he takes Zrons' instructions (13505) and hears of the machine's setback (13509). Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4218,
+      "map": 0,
+      "opening": 29628,
+      "lines": [
+        {
+          "message": 29628,
+          "choices": [
+            { "reply": 35596, "next": 29629, "quest": 1943, "afterObjective": 13505, "beforeObjective": 13506 },
+            { "reply": 35597, "next": 29631, "quest": 1943, "afterObjective": 13506, "beforeObjective": 13508, "completesAll": [13507, 13508], "completes": 13508, "params": [[30, 13508]] },
+            { "reply": 35620, "next": 29642, "quest": 1943, "afterObjective": 13513, "beforeObjective": 13514, "gives": 19581, "completes": 13514, "params": [[30, 13514]] }
+          ]
+        },
+        {
+          "message": 29629,
+          "choices": [
+            { "reply": 35595, "next": 29630, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29630,
+          "choices": [
+            { "reply": 35594, "quest": 1943, "completes": 13506, "params": [[30, 13506]] }
+          ]
+        },
+        {
+          "message": 29631,
+          "choices": [
+            { "reply": 35619, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29642,
+          "choices": []
+        }
+      ],
+      "why": "Noah Ydeke at [-49,-80] (1943): the list of materials (13506), the Ardonite and calm water he takes (13507, 13508) and the box holding the prisoner (13514). Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4212,
+      "map": 0,
+      "opening": 29610,
+      "lines": [
+        {
+          "message": 29610,
+          "choices": [
+            { "reply": 35574, "next": 29635, "quest": 1943, "afterObjective": 13510, "beforeObjective": 13511 }
+          ]
+        },
+        {
+          "message": 29635,
+          "choices": [
+            { "reply": 35603, "next": 29611, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29611,
+          "choices": [
+            { "reply": 35572, "next": 29634, "quest": 1943 },
+            { "reply": 35573, "next": 29634, "quest": 1943 },
+            { "reply": 35604, "next": 29634, "quest": 1943 }
+          ]
+        },
+        {
+          "message": 29634,
+          "choices": [
+            { "reply": 35602, "quest": 1943, "completes": 13511, "params": [[30, 13511]] }
+          ]
+        }
+      ],
+      "why": "Bibak of the hooded Brotherhood at [-49,-82] (1943, 13511): he wants the prisoner freed. INFERRED: the order of the replies inside the talk (the walkthrough names no ids). Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4220,
+      "map": 0,
+      "opening": 29633,
+      "lines": [
+        {
+          "message": 29633,
+          "choices": [
+            { "reply": 35600, "quest": 1943, "afterObjective": 13509, "beforeObjective": 13510 },
+            { "reply": 35601, "quest": 1943, "afterObjective": 13509, "beforeObjective": 13510 }
+          ]
+        }
+      ],
+      "why": "Mortisparo aullador at [-49,-82] (1943, 13510): «Atacar» starts the fight against the sumergidos. Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4222,
+      "map": 0,
+      "opening": 29636,
+      "lines": [
+        {
+          "message": 29636,
+          "choices": [
+            { "reply": 35605, "quest": 1943, "afterObjective": 13511, "beforeObjective": 13512 }
+          ]
+        }
+      ],
+      "why": "A sumergido reinforcement at [-49,-81] (1943, 13512): «Defenderte como buenamente puedas» starts the wave fight. Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4224,
+      "map": 0,
+      "opening": 29637,
+      "lines": [
+        {
+          "message": 29637,
+          "choices": [
+            { "reply": 35608, "quest": 1943, "afterObjective": 13511, "beforeObjective": 13512 }
+          ]
+        }
+      ],
+      "why": "A sumergido reinforcement at [-49,-81] (1943, 13512): «Defenderte como buenamente puedas» starts the wave fight. Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4225,
+      "map": 0,
+      "opening": 29638,
+      "lines": [
+        {
+          "message": 29638,
+          "choices": [
+            { "reply": 35611, "quest": 1943, "afterObjective": 13511, "beforeObjective": 13512 }
+          ]
+        }
+      ],
+      "why": "A sumergido reinforcement at [-49,-81] (1943, 13512): «Defenderte como buenamente puedas» starts the wave fight. Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4226,
+      "map": 0,
+      "opening": 29639,
+      "lines": [
+        {
+          "message": 29639,
+          "choices": [
+            { "reply": 35614, "quest": 1943, "afterObjective": 13511, "beforeObjective": 13512 }
+          ]
+        }
+      ],
+      "why": "A sumergido reinforcement at [-49,-81] (1943, 13512): «Defenderte como buenamente puedas» starts the wave fight. Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4228,
+      "map": 0,
+      "opening": 29640,
+      "lines": [
+        {
+          "message": 29640,
+          "choices": [
+            { "reply": 35617, "quest": 1943, "afterObjective": 13512, "beforeObjective": 13513, "completes": 13513, "params": [[30, 13513]] }
+          ]
+        }
+      ],
+      "why": "Simon Kara, steamer sent by Noah Ydeke, at [-49,-81] (1943, 13513). Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4229,
+      "map": 0,
+      "opening": 29641,
+      "lines": [
+        {
+          "message": 29641,
+          "choices": [
+            { "reply": 35618, "quest": 1943, "afterObjective": 13512, "beforeObjective": 13513, "completes": 13513, "params": [[30, 13513]] }
+          ]
+        }
+      ],
+      "why": "Serge Mazov, steamer sent by Noah Ydeke, at [-49,-81] (1943, 13513). Dofus pour les noobs («Au-delà de la Côte»)."
+    },
+    {
+      "npc": 4092,
+      "map": 99352584,
+      "opening": 29219,
+      "openings": [
+        { "criterion": "Qf=1911", "message": 29238 }
+      ],
+      "lines": [
+        {
+          "message": 29219,
+          "choices": [
+            { "reply": 35058, "quest": 1911, "beforeObjective": 13104, "next": 29220 },
+            { "reply": 35064, "quest": 1911, "afterObjective": 13111, "beforeObjective": 13112, "completes": 13112, "params": [[30, 13112]], "next": 29228 },
+            { "reply": 35071, "quest": 1911, "afterObjective": 13114, "beforeObjective": 13115, "criterion": "PO>19173,0&PO>19174,0&PO>19175,0&PO>19178,0", "completesAll": [13115, 13116, 13117, 13118], "params": [[30, 13115]], "next": 29233 },
+            { "reply": 35050 }
+          ]
+        },
+        {
+          "message": 29220,
+          "choices": [
+            { "reply": 35057, "next": 29221 }
+          ]
+        },
+        {
+          "message": 29221,
+          "choices": [
+            { "reply": 35056, "next": 29222 }
+          ]
+        },
+        {
+          "message": 29222,
+          "choices": [
+            { "reply": 35055, "next": 29223 }
+          ]
+        },
+        {
+          "message": 29223,
+          "choices": [
+            { "reply": 35054, "next": 29224 }
+          ]
+        },
+        {
+          "message": 29224,
+          "choices": [
+            { "reply": 35053, "next": 29225 }
+          ]
+        },
+        {
+          "message": 29225,
+          "choices": [
+            { "reply": 35052, "next": 29226 }
+          ]
+        },
+        {
+          "message": 29226,
+          "choices": [
+            { "reply": 35065, "teleport": 179307521 },
+            { "reply": 35051 }
+          ]
+        },
+        {
+          "message": 29228,
+          "choices": [
+            { "reply": 35063, "next": 29229 }
+          ]
+        },
+        {
+          "message": 29229,
+          "choices": [
+            { "reply": 35062, "next": 29230 }
+          ]
+        },
+        {
+          "message": 29230,
+          "choices": [
+            { "reply": 35061, "next": 29231 }
+          ]
+        },
+        {
+          "message": 29231,
+          "choices": [
+            { "reply": 35060, "next": 29232 }
+          ]
+        },
+        {
+          "message": 29232,
+          "choices": [
+            { "reply": 35059 }
+          ]
+        },
+        {
+          "message": 29233,
+          "choices": [
+            { "reply": 35070, "next": 29234 }
+          ]
+        },
+        {
+          "message": 29234,
+          "choices": [
+            { "reply": 35069, "next": 29235 }
+          ]
+        },
+        {
+          "message": 29235,
+          "choices": [
+            { "reply": 35068, "next": 29236 }
+          ]
+        },
+        {
+          "message": 29236,
+          "choices": [
+            { "reply": 35067, "gives": 19177, "next": 29237 }
+          ]
+        },
+        {
+          "message": 29237,
+          "choices": [
+            { "reply": 35066 }
+          ]
+        },
+        {
+          "message": 29238,
+          "choices": [
+            { "reply": 35066 }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): the happy alchemist Pau Locuelo at [1,16]: the search for the portion of happiness (29219-29226, 13103/13104), the flask (29228-29232, 13112), the remedy (29233-29237, 13115-13118). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies). The «chasse aux chasseurs» achievement that gates the waterfall is not a criterion the engine knows, so 29226 (not 29227) is always the line."
+    },
+    {
+      "npc": 4091,
+      "map": 179306499,
+      "opening": 29263,
+      "openings": [
+        { "quest": 1911, "objective": 13105, "pending": 13106, "message": 29273 },
+        { "quest": 1911, "objective": 13106, "pending": 13107, "message": 29262 },
+        { "quest": 1911, "objective": 13107, "pending": 13108, "message": 29255 }
+      ],
+      "lines": [
+        {
+          "message": 29273,
+          "choices": [
+            { "reply": 35110, "quest": 1911, "afterObjective": 13105, "beforeObjective": 13106, "next": 29272 }
+          ]
+        },
+        {
+          "message": 29272,
+          "choices": [
+            { "reply": 35117 }
+          ]
+        },
+        {
+          "message": 29262,
+          "choices": [
+            { "reply": 35100, "quest": 1911, "afterObjective": 13106, "beforeObjective": 13107 }
+          ]
+        },
+        {
+          "message": 29255,
+          "choices": [
+            { "reply": 35096, "next": 29256 }
+          ]
+        },
+        {
+          "message": 29256,
+          "choices": [
+            { "reply": 35095, "next": 29257 }
+          ]
+        },
+        {
+          "message": 29257,
+          "choices": [
+            { "reply": 35094, "next": 29258 }
+          ]
+        },
+        {
+          "message": 29258,
+          "choices": [
+            { "reply": 35093 }
+          ]
+        },
+        {
+          "message": 29263,
+          "choices": [
+            { "reply": 35103, "next": 29264 }
+          ]
+        },
+        {
+          "message": 29264,
+          "choices": [
+            { "reply": 35102 }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): the chatty hunter at [-67,31]: eavesdrop (35110, 13106), attack (35100, the fight of 13107), then the confession and the caves (29255-29258). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4090,
+      "map": 179306499,
+      "opening": 29278,
+      "openings": [
+        { "quest": 1911, "objective": 13105, "pending": 13106, "message": 29279 },
+        { "quest": 1911, "objective": 13106, "pending": 13107, "message": 29278 },
+        { "quest": 1911, "objective": 13107, "pending": 13108, "message": 29277 }
+      ],
+      "lines": [
+        {
+          "message": 29279,
+          "choices": [
+            { "reply": 35117 }
+          ]
+        },
+        {
+          "message": 29278,
+          "choices": [
+            { "reply": 35116, "quest": 1911, "afterObjective": 13106, "beforeObjective": 13107 }
+          ]
+        },
+        {
+          "message": 29277,
+          "choices": [
+            { "reply": 35117 }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): the stupid hunter at [-67,31] (13106 then the fight of 13107, 35116). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 3762,
+      "map": 180092928,
+      "opening": 26917,
+      "openings": [
+        { "quest": 1911, "objective": 13109, "pending": 13110, "message": 29304 },
+        { "quest": 1911, "objective": 13110, "pending": 13111, "message": 29295 }
+      ],
+      "lines": [
+        {
+          "message": 26917,
+          "choices": [
+            { "reply": 35154, "quest": 1911, "afterObjective": 13108, "beforeObjective": 13109, "next": 29304 }
+          ]
+        },
+        {
+          "message": 29304,
+          "choices": [
+            { "reply": 35151, "next": 29305 }
+          ]
+        },
+        {
+          "message": 29305,
+          "choices": [
+            { "reply": 35150, "quest": 1911, "afterObjective": 13109, "beforeObjective": 13110 }
+          ]
+        },
+        {
+          "message": 29295,
+          "choices": [
+            { "reply": 35145, "next": 29296 }
+          ]
+        },
+        {
+          "message": 29296,
+          "choices": [
+            { "reply": 35144, "next": 29297 }
+          ]
+        },
+        {
+          "message": 29297,
+          "choices": [
+            { "reply": 35142, "next": 29298 }
+          ]
+        },
+        {
+          "message": 29298,
+          "choices": [
+            { "reply": 35149, "next": 29299 }
+          ]
+        },
+        {
+          "message": 29299,
+          "choices": [
+            { "reply": 35141, "next": 29300 }
+          ]
+        },
+        {
+          "message": 29300,
+          "choices": [
+            { "reply": 35143, "next": 29301 }
+          ]
+        },
+        {
+          "message": 29301,
+          "choices": [
+            { "reply": 35148, "next": 29302 }
+          ]
+        },
+        {
+          "message": 29302,
+          "choices": [
+            { "reply": 35147, "gives": 19172, "next": 29303 }
+          ]
+        },
+        {
+          "message": 29303,
+          "choices": [
+            { "reply": 35146, "quest": 1911, "afterObjective": 13110, "beforeObjective": 13111, "completes": 13111, "params": [[30, 13111]] }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): the henchman Tifoux in the cave at [-66,28]: «Insister» starts the fight against the three compinches (13109, 13110); afterwards the questions and the strange flask under the bed (29295-29303, 13111). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 3809,
+      "map": 180094978,
+      "opening": 27188,
+      "openings": [
+        { "quest": 1911, "objective": 13120, "pending": 13121, "message": 29308 }
+      ],
+      "lines": [
+        {
+          "message": 27188,
+          "choices": [
+            { "reply": 32671, "quest": 1911, "afterObjective": 13118, "beforeObjective": 13120, "completes": 13119, "params": [[30, 13119]], "criterion": "PO>19177,0" },
+            { "reply": 32672 }
+          ]
+        },
+        {
+          "message": 29308,
+          "choices": [
+            { "reply": 35159, "next": 29309 }
+          ]
+        },
+        {
+          "message": 29309,
+          "choices": [
+            { "reply": 35158, "quest": 1911, "afterObjective": 13120, "beforeObjective": 13121, "completes": 13121, "params": [[30, 13121]], "gives": 19179 }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): Lady Urikoíris (Rainikrone) in the hidden room: the remedy is sprayed on her (32671, the tactical fight, 13119/13120), then the portion of happiness is asked for (35159, 35158; 13121). (Dofus pour les noobs, «Le bonheur est dans le spray») Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4093,
+      "map": 180356609,
+      "opening": 29307,
+      "lines": [
+        {
+          "message": 29307,
+          "choices": [
+            { "reply": 35157, "quest": 1911, "afterObjective": 13114, "beforeObjective": 13115, "criterion": "PO!19173" }
+          ]
+        }
+      ],
+      "why": "«Le bonheur est dans le spray» (1911): «Tirarle de los bigotes al miaumiau» (35157) starts the fight against Michazrael at [-10,30]; he drops the moustache of a bad cat (19173). (Dofus pour les noobs, «Le bonheur est dans le spray»)"
+    },
+    {
+      "npc": 4240,
+      "map": 0,
+      "opening": 29665,
+      "lines": [
+        {
+          "message": 29665,
+          "choices": [
+            { "reply": 35645, "next": 29666, "quest": 1944, "beforeObjective": 13519, "completes": 13519, "params": [[30, 13519]] },
+            { "reply": 35664, "next": 29683, "quest": 1944, "afterObjective": 13530, "beforeObjective": 13534, "completesAll": [13531, 13532, 13533, 13534], "completes": 13534, "params": [[30, 13534]] }
+          ]
+        },
+        {
+          "message": 29666,
+          "choices": [
+            { "reply": 35644, "next": 29667, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29667,
+          "choices": [
+            { "reply": 35643, "next": 29668, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29668,
+          "choices": []
+        },
+        {
+          "message": 29683,
+          "choices": [
+            { "reply": 35663, "next": 29684, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29684,
+          "choices": [
+            { "reply": 35662, "quest": 1944 }
+          ]
+        }
+      ],
+      "why": "Skorpaine in the wreck at [-48,-80] (1944): takes Zrons' list (13519) and the four finds (13531-13534). Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4241,
+      "map": 0,
+      "opening": 29669,
+      "lines": [
+        {
+          "message": 29669,
+          "choices": [
+            { "reply": 35649, "next": 29670, "quest": 1944, "afterObjective": 13520, "beforeObjective": 13521 },
+            { "reply": 35648, "next": 29671, "quest": 1944, "afterObjective": 13520, "beforeObjective": 13521 }
+          ]
+        },
+        {
+          "message": 29670,
+          "choices": []
+        },
+        {
+          "message": 29671,
+          "choices": [
+            { "reply": 35646, "quest": 1944, "completes": 13521, "params": [[30, 13521]] },
+            { "reply": 35647, "quest": 1944 }
+          ]
+        }
+      ],
+      "why": "Pepe Dea (Pépé Déa) at [-48,-84] (1944, 13521): sharing the samples he shows the passage out. INFERRED: the order inside the talk. Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4242,
+      "map": 0,
+      "opening": 29672,
+      "lines": [
+        {
+          "message": 29672,
+          "choices": [
+            { "reply": 35652, "next": 29673, "quest": 1944, "afterObjective": 13522, "beforeObjective": 13523 },
+            { "reply": 35651, "quest": 1944, "afterObjective": 13522, "beforeObjective": 13523 }
+          ]
+        },
+        {
+          "message": 29673,
+          "choices": [
+            { "reply": 35650, "quest": 1944, "completes": 13523, "params": [[30, 13523]] }
+          ]
+        }
+      ],
+      "why": "Hermana Sonrisa at [-45,-82] (1944, 13523): the last reply («Defenderte») ticks the talk and starts the solo fight (13524). Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4245,
+      "map": 0,
+      "opening": 29674,
+      "lines": [
+        {
+          "message": 29674,
+          "choices": [
+            { "reply": 35654, "next": 29675, "quest": 1944, "afterObjective": 13524, "beforeObjective": 13525, "completes": 13525, "params": [[30, 13525]] },
+            { "reply": 35653, "quest": 1944, "afterObjective": 13525, "beforeObjective": 13526, "gives": 19547 }
+          ]
+        },
+        {
+          "message": 29675,
+          "choices": [
+            { "reply": 35747, "quest": 1944 }
+          ]
+        }
+      ],
+      "why": "Caterina (Catherine) at [-45,-82] (1944, 13525): she does not understand; her chest (19547) is one of the four finds. INFERRED: the chest is taken by 35653 («Tomar el cofre y marcharte»). Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4243,
+      "map": 0,
+      "opening": 29676,
+      "lines": [
+        {
+          "message": 29676,
+          "choices": [
+            { "reply": 35657, "next": 29677, "quest": 1944, "afterObjective": 13526, "beforeObjective": 13527 }
+          ]
+        },
+        {
+          "message": 29677,
+          "choices": [
+            { "reply": 35656, "next": 29678, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29678,
+          "choices": [
+            { "reply": 35655, "quest": 1944, "completes": 13527, "params": [[30, 13527]] }
+          ]
+        }
+      ],
+      "why": "Pau Breton (Vincent Lecou in the guide) at [-46,-81] (1944, 13527). INFERRED: the order inside the talk. Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4244,
+      "map": 0,
+      "opening": 29679,
+      "lines": [
+        {
+          "message": 29679,
+          "choices": [
+            { "reply": 35661, "next": 29680, "quest": 1944, "afterObjective": 13528, "beforeObjective": 13529 }
+          ]
+        },
+        {
+          "message": 29680,
+          "choices": [
+            { "reply": 35660, "next": 29681, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29681,
+          "choices": [
+            { "reply": 35659, "next": 29682, "quest": 1944 }
+          ]
+        },
+        {
+          "message": 29682,
+          "choices": [
+            { "reply": 35658, "quest": 1944, "completes": 13529, "params": [[30, 13529]] }
+          ]
+        }
+      ],
+      "why": "Arty Rovals (Mac Lesguignol in the guide) at [-47,-83] (1944, 13529). INFERRED: the order inside the talk. Dofus pour les noobs («La croisière, ça m'use»)."
+    },
+    {
+      "npc": 4211,
+      "map": 0,
+      "opening": 29603,
+      "lines": [
+        {
+          "message": 29603,
+          "choices": [
+            { "reply": 35564, "next": 29604 },
+            { "reply": 35569, "next": 29605, "quest": 1942, "beforeObjective": 13492 },
+            { "reply": 35571, "next": 29609, "quest": 1942, "afterObjective": 13497, "beforeObjective": 13498 },
+            { "reply": 35576, "next": 29612, "quest": 1942, "afterObjective": 13498, "beforeObjective": 13499, "gives": 19416, "completes": 13499, "params": [[30, 13499]] },
+            { "reply": 35584, "next": 29617, "quest": 1942, "afterObjective": 13503, "beforeObjective": 13504, "completes": 13504, "params": [[30, 13504]] },
+            { "reply": 35575 }
+          ]
+        },
+        {
+          "message": 29604,
+          "choices": [
+            { "reply": 35575 }
+          ]
+        },
+        {
+          "message": 29605,
+          "choices": [
+            { "reply": 35568, "next": 29606, "quest": 1942 }
+          ]
+        },
+        {
+          "message": 29606,
+          "choices": [
+            { "reply": 35567, "next": 29607, "quest": 1942 }
+          ]
+        },
+        {
+          "message": 29607,
+          "choices": [
+            { "reply": 35566, "next": 29608, "quest": 1942 }
+          ]
+        },
+        {
+          "message": 29608,
+          "choices": [
+            { "reply": 35565, "quest": 1942, "completes": 13492, "params": [[30, 13492]] }
+          ]
+        },
+        {
+          "message": 29609,
+          "choices": [
+            { "reply": 35570, "quest": 1942 }
+          ]
+        },
+        {
+          "message": 29612,
+          "choices": [
+            { "reply": 35583 }
+          ]
+        },
+        {
+          "message": 29617,
+          "choices": []
+        }
+      ],
+      "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»)."
     }
 ]
 }

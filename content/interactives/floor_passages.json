@@ -421,6 +421,7 @@
       "toMap": 131860996,
       "toCell": 352,
       "why": "The same arch's other walkable sun (505631) as the 254 one above."
-    }
+    },
+    {"map": 179307521, "cell": 235, "toMap": 180094978, "toCell": 345, "why": "«Empruntez le passage secret à droite de la cascade» (1911, 13104) (Dofus pour les noobs, «Le bonheur est dans le spray»): the secret passage by the waterfall of [-65,29] to Lady Urikoíris's room; the client has no element for it, so it is a floor passage. The cells are INFERRED, and the guide's condition (the achievement «La chasse aux chasseurs» done) is not a criterion the engine knows, so the passage is open."}
   ]
 }
