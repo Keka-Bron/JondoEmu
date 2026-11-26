@@ -344,6 +344,14 @@ namespace Jondo.Unity.Server.Managers
 
             public bool HasRows => Rows.Count > 0;
 
+            /// <summary>
+            /// The rows that strip an invulnerability when the spell is cast (951 or 952 on a state
+            /// that shields): what makes the blow worth aiming at one who holds it. A summary
+            /// spell weighs the blow alike on everybody; the siphon turret's Sea Wave (6851)
+            /// strips the shorrokh's 56 and wounds it, and was thrown at whoever stood nearest.
+            /// </summary>
+            public IReadOnlyList<SpellEffect> Strips { get; init; } = Array.Empty<SpellEffect>();
+
             /// <summary>Whether one of its rows summons -- a double too: it is then aimed at free cells too.</summary>
             public bool SummonsByRow => Rows.Any(r => EffectEngine.EsInvocacion(r.EffectId) || EffectEngine.EsDobleDelLanzador(r.EffectId));
 
@@ -1125,7 +1133,7 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Damage > 0 && (onEnemy || spell.OnSelf))
             {
                 foreach (var hit in enemies.Where(e => Hit(spell, from, aim, e)))
-                    value += Worth(spell, monster, hit);
+                    value += Worth(spell, monster, hit) + StripWorth(spell, monster, hit);
                 if (spell.HurtsAllies)
                     foreach (var own in allies.Where(a => Hit(spell, from, aim, a)))
                         value -= Blow(spell, monster, own);
@@ -1226,6 +1234,19 @@ namespace Jondo.Unity.Server.Managers
         /// What hitting an enemy is worth: the blow, a kill on top, and more the weaker he is --
         /// which is what makes the whole group go for the same one.
         /// </summary>
+        /// <summary>
+        /// What the invulnerability a cast takes off an enemy is worth (<see cref="Spell.Strips"/>):
+        /// the same as a dispel of it (<see cref="BuffsWorth"/>), for the rows whose mask names him.
+        /// </summary>
+        private static double StripWorth(Spell spell, Fighter monster, Fighter enemy)
+        {
+            double worth = 0;
+            foreach (var row in spell.Strips)
+                if (enemy.Buffs.TieneEstado(row.Value) && EffectEngine.CumpleLaMascara(monster, enemy, row.TargetMask ?? ""))
+                    worth += 0.6 * PerPointPerTurn(enemy, 25) * 1000;
+            return worth;
+        }
+
         private static double Worth(Spell spell, Fighter monster, Fighter enemy)
             => WorthOfBlow(Blow(spell, monster, enemy), enemy);
 

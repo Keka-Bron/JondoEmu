@@ -138,6 +138,53 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Same(shorrokh, action!.Target);
         }
 
+        /// <summary>
+        /// The foes that are not invulnerable stand nearer and take the same blow: the turret still
+        /// aims at the shorrokh, because only that cast also takes its 56 off (952).
+        /// </summary>
+        [Fact]
+        public async Task The_turret_prefers_the_shorrokh_it_can_strip_over_nearer_foes()
+        {
+            if (SpellEffects.De(6851, 1).Count == 0 || SpellEffects.De(6855, 1).Count == 0) return;
+            MobSpawnManager.EnsureMonsterData();
+            var (fight, me, turret, shorrokh) = await Repaired();
+            turret.SpellIds.Add(6851); turret.SpellGrades[6851] = 1;
+            turret.CurrentAP = turret.MaxAP = 2;
+            turret.CurrentMP = turret.MaxMP = 0;
+            int a = MapGeometry.GetNeighbors(turret.CellId).First(c => c != me.CellId && c != shorrokh.CellId && !fight.Todos.Any(f => f.CellId == c));
+            int b = MapGeometry.GetNeighbors(a).First(c => c != turret.CellId && !fight.Todos.Any(f => f.CellId == c) && c != me.CellId);
+            var near1 = Mob(-4, 4448, a); var near2 = Mob(-5, 4449, b);
+            fight.AddOpponent(near1); fight.AddOpponent(near2);
+            near1.CellId = a; near2.CellId = b;
+
+            var spells = FightHandler.TacticsOf(turret);
+            var action = MonsterTactics.Next(FightHandler.BoardOf(fight), turret, spells, new System.Collections.Generic.List<MonsterTactics.Spell>());
+            Assert.Equal(6851, action?.Spell.Id);
+            Assert.Same(shorrokh, action!.Target);
+
+            // Not a tie won by order: the stripped state is worth more than the same blow on a foe.
+            var options = MonsterTactics.Options(FightHandler.BoardOf(fight), turret, spells);
+            double onShorrokh = options.Where(o => o.Target == shorrokh).Max(o => o.Score);
+            double onOthers = options.Where(o => o.Target == near1 || o.Target == near2).Max(o => o.Score);
+            Assert.True(onShorrokh > onOthers, $"{onShorrokh} vs {onOthers}");
+
+            // Once its invulnerability is gone there is nothing to strip: no preference left.
+            shorrokh.Buffs.QuitarEstado(Invulnerable);
+            options = MonsterTactics.Options(FightHandler.BoardOf(fight), turret, spells);
+            Assert.True(options.Where(o => o.Target == shorrokh).Max(o => o.Score)
+                        <= options.Where(o => o.Target == near1 || o.Target == near2).Max(o => o.Score) + 0.001);
+        }
+
+        /// <summary>The rows that strip a shield are found from the spell's data, not from a monster id.</summary>
+        [Fact]
+        public void Sea_wave_s_952_on_state_56_is_a_stripping_row_and_a_blow_without_one_is_not()
+        {
+            if (SpellEffects.De(6851, 1).Count == 0) return;
+            var rows = FightHandler.StrippingRows(6851, 1);
+            Assert.Contains(rows, r => r.EffectId == 952 && r.Value == Invulnerable);
+            Assert.Empty(FightHandler.StrippingRows(6855, 1));
+        }
+
         [Fact]
         public async Task The_broken_turret_cannot_cast_its_sea_wave()
         {

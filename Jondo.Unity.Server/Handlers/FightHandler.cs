@@ -12152,6 +12152,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     Id = spell,
                     Grade = grade,
+                    Strips = StrippingRows(spell, grade),
                     Cost = data.APCost,
                     MinRange = data.MinRange,
                     MaxRange = data.MaxRange,
@@ -12206,6 +12207,21 @@ namespace Jondo.Unity.Server.Handlers
             }
             return spells;
         }
+
+        /// <summary>
+        /// The rows of a spell that take an invulnerability off the enemies when it is cast (951 or
+        /// 952 on a state that shields), for the tactics to aim it at one who holds it.
+        /// </summary>
+        internal static IReadOnlyList<Managers.SpellEffect> StrippingRows(int spell, int grade)
+            => Managers.SpellEffects.De(spell, grade)
+                .Where(e => e.EffectId is Jondo.Unity.World.Combat.EffectSupport.RemoveState
+                                          or Jondo.Unity.World.Combat.EffectSupport.DisableState
+                            && !e.ForClientOnly
+                            && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
+                            && NamesEnemies(e.TargetMask ?? "")
+                            && Managers.SpellStates.Of(e.Value) is { } state
+                            && (state.Invulnerable || state.InvulnerableMelee || state.InvulnerableRange))
+                .ToList();
 
         /// <summary>
         /// Whether a spell brings back the last ally to fall (780, 1034), or does nothing but pull
