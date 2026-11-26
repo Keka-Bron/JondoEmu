@@ -44255,6 +44255,7 @@
             { "reply": 7738, "next": 7709, "criterion": "Qf=613", "beforeQuest": 614 },
             { "reply": 8149, "next": 8156, "criterion": "Qf=613", "beforeQuest": 649 },
             { "reply": 8151, "next": 8157, "quest": 649, "params": [[30, 4065]], "criterion": "Qf=612&Qf=613&Qf=614&Qf=615", "completesAll": [4065] },
+            { "reply": 8154, "quest": 650, "completes": 4066, "completesAll": [4011, 4066], "params": [[30, 4066]], "next": 8159, "criterion": "Qa=650&Qo=4011" },
             { "reply": 7846 }
           ]
         },
@@ -44281,9 +44282,13 @@
           "choices": [
             { "reply": 8153, "startsQuest": 650, "params": [[34, 650]] }
           ]
+        },
+        {
+          "message": 8159,
+          "choices": []
         }
       ],
-      "why": "«Una alcaldesa de hielo» (613): talking to the mayor ends it (3669), she gives the list of the town's people to meet (7709, «Si deseas conocer mejor la región»); Dofus pour les noobs «La maire de glace»: «La quête se termine en lui adressant la parole». «Full contact» (614, Dofus pour les noobs «Full Contact»: «Parlez à Maire Cantille: elle vous demande de rencontrer la plupart des habitants»): its step line 7709 is reached right after 613 (7723) or, later, by «¿Qué puedes contarme sobre Frigost?» (7738); «Vale.» (8156) on it starts 614. «Hasta luego.» (7846) leaves. INFERRED: which of her replies sits on 7709 and on the greeting."
+      "why": "«Una alcaldesa de hielo» (613): talking to the mayor ends it (3669), she gives the list of the town's people to meet (7709, «Si deseas conocer mejor la región»); Dofus pour les noobs «La maire de glace»: «La quête se termine en lui adressant la parole». «Full contact» (614, Dofus pour les noobs «Full Contact»: «Parlez à Maire Cantille: elle vous demande de rencontrer la plupart des habitants»): its step line 7709 is reached right after 613 (7723) or, later, by «¿Qué puedes contarme sobre Frigost?» (7738); «Vale.» (8156) on it starts 614. «Hasta luego.» (7846) leaves. INFERRED: which of her replies sits on 7709 and on the greeting. «Lo esencial está en el lago helado» (650, Dofus pour les noobs «L'essentiel est dans le lac gelé»): after 577, 578, 628, 629 and 579 are done, «La pesca ha vuelto al lago.» (8154) closes 4011 and 4066 and she answers 8159. INFERRED: 8154 is the reply the client carries for it; the catalogue's step line for the next quest, 8160, is not hooked up (651 needs seven further quests)."
     },
   {
       "npc": 1236,
