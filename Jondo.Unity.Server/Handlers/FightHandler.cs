@@ -13329,6 +13329,12 @@ namespace Jondo.Unity.Server.Handlers
             // first, the very fight that does it never let them fall.
             await QuestWatcher.FightEndedAsync(session, fight, won);
 
+            // An item a quest asks to obtain on a map closes its objective when it drops there, as
+            // a gathered one does: the three P'Koutoulou of «Fhtagn» (1765), 30 % each off the
+            // klutist of their own map, tick only the fight that lets one fall.
+            foreach (int item in loot.Keys)
+                await Managers.Quests.OnGatheredAsync(session, item, fight.MapId);
+
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and
             // it is kolichas and vitorichas. The loser gets nothing, not even experience -- in the

@@ -1490,8 +1490,9 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Something has been gathered on a map: an objective bound to gathering it there closes
-        /// (the tutorial's five resources of the jobs room).
+        /// Something has been gathered, or has dropped in a fight, on a map: an objective bound to
+        /// obtaining it there closes (the tutorial's five resources of the jobs room, the
+        /// P'Koutoulou of 1765).
         /// </summary>
         public static async Task OnGatheredAsync(GameSession session, int itemId, long mapId)
         {

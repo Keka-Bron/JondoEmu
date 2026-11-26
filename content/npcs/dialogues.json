@@ -76072,8 +76072,8 @@
         {
           "message": 24466,
           "choices": [
-            { "reply": 29389, "quest": 1764, "criterion": "Qa=1764&Qo<11270" },
-            { "reply": 29393, "quest": 1764, "next": 24467, "criterion": "Qa=1764&Qo>11270" }
+            { "reply": 29389, "quest": 1764, "criterion": "Qa=1764&Qo<11271" },
+            { "reply": 29393, "quest": 1764, "next": 24467, "criterion": "Qa=1764&Qo>11271" }
           ]
         },
         {
@@ -76092,8 +76092,8 @@
         {
           "message": 24462,
           "choices": [
-            { "reply": 29383, "quest": 1764 },
-            { "reply": 29382, "quest": 1764 }
+            { "reply": 29383, "quest": 1764, "completes": 11273, "params": [[30, 11273]] },
+            { "reply": 29382, "quest": 1764, "completes": 11273, "params": [[30, 11273]] }
           ]
         }
       ],

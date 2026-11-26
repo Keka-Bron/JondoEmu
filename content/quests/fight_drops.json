@@ -249,6 +249,9 @@
    "criterion": "Qa=1764&PB=861&Qo<11269",
    "why": "«Le vieux gob et la mer» (1764): the centenary greuvettes drop at 20 % base on the monsters of the Old Sufokia zone only (Dofus pour les noobs)."
   },
-  {"item": 19392, "percent": 100, "monsters": [5164], "criterion": "Qa=1936&Qo>13445&Qo<13446", "why": "«El día de los asesinos» (1936): the iridescent nemroza gives the rainbow powder Doktari mixes into the sand (Dofus pour les noobs («Le jour des assassins»): «vous récupérez de la Poudre d'arc-en-ciel»)."}
+  {"item": 19392, "percent": 100, "monsters": [5164], "criterion": "Qa=1936&Qo>13445&Qo<13446", "why": "«El día de los asesinos» (1936): the iridescent nemroza gives the rainbow powder Doktari mixes into the sand (Dofus pour les noobs («Le jour des assassins»): «vous récupérez de la Poudre d'arc-en-ciel»)."},
+  {"item": 18108, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168559628&PO!18108", "why": "1765 (Fhtagn): P'Koutoulou Ch'ton drops only from the klutist (4452) at [26,32], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."},
+  {"item": 18109, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168558606&PO!18109", "why": "1765 (Fhtagn): P'Koutoulou Zothoth drops only from the klutist (4452) at [25,33], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."},
+  {"item": 18110, "percent": 30, "monsters": [4452], "criterion": "Qa=1765&Pm=168559632&PO!18110", "why": "1765 (Fhtagn): P'Koutoulou Glaakiph drops only from the klutist (4452) at [26,34], 30 % base (Dofus pour les noobs, Fhtagn: one map per P'Koutoulou); no PO means one at most until handed over."}
   ]
 }

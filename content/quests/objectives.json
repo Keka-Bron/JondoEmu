@@ -9328,31 +9328,28 @@
   {
    "objective": 11280,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168559628,
-   "gives": [{"item": 18108, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Ch'ton» (649713): the klutist (4452) beaten at [26,32], whose P'Koutoulou Ch'ton (18108, 30 % in the client) is won; the 30 % is a sure drop here.",
+   "item": 18108,
+   "why": "«Cloolooth P'Kutulu Ch'ton» (649713): the P'Koutoulou Ch'ton (18108) has to drop off the klutist (4452) at [26,32], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
    "objective": 11281,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168558606,
-   "gives": [{"item": 18109, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Zothoth» (649708): the klutist beaten at [25,33], P'Koutoulou Zothoth (18109); the 30 % is a sure drop here.",
+   "item": 18109,
+   "why": "«Cloolooth P'Kutulu Zothoth» (649708): the P'Koutoulou Zothoth (18109) has to drop off the klutist (4452) at [25,33], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
    "objective": 11282,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168559632,
-   "gives": [{"item": 18110, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Glaakiph» (649736): the klutist beaten at [26,34], P'Koutoulou Glaakiph (18110); the 30 % is a sure drop here.",
+   "item": 18110,
+   "why": "«Cloolooth P'Kutulu Glaakiph» (649736): the P'Koutoulou Glaakiph (18110) has to drop off the klutist (4452) at [26,34], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
