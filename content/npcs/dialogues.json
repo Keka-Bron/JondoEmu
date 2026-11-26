@@ -74808,7 +74808,7 @@
         {
           "message": 24299,
           "choices": [
-            { "reply": 29194, "quest": 1751, "next": 24301 }
+            { "reply": 29194, "quest": 1751, "next": 24301, "completes": 11191, "completesAll": [11189, 11190, 11191], "params": [[30, 11191]] }
           ]
         },
         {
@@ -74838,7 +74838,7 @@
           "choices": []
         }
       ],
-      "why": "Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies. Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies. Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies."
+      "why": "Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies. Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies. Umra Tawil (3299), «El que apesta en el umbral» (1751, Dofus pour les noobs): the start (24292-24297, 29189), the key and ring shown (29190, 24298), the hand-over of globes, tentacles and flesh (24299, 29194) and her closing words (24301-24303). INFERRED order of the replies. 1751: reply 29194 (Here are the globes, the tentacles and the flesh) is the engine's bring hand-over for 11189-11191 (items 18084 x8, 18082, 18083), as Dofus pour les noobs says 'donnez les globes, tentacules et la chair a Umra'."
     },
   {
       "npc": 3334,
