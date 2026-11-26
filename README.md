@@ -719,9 +719,9 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
-| Frigost Island | `███░░░░░░░` **26%** | 60/228 |
+| Frigost Island | `███░░░░░░░` **27%** | 62/228 |
 | Astrub | `██████████` **100%** | 51/51 |
-| World Quests | `███░░░░░░░` **34%** | 49/145 |
+| World Quests | `███░░░░░░░` **34%** | 50/145 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Sufokia | `█████░░░░░` **51%** | 29/57 |
@@ -747,7 +747,7 @@ played through.
 | Archipelago of Vulkania | `░░░░░░░░░░` **5%** | 3/60 |
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Xelorium | `█░░░░░░░░░` **7%** | 2/28 |
-| **All quests** | **25.9%** | **511/1976** |
+| **All quests** | **26.0%** | **514/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
