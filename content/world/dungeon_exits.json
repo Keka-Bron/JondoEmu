@@ -608,6 +608,15 @@
       "npc": 2028,
       "replies": [17538, 17329, 17769, 35171, 35173, 35180, 35182],
       "why": "Nileza's Laboratory (dungeon 70): after Nileza the winners are in «Laboratorio de Nileza - Salida» (109577731, the map's own name), where Nileza stands (DPLN «Une voix de crystal»: «Une fois dans la salle de sortie, parlez à Nileza»). His «Salir del laboratorio» (17538, 17329, 17769) and «Abandonar el laboratorio para ir a Sufokia» (35171, 35173, 35180, 35182) leave. Cell 270: the arrival cell the map gives."
+    },
+    {
+      "dungeon": 106,
+      "bossRoom": 182718464,
+      "room": 182719488,
+      "cell": 282,
+      "npc": 3963,
+      "replies": [33178, 33503, 33542, 33495],
+      "why": "Mansion of Kuatropatas (dungeon 106): after Anerice the winners are in the exit room (182719488, the map's own name 'Mansion de Kuatropatas - Salida'), where Anerice stands (Dofus pour les noobs, Le mort dans l'ame: 'Une fois dans la salle de sortie, parlez a Anerice la Shushess'). Her 'Abandonar la Mansion de Kuatropatas' (33178, 33503, 33542) and 'Hacer una reverencia y despedirte' (33495) leave. Cell 282: the arrival cell the map gives."
     }
   ]
 }

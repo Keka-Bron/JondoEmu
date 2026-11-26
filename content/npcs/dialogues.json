@@ -45114,7 +45114,9 @@
             { "reply": 7764, "startsQuest": 615, "params": [[34, 615]], "next": 7760 },
             { "reply": 35563, "next": 29600, "criterion": "PL>179&PO=19414&Qa!1942&Qf!1942" },
             { "reply": 35577, "next": 29613, "quest": 1942, "afterObjective": 13499, "beforeObjective": 13500, "completes": 13500, "params": [[30, 13500]] },
-            { "reply": 35580, "next": 29614, "quest": 1942, "afterObjective": 13500, "beforeObjective": 13502, "completes": 13502, "completesAll": [13501, 13502], "params": [[30, 13502]] }
+            { "reply": 35580, "next": 29614, "quest": 1942, "afterObjective": 13500, "beforeObjective": 13502, "completes": 13502, "completesAll": [13501, 13502], "params": [[30, 13502]] },
+            { "reply": 36443, "quest": 1945, "afterObjective": 13752, "beforeObjective": 13753, "next": 30265 },
+            { "reply": 36446, "quest": 1945, "afterObjective": 13753, "beforeObjective": 13755, "completesAll": [13754, 13755], "completes": 13755, "params": [[30, 13755]], "next": 30267 }
           ]
         },
         {
@@ -45172,9 +45174,33 @@
           "choices": [
             { "reply": 35578 }
           ]
+        },
+        {
+          "message": 30265,
+          "choices": [
+            { "reply": 36442, "quest": 1945, "next": 30266 }
+          ]
+        },
+        {
+          "message": 30266,
+          "choices": [
+            { "reply": 36441, "quest": 1945, "completes": 13753, "params": [[30, 13753]] }
+          ]
+        },
+        {
+          "message": 30267,
+          "choices": [
+            { "reply": 36445, "quest": 1945, "gives": 19564, "givesCount": 2, "next": 30268 }
+          ]
+        },
+        {
+          "message": 30268,
+          "choices": [
+            { "reply": 36444, "quest": 1945 }
+          ]
         }
       ],
-      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Review fix: the start carries the quest's own Sc=702 switch (no PL clause); the weekly renewal is NOT modelled: quest 685 has no repeatType in the client data, so the engine treats it as done once (CanStart refuses it after the first run); it needs a repeatType 2 override in the quest catalogue (engine data). Albert Pess (1942): «Montrer la mycose» starts the quest (step line 29602, the guide's «Suivre son conseil»); the parasites hand-over ticks 13500 and the potions and limpets 13501/13502 (guide: 5 Potion Torboyo, 3 Patelle). INFERRED: the order of 35559/35557/35558 and 35579. Dofus pour les noobs («Algue au rythme»)."
+      "why": "Albert Pess (Albert Paisse), Frigost's doctor at the frost port [-80,-45]: «No hay vacuna para los malos» (685, Dofus pour les noobs «Pas de vaccin pour les vilains»), the weekly renewal of the vaccine once «La enfermedad» (674) is done. «¿En qué puedo ayudarte?» (8580) starts it and he asks for a new jalamut blood sample (8533, the step's own dialog, also his line while it is under way); «Toma la muestra de sangre.» (8581) hands it over (4508) and he thanks (8534). The server criterion Sc=702 of the quest (once a week) is not modelled here. «Envío» (667): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8206 (4050) and his thanks (8198) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» Review fix: the start carries the quest's own Sc=702 switch (no PL clause); the weekly renewal is NOT modelled: quest 685 has no repeatType in the client data, so the engine treats it as done once (CanStart refuses it after the first run); it needs a repeatType 2 override in the quest catalogue (engine data). Albert Pess (1942): «Montrer la mycose» starts the quest (step line 29602, the guide's «Suivre son conseil»); the parasites hand-over ticks 13500 and the potions and limpets 13501/13502 (guide: 5 Potion Torboyo, 3 Patelle). INFERRED: the order of 35559/35557/35558 and 35579. Dofus pour les noobs («Algue au rythme»). «Toucher le fond» (1945, 13753-13755): Albert Pess in Frigost's clinic [-80,-45] (Dofus pour les noobs, «Toucher le fond»): «Demander un gâteau benzo» (36443): not for himself (36442), he needs belladonna and oak wood (30266, 36441). «Donner les ressources demandées» (36446, 70 oak wood 460 and 45 belladonna 16387) gives the Benzopastel 19564, two portions (the guide: «deux parts de gâteau»; INFERRED that he gives them as two items) and the dose warning (30267, 30268). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 3300,
@@ -61222,11 +61248,34 @@
       "npc": 274,
       "map": 0,
       "opening": 1124,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 1124, "choices": [] }
+        {
+          "message": 1124,
+          "choices": [
+            { "reply": 35265, "next": 29386, "quest": 1913, "afterObjective": 13146, "beforeObjective": 13147 }
+          ]
+        },
+        {
+          "message": 29386,
+          "choices": [
+            { "reply": 35264, "next": 29387, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29387,
+          "choices": [
+            { "reply": 35263, "next": 29388, "quest": 1913, "holds": 11109, "holdsCount": 50, "takes": 11109, "takesCount": 50 }
+          ]
+        },
+        {
+          "message": 29388,
+          "choices": [
+            { "reply": 35262, "quest": 1913, "gives": 19190, "completes": 13147, "params": [[30, 13147]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 1913: Rucar at the Brakmar farmers' workshop [-23,35] swaps a garlic bread (19190) for fifty Frostizz (11109) (29386-29388, 13147). Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids)."
     },
   {
       "npc": 230,
@@ -66890,11 +66939,14 @@
       "npc": 59,
       "map": 0,
       "opening": 33,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 33,
           "choices": [
-            { "reply": 60384, "next": 45519 }
+            { "reply": 60384, "next": 45519 },
+            { "reply": 35270, "next": 29389, "quest": 1913, "criterion": "PO!19191", "afterObjective": 13150, "beforeObjective": 13151 },
+            { "reply": 35269, "next": 29390, "quest": 1913, "holds": 19191, "afterObjective": 13150, "beforeObjective": 13151 }
           ]
         },
         {
@@ -66920,10 +66972,27 @@
           "choices": [
             { "reply": 60380 }
           ]
+        },
+        {
+          "message": 29389,
+          "choices": [
+            { "reply": 35266, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29390,
+          "choices": [
+            { "reply": 35268, "next": 29391, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29391,
+          "choices": [
+            { "reply": 35267, "quest": 1913, "gives": 19192, "takes": 19191, "takesCount": 1, "completes": 13151, "params": [[30, 13151]] }
+          ]
         }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 1913: Agrid at [4,8] carves the vampire hunter's stake (19192) from the sinister wood (19191) the Abraknyde dropped (29389-29391, 13151). Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids)."
     },
   {
       "npc": 6185,
@@ -67234,7 +67303,9 @@
         },
         {
           "message": 29044,
-          "choices": []
+          "choices": [
+            { "reply": 34841, "next": 29048, "quest": 1913, "afterObjective": 13157, "beforeObjective": 13158, "completes": 13158, "params": [[30, 13158]] }
+          ]
         },
         {
           "message": 29048,
@@ -67262,7 +67333,7 @@
           ]
         }
       ],
-      "why": "Nordalie (1909), Dofus pour les noobs: talk to Atroskuld («Dire que vous êtes ici pour parler du destin de Dardondakal»), Clothurd, Lachandi, then Atroskuld again; she sends you to a Frigost dweller, an Uginak chief and an oracle fond of gnomes (13069 -> 13070). Nordalie (1909), Dofus pour les noobs: talk to Atroskuld («Dire que vous êtes ici pour parler du destin de Dardondakal»), Clothurd, Lachandi, then Atroskuld again; she sends you to a Frigost dweller, an Uginak chief and an oracle fond of gnomes (13069 -> 13070). Atroskuld, once the player is back from the three nordes' witnesses, asks if destiny can still change (Ivory quest 1909). Atroskuld's favours: Funestaro (1913) and the black warrior (1914); thread of Dardondakal 19171 (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies)."
+      "why": "Nordalie (1909), Dofus pour les noobs: talk to Atroskuld («Dire que vous êtes ici pour parler du destin de Dardondakal»), Clothurd, Lachandi, then Atroskuld again; she sends you to a Frigost dweller, an Uginak chief and an oracle fond of gnomes (13069 -> 13070). Nordalie (1909), Dofus pour les noobs: talk to Atroskuld («Dire que vous êtes ici pour parler du destin de Dardondakal»), Clothurd, Lachandi, then Atroskuld again; she sends you to a Frigost dweller, an Uginak chief and an oracle fond of gnomes (13069 -> 13070). Atroskuld, once the player is back from the three nordes' witnesses, asks if destiny can still change (Ivory quest 1909). Atroskuld's favours: Funestaro (1913) and the black warrior (1914); thread of Dardondakal 19171 (Dofus pour les noobs, Nordalie / Le bonheur est dans le spray / Une voix de cristal / Mort dans l'ame / Le guerrier noir; INFERRED order of the replies). 1913 'Muerto en vida': 'Annoncer la reussite de votre mission' (34841) closes 13158 and leads to the thread she gives (19171, 1909). Dofus pour les noobs (Le mort dans l'ame)."
     },
   {
       "npc": 2018,
@@ -78223,7 +78294,8 @@
           "message": 29618,
           "choices": [
             { "reply": 35593, "next": 29626, "quest": 1943, "beforeObjective": 13505, "completes": 13505, "params": [[30, 13505]] },
-            { "reply": 35599, "next": 29632, "quest": 1943, "afterObjective": 13508, "beforeObjective": 13509, "completes": 13509, "params": [[30, 13509]] }
+            { "reply": 35599, "next": 29632, "quest": 1943, "afterObjective": 13508, "beforeObjective": 13509, "completes": 13509, "params": [[30, 13509]] },
+            { "reply": 36422, "quest": 1945, "afterObjective": 13746, "beforeObjective": 13747, "next": 30245 }
           ]
         },
         {
@@ -78241,9 +78313,21 @@
         {
           "message": 29632,
           "choices": []
+        },
+        {
+          "message": 30245,
+          "choices": [
+            { "reply": 36421, "quest": 1945, "next": 30246 }
+          ]
+        },
+        {
+          "message": 30246,
+          "choices": [
+            { "reply": 36420, "quest": 1945, "completes": 13747, "params": [[30, 13747]] }
+          ]
         }
       ],
-      "why": "Gueymoff at the Silent Wrecks [-48,-78] (1943): he takes Zrons' instructions (13505) and hears of the machine's setback (13509). Dofus pour les noobs («Au-delà de la Côte»)."
+      "why": "Gueymoff at the Silent Wrecks [-48,-78] (1943): he takes Zrons' instructions (13505) and hears of the machine's setback (13509). Dofus pour les noobs («Au-delà de la Côte»). «Toucher le fond» (1945, 13747): Gueymoff, «Hablemos sobre lo que ha dicho el espíritu torturado» (36422): rumours of disappearances are normal in a hostile zone (30245), he mentioned them unasked (30246) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 4218,
@@ -78255,7 +78339,8 @@
           "choices": [
             { "reply": 35596, "next": 29629, "quest": 1943, "afterObjective": 13505, "beforeObjective": 13506 },
             { "reply": 35597, "next": 29631, "quest": 1943, "afterObjective": 13506, "beforeObjective": 13508, "completesAll": [13507, 13508], "completes": 13508, "params": [[30, 13508]] },
-            { "reply": 35620, "next": 29642, "quest": 1943, "afterObjective": 13513, "beforeObjective": 13514, "gives": 19581, "completes": 13514, "params": [[30, 13514]] }
+            { "reply": 35620, "next": 29642, "quest": 1943, "afterObjective": 13513, "beforeObjective": 13514, "gives": 19581, "completes": 13514, "params": [[30, 13514]] },
+            { "reply": 36425, "quest": 1945, "afterObjective": 13747, "beforeObjective": 13748, "next": 30247 }
           ]
         },
         {
@@ -78279,9 +78364,21 @@
         {
           "message": 29642,
           "choices": []
+        },
+        {
+          "message": 30247,
+          "choices": [
+            { "reply": 36424, "quest": 1945, "next": 30248 }
+          ]
+        },
+        {
+          "message": 30248,
+          "choices": [
+            { "reply": 36423, "quest": 1945, "completes": 13748, "params": [[30, 13748]] }
+          ]
         }
       ],
-      "why": "Noah Ydeke at [-49,-80] (1943): the list of materials (13506), the Ardonite and calm water he takes (13507, 13508) and the box holding the prisoner (13514). Dofus pour les noobs («Au-delà de la Côte»)."
+      "why": "Noah Ydeke at [-49,-80] (1943): the list of materials (13506), the Ardonite and calm water he takes (13507, 13508) and the box holding the prisoner (13514). Dofus pour les noobs («Au-delà de la Côte»). «Toucher le fond» (1945, 13748): Noah Ydeké, «Hablemos sobre lo que ha dicho el espíritu torturado» (36425): the strange disappearances (30247), do not listen to the dead (30248) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 4212,
@@ -78781,7 +78878,8 @@
           "message": 29665,
           "choices": [
             { "reply": 35645, "next": 29666, "quest": 1944, "beforeObjective": 13519, "completes": 13519, "params": [[30, 13519]] },
-            { "reply": 35664, "next": 29683, "quest": 1944, "afterObjective": 13530, "beforeObjective": 13534, "completesAll": [13531, 13532, 13533, 13534], "completes": 13534, "params": [[30, 13534]] }
+            { "reply": 35664, "next": 29683, "quest": 1944, "afterObjective": 13530, "beforeObjective": 13534, "completesAll": [13531, 13532, 13533, 13534], "completes": 13534, "params": [[30, 13534]] },
+            { "reply": 36428, "quest": 1945, "afterObjective": 13748, "beforeObjective": 13749, "next": 30249 }
           ]
         },
         {
@@ -78811,9 +78909,21 @@
           "choices": [
             { "reply": 35662, "quest": 1944 }
           ]
+        },
+        {
+          "message": 30249,
+          "choices": [
+            { "reply": 36427, "quest": 1945, "next": 30250 }
+          ]
+        },
+        {
+          "message": 30250,
+          "choices": [
+            { "reply": 36426, "quest": 1945, "completes": 13749, "params": [[30, 13749]] }
+          ]
         }
       ],
-      "why": "Skorpaine in the wreck at [-48,-80] (1944): takes Zrons' list (13519) and the four finds (13531-13534). Dofus pour les noobs («La croisière, ça m'use»)."
+      "why": "Skorpaine in the wreck at [-48,-80] (1944): takes Zrons' list (13519) and the four finds (13531-13534). Dofus pour les noobs («La croisière, ça m'use»). «Toucher le fond» (1945, 13749): Skorpaine, «Hablemos sobre lo que ha dicho el espíritu torturado» (36428): as many wrecks as theories (30249), do not search them (30250) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 4241,
@@ -78954,7 +79064,9 @@
             { "reply": 35571, "next": 29609, "quest": 1942, "afterObjective": 13497, "beforeObjective": 13498 },
             { "reply": 35576, "next": 29612, "quest": 1942, "afterObjective": 13498, "beforeObjective": 13499, "gives": 19416, "completes": 13499, "params": [[30, 13499]] },
             { "reply": 35584, "next": 29617, "quest": 1942, "afterObjective": 13503, "beforeObjective": 13504, "completes": 13504, "params": [[30, 13504]] },
-            { "reply": 35575 }
+            { "reply": 35575 },
+            { "reply": 36466, "quest": 1945, "afterObjective": 13756, "beforeObjective": 13757, "next": 30280 },
+            { "reply": 36486, "quest": 1945, "afterObjective": 13763, "beforeObjective": 13764, "next": 30298 }
           ]
         },
         {
@@ -79002,9 +79114,51 @@
         {
           "message": 29617,
           "choices": []
+        },
+        {
+          "message": 30280,
+          "choices": [
+            { "reply": 36465, "quest": 1945, "next": 30281 }
+          ]
+        },
+        {
+          "message": 30281,
+          "choices": [
+            { "reply": 36464, "quest": 1945, "next": 30282 }
+          ]
+        },
+        {
+          "message": 30282,
+          "choices": [
+            { "reply": 36463, "quest": 1945, "next": 30283 }
+          ]
+        },
+        {
+          "message": 30283,
+          "choices": [
+            { "reply": 36462, "quest": 1945, "next": 30284 }
+          ]
+        },
+        {
+          "message": 30284,
+          "choices": [
+            { "reply": 36461, "quest": 1945, "completes": 13757, "params": [[30, 13757]] }
+          ]
+        },
+        {
+          "message": 30298,
+          "choices": [
+            { "reply": 36485, "quest": 1945, "next": 30299 }
+          ]
+        },
+        {
+          "message": 30299,
+          "choices": [
+            { "reply": 36484, "quest": 1945, "completes": 13764, "params": [[30, 13764]] }
+          ]
         }
       ],
-      "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»)."
+      "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»). «Toucher le fond» (1945, 13757, 13764): Zrid Rahys in the Frigost depths [-47,-80]. «Hablemos de la misión de los steamers» (36466, 30280-30283), the crumpled plan (36462, 30284) and «Ir en busca del vórtice submarino» (36461) after the steamer's account; after the way out, the report (36486, 30298, 30299) closed by «Seguir su consejo e ir a hablar con Lilia Nha» (36484) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 3305,
@@ -79241,6 +79395,538 @@
         }
       ],
       "why": "«Une voix de crystal» (1912, 13130): André Rieur in Incarnam's tavern [0,-3] gives a copy of the «Concierto para limonada» (Dofus pour les noobs, «Une voix de crystal»)."
+    },
+    {
+      "npc": 4095,
+      "map": 0,
+      "opening": 29342,
+      "lines": [
+        {
+          "message": 29342,
+          "choices": [
+            { "reply": 35205, "next": 29343, "quest": 1913, "beforeObjective": 13139 },
+            { "reply": 35207, "next": 29343, "quest": 1913, "beforeObjective": 13139 }
+          ]
+        },
+        {
+          "message": 29343,
+          "choices": [
+            { "reply": 35206, "next": 29344, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29344,
+          "choices": [
+            { "reply": 35204, "next": 29345, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29345,
+          "choices": [
+            { "reply": 35203, "quest": 1913, "completes": 13139, "params": [[30, 13139]] }
+          ]
+        }
+      ],
+      "why": "Kontratak at [-16,25] (1913, 13139): 'Dire que vous ne lui voulez aucun mal' (35206) and the question where Funestaro is (35204) lead to the crypt of the Cementerio de los Torturados. Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids)."
+    },
+    {
+      "npc": 4098,
+      "map": 0,
+      "opening": 29355,
+      "openings": [
+        { "criterion": "Qa=1913&Qo>13143&Qo<13144", "message": 29352 },
+        { "criterion": "Qa=1913&Qo>13155&Qo<13158", "message": 29349 }
+      ],
+      "lines": [
+        {
+          "message": 29355,
+          "choices": [
+            { "reply": 35223, "next": 29356, "quest": 1913, "afterObjective": 13145, "beforeObjective": 13146 },
+            { "reply": 35218, "quest": 1913, "afterObjective": 13145, "beforeObjective": 13146 },
+            { "reply": 35232, "next": 29361, "quest": 1913, "afterObjective": 13147, "beforeObjective": 13148 },
+            { "reply": 35240, "next": 29367, "quest": 1913, "afterObjective": 13149, "beforeObjective": 13150 },
+            { "reply": 35247, "next": 29372, "quest": 1913, "afterObjective": 13151, "beforeObjective": 13152 },
+            { "reply": 35251, "quest": 1913, "afterObjective": 13153, "beforeObjective": 13154, "gives": 19222 }
+          ]
+        },
+        {
+          "message": 29356,
+          "choices": [
+            { "reply": 35222, "next": 29357, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29357,
+          "choices": [
+            { "reply": 35220, "next": 29359, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29359,
+          "choices": [
+            { "reply": 35221, "next": 29358, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29358,
+          "choices": [
+            { "reply": 35224, "next": 29360, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29360,
+          "choices": [
+            { "reply": 35218, "quest": 1913, "beforeObjective": 13146 }
+          ]
+        },
+        {
+          "message": 29361,
+          "choices": [
+            { "reply": 35231, "next": 29362, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29362,
+          "choices": [
+            { "reply": 35230, "next": 29363, "quest": 1913, "holds": 19190, "takes": 19190, "takesCount": 1 }
+          ]
+        },
+        {
+          "message": 29363,
+          "choices": [
+            { "reply": 35229, "next": 29364, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29364,
+          "choices": [
+            { "reply": 35228, "next": 29365, "quest": 1913, "completes": 13148, "params": [[30, 13148]] }
+          ]
+        },
+        {
+          "message": 29365,
+          "choices": [
+            { "reply": 35224, "next": 29366, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29366,
+          "choices": [
+            { "reply": 35225, "quest": 1913 },
+            { "reply": 35226, "quest": 1913 },
+            { "reply": 35227, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29367,
+          "choices": [
+            { "reply": 35239, "next": 29368, "quest": 1913, "holds": 19189, "takes": 19189, "takesCount": 1 }
+          ]
+        },
+        {
+          "message": 29368,
+          "choices": [
+            { "reply": 35238, "next": 29369, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29369,
+          "choices": [
+            { "reply": 35237, "next": 29370, "quest": 1913, "completes": 13150, "params": [[30, 13150]] }
+          ]
+        },
+        {
+          "message": 29370,
+          "choices": [
+            { "reply": 35233, "next": 29371, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29371,
+          "choices": [
+            { "reply": 35234, "quest": 1913 },
+            { "reply": 35235, "quest": 1913 },
+            { "reply": 35236, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29372,
+          "choices": [
+            { "reply": 35246, "next": 29373, "quest": 1913, "holds": 19192, "takes": 19192, "takesCount": 1 }
+          ]
+        },
+        {
+          "message": 29373,
+          "choices": [
+            { "reply": 35245, "next": 29374, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29374,
+          "choices": [
+            { "reply": 35244, "next": 29375, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29375,
+          "choices": [
+            { "reply": 35243, "next": 29376, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29376,
+          "choices": [
+            { "reply": 35242, "next": 29377, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29377,
+          "choices": [
+            { "reply": 35241, "next": 29378, "quest": 1913, "completes": 13152, "params": [[30, 13152]] }
+          ]
+        },
+        {
+          "message": 29378,
+          "choices": [
+            { "reply": 35248, "next": 29379, "quest": 1913 },
+            { "reply": 35249, "next": 29380, "quest": 1913 },
+            { "reply": 35250, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29379,
+          "choices": []
+        },
+        {
+          "message": 29380,
+          "choices": []
+        },
+        {
+          "message": 29352,
+          "choices": [
+            { "reply": 35217, "next": 29353, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29353,
+          "choices": [
+            { "reply": 35216, "next": 29354, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29354,
+          "choices": [
+            { "reply": 35215, "quest": 1913, "completes": 13144, "params": [[30, 13144]] }
+          ]
+        },
+        {
+          "message": 29349,
+          "choices": [
+            { "reply": 35211, "quest": 1913, "afterObjective": 13155, "beforeObjective": 13156 },
+            { "reply": 35214, "next": 29350, "quest": 1913, "afterObjective": 13156, "beforeObjective": 13157 }
+          ]
+        },
+        {
+          "message": 29350,
+          "choices": [
+            { "reply": 35213, "next": 29351, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29351,
+          "choices": [
+            { "reply": 35212, "quest": 1913, "completes": 13157, "params": [[30, 13157]] }
+          ]
+        }
+      ],
+      "why": "Funestaro (1913): at the lava [-23,22] he refuses to be talked out of it (29352-29354, 13144); in his crypt [-11,37] he explains why he cannot die (29356-29360), takes the garlic bread (29362, 13148), the holy water (29367, 13150) and the stake (29372, 13152), and follows the player (follower item 19222, 35251); in the Mansion's exit room he is calmer (29349-29351, 13157). Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids). The outcome lines 29364-29366, 29370-29371 and 29377-29380 are placed by id order."
+    },
+    {
+      "npc": 3953,
+      "map": 0,
+      "opening": 27868,
+      "lines": [
+        {
+          "message": 27868,
+          "choices": [
+            { "reply": 35257, "next": 29381, "quest": 1913, "afterObjective": 13145, "beforeObjective": 13146 },
+            { "reply": 35261, "next": 29385, "quest": 1913, "afterObjective": 13152, "beforeObjective": 13153 }
+          ]
+        },
+        {
+          "message": 29381,
+          "choices": [
+            { "reply": 35259, "next": 29383, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29383,
+          "choices": [
+            { "reply": 35260, "next": 29384, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29384,
+          "choices": [
+            { "reply": 35256, "next": 29382, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29382,
+          "choices": [
+            { "reply": 35258, "quest": 1913, "completes": 13146, "params": [[30, 13146]] }
+          ]
+        },
+        {
+          "message": 29385,
+          "choices": [
+            { "reply": 35255, "quest": 1913, "completes": 13153, "params": [[30, 13153]] }
+          ]
+        }
+      ],
+      "why": "Vanjel Sings (Vanelle in the guide) at [-16,32] (1913): the three ways to destroy a vampire (13146, 29381-29382) and the news that Anerice can reduce them to ashes (13153, 29385). Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids)."
+    },
+    {
+      "npc": 3963,
+      "map": 0,
+      "opening": 27639,
+      "lines": [
+        {
+          "message": 27639,
+          "choices": [
+            { "reply": 35274, "next": 29392, "quest": 1913, "afterObjective": 13155, "beforeObjective": 13156 },
+            { "reply": 33178 }
+          ]
+        },
+        {
+          "message": 29392,
+          "choices": [
+            { "reply": 35273, "next": 29393, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29393,
+          "choices": [
+            { "reply": 35272, "next": 29394, "quest": 1913 }
+          ]
+        },
+        {
+          "message": 29394,
+          "choices": [
+            { "reply": 35271, "quest": 1913, "completes": 13156, "params": [[30, 13156]] }
+          ]
+        }
+      ],
+      "why": "Anerice in the Mansion's exit room (1913, 13156): 'Lui presenter Funestaro' (35274). Her default greeting 27639 and 'Abandonar la Mansion' (33178) stay. Dofus pour les noobs (Le mort dans l'ame). INFERRED: the order of the replies inside the talk (the walkthrough names no ids)."
+    },
+    {
+      "npc": 4174,
+      "map": 0,
+      "opening": 29523,
+      "lines": [
+        {
+          "message": 29523,
+          "choices": [
+            { "reply": 35451, "next": 29524 },
+            { "reply": 36409, "quest": 1945, "beforeObjective": 13743, "completes": 13743, "params": [[30, 13743]], "next": 30235 },
+            { "reply": 36435, "quest": 1945, "afterObjective": 13751, "beforeObjective": 13752, "next": 30258 },
+            { "reply": 36490, "quest": 1945, "afterObjective": 13764, "beforeObjective": 13765, "next": 30300 }
+          ]
+        },
+        {
+          "message": 29524,
+          "choices": [
+            { "reply": 35452 }
+          ]
+        },
+        {
+          "message": 30235,
+          "choices": [
+            { "reply": 36434, "quest": 1945, "next": 30257 }
+          ]
+        },
+        {
+          "message": 30257,
+          "choices": [
+            { "reply": 36408, "quest": 1945, "next": 30236 }
+          ]
+        },
+        {
+          "message": 30236,
+          "choices": [
+            { "reply": 36407, "quest": 1945 }
+          ]
+        },
+        {
+          "message": 30258,
+          "choices": [
+            { "reply": 36433, "quest": 1945, "next": 30259 }
+          ]
+        },
+        {
+          "message": 30259,
+          "choices": [
+            { "reply": 36432, "quest": 1945, "completes": 13752, "params": [[30, 13752]] }
+          ]
+        },
+        {
+          "message": 30300,
+          "choices": [
+            { "reply": 36489, "quest": 1945, "next": 30301 }
+          ]
+        },
+        {
+          "message": 30301,
+          "choices": [
+            { "reply": 36488, "quest": 1945, "next": 30302 }
+          ]
+        },
+        {
+          "message": 30302,
+          "choices": [
+            { "reply": 36487, "quest": 1945, "completes": 13765, "params": [[30, 13765]] }
+          ]
+        }
+      ],
+      "why": "«Toucher le fond» (1945, 13743, 13752, 13765): Lilia Nha in the hold of the ship [-48,-78] (Dofus pour les noobs, «Toucher le fond»). «Se renseigner sur l'auteur du carnet» (36409): he drowned himself in a rum barrel (30235), a waste of time unless it matters (30257), his mind is shut (30236). «Demander des suggestions pour réussir à discuter avec les Steamers fous» (36435): benzo cake (30258), from the doctor of Frigost (30259). «Discuter des découvertes concernant le carnet» (36490, 30300-30302) at the end. Reply order INFERRED from the message ids (the guide gives the story, not the replies). 29523 is her own greeting; 35451 «¿Qué haces en el barco?» keeps her plain talk (29524, 35452 to leave)."
+    },
+    {
+      "npc": 4303,
+      "map": 0,
+      "opening": 30239,
+      "lines": [
+        {
+          "message": 30239,
+          "choices": [
+            { "reply": 36419, "next": 30240 }
+          ]
+        },
+        {
+          "message": 30240,
+          "choices": [
+            { "reply": 36417, "next": 30241 }
+          ]
+        },
+        {
+          "message": 30241,
+          "choices": [
+            { "reply": 36416, "next": 30242 }
+          ]
+        },
+        {
+          "message": 30242,
+          "choices": [
+            { "reply": 36418, "next": 30243 }
+          ]
+        },
+        {
+          "message": 30243,
+          "choices": [
+            { "reply": 36415, "next": 30244 }
+          ]
+        },
+        {
+          "message": 30244,
+          "choices": [
+            { "reply": 36414, "quest": 1945, "completes": 13746, "params": [[30, 13746]] }
+          ]
+        }
+      ],
+      "why": "«Toucher le fond» (1945, 13746): the tortured spirit that appears when the broken crate of the wreck [-46,-81] is clicked (Dofus pour les noobs, «Toucher le fond»): the passengers' chest of kamas and their nightly litany (30239, 30240), their trunks in the hold (30241), the storm off Frigost (30242), the sinking and the horror of the passengers (30243), and his scream (30244). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4176,
+      "map": 0,
+      "opening": 29533,
+      "lines": [
+        {
+          "message": 29533,
+          "choices": [
+            { "reply": 35461, "criterion": "PO>19390,0", "passage": 4176001 },
+            { "reply": 36561, "criterion": "PO!19390", "next": 30349 },
+            { "reply": 36430, "quest": 1945, "afterObjective": 13749, "beforeObjective": 13750, "next": 30251 },
+            { "reply": 35462 }
+          ]
+        },
+        {
+          "message": 30349,
+          "choices": [
+            { "reply": 36560 }
+          ]
+        },
+        {
+          "message": 30251,
+          "choices": [
+            { "reply": 36429, "quest": 1945, "completes": 13750, "params": [[30, 13750]] }
+          ]
+        }
+      ],
+      "why": "«Toucher le fond» (1945, 13750): the Frigostian sailor on the deck of the ship [-48,-78] (Dofus pour les noobs, «Toucher le fond»): «Discuter des rumeurs» (36430) tells of the rescued steamers kept in the hold (30251, closed by 36429 «Ir a ver a los steamers»). His own lines: the diving bell (35461 lowers the character to the sea floor, 35462 stays on deck) and, without the Égida de Feca, his warning (36561, 30349, 36560). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4307,
+      "map": 0,
+      "opening": 30255,
+      "lines": [
+        {
+          "message": 30255,
+          "choices": [
+            { "reply": 36431, "quest": 1945, "afterObjective": 13750, "beforeObjective": 13751, "next": 30256 },
+            { "reply": 36456, "quest": 1945, "afterObjective": 13755, "beforeObjective": 13756, "completes": 13756, "params": [[30, 13756]], "next": 30272 }
+          ]
+        },
+        {
+          "message": 30256,
+          "choices": []
+        },
+        {
+          "message": 30272,
+          "choices": [
+            { "reply": 36455, "quest": 1945, "takes": 19564, "next": 30273 }
+          ]
+        },
+        {
+          "message": 30273,
+          "choices": [
+            { "reply": 36454, "quest": 1945, "next": 30274 }
+          ]
+        },
+        {
+          "message": 30274,
+          "choices": [
+            { "reply": 36453, "quest": 1945, "next": 30275 }
+          ]
+        },
+        {
+          "message": 30275,
+          "choices": [
+            { "reply": 36452, "quest": 1945, "gives": 19566 }
+          ]
+        }
+      ],
+      "why": "«Toucher le fond» (1945, 13751, 13756): the steamer of the hold's bottom [-48,-78] (Dofus pour les noobs, «Toucher le fond»). Before the cake: «Intentar que entre en razón» (36431), she thinks she is in a nightmare (30256). A slice of benzo cake (36456, the objective's one) and a second one (36455, taken too) make her speak: who she is (30272), Zrid Rahys' contract (30273), the grotto and the monstrosity (30274), its look (30275); the crumpled plan in her hand (36453) is taken (36452, Plano arrugado 19566). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4308,
+      "map": 0,
+      "opening": 30296,
+      "lines": [
+        {
+          "message": 30296,
+          "choices": [
+            { "reply": 36482, "quest": 1945, "afterObjective": 13760, "beforeObjective": 13761, "next": 30297 },
+            { "reply": 36483 }
+          ]
+        },
+        {
+          "message": 30297,
+          "choices": [
+            { "reply": 36480, "quest": 1945, "beforeObjective": 13761 },
+            { "reply": 36481 }
+          ]
+        }
+      ],
+      "why": "«Toucher le fond» (1945, 13761): the monolith of the grotto [-45,-80], monster 5211 (Monolito). «Intentar acercarte» (36482): a force pushes the character (30297); «Insistir» (36480) starts the fight; «Mantenerte al margen» (36481, 36483) walks away (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
     }
   ]
 }

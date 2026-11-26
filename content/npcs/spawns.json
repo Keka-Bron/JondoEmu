@@ -8832,6 +8832,26 @@
   {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."},
   {"map": 54789135, "npc": 3292, "cell": 297, "remove": true, "why": "Naroto stood twice in the Frigost tavern; the inferred placement goes and the other one stays."},
   {"map": 168560656, "npc": 3349, "cell": 284, "orientation": 1, "why": "Pacific Klutist, giver and hand-over of Fhtagn (1765) at the Abyss of R'lyugluglu [27,34] (Dofus pour les noobs); he had no placement. Cell INFERRED (open floor next to the arrival cell)."},
-  {"map": 183502850, "npc": 4094, "cell": 410, "orientation": 1, "criterion": "Qa=1912&Qo>13125", "why": "The melomaniac ghost of the barracks [-75,-80] (1912, 13126), who appears after the piano is played (13125) (Dofus pour les noobs, «Une voix de crystal»). Cell 410 is the derived placement of the quest data («wanted by quest 1912»)."}
+  {"map": 183502850, "npc": 4094, "cell": 410, "orientation": 1, "criterion": "Qa=1912&Qo>13125", "why": "The melomaniac ghost of the barracks [-75,-80] (1912, 13126), who appears after the piano is played (13125) (Dofus pour les noobs, «Une voix de crystal»). Cell 410 is the derived placement of the quest data («wanted by quest 1912»)."},
+  {"map": 179830784, "npc": 4095, "cell": 369, "orientation": 1, "criterion": "Qa=1913", "why": "Kontratak at [-16,25] near the Brakmar zaap (1913, 13139). INFERRED cell."},
+  {"map": 173018630, "npc": 4098, "cell": 59, "orientation": 1, "criterion": "Qa=1913&Qo>13143&Qo<13144", "why": "Funestaro at the lava of [-23,22] (1913, 13144). INFERRED cell."},
+  {"map": 178520068, "npc": 4098, "cell": 273, "orientation": 1, "criterion": "Qa=1913&Qo>13144&Qo<13154&PO!19222", "why": "Funestaro in his crypt of [-11,37] (1913), until he follows the player. INFERRED cell."},
+  {"map": 182719488, "npc": 4098, "cell": 345, "orientation": 1, "criterion": "Qa=1913&Qo>13155&Qo<13158", "why": "Funestaro in the Mansion's exit room (1913, 13157). INFERRED cell."},
+    {
+      "map": 186647556,
+      "npc": 4303,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1945&Qo>13745&Qo<13747",
+      "why": "The tortured spirit that appears in the wreck [-46,-81] when the broken crate is clicked (1945, 13745-13746) (Dofus pour les noobs, «Toucher le fond»). Cell 371 is the derived placement of the quest data (a gated row has to use the same cell to override it)."
+    },
+    {
+      "map": 186646534,
+      "npc": 4308,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=1945&Qo>13760&Qo<13762",
+      "why": "Monolito in the grotto [-45,-80] once the grotto is searched (1945, 13760-13761) (Dofus pour les noobs, «Toucher le fond»). INFERRED: cell 285 (the quest-only element 512000's)."
+    }
   ]
 }

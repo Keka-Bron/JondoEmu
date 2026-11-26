@@ -9970,6 +9970,89 @@
    "spends": true,
    "gives": [{"item": 19187, "count": 1}],
    "why": "«Donner les partitions demandées» (Dofus pour les noobs, «Une voix de crystal»): Meno takes the seven scores and gives the Cristal de Kallishindri (19187, text 29336)."
+  },
+  {"objective": 13140, "quest": 1913, "kind": "enter", "map": 171445250, "afterObjectives": [13139], "why": "Cementerio de los Torturados [-11,37] (1913, 13140; type 4 with no parameters): the cemetery above the crypt. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13141, "quest": 1913, "kind": "click", "elements": [{"map": 178520068, "element": 511305}], "afterObjectives": [13140], "gives": [{"item": 19188, "count": 1}], "why": "'Registra la cripta' (732580): the open coffin of Funestaro's crypt (element 511305, gfx 49536, cell 302) gives the yellowed parchment 19188. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13142, "quest": 1913, "kind": "read", "item": 19188, "afterObjectives": [13141], "why": "'Lee el pergamino amarillento' (732581): the parchment opened from the bag. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13143, "quest": 1913, "kind": "enter", "map": 173018630, "afterObjectives": [13142], "why": "'Encuentra a Funestaro' (732582): the lava of [-23,22]. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13145, "quest": 1913, "kind": "enter", "map": 178520068, "afterObjectives": [13144], "why": "'Vuelve a la cripta para comprobar si Funestaro no ha vuelto a aparecer' (735813). Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13149, "quest": 1913, "kind": "click", "elements": [{"map": 99094023, "element": 511308}], "afterObjectives": [13148], "gives": [{"item": 19189, "count": 1}], "why": "'Consigue agua bendita' (732653): the flask in the church of Amakna [6,3] (element 511308, gfx 3318, cell 219) gives 19189. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13154, "quest": 1913, "kind": "enter", "map": 179831808, "afterObjectives": [13153], "why": "'Escolta a Funestaro hasta la entrada de la Mansion de Kuatropatas' (732657): the entrance of [-14,25], with the follower 19222. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13155, "quest": 1913, "kind": "beat", "monsters": [4882], "map": 182718464, "afterObjectives": [13154], "why": "'Obten a la fuerza una audiencia con Anerice' (732662): Anerice la Fab'huquesa (4882) in the last room of the dungeon. Dofus pour les noobs (Le mort dans l'ame)."},
+  {
+   "objective": 13744,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 186647556,
+   "afterObjectives": [13743],
+   "why": "«Restos» (744955): entering the wreck of [-46,-81] (186647556), as the guide asks («entrez dans l'épave») (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13745,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186647556, "element": 512069}],
+   "afterObjectives": [13744],
+   "showsNpc": 4303,
+   "why": "«Explora los restos» (744956): the broken big crate of the wreck [-46,-81] (the quest-only element 512069, gfx 118919: INFERRED to be the crate) brings the tortured spirit in (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13751,
+   "quest": 1945,
+   "kind": "reply",
+   "replies": [36431],
+   "afterObjectives": [13750],
+   "why": "«Pregunta a los steamers» (744965): «Intentar que entre en razón» (36431) to the steamer of the hold's bottom, who thinks she is in a nightmare (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13758,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 186387972,
+   "afterObjectives": [13757],
+   "why": "«Encuentra el vórtice» (type 4): arriving at [-45,-80] (186387972), the vortex's map (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13759,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 186646534,
+   "afterObjectives": [13758],
+   "why": "«Toma el vórtice submarino»: the vortex (passage of element 511916) brings the character to the grotto (186646534) (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13760,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186646534, "element": 512000}],
+   "afterObjectives": [13759],
+   "showsNpc": 4308,
+   "why": "«Registra la gruta»: the element 512000 of the grotto (gfx 62180, cell 285: INFERRED to be the monolith's seat among the grotto's three quest-only elements) brings Monolito in (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13761,
+   "quest": 1945,
+   "kind": "beat",
+   "monster": 5211,
+   "map": 186646534,
+   "afterObjectives": [13760],
+   "why": "«Vence a 1 x Monolito»: the monolith of the grotto, in a solo fight (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13762,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 187433986,
+   "afterObjectives": [13761],
+   "why": "«Toma el pasadizo subterráneo»: the passage of the grotto (element 512002) ends at Bethel's Tower (187433986) (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13763,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 186385924,
+   "afterObjectives": [13762],
+   "why": "«Busca una salida»: the tower's stairs (element 512003) bring the character back to Zrid's map [-47,-80] (Dofus pour les noobs, «Toucher le fond»)."
   }
 ]
 }

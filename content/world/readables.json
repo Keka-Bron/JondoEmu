@@ -783,6 +783,7 @@
     { "map": 213910530, "element": 541968, "document": 251, "why": "Clicked on the official server: kif 251. official server packet captures, 2026-11-17 to 11-21" },
     { "map": 213910788, "element": 541969, "document": 252, "why": "Clicked on the official server: kif 252. official server packet captures, 2026-11-17 to 11-21" },
     { "map": 215744772, "element": 541965, "document": 253, "why": "Clicked on the official server: kif 253. official server packet captures, 2026-11-17 to 11-21" },
-    { "map": 215876874, "element": 541966, "document": 255, "why": "Clicked on the official server: kif 255. official server packet captures, 2026-11-17 to 11-21" }
+    { "map": 215876874, "element": 541966, "document": 255, "why": "Clicked on the official server: kif 255. official server packet captures, 2026-11-17 to 11-21" },
+    { "map": 186647552, "element": 512065, "document": 552, "why": "The explorer's diary on the Silent Wrecks ship [-48,-78]: document 552 (Diario de un explorador submarino) ends with the link «Buscar información acerca del autor», event:startquest,1945 (client documents data), the start the guide gives: «cliquez sur le livre puis sur Chercher des informations sur l'auteur à la dernière page» (Dofus pour les noobs, «Toucher le fond»). Element 512065 is the quest-only element of the hold's map (gfx 4750)." }
   ]
 }
