@@ -4807,7 +4807,11 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.Glifos.Any(g => g != aura && EsAuraDeMonstruo(g) && g.Hechizo == aura.Hechizo
                                       && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId)))
                 return;
-            var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo);
+            // The aura's own grade only: what it cast on with a duration of its own stays. Rainikron's
+            // direction glyph (8918 grade 2) casts grade 3, a state for the round, and the Minikron's
+            // step dispels the glyph right after landing on it -- taken with it, the yellow rune never
+            // saw the state that tells it which way to send him.
+            var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo, aura.Grado);
             foreach (var quitado in quitados)
             {
                 await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
@@ -5199,7 +5203,11 @@ namespace Jondo.Unity.Server.Handlers
                 if (EsAuraDeMonstruo(glifo))
                 {
                     soloElQueCae = true;
-                    desde = glifo.Centro >= 0 ? glifo.Centro : -1;
+                    // Unless it was a line run from its caster ("l"): its aimed cell is only where
+                    // the line points. Rainikron's direction glyphs (8918-8921) aim at the board's
+                    // corners and lie next to the Minikron; judged from the corner, their state
+                    // reached nobody on the glyph.
+                    desde = glifo.Centro >= 0 && glifo.ZoneShape != 'l' ? glifo.Centro : -1;
                 }
                 // Set off by its owner (Trashumancia, Posicion Defensiva), a glyph that hurts goes off
                 // over its ground: "danos inmediatos a todos los enemigos en su interior". Cast on the
@@ -8871,7 +8879,7 @@ namespace Jondo.Unity.Server.Handlers
                                 glyph.Hechizo, c.HechizoOrigen, c.NivelOrigen, glyph.Color);
                         await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, packet));
                     }
-                    Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s), " +
+                    Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s) [{string.Join(",", c.Glifo.Casillas)}], " +
                                      $"casts {c.Glifo.Hechizo}, colour {c.Glifo.Color:X6}, drops in round {c.Glifo.CaducaEnRonda}.");
                     if (glyph.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse && !holmgang
                         && (!lanceAura || glyph.Grado == 3))

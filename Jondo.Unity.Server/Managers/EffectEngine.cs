@@ -1649,6 +1649,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Disipa los glifos»: the target's glyphs go, the ones of the spell in the die when it names one.</summary>
         private const int DisipaLosGlifos = 2018;
 
+        /// <summary>«Dissipe les pièges» and «Dissipe les runes»: the same, for the target's traps and runes.</summary>
+        private const int DisipaLasTrampas = 2019, DisipaLasRunas = 2024;
+
         /// <summary>«Retira los embrujos»: every row that can be dispelled comes off the target.</summary>
         private const int Desembrujar = 132;
 
@@ -3546,7 +3549,12 @@ namespace Jondo.Unity.Server.Managers
                     // owner on 259; then 273 -> 244, owner on 230). Only when the aimed cell is
                     // taken: Superposicionamiento's 30196 is a 63 too, aimed at a free cell, and
                     // landed one cell short of it -- or not at all when it was next door.
-                    if (efecto.DiceNum == 63 && !LibreYPisable(combat, aDonde))
+                    // A line from the caster that stops short of the aimed cell is read as a line:
+                    // the yellow rune's step on (9091 grade 2, "4 63" on l1/0) is aimed at
+                    // Rainikron's corner and takes the Minikron one cell towards it, not to her.
+                    bool lineaCorta = efecto.Forma == Jondo.Unity.World.Maps.Zone.Segmento
+                                      && !CasillasDelEfecto(efecto, caster.CellId, aDonde).Contains(aDonde);
+                    if (efecto.DiceNum == 63 && !lineaCorta && !LibreYPisable(combat, aDonde))
                     {
                         var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
                         int ownerCell = aDonde;
@@ -5256,10 +5264,17 @@ namespace Jondo.Unity.Server.Managers
             // "Disipa los glifos": the glyphs of whoever the mask names -- the caster, with a
             // "C", in 72 of the 98 rows -- and only the ones his spell in the die laid, when the
             // die names one: Anutrof's 29575, 6537, 8139...
-            if (efecto.EffectId == DisipaLosGlifos)
+            // Its two siblings take the other marks: 2019 «Dissipe les pièges» the traps and 2024
+            // «Dissipe les runes» the runes. A 2018 leaves both: Rainikron's yellow rune (8916
+            // grade 1) has her cast grade 6 -- "2018 C" -- at the Minikron, and when it took her
+            // runes too, the whole board went blank at the first yellow step.
+            if (efecto.EffectId == DisipaLosGlifos || efecto.EffectId == DisipaLasTrampas || efecto.EffectId == DisipaLasRunas)
             {
                 if (sobre == null) return null;
                 var suyos = combate.Glifos.Where(g => g.Dueno == sobre.Id
+                                                   && (efecto.EffectId == DisipaLasTrampas ? g.Tipo == Trampa
+                                                       : efecto.EffectId == DisipaLasRunas ? g.Tipo == Runa
+                                                       : g.Tipo != Trampa && g.Tipo != Runa)
                                                    && (efecto.DiceNum <= 0 || g.HechizoQueLoPuso == efecto.DiceNum))
                                           .ToList();
                 if (suyos.Count == 0) return null;

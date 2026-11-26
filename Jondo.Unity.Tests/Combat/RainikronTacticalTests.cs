@@ -125,5 +125,64 @@ namespace Jondo.Unity.Tests.Combat
             // The Colère d'Ougah comes out of the mushroom at [-27,5] when it is clicked.
             Assert.Contains(NpcFights.OnMap(171966475), f => f.ElementId == 511296 && f.Monsters.Any(m => m.Monster == 4999));
         }
+
+        /// <summary>
+        /// A yellow rune (8916 grade 1) turns red and sends the Minikron one cell further; its
+        /// grade 6 is a "2018 C" in her name, which takes her glyphs -- not her runes. When it took
+        /// them too, the first yellow step wiped the board and the pinks with it.
+        /// </summary>
+        [Fact]
+        public async Task A_yellow_step_keeps_the_board()
+        {
+            const int Yellow = 14870798, Red = 14620160;
+            if (!SpellEffects.De(RuneSpell, 6).Any(row => row.EffectId == 2018)) return;   // no spell data
+            MobSpawnManager.EnsureMonsterData();
+            var data = MobSpawnManager.GetMonsterData(Rainikron);
+            if (data == null || MobSpawnManager.GetMonsterData(Minikron) == null) return;
+            if (MapManager.GetFightWalkable(Board) == null) MapManager.Initialize();
+            var floor = MapManager.GetFightWalkable(Board);
+            if (floor == null) return;
+
+            var fight = new FightInstance(9_904_947, RoleplayMap, Board);
+            var me = new Fighter { Id = 7404, TeamId = 0, CellId = 300, Level = 200, MaxHP = 9000, CurrentHP = 9000 };
+            Assert.True(FightHandler.Incarnate(me, Minikron, 0, 0, actionPoints: 12));
+            fight.AddPlayer(me);
+            var lady = FightHandler.BuildMonsterFighter(new MobSpawnManager.MobMember { Monster = data, GradeIndex = 0 }, -1, 141);
+            fight.AddMonster(lady);
+            fight.StartFight();
+            await FightHandler.LanzarLaConductaAsync(null, fight, lady);
+
+            bool Free(int c) => floor.Contains(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c);
+            int RuneOn(int c) => fight.Glifos.Where(g => g.Tipo == 2022 && g.Cubre(c)).Select(g => g.Color).DefaultIfEmpty(-1).Last();
+            int Ahead(int from, int to)
+            {
+                var (fx, fy) = MapGeometry.CellToPoint(from);
+                var (tx, ty) = MapGeometry.CellToPoint(to);
+                return MapGeometry.PointToCell(2 * tx - fx, 2 * ty - fy);
+            }
+
+            // A yellow cell with a free cell behind it and a free cell ahead of it, both yellow-free
+            // of anything else that could set something off.
+            var pick = fight.Glifos.Where(g => g.Tipo == 2022 && g.Color == Yellow).SelectMany(g => g.Casillas)
+                .SelectMany(y => MapGeometry.GetNeighbors(y).Where(Free).Select(from => (from, y, ahead: Ahead(from, y))))
+                .FirstOrDefault(t => Free(t.ahead) && RuneOn(t.from) != -1);
+            Assert.NotEqual(0, pick.y);
+            // The cell he is sent to keeps no rune here: one there goes off in turn and carries
+            // the chain on, which is the game's but not what this test looks at.
+            fight.Glifos.RemoveAll(g => g.Tipo == 2022 && g.Cubre(pick.ahead));
+            int runes = fight.Glifos.Count(g => g.Tipo == 2022);
+
+            me.CellId = pick.from;
+            me.CurrentAP = me.MaxAP;
+            await FightHandler.AplicarEfectosAsync(null, fight, me, Step, 1, null, EffectEngine.AlLanzar, pick.y);
+            _out.WriteLine($"step {pick.from}->{pick.y} (ahead {pick.ahead}): me at {me.CellId}, runes {runes} -> {fight.Glifos.Count(g => g.Tipo == 2022)}, cell now {RuneOn(pick.y)}");
+
+            foreach (int pink in PinkCells)
+                Assert.Contains(fight.Glifos, g => g.Tipo == 2022 && g.Color == Pink && g.Cubre(pink));
+            Assert.True(fight.Glifos.Count(g => g.Tipo == 2022) >= runes - 1);
+            Assert.Equal(Red, RuneOn(pick.y));
+            Assert.Equal(pick.ahead, me.CellId);
+            Assert.True(me.IsAlive);
+        }
     }
 }
