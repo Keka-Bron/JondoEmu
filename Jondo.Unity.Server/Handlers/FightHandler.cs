@@ -13332,8 +13332,10 @@ namespace Jondo.Unity.Server.Handlers
             // An item a quest asks to obtain on a map closes its objective when it drops there, as
             // a gathered one does: the three P'Koutoulou of «Fhtagn» (1765), 30 % each off the
             // klutist of their own map, tick only the fight that lets one fall.
+            // The binding names the roleplay map, not the arena the fight is played on.
+            long dropMap = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : session.State.MapId;
             foreach (int item in loot.Keys)
-                await Managers.Quests.OnGatheredAsync(session, item, fight.MapId);
+                await Managers.Quests.OnGatheredAsync(session, item, dropMap);
 
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and
