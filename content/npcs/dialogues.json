@@ -85307,7 +85307,8 @@
         { "criterion": "Qa=2082&Qo<15046", "message": 35883 },
         { "criterion": "Qa=2082&Qo>15045&Qo<15050", "message": 35917 },
         { "criterion": "Qa=2082&Qo>15049&Qo<15053", "message": 35883 },
-        { "criterion": "Qa=2082&Qo>15053&Qo<15054", "message": 35937 }
+        { "criterion": "Qa=2082&Qo>15053&Qo<15054", "message": 35937 },
+        { "canStart": 2083, "message": 35943 }
       ],
       "lines": [
         {
@@ -85343,18 +85344,21 @@
         {
           "message": 35881,
           "choices": [
-            { "reply": 47447, "next": 35882, "startsQuest": 2082, "params": [[34, 2082]] }
+            { "reply": 47447, "next": 35883 },
+            { "reply": 47444, "next": 35882 }
           ]
         },
         {
           "message": 35882,
           "choices": [
-            { "reply": 47444 }
+            { "reply": 47443, "startsQuest": 2082, "params": [[34, 2082]] }
           ]
         },
         {
           "message": 35883,
-          "choices": []
+          "choices": [
+            { "reply": 47445, "startsQuest": 2082, "params": [[34, 2082]] }
+          ]
         },
         {
           "message": 35917,
@@ -85395,35 +85399,54 @@
         {
           "message": 35938,
           "choices": [
-            { "reply": 47533, "next": 35939 }
+            { "reply": 47532, "next": 35939, "quest": 2082, "completes": 15054, "params": [[30, 15054]] },
+            { "reply": 47531, "next": 35939, "quest": 2082, "completes": 15054, "params": [[30, 15054]] }
           ]
         },
         {
           "message": 35939,
           "choices": [
-            { "reply": 47532, "next": 35940 }
+            { "reply": 47530, "next": 35940 }
           ]
         },
         {
           "message": 35940,
           "choices": [
-            { "reply": 47530, "next": 35941 }
+            { "reply": 47529, "next": 35941 }
           ]
         },
         {
           "message": 35941,
           "choices": [
-            { "reply": 47529, "next": 35942 }
+            { "reply": 47528, "next": 35942 }
           ]
         },
         {
           "message": 35942,
           "choices": [
-            { "reply": 47527, "quest": 2082, "completes": 15054, "params": [[30, 15054]] }
+            { "reply": 47527, "startsQuest": 2083, "params": [[34, 2083]] }
+          ]
+        },
+        {
+          "message": 35943,
+          "choices": [
+            { "reply": 47538, "next": 35944 }
+          ]
+        },
+        {
+          "message": 35944,
+          "choices": [
+            { "reply": 47537, "next": 35945 }
+          ]
+        },
+        {
+          "message": 35945,
+          "choices": [
+            { "reply": 47536, "next": 35942 }
           ]
         }
       ],
-      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»)). 2082: Tylezia asks the player to reach her father, gives her ruby (35917-35921) and, at the end, learns of her child (35937-35942). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»)). 2082: Tylezia asks the player to reach her father, gives her ruby (35917-35921) and, at the end, learns of her child (35937-35942). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2082 hand-over, read from the texts: «Puedo comunicarme con el dragón acudiendo a su sueño» (47447) leads to 35883, the line its step names, and «Ir al sueño de Terrakurial...» (47445) hands it over; asking Draconiros first (47444, 35882) hands it over on «Retomar el camino de los Sueños Infinitos» (47443). The end: the veil of sadness (47532) or comforting her (47531) closes 15054, and the talk goes on at 35939, the line where 2083 is handed over, through the envoy of Xelor to «Ir al pueblo de Amakna» (47527). Whoever left before that is asked again from 35943 (35943-35945, the same talk without the grief)."
     },
     {
       "npc": 2004,
