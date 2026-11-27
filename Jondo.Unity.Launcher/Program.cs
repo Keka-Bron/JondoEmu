@@ -60,6 +60,9 @@ namespace Jondo.Unity.Launcher
         [STAThread]
         private static int Main(string[] args)
         {
+            if (args is ["--prepare-client-mod-build", var clientDirectory])
+                return Setup.ClientModBuild.PrepareAsync(clientDirectory).GetAwaiter().GetResult();
+
             // The part of the setup that needs an administrator: a process of its own, no window.
             if (Array.IndexOf(args, "--elevated-setup") >= 0) return Setup.SystemIntegration.ElevatedMain(args);
             if (Array.IndexOf(args, "--uninstall-run") >= 0) return Setup.Uninstaller.RunMain(args);

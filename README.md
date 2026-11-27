@@ -186,7 +186,7 @@ datos/                        json and bin the emulator reads (maps, items, appe
 bases/                        writable databases and backups
 docs/                         technical documentation
 launcher_assets/              launcher artwork and music
-JondoFix/                     the MelonLoader mod, source and compiled dll
+JondoFix/                     source for the MelonLoader redirect mod
 Cazacabezas/                  the head hunters' client mod
 Cazacabezas.Server/           the optional head hunters' server package
 Heroes/                       the hero mode's client mod

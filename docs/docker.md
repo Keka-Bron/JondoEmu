@@ -6,6 +6,11 @@ before. Nothing changes unless you start the container.
 
 ## Quick start
 
+When building from a source checkout, first build the client DLLs with
+`./.github/scripts/Build-ClientMods.ps1 -DofusClientDir <client-folder>` using a
+Dofus 3.6.10.11 installation with MelonLoader and its generated assemblies.
+The Docker build copies the generated `mods/JondoFix.dll` into the image.
+
 ```sh
 cp .env.example .env          # optional: bind address, tag, time zone
 docker compose up -d --build

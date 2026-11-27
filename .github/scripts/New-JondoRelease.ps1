@@ -5,13 +5,13 @@
 
 .DESCRIPTION
   The folder a player installs is what git versions of datos/, content/, launcher_assets/, the
-  mods and the root marker, plus the executables built for the platform. Every file of it goes
+  root marker, plus the built executables and mods. Every file of it goes
   in the manifest with its size and SHA-256:
 
     - the versioned ones as "raw": the launcher fetches them one by one from the repository at
       the release's tag. They are taken with LF line endings, which is how the repository stores
       them, so their hashes are the raw files' hashes;
-    - the executables as "asset": uploaded beside the zip under names without spaces. The
+    - the executables and client mods as "asset": uploaded beside the zip. The
       launcher's asset is the setup itself (the same file), so it is uploaded once.
 
   An update fetches only the files whose hash changed, or the full zip when most did. Runs on
@@ -28,8 +28,7 @@ param(
     # Name in the folder -> the built file to put there.
     [Parameter(Mandatory)] [hashtable] $Executables,
     [string] $Ref = 'HEAD',
-    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets', 'mods',
-                         'JondoModLoader/JondoModLoader.dll')
+    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -60,6 +59,18 @@ foreach ($name in $Executables.Keys) {
     $base = [IO.Path]::GetFileNameWithoutExtension($name).ToLowerInvariant() -replace '^jondo\s+', '' -replace '\s+', '-'
     $ext = [IO.Path]::GetExtension($name)
     $assets[$name] = if ($name -like 'Jondo Emulator Launcher*') { $setupName } else { "$base-$Platform$ext" }
+}
+
+$root = Resolve-Path (Join-Path $PSScriptRoot '../..')
+foreach ($path in 'mods/JondoFix.dll', 'JondoModLoader/JondoModLoader.dll') {
+    $source = Join-Path $root $path
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+        throw "Missing built client mod: $path. Run Build-ClientMods.ps1 before packaging."
+    }
+    $target = Join-Path $stage $path
+    New-Item -ItemType Directory -Force (Split-Path -Parent $target) | Out-Null
+    Copy-Item -LiteralPath $source -Destination $target
+    $assets[$path] = "client-mod-$Platform-$(Split-Path -Leaf $path)"
 }
 
 # The manifest.
@@ -95,8 +106,8 @@ if ($Platform -eq 'linux-x64' -and (Get-Command zip -ErrorAction SilentlyContinu
     [IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [IO.Compression.CompressionLevel]::Optimal, $true)
 }
 
-# The executables as assets: the launcher under the setup's name, the one players download.
-foreach ($name in $Executables.Keys) {
+# Uploadable assets, including the launcher under the setup's name.
+foreach ($name in $assets.Keys) {
     Copy-Item -LiteralPath (Join-Path $stage $name) -Destination (Join-Path $OutDir $assets[$name]) -Force
 }
 

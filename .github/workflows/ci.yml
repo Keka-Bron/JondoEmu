@@ -14,13 +14,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build-client-mods:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/build-client-mods
+
   build-and-test:
+    needs: build-client-mods
     runs-on: windows-latest
     timeout-minutes: 20
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: client-mods
 
       - name: Install .NET 10
         uses: actions/setup-dotnet@v5
@@ -89,6 +101,7 @@ jobs:
           if-no-files-found: ignore
 
   build-and-test-linux:
+    needs: build-client-mods
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -97,6 +110,9 @@ jobs:
       XDG_DATA_HOME: ${{ github.workspace }}/host-artifacts/test-profile/data
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v6
+        with:
+          name: client-mods
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
@@ -145,12 +161,17 @@ jobs:
 
   # The server image (Dockerfile, docs/docker.md): built, not pushed, so it cannot rot unnoticed.
   docker-image:
+    needs: build-client-mods
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: client-mods
 
       - name: Build the server image
         run: docker build --tag jondo-server:ci .

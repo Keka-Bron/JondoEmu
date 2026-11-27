@@ -1,0 +1,29 @@
+name: Build client mods
+description: Generate the client references on Windows and build the four Jondo client mods.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          6.0.x
+          10.0.x
+    - name: Generate references and build client mods
+      shell: pwsh
+      run: |
+        $bootstrap = Join-Path $env:RUNNER_TEMP 'jondo-bootstrap'
+        $client = Join-Path $env:RUNNER_TEMP 'jondo-build-client'
+        dotnet build Jondo.Unity.Launcher/Jondo.Unity.Launcher.csproj -c Release --output $bootstrap --nologo
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        dotnet (Join-Path $bootstrap 'Jondo Emulator Launcher.dll') --prepare-client-mod-build $client
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        ./.github/scripts/Build-ClientMods.ps1 -DofusClientDir $client
+    - uses: actions/upload-artifact@v6
+      with:
+        name: client-mods
+        path: |
+          mods/JondoFix.dll
+          JondoModLoader/JondoModLoader.dll
+          Heroes/Heroes.dll
+          Cazacabezas/Cazacabezas.dll
+        if-no-files-found: error

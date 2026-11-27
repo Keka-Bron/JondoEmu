@@ -2,7 +2,7 @@ name: Release
 
 # Builds the Windows and Linux applications, runs the tests on both and creates a draft release
 # with a zip for each.
-# The .exe are not versioned in git any more: this is where they come from.
+# Executables and mod DLLs are built here.
 
 on:
   workflow_dispatch:
@@ -30,7 +30,7 @@ concurrency:
 jobs:
   release:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     outputs:
       tag: ${{ steps.version.outputs.tag }}
       version: ${{ steps.version.outputs.version }}
@@ -61,6 +61,9 @@ jobs:
           dotnet-version: 10.0.x
           cache: true
           cache-dependency-path: '**/*.csproj'
+
+      - name: Build client mods
+        uses: ./.github/actions/build-client-mods
 
       # The last vX.Y.Z tag in the repository, bumped. With no tag yet, the first one is 0.1.0.
       - name: Compute version
@@ -168,7 +171,7 @@ jobs:
 
             Server operators can extract any of the optional `*-server-mod.zip` archives into `mods/` at the emulator root, add the mod ID to `ServerMods` in `config/server_settings.json`, and restart the server. The same mod archives work with the Windows and Linux servers.
 
-          artifacts: release/*.zip,release/*.exe,release/*.json
+          artifacts: release/*.zip,release/*.exe,release/*.json,release/client-mod-*.dll
           artifactErrorsFailBuild: true
 
       # The test results stay with the run, not among the files players see.
@@ -193,6 +196,9 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.release.outputs.sha }}
+      - uses: actions/download-artifact@v6
+        with:
+          name: client-mods
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
