@@ -719,10 +719,10 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
-| Frigost Island | `███░░░░░░░` **30%** | 68/228 |
-| World Quests | `████░░░░░░` **38%** | 55/145 |
+| Frigost Island | `███░░░░░░░` **35%** | 79/228 |
+| World Quests | `█████░░░░░` **47%** | 68/145 |
 | Astrub | `██████████` **100%** | 51/51 |
-| Sufokia | `███████░░░` **72%** | 41/57 |
+| Sufokia | `███████░░░` **74%** | 42/57 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
@@ -731,23 +731,24 @@ played through.
 | Cania | `█████████░` **88%** | 23/26 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
-| Pandala Island | `███░░░░░░░` **27%** | 15/55 |
+| Pandala Island | `███░░░░░░░` **31%** | 17/55 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Kwismas | `█░░░░░░░░░` **13%** | 10/79 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Enurado | `██░░░░░░░░` **24%** | 8/33 |
+| Towers of the Brotherhood of the Forgotten | `████░░░░░░` **44%** | 8/18 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
 | Bonta Alignment | `█░░░░░░░░░` **5%** | 6/115 |
-| Towers of the Brotherhood of the Forgotten | `███░░░░░░░` **33%** | 6/18 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
-| Archipelago of Vulkania | `░░░░░░░░░░` **5%** | 3/60 |
+| Archipelago of Vulkania | `█░░░░░░░░░` **7%** | 4/60 |
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Evil Forest | `████████░░` **75%** | 3/4 |
 | Xelorium | `█░░░░░░░░░` **7%** | 2/28 |
-| **All quests** | **27.2%** | **537/1976** |
+| Osavora | `█░░░░░░░░░` **10%** | 2/21 |
+| **All quests** | **28.8%** | **569/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
