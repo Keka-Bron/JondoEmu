@@ -11758,7 +11758,7 @@ namespace Jondo.Unity.Server.Handlers
                     SupportMasks = supportMasks,
                     UtilityAllyMasks = utilityAllyMasks,
                     UtilityOwnSideMasks = utilityOwnSideMasks,
-                    Summons = summons,
+                    Summons = summons || Managers.MonsterTactics.Spell.SummonsByRows(Managers.SpellEffects.De(spell, grade), 0),
                     NeedsFreeCell = limits.NeedFreeCell,
                     BlowsUpOnTimer = limits.EsperaInicial > 0
                                      && Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill

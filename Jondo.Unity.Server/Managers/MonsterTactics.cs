@@ -352,8 +352,24 @@ namespace Jondo.Unity.Server.Managers
             /// </summary>
             public IReadOnlyList<SpellEffect> Strips { get; init; } = Array.Empty<SpellEffect>();
 
-            /// <summary>Whether one of its rows summons -- a double too: it is then aimed at free cells too.</summary>
-            public bool SummonsByRow => Rows.Any(r => EffectEngine.EsInvocacion(r.EffectId) || EffectEngine.EsDobleDelLanzador(r.EffectId));
+            /// <summary>
+            /// Whether one of its rows summons -- a double too: it is then aimed at free cells too.
+            /// Or what it casts on its caster when cast: the Kwapa's Pepinobus (16721) shows the
+            /// water bombombre's summon to the client only, and summons it through 2794 down to
+            /// 16741's fourth grade, at the grade of the caster's kind. Weighed by its own rows
+            /// alone it summoned nothing, was never cast, and Nagate's islet stayed out of reach.
+            /// </summary>
+            public bool SummonsByRow => _summonsByRow ??= SummonsByRows(Rows, 0);
+
+            private bool? _summonsByRow;
+
+            internal static bool SummonsByRows(IEnumerable<SpellEffect> rows, int depth)
+                => rows.Any(r => !r.ForClientOnly
+                                 && (EffectEngine.EsInvocacion(r.EffectId) || EffectEngine.EsDobleDelLanzador(r.EffectId)
+                                     || (depth < SubCastDepth && EffectEngine.EsDeLaFamiliaDeSublanzar(r.EffectId) && r.DiceNum > 0
+                                         && OnCaster(r)
+                                         && string.Equals(r.Triggers ?? EffectEngine.AlLanzar, EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
+                                         && SummonsByRows(SpellEffects.De(r.DiceNum, Math.Max(1, r.DiceSide)), depth + 1))));
 
             /// <summary>Whether one of its rows lays a trap: it is then aimed at the cells the enemy may walk.</summary>
             public bool LaysTraps => Rows.Any(r => r.EffectId == EffectEngine.ColocaUnaTrampa);
