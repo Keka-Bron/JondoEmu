@@ -46,14 +46,26 @@ namespace Jondo.Unity.Server
                     e.Cancel = true;
                     RequestShutdown("Ctrl+C");
                 };
-                using var sigterm = OperatingSystem.IsWindows() ? null :
-                    PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
-                    {
-                        context.Cancel = true;
-                        RequestShutdown("SIGTERM");
-                    });
-                if (_headless) RunServerAsync().GetAwaiter().GetResult();
+                var headlessStopped = OperatingSystem.IsWindows() && _headless ? new TaskCompletionSource() : null;
+                using var sigterm = OperatingSystem.IsWindows() && headlessStopped == null ? null :
+                    PosixSignalRegistration.Create(PosixSignal.SIGTERM, HandleTerminationSignal);
+                using var sighup = headlessStopped == null ? null :
+                    PosixSignalRegistration.Create(PosixSignal.SIGHUP, HandleTerminationSignal);
+
+                if (_headless)
+                {
+                    try { RunServerAsync().GetAwaiter().GetResult(); }
+                    finally { headlessStopped?.SetResult(); }
+                }
                 else UI.ServerApp.Run(args);
+
+                void HandleTerminationSignal(PosixSignalContext context)
+                {
+                    context.Cancel = true;
+                    RequestShutdown(context.Signal.ToString());
+                    // Windows can terminate the process as soon as the console callback returns.
+                    headlessStopped?.Task.GetAwaiter().GetResult();
+                }
             }
             catch (Exception ex)
             {
