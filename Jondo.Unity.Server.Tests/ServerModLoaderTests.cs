@@ -239,7 +239,7 @@ public sealed class ServerModLoaderTests : IDisposable
     }
 
     [Fact]
-    public async Task DefaultSettingsStartWithoutPackagesOrModRoutes()
+    public async Task DefaultSettingsReportMissingPackagesAndStartWithoutModRoutes()
     {
         string missingRoot = Path.Combine(_root.FullName, "mods");
         await Program.RunEmulationAsync(missingRoot, ServerSettings.Read("{}"),
@@ -252,7 +252,12 @@ public sealed class ServerModLoaderTests : IDisposable
                 return Task.CompletedTask;
             }, () => _messages.Add("host stopped"), _messages.Add);
 
-        Assert.Equal(["ready", "host stopped"], _messages);
+        Assert.Equal([
+            $"[Server mods] heroes: package not found in '{missingRoot}'; skipped.",
+            $"[Server mods] cazacabezas: package not found in '{missingRoot}'; skipped.",
+            "ready",
+            "host stopped"
+        ], _messages);
     }
 
     [Fact]
@@ -469,6 +474,23 @@ public sealed class ServerModLoaderTests : IDisposable
         Assert.Equal(["fixture.running"], running.ServerMods);
         Assert.Equal(["fixture.next"], ServerSettings.Read(JsonSerializer.Serialize(edited)).ServerMods);
         Assert.True(edited.DiffersFrom(running));
+    }
+
+    [Theory]
+    [InlineData("""{}""", "heroes", "cazacabezas")]
+    [InlineData("""{"heroMode":true}""", "heroes", "cazacabezas")]
+    [InlineData("""{"heroMode":false}""", "cazacabezas")]
+    [InlineData("""{"HeroMode":true,"ServerMods":["fixture.first"]}""", "fixture.first", "heroes")]
+    [InlineData("""{"HeroMode":true,"ServerMods":["HEROES"]}""", "HEROES")]
+    [InlineData("""{"serverMods":[],"HeroMode":false}""")]
+    [InlineData("""{"ServerMods":[]}""")]
+    public void SettingsMigrateLegacyHeroModeAndRespectExplicitSelections(string json, params string[] expected)
+    {
+        Assert.Equal(["heroes", "cazacabezas"], new ServerSettings().ServerMods);
+        var settings = ServerSettings.Read(json);
+        Assert.Equal(expected, settings.ServerMods);
+        settings.ServerMods = [];
+        Assert.Empty(ServerSettings.Read(JsonSerializer.Serialize(settings)).ServerMods);
     }
 
     [Theory]

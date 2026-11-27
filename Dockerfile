@@ -40,6 +40,9 @@ RUN if [ "$SKIP_TESTS" != "true" ]; then \
         -p:SkipTests=$SKIP_TESTS -p:SkipRootDeploy=true \
         --artifacts-path /artifacts --nologo
 
+RUN dotnet build Heroes.Server/Heroes.Server.csproj -c Release -p:StageServerMod=true --nologo \
+ && dotnet build Cazacabezas.Server/Cazacabezas.Server.csproj -c Release -p:StageServerMod=true --nologo
+
 # ─── Runtime ──────────────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime
 WORKDIR /app

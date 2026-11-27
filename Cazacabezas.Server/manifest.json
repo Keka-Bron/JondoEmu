@@ -9,7 +9,7 @@
     "fields": [
       {
         "key": "Enabled",
-        "default": true,
+        "default": false,
         "legacyKey": "HeadHunters",
         "label": {
           "es": "Órdenes de caza",
@@ -50,7 +50,6 @@
           "fr": "Minutes de répit entre traques"
         }
       }
-    ],
-    "activationSetting": "Enabled"
+    ]
   }
 }

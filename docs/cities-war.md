@@ -52,7 +52,7 @@ dishonour washed, 155 not this time. The sheet's honour block is
 
 ## The Cazacabezas
 
-`Cazacabezas.Server/HeadHunts.cs` owns the rules, and `Cazacabezas.Server/CazacabezasMod.cs` handles the package's control routes. Install the [Cazacabezas server package](server-mod-migration.md#cazacabezas), list `cazacabezas` in `ServerMods`, and set its `Enabled` gameplay setting to true.
+`Cazacabezas.Server/HeadHunts.cs` owns the rules, and `Cazacabezas.Server/CazacabezasMod.cs` handles the package's control routes. The bundled package loads by default and handles chapeuvepé trades. Set its `Enabled` gameplay setting to true to allow hunt orders. See the [Cazacabezas server package settings](server-mod-migration.md#cazacabezas).
 
 **Taking an order.** From level 50, sworn, PvP on and no dishonour. The board lists the enemies within
 reach: the other city, PvP on, level 30 or more, from 20 levels below the hunter to 50 above, seen

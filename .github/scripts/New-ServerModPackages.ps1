@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory)] [string] $OutDir,
-    [string] $Configuration = 'Release'
+    [string] $Configuration = 'Release',
+    [string] $BundledModsDirectory,
+    [switch] $SkipArchives
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,7 +15,7 @@ try {
         Cazacabezas = 'cazacabezas'
         Heroes = 'heroes'
     }
-    if (Test-Path -LiteralPath (Join-Path $root 'HeroProgressionSync.Server/HeroProgressionSync.Server.csproj') -PathType Leaf) {
+    if (-not $SkipArchives -and (Test-Path -LiteralPath (Join-Path $root 'HeroProgressionSync.Server/HeroProgressionSync.Server.csproj') -PathType Leaf)) {
         $modules['HeroProgressionSync'] = 'hero-progression-sync'
     }
     foreach ($module in $modules.Keys) {
@@ -23,7 +25,12 @@ try {
         dotnet build $project --configuration $Configuration --nologo -m:1 -nr:false -p:StageServerMod=true "-p:${module}PackageDirectory=$package"
         if ($LASTEXITCODE -ne 0) { throw "Building $id failed." }
 
-        Compress-Archive -LiteralPath $package -DestinationPath (Join-Path $output.FullName "$id-server-mod.zip") -Force
+        if ($BundledModsDirectory -and $id -in 'cazacabezas', 'heroes') {
+            Copy-Item -LiteralPath $package -Destination (Join-Path $BundledModsDirectory $id) -Recurse
+        }
+        if (-not $SkipArchives) {
+            Compress-Archive -LiteralPath $package -DestinationPath (Join-Path $output.FullName "$id-server-mod.zip") -Force
+        }
     }
 }
 finally {

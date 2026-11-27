@@ -104,7 +104,7 @@ namespace Jondo.Unity.Server
         public string[] ClientMods { get; set; } = ["JondoFix.dll"];
 
         /// <summary>Server mod filenames and package manifest IDs in startup order.</summary>
-        public string[] ServerMods { get; set; } = [];
+        public string[] ServerMods { get; set; } = ["heroes", "cazacabezas"];
 
         /// <summary>Abort server startup when mod discovery, loading, or startup throws.</summary>
         public bool FailOnServerModError { get; set; }
@@ -176,6 +176,21 @@ namespace Jondo.Unity.Server
             foreach (var (key, value) in settings.ModSettings)
                 extra[key] = value;
             settings.ModSettings = extra;
+
+            bool hasSelection = doc.RootElement.EnumerateObject()
+                .Any(property => property.Name.Equals("ServerMods", StringComparison.OrdinalIgnoreCase));
+            if (extra.TryGetValue("HeroMode", out var heroMode))
+            {
+                if (heroMode.ValueKind == JsonValueKind.False && !hasSelection)
+                    settings.ServerMods = ["cazacabezas"];
+                else if (heroMode.ValueKind == JsonValueKind.True)
+                {
+                    if (!settings.ServerMods.Contains("heroes", StringComparer.OrdinalIgnoreCase))
+                        settings.ServerMods = [..settings.ServerMods, "heroes"];
+                    // A saved selection can now disable Heroes without the old flag re-adding it.
+                    extra.Remove("HeroMode");
+                }
+            }
             return settings;
         }
 

@@ -35,6 +35,10 @@ namespace Jondo.Unity.Tests.World
         private const long Map = 191105026;
         private static string Packages => Path.Combine(AppContext.BaseDirectory, "ServerModFixtures");
 
+        private static ServerSettings HuntEnabled() => ServerSettings.Read("""
+            {"ServerMods":["cazacabezas"],"cazacabezas":{"Enabled":true}}
+            """);
+
         private static HeadHunts OpenStorage()
         {
             var world = new AlignmentWorld();
@@ -62,8 +66,7 @@ namespace Jondo.Unity.Tests.World
         private static async Task WithHunt(Func<HeadHunts, long, long, ClientPipe, ClientPipe, Task> test, string tag)
         {
             var mod = new CazacabezasMod();
-            var settings = new ServerSettings { ServerMods = ["cazacabezas"] };
-            using var loaded = ServerModLoader.LoadConfigured(Packages, settings, Console.WriteLine, _ => mod);
+            using var loaded = ServerModLoader.LoadConfigured(Packages, HuntEnabled(), Console.WriteLine, _ => mod);
             var hunts = mod.Hunts!;
             long hunter = Create(HunterAccount, "Cazador-" + tag, 100);
             long prey = Create(PreyAccount, "Presa-" + tag, 110);
@@ -195,10 +198,7 @@ namespace Jondo.Unity.Tests.World
         [Fact]
         public async Task The_loaded_package_serves_routes_settles_hunts_and_restores_saved_orders()
         {
-            var disabledSettings = ServerSettings.Read("""
-                {"ServerMods":["cazacabezas"],"cazacabezas":{"Enabled":false}}
-                """);
-            using var disabled = ServerModLoader.LoadConfigured(Packages, disabledSettings, _ => { });
+            using var disabled = ServerModLoader.Load(Packages, [], _ => { });
             Assert.Empty(disabled.ClientAssets);
             var catalog = new ClientModCatalog(Packages, []);
             int port;
@@ -221,7 +221,7 @@ namespace Jondo.Unity.Tests.World
             {
                 storage.CharacterDeleted(hunter);
                 storage.CharacterDeleted(prey);
-                using var enabled = ServerModLoader.Load(Packages, ["cazacabezas"], _ => { });
+                using var enabled = ServerModLoader.LoadConfigured(Packages, HuntEnabled(), _ => { });
                 enabled.StartGameplay();
                 Sworn(hunter, Alignments.Bonta);
                 Sworn(prey, Alignments.Brakmar);
@@ -309,7 +309,7 @@ namespace Jondo.Unity.Tests.World
                 saved.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 saved.ExecuteNonQuery();
 
-                using (var restarted = ServerModLoader.Load(Packages, ["cazacabezas"], _ => { }))
+                using (var restarted = ServerModLoader.LoadConfigured(Packages, HuntEnabled(), _ => { }))
                 {
                     restarted.StartGameplay();
                     var restored = await Send("status", Body(), 200, restarted.ControlRoutes);
@@ -356,16 +356,22 @@ namespace Jondo.Unity.Tests.World
             }
         }
 
-        [Fact]
-        public void A_chapeuvepe_trade_needs_the_chapeuvepes()
+        [Theory]
+        [InlineData("""{"HeroMode":false}""")]
+        [InlineData("""{"HeroMode":false,"HeadHunters":false}""")]
+        public void A_chapeuvepe_trade_needs_the_chapeuvepes_even_when_hunts_are_off(string json)
         {
             const long someone = 8_980_000_099;
-            var hunts = OpenStorage();
+            var mod = new CazacabezasMod();
+            using var loaded = ServerModLoader.LoadConfigured(Packages, ServerSettings.Read(json), Console.WriteLine, _ => mod);
+            var hunts = Assert.IsType<HeadHunts>(mod.Hunts);
+            Assert.False(hunts.On);
+            var currency = Assert.Single(ServerModHooks.All<IDialogueCurrency>());
             try
             {
-                Assert.False(hunts.Pay(someone, -2));
-                Assert.True(hunts.Pay(someone, 5));
-                Assert.True(hunts.Pay(someone, -2));
+                Assert.False(currency.AdjustBalance(someone, -2));
+                Assert.True(currency.AdjustBalance(someone, 5));
+                Assert.True(currency.AdjustBalance(someone, -2));
                 Assert.Equal(3, hunts.Of(someone).Chapeuvepes);
             }
             finally

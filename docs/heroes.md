@@ -4,8 +4,8 @@ The account's other characters connected beside the one in the world -- the mast
 his side and played by hand from his client in their turns. Ankama's Dofus 3 has none yet (« rien en
 2026 »); Wakfu's heroes and Dofus Touch's « Duo de choc » (1.72) are the model.
 
-Install the [Heroes server package](server-mod-migration.md#heroes), add `heroes` to
-`ServerMods` and restart. In the package's settings, `Enabled` defaults to true,
+The [Heroes server package](server-mod-migration.md#heroes) ships with JondoEmu
+and is selected by default. In the package's settings, `Enabled` defaults to true,
 `MaxHeroes` defaults to 7, and `ReloadMapOnSwitch` defaults to false. The window has
 eight places including the master. The server advertises the package's client DLL
 while the package is active.

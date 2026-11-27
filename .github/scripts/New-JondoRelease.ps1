@@ -11,7 +11,7 @@
     - the versioned ones as "raw": the launcher fetches them one by one from the repository at
       the release's tag. They are taken with LF line endings, which is how the repository stores
       them, so their hashes are the raw files' hashes;
-    - the executables and client mods as "asset": uploaded beside the zip. The
+    - the executables, client mods and bundled server packages as "asset": uploaded beside the zip. The
       launcher's asset is the setup itself (the same file), so it is uploaded once.
 
   An update fetches only the files whose hash changed, or the full zip when most did. Runs on
@@ -28,7 +28,8 @@ param(
     # Name in the folder -> the built file to put there.
     [Parameter(Mandatory)] [hashtable] $Executables,
     [string] $Ref = 'HEAD',
-    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets')
+    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets'),
+    [switch] $BundleServerMods
 )
 
 $ErrorActionPreference = 'Stop'
@@ -71,6 +72,18 @@ foreach ($path in 'mods/JondoFix.dll', 'JondoModLoader/JondoModLoader.dll') {
     New-Item -ItemType Directory -Force (Split-Path -Parent $target) | Out-Null
     Copy-Item -LiteralPath $source -Destination $target
     $assets[$path] = "client-mod-$Platform-$(Split-Path -Leaf $path)"
+}
+
+if ($BundleServerMods) {
+    $mods = Join-Path $stage 'mods'
+    New-Item -ItemType Directory -Force $mods | Out-Null
+    & (Join-Path $PSScriptRoot 'New-ServerModPackages.ps1') -OutDir $OutDir `
+        -BundledModsDirectory $mods -SkipArchives:($Platform -eq 'linux-x64')
+    foreach ($id in 'heroes', 'cazacabezas') {
+        foreach ($file in Get-ChildItem -LiteralPath (Join-Path $mods $id) -File) {
+            $assets["mods/$id/$($file.Name)"] = "server-mod-$Platform-$id-$($file.Name)"
+        }
+    }
 }
 
 # The manifest.

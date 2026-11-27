@@ -106,8 +106,9 @@ The image runs as the non-root `app` user and sets:
 ## Optional server mods
 
 Put standalone DLLs and unpacked packages in `mods/` on the Docker host and bind-mount
-it at `/app/mods`. Include `JondoFix.dll` and any other client DLLs the server should
-offer, because this mount replaces the image's built-in `mods/` directory. Add this
+it at `/app/mods`. This mount replaces the image's built-in `mods/` directory, which
+includes `JondoFix.dll` and the Heroes and Cazacabezas packages. Include those files
+in the mounted folder to keep them available. Add this
 to a Compose override file next to `docker-compose.yml`.
 
 ```yaml

@@ -138,16 +138,12 @@ jobs:
       - name: Package
         shell: pwsh
         run: |
-          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ steps.version.outputs.tag }}' -Platform win-x64 -OutDir release `
+          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ steps.version.outputs.tag }}' -Platform win-x64 -OutDir release -BundleServerMods `
             -Executables @{
               'Jondo Emulator Launcher.exe' = 'Jondo Emulator Launcher.exe'
               'Jondo Server.exe' = 'Jondo Server.exe'
               'Jondo Studio.exe' = 'Jondo Studio.exe'
             }
-
-      - name: Package optional server mods
-        shell: pwsh
-        run: ./.github/scripts/New-ServerModPackages.ps1 -OutDir release
 
       # The notes open with the one file to download for each system: the release also carries
       # what the launcher fetches by itself, and nothing on the page tells them apart otherwise.
@@ -169,9 +165,9 @@ jobs:
 
             Download the setup for your system to install the emulator and fetch the Dofus client. The platform ZIPs are ready to unpack for a manual installation.
 
-            Server operators can extract any of the optional `*-server-mod.zip` archives into `mods/` at the emulator root, add the mod ID to `ServerMods` in `config/server_settings.json`, and restart the server. The same mod archives work with the Windows and Linux servers.
+            The setup and platform ZIPs include Heroes and Cazacabezas. For a manual server-only installation or update, extract their `*-server-mod.zip` archives into `mods/` at the emulator root. The same mod archives work with the Windows and Linux servers.
 
-          artifacts: release/*.zip,release/*.exe,release/*.json,release/client-mod-*.dll
+          artifacts: release/*.zip,release/*.exe,release/*.json,release/client-mod-*.dll,release/server-mod-*.dll
           artifactErrorsFailBuild: true
 
       # The test results stay with the run, not among the files players see.
@@ -221,7 +217,7 @@ jobs:
         shell: pwsh
         run: |
           $published = 'host-artifacts/publish'
-          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ needs.release.outputs.tag }}' -Platform linux-x64 -OutDir host-artifacts/release `
+          ./.github/scripts/New-JondoRelease.ps1 -Tag '${{ needs.release.outputs.tag }}' -Platform linux-x64 -OutDir host-artifacts/release -BundleServerMods `
             -Executables @{
               'Jondo Server' = "$published/Jondo.Unity.Server/release_linux-x64/Jondo Server"
               'Jondo Emulator Launcher' = "$published/Jondo.Unity.Launcher/release_linux-x64/Jondo Emulator Launcher"
