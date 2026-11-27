@@ -59516,7 +59516,9 @@
             { "reply": 45214, "criterion": "Qa=2064&Qo>14897&Qo<14898", "quest": 2064, "completes": 14898, "params": [[30, 14898]] },
             { "reply": 50309, "next": 38633, "criterion": "Qf=2064&Qa!2097&Qf!2097" },
             { "reply": 46984, "next": 35552, "criterion": "PL>179&Qf=2064&Qa!2078&Qf!2078" },
-            { "reply": 46986, "next": 35554, "quest": 2078, "afterObjective": 15074, "beforeObjective": 14984, "completes": 14984, "params": [[30, 14984]] }
+            { "reply": 46986, "next": 35554, "quest": 2078, "afterObjective": 15074, "beforeObjective": 14984, "completes": 14984, "params": [[30, 14984]] },
+            { "reply": 47542, "next": 35947, "quest": 2083, "criterion": "Qa=2083&Qo<15055" },
+            { "reply": 47544, "next": 35950, "criterion": "Qa=2083&Qo>15056&Qo<15057" }
           ]
         },
         {
@@ -59760,9 +59762,33 @@
           "choices": [
             { "reply": 46988, "gives": 21186, "quest": 2078, "completes": 14986, "params": [[30, 14986]] }
           ]
+        },
+        {
+          "message": 35947,
+          "choices": [
+            { "reply": 47541, "next": 35948 }
+          ]
+        },
+        {
+          "message": 35948,
+          "choices": [
+            { "reply": 47540, "next": 35949 }
+          ]
+        },
+        {
+          "message": 35949,
+          "choices": [
+            { "reply": 47539, "quest": 2083, "completes": 15055, "params": [[30, 15055]] }
+          ]
+        },
+        {
+          "message": 35950,
+          "choices": [
+            { "reply": 47543, "quest": 2083, "completes": 15057, "params": [[30, 15057]] }
+          ]
         }
       ],
-      "why": "As the official server says it, with no quest under way. 2062 (Cada cosa a su tiempo): she is shown the perpetual pixel (43299 closes 14832), cannot study it herself and sends the player to Doctor Braun in Xelorium; at the end the report (43300) closes 14843. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): she accepts the player on the enquiry and sends them to the FBA (34382-34384; 43303 starts the quest), and takes the FBA's results at the end (43444 closes 14880). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): the same start from the opening for a player whose 2062 talk is long over. INFERRED reply order. 2064 (Sera mejor antes): the Envoyee notices Entropix (43447/43446 start the quest on 34489), answers about the zaaps of the cursed day (43461 -> 34493-34503; the last reply closes 14882 and sends the player to Doctor Bu in Sufokia) and takes the report on Martalo (45214 closes 14898). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2097 (Pesadillas premonitorias): 50309 (ask the Watchers' discoveries) opens 38633-38636; 38635 is the quest's step dialog, so 50306 starts it. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2078 (Amaknomalia): the Envoyee tells of the invisible anomalies (46984 -> 35552 -> 35553, 46981 accepts and starts the quest), takes the Dofus vulbis (46986 closes 14984, 35554), the ambush fight starts on 46987; afterwards she looks at the Dofus again (35555-35558) and sends the player to Xelorium (46988 closes 14986 and gives the dofus back). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "As the official server says it, with no quest under way. 2062 (Cada cosa a su tiempo): she is shown the perpetual pixel (43299 closes 14832), cannot study it herself and sends the player to Doctor Braun in Xelorium; at the end the report (43300) closes 14843. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): she accepts the player on the enquiry and sends them to the FBA (34382-34384; 43303 starts the quest), and takes the FBA's results at the end (43444 closes 14880). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): the same start from the opening for a player whose 2062 talk is long over. INFERRED reply order. 2064 (Sera mejor antes): the Envoyee notices Entropix (43447/43446 start the quest on 34489), answers about the zaaps of the cursed day (43461 -> 34493-34503; the last reply closes 14882 and sends the player to Doctor Bu in Sufokia) and takes the report on Martalo (45214 closes 14898). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2097 (Pesadillas premonitorias): 50309 (ask the Watchers' discoveries) opens 38633-38636; 38635 is the quest's step dialog, so 50306 starts it. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2078 (Amaknomalia): the Envoyee tells of the invisible anomalies (46984 -> 35552 -> 35553, 46981 accepts and starts the quest), takes the Dofus vulbis (46986 closes 14984, 35554), the ambush fight starts on 46987; afterwards she looks at the Dofus again (35555-35558) and sends the player to Xelorium (46988 closes 14986 and gives the dofus back). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2083: the Amakna envoy sends the player to the Almanax and later to Martalo. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 104,
@@ -65162,19 +65188,32 @@
       "npc": 1626,
       "map": 0,
       "opening": 12044,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 12044,
           "choices": [
             { "reply": 13549, "next": 12045 },
-            { "reply": 13550, "next": 12046 }
+            { "reply": 13550, "next": 12046 },
+            { "reply": 47546, "next": 35951, "criterion": "Qa=2083&Qo>15055&Qo<15056" }
           ]
         },
-        { "message": 12045, "choices": [] },
-        { "message": 12046, "choices": [] }
+        {
+          "message": 12045,
+          "choices": []
+        },
+        {
+          "message": 12046,
+          "choices": []
+        },
+        {
+          "message": 35951,
+          "choices": [
+            { "reply": 47545 }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 2083: Yacinthe Ax on the date. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 359,
@@ -76758,7 +76797,10 @@
       "opening": 34967,
       "openings": [
         { "quest": 2064, "objective": 14895, "pending": 14896, "message": 34968 },
-        { "quest": 2064, "objective": 14896, "pending": 14897, "message": 34976 }
+        { "quest": 2064, "objective": 14896, "pending": 14897, "message": 34976 },
+        { "criterion": "Qa=2083&Qo>15058&Qo<15059", "message": 35962 },
+        { "criterion": "Qa=2083&Qo>15059&Qo<15060", "message": 35956 },
+        { "criterion": "Qa=2083&Qo>15060&Qo<15061", "message": 35954 }
       ],
       "lines": [
         {
@@ -76826,9 +76868,63 @@
           "choices": [
             { "reply": 45218, "teleport": 88081174, "quest": 2064, "completes": 14897, "params": [[30, 14897]] }
           ]
+        },
+        {
+          "message": 35962,
+          "choices": [
+            { "reply": 47556 }
+          ]
+        },
+        {
+          "message": 35956,
+          "choices": [
+            { "reply": 47555, "next": 35957 }
+          ]
+        },
+        {
+          "message": 35957,
+          "choices": [
+            { "reply": 47554, "next": 35958 }
+          ]
+        },
+        {
+          "message": 35958,
+          "choices": [
+            { "reply": 47553, "next": 35959 }
+          ]
+        },
+        {
+          "message": 35959,
+          "choices": [
+            { "reply": 47552, "next": 35960 }
+          ]
+        },
+        {
+          "message": 35960,
+          "choices": [
+            { "reply": 47551, "next": 35961 }
+          ]
+        },
+        {
+          "message": 35961,
+          "choices": [
+            { "reply": 47550, "quest": 2083, "completes": 15060, "params": [[30, 15060]] }
+          ]
+        },
+        {
+          "message": 35954,
+          "choices": [
+            { "reply": 47549, "next": 35955 }
+          ]
+        },
+        {
+          "message": 35955,
+          "choices": [
+            { "reply": 47548 }
+          ]
         }
       ],
-      "why": "2064 (Sera mejor antes): Martalo is stuck in a loop (34967-34968); once Ganymed is beaten he explains the watchers (34976-34984) and the player follows Entropix back to the present (45218 closes 14897). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "2064 (Sera mejor antes): Martalo is stuck in a loop (34967-34968); once Ganymed is beaten he explains the watchers (34976-34984) and the player follows Entropix back to the present (45218 closes 14897). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2083: Martalo at the rock (fight), his tale, and the way into the Clock. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 4823,
@@ -80719,7 +80815,21 @@
         {
           "message": 14809,
           "choices": [
-            { "reply": 35166, "quest": 1912, "afterObjective": 13123, "beforeObjective": 13124, "next": 29313 }
+            { "reply": 35166, "quest": 1912, "afterObjective": 13123, "beforeObjective": 13124, "next": 29313 },
+            { "reply": 17343, "next": 14810 },
+            { "reply": 17347, "next": 14811, "criterion": "Qf=626&PL>179&Qa!1334&Qf!1334" },
+            { "reply": 17344, "next": 14812, "criterion": "Qa=1334&PL>179&Qa!1335&Qf!1335" },
+            { "reply": 17363, "next": 14821, "quest": 1335, "afterObjective": 7345, "beforeObjective": 7346 },
+            { "reply": 17366, "next": 14823, "quest": 1335, "afterObjective": 7347, "beforeObjective": 7348, "completes": 7348, "params": [[30, 7348]] },
+            { "reply": 17364, "next": 14824, "criterion": "Qf=1335&PL>179&Qa!1336&Qf!1336" },
+            { "reply": 17370, "next": 14826, "quest": 1336, "completes": 7377, "params": [[30, 7377]] },
+            { "reply": 17370, "next": 14826, "criterion": "Qf=1336&PL>179&Qa!1337&Qf!1337" },
+            { "reply": 17380, "next": 14832, "quest": 1337, "afterObjective": 7380, "beforeObjective": 7381, "completes": 7381, "params": [[30, 7381]] },
+            { "reply": 17389, "next": 14838, "quest": 1337, "afterObjective": 7383, "beforeObjective": 7384, "completes": 7384, "params": [[30, 7384]] },
+            { "reply": 17389, "next": 14838, "criterion": "Qf=1337&PL>179&Qa!1338&Qf!1338" },
+            { "reply": 17396, "next": 14843, "quest": 1338, "afterObjective": 7386, "beforeObjective": 7387, "completes": 7387, "params": [[30, 7387]] },
+            { "reply": 17396, "next": 14843, "criterion": "Qf=1338&PL>179&Qa!1339&Qf!1339" },
+            { "reply": 17398, "next": 14844, "quest": 1339, "afterObjective": 7388, "beforeObjective": 7389, "completes": 7389, "params": [[30, 7389]] }
           ]
         },
         {
@@ -80731,9 +80841,88 @@
         {
           "message": 29314,
           "choices": []
+        },
+        {
+          "message": 14810,
+          "choices": [
+            { "reply": 17347, "next": 14811, "criterion": "Qf=626&PL>179&Qa!1334&Qf!1334" }
+          ]
+        },
+        {
+          "message": 14811,
+          "choices": [
+            { "reply": 17345, "next": 14812, "startsQuest": 1334, "params": [[34, 1334]] },
+            { "reply": 17346 }
+          ]
+        },
+        {
+          "message": 14812,
+          "choices": [
+            { "reply": 17344, "startsQuest": 1335, "params": [[34, 1335]] }
+          ]
+        },
+        {
+          "message": 14821,
+          "choices": [
+            { "reply": 17362, "next": 14822, "quest": 1335, "afterObjective": 7345, "beforeObjective": 7346, "completes": 7346, "params": [[30, 7346]] }
+          ]
+        },
+        {
+          "message": 14822,
+          "choices": []
+        },
+        {
+          "message": 14823,
+          "choices": [
+            { "reply": 17364, "next": 14824, "criterion": "Qf=1335&PL>179&Qa!1336&Qf!1336" }
+          ]
+        },
+        {
+          "message": 14824,
+          "choices": [
+            { "reply": 17365, "startsQuest": 1336, "params": [[34, 1336]] }
+          ]
+        },
+        {
+          "message": 14826,
+          "choices": [
+            { "reply": 17369, "gives": 14211, "startsQuest": 1337, "params": [[34, 1337]] }
+          ]
+        },
+        {
+          "message": 14832,
+          "choices": [
+            { "reply": 17418, "next": 14833, "quest": 1337 }
+          ]
+        },
+        {
+          "message": 14833,
+          "choices": []
+        },
+        {
+          "message": 14838,
+          "choices": [
+            { "reply": 17388, "next": 14839 }
+          ]
+        },
+        {
+          "message": 14839,
+          "choices": [
+            { "reply": 17397, "startsQuest": 1338, "params": [[34, 1338]] }
+          ]
+        },
+        {
+          "message": 14843,
+          "choices": [
+            { "reply": 17395, "startsQuest": 1339, "params": [[34, 1339]] }
+          ]
+        },
+        {
+          "message": 14844,
+          "choices": []
         }
       ],
-      "why": "«Une voix de crystal» (1912, 13124): the guard captain of Frigost III's militia, «Savoir si le nom de Kallishindri lui est familier» (Dofus pour les noobs, «Une voix de crystal»): 35166 asks (29313: she died in the barracks), 35165 asks whether she left something (29314: her best friend's ghost may still haunt the place). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+      "why": "«Une voix de crystal» (1912, 13124): the guard captain of Frigost III's militia, «Savoir si le nom de Kallishindri lui est familier» (Dofus pour les noobs, «Une voix de crystal»): 35166 asks (29313: she died in the barracks), 35165 asks whether she left something (29314: her best friend's ghost may still haunt the place). Reply order INFERRED from the message ids (the guide gives the story, not the replies). Baron d'Ouillard (Valero Yizo) at the castle gate [-68,-78] gives and takes the whole 1334-1339 chain: 17347 'Busco aventuras' -> 14811 (accept 17345 starts 1334) -> 14812 (17344 starts 1335); the patrol report 17363/17362 shows the satchel (14822), 17366 ends 1335 (14823) -> 14824 starts 1336; 17370 ends 1336 -> 14826 starts 1337 and hands the enigmatic message 14211; 17380 brings the translation (14832-14833); 17389 ends 1337 -> 14838 -> 14839 starts 1338; 17396 ends 1338 -> 14843 starts 1339; 17398 ends 1339 (14844). INFERRED: the order of replies inside each talk (the guide names no ids); the step lines and their start replies are the client's. Dofus pour les noobs («La vie de château», «Le tour de guet», «Guerre froide», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?», «La dernière carte»)."
     },
     {
       "npc": 4094,
@@ -81662,11 +81851,36 @@
         {
           "message": 14800,
           "choices": [
-            { "reply": 17332 }
+            { "reply": 17332 },
+            { "reply": 17386, "next": 14834, "quest": 1337, "afterObjective": 7382, "beforeObjective": 7383 }
+          ]
+        },
+        {
+          "message": 14834,
+          "choices": [
+            { "reply": 17385, "next": 14835 }
+          ]
+        },
+        {
+          "message": 14835,
+          "choices": [
+            { "reply": 17384, "next": 14836 }
+          ]
+        },
+        {
+          "message": 14836,
+          "choices": [
+            { "reply": 17488, "next": 14837 }
+          ]
+        },
+        {
+          "message": 14837,
+          "choices": [
+            { "reply": 17382, "quest": 1337, "completes": 7383, "params": [[30, 7383]] }
           ]
         }
       ],
-      "why": "Sylargh in his exit room (dungeon 67): 17332 leaves through the dungeon's own way out (world/dungeon_exits.json). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+      "why": "Sylargh in his exit room (dungeon 67): 17332 leaves through the dungeon's own way out (world/dungeon_exits.json). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir») 1337 (7383): showing Sylargh the aerial sketch (17386) and hearing out his plan (14834-14837; Klim copies it on a magic skin). Dofus pour les noobs («La vie de château», «Le tour de guet», «Guerre froide», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?», «La dernière carte»)."
     },
     {
       "npc": 4125,
@@ -85308,7 +85522,8 @@
         { "criterion": "Qa=2082&Qo>15045&Qo<15050", "message": 35917 },
         { "criterion": "Qa=2082&Qo>15049&Qo<15053", "message": 35883 },
         { "criterion": "Qa=2082&Qo>15053&Qo<15054", "message": 35937 },
-        { "canStart": 2083, "message": 35943 }
+        { "canStart": 2083, "message": 35943 },
+        { "criterion": "Qa=2083&Qo>15068&Qo<15069", "message": 35943 }
       ],
       "lines": [
         {
@@ -85430,7 +85645,8 @@
         {
           "message": 35943,
           "choices": [
-            { "reply": 47538, "next": 35944 }
+            { "reply": 47538, "next": 35944, "criterion": "Qa!2083" },
+            { "reply": 47582, "next": 35997, "criterion": "Qa=2083&Qo>15068&Qo<15069" }
           ]
         },
         {
@@ -85444,9 +85660,27 @@
           "choices": [
             { "reply": 47536, "next": 35942 }
           ]
+        },
+        {
+          "message": 35997,
+          "choices": [
+            { "reply": 47581, "next": 35998 }
+          ]
+        },
+        {
+          "message": 35998,
+          "choices": [
+            { "reply": 47580, "next": 35999 }
+          ]
+        },
+        {
+          "message": 35999,
+          "choices": [
+            { "reply": 47579, "quest": 2083, "completes": 15069, "params": [[30, 15069]], "teleport": 200280064 }
+          ]
         }
       ],
-      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»)). 2082: Tylezia asks the player to reach her father, gives her ruby (35917-35921) and, at the end, learns of her child (35937-35942). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2082 hand-over, read from the texts: «Puedo comunicarme con el dragón acudiendo a su sueño» (47447) leads to 35883, the line its step names, and «Ir al sueño de Terrakurial...» (47445) hands it over; asking Draconiros first (47444, 35882) hands it over on «Retomar el camino de los Sueños Infinitos» (47443). The end: the veil of sadness (47532) or comforting her (47531) closes 15054, and the talk goes on at 35939, the line where 2083 is handed over, through the envoy of Xelor to «Ir al pueblo de Amakna» (47527). Whoever left before that is asked again from 35943 (35943-35945, the same talk without the grief)."
+      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»)). 2082: Tylezia asks the player to reach her father, gives her ruby (35917-35921) and, at the end, learns of her child (35937-35942). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2082 hand-over, read from the texts: «Puedo comunicarme con el dragón acudiendo a su sueño» (47447) leads to 35883, the line its step names, and «Ir al sueño de Terrakurial...» (47445) hands it over; asking Draconiros first (47444, 35882) hands it over on «Retomar el camino de los Sueños Infinitos» (47443). The end: the veil of sadness (47532) or comforting her (47531) closes 15054, and the talk goes on at 35939, the line where 2083 is handed over, through the envoy of Xelor to «Ir al pueblo de Amakna» (47527). Whoever left before that is asked again from 35943 (35943-35945, the same talk without the grief). 2083: Tylezia asks for the player's help against the invocation. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 2004,
@@ -85772,6 +86006,360 @@
         }
       ],
       "why": "2082: the abrajidor's bark is taken after a solo fight (47375). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 2002,
+      "map": 0,
+      "opening": 14382,
+      "lines": [
+        {
+          "message": 14382,
+          "choices": [
+            { "reply": 16809, "next": 14383 },
+            { "reply": 17368, "next": 14825, "quest": 1335, "afterObjective": 7346, "beforeObjective": 7347, "completes": 7347, "params": [[30, 7347]] }
+          ]
+        },
+        {
+          "message": 14383,
+          "choices": []
+        },
+        {
+          "message": 14825,
+          "choices": []
+        }
+      ],
+      "why": "Cehesege at the castle zaap (1335, 7347): 17368 hands her the messenger's satchel and she starts defusing it (14825); 16809 asks about her mission (14383). Her later quests (1321, 1324, 2075) are not written yet. Dofus pour les noobs («La vie de château», «Le tour de guet», «Guerre froide», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?», «La dernière carte»)."
+    },
+    {
+      "npc": 2050,
+      "map": 0,
+      "opening": 14827,
+      "lines": [
+        {
+          "message": 14827,
+          "choices": [
+            { "reply": 17376, "next": 14830, "quest": 1337, "afterObjective": 7378, "beforeObjective": 7380 }
+          ]
+        },
+        {
+          "message": 14830,
+          "choices": [
+            { "reply": 17375, "next": 14831, "quest": 1337, "afterObjective": 7378, "beforeObjective": 7380, "criterion": "PO!14212", "buyItem": 14212, "buyPrice": 3000 },
+            { "reply": 17377 }
+          ]
+        },
+        {
+          "message": 14831,
+          "choices": [
+            { "reply": 17374 }
+          ]
+        }
+      ],
+      "why": "Gobilingua at the Sakai plain [-53,-41] (1337, 7379/7380): 17376 shows Sylargh's message (finds a translator, 7379), 17375 pays the 3000 kamas for the translated message 14212 (14830-14831). His shop and his other lines are not written yet. Dofus pour les noobs («La vie de château», «Le tour de guet», «Guerre froide», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?», «La dernière carte»)."
+    },
+    {
+      "npc": 2045,
+      "map": 110364674,
+      "opening": 14799,
+      "lines": [
+        {
+          "message": 14799,
+          "choices": [
+            { "reply": 17394, "next": 14840, "quest": 1338, "afterObjective": 7385, "beforeObjective": 7386 },
+            { "reply": 17331 }
+          ]
+        },
+        {
+          "message": 14840,
+          "choices": [
+            { "reply": 17393, "next": 14841 }
+          ]
+        },
+        {
+          "message": 14841,
+          "choices": [
+            { "reply": 17392, "next": 14842 }
+          ]
+        },
+        {
+          "message": 14842,
+          "choices": [
+            { "reply": 17481, "quest": 1338, "completes": 7386, "params": [[30, 7386]] }
+          ]
+        }
+      ],
+      "why": "Klim in his private room exit (dungeon 68, 1338, 7386): 17394 shows him the skin, 14840-14842 his plan; 17331 leaves through the dungeon's own way out. Dofus pour les noobs («La vie de château», «Le tour de guet», «Guerre froide», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?», «La dernière carte»)."
+    },
+    {
+      "npc": 4960,
+      "map": 0,
+      "opening": 35968,
+      "openings": [
+        { "criterion": "Qa=2083&Qo>15064&Qo<15065", "message": 35967 },
+        { "criterion": "Qa=2083&Qo>15065&Qo<15066", "message": 35966 },
+        { "criterion": "Qa=2083&Qo>15066&Qo<15067", "message": 35965 },
+        { "criterion": "Qa=2083&Qo>15067&Qo<15068", "message": 35964 },
+        { "criterion": "Qa=2083&Qo>15062&Qo<15064", "message": 35974 }
+      ],
+      "lines": [
+        {
+          "message": 35968,
+          "choices": [
+            { "reply": 47567, "next": 35969 }
+          ]
+        },
+        {
+          "message": 35969,
+          "choices": [
+            { "reply": 47566, "next": 35970 }
+          ]
+        },
+        {
+          "message": 35970,
+          "choices": [
+            { "reply": 47564, "next": 35971 }
+          ]
+        },
+        {
+          "message": 35971,
+          "choices": [
+            { "reply": 47565, "next": 35972 }
+          ]
+        },
+        {
+          "message": 35972,
+          "choices": [
+            { "reply": 47563, "next": 35973 }
+          ]
+        },
+        {
+          "message": 35973,
+          "choices": [
+            { "reply": 47562, "next": 35974 }
+          ]
+        },
+        {
+          "message": 35974,
+          "choices": [
+            { "reply": 47561, "quest": 2083, "completes": 15062, "params": [[30, 15062]], "teleport": 183763982, "criterion": "Qa=2083&Qo<15062" },
+            { "reply": 47571, "next": 35975, "criterion": "Qa=2083&Qo>15062&Qo<15064&PO=8365&PO=21205", "quest": 2083, "completesAll": [15063, 15064], "params": [[30, 15064]], "completes": 15064 },
+            { "reply": 47573, "criterion": "Qa=2083&Qo>15062&Qo<15064", "teleport": 183763982 }
+          ]
+        },
+        {
+          "message": 35967,
+          "choices": [
+            { "reply": 47559 }
+          ]
+        },
+        {
+          "message": 35966,
+          "choices": [
+            { "reply": 47572, "quest": 2083, "completes": 15066, "params": [[30, 15066]], "teleport": 200280064 }
+          ]
+        },
+        {
+          "message": 35965,
+          "choices": [
+            { "reply": 47607 }
+          ]
+        },
+        {
+          "message": 35964,
+          "choices": [
+            { "reply": 47558, "next": 35963 }
+          ]
+        },
+        {
+          "message": 35963,
+          "choices": [
+            { "reply": 47557, "quest": 2083, "completes": 15068, "params": [[30, 15068]], "teleport": 183763982 }
+          ]
+        },
+        {
+          "message": 35975,
+          "choices": [
+            { "reply": 47570, "next": 35976 }
+          ]
+        },
+        {
+          "message": 35976,
+          "choices": [
+            { "reply": 47569, "next": 35977 }
+          ]
+        },
+        {
+          "message": 35977,
+          "choices": [
+            { "reply": 47560 }
+          ]
+        }
+      ],
+      "why": "2083: Agusto in the Clock (tale, larvae fight, journey into the past, return). Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2083: Agusto takes the horn and the glasses (47571) and tells of the Clock (35975-35977); 47573 leaves the Clock. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids."
+    },
+    {
+      "npc": 5003,
+      "map": 200280064,
+      "opening": 35980,
+      "lines": [
+        {
+          "message": 35980,
+          "choices": [
+            { "reply": 47574, "next": 35978 }
+          ]
+        },
+        {
+          "message": 35978,
+          "choices": [
+            { "reply": 47575 }
+          ]
+        }
+      ],
+      "why": "2083: Tyzerion in the past scene. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5009,
+      "map": 200280064,
+      "opening": 35982,
+      "lines": [
+        {
+          "message": 35982,
+          "choices": [
+            { "reply": 47578, "next": 35983 }
+          ]
+        },
+        {
+          "message": 35983,
+          "choices": [
+            { "reply": 47577, "next": 35981 }
+          ]
+        },
+        {
+          "message": 35981,
+          "choices": [
+            { "reply": 47576, "quest": 2083, "completes": 15067, "params": [[30, 15067]], "teleport": 204211202 }
+          ]
+        }
+      ],
+      "why": "2083: Osamodas of the past speaks of the secret. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4948,
+      "map": 200280064,
+      "opening": 36015,
+      "lines": [
+        {
+          "message": 36015,
+          "choices": [
+            { "reply": 47605, "next": 36016 }
+          ]
+        },
+        {
+          "message": 36016,
+          "choices": [
+            { "reply": 47603, "next": 36017 }
+          ]
+        },
+        {
+          "message": 36017,
+          "choices": [
+            { "reply": 47602, "next": 36018 }
+          ]
+        },
+        {
+          "message": 36018,
+          "choices": [
+            { "reply": 47602, "next": 36019 }
+          ]
+        },
+        {
+          "message": 36019,
+          "choices": [
+            { "reply": 47601, "quest": 2083, "completes": 15073, "params": [[30, 15073]], "teleport": 197921026 }
+          ]
+        }
+      ],
+      "why": "2083: Tylezia's farewell. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4958,
+      "map": 200280064,
+      "opening": 36001,
+      "openings": [
+        { "criterion": "Qa=2083&Qo>15069&Qo<15070", "message": 36001 },
+        { "criterion": "Qa=2083&Qo>15070&Qo<15071", "message": 36005 },
+        { "criterion": "Qa=2083&Qo>15071&Qo<15072", "message": 36004 }
+      ],
+      "lines": [
+        {
+          "message": 36001,
+          "choices": [
+            { "reply": 47586, "next": 36002 }
+          ]
+        },
+        {
+          "message": 36002,
+          "choices": [
+            { "reply": 47585, "next": 36003 }
+          ]
+        },
+        {
+          "message": 36003,
+          "choices": [
+            { "reply": 47584, "next": 36005 }
+          ]
+        },
+        {
+          "message": 36005,
+          "choices": [
+            { "reply": 47595, "quest": 2083, "completes": 15070, "params": [[30, 15070]] },
+            { "reply": 47413 }
+          ]
+        },
+        {
+          "message": 36004,
+          "choices": [
+            { "reply": 47592, "next": 36006 }
+          ]
+        },
+        {
+          "message": 36006,
+          "choices": [
+            { "reply": 47593, "next": 36007 }
+          ]
+        },
+        {
+          "message": 36007,
+          "choices": [
+            { "reply": 47440, "next": 36008 }
+          ]
+        },
+        {
+          "message": 36008,
+          "choices": [
+            { "reply": 47591, "next": 36009 }
+          ]
+        },
+        {
+          "message": 36009,
+          "choices": [
+            { "reply": 47590, "next": 36010 }
+          ]
+        },
+        {
+          "message": 36010,
+          "choices": [
+            { "reply": 47589, "next": 36011 }
+          ]
+        },
+        {
+          "message": 36011,
+          "choices": [
+            { "reply": 47588, "quest": 2083, "completes": 15072, "params": [[30, 15072]] }
+          ]
+        }
+      ],
+      "why": "2083: Osamodas and the invocation. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     }
   ]
 }

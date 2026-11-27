@@ -10783,6 +10783,133 @@
    "anyOrder": true,
    "afterObjectives": [15045],
    "why": "2082: the five offerings are fetched in any order (Dofus pour les noobs, La Colere de Terrakurial)."
+  },
+  {
+   "objective": 7323,
+   "quest": 1334,
+   "kind": "reply",
+   "replies": [17366],
+   "why": "«Demuestra que eres un soldado de patrulla concienzudo» (1334): done with the Baron's last reply of «Le tour de guet» (1335), 17366. The client's catalogue has no link between a parent quest and the quests it names. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7324,
+   "quest": 1334,
+   "kind": "reply",
+   "replies": [17370],
+   "why": "«Demuestra que eres un luchador experimentado» (1334): done when «Guerre froide» (1336) is handed in, 17370. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7325,
+   "quest": 1334,
+   "kind": "reply",
+   "replies": [17389],
+   "why": "«Afirma tu superioridad intelectual desvelando las intenciones de Sylargh» (1334): done when «Les desseins de Sylargh» (1337) is handed in, 17389. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7326,
+   "quest": 1334,
+   "kind": "reply",
+   "replies": [17396],
+   "why": "«Confisca la piel mágica curtida por Klim» (1334): done when «Vous avez demandé la peau lisse ?» (1338) is handed in, 17396. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7327,
+   "quest": 1334,
+   "kind": "reply",
+   "replies": [17398],
+   "why": "«Deshaz los planes de Mizz Frizz» (1334): done when «La dernière carte» (1339) is handed in, 17398. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7378,
+   "quest": 1337,
+   "kind": "read",
+   "item": 14211,
+   "why": "«Lee el mensaje de Sylargh» (1337): double click on the Enigmatic Message (14211) from the bag (Dofus pour les noobs: «Double cliquez dessus pour le consulter»). Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7379,
+   "quest": 1337,
+   "kind": "reply",
+   "replies": [17376],
+   "afterObjectives": [7378],
+   "why": "«Encuentra a alguien capaz de traducir el texto del mensaje» (1337): Gobilingua at the Sakai plain [-53,-41], done by showing him the message (17376). Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7380,
+   "quest": 1337,
+   "kind": "read",
+   "item": 14212,
+   "afterObjectives": [7379],
+   "why": "«Lee la traducción del mensaje» (1337): double click on the Translated Message (14212). Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7382,
+   "quest": 1337,
+   "kind": "click",
+   "elements": [{"map": 110103552, "element": 480611}],
+   "gives": [{"item": 14213, "count": 1}],
+   "afterObjectives": [7381],
+   "why": "«Registra el Transportador de Sylargh en busca de una pista» (1337): the unfinished aerial map on a crate in room 3 of Sylargh's transporter (element 480611, graphic 40477) gives the sketch 14213. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 7385,
+   "quest": 1338,
+   "kind": "click",
+   "elements": [{"map": 110364672, "element": 480612}],
+   "gives": [{"item": 14214, "count": 1}],
+   "why": "«Encuentra la piel mágica curtida por Klim» (1338): the yellow chest of drawers in room 3 of Klim's private rooms (element 480612, graphic 39429) gives the magic skin 14214. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)."
+  },
+  {
+   "objective": 15056,
+   "quest": 2083,
+   "kind": "read",
+   "map": 101450251,
+   "elements": [{"map": 101450251, "element": 476225}],
+   "afterObjectives": [15055],
+   "why": "«Descubre la fecha»: the pile of books of the Almanax sanctuary (document 241). (Dofus pour les noobs («Le temps des secrets»))"
+  },
+  {
+   "objective": 15058,
+   "quest": 2083,
+   "kind": "enter",
+   "map": 140510467,
+   "afterObjectives": [15057],
+   "why": "«Ve al lugar donde espera Martalo»: the Roc des Albatroces. (Dofus pour les noobs («Le temps des secrets»))"
+  },
+  {
+   "objective": 15059,
+   "quest": 2083,
+   "kind": "beat",
+   "monster": 5889,
+   "map": 140510467,
+   "afterObjectives": [15058],
+   "why": "«Derrota a los cronoformes»: the three xeloformes (5887-5889) that attack at the rock. (Dofus pour les noobs («Le temps des secrets»))"
+  },
+  {
+   "objective": 15065,
+   "quest": 2083,
+   "kind": "beat",
+   "monster": 5890,
+   "map": 204211202,
+   "afterObjectives": [15064],
+   "why": "«Vigila a Agusto»: the larvae (5890) he lets loose. (Dofus pour les noobs («Le temps des secrets»))"
+  },
+  {
+   "objective": 15071,
+   "quest": 2083,
+   "kind": "beat",
+   "monster": 5842,
+   "map": 200280064,
+   "afterObjectives": [15070],
+   "why": "«Enfréntate a la invocación»: the Osamodas invocation (5842) in the Inglorium jungle. (Dofus pour les noobs («Le temps des secrets»))"
+  },
+  {
+   "objective": 15061,
+   "quest": 2083,
+   "kind": "click",
+   "elements": [{"map": 183763982, "element": 511751}],
+   "afterObjectives": [15060],
+   "why": "«Entra en el reloj de Xelor»: the great clock of the temple of Xelor (Dofus pour les noobs («Le temps des secrets»))."
   }
   ]
 }

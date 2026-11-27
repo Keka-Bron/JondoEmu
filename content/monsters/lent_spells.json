@@ -12,6 +12,22 @@
     {
       "monster": 3370, "spell": 3449, "grade": 1,
       "why": "The Crujidor de hielo (Frigost; «La marcha de la emperatriz» fights him) wraps himself in Cura Glacial (3443): Invulnerable (state 56) for good. Grieta (3449, French «Craquelure»: 4 AP, range 1, once every 5 turns) deactivates state 56 on him alone (952 on «A,F3370») for a turn, at the cost of 1 MP and 3 range to its caster. «Chaque personnage reçoit au début du combat le sort Craquelure» (JeuxOnLine, «Lumière sur l'ombre»)."
+    },
+    {
+      "monster": 5842, "spell": 14407, "grade": 1,
+      "why": "The Osamodas invocation of «Tiempo de secretos» (2083) is a Mastermind: its starting spell Espíritus Bestiales (14301) draws a hidden code of four elements (14302, states 1371-1386) and answers each elemental hit with white or black circles (14305, 14304 and its kin). Maestro del Espíritu Telúrico (earth), 2 AP, 10 damage, is one of the four keys. «Vous obtenez quatre sorts élémentaires» (Dofus pour les noobs, «Le temps des secrets»)."
+    },
+    {
+      "monster": 5842, "spell": 14408, "grade": 1,
+      "why": "The Osamodas invocation of «Tiempo de secretos» (2083) is a Mastermind: its starting spell Espíritus Bestiales (14301) draws a hidden code of four elements (14302, states 1371-1386) and answers each elemental hit with white or black circles (14305, 14304 and its kin). Maestro del Espíritu Incandescente (fire), 2 AP, 10 damage, is one of the four keys. «Vous obtenez quatre sorts élémentaires» (Dofus pour les noobs, «Le temps des secrets»)."
+    },
+    {
+      "monster": 5842, "spell": 14409, "grade": 1,
+      "why": "The Osamodas invocation of «Tiempo de secretos» (2083) is a Mastermind: its starting spell Espíritus Bestiales (14301) draws a hidden code of four elements (14302, states 1371-1386) and answers each elemental hit with white or black circles (14305, 14304 and its kin). Maestro del Espíritu Acuático (water), 2 AP, 10 damage, is one of the four keys. «Vous obtenez quatre sorts élémentaires» (Dofus pour les noobs, «Le temps des secrets»)."
+    },
+    {
+      "monster": 5842, "spell": 14410, "grade": 1,
+      "why": "The Osamodas invocation of «Tiempo de secretos» (2083) is a Mastermind: its starting spell Espíritus Bestiales (14301) draws a hidden code of four elements (14302, states 1371-1386) and answers each elemental hit with white or black circles (14305, 14304 and its kin). Maestro del Espíritu Aéreo (air), 2 AP, 10 damage, is one of the four keys. «Vous obtenez quatre sorts élémentaires» (Dofus pour les noobs, «Le temps des secrets»)."
     }
   ]
 }

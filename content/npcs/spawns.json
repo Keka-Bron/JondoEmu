@@ -9512,6 +9512,78 @@
       "orientation": 1,
       "criterion": "Qa=2082&Qo>15046&Qo<15049",
       "why": "The abrajidor of the Hakam tree. Map INFERRED (Dofus pour les noobs («La Colère de Terrakurial»)). Cell INFERRED."
+    },
+    {
+      "map": 108927241,
+      "npc": 2048,
+      "cell": 373,
+      "orientation": 1,
+      "criterion": "Qa=1335&Qo>7341&Qo<7342",
+      "why": "Mensajero gripado on the Bastion stairs (1335, 7342): the fight starts from his reply 17356; the satchel 14209 drops from him. INFERRED cell."
+    },
+    {
+      "map": 140510467,
+      "npc": 4822,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15057&Qo<15060",
+      "why": "Martalo waits on the Roc des Albatroces (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 183763982,
+      "npc": 4822,
+      "cell": 331,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15059&Qo<15061",
+      "why": "Martalo meets the player at the temple of Xelor (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 200280064,
+      "npc": 4960,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15066&Qo<15067",
+      "why": "Agusto in the past scene (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 200280064,
+      "npc": 5003,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15066&Qo<15067",
+      "why": "Tyzerion in the past scene (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 200280064,
+      "npc": 5009,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15066&Qo<15067",
+      "why": "Osamodas of the past (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 200280064,
+      "npc": 4958,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15068&Qo<15073",
+      "why": "Osamodas in the jungle of Inglorium (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 200280064,
+      "npc": 4948,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15072&Qo<15073",
+      "why": "Tylezia after the invocation (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
+    },
+    {
+      "map": 204211202,
+      "npc": 4960,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=2083&Qo>15060&Qo<15068",
+      "why": "Agusto in the Clock, up to the talk that ends the journey into the past (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
     }
   ]
 }

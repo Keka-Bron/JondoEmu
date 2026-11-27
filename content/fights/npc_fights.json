@@ -2107,7 +2107,7 @@
       "why": "«Toucher le fond» (1945, 13761): «Insistir» (36480) against Monolito (monster 5211, level 200, 5500 life; its starting spell level 35952 puts the state 56 on it and summons the monsters 5210) alone, as the objective asks («Vence 1 x Monolito») (Dofus pour les noobs, «Toucher le fond»). INFERRED: grade 1 (the five grades hold the same figures)." },
   {"map": 176817155, "element": 511310, "byLevel": true, "criterion": "Qa=1914&Qo>13164&Qo<13165", "monsters": [{"monster": 5004, "grade": 0}], "marks": -1914165, "why": "«Lee el libro sobre el final de Hyrkul» (13165): the first click on the book at the back of Gisgul's room sets the Bwork bibliophile (5004) on the player, a fight that may be done in a group; the second click, after the win, reads it (Dofus pour les noobs «Le guerrier noir»)."},
   {"npc": 4125, "map": 63308288, "reply": 34607, "monsters": [{"monster": 5023, "grade": 1}, {"monster": 5023, "grade": 1}, {"monster": 5022, "grade": 1}], "why": "1915: two Macabre Riders (5023) and an Old Siegalak (5022, carries the cloth 19276)."},
-  {"npc": 4085, "map": 183241229, "reply": 35352, "solo": true, "monsters": [{"monster": 4974, "grade": 1}], "why": "1915: Hyrkul (4974) alone in his cave."},
+  {"npc": 4085, "map": 183241229, "reply": 35352, "solo": true, "arena": 183241229, "monsters": [{"monster": 4974, "grade": 1}], "why": "1915: Hyrkul (4974) alone in his cave. Fought on the cave itself: his start spell (9104) summons the tomb on cell 176 and the sixteen stones on fixed cells, all of them fight cells of 183241229 and only two of them of the subarea arena the rule picks (180617223)."},
     { "npc": 3291, "map": 168820748, "reply": 29244,
       "monsters": [ { "monster": 4511, "grade": 0 }, { "monster": 4511, "grade": 0 } ],
       "why": "1757: «Un combat se lance contre 2 x Plongeuse Agressive» (Dofus pour les noobs)." },
@@ -2238,6 +2238,13 @@
       "monsters": [ { "monster": 5885, "grade": 0 } ],
       "why": "Miauguar tamed alone (Dofus pour les noobs («La Nuit-qui-rugit»), un combat seul): the guide's fight against one miauguar." },
   {"npc": 5027, "map": 88605702, "reply": 47375, "solo": true, "criterion": "Qa=2082&Qo>15046&Qo<15049", "monsters": [{"monster": 5886, "grade": 0}], "why": "2082 «Recupera un trozo de corteza del árbol Hakam» (15049): the abrajidor Hakam Abrakleur (5886) alone (Dofus pour les noobs («La Colère de Terrakurial»))."},
-  {"map": 183768072, "element": 517374, "solo": true, "criterion": "Qa=2082&Qo>15046&Qo<15047", "monsters": [{"monster": 5867, "grade": 0}], "why": "2082 «Recupera un recuerdo de Maminala» (15047): the trunk in the last room of the Sadida temple wakes the Historic Doll (5867) alone (Dofus pour les noobs («La Colère de Terrakurial»))."}
+  {"map": 183768072, "element": 517374, "solo": true, "criterion": "Qa=2082&Qo>15046&Qo<15047", "monsters": [{"monster": 5867, "grade": 0}], "why": "2082 «Recupera un recuerdo de Maminala» (15047): the trunk in the last room of the Sadida temple wakes the Historic Doll (5867) alone (Dofus pour les noobs («La Colère de Terrakurial»))."},
+    { "npc": 2048, "map": 108927241, "reply": 17356,
+      "monsters": [ { "monster": 3428, "grade": 0 } ],
+      "criterion": "Qa=1335&Qo>7341&Qo<7342",
+      "why": "«Mensajero gripado» (1335, 7342): one fight against the sick messenger (3428), may be done in a group (Dofus pour les noobs). The satchel drops by the monster's own criterion. Dofus pour les noobs («La vie de château», «Le tour de guet», «Les desseins de Sylargh», «Vous avez demandé la peau lisse ?»)." },
+  {"npc": 4822, "map": 0, "reply": 47556, "solo": true, "criterion": "Qa=2083&Qo>15058&Qo<15059", "monsters": [{"monster": 5887, "grade": 0}, {"monster": 5888, "grade": 0}, {"monster": 5889, "grade": 0}], "why": "2083 «Derrota a los cronoformes» (15059): the three xeloformes at the Roc des Albatroces (Dofus pour les noobs («Le temps des secrets»)). INFERRED composition, as in 2062."},
+  {"npc": 4960, "map": 0, "reply": 47559, "solo": true, "criterion": "Qa=2083&Qo>15064&Qo<15065", "monsters": [{"monster": 5890, "grade": 0}], "why": "2083 «Vigila a Agusto» (15065): the larvae (5890) (Dofus pour les noobs («Le temps des secrets»))."},
+  {"npc": 4958, "map": 200280064, "reply": 47413, "criterion": "Qa=2083&Qo>15070&Qo<15071", "monsters": [{"monster": 5842, "grade": 0}], "allies": [{"monster": 5866, "grade": 0}], "alliesMustLive": true, "why": "2083 «Enfréntate a la invocación» (15071): the Osamodas invocation (5842) with Tylezia (5866) at the player's side (Dofus pour les noobs («Le temps des secrets»))."}
   ]
 }
