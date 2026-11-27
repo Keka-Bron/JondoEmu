@@ -619,6 +619,9 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Whether his power was taken: "quand vous utilisez son pouvoir, le Gobelin disparaît".</summary>
             public bool GoblinGone { get; set; }
 
+            /// <summary>The Cocobur dream shown here once the room was won, by its NPC, or 0 (<see cref="CocoburDreamOf"/>).</summary>
+            public int Cocobur { get; set; }
+
             /// <summary>Whether the Rey Gob stands here: the dreams saved before the other goblins say it so.</summary>
             public bool HasReyGob
             {
@@ -2158,6 +2161,78 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The four goblins.</summary>
         public static readonly int[] Goblins = { Bog, Gobledore, Gobserico, ReyGob };
 
+        // ═══════════════════════════════════════════════════════════════════
+        //  Cocobur's dreams
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Ebony's quest 2037, whose sword is woken in the dreams: twelve "sueños de Cocobur" to
+        /// find in the well, each an NPC of the client's (4657 to 4668, «perdido» to «despierto»)
+        /// whose one reply is to brandish the sword.
+        /// </summary>
+        public const int CocoburQuest = 2037;
+
+        /// <summary>
+        /// The first eleven dreams, by objective: the NPC that stands for it, the level the client's
+        /// texts ask for the first six (1147788 to 1147793: 130 to 180), and the band (palier) the
+        /// room must be in for the other five, whose texts ask for an intense dream -- difficulty 3
+        /// or more. The order of the NPCs is INFERRED from their ids, the objectives' order.
+        /// </summary>
+        public static readonly (int Objective, int Npc, int Level, int Palier)[] CocoburDreams =
+        {
+            (14613, 4657, 130, 0), (14614, 4658, 140, 0), (14615, 4659, 150, 0),
+            (14616, 4660, 160, 0), (14617, 4661, 170, 0), (14618, 4662, 180, 0),
+            (14619, 4663, 0, 1), (14620, 4664, 0, 2), (14621, 4665, 0, 3),
+            (14705, 4666, 0, 4), (14706, 4667, 0, 5),
+        };
+
+        /// <summary>
+        /// The twelfth: «Lucha contra la oleada de guardianes quiméricos de un sueño intenso
+        /// (dificultad 3 o superior)». Counted when the dream's end is won, since winning it takes
+        /// the player out of the dream (DreamHandler.AfterTheFight).
+        /// </summary>
+        public const int CocoburLastObjective = 14707;
+
+        /// <summary>The difficulty an intense dream starts at, for the last six.</summary>
+        public const int CocoburIntense = 3;
+
+        /// <summary>
+        /// The Cocobur dream a won room shows, by its NPC, or 0: the first of the eleven the
+        /// character still has to find, when his level, the dream's difficulty and the room's
+        /// band allow it, and the room's throw of the dream's dice says so.
+        /// </summary>
+        /// <remarks>
+        /// The odds are INFERRED, the client's texts only say to explore the well until one is
+        /// found: one won fight room in <see cref="CocoburOneIn"/>. None in a dream from a code
+        /// (a souvenir), at the fountain, favour or end.
+        /// </remarks>
+        public static int CocoburDreamOf(Sueno sueno, Sala sala, int level, Func<int, bool> pending)
+        {
+            if (sueno.FromSouvenir || sala.EsFinal || sala.EsFavor || sala.EsFuente || sala.Fila == 0) return 0;
+            if (sala.Miembros.Count == 0) return 0;
+
+            foreach (var dream in CocoburDreams)
+            {
+                if (!pending(dream.Objective)) continue;
+                if (level < dream.Level) return 0;
+                if (dream.Palier > 0
+                    && (sueno.Dificultad < CocoburIntense || PalierOf(sala.Fila) < dream.Palier)) return 0;
+                return DiceOf(sueno, "cocobur", sala.Id).Next(CocoburOneIn) == 0 ? dream.Npc : 0;
+            }
+            return 0;
+        }
+
+        public const int CocoburOneIn = 3;
+
+        /// <summary>Whether the last dream is the character's to find on winning this dream's end.</summary>
+        public static bool FindsLastCocobur(Sueno sueno, Func<int, bool> pending)
+            => !sueno.FromSouvenir && sueno.Dificultad >= CocoburIntense
+               && pending(CocoburLastObjective)
+               && !CocoburDreams.Any(d => pending(d.Objective));
+
+        /// <summary>The NPCs of the eleven dreams.</summary>
+        public static IEnumerable<int> CocoburNpcs => CocoburDreams.Select(d => d.Npc);
+
         /// <summary>
         /// Gobserico's power, 4033 ClearDreamRoom: "ce Gobelin s'occupe du groupe de monstre
         /// présent dans la salle et vous pouvez avancer sans l'affronter". The room is won, its
@@ -2213,6 +2288,20 @@ namespace Jondo.Unity.Server.Managers
                 return CasillaDelReyGob;
             int near = MapManager.GetNearestWalkableCell(sala.MapaDeLaSala, CasillaDelReyGob);
             return near > 0 ? near : CasillaDelReyGob;
+        }
+
+        /// <summary>
+        /// Where a Cocobur dream stands: two rows below the goblins' cell, or the walkable cell
+        /// nearest it, off the doors and off the goblin. INFERRED: the client places no actor.
+        /// </summary>
+        public static int CocoburCell(Sala sala)
+        {
+            int wanted = CasillaDelReyGob + 28;
+            var taken = DoorsOf(sala.MapaDeLaSala).Select(d => d.Cell).ToHashSet();
+            if (sala.Goblin != 0) taken.Add(GoblinCell(sala));
+            if (MapManager.IsCellWalkable(sala.MapaDeLaSala, wanted) && !taken.Contains(wanted)) return wanted;
+            int near = MapManager.GetNearestWalkableCell(sala.MapaDeLaSala, wanted);
+            return near > 0 && !taken.Contains(near) ? near : wanted;
         }
 
         /// <summary>The Dream Favour's Rey Gob, and where he is placed.</summary>

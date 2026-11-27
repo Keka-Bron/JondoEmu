@@ -6241,7 +6241,9 @@
             { "reply": 81544, "next": 59628 },
             { "reply": 50321, "teleport": 200804356 },
             { "reply": 81733 },
-            { "reply": 50314, "next": 38640, "criterion": "Qa=2097&Qo>15190&Qo<15191" }
+            { "reply": 50314, "next": 38640, "criterion": "Qa=2097&Qo>15190&Qo<15191" },
+            { "reply": 47100, "next": 35637, "criterion": "Qa=2080&Qo<15007" },
+            { "reply": 47107, "next": 35640, "criterion": "Qa=2080&Qo>15007&Qo<15010", "quest": 2080, "completesAll": [15008, 15009, 15010], "params": [[30, 15010]] }
           ]
         },
         {
@@ -6326,9 +6328,49 @@
           "choices": [
             { "reply": 50315, "quest": 2097, "completes": 15191, "params": [[30, 15191]] }
           ]
+        },
+        {
+          "message": 35637,
+          "choices": [
+            { "reply": 47102, "next": 35638 }
+          ]
+        },
+        {
+          "message": 35638,
+          "choices": [
+            { "reply": 47101, "next": 35639, "quest": 2080, "completes": 15007, "params": [[30, 15007]] }
+          ]
+        },
+        {
+          "message": 35639,
+          "choices": []
+        },
+        {
+          "message": 35640,
+          "choices": [
+            { "reply": 47106, "next": 35641 }
+          ]
+        },
+        {
+          "message": 35641,
+          "choices": [
+            { "reply": 47105, "next": 35642 }
+          ]
+        },
+        {
+          "message": 35642,
+          "choices": [
+            { "reply": 47104, "next": 35649, "gives": 21237 }
+          ]
+        },
+        {
+          "message": 35649,
+          "choices": [
+            { "reply": 47110 }
+          ]
         }
       ],
-      "why": "2097 (Pesadillas premonitorias): Draconiros denies, then asks for four nightmare stones (38640-38643); 50315 closes 15191. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "2097 (Pesadillas premonitorias): Draconiros denies, then asks for four nightmare stones (38640-38643); 50315 closes 15191. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080: Draconiros explains the key (35637-35639, 47101 ends the talk objective), then takes the garra/sombra/rugido and forges Oyukipoca's key (21237) (35640-35649) (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
   {
       "npc": 5130,
@@ -84415,6 +84457,9 @@
       "npc": 4948,
       "map": 0,
       "opening": 35626,
+      "openings": [
+        { "canStart": 2080, "message": 35630 }
+      ],
       "lines": [
         {
           "message": 35626,
@@ -84431,9 +84476,27 @@
         {
           "message": 35628,
           "choices": []
+        },
+        {
+          "message": 35630,
+          "choices": [
+            { "reply": 47099, "next": 35631 }
+          ]
+        },
+        {
+          "message": 35631,
+          "choices": [
+            { "reply": 47097, "next": 35632, "startsQuest": 2080, "params": [[34, 2080]] }
+          ]
+        },
+        {
+          "message": 35632,
+          "choices": [
+            { "reply": 47098 }
+          ]
         }
       ],
-      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest."
+      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest. 2080 (Pesadilla Infinita): after 2079 Tylezia tells of her recurring dream (35630-35631); proposing Draconiros (47097) starts the quest (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
     {
       "npc": 4246,
@@ -84514,6 +84577,171 @@
         }
       ],
       "why": "Nekrobio at [-47,-84] (1947, 13575): «Atacar a los krobios» (36550) starts the fight. Dofus pour les noobs («Krobe en bourg»)."
+    },
+    {
+      "npc": 4657,
+      "map": 0,
+      "opening": 32607,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32607,
+          "choices": [
+            { "reply": 39610, "quest": 2037, "completes": 14613, "params": [[30, 14613]] }
+          ]
+        }
+      ],
+      "why": "The first dream of Cocobur (2037, 14613), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39610)."
+    },
+    {
+      "npc": 4658,
+      "map": 0,
+      "opening": 32608,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32608,
+          "choices": [
+            { "reply": 39611, "quest": 2037, "completes": 14614, "params": [[30, 14614]] }
+          ]
+        }
+      ],
+      "why": "The second dream of Cocobur (2037, 14614), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39611)."
+    },
+    {
+      "npc": 4659,
+      "map": 0,
+      "opening": 32609,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32609,
+          "choices": [
+            { "reply": 39612, "quest": 2037, "completes": 14615, "params": [[30, 14615]] }
+          ]
+        }
+      ],
+      "why": "The third dream of Cocobur (2037, 14615), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39612)."
+    },
+    {
+      "npc": 4660,
+      "map": 0,
+      "opening": 32610,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32610,
+          "choices": [
+            { "reply": 39613, "quest": 2037, "completes": 14616, "params": [[30, 14616]] }
+          ]
+        }
+      ],
+      "why": "The fourth dream of Cocobur (2037, 14616), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39613)."
+    },
+    {
+      "npc": 4661,
+      "map": 0,
+      "opening": 32611,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32611,
+          "choices": [
+            { "reply": 39614, "quest": 2037, "completes": 14617, "params": [[30, 14617]] }
+          ]
+        }
+      ],
+      "why": "The fifth dream of Cocobur (2037, 14617), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39614)."
+    },
+    {
+      "npc": 4662,
+      "map": 0,
+      "opening": 32612,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32612,
+          "choices": [
+            { "reply": 39615, "quest": 2037, "completes": 14618, "params": [[30, 14618]] }
+          ]
+        }
+      ],
+      "why": "The sixth dream of Cocobur (2037, 14618), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39615)."
+    },
+    {
+      "npc": 4663,
+      "map": 0,
+      "opening": 32613,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32613,
+          "choices": [
+            { "reply": 39616, "quest": 2037, "completes": 14619, "params": [[30, 14619]] }
+          ]
+        }
+      ],
+      "why": "The seventh dream of Cocobur (2037, 14619), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39616)."
+    },
+    {
+      "npc": 4664,
+      "map": 0,
+      "opening": 32614,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32614,
+          "choices": [
+            { "reply": 39617, "quest": 2037, "completes": 14620, "params": [[30, 14620]] }
+          ]
+        }
+      ],
+      "why": "The eighth dream of Cocobur (2037, 14620), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39617)."
+    },
+    {
+      "npc": 4665,
+      "map": 0,
+      "opening": 32615,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32615,
+          "choices": [
+            { "reply": 39618, "quest": 2037, "completes": 14621, "params": [[30, 14621]] }
+          ]
+        }
+      ],
+      "why": "The ninth dream of Cocobur (2037, 14621), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39618)."
+    },
+    {
+      "npc": 4666,
+      "map": 0,
+      "opening": 32616,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32616,
+          "choices": [
+            { "reply": 39619, "quest": 2037, "completes": 14705, "params": [[30, 14705]] }
+          ]
+        }
+      ],
+      "why": "The tenth dream of Cocobur (2037, 14705), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39619)."
+    },
+    {
+      "npc": 4667,
+      "map": 0,
+      "opening": 32617,
+      "_byHand": true,
+      "lines": [
+        {
+          "message": 32617,
+          "choices": [
+            { "reply": 39620, "quest": 2037, "completes": 14706, "params": [[30, 14706]] }
+          ]
+        }
+      ],
+      "why": "The eleventh dream of Cocobur (2037, 14706), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39620)."
     }
   ]
 }
