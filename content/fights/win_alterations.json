@@ -18,6 +18,70 @@
   "wins": [
     { "monster": 823, "subarea": 1038, "alteration": 634, "lostAt": 159125512, "why": "Zorio, el Zorrowapo (Rono le Renarbo) leaves the «Pluma de Zorio»." },
     { "monster": 824, "subarea": 1038, "alteration": 632, "lostAt": 159125512, "why": "Horacio, el Cuerbok Domesticado (Horace le Corbac Apprivoisé) leaves the «Pluma de Horacio»." },
-    { "monster": 825, "subarea": 1038, "alteration": 633, "lostAt": 159125512, "why": "Kondonio, el Bebedor (Kapotie le Buveur) leaves the «Pluma de Kondonio»." }
+    { "monster": 825, "subarea": 1038, "alteration": 633, "lostAt": 159125512, "why": "Kondonio, el Bebedor (Kapotie le Buveur) leaves the «Pluma de Kondonio»." },
+    {
+      "monster": 8048,
+      "subarea": 1040,
+      "alteration": 758,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Fortachobz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8136,
+      "subarea": 1040,
+      "alteration": 758,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Fortachobz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8049,
+      "subarea": 1040,
+      "alteration": 759,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Doctobz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8137,
+      "subarea": 1040,
+      "alteration": 759,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Doctobz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8050,
+      "subarea": 1040,
+      "alteration": 760,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Kamikabz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8138,
+      "subarea": 1040,
+      "alteration": 760,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Kamikabz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8051,
+      "subarea": 1040,
+      "alteration": 761,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Cuadrabz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    },
+    {
+      "monster": 8139,
+      "subarea": 1040,
+      "alteration": 761,
+      "lostAt": 0,
+      "lostEntering": 1041,
+      "why": "«Un problème de taille» (Dofus pour les noobs): beaten in the Osavane (subarea 1040) the Cuadrabz leaves its alteration, which the quest's 79257 asks to see. 1 hour (effect 2833), or until the bearer walks into subarea 1041."
+    }
   ]
 }

@@ -7576,8 +7576,7 @@
    "anyOrder": true,
    "elements": [{"map": 119276033, "element": 483344}],
    "gives": [{"item": 14820, "count": 1}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del bathyscaphe room» (Dofus pour les noobs, «Prise de notes»: «cliquez sur chaque objet nécessaire dans chaque salle»): the one element of that Aquadome room gives one note of Merkator (14820); five are handed to Teo Dolito."
+   "why": "«Consigue las notas de la sala del bathyscaphe room» (Dofus pour les noobs, «Prise de notes»: «cliquez sur chaque objet nécessaire dans chaque salle»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7972,
@@ -7585,9 +7584,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119277057, "element": 483349}],
-   "gives": [{"item": 14820, "count": 2}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del bubble room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (2), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del bubble room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7973,
@@ -7595,9 +7593,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119278081, "element": 483345}],
-   "gives": [{"item": 14820, "count": 3}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del orb room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (3), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del orb room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7974,
@@ -7605,9 +7602,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119276035, "element": 483346}],
-   "gives": [{"item": 14820, "count": 4}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del periscope room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (4), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del periscope room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 7975,
@@ -7615,9 +7611,8 @@
    "kind": "click",
    "anyOrder": true,
    "elements": [{"map": 119277059, "element": 483347}],
-   "gives": [{"item": 14820, "count": 5}],
-   "givesEach": true,
-   "why": "«Consigue las notas de la sala del treasure room» (Dofus pour les noobs, «Prise de notes»): the room's element gives one note of Merkator (14820); the row's count is how many notes are in the bag once it is taken (5), so each room adds one and five go to Teo Dolito."
+   "gives": [{"item": 14820, "count": 1}],
+   "why": "«Consigue las notas de la sala del treasure room» (Dofus pour les noobs, «Prise de notes»): clicking the room's element closes the objective and gives one note of Merkator (14820), whatever the order of the rooms; five are handed to Teo Dolito."
   },
   {
    "objective": 8712,
@@ -8517,7 +8512,9 @@
    "quest": 1741,
    "kind": "reply",
    "replies": [28741],
-   "why": "«Lleva 5 muestras de algas a Pulpalas» (886836): she accepts to cook for him (28741); the resources are shown with the bring objective."
+   "requires": [{"item": 17944, "count": 1}, {"item": 17946, "count": 1}, {"item": 17947, "count": 1}, {"item": 17948, "count": 1}, {"item": 17949, "count": 1}],
+   "spends": true,
+   "why": "«Lleva 5 muestras de algas a Pulpalas» (886836): she accepts to cook for him (28741) once the five algae samples (17944, 17946-17949, picked on the rift maps, messages.json) are handed over; the mercury goes with the next objective."
   },
   {
    "objective": 11079,
@@ -8639,8 +8636,9 @@
    "objective": 11098,
    "quest": 1743,
    "kind": "enter",
-   "map": 169082890,
-   "why": "«Utiliza un volante hidráulico para accionar el ascensor» (644033): the sunken ruins' map; the elevator's use is not modelled, INFERRED."
+   "map": 169082892,
+   "overridesMap": true,
+   "why": "«Utiliza un volante hidráulico para accionar el ascensor» (644033): the lift of [22,31] (element 508182, open only with the hydraulic wheel in the bag, teleports.json) lands on 169082892; arriving there closes the objective, as with the lift of 1734."
   },
   {
    "objective": 3739,
@@ -9330,31 +9328,28 @@
   {
    "objective": 11280,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168559628,
-   "gives": [{"item": 18108, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Ch'ton» (649713): the klutist (4452) beaten at [26,32], whose P'Koutoulou Ch'ton (18108, 30 % in the client) is won; the 30 % is a sure drop here.",
+   "item": 18108,
+   "why": "«Cloolooth P'Kutulu Ch'ton» (649713): the P'Koutoulou Ch'ton (18108) has to drop off the klutist (4452) at [26,32], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
    "objective": 11281,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168558606,
-   "gives": [{"item": 18109, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Zothoth» (649708): the klutist beaten at [25,33], P'Koutoulou Zothoth (18109); the 30 % is a sure drop here.",
+   "item": 18109,
+   "why": "«Cloolooth P'Kutulu Zothoth» (649708): the P'Koutoulou Zothoth (18109) has to drop off the klutist (4452) at [25,33], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
    "objective": 11282,
    "quest": 1765,
-   "kind": "beat",
-   "monster": 4452,
+   "kind": "gather",
    "map": 168559632,
-   "gives": [{"item": 18110, "count": 1}],
-   "why": "«Cloolooth P'Kutulu Glaakiph» (649736): the klutist beaten at [26,34], P'Koutoulou Glaakiph (18110); the 30 % is a sure drop here.",
+   "item": 18110,
+   "why": "«Cloolooth P'Kutulu Glaakiph» (649736): the P'Koutoulou Glaakiph (18110) has to drop off the klutist (4452) at [26,34], 30 % (fight_drops.json); the drop closes the objective.",
    "anyOrder": true
   },
   {
@@ -9763,6 +9758,587 @@
   },
   {"objective": 13444, "quest": 1936, "kind": "click", "elements": [{"map": 179307011, "element": 509881}], "gives": [{"item": 19496, "count": 1}], "why": "«Consigue pelos de magicorrinco» (739750): the hole at the foot of the tree left of the river on [-66,31] gives a few magicorrinco hairs (Dofus pour les noobs («Le jour des assassins»): «cliquez sur le trou au pied du tronc d'arbre à gauche de la rivière»). INFERRED element: the map's graphic 40689 on cell 294."},
   {"objective": 13450, "quest": 1936, "kind": "talk", "npc": 4202, "afterObjectives": [13449], "why": "«Patrulla en los alrededores de tu templo con el molocán guardián» (744922): the patrol ends on finding the Asesino mediomuerto around the class temple (Dofus pour les noobs («Le jour des assassins»): «Une fois que vous avez trouvé l'assassin, le molosk qui vous suivait prend peur et se sauve»); speaking to him ticks it."},
-  {"objective": 13451, "quest": 1936, "kind": "beat", "monster": 5174, "afterObjectives": [13450], "why": "«Vence al asesino enviado por Toxina» (739849): the Asesino mediomuerto fought alone (Dofus pour les noobs («Le jour des assassins»))."}
+  {"objective": 13451, "quest": 1936, "kind": "beat", "monster": 5174, "afterObjectives": [13450], "why": "«Vence al asesino enviado por Toxina» (739849): the Asesino mediomuerto fought alone (Dofus pour les noobs («Le jour des assassins»))."},
+  {"objective": 13462, "quest": 1937, "kind": "enter", "map": 171707400, "afterObjectives": [13460], "why": "«Entra en la gruta de Azrim» (739888): Azrim's cave [-22,-3] (Dofus pour les noobs («Le piège se referme»))."},
+  {"objective": 13463, "quest": 1937, "kind": "click", "elements": [{"map": 171707400, "element": 510904}], "afterObjectives": [13462], "why": "«Haz como si meditaras cerca del fuego apagado» (744241): the cave's camp-fire remains (element 510904, the one of 1867) (Dofus pour les noobs («Le piège se referme»): «cliquez sur le feu de camp au centre de la grotte pour faire semblant de méditer»)."},
+  {"objective": 13465, "quest": 1937, "kind": "beat", "monster": 5187, "afterObjectives": [13464], "why": "«Vence a Toxina» (739890): Toxina fought with the Queen of Thieves as an ally (Dofus pour les noobs («Le piège se referme»))."},
+  {"objective": 13607, "quest": 1948, "kind": "enter", "map": 173019659, "afterObjectives": [13606], "why": "Lugar de la entrega (741385): the delivery place [-21,27] (map named by the guide; the objective carries no map in the data). Dofus pour les noobs («Coeur de pierre»)."},
+  {"objective": 13610, "quest": 1948, "kind": "click", "elements": [{"map": 179179786, "element": 511991}, {"map": 179179786, "element": 511992}], "afterObjectives": [13609], "why": "Registra la guarida (744320): the sacks in the middle of the den (Dofus pour les noobs: click the sacks). INFERRED: elements 511991/511992 (cell 212) as the sacks."},
+  {"objective": 13616, "quest": 1949, "kind": "beat", "monsters": [5102, 5103, 5104, 5105], "map": 184287236, "afterObjectives": [13615], "why": "Combate a los calcinados (744691): eight calcined ones fought at [-31,24] (Dofus pour les noobs («Les pierres à feu»): 8 Calcinés, may be done in a group)."},
+  {"objective": 13622, "quest": 1949, "kind": "beat", "monsters": [5102, 5103, 5104, 5105, 5216], "map": 184289284, "afterObjectives": [13621], "why": "Ocupa los objetivos (744697): four calcined ones and four Lave Magique at [-29,24] (Dofus pour les noobs («Les pierres à feu»))."},
+  {"objective": 13626, "quest": 1949, "kind": "beat", "monsters": [5193, 5194, 5195, 5196, 5197, 5198, 5199, 5200], "map": 182978058, "afterObjectives": [13625], "why": "Vence a los bandidos (744700): the Magma Steps bandits at [-28,24] (Dofus pour les noobs («Les pierres à feu»))."},
+  {
+   "objective": 13073,
+   "quest": 1909,
+   "kind": "enter",
+   "map": 175637504,
+   "why": "Enter the Chamber of Tal Kasha (732413): its first room 176160768, reached through the keeper's keyring on 175637504. Dofus pour les noobs «Nordalie». The binding of the first pass was gone from objectives.json, re-added."
+  },
+  {"objective": 13510, "quest": 1943, "kind": "beat", "monsters": [5148, 5149, 5112, 5112, 5113, 5113, 5114, 5115], "map": 186515968, "afterObjectives": [13509], "why": "«Captura un sumergido» (740675): the eight sumergidos fought at [-49,-82] after «Atacar» (Dofus pour les noobs: «Un combat se lance contre 8 x Submergés»)."},
+  {"objective": 13512, "quest": 1943, "kind": "beat", "monsters": [5112, 5112, 5113, 5113, 5114, 5114, 5115, 5115], "map": 186515970, "afterObjectives": [13511], "why": "«Vence a la horda de sumergidos» (740676): three waves of eight at [-49,-81] (Dofus pour les noobs)."},
+  {"objective": 13513, "quest": 1943, "kind": "talk", "npc": 4228, "map": 186515970, "afterObjectives": [13512], "why": "«Habla con los steamers» (740677): Simon Kara after the wave fight (Dofus pour les noobs)."},
+  {
+   "objective": 13103,
+   "quest": 1911,
+   "kind": "talk",
+   "npc": 4092
+  },
+  {
+   "objective": 13104,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 180094978,
+   "afterObjectives": [13103]
+  },
+  {
+   "objective": 13106,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [35110],
+   "afterObjectives": [13105]
+  },
+  {
+   "objective": 13107,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4993, 4994],
+   "map": 179306499,
+   "afterObjectives": [13106]
+  },
+  {
+   "objective": 13108,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 180092928,
+   "afterObjectives": [13107]
+  },
+  {
+   "objective": 13109,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [35154],
+   "afterObjectives": [13108]
+  },
+  {
+   "objective": 13110,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4995, 4996, 4997],
+   "map": 180092928,
+   "afterObjectives": [13109]
+  },
+  {
+   "objective": 13113,
+   "quest": 1911,
+   "kind": "enter",
+   "map": 181404680,
+   "afterObjectives": [13112]
+  },
+  {
+   "objective": 13114,
+   "quest": 1911,
+   "kind": "click",
+   "elements": [{"map": 181403656, "element": 511294}],
+   "afterObjectives": [13113],
+   "gives": [{"item": 19176, "count": 1}]
+  },
+  {
+   "objective": 13119,
+   "quest": 1911,
+   "kind": "reply",
+   "replies": [32671],
+   "afterObjectives": [13115, 13116, 13117, 13118],
+   "requires": [{"item": 19177, "count": 1}],
+   "spends": true
+  },
+  {
+   "objective": 13120,
+   "quest": 1911,
+   "kind": "beat",
+   "monsters": [4946],
+   "map": 180094978,
+   "afterObjectives": [13119]
+  },
+  {"objective": 13520, "quest": 1944, "kind": "click", "elements": [{"map": 186648582, "element": 511905}], "afterObjectives": [13519], "showsNpc": 4241, "gives": [{"item": 19546, "count": 1}], "why": "«Explora los restos» (743974): the small barrels at [-48,-84] (Dofus pour les noobs: «cliquez sur les trois petits tonneaux»), which brings Pepe Dea out. INFERRED: element 511905 and that it hands over the Tonel de restos (19546)."},
+  {"objective": 13522, "quest": 1944, "kind": "click", "elements": [{"map": 186646532, "element": 511906}], "afterObjectives": [13521], "showsNpc": 4242, "why": "«Explora los restos» (743976): the plant in the top right corner at [-45,-82] (Dofus pour les noobs). INFERRED: element 511906."},
+  {"objective": 13526, "quest": 1944, "kind": "click", "elements": [{"map": 186647556, "element": 511907}], "afterObjectives": [13525], "showsNpc": 4243, "gives": [{"item": 19548, "count": 1}], "why": "«Explora los restos» (743978): the violet aquatic plant at [-46,-81] (Dofus pour les noobs). INFERRED: element 511907 and that it hands over the Piedra de restos (19548)."},
+  {"objective": 13528, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511908}], "afterObjectives": [13527], "showsNpc": 4244, "why": "«Explora los restos» (743980): the wooden barrel left of the stairs at [-47,-83] (Dofus pour les noobs). INFERRED: element 511908."},
+  {"objective": 13530, "quest": 1944, "kind": "click", "elements": [{"map": 186649604, "element": 511909}], "afterObjectives": [13529], "gives": [{"item": 19549, "count": 1}], "why": "«Continua la exploración de los restos» (743981): the three small crates at [-47,-83] (Dofus pour les noobs). INFERRED: element 511909 and that it hands over the Caja de restos (19549)."},
+  {"objective": 13498, "quest": 1942, "kind": "beat", "monsters": [5147, 5147, 5147, 5147, 5146, 5146, 5146, 5145], "map": 186385924, "afterObjectives": [13497], "why": "«Caza a los inoportunos» (740603): the Trepamuertos fanatics' ambush at Zrid's camp, 4 Ocra amenazador, 3 Yopuka amenazadora and Bibak (Dofus pour les noobs: «un combat contre 4 Crâs, 3 Iops et 1 Zobal»)."},
+  {
+   "objective": 13125,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 183502850, "element": 511306}],
+   "afterObjectives": [13124],
+   "showsNpc": 4094,
+   "mapCleared": true,
+   "why": "«Cliquez sur le piano afin de faire apparaitre le Fantôme mélomane» (Dofus pour les noobs, «Une voix de crystal»): the piano of the barracks [-75,-80] (element 511306, one of the elements added for this quest) brings the ghost in. The guide asks for a map empty of monsters, so the piano counts only once no group stands on the barracks («mapCleared»)."
+  },
+  {
+   "objective": 13127,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35179],
+   "afterObjectives": [13126],
+   "why": "«Parler du chant de Kallishindri» (35179) (Dofus pour les noobs, «Une voix de crystal»): Nileza, in the exit room of his laboratory."
+  },
+  {
+   "objective": 13128,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35174, 35183],
+   "afterObjectives": [13127],
+   "why": "«Averigua quién creó el cristal»: Nileza has told of the crystal and of a sailor of Sufokia; the player remembers Captain Meno, crystal maker and admirer (35174 first visit, 35183 second). (Dofus pour les noobs, «Une voix de crystal»)"
+  },
+  {
+   "objective": 13130,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35197],
+   "afterObjectives": [13129],
+   "gives": [{"item": 19180, "count": 1}],
+   "why": "«Concerto pour limonade» (Dofus pour les noobs, «Une voix de crystal»): André Rieur gives a copy of the score on thanking him (35197)."
+  },
+  {
+   "objective": 13131,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 95683075, "element": 511299}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19181, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the royal concerto: the piano of Amakna castle [4,-6]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13132,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 173938178, "element": 511300}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19182, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the spicy concerto: the piano of Saharach's Sabloon [15,-57]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13133,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 149160960, "element": 511301}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19183, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the cloth concerto: the piano of the Rac Queen's first room [-6,-15]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13134,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 99092999, "element": 511302}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19184, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the meow-meow concerto: the piano at the top of the house of the secret map of [3,17]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13135,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 192677888, "element": 515320}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19185, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the mercenaries' concerto: the piano of Astrub's right house [6,-21]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13136,
+   "quest": 1912,
+   "kind": "click",
+   "elements": [{"map": 99095049, "element": 511304}],
+   "afterObjectives": [13129],
+   "anyOrder": true,
+   "gives": [{"item": 19186, "count": 1}],
+   "why": "«Récupérer une partition du Concerto» (the Amakna concerto: the piano of the ballroom of Amakna's tavern [2,-1]) (Dofus pour les noobs, «Une voix de crystal»). Elements 511299-511304 and 515320 were added to the maps for this quest and are the only gfx 20715/36896 pianos."
+  },
+  {
+   "objective": 13137,
+   "quest": 1912,
+   "kind": "reply",
+   "replies": [35196],
+   "afterObjectives": [13130, 13131, 13132, 13133, 13134, 13135, 13136],
+   "requires": [{"item": 19180, "count": 1}, {"item": 19181, "count": 1}, {"item": 19182, "count": 1}, {"item": 19183, "count": 1}, {"item": 19184, "count": 1}, {"item": 19185, "count": 1}, {"item": 19186, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 19187, "count": 1}],
+   "why": "«Donner les partitions demandées» (Dofus pour les noobs, «Une voix de crystal»): Meno takes the seven scores and gives the Cristal de Kallishindri (19187, text 29336)."
+  },
+  {"objective": 13140, "quest": 1913, "kind": "enter", "map": 171445250, "afterObjectives": [13139], "why": "Cementerio de los Torturados [-11,37] (1913, 13140; type 4 with no parameters): the cemetery above the crypt. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13141, "quest": 1913, "kind": "click", "elements": [{"map": 178520068, "element": 511305}], "afterObjectives": [13140], "gives": [{"item": 19188, "count": 1}], "why": "'Registra la cripta' (732580): the open coffin of Funestaro's crypt (element 511305, gfx 49536, cell 302) gives the yellowed parchment 19188. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13142, "quest": 1913, "kind": "read", "item": 19188, "afterObjectives": [13141], "why": "'Lee el pergamino amarillento' (732581): the parchment opened from the bag. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13143, "quest": 1913, "kind": "enter", "map": 173018630, "afterObjectives": [13142], "why": "'Encuentra a Funestaro' (732582): the lava of [-23,22]. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13145, "quest": 1913, "kind": "enter", "map": 178520068, "afterObjectives": [13144], "why": "'Vuelve a la cripta para comprobar si Funestaro no ha vuelto a aparecer' (735813). Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13149, "quest": 1913, "kind": "click", "elements": [{"map": 99094023, "element": 511308}], "afterObjectives": [13148], "gives": [{"item": 19189, "count": 1}], "why": "'Consigue agua bendita' (732653): the flask in the church of Amakna [6,3] (element 511308, gfx 3318, cell 219) gives 19189. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13154, "quest": 1913, "kind": "enter", "map": 179831808, "afterObjectives": [13153], "why": "'Escolta a Funestaro hasta la entrada de la Mansion de Kuatropatas' (732657): the entrance of [-14,25], with the follower 19222. Dofus pour les noobs (Le mort dans l'ame)."},
+  {"objective": 13155, "quest": 1913, "kind": "beat", "monsters": [4882], "map": 182718464, "afterObjectives": [13154], "why": "'Obten a la fuerza una audiencia con Anerice' (732662): Anerice la Fab'huquesa (4882) in the last room of the dungeon. Dofus pour les noobs (Le mort dans l'ame)."},
+  {
+   "objective": 13744,
+   "quest": 1945,
+   "kind": "enter",
+   "map": 186647556,
+   "afterObjectives": [13743],
+   "why": "«Restos» (744955): entering the wreck of [-46,-81] (186647556), as the guide asks («entrez dans l'épave») (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13745,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186647556, "element": 512069}],
+   "afterObjectives": [13744],
+   "showsNpc": 4303,
+   "why": "«Explora los restos» (744956): the broken big crate of the wreck [-46,-81] (the quest-only element 512069, gfx 118919: INFERRED to be the crate) brings the tortured spirit in (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13751,
+   "quest": 1945,
+   "kind": "reply",
+   "replies": [36431],
+   "afterObjectives": [13750],
+   "why": "«Pregunta a los steamers» (744965): «Intentar que entre en razón» (36431) to the steamer of the hold's bottom, who thinks she is in a nightmare (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13759,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186387972, "element": 511916}],
+   "afterObjectives": [13758],
+   "why": "«Toma el vórtice submarino»: the vortex of [-45,-80] (element 511916 of 186387972) is taken, and it sweeps the character into the grotto (186646534) (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13760,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186646534, "element": 512000}],
+   "afterObjectives": [13759],
+   "showsNpc": 4308,
+   "why": "«Registra la gruta»: the element 512000 of the grotto (gfx 62180, cell 285: INFERRED to be the monolith's seat among the grotto's three quest-only elements) brings Monolito in (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13762,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 186646534, "element": 512002}],
+   "afterObjectives": [13761],
+   "why": "«Toma el pasadizo subterráneo»: the passage of the grotto (element 512002) ends at Bethel's Tower (187433986) (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {
+   "objective": 13763,
+   "quest": 1945,
+   "kind": "click",
+   "elements": [{"map": 187433986, "element": 512003}],
+   "afterObjectives": [13762],
+   "why": "«Busca una salida»: the tower's stairs (element 512003) bring the character back to Zrid's map [-47,-80] (Dofus pour les noobs, «Toucher le fond»)."
+  },
+  {"objective": 13161, "quest": 1914, "kind": "reply", "replies": [62921], "afterObjectives": [13160], "why": "«Habla con el bibliotecario de Brakmar» (732679): the librarian's last line about Hyrkul (62921). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13162, "quest": 1914, "kind": "read", "item": 7879, "afterObjectives": [13161], "why": "«Lee el libro sobre la llegada de Hyrkul» (732680): item 7879 «La Llegada de Hyrkul», 10 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13163, "quest": 1914, "kind": "read", "item": 12772, "afterObjectives": [13162], "why": "«Lee el tomo IX de Fragmentos Encontrados» (732684): item 12772, 2000 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13164, "quest": 1914, "kind": "read", "item": 12773, "afterObjectives": [13163], "why": "«Lee el tomo X de Fragmentos Encontrados» (732685): item 12773, 2000 kamas at the librarian. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13165, "quest": 1914, "kind": "read", "elements": [{"map": 176817155, "element": 511310}], "afterObjectives": [13164], "why": "«Lee el libro sobre el final de Hyrkul» (732686): the book at the back of Gisgul's room [-18,16] (element 511310 INFERRED, gfx 43836), read again once the Bwork bibliophile is beaten (the fight row). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13166, "quest": 1914, "kind": "reply", "replies": [35294], "afterObjectives": [13165], "why": "«Pregunta a un centauroro sobre Menalt» (732705): Arpagnagrobis [2,-9], «Seguiré tu consejo.» (35294). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13167, "quest": 1914, "kind": "click", "elements": [{"map": 190842882, "element": 515699}], "afterObjectives": [13166], "why": "«Medita delante de la tumba de Menalt» (732706): Menalt's grave in the Field of Rest [1,-12] (element 515699 INFERRED, the map's only element); he does not show. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13168, "quest": 1914, "kind": "reply", "replies": [62105], "afterObjectives": [13167], "why": "«Habla con el maestro de la Orden del Corazón Valiente» (732707): Medah Larisa (6310), «Partir en busca de los cráneos de los centauroros.» (62105). (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13172, "quest": 1914, "kind": "click", "elements": [{"map": 190842882, "element": 515699}], "afterObjectives": [13171], "why": "«Vuelve a meditar delante de la tumba de Menalt» (732747): the same grave; the spirit shows. (1914 «El Guerrero Negro», Dofus pour les noobs «Le guerrier noir»)"},
+  {"objective": 13174, "quest": 1915, "kind": "reply", "replies": [35333], "why": "Agonía's reveal (29438). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13176, "quest": 1915, "kind": "enter", "map": 108793118, "afterObjectives": [13174], "why": "The transporter's entrance map. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13178, "quest": 1915, "kind": "reply", "replies": [35341], "afterObjectives": [13177], "why": "«Destruir al bricolérico.» at the nekrolérico. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13180, "quest": 1915, "kind": "click", "elements": [{"map": 172493318, "element": 511312}], "afterObjectives": [13179], "gives": [{"item": 19271, "count": 1}], "why": "The grave of Hyrkul gives the earth (19271). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13181, "quest": 1915, "kind": "beat", "monster": 5022, "map": 63308288, "afterObjectives": [13179], "why": "The old siegalak (5022) drops the old cloth (19276). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13182, "quest": 1915, "kind": "use", "afterObjectives": [13180, 13181], "why": "The bone (effect 30) summons the Wauwau. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {"objective": 13387, "quest": 1915, "kind": "click", "elements": [{"map": 183242244, "element": 511260}], "afterObjectives": [13186], "gives": [{"item": 7115, "count": 1}], "why": "The pedestal holding the Ivory Dofus. (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"},
+  {
+   "objective": 11146,
+   "quest": 1748,
+   "kind": "beat",
+   "monsters": [4490, 4491, 4492, 4493, 4494, 4495, 4496],
+   "map": 170133510,
+   "spawns": {"monster": 4490, "count": 1, "with": [4491, 4492, 4493, 4494, 4495, 4496], "attacks": true},
+   "afterObjectives": [11145],
+   "why": "«Enfréntate a los saboteadores»: the seven Mercemers, monsters 4490-4496 (Krisadam, Vintaner, Chiko, Doreilly, Ly, Brittney, Ryluck), whose spells are the ones Dofus pour les noobs lists in this order; they wait on the surface of the dive room [23,24]. Krisadam's own drop (criterion Qo=11146) is the contract 18063."
+  },
+  {
+   "objective": 11286,
+   "quest": 1766,
+   "kind": "enter",
+   "map": 168560640,
+   "requires": [{"item": 18112, "count": 1}],
+   "why": "«Conduce a la buceadora hasta la entrada del Templo de Kutulú» (886814): ticks on reaching [27,26] with the diver following (item 18112, effect 148)."
+  },
+  {
+   "objective": 11295,
+   "quest": 1766,
+   "kind": "enter",
+   "map": 168560640,
+   "gives": [{"item": 18114, "count": 1}],
+   "why": "«Atrae a una polilla de Kutulú» (886815): Dofus pour les noobs «Une fois arrivé sur la map, vous obtenez directement la Mite de Koutoulou»."
+  },
+  {
+   "objective": 11299,
+   "quest": 1766,
+   "kind": "beat",
+   "monster": 4521,
+   "map": 117964800,
+   "why": "«Defiéndete de los guardias» (886816): the fight that Paula Rice's reply 29332 starts against the Gobvio servil."
+  },
+  {
+   "objective": 13591,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13589],
+   "why": "«Cumple la misión que la sacerdotisa de Uginak te ha confiado» (741292): her quest «La guerra de los Peldaños» (1940) done, 13589 its last objective (Dofus pour les noobs («Les cœurs livides»): «Une fois ces trois quêtes terminées»)."
+  },
+  {
+   "objective": 13593,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13742],
+   "why": "«Confirma la relación entre las fuerzas elementales y los corazones lívidos» (745739): the Sram priest's quest «Toda el agua al molino» (1955) done, 13742 its last objective."
+  },
+  {
+   "objective": 13695,
+   "quest": 1954,
+   "kind": "objectives",
+   "afterObjectives": [13725],
+   "why": "«Haz que lata el corazón de un crujidor ancestral» (744167): the Yopuka priest's quest «Crujidos de corazón» (1956) done, 13725 its last objective."
+  },
+  {
+   "objective": 13560,
+   "quest": 1940,
+   "kind": "use",
+   "afterObjectives": [13559],
+   "why": "«Lee la obra sobre la guerra de los Peldaños» (741250): the book 19527, used (its effect 30 is this objective) (Dofus pour les noobs («La guerre des Marches»): «double-cliquer dessus»)."
+  },
+  {
+   "objective": 13562,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 182978061, "element": 511926}],
+   "afterObjectives": [13560],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13562): the sign of [-28,27] (element 511926); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»."
+  },
+  {
+   "objective": 13563,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 183108104, "element": 511928}],
+   "afterObjectives": [13562],
+   "spawns": {"monster": 3098, "count": 1, "attacks": true},
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13563): the sign of [-31,22] (element 511928); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»; its click starts a fight against an Uginak (INFERRED monster 3098, the guide names no id)."
+  },
+  {
+   "objective": 13564,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 182977032, "element": 511925}],
+   "afterObjectives": [13563],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13564): the sign of [-30,20] (element 511925); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»."
+  },
+  {
+   "objective": 13565,
+   "quest": 1940,
+   "kind": "click",
+   "elements": [{"map": 183109635, "element": 511927}],
+   "afterObjectives": [13564],
+   "gives": [{"item": 19523, "count": 1}],
+   "why": "«Lee el cartel del recorrido de los peldaños magmáticos» (13565): the sign of [-33,15] (element 511927); Dofus pour les noobs («La guerre des Marches»): «cliquez sur le panneau»; the fourth sign hands over the vitrified eye 19523 («Vous obtenez un Œil vitrifié»)."
+  },
+  {
+   "objective": 13577,
+   "quest": 1940,
+   "kind": "use",
+   "afterObjectives": [13565],
+   "why": "«Examina el ojo vitrificado» (741265): the vitrified eye 19523, used (its effect 30 is this objective) (Dofus pour les noobs («La guerre des Marches»): «Il faudra double-cliquer dessus»)."
+  },
+  {
+   "objective": 4010,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [3700],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «La tierra banquisa» (612). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
+  },
+  {
+   "objective": 4062,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [3669],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Una alcaldesa de hielo» (613). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
+  },
+  {
+   "objective": 4063,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [3696],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Full contact» (614). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
+  },
+  {
+   "objective": 4064,
+   "quest": 649,
+   "kind": "objectives",
+   "afterObjectives": [3728],
+   "why": "«Descubre Frigost, sus habitantes y sus problemas»: one of the mayor's four quests, done when its last objective is: «Los monólogos de la vacuna» (615). Dofus pour les noobs «Bienvenue à Frigost»: «Il faut faire quatre quêtes: La terre banquise, La maire de glace, Full Contact, Les monologues du vaccin»."
+  },
+  {"objective": 3780, "quest": 577, "kind": "gather", "item": 11261, "afterObjectives": [3779], "why": "«Consigue la alianza de Damar que tiene el Morsagüino Real» (886009): Dofus pour les noobs («vous droperez l'anneau automatiquement sur le combat de la dernière salle»); closes when the ring 11261 drops."},
+  {"objective": 3782, "quest": 578, "kind": "beat", "monster": 2849, "map": 54165815, "why": "«Lucha contra los güinos»: the wave Mel sends (npc_fights, reply 7866); Dofus pour les noobs."},
+  {"objective": 3783, "quest": 578, "kind": "reply", "replies": [68336], "afterObjectives": [3782], "why": "«Infórmale del combate a Mel»: reply 68336 to Mel once the wave is beaten («retournez voir Mel et annoncez lui la mort des mansots»); Dofus pour les noobs."},
+  {"objective": 3784, "quest": 628, "kind": "beat", "monster": 2855, "map": 54165815, "why": "«Lucha contra los güinos»: the wave Mel sends (npc_fights, reply 7868); Dofus pour les noobs."},
+  {"objective": 3785, "quest": 628, "kind": "reply", "replies": [68338], "afterObjectives": [3784], "why": "«Infórmale del combate a Mel»: reply 68338 to Mel once the wave is beaten («retournez voir Mel et annoncez lui la mort des mansots»); Dofus pour les noobs."},
+  {"objective": 3786, "quest": 629, "kind": "beat", "monster": 2856, "map": 54165815, "why": "«Lucha contra los güinos»: the wave Mel sends (npc_fights, reply 7870); Dofus pour les noobs."},
+  {"objective": 3787, "quest": 629, "kind": "reply", "replies": [7871], "afterObjectives": [3786], "why": "«Infórmale del combate a Mel»: reply 7871 to Mel once the wave is beaten («retournez voir Mel et annoncez lui la mort des mansots»); Dofus pour les noobs."},
+  {"objective": 13578, "quest": 1940, "kind": "click", "elements": [{"map": 184287492, "element": 511934}], "afterObjectives": [13577], "why": "«Investiga en el templo demoníaco» (741266): the stele in the middle of the temple's middle floor (element 511934, graphic 49269) (Dofus pour les noobs («La guerre des Marches»): «cliquez sur la stèle au centre de la map»)."},
+  {"objective": 13579, "quest": 1940, "kind": "click", "elements": [{"map": 184287494, "element": 511935}], "afterObjectives": [13578], "why": "«Busca más información sobre el Asesino de Muerte» (741267): the parchment on the ground of the top floor (element 511935, graphic 59084, cell 377, the right side) (Dofus pour les noobs («La guerre des Marches»): «cliquez sur le parchemin posé au sol en haut à droite»)."},
+  {"objective": 13583, "quest": 1940, "kind": "click", "elements": [{"map": 184419334, "element": 511929}], "afterObjectives": [13582], "requires": [{"item": 19438, "count": 4}], "spends": true, "gives": [{"item": 19543, "count": 1}], "why": "«Haz la ofrenda al árbol para conseguir sangre» (741281): the tree's root (element 511929, graphic 62526) takes the four horns and gives the tree's blood 19543 (Dofus pour les noobs («La guerre des Marches»): «cliquez sur la racine de l'arbre pour lui donner l'offrande et obtenir du sang»)."},
+  {"objective": 13584, "quest": 1940, "kind": "click", "elements": [{"map": 184287492, "element": 511878}], "afterObjectives": [13583], "requires": [{"item": 19543, "count": 1}], "spends": true, "why": "«Vacía la sangre de los pozos» (741280): the well of the temple's middle floor takes the blood (Dofus pour les noobs («La guerre des Marches»): «cliquez sur le puits pour y verser le sang»)."},
+  {"objective": 13585, "quest": 1940, "kind": "click", "elements": [{"map": 184287494, "element": 511936}], "afterObjectives": [13584], "why": "«Reza ante la tumba del Asesino de Muerte» (741282): the hero's tomb of the top floor (element 511936, graphic 59896, cell 329); the Death Slayer appears (Dofus pour les noobs («La guerre des Marches»): «cliquez sur le tombeau du Héros pour faire apparaitre le Tueur de mort»)."},
+  {"objective": 13587, "quest": 1940, "kind": "beat", "monster": 5191, "map": 184290562, "afterObjectives": [13586], "why": "«Vence al demonio de los pozos» (741283): Arak'Imperitax (5191) in the annex room of the Infernal Well (Dofus pour les noobs («La guerre des Marches»))."},
+  {"objective": 13582, "quest": 1940, "kind": "click", "givesEach": true, "onlyGives": true, "gives": [{"item": 19438, "count": 4}], "afterObjectives": [13581], "elements": [{"map": 183109641, "element": 511931}, {"map": 184289538, "element": 511930}, {"map": 184419330, "element": 511932}, {"map": 183109637, "element": 511933}], "why": "«Mostrarle los cuernos de demonio»: the four demon remains of [-38,22], [-32,22], [-33,18] (the skeleton) and [-33,16] hand a demon horn (19438) each, four in all; showing the four is Efigienia's reply 36316 (Dofus pour les noobs («La guerre des Marches»): «cliquez sur le crâne de démon», «le squelette de démon»)."},
+  {"objective": 13712, "quest": 1956, "kind": "enter", "map": 186908930, "afterObjectives": [13713], "why": "«Escolta al crujidor hasta los pies de la torre quebrada» (743847): arriving at [-10,-30] with the shaman (Dofus pour les noobs («Craquements de cœur»): «guidez le jusqu'en [-10,-30]»)."},
+  {"objective": 13717, "quest": 1956, "kind": "enter", "map": 187695104, "afterObjectives": [13714], "why": "«Lleva al crujidor a lo más alto de la torre» (744104): the cave's top floor, map 187695104 (Dofus pour les noobs («Craquements de cœur»): «montez les escaliers pour reparler au Shaman»)."},
+  {"objective": 13719, "quest": 1956, "kind": "enter", "map": 187695108, "afterObjectives": [13718], "why": "«Escolta al crujidor a las profundidades de la torre» (744106): the cave's depths, map 187695108 (Dofus pour les noobs («Craquements de cœur»): «descendez les seconds escaliers»)."},
+  {"objective": 13714, "quest": 1956, "kind": "beat", "monster": 5202, "map": 186908930, "afterObjectives": [13712], "why": "«Protege al crujidor durante el ritual» (744092): the first fight, three sacrificed sentinels at the tower's foot (Dofus pour les noobs («Craquements de cœur»))."},
+  {"objective": 13718, "quest": 1956, "kind": "beat", "monster": 5202, "map": 187695104, "afterObjectives": [13717], "why": "«Protege al crujidor durante el ritual» (744105): the second fight, two sacrificed sentinels on the top floor (Dofus pour les noobs («Craquements de cœur»))."},
+  {"objective": 13720, "quest": 1956, "kind": "beat", "monster": 5202, "map": 187695108, "afterObjectives": [13719], "why": "«Protege al crujidor durante el ritual» (744107): the third fight, four sacrificed sentinels in the depths (Dofus pour les noobs («Craquements de cœur»))."},
+  {"objective": 13721, "quest": 1956, "kind": "reply", "replies": [36404], "afterObjectives": [13720], "why": "«Asiste al final del ritual» (744117): the shaman's last stone; done on «Observar lo que ocurre.» (36404), after which the ancestral crujidor appears (Dofus pour les noobs («Craquements de cœur»)). Reply INFERRED."},
+  {"objective": 13727, "quest": 1954, "kind": "enter", "map": 187957506, "afterObjectives": [13726], "why": "«Entra en la torre de Solar» (744195): the tower's first room, through the keeper with the key (Dofus pour les noobs («Les coeurs livides»))."},
+  {"objective": 13730, "quest": 1954, "kind": "click", "elements": [{"map": 187957516, "element": 511975}], "afterObjectives": [13729], "why": "«Concéntrate en los latidos del corazón de los calcinados» (744194): the livid heart of the Solar tower (element 511975, graphic 62554) (Dofus pour les noobs («Les coeurs livides»): «cliquer sur le cœur livide»). Which of the two elements of the room is the heart is INFERRED."},
+  {"objective": 13732, "quest": 1954, "kind": "enter", "map": 187432960, "afterObjectives": [13731], "why": "«Entra en la torre de Bethel» (744197): the tower's first room through its keeper (Dofus pour les noobs («Les coeurs livides»))."},
+  {"objective": 13735, "quest": 1954, "kind": "click", "elements": [{"map": 187439104, "element": 511965}], "afterObjectives": [13734], "why": "«Concéntrate en los latidos del corazón de los sumergidos» (744199): the livid heart of the Bethel tower (element 511965, graphic 62555) (Dofus pour les noobs («Les coeurs livides»)). Which of the two elements is the heart is INFERRED."},
+  {"objective": 3779, "quest": 577, "kind": "order", "anyOrder": true, "why": "«Damar, second visit»: anyOrder because the catalogue lists the ring hand-over (3778) before the second visit to Damar (3779), which the real quest does in the opposite order (Dofus pour les noobs «Pêche en eaux gelées»)."},
+  {"objective": 3778, "quest": 577, "kind": "order", "anyOrder": true, "afterObjectives": [3780], "why": "«Kristina, the ring»: anyOrder because the catalogue lists the ring hand-over (3778) before the second visit to Damar (3779), which the real quest does in the opposite order (Dofus pour les noobs «Pêche en eaux gelées»)."},
+  {
+   "objective": 19285,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79229],
+   "why": "«Prueba el reductor dimensional delante de Goblasto»: the reducer (31493) used shows the Mirgrillon look (31495) and Goblasto's reply 79229 «Dejar que el goblin examine el aparato» closes it (57969). INFERRED: 31493 carries no effect 30."
+  },
+  {
+   "objective": 19286,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79247, 79253],
+   "afterObjectives": [19285],
+   "why": "«Deshazte del eidolon residual y vuelve a hablar con Goblasto»: once the look is gone (a fight takes it) his «Recoger el material y dirigirte hacia los nidos» (79247/79253) closes it and hands the telekametro (31498)."
+  },
+  {
+   "objective": 19287,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 234620929,
+   "afterObjectives": [19286],
+   "why": "«Realiza un levantamiento topográfico del primer nido»: the first nest, Osavane [8,15]; the telekametro surveys on arriving (DPLN: «placez-vous sur le nid»)."
+  },
+  {
+   "objective": 19288,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 235146498,
+   "afterObjectives": [19287],
+   "why": "«Realiza un levantamiento topográfico del segundo nido»: the second nest, Reserva Tupida [5,10]."
+  },
+  {
+   "objective": 19289,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 235405313,
+   "afterObjectives": [19288],
+   "why": "«Realiza un levantamiento topográfico del tercer nido»: the third nest, Pueblo rhoarim [11,5]."
+  },
+  {
+   "objective": 19290,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un fortachobz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19291,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un doctobz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19292,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un kamikabz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19293,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un cuadrabz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19297,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539268}],
+   "afterObjectives": [19294],
+   "why": "«Examina el compilador que falla»: the microwave compiler (element 539268, cell 232) of the outpost, after the Krosmoglob's call."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539268}],
+   "requires": [{"item": 31499, "count": 1}],
+   "spends": true,
+   "afterObjectives": [19297],
+   "why": "«Repara el compilador de microondas»: the insulating plate (31499) set into the compiler, which takes it."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539052}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31702, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials (outpost, cell 425): one «Metal sin tratar» (31702) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539053}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31703, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials (outpost, cell 249): one «Mineral aislante» (31703) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234751491, "element": 539054}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31704, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials ([1,17], cell 89): one «Ácido goblídrico» (31704) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234753031, "element": 539055}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31705, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials ([0,31], cell 551): one «Sal de galvanización» (31705) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  }
 ]
 }

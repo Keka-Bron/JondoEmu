@@ -1707,6 +1707,18 @@ namespace Jondo.Unity.Server.Handlers
             // lqn 56 and ied 1633 in the capture.
             int questNpcId = SessionContext.State.OpenDialogueNpcId;
             int completesAfterClosing = 0;
+            // A «completes» that is one of its own «completesAll» waits behind the others: they go
+            // first, so it is open when its turn comes and the reply's gift goes with it (Albert's
+            // cakes in «1945»).
+            bool othersDone = false;
+            if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.CompletesAll.Contains(elegidaAhora.Completes)
+                && elegidaAhora.StartsQuest == 0 && !sinPagar)
+            {
+                foreach (int objective in elegidaAhora.CompletesAll)
+                    if (objective != elegidaAhora.Completes)
+                        await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
+                othersDone = true;
+            }
             if (elegidaAhora != null && elegidaAhora.Completes != 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
             {
                 if (elegidaAhora.Ends && elegidaAhora.TeleportsTo == 0 && elegidaAhora.TeleportPassage == 0)
@@ -1725,7 +1737,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // The other objectives the reply does, all at once: Vey Gana's four slobbers.
-            if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar)
+            if (elegidaAhora != null && elegidaAhora.CompletesAll.Count > 0 && elegidaAhora.StartsQuest == 0 && !sinPagar && !othersDone)
             {
                 foreach (int objective in elegidaAhora.CompletesAll)
                     await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora, objective);
@@ -1734,6 +1746,10 @@ namespace Jondo.Unity.Server.Handlers
             // The alteration the reply puts on: Max Ymillán's «Supercaptura» for a medium soul stone.
             if (elegidaAhora != null && elegidaAhora.GivesAlteration != 0 && !sinPagar)
                 await AlterationHandler.GainAsync(stream, elegidaAhora.GivesAlteration);
+            // And the ones it takes: the captured Kabombz handed to Goblasto.
+            if (elegidaAhora != null && !sinPagar)
+                foreach (int alteration in elegidaAhora.TakesAlterations)
+                    await AlterationHandler.LoseAsync(stream, alteration);
 
             // The spell the reply teaches for good: the Sadida priestess's Nécronyx.
             if (elegidaAhora != null && elegidaAhora.TeachesSpell != 0 && !sinPagar)
@@ -1782,7 +1798,10 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // And an objective that is this very reply: Noken wishing the character luck.
-            await Managers.Quests.OnReplyChosenAsync(session, reply,
+            // A reply that ends the talk and «completes» an objective bound to itself (2520's
+            // «Recoger el material», which hands the telekametro): the binding closes it first, and
+            // the gift must not be lost for it.
+            var closedByReply = await Managers.Quests.OnReplyChosenAsync(session, reply,
                 () => elegidaAhora == null ? Quests.CanShareNpc(questNpcId) : CanShareQuestReply(questNpcId, elegidaAhora));
 
             // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
@@ -1894,7 +1913,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (completesAfterClosing != 0
-                && await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true))
+                && (closedByReply.Contains(completesAfterClosing)
+                    || await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true)))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in

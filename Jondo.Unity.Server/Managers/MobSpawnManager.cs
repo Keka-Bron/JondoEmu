@@ -194,7 +194,9 @@ namespace Jondo.Unity.Server.Managers
             public const int MaxGradesPerMonster = 5;
 
             /// <summary>
-            /// And up to the sixth for a group written or composed by hand, if the monster has it.
+            /// The grades the kanojedo bags and the legendary treasure-hunt picks reach. A group written
+            /// or composed by hand takes any grade the monster has: the quest monsters that grow with the
+            /// character have one every 20 levels, up to the tenth.
             /// </summary>
             /// <remarks>
             /// Measured: the kanojedo's level 200 Puch Ingball travels as <c>f2=200 f4=6</c> in
@@ -1133,11 +1135,12 @@ namespace Jondo.Unity.Server.Managers
                             continue;
                         }
 
-                        // Up to the sixth grade if the monster declares it: the level 200 Puch Ingball
-                        // travels as grade 6 in the kanojedo captures and the client
-                        // draws it. The cap of five stays for the generated ones, which is where it was measured.
+                        // Any grade the monster declares: the level 200 Puch Ingball travels as grade 6
+                        // in the kanojedo captures and the client draws it, and the quest monsters that
+                        // grow with the character go up to the tenth. The cap of five stays for the
+                        // generated ones, which is where it was measured.
                         int grado = Math.Clamp(miembro.Grade, 0,
-                                               Math.Min(datos.Grades.Count, MobMember.MaxWrittenGrades) - 1);
+                                               datos.Grades.Count - 1);
                         grupo.Members.Add(new MobMember
                         {
                             Monster = datos,
@@ -1653,6 +1656,41 @@ namespace Jondo.Unity.Server.Managers
             }
         }
 
+        /// <summary>
+        /// A beaten group is not replaced on a map a quest asks to clear (the barracks of «Une voix
+        /// de crystal», 1912): once its last group falls the map stays empty for
+        /// <paramref name="howLong"/>, and only then do its monsters come back -- as the world loaded
+        /// them where it has written groups, from its subarea on the next load where it has none.
+        /// </summary>
+        public static void LeaveClearedFor(long mapId, TimeSpan howLong)
+        {
+            lock (_candado)
+            {
+                if (_mapMobs.TryGetValue(mapId, out var mobs) && mobs.Count > 0) return;
+                _mapMobs[mapId] = new List<MobGroup>();
+                _emptiedByHand.Add(mapId);
+            }
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(howLong);
+                lock (_candado)
+                {
+                    if (!_emptiedByHand.Contains(mapId) || (_mapMobs.TryGetValue(mapId, out var now) && now.Count > 0)) return;
+                    if (_asLoaded.TryGetValue(mapId, out var loaded) && loaded.Count > 0)
+                        _mapMobs[mapId] = loaded.Select(CloneOf).ToList();
+                    else
+                        _mapMobs.Remove(mapId);
+                    _emptiedByHand.Remove(mapId);
+                }
+            });
+        }
+
+        /// <summary>Whether a monster group stands on the map now.</summary>
+        public static bool HasGroups(long mapId)
+        {
+            lock (_candado) return _mapMobs.TryGetValue(mapId, out var groups) && groups.Count > 0;
+        }
+
         /// <summary>How many groups a map had when the world was loaded.</summary>
         public static int LoadedGroups(long mapId)
         {
@@ -1798,13 +1836,14 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// The 0-based grade of this monster for a character of this level: the highest one not above it,
-        /// the first if all are, and never past the sixth (<see cref="MobMember.MaxWrittenGrades"/>).
+        /// the first if all are, up to its last one (the quest monsters that grow with the character
+        /// have one grade every 20 levels, up to the tenth).
         /// </summary>
         public static int GradeForLevel(int monster, int level)
         {
             if (!_monsters.TryGetValue(monster, out var data)) return 0;
             int best = 0;
-            int top = Math.Min(data.Grades.Count, MobMember.MaxWrittenGrades);
+            int top = data.Grades.Count;
             for (int i = 0; i < top; i++)
             {
                 if (data.Grades[i].Level <= level) best = i;
@@ -1812,7 +1851,7 @@ namespace Jondo.Unity.Server.Managers
             return best;
         }
 
-        /// <summary>The members of a hand-composed group, up to the sixth grade.</summary>
+        /// <summary>The members of a hand-composed group, at any grade the monster has.</summary>
         /// <summary>Monsters as fight members, by monster and 0-based grade: an NPC fight's allies.</summary>
         public static List<MobMember> ComposeMembers(IEnumerable<(int Monster, int Grade)> members) => Componer(members);
 
@@ -1824,8 +1863,7 @@ namespace Jondo.Unity.Server.Managers
                 if (!_monsters.TryGetValue(monstruo, out var datos)) continue;
                 if (datos.Grades.Count == 0) continue;
 
-                int cual = Math.Clamp(grado, 0, Math.Min(datos.Grades.Count,
-                                                         MobMember.MaxWrittenGrades) - 1);
+                int cual = Math.Clamp(grado, 0, datos.Grades.Count - 1);
                 quienes.Add(new MobMember
                 {
                     Monster = datos,

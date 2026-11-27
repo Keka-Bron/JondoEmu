@@ -94,6 +94,13 @@ namespace Jondo.Unity.Server.Managers
             public bool IncarnationInvulnerable { get; init; }
 
             /// <summary>
+            /// The AP the incarnation fights with instead of its grade's («actionPoints»), zero for
+            /// the grade's: the Minikron of «Le bonheur est dans le spray» (4947) carries 20 in every
+            /// grade, where the fight gives «1 PV, 12 PA, 0 PM» (Dofus pour les noobs).
+            /// </summary>
+            public int IncarnationActionPoints { get; init; }
+
+            /// <summary>
             /// Whether the character plays the allies by hand («alliesPlayed»): Barnabé,
             /// «contrôlable depuis la màj 2.70» (Fighter.IsPlayedAlly).
             /// </summary>
@@ -126,7 +133,8 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>
             /// Monsters that come in later, each wave so many rounds after the one before
-            /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers.
+            /// («waves»: [{ "turns", "monsters" }]): Dark Vlad's chafers. An ally with a «wave»
+            /// comes in with that wave instead of at the start (see <see cref="WaveOf"/>).
             /// </summary>
             public IReadOnlyList<Jondo.Unity.World.Fights.FightInstance.TimedWave> Waves { get; init; }
                 = Array.Empty<Jondo.Unity.World.Fights.FightInstance.TimedWave>();
@@ -149,6 +157,15 @@ namespace Jondo.Unity.Server.Managers
             /// («type»), the client's name on hover; zero for the quest default.
             /// </summary>
             public int ElementType { get; init; }
+
+            /// <summary>
+            /// Whether the fight starts as the character comes onto <see cref="MapId"/> («enter»), for a
+            /// row with no NPC, reply or element: the monsters waiting on the way of an escort, «Dès que
+            /// vous arrivez sur la map vous vous faites agresser par un groupe de monstres» (Dofus pour
+            /// les noobs, «Il est frais mon pichon»). Its criterion says when it waits there, and its
+            /// «marks» that it is behind him once won; without a mark, a won ambush would wait again.
+            /// </summary>
+            public bool OnEnter { get; init; }
 
             /// <summary>
             /// The fight that starts as soon as this one is won and the character is back on the
@@ -183,7 +200,7 @@ namespace Jondo.Unity.Server.Managers
             Load();
             foreach (var fight in _fights!)
             {
-                if (fight.ElementId != 0) continue;
+                if (fight.ElementId != 0 || fight.OnEnter) continue;
                 if (fight.NpcId != npcId || fight.Reply != reply || (fight.MapId != 0 && fight.MapId != mapId)) continue;
                 if (fight.Criterion.Length > 0 && !PlayerCriteria.Met(fight.Criterion, mapId)) continue;
                 return fight;
@@ -207,6 +224,21 @@ namespace Jondo.Unity.Server.Managers
             }
             return null;
         }
+
+        /// <summary>
+        /// The fight that waits for the session's character on this map as he comes onto it, or null:
+        /// a row with «enter», its criterion met and its chain not yet behind him.
+        /// </summary>
+        public static Fight? ForEntry(long mapId, Func<int, bool> marked)
+        {
+            Load();
+            return EntryAmong(_fights!, mapId, marked, criterion => PlayerCriteria.Met(criterion, mapId));
+        }
+
+        /// <summary>The «enter» row of <paramref name="fights"/> for this map, with the criterion tested by <paramref name="met"/>.</summary>
+        internal static Fight? EntryAmong(IEnumerable<Fight> fights, long mapId, Func<int, bool> marked, Func<string, bool> met)
+            => fights.FirstOrDefault(f => f.OnEnter && f.MapId == mapId && !f.Done(marked)
+                                          && (f.Criterion.Length == 0 || met(f.Criterion)));
 
         /// <summary>The element rows of a map, to declare their elements usable.</summary>
         public static IEnumerable<Fight> OnMap(long mapId)
@@ -260,9 +292,9 @@ namespace Jondo.Unity.Server.Managers
                 Reply = Long(row, "reply"),
                 ArenaMapId = Long(row, "arena"),
                 Monsters = Members(row, "monsters"),
-                Allies = Members(row, "allies"),
+                Allies = StartAllies(row),
                 PlayerCell = Math.Max(0, (int)Long(row, "playerCell")),
-                AllyCells = Cells(row),
+                AllyCells = StartAllyCells(row),
                 MonsterCells = MemberCells(row, "monsters"),
                 AlliesMustLive = row.TryGetProperty("alliesMustLive", out var must) && must.ValueKind == JsonValueKind.True,
                 WinMapId = Long(row, "winMap"),
@@ -275,6 +307,7 @@ namespace Jondo.Unity.Server.Managers
                 IncarnationGrade = incarnates ? Math.Max(1, (int)Long(incarnation, "grade")) : 1,
                 IncarnationInvulnerable = incarnates && incarnation.TryGetProperty("invulnerable", out var invulnerable)
                                           && invulnerable.ValueKind == JsonValueKind.True,
+                IncarnationActionPoints = incarnates ? Math.Max(0, (int)Long(incarnation, "actionPoints")) : 0,
                 AlliesPlayed = row.TryGetProperty("alliesPlayed", out var played) && played.ValueKind == JsonValueKind.True,
                 DefeatFree = row.TryGetProperty("defeatFree", out var free) && free.ValueKind == JsonValueKind.True,
                 Criterion = row.TryGetProperty("criterion", out var criterion) && criterion.ValueKind == JsonValueKind.String
@@ -285,6 +318,7 @@ namespace Jondo.Unity.Server.Managers
                 Rules = RulesOf(row),
                 ElementId = (int)Long(row, "element"),
                 ElementType = (int)Long(row, "type"),
+                OnEnter = row.TryGetProperty("enter", out var enter) && enter.ValueKind == JsonValueKind.True,
                 Then = row.TryGetProperty("then", out var then) && then.ValueKind == JsonValueKind.Object ? Parse(then) : null,
             };
         }
@@ -299,13 +333,71 @@ namespace Jondo.Unity.Server.Managers
                 if (members.Count > 0)
                     waves.Add(new Jondo.Unity.World.Fights.FightInstance.TimedWave(Math.Max(1, (int)Long(wave, "turns")), members));
             }
+            // The allies that arrive with a wave, on the players' side of it.
+            var late = new Dictionary<int, List<(int, int)>>();
+            foreach (var (ally, at) in AlliesWithWave(row))
+            {
+                int index = at - 2;
+                if (index < 0 || index >= waves.Count) continue;
+                if (!late.TryGetValue(index, out var joining)) late[index] = joining = new List<(int, int)>();
+                joining.Add(ally);
+            }
+            foreach (var (index, allies) in late) waves[index] = waves[index] with { Allies = allies };
             return waves;
+        }
+
+        /// <summary>
+        /// The wave an ally comes in with («wave» on an «allies» entry), counted as the guides
+        /// count them: 1 is the group the fight starts with, 2 the first of the «waves», and so on.
+        /// 0, 1 or a wave the row does not have puts the ally on the board from the start.
+        /// «Vence a la horda de sumergidos» (1943): the two Refuerzo steamers come at wave 3.
+        /// </summary>
+        internal static int WaveOf(int waveCount, JsonElement ally)
+        {
+            int at = (int)Long(ally, "wave");
+            return at >= 2 && at - 2 < waveCount ? at : 1;
+        }
+
+        /// <summary>Each «allies» entry with the wave it comes in with (<see cref="WaveOf"/>), in order.</summary>
+        private static List<((int, int) Ally, int Wave)> AlliesWithWave(JsonElement row)
+        {
+            var found = new List<((int, int), int)>();
+            if (!row.TryGetProperty("allies", out var list) || list.ValueKind != JsonValueKind.Array) return found;
+            int waveCount = WaveCount(row);
+            foreach (var member in list.EnumerateArray())
+            {
+                int monster = (int)Long(member, "monster");
+                if (monster != 0) found.Add(((monster, (int)Long(member, "grade")), WaveOf(waveCount, member)));
+            }
+            return found;
+        }
+
+        /// <summary>How many of a row's «waves» bring someone in: the ones <see cref="Waves"/> keeps.</summary>
+        private static int WaveCount(JsonElement row)
+        {
+            if (!row.TryGetProperty("waves", out var list) || list.ValueKind != JsonValueKind.Array) return 0;
+            return list.EnumerateArray().Count(wave => Members(wave, "monsters").Count > 0);
+        }
+
+        /// <summary>The allies on the board from the start: those with no later wave.</summary>
+        private static List<(int, int)> StartAllies(JsonElement row)
+            => AlliesWithWave(row).Where(a => a.Wave <= 1).Select(a => a.Ally).ToList();
+
+        /// <summary>The «allyCells» of the allies on the board from the start, in their order.</summary>
+        private static List<int> StartAllyCells(JsonElement row)
+        {
+            var cells = Cells(row);
+            var all = AlliesWithWave(row);
+            var found = new List<int>();
+            for (int i = 0; i < all.Count && i < cells.Count; i++)
+                if (all[i].Wave <= 1) found.Add(cells[i]);
+            return found;
         }
 
         /// <summary>
         /// A row's quest rules: «grants» [spell...], «passives» [{ monster, spell }], «states»
         /// [{ monster, state }], «winState», «sacrifice» { ally, message }, «winMessage» and
-        /// «allyProof» [monster...].
+        /// «allyProof» [monster...] and «antidotes» [{ item, spells }].
         /// </summary>
         internal static Jondo.Unity.World.Fights.FightInstance.QuestRules RulesOf(JsonElement row)
         {
@@ -317,6 +409,17 @@ namespace Jondo.Unity.Server.Managers
             if (row.TryGetProperty("allyProof", out var proof) && proof.ValueKind == JsonValueKind.Array)
                 foreach (var monster in proof.EnumerateArray())
                     if (monster.ValueKind == JsonValueKind.Number && monster.GetInt32() > 0) allyProof.Add(monster.GetInt32());
+            var antidotes = new List<(int, IReadOnlyList<int>)>();
+            if (row.TryGetProperty("antidotes", out var cures) && cures.ValueKind == JsonValueKind.Array)
+                foreach (var cure in cures.EnumerateArray())
+                {
+                    if (cure.ValueKind != JsonValueKind.Object || Long(cure, "item") <= 0) continue;
+                    var spells = new List<int>();
+                    if (cure.TryGetProperty("spells", out var named) && named.ValueKind == JsonValueKind.Array)
+                        foreach (var spell in named.EnumerateArray())
+                            if (spell.ValueKind == JsonValueKind.Number && spell.GetInt32() > 0) spells.Add(spell.GetInt32());
+                    if (spells.Count > 0) antidotes.Add(((int)Long(cure, "item"), spells));
+                }
             bool sacrifice = row.TryGetProperty("sacrifice", out var sacrificed) && sacrificed.ValueKind == JsonValueKind.Object;
             var rules = new Jondo.Unity.World.Fights.FightInstance.QuestRules(
                 grants, Pairs(row, "passives", "spell"), Pairs(row, "states", "state"), (int)Long(row, "winState"))
@@ -326,6 +429,7 @@ namespace Jondo.Unity.Server.Managers
                 SacrificeTakes = sacrifice ? (int)Long(sacrificed, "takes") : 0,
                 WinMessage = (int)Long(row, "winMessage"),
                 AllyProof = allyProof,
+                Antidotes = antidotes,
             };
             return rules.IsEmpty ? Jondo.Unity.World.Fights.FightInstance.QuestRules.None : rules;
         }

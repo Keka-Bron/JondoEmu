@@ -1907,6 +1907,133 @@
    "remove": true,
    "why": "Shipwreck interior [15,21]: the lute rock of «La musique de Rykke Zane» (1732, objective 10987). The legacy-version import paired it with 88088322 (the beach map east of the wreck), but the walkthrough only has the player click the rock to get Rykke's old lute and stay in the room; the teleport is removed."
   },
-    { "map": 54535201, "element": 457180, "cell": 338, "gfx": 21987, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 310, "why": "The quest basement's door (54535201: element 457180, graphic 21987 on cell 338) back up into Albert Pess's house (54534177), landing on 310, where the official server puts the character." }
+    { "map": 54535201, "element": 457180, "cell": 338, "gfx": 21987, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 310, "why": "The quest basement's door (54535201: element 457180, graphic 21987 on cell 338) back up into Albert Pess's house (54534177), landing on 310, where the official server puts the character." },
+    { "map": 169082890, "element": 508182, "cell": 327, "gfx": 60371, "type": 0, "skill": 114, "toMap": 169082892, "toCell": 272, "criterion": "PO>17964,0", "refusal": 449, "refusalType": 1, "why": "The lift of [22,31] down to [22,32] («Utiliza un volante hidráulico para accionar el ascensor», quest 1743): it works with the hydraulic wheel (17964) in the bag, the interactive as in the game; the landing cell is INFERRED."},
+    {"map": 180486661, "element": 510884, "cell": 247, "gfx": 58946, "type": -1, "skill": 114, "toMap": 181404680, "toCell": 330, "criterion": "POE15990,1", "why": "The Village Miniature of the Sidimote moors [-14,34] (1911, 13113): «il faudra alors s'équiper d'1 Baguette Rikiki puis cliquer sur le Village Miniature» (Dofus pour les noobs, «Le bonheur est dans le spray»). The wand is item 15990: the quest does not hand it out, it is crafted by a Carver (job 13, level 40: 652, 8157 and 1672 in the recipe); the landing cell is INFERRED."},
+    {"map": 181404680, "element": 510922, "cell": 401, "gfx": 13117, "type": -1, "skill": 114, "toMap": 180486661, "toCell": 261, "why": "The way out of the miniature village back to [-14,34] (1911). INFERRED: element 510922 (gfx 13117) is the only other element of the village besides the house door; the guide does not say how one leaves."},
+    {"map": 117704200, "element": 508072, "cell": 240, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117705224, "toCell": 479, "why": "Abyssal base, room beside the Cartographer's lift [22,18]: the wall door to the next room east (117705224), the way on to Kralab Rah's quarters (Dofus pour les noobs, «Relevez les niveaux»: two maps on from the Cartographer's lift). The 2.73 graph has no transition for it. The arrival cell 479 is INFERRED: where the base's other wall doors land."},
+    {"map": 117705224, "element": 483115, "cell": 187, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117704200, "toCell": 478, "why": "Abyssal base, room before Kralab Rah's quarters: the wall door back to the room beside the Cartographer's lift (117704200), the pair of 508072. Arrival cell 478 INFERRED: where the base's other wall doors land."},
+    {"map": 117708801, "element": 483150, "cell": 186, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117707777, "toCell": 478, "why": "Abyssal base, last room of the lever-door chain from the water room -> 117708805 -> 117708803 -> 117708801 ([24,26]): its wall door leads on to Bosko Tho's quarters 117707777 [23,30] (Dofus pour les noobs, «Relevez les niveaux»: after the tree room, the levers open the door to Bosko Tho's quarters; objective 7967). The 2.73 graph has no transition for it. INFERRED pair: 117707777 has no door element, so only a door of the Undertow side can open into it; the landing cell 478 is where the room's other return door lands."},
+    {"map": 117707786, "element": 483156, "cell": 145, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117706764, "toCell": 203, "why": "Abyssal base, Abyss lift room [22,31]: the wall door west of the lift to the Aquadome side lever rooms (117706764 [20,32], then 117707788, 117707793, 117707791 and the Aquadome entrance 117706767). Dofus pour les noobs, «Relevez les niveaux»: from the Abysses lift keep on working the right levers to the Entree de l'Aquadome (objective 7969). The 2.73 graph has no transition for it. INFERRED pair with 483159; landing cell 203 is the walkable cell beside that door."},
+    {"map": 117706764, "element": 483159, "cell": 204, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117707786, "toCell": 146, "why": "Abyssal base, first lever room of the Aquadome side [20,32]: the wall door back to the Abyss lift room 117707786, the pair of 483156 (the room's only way out besides its levers' doors; the lifts need the Qf of 1440 or 1442). INFERRED pair; landing cell 146 is the walkable cell beside 483156."},
+    { "map": 186646528, "element": 4176001, "npc": 4176, "cell": 287, "gfx": 4176001, "type": -1, "skill": 339, "toMap": 186384904, "toCell": 296, "why": "The diving bell of the Silent Wrecks ship [-48,-78]: «Meterte en la campana» (35461) lets the sailor lower the character to the depths of the Antinau Sea (map 186384904 named «Depths of the Antinau Sea» in the map data, the first map of the sea floor, [-48,-78]). INFERRED: the landing cell 296 (the map's own) and that the Égida de Feca (item 19390, 30349: without it a certain death) is the condition; the client has the criterion only on another passage of this item (173016076). (Dofus pour les noobs, «Toucher le fond»)" },
+    { "map": 186384904, "element": 511656, "cell": 394, "gfx": 62111, "type": -1, "skill": 114, "toMap": 186646528, "toCell": 268, "why": "The rope of the diving bell on the sea floor [-48,-78] (quest-only element 511656, gfx 62111): hauls the character back to the deck of the Silent Wrecks ship [-48,-78] (Dofus pour les noobs, «Toucher le fond»). INFERRED: that element 511656 is the bell's rope and the deck landing cell 268." },
+    { "map": 186387972, "element": 511916, "cell": 180, "gfx": 62367, "type": 0, "skill": 114, "toMap": 186646534, "toCell": 282, "why": "The submarine vortex of [-45,-80] (186387972, 1945 13759 «Toma el vórtice submarino»): it sweeps the character into the grotto of the Silent Wrecks (186646534) (Dofus pour les noobs, «Toucher le fond»). INFERRED: the landing cell 282 (the grotto's own)." },
+    { "map": 186646534, "element": 512002, "cell": 529, "gfx": 44035, "type": 0, "skill": 114, "toMap": 187433986, "toCell": 272, "why": "The underground passage of the grotto (1945 13762 «Toma el pasadizo subterráneo»), to Bethel's Tower map 187433986 [-48,-82] (Dofus pour les noobs, «Toucher le fond»). INFERRED: the landing cell 272 (the map's own); that it is open from the start (the client has no condition on it)." },
+    { "map": 187433986, "element": 512003, "cell": 192, "gfx": 62238, "type": -1, "skill": 114, "toMap": 186385924, "toCell": 268, "why": "The way out of Bethel's Tower (1945 13763 «Busca una salida»): the stairs (quest-only element 512003, gfx 62238) lead back to the sea floor [-47,-80], where Zrid Rahys waits for the report (Dofus pour les noobs, «Toucher le fond»). INFERRED: the destination map 186385924 (Zrid's) and cell 268." },
+  {
+   "map": 184287490,
+   "element": 511372,
+   "cell": 199,
+   "gfx": 59348,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184287492,
+   "toCell": 277,
+   "why": "Temple of the Magmatic Steps [-34,22], ground floor: the stairs up to the middle floor with the stele (Dofus pour les noobs («La guerre des Marches»): «empruntez les marches, puis cliquez sur la stèle»). The 2.73 graph has no passage. Arrival cell 277 (beside the floor's stairs 511371) INFERRED."
+  },
+  {
+   "map": 184287492,
+   "element": 511371,
+   "cell": 222,
+   "gfx": 56079,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184287490,
+   "toCell": 227,
+   "why": "Temple of the Magmatic Steps, middle floor: the stairs back down to the ground floor (pair of 511372). Arrival cell 227 INFERRED."
+  },
+  {
+   "map": 184287492,
+   "element": 511370,
+   "cell": 106,
+   "gfx": 56079,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184287494,
+   "toCell": 282,
+   "why": "Temple of the Magmatic Steps, middle floor: the stairs up to the top floor with the parchment and the hero's tomb (Dofus pour les noobs («La guerre des Marches»): «montez les prochains escaliers»). Arrival cell 282, the left edge of the top floor, INFERRED."
+  },
+  {
+   "map": 184287492,
+   "element": 511878,
+   "cell": 286,
+   "gfx": 62494,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184290304,
+   "toCell": 282,
+   "criterion": "Qa=1940&Qo>13584&PO>9935,0",
+   "why": "Temple of the Magmatic Steps, middle floor: the well in the middle of the temple. The way down needs the climbing rope 9935 and the blood already poured (Dofus pour les noobs («La guerre des Marches»): «descendre dans le puits (avec 1 x Corde d'Escalade)»). Arrival cell 282 INFERRED."
+  },
+  {
+   "map": 184290304,
+   "element": 511876,
+   "cell": 122,
+   "gfx": 62493,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184287492,
+   "toCell": 258,
+   "why": "Infernal Well [-34,22]: the rope/chain back up to the temple's middle floor (Dofus pour les noobs («La guerre des Marches»): «remontez le puits»). Arrival cell 258, beside the well, INFERRED."
+  },
+  {
+   "map": 184290304,
+   "element": 511879,
+   "cell": 170,
+   "gfx": 62183,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184290562,
+   "toCell": 327,
+   "why": "Infernal Well: the way to the annex room where Arak'Imperitax waits (Dofus pour les noobs («La guerre des Marches»): «allez dans la salle annexe»). Arrival cell 327 INFERRED."
+  },
+  {
+   "map": 184290562,
+   "element": 511877,
+   "cell": 549,
+   "gfx": 39767,
+   "type": -1,
+   "skill": 114,
+   "toMap": 184290304,
+   "toCell": 198,
+   "why": "Annex room of the Infernal Well: the way back to the well chamber. Arrival cell 198 INFERRED."
+  },
+    {
+      "map": 186908930, "element": 511892, "cell": 354, "gfx": 62486, "type": -1, "skill": 114, "toMap": 187695106, "toCell": 312,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the cave mouth to the cave's first floor. Which of the four cave maps is the first floor, and the arrival cell, are INFERRED (187695106 is the only one with two stairs)."
+    },
+    {
+      "map": 187695106, "element": 511895, "cell": 284, "gfx": 62487, "type": -1, "skill": 114, "toMap": 187695104, "toCell": 296,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the first stairs up to the top floor where the second ritual is held (objective 13717 names map 187695104, an empty room). Which stairs go where is INFERRED from the graphics' order."
+    },
+    {
+      "map": 187695106, "element": 511894, "cell": 420, "gfx": 62488, "type": -1, "skill": 114, "toMap": 187695108, "toCell": 172,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the second stairs down to the depths where the ancestral crujidor stands (objective 13719 names map 187695108). INFERRED."
+    },
+    {
+      "map": 187695108, "element": 511893, "cell": 144, "gfx": 62489, "type": -1, "skill": 114, "toMap": 187695106, "toCell": 422,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the stairs back up to the first floor (pair of 511894). INFERRED."
+    },
+    {
+      "map": 187695108, "element": 511897, "cell": 262, "gfx": 62491, "type": -1, "skill": 114, "toMap": 187695110, "toCell": 273,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the stairs to the little room beyond the depths (no quest step; keeps the element usable). INFERRED."
+    },
+    {
+      "map": 187695110, "element": 511896, "cell": 245, "gfx": 62490, "type": -1, "skill": 114, "toMap": 187695108, "toCell": 275,
+      "why": "Cania's petrified ridge cave [-10,-30] (Dofus pour les noobs («Craquements de cœur»): «Entrez dans la grotte et montez les escaliers», «Redescendez les escaliers puis descendez les seconds escaliers»). The 2.73 graph has none; the way back to the depths (pair of 511897). INFERRED."
+    },
+    {
+      "map": 187957516, "element": 512026, "cell": 311, "gfx": 62499, "type": -1, "skill": 114, "toMap": 187957518, "toCell": 202,
+      "why": "Solar tower, room above the boss [?]: Dofus pour les noobs («Les coeurs livides»): «monter les escaliers», «cliquer sur le cœur livide», then speak to the god. The 2.73 graph has none of these stairs; elements taken from the client's map data (the pair of consecutive element ids is the stairs up and the way back); arrival cells INFERRED. The stairs to the god's room (objective 13731 names map 187957518)."
+    },
+    {
+      "map": 187439104, "element": 511977, "cell": 413, "gfx": 62553, "type": -1, "skill": 114, "toMap": 187440128, "toCell": 427,
+      "why": "Bethel tower, room above the boss: Dofus pour les noobs («Les coeurs livides»): «monter les escaliers», «cliquer sur le cœur livide», then speak to the god. The 2.73 graph has none of these stairs; elements taken from the client's map data (the pair of consecutive element ids is the stairs up and the way back); arrival cells INFERRED. The stairs to Raval's room (objective 13736 names map 187440128)."
+    },
+    {
+      "map": 187440128, "element": 511978, "cell": 413, "gfx": 62501, "type": -1, "skill": 114, "toMap": 187439104, "toCell": 427,
+      "why": "Bethel tower, Raval's room: the way back down (pair of 511977). INFERRED."
+    }
   ]
 }

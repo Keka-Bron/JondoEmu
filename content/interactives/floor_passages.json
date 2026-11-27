@@ -421,6 +421,18 @@
       "toMap": 131860996,
       "toCell": 352,
       "why": "The same arch's other walkable sun (505631) as the 254 one above."
-    }
+    },
+    {"map": 179307521, "cell": 235, "toMap": 180094978, "toCell": 345, "why": "«Empruntez le passage secret à droite de la cascade» (1911, 13104) (Dofus pour les noobs, «Le bonheur est dans le spray»): the secret passage by the waterfall of [-65,29] to Lady Urikoíris's room; the client has no element for it, so it is a floor passage. The cells are INFERRED, and the guide's condition (the achievement «La chasse aux chasseurs» done) is not a criterion the engine knows, so the passage is open."},
+  {
+   "map": 184287494,
+   "cell": 338,
+   "toMap": 184287492,
+   "toCell": 134,
+   "why": "Temple of the Magmatic Steps, top floor: the way down to the middle floor (Dofus pour les noobs («La guerre des Marches»): «montez les marches» up, so back down). No element for it in the client; the cell is INFERRED (the lower left of the floor, beside where the stairs arrive)."
+  },
+    { "map": 187695104, "cell": 310, "toMap": 187695106, "toCell": 326,
+      "why": "Cave top floor of [-10,-30]: the way back down to the first floor (no element in the client; the cell is INFERRED, beside the arrival)." },
+    { "map": 187957518, "cell": 188, "toMap": 187957516, "toCell": 297,
+      "why": "Solar tower, the god's room: the way back down to the room of the livid heart (no element for it in the client; the cell is INFERRED), so the dungeon's exit stays reachable from the first room above the boss." }
   ]
 }

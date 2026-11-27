@@ -68,7 +68,7 @@ namespace Jondo.Unity.Server.Handlers
         public const int InvulnerableState = 269;
 
         /// <summary>A monster a character is to fight as in the fight a reply is about to start (NpcFights).</summary>
-        internal readonly record struct NextIncarnation(int Monster, int Grade, bool Invulnerable);
+        internal readonly record struct NextIncarnation(int Monster, int Grade, bool Invulnerable, int ActionPoints = 0);
 
         /// <summary>The incarnations waiting for their fight, by character.</summary>
         private static readonly ConcurrentDictionary<long, NextIncarnation> _nextIncarnations = new();
@@ -78,8 +78,10 @@ namespace Jondo.Unity.Server.Handlers
         /// at <paramref name="grade"/> (1-based): the reply that starts a quest's fight says so just
         /// before starting it, and the player's fighter takes it when it is built.
         /// </summary>
-        internal static void IncarnateInNextFight(long characterId, int monsterId, int grade, bool invulnerable)
-            => _nextIncarnations[characterId] = new NextIncarnation(monsterId, Math.Max(1, grade), invulnerable);
+        internal static void IncarnateInNextFight(long characterId, int monsterId, int grade, bool invulnerable,
+                                                  int actionPoints = 0)
+            => _nextIncarnations[characterId] = new NextIncarnation(monsterId, Math.Max(1, grade), invulnerable,
+                                                                    Math.Max(0, actionPoints));
 
         /// <summary>The incarnation waiting for this character's fight, taken so that it lasts one fight only.</summary>
         internal static NextIncarnation? TakeNextIncarnation(long characterId)
@@ -112,9 +114,12 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// A quest's rules put on a fight just built: its winning state, the spells lent to the
-        /// player and, on each monster of the template named, its passive and its states.
+        /// player and, on each monster of the template named, its passive and its states. An
+        /// antidote the character holds (<paramref name="held"/> counts it, the bag by default)
+        /// makes the player immune to the spells it names.
         /// </summary>
-        internal static void ApplyRules(FightInstance fight, Fighter player, FightInstance.QuestRules? rules)
+        internal static void ApplyRules(FightInstance fight, Fighter player, FightInstance.QuestRules? rules,
+                                        Func<int, int>? held = null)
         {
             if (rules == null || rules.IsEmpty) return;
             fight.WinState = rules.WinState;
@@ -124,6 +129,9 @@ namespace Jondo.Unity.Server.Handlers
             fight.WinMessage = rules.WinMessage;
             foreach (var ally in fight.Azul.Where(f => f.IsMonster && rules.AllyProof.Contains(f.MonsterId)))
                 ally.ImmuneToAllies = true;
+            held ??= Managers.Equipment.HowMany;
+            foreach (var (item, spells) in rules.Antidotes)
+                if (held(item) > 0) player.SpellImmunities.UnionWith(spells);
             foreach (int spell in rules.Grants)
             {
                 player.GrantedSpells.RemoveAll(g => g.Spell == spell);
@@ -142,9 +150,11 @@ namespace Jondo.Unity.Server.Handlers
         /// Makes <paramref name="player"/> fight as <paramref name="monsterId"/> at the grade
         /// <paramref name="gradeIndex"/>, its sheet brought to <paramref name="level"/> when it is
         /// not zero: see the class remarks. A mutation (Mutations) is its grade as it stands. False,
-        /// and nothing changed, when the template is not in the data.
+        /// and nothing changed, when the template is not in the data. <paramref name="actionPoints"/>,
+        /// when not zero, is the AP the fight gives him instead of the grade's (NpcFights
+        /// «incarnates.actionPoints»).
         /// </summary>
-        internal static bool Incarnate(Fighter player, int monsterId, int level, int gradeIndex = 0)
+        internal static bool Incarnate(Fighter player, int monsterId, int level, int gradeIndex = 0, int actionPoints = 0)
         {
             MobSpawnManager.EnsureMonsterData();
             var data = MobSpawnManager.GetMonsterData(monsterId);
@@ -163,8 +173,8 @@ namespace Jondo.Unity.Server.Handlers
             player.LookBoneId = template.LookBoneId;
             player.MaxHP = template.MaxHP;
             player.CurrentHP = template.MaxHP;
-            player.MaxAP = template.MaxAP;
-            player.CurrentAP = template.MaxAP;
+            player.MaxAP = actionPoints > 0 ? actionPoints : template.MaxAP;
+            player.CurrentAP = player.MaxAP;
             player.MaxMP = template.MaxMP;
             player.CurrentMP = template.MaxMP;
             player.Initiative = template.Initiative;

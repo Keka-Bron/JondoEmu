@@ -666,6 +666,18 @@ namespace Jondo.Unity.World.Fights
         }
 
         /// <summary>
+        /// <see cref="Join"/> on the players' side: a monster that comes in with a wave to fight
+        /// beside them, the Refuerzo steamers of «Mas alla de la costa». It plays its own turn
+        /// from the order rebuilt here.
+        /// </summary>
+        public void JoinBeside(Fighter fighter)
+        {
+            fighter.TeamId = 0;
+            Azul.Add(fighter);
+            RebuildTurnOrderKeepingCurrent();
+        }
+
+        /// <summary>
         /// Puts a summon in the fight, on the summoner's side, and rebuilds the turn
         /// order so that it gets to play.
         /// </summary>
@@ -1124,8 +1136,16 @@ namespace Jondo.Unity.World.Fights
         /// <summary>
         /// A wave of monsters still to come in a fight whose waves come by the clock: it arrives
         /// <see cref="Turns"/> rounds after the one before it, or at once when the board is cleared.
+        /// With it, the monsters that come in on the players' side (<see cref="Allies"/>).
         /// </summary>
-        public sealed record TimedWave(int Turns, IReadOnlyList<(int Monster, int Grade)> Monsters);
+        public sealed record TimedWave(int Turns, IReadOnlyList<(int Monster, int Grade)> Monsters)
+        {
+            /// <summary>
+            /// Monsters that come in with the wave on the players' side, played by the AI against
+            /// the other side: the two Refuerzo steamers of «Mas alla de la costa», at wave 3.
+            /// </summary>
+            public IReadOnlyList<(int Monster, int Grade)> Allies { get; init; } = Array.Empty<(int, int)>();
+        }
 
         /// <summary>
         /// The waves still to come, in order: Dark Vlad's chafers in «Ver a Dark Vlad y morir... o
@@ -1176,9 +1196,16 @@ namespace Jondo.Unity.World.Fights
             /// </summary>
             public IReadOnlyList<int> AllyProof { get; init; } = Array.Empty<int>();
 
+            /// <summary>
+            /// An item held into the fight that makes the player immune to some spells («antidotes»:
+            /// [{ item, spells }]): Otomai's toxin immunity potion (19507) against Toxina's poison.
+            /// </summary>
+            public IReadOnlyList<(int Item, IReadOnlyList<int> Spells)> Antidotes { get; init; }
+                = Array.Empty<(int, IReadOnlyList<int>)>();
+
             /// <summary>Whether there is nothing to apply.</summary>
             public bool IsEmpty => Grants.Count == 0 && Passives.Count == 0 && States.Count == 0 && WinState == 0
-                                   && SacrificeAlly == 0 && WinMessage == 0 && AllyProof.Count == 0;
+                                   && SacrificeAlly == 0 && WinMessage == 0 && AllyProof.Count == 0 && Antidotes.Count == 0;
         }
 
         /// <summary>The ally that dies in the player's place (<see cref="QuestRules.SacrificeAlly"/>), or zero.</summary>

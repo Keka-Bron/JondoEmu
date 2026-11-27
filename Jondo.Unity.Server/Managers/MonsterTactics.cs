@@ -344,6 +344,14 @@ namespace Jondo.Unity.Server.Managers
 
             public bool HasRows => Rows.Count > 0;
 
+            /// <summary>
+            /// The rows that strip an invulnerability when the spell is cast (951 or 952 on a state
+            /// that shields): what makes the blow worth aiming at one who holds it. A summary
+            /// spell weighs the blow alike on everybody; the siphon turret's Sea Wave (6851)
+            /// strips the shorrokh's 56 and wounds it, and was thrown at whoever stood nearest.
+            /// </summary>
+            public IReadOnlyList<SpellEffect> Strips { get; init; } = Array.Empty<SpellEffect>();
+
             /// <summary>Whether one of its rows summons -- a double too: it is then aimed at free cells too.</summary>
             public bool SummonsByRow => Rows.Any(r => EffectEngine.EsInvocacion(r.EffectId) || EffectEngine.EsDobleDelLanzador(r.EffectId));
 
@@ -517,9 +525,24 @@ namespace Jondo.Unity.Server.Managers
                 if (opener != null) return opener;
             }
 
-            Action? best = null;
+            Action? best = null, summon = null;
             foreach (var option in Options(board, monster, spells))
+            {
                 if (best == null || option.Score > best.Score) best = option;
+                if (option.Spell.Summons && !option.Spell.Offensive && option.Score > 0
+                    && (summon == null || option.Score > summon.Score)) summon = option;
+            }
+
+            // Its creature before the blow that would leave no AP for it: one that comes out plays
+            // the rest of the fight, and weighed per AP against a single blow it never came out.
+            // Toxina (5187) spent seven rounds on her Vengeance aiguisée and never cast her
+            // Rassemblement du gang (10115/10116), which «invoque une Chasseuse de poison» (Dofus
+            // pour les noobs, «Le piège se referme»). While both can be paid the best goes first:
+            // the Shin Larva still sinks the enemies (506) before it calls its larva (507).
+            // One a turn all the same (Options), and only while the summon limit has room (Board.CanSummon).
+            // A JondoBot plans its turn whole and weighs its creatures by their standing (PlanTurn).
+            if (summon != null && !monster.IsBot && best != summon && best!.ActionPoints - best.Spell.Cost < summon.Spell.Cost)
+                return summon;
 
             // Power before the blow: a buff that raises its damage goes first when both can be
             // paid -- "lancer puissance le tour d'avant", as the players' own advice goes.
@@ -771,8 +794,11 @@ namespace Jondo.Unity.Server.Managers
             }
             else if (ranged)
             {
-                // At the reach of its best spell from the nearest enemy, no closer than it must be.
-                int want = attack!.ReachFor(monster);
+                // At the reach of its best spell from the nearest enemy, no closer than it must be;
+                // or at the distance its own row keeps (MonsterStandoffs): the library yokais push
+                // from two cells and are only beaten by reaching all five at once.
+                int standoff = MonsterStandoffs.For(monster.MonsterId);
+                int want = standoff > 0 ? standoff : attack!.ReachFor(monster);
                 chosen = cells.OrderBy(kv => Math.Abs(Nearest(kv.Key) - want)
                                              + (Seen(kv.Key) ? HiddenWorth : 0) + (Stuck(kv.Key) ? StuckCost : 0))
                               .ThenByDescending(kv => Nearest(kv.Key))
@@ -1110,7 +1136,7 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Damage > 0 && (onEnemy || spell.OnSelf))
             {
                 foreach (var hit in enemies.Where(e => Hit(spell, from, aim, e)))
-                    value += Worth(spell, monster, hit);
+                    value += Worth(spell, monster, hit) + StripWorth(spell, monster, hit);
                 if (spell.HurtsAllies)
                     foreach (var own in allies.Where(a => Hit(spell, from, aim, a)))
                         value -= Blow(spell, monster, own);
@@ -1211,6 +1237,19 @@ namespace Jondo.Unity.Server.Managers
         /// What hitting an enemy is worth: the blow, a kill on top, and more the weaker he is --
         /// which is what makes the whole group go for the same one.
         /// </summary>
+        /// <summary>
+        /// What the invulnerability a cast takes off an enemy is worth (<see cref="Spell.Strips"/>):
+        /// the same as a dispel of it (<see cref="BuffsWorth"/>), for the rows whose mask names him.
+        /// </summary>
+        private static double StripWorth(Spell spell, Fighter monster, Fighter enemy)
+        {
+            double worth = 0;
+            foreach (var row in spell.Strips)
+                if (enemy.Buffs.TieneEstado(row.Value) && EffectEngine.CumpleLaMascara(monster, enemy, row.TargetMask ?? ""))
+                    worth += 0.6 * PerPointPerTurn(enemy, 25) * 1000;
+            return worth;
+        }
+
         private static double Worth(Spell spell, Fighter monster, Fighter enemy)
             => WorthOfBlow(Blow(spell, monster, enemy), enemy);
 

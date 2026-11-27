@@ -382,5 +382,24 @@ namespace Jondo.Unity.Tests.Content
                 }
             }
         }
+
+        /// <summary>
+        /// Zrons's hand-over in «Mas alla de la costa» (1943): reply 35622 sends him to line 29643,
+        /// which was not written, so the talk closed on an empty question instead of his advice.
+        /// The line is there now, and it takes the template's 35621 («Suivre son conseil»).
+        /// </summary>
+        [Fact]
+        public void Zrons_s_hand_over_leads_to_his_advice()
+        {
+            if (!Available) return;
+
+            var zrons = Trees().Where(t => t.NpcId == 4216).ToList();
+            Assert.NotEmpty(zrons);
+            var lines = zrons.SelectMany(t => t.Lines).ToList();
+            Assert.Contains(lines, l => l.Choices.Any(c => c.Reply == 35622 && c.Next == 29643));
+            var advice = lines.Single(l => l.Message == 29643);
+            Assert.Equal(new long[] { 35621 }, advice.Choices.Select(c => c.Reply).ToArray());
+            Assert.Contains(lines, l => l.Message == 29645);
+        }
     }
 }

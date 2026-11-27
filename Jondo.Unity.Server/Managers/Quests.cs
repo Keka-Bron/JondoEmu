@@ -578,6 +578,12 @@ namespace Jondo.Unity.Server.Managers
                 if (binding.SkillName != 0
                     && (!InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out _, out var picked)
                         || picked.SkillNameId != binding.SkillName)) continue;
+                // A room to clear first: with a group still on the map the element does nothing.
+                if (binding.MapCleared && MobSpawnManager.HasGroups(mapId))
+                {
+                    Console.WriteLine($"[Quests] Objective {binding.ObjectiveId}: element {elementId} of map {mapId} pressed with monsters still there.");
+                    continue;
+                }
                 // One item per element, up to the row's count: a leaf from each of the four bushes.
                 if (binding.GivesEach)
                 {
@@ -1469,11 +1475,13 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// A reply has been chosen in a conversation: an objective bound to it closes.
         /// </summary>
-        public static async Task OnReplyChosenAsync(GameSession session, long reply, Func<bool>? canShare = null)
+        /// <returns>The objectives it closed, so a reply that also «completes» one of them still hands its gift.</returns>
+        public static async Task<List<int>> OnReplyChosenAsync(GameSession session, long reply, Func<bool>? canShare = null)
         {
             using var context = SessionContext.Push(session);
+            var closed = new List<int>();
             var log = Log;
-            if (log == null || _book == null || reply <= 0) return;
+            if (log == null || _book == null || reply <= 0) return closed;
             foreach (var run in new List<QuestRun>(log.Doing()))
             {
                 var step = _book.Step(run.StepId);
@@ -1483,15 +1491,18 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Reply) continue;
                     if (!binding.Replies.Contains((int)reply)) continue;
-                    if (canShare == null) await CloseAsync(session, binding);
-                    else await CloseSharedAsync(session, binding, canShare);
+                    bool done = canShare == null ? await CloseAsync(session, binding)
+                                                 : await CloseSharedAsync(session, binding, canShare);
+                    if (done) closed.Add(objective.Id);
                 }
             }
+            return closed;
         }
 
         /// <summary>
-        /// Something has been gathered on a map: an objective bound to gathering it there closes
-        /// (the tutorial's five resources of the jobs room).
+        /// Something has been gathered, or has dropped in a fight, on a map: an objective bound to
+        /// obtaining it there closes (the tutorial's five resources of the jobs room, the
+        /// P'Koutoulou of 1765).
         /// </summary>
         public static async Task OnGatheredAsync(GameSession session, int itemId, long mapId)
         {
@@ -1815,6 +1826,11 @@ namespace Jondo.Unity.Server.Managers
             // hero by his master's talk asks his own class's master only.
             await SendStepAsync(session, questId);
             if (!session.HasTransport) return true;
+
+            // Objectives that wait on others already done: «Bienvenido a Frigost» (649) is taken once
+            // the mayor's four quests are finished, and their four objectives close as it starts, since
+            // no later tick will ever come to close them.
+            await AfterObjectivesAsync(session);
 
             // And the green mark of the one who just gave it is switched off.
             await SendMarksAsync(session, session.MapId);

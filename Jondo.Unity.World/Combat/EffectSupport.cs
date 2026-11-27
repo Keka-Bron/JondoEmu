@@ -287,6 +287,13 @@ namespace Jondo.Unity.World.Combat
         public const int HealPercent = 1109;
 
         /// <summary>
+        /// "Cura en el atacante: #1% de los daños": a row under "D" that heals whoever just hit its
+        /// bearer by that share of the blow -- the Uginak's prey, the Royal Pingwin's 2610 after a
+        /// push. The engine heals the attacker itself, so the panel must not call it panel-only.
+        /// </summary>
+        public const int HealsTheAttacker = 786;
+
+        /// <summary>
         /// Kill outright. It is also a summon's countdown: on being born one of these is hung on it
         /// with its round, and when that round comes, the summon is undone.
         /// </summary>
@@ -319,7 +326,8 @@ namespace Jondo.Unity.World.Combat
                 AddState, RemoveState,
                 CastSpell, TriggerSpell, NearestTargetExecuteSpell,
                 RemoveSpellEffects, ChangeLook, ChangeAppearance, ProposesChoice,
-                Summon, FireHeal, HealPercent, Kill,
+                Summon, FireHeal, HealPercent, HealsTheAttacker, Kill,
+                DisableState,
             };
 
             for (int damage = FirstDamage; damage <= LastDamage; damage++) known.Add(damage);

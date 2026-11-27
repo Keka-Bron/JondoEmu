@@ -588,8 +588,8 @@
       "room": 169874432,
       "cell": 425,
       "npc": 3258,
-      "replies": [28923, 28559, 28933],
-      "why": "Captain Meno's Ship (dungeon 97): after the boss the winners are in «Capitán Meno - Salida» (169874432), where Captain Meno stands beside the ship's wheel (DPLN «Piège de crystal»: «Une fois le donjon terminé, parlez au Capitaine Meno avant de sortir», screenshot titled «Capitaine Meno - Sortie»; the client's own data puts quest 1735's objective 11037 and 1736's hand-over 11042 on this map). His «Leave the submarine» (28923), «Leave Captain Meno's Ship» (28559) and «Shrug your shoulders and leave the submarine» (28933) leave. Cell 425: where the character stands in that screenshot, measured against tools/dibujar_mapa.py; +-1 cell."
+      "replies": [28923, 28559, 28933, 35185, 35191, 35195],
+      "why": "Captain Meno's Ship (dungeon 97): after the boss the winners are in «Capitán Meno - Salida» (169874432), where Captain Meno stands beside the ship's wheel (DPLN «Piège de crystal»: «Une fois le donjon terminé, parlez au Capitaine Meno avant de sortir», screenshot titled «Capitaine Meno - Sortie»; the client's own data puts quest 1735's objective 11037 and 1736's hand-over 11042 on this map). His «Leave the submarine» (28923), «Leave Captain Meno's Ship» (28559) and «Shrug your shoulders and leave the submarine» (28933) leave. Cell 425: where the character stands in that screenshot, measured against tools/dibujar_mapa.py; +-1 cell. 35185, 35191 and 35195 («Tomar nota de ello [...] y abandonar el submarino», «Darle las gracias y abandonar el submarino») leave after the 1912 talks."
     },
     {
       "dungeon": 99,
@@ -599,6 +599,27 @@
       "npc": 3257,
       "replies": [28635, 28639],
       "why": "Dientinea's Palace (dungeon 99): after Dientinea the winners are in her throne room (169612288, screenshot titled «Palais de Dantinéa - Sortie»), where she dictates her demands (1737, objective 11045). «Note down her demands and leave the palace.» (28635) and «Leave the palace.» (28639) leave. Cell 491: where the character stands in the DPLN «Reine de beauté» screenshot of that room, measured against tools/dibujar_mapa.py; +-1 cell."
-    }
+    },
+    {
+      "dungeon": 70,
+      "bossRoom": 109576707,
+      "room": 109577731,
+      "cell": 270,
+      "npc": 2028,
+      "replies": [17538, 17329, 17769, 35171, 35173, 35180, 35182],
+      "why": "Nileza's Laboratory (dungeon 70): after Nileza the winners are in «Laboratorio de Nileza - Salida» (109577731, the map's own name), where Nileza stands (DPLN «Une voix de crystal»: «Une fois dans la salle de sortie, parlez à Nileza»). His «Salir del laboratorio» (17538, 17329, 17769) and «Abandonar el laboratorio para ir a Sufokia» (35171, 35173, 35180, 35182) leave. Cell 270: the arrival cell the map gives."
+    },
+    {
+      "dungeon": 106,
+      "bossRoom": 182718464,
+      "room": 182719488,
+      "cell": 282,
+      "npc": 3963,
+      "replies": [33178, 33503, 33542, 33495],
+      "why": "Mansion of Kuatropatas (dungeon 106): after Anerice the winners are in the exit room (182719488, the map's own name 'Mansion de Kuatropatas - Salida'), where Anerice stands (Dofus pour les noobs, Le mort dans l'ame: 'Une fois dans la salle de sortie, parlez a Anerice la Shushess'). Her 'Abandonar la Mansion de Kuatropatas' (33178, 33503, 33542) and 'Hacer una reverencia y despedirte' (33495) leave. Cell 282: the arrival cell the map gives."
+    },
+  {"dungeon": 67, "bossRoom": 110101506, "room": 110102530, "cell": 358, "npc": 2046, "replies": [17332, 17485], "why": "Sylargh's Transporter (dungeon 67): after Sylargh the winners are in the exit room (110102530) where Sylargh stands (1915, 13178). His 17332/17485 leaves. Cell 358 INFERRED."},
+    {"dungeon": 109, "bossRoom": 187957512, "room": 187957516, "cell": 300, "npc": 4296, "replies": [], "why": "Solar tower: Dofus pour les noobs («Les coeurs livides») «monter les escaliers puis cliquer sur le cœur livide» before leaving; the quest names the room above the boss (187957516, «discover» 13729) where the livid heart is (13730). The win leads there, the god's room (187957518) is up the stairs, and the map panel's «Salir de la mazmorra» leaves from it. INFERRED: that the real game leaves the winners in the boss room with stairs; cell INFERRED."},
+    {"dungeon": 108, "bossRoom": 187437056, "room": 187439104, "cell": 300, "npc": 4292, "replies": [], "why": "Bethel tower: Dofus pour les noobs («Les coeurs livides») the same: room above the boss (187439104, 13734) with the livid heart (13735), Raval's room (187440128) up the stairs. INFERRED as in the Solar tower."}
   ]
 }

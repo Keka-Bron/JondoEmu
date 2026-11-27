@@ -53,10 +53,11 @@ namespace Jondo.Unity.Server.Handlers
         /// <summary>
         /// Effects with no text that only go with a quest item's use, beside what it gives: 350 names
         /// NPCs (the precious ore shard of «La luz al final de las alcantarillas» names Temerius and
-        /// the «Haz de luz», 6626), 630 a number of the client's own (1437 for the shard). Nothing for
+        /// the «Haz de luz», 6626), 630 a number of the client's own (1437 for the shard), 3003 nothing
+        /// at all (the reducer 31493 of quest 2520 carries it beside the look it gives). Nothing for
         /// the server to keep.
         /// </summary>
-        private static readonly HashSet<int> Shown = new() { 350, 630 };
+        private static readonly HashSet<int> Shown = new() { 350, 630, 3003 };
 
         /// <summary>
         /// The item used up (192), with the item in its first number. Naming the item itself, it is

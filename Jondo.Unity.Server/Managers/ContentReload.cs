@@ -24,6 +24,7 @@ namespace Jondo.Unity.Server.Managers
             Managers.Bankers.Initialize();
             Managers.Quests.ReloadContent();
             Managers.NpcFights.Forget();
+            Managers.FollowerLifetimes.Forget();
             Handlers.NpcBarterHandler.Forget();
             Managers.MapStagings.Forget();
             Managers.PlateGates.Forget();
@@ -48,7 +49,9 @@ namespace Jondo.Unity.Server.Managers
             Managers.IdolRules.Forget();
             Managers.IdolRules.Load();
             Managers.MonsterSummonCaps.Reload();
+            Managers.MonsterStandoffs.Reload();
             Managers.MonsterSpellGates.Reload();
+            Managers.MonsterLentSpells.Reload();
             Managers.MonsterPartyGrades.Reload();
             Managers.Readables.Forget();
             Managers.InteractiveMessages.Forget();

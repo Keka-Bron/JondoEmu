@@ -1,0 +1,14 @@
+{
+  "_comment": [
+    "How far from the nearest enemy a ranged monster ends its turn (Managers.MonsterStandoffs). Without a",
+    "row a ranged monster ends at the reach of its best blow, out of sight when it can.",
+    "",
+    "  monster   the monster template",
+    "  cells     the distance it keeps from the nearest enemy"
+  ],
+  "standoffs": [
+    { "monster": 6237, "cells": 2, "why": "Yokai ruidoso, the library fight of «En la encrucijada de los mundos» (2150). Its kit: Yokunai (16975, 3-10), Trokai (16976, 3-6), Telepyokai (16977, 4-8) and Yoku (16980), a push of four from exactly two cells. The fight is won by putting all five yokais to sleep with «Yokaido Do» (16932, range 1-2) in the same turn; each cast also takes one MP for the rest of the fight (alucare: «Le sort permet également d'enlever un PM, c'est cumulable et infini»). INFERRED: that they end their turn at Yoku's two cells. Kept at Yokunai's ten, out of sight, with ten MP, none could be reached in 40 rounds." },
+    { "monster": 6238, "cells": 2, "why": "Yokai tronchado, the same fight and kit as the Yokai ruidoso (6237): Yoku (16980) pushes from exactly two cells. INFERRED: that it ends its turn at two cells." },
+    { "monster": 6239, "cells": 2, "why": "Yokai escandaloso, the same fight and kit as the Yokai ruidoso (6237): Yoku (16980) pushes from exactly two cells. INFERRED: that it ends its turn at two cells." }
+  ]
+}

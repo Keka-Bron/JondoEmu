@@ -6243,7 +6243,7 @@
       "npc": 4053,
       "cell": 343,
       "orientation": 1,
-      "criterion": "(Qa=1905&Qo>13024)|(Qf=1905&Qf!1915&Qo<13185)",
+      "criterion": "(Qa=1905&Qo>13024)|(Qf=1905&Qf!1915&Qo<13185)|(Qa=1915&Qo>13185&Qo<13186)",
       "why": "Dardondakal (4053), the white dragon's soul in the Ivory Room: «cliquez sur la ronce qui tient le dofus Ivoire pour faire apparaitre Dardondakal» (Dofus pour les noobs, «Le dragon blanc»), so he shows from that click (13024) on, and stays for the quests he gives after -- until «Es hora de morir» (1915) sees «el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna» (reply 35357) with 13185, after which the incarnate dragon (4054) stands there instead. The cell is the derived one (343); its derived criterion showed him from the start of 1905."
     },
     {
@@ -6251,7 +6251,7 @@
       "npc": 4054,
       "cell": 356,
       "orientation": 1,
-      "criterion": "(Qa=1915&Qo>13185)|Qf=1915",
+      "criterion": "(Qa=1915&Qo>13186)|Qf=1915",
       "why": "Dardondakal incarnate (4054), the dragon 1915 sends you back to (13186) once his soul has taken flesh (13185, «Ver cómo el fantasma de Dardondakal desaparece mientras el alma del dragón se encarna», 35357). The derived row had no criterion, so he stood in the Ivory Room from the start of «El dragón blanco» (1905): a solid dragon before the bramble was clicked, on top of the ghost once it was, and the click meant for the ghost opened his line instead."
     },
     {
@@ -7193,6 +7193,7 @@
       "npc": 3238,
       "cell": 283,
       "orientation": 3,
+      "criterion": "PL>179&Qa!1731&Qf!1731",
       "why": "Poly Perkin (3238), quest launch position of 1731 (Sufokia [23,24], Dofus pour les noobs); no client placement, a free cell beside the arrival."
     },
     {
@@ -7506,14 +7507,7 @@
       "criterion": "Qa=1734&Qo>11027&Qo<11030",
       "why": "Topo hidden behind the big tank (1734, objectives 11028 to 11030, Dofus pour les noobs: Il faut retrouver ou a fui Topo); INFERRED cell."
     },
-    {
-      "map": 91752961,
-      "npc": 1591,
-      "cell": 327,
-      "orientation": 1,
-      "criterion": "Qa=1608",
-      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Alain Bombardas in the tavern. INFERRED cell."
-    },
+    
     {
       "map": 88083713,
       "npc": 2779,
@@ -7932,7 +7926,7 @@
     {
       "map": 170132480,
       "npc": 3266,
-      "cell": 373,
+      "cell": 374,
       "orientation": 3,
       "criterion": "Qa=1743&Qo>11099&Qo<11102",
       "why": "Prosper in the hidden room behind the big tank (1743, 11101: «pass the secret passage then show the key to Prosper»); INFERRED cell."
@@ -7951,14 +7945,6 @@
       "orientation": 1,
       "criterion": "Qa=589&Qo>3742",
       "why": "Dofus pour les noobs («Bricole Girl»): Valy (Kristina Pielhova) is back once the snowman has melted. INFERRED cell."
-    },
-    {
-      "map": 54791183,
-      "npc": 1254,
-      "cell": 300,
-      "orientation": 1,
-      "criterion": "Qa=589&Qo=3741",
-      "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]. INFERRED cell."
     },
     {
       "map": 170132480,
@@ -8021,7 +8007,7 @@
       "npc": 1591,
       "cell": 327,
       "orientation": 1,
-      "criterion": "Qa=1746",
+      "criterion": "Qa=1608|Qa=1746",
       "why": "Alain Bombardas in the Ripata tavern for 1746 (11126); INFERRED cell, the one he has for 1608."
     },
     {
@@ -8029,7 +8015,7 @@
       "npc": 3265,
       "cell": 259,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11128&Qo<11136",
+      "criterion": "(Qa=1746&Qo>11128&Qo<11136)|(Qa=1747&Qo>11209&Qo<11213)",
       "why": "Captain Skyluza at [11,25] (1746, 11129, 11131, 11134); INFERRED cell."
     },
     {
@@ -8037,7 +8023,7 @@
       "npc": 3265,
       "cell": 358,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11136",
+      "criterion": "(Qa=1746&Qo>11136)|(Qf=1746&Qa!1747&Qf!1747)",
       "why": "Captain Skyluza visiting the cell (1746, 11137; 1747's prison); INFERRED cell."
     },
     {
@@ -8053,7 +8039,7 @@
       "npc": 3309,
       "cell": 220,
       "orientation": 3,
-      "criterion": "Qa=1746&Qo>11135&Qo<11136",
+      "criterion": "(Qa=1746&Qo>11135&Qo<11136)|(Qf=1746&Qa!1747&Qf!1747)",
       "why": "The sergeant of Sufokia's guard who arrests the player at Llanes's (1746, 11136); INFERRED cell."
     },
     {
@@ -8080,22 +8066,8 @@
       "criterion": "Qa=2062&Qo>14841&Qo<14844",
       "why": "Entropix at Doctor Braun's side, stand-in for the follower the engine lacks. INFERRED cell."
     },
-    {
-      "map": 90703360,
-      "npc": 3309,
-      "cell": 220,
-      "orientation": 3,
-      "criterion": "Qf=1746&Qa!1747&Qf!1747",
-      "why": "The sergeant (3309) who takes the player to the cell after 1746 and before 1747; INFERRED cell."
-    },
-    {
-      "map": 170132490,
-      "npc": 3265,
-      "cell": 358,
-      "orientation": 3,
-      "criterion": "Qf=1746&Qa!1747&Qf!1747",
-      "why": "Captain Skyluza in the cell block after 1746 and before 1747 (11137, 1747's prison); INFERRED cell."
-    },
+    
+    
     {
       "map": 170132490,
       "npc": 3308,
@@ -8112,14 +8084,7 @@
       "criterion": "Qa=1747&Qo>11138&Qo<11209",
       "why": "The priest in yellow of the ritual room (1747, 11207); INFERRED room and cell."
     },
-    {
-      "map": 90702336,
-      "npc": 3265,
-      "cell": 259,
-      "orientation": 3,
-      "criterion": "Qa=1747&Qo>11209&Qo<11213",
-      "why": "Captain Skyluza at [11,25] (1747, 11210 and 11212); INFERRED cell."
-    },
+    
     {
       "map": 168559620,
       "npc": 3323,
@@ -8536,7 +8501,7 @@
       "npc": 4086,
       "cell": 386,
       "orientation": 1,
-      "criterion": "Qa=1909&Qo>13101&Qo<13102",
+      "criterion": "(Qa=1909&Qo>13101&Qo<13102)|(Qf=1909&Qa!1915&Qf!1915)|(Qa=1915&Qo<13174)",
       "why": "Spirit of Menalt at the Ilyzaelle viewpoint once Hyrkul is beaten (1909, 13102; Dofus pour les noobs «Nordalie»); cell INFERRED next to Hyrkul's."
     },
     {
@@ -8588,8 +8553,8 @@
       "npc": 3278,
       "cell": 313,
       "orientation": 1,
-      "criterion": "Qa=1736&Qo>11041&Qo<11042",
-      "why": "Meno's Snapper (Pichon kloune de Meno, 3278) at the ship's entrance [24,27] after the organ score (1736, DPLN «Son nom est Personne»: «Parlez au Pichon kloune de Meno pour retourner voir Meno»); cell 313 measured on that screenshot against the numbered drawing (the small orange Snapper in the middle of the square, left of the glass-windowed house); +-1 cell."
+      "criterion": "Qa=1736&Qo>11041&Qo<11042|Qa=1912&Qo>13129&Qo<13138",
+      "why": "Meno's Snapper (Pichon kloune de Meno, 3278) at the ship's entrance [24,27] after the organ score (1736, DPLN «Son nom est Personne»: «Parlez au Pichon kloune de Meno pour retourner voir Meno»); cell 313 measured on that screenshot against the numbered drawing (the small orange Snapper in the middle of the square, left of the glass-windowed house); +-1 cell. Also for «Une voix de crystal» (1912, DPLN «Une fois les sept partitions récupérées, retournez [...] et parlez au Pichon kloune de Meno pour retourner auprès de Meno sans avoir à refaire le donjon»), from the deal until the hand-over."
     },
     {
       "map": 168822786,
@@ -8738,6 +8703,13 @@
       "why": "Teo Dolito stands at the foot of the arched door on the left of the Aquadome entrance [22,30], right of its base (Dofus pour les noobs, «Relevez les niveaux», last two screenshots; cell read off tools/dibujar_mapa.py drawing of the map). INFERRED to one cell."
     },
     {
+      "map": 117706767,
+      "npc": 2196,
+      "cell": 356,
+      "remove": true,
+      "why": "The derived placement of Teo Dolito; he stands on 242, as the row above says, and was shown twice."
+    },
+    {
       "map": 135269891,
       "npc": 2541,
       "cell": 300,
@@ -8788,6 +8760,332 @@
 {"map": 88214297, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=17", "why": "The Asesino mediomuerto at the Huppermage temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
 {"map": 176555010, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=18", "why": "The Asesino mediomuerto at the Ouginak temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
 {"map": 88212755, "npc": 4202, "cell": 285, "orientation": 3, "criterion": "Qa=1936&Qo>13449&Qo<13451&PG=19", "why": "The Asesino mediomuerto at the Forgelance temple's surroundings (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): the position depends on the class, listed per class). INFERRED: the map (the coordinates' outdoor map) and the cell."},
-{"map": 177209344, "npc": 4200, "cell": 413, "orientation": 1, "criterion": "Qa=1936&Qo>13449&Qo<13450", "why": "The guardian molocan (4200) Chalcas lends once the character has taught him the lullaby (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): Chalcas hands over a molosk after smelling the magypus). INFERRED cell: beside Chalcas."}
+{"map": 177209344, "npc": 4200, "cell": 413, "orientation": 1, "criterion": "Qa=1936&Qo>13449&Qo<13450", "why": "The guardian molocan (4200) Chalcas lends once the character has taught him the lullaby (Dofus pour les noobs (\u00abLe jour des assassins\u00bb): Chalcas hands over a molosk after smelling the magypus). INFERRED cell: beside Chalcas."},
+  {"map": 176555008, "npc": 3502, "cell": 324, "orientation": 1, "criterion": "(Qa=1937&Qo<13454)|(Qa=1937&Qo>13456&Qo<13457)", "why": "Incognita outside the Ouginak temple [8,-67] (1937, 13453 and 13457; Chalcas: «Incógnita está aquí»). INFERRED cell."},
+  {"map": 177212416, "npc": 3919, "cell": 298, "orientation": 1, "criterion": "Qa=1937&Qo>13453&Qo<13454", "why": "Imaguni in the temple's prison (1937, 13454; Dofus pour les noobs: «la salle sur la gauche»). INFERRED cell."},
+  {"map": 99095049, "npc": 3173, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13453&Qo<13456", "why": "Ush Galesh on the Amakna tavern's upper floor [2,-1] (1937, 13456). INFERRED cell."},
+  {"map": 63964424, "npc": 4203, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Fécorce [-54,12] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 63965449, "npc": 4204, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Floribonde [-52,11] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 63964427, "npc": 4205, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13458&Qo<13459", "why": "The toxic Chiendent [-54,9] (1937, 13459; the guide gives no cell). INFERRED cell."},
+  {"map": 171707400, "npc": 4191, "cell": 342, "orientation": 1, "criterion": "Qa=1937&Qo>13463&Qo<13465", "why": "Toxina steps out at the fire of Azrim's cave (1937, 13464). INFERRED cell."},
+  {"map": 171707400, "npc": 2803, "cell": 356, "orientation": 1, "criterion": "Qa=1937&Qo>13465&Qo<13466", "why": "Echo, with the Brotherhood, in Azrim's cave after the fight (1937, 13466). INFERRED cell."},
+  {"map": 171707400, "npc": 2447, "cell": 296, "orientation": 1, "criterion": "Qa=1937&Qo>13467&Qo<13469", "why": "The Queen of Thieves in Azrim's cave (1937, 13468). INFERRED cell."},
+  {"map": 182978060, "npc": 4252, "cell": 300, "orientation": 1, "criterion": "Qa=1948&Qo>13595&Qo<13596", "why": "The corpse looter on the magmatic steps [-28,26] (1948, 13596). INFERRED cell."},
+  {"map": 182977548, "npc": 4253, "cell": 304, "orientation": 1, "criterion": "Qa=1948&Qo>13596&Qo<13597", "why": "The corpse looter [-29,26] (1948, 13597). INFERRED cell."},
+  {"map": 180619268, "npc": 4252, "cell": 298, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "The male looter in the Brakdad Cafe [-25,26] (1948, 13605). INFERRED cell."},
+  {"map": 180619268, "npc": 4253, "cell": 305, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "The female looter in the Brakdad Cafe (1948, 13605). INFERRED cell."},
+  {"map": 180619268, "npc": 4254, "cell": 312, "orientation": 1, "criterion": "Qa=1948&Qo>13603&Qo<13606", "why": "Brak Pitt in the Brakdad Cafe (1948, 13605). INFERRED cell."},
+  {"map": 173019659, "npc": 4256, "cell": 300, "orientation": 1, "criterion": "Qa=1948&Qo>13606&Qo<13609", "why": "The discreet individual at the delivery place [-21,27] (1948, 13608). INFERRED cell."},
+  {"map": 183108105, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "(Qf=1939&PL>179&Qa!1949&Qf!1949)|(Qa=1949&Qo<13614)", "why": "Triki Guest offers the fire-stones plan at [-31,23] (1949). INFERRED cell."},
+  {"map": 184288260, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13617&Qo<13620", "why": "Triki Guest waits at [-30,24] (1949, 13619). INFERRED cell."},
+  {"map": 184289284, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13619&Qo<13624", "why": "Triki Guest at [-29,24] (1949, 13621 and 13623). INFERRED cell."},
+  {"map": 182978058, "npc": 4258, "cell": 300, "orientation": 1, "criterion": "Qa=1949&Qo>13623&Qo<13628", "why": "Triki Guest faces the bandits at [-28,24] (1949, 13625 and 13627). INFERRED cell."},
+  {"map": 182978568, "npc": 4258, "cell": 296, "orientation": 1, "criterion": "Qa=1949&Qo>13627&Qo<13630", "why": "Triki Guest beside the lava tongue at [-27,22] (1949, 13629). INFERRED cell."},
+    {
+      "map": 179308545,
+      "npc": 3733,
+      "cell": 246,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): Kaskarina (Coqueline), met at [-63,29] (13105) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 179306499,
+      "npc": 4091,
+      "cell": 232,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): the chatty hunter (Chasseur bavard), met at [-67,31] (13106, 13107) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 179306499,
+      "npc": 4090,
+      "cell": 245,
+      "orientation": 1,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): the stupid hunter (Chasseur stupide), met at [-67,31] (13106, 13107) stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+    {
+      "map": 180356609,
+      "npc": 4093,
+      "cell": 246,
+      "orientation": 3,
+      "why": "«Le bonheur est dans le spray» (1911) (Dofus pour les noobs, «Le bonheur est dans le spray»): Michazrael (Chazrael), met at [-10,30] to drop the cat's moustache stands here as in the game; the cell is INFERRED (walkable, in view)."
+    },
+  {"map": 186515968, "npc": 4220, "cell": 344, "orientation": 1, "criterion": "Qa=1943&Qo>13509&Qo<13510", "why": "Mortisparo aullador who rallies the sumergidos at [-49,-82] (1943, 13510). INFERRED cell."},
+  {"map": 186515968, "npc": 4212, "cell": 315, "orientation": 1, "criterion": "Qa=1943&Qo>13510&Qo<13512", "why": "Bibak after the capture fight (1943, 13511); the base spawn carries no criterion. INFERRED cell."},
+  {"map": 186515970, "npc": 4222, "cell": 241, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Maremorto reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4224, "cell": 243, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Funespada reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4225, "cell": 255, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Mortisparo reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4226, "cell": 257, "orientation": 1, "criterion": "Qa=1943&Qo>13511&Qo<13512", "why": "Cangreno reinforcement at [-49,-81] (1943, 13512). INFERRED cell."},
+  {"map": 186515970, "npc": 4228, "cell": 298, "orientation": 1, "criterion": "Qa=1943&Qo>13512&Qo<13514", "why": "Simon Kara after the waves (1943, 13513). INFERRED cell."},
+  {"map": 186515970, "npc": 4229, "cell": 300, "orientation": 1, "criterion": "Qa=1943&Qo>13512&Qo<13514", "why": "Serge Mazov after the waves (1943, 13513). INFERRED cell."},
+  {"map": 186648582, "npc": 4241, "cell": 399, "orientation": 1, "criterion": "Qa=1944&Qo>13520&Qo<13522", "why": "Pepe Dea at [-48,-84] (1944, 13521). INFERRED cell."},
+  {"map": 186646532, "npc": 4242, "cell": 383, "orientation": 1, "criterion": "Qa=1944&Qo>13522&Qo<13524", "why": "Hermana Sonrisa at [-45,-82] (1944, 13523). INFERRED cell."},
+  {"map": 186646532, "npc": 4245, "cell": 384, "orientation": 1, "criterion": "Qa=1944&Qo>13523&Qo<13526", "why": "Caterina at [-45,-82] after the fight (1944, 13525). INFERRED cell."},
+  {"map": 186647556, "npc": 4243, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13526&Qo<13528", "why": "Pau Breton at [-46,-81] (1944, 13527). INFERRED cell."},
+  {"map": 186649604, "npc": 4244, "cell": 357, "orientation": 1, "criterion": "Qa=1944&Qo>13528&Qo<13530", "why": "Arty Rovals at [-47,-83] (1944, 13529). INFERRED cell."},
+  {"map": 54789135, "npc": 3292, "cell": 297, "remove": true, "why": "Naroto stood twice in the Frigost tavern; the inferred placement goes and the other one stays."},
+  {"map": 183502850, "npc": 4094, "cell": 410, "orientation": 1, "criterion": "Qa=1912&Qo>13125", "why": "The melomaniac ghost of the barracks [-75,-80] (1912, 13126), who appears after the piano is played (13125) (Dofus pour les noobs, «Une voix de crystal»). Cell 410 is the derived placement of the quest data («wanted by quest 1912»)."},
+  {"map": 179830784, "npc": 4095, "cell": 369, "orientation": 1, "criterion": "Qa=1913", "why": "Kontratak at [-16,25] near the Brakmar zaap (1913, 13139). INFERRED cell."},
+  {"map": 173018630, "npc": 4098, "cell": 59, "orientation": 1, "criterion": "Qa=1913&Qo>13143&Qo<13144", "why": "Funestaro at the lava of [-23,22] (1913, 13144). INFERRED cell."},
+  {"map": 178520068, "npc": 4098, "cell": 273, "orientation": 1, "criterion": "Qa=1913&Qo>13144&Qo<13154&PO!19222", "why": "Funestaro in his crypt of [-11,37] (1913), until he follows the player. INFERRED cell."},
+  {"map": 182719488, "npc": 4098, "cell": 345, "orientation": 1, "criterion": "Qa=1913&Qo>13155&Qo<13158", "why": "Funestaro in the Mansion's exit room (1913, 13157). INFERRED cell."},
+    {
+      "map": 186647556,
+      "npc": 4303,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1945&Qo>13745&Qo<13747",
+      "why": "The tortured spirit that appears in the wreck [-46,-81] when the broken crate is clicked (1945, 13745-13746) (Dofus pour les noobs, «Toucher le fond»). Cell 371 is the derived placement of the quest data (a gated row has to use the same cell to override it)."
+    },
+    {
+      "map": 186646534,
+      "npc": 4308,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=1945&Qo>13760&Qo<13762",
+      "why": "Monolito in the grotto [-45,-80] once the grotto is searched (1945, 13760-13761) (Dofus pour les noobs, «Toucher le fond»). INFERRED: cell 285 (the quest-only element 512000's)."
+    },
+  {"map": 190842882, "npc": 4086, "cell": 304, "orientation": 1, "criterion": "Qa=1914&Qo>13172&Qo<13173", "why": "Spirit of Menalt at his grave of the Field of Rest [1,-12] after the second meditation (1914, 13173); cell next to the grave, INFERRED. INFERRED cell."},
+  {"map": 185074176, "npc": 4076, "cell": 329, "orientation": 1, "criterion": "Qa=1915&Qo>13184&Qo<13185", "why": "Queen Thanatena at the Gates of Onekros once Hyrkul is beaten (1915, 13185). INFERRED cell."},
+  {"map": 185075200, "npc": 4100, "cell": 300, "orientation": 1, "criterion": "Qa=1915&Qo<13176", "why": "The gloomy mane (Agonía) on Externam's second map (1915, 13174). INFERRED cell."},
+  {"map": 63308288, "npc": 4125, "cell": 326, "orientation": 1, "criterion": "Qa=1915&Qo>13178&Qo<13181", "why": "The macabre rider of the Morh'Kitu valley (1915, 13181). INFERRED cell."},
+  {"map": 183241229, "npc": 4085, "cell": 340, "orientation": 1, "criterion": "Qa=1915&Qo>13182&Qo<13184", "why": "Hyrkul in his cave (1915, 13184). INFERRED cell."},
+  {"map": 110102530, "npc": 4116, "cell": 345, "orientation": 1, "criterion": "Qa=1915&Qo>13177&Qo<13178", "why": "The unstable nekrolérico in Sylargh's exit room (1915, 13178). INFERRED cell."},
+    {
+      "map": 168820748,
+      "npc": 3291,
+      "cell": 314,
+      "orientation": 3,
+      "criterion": "PL>179&Qf=1748&Qf=1749&PO>17965,0&Qa!1757&Qf!1757|Qa=1757&Qo<11217",
+      "why": "Markaris at the Trithon depths [19,32] (1757, start and 11215/11216); INFERRED cell."
+    },
+    {
+      "map": 88083976,
+      "npc": 3345,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11220&Qo<11223",
+      "why": "Victor Schubert on the frozen peninsula (1757, 11222); INFERRED cell."
+    },
+    {
+      "map": 88084485,
+      "npc": 3345,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11222&Qo<11225",
+      "why": "Victor Schubert at [9,28], the bay of Sufokia (1757, 11224); INFERRED cell."
+    },
+    {
+      "map": 168820752,
+      "npc": 3347,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=1757&Qo>11225&Qo<11228",
+      "why": "Rilur Intrigant in Neptoon's cave (1757, 11227); INFERRED cell."
+    },
+    {
+      "map": 168560650,
+      "npc": 3351,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11283&Qo<11285",
+      "why": "Diver of the Black Star at [27,31] (1766); INFERRED cell."
+    },
+    {
+      "map": 168560640,
+      "npc": 3351,
+      "cell": 283,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11285&Qo<11288",
+      "why": "Diver at the temple entrance [27,26] (1766); INFERRED cell."
+    },
+    {
+      "map": 88088322,
+      "npc": 3345,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11287&Qo<11289",
+      "why": "Victor Schubert at [16,21] (1766); INFERRED cell."
+    },
+    {
+      "map": 156894216,
+      "npc": 3352,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11288&Qo<11291",
+      "why": "Black Star minion on the Turtle beach [33,12] (1766); INFERRED cell."
+    },
+    {
+      "map": 168558598,
+      "npc": 3305,
+      "cell": 289,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11291",
+      "why": "Mi-To at [25,29] (1766); INFERRED cell."
+    },
+    {
+      "map": 117964800,
+      "npc": 3353,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11296&Qo<11302",
+      "why": "Paula Rice on Kartonpath [21,8] (1766); INFERRED cell."
+    },
+    {
+      "map": 117964800,
+      "npc": 3354,
+      "cell": 287,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11299&Qo<11301",
+      "why": "The hurt Gobvio on Kartonpath (1766); INFERRED cell."
+    },
+    {
+      "map": 117965570,
+      "npc": 3291,
+      "cell": 285,
+      "orientation": 3,
+      "criterion": "Qa=1766&Qo>11300&Qo<11303",
+      "why": "Markaris at [22,6] (1766); INFERRED cell."
+    },
+    {
+      "map": 54791183,
+      "npc": 1254,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "(Qa=589&Qo=3741)|(Qa=614&Qo=3686)",
+      "why": "Dofus pour les noobs («Bricole Girl»): Jean-Pierre Kofkof (Txumari Alfuego) in the tavern [-77,-38]; also «Full contact» (614, «Jean-Pierre Kofkof à la taverne en [-77,-38]»), objective 3686. INFERRED cell."
+    },
+    {
+      "map": 54531097,
+      "npc": 1290,
+      "cell": 358,
+      "orientation": 1,
+      "criterion": "Qa=577",
+      "why": "Dofus pour les noobs («Pêche en eaux gelées»): Valy Domidat (Kristina Pielhova) in the Frigost workshop [-75,-38], beside Francky. INFERRED cell."
+    },
+    {
+      "map": 184287494,
+      "npc": 4238,
+      "cell": 356,
+      "orientation": 1,
+      "remove": true,
+      "why": "1940: the Death Slayer only stands in the tomb room once the tomb was prayed at; the derived placement stood always."
+    },
+    {
+      "map": 184287494,
+      "npc": 4238,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=1940&Qo>13585&Qo<13588",
+      "why": "«Reza ante la tumba del Asesino de Muerte» (13585): after praying at the tomb the Death Slayer appears; he leaves after his last words (13588) (Dofus pour les noobs («La guerre des Marches»)). Cell beside the tomb, INFERRED."
+    },
+    {
+      "map": 184290562,
+      "npc": 4239,
+      "cell": 371,
+      "orientation": 1,
+      "criterion": "Qa=1940&Qo>13585&Qo<13587",
+      "why": "Arak'Imperitax (NPC 4239) in the annex room of the Infernal Well, until beaten (13587) (Dofus pour les noobs («La guerre des Marches»): «parler à l'Arak'Imperitax: Affronter l'arakne démoniaque»). Cell INFERRED."
+    },
+    {
+      "map": 163054594,
+      "npc": 3428,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Rimanda, dean of the hypermages, in the Temple of the Hypermages [38,-21] (map 163054594), where every later step of hers is catalogued (2421, 2473, 2701, 3078). 1955's step 13741 lists a map id (30334) that does not exist in the client, so this placement is INFERRED from those steps; no capture places her. Cell 300 INFERRED."
+    },
+    {
+      "map": 165154311,
+      "npc": 4287,
+      "cell": 329,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: the shaman only waits here until he agrees to follow."
+    },
+    {
+      "map": 165154311,
+      "npc": 4287,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa!1956|Qo<13713",
+      "why": "The crujidor shaman waits at [-9,-28] until the character agrees to guide him (13713) (Dofus pour les noobs («Craquements de cœur»)); the derived placement."
+    },
+    {
+      "map": 186908930,
+      "npc": 4287,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13713&Qo<13717",
+      "why": "The shaman at the tower's foot [-10,-30] from when he is guided there until he is taken into the cave (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695104,
+      "npc": 4287,
+      "cell": 282,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13717&Qo<13719",
+      "why": "The shaman on the cave's top floor for the second ritual (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695108,
+      "npc": 4287,
+      "cell": 283,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13719&Qo<13722",
+      "why": "The shaman in the depths for the third ritual and the last stone (Dofus pour les noobs («Craquements de cœur»)). Cell INFERRED."
+    },
+    {
+      "map": 187695108,
+      "npc": 4291,
+      "cell": 328,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: the ancestral crujidor only appears after the last ritual."
+    },
+    {
+      "map": 187695108,
+      "npc": 4291,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13721&Qo<13723",
+      "why": "The ancestral crujidor appears when the ritual ends (13721) until it is beaten (13723) (Dofus pour les noobs («Craquements de cœur»): «Un Craqueleur ancestral fait alors son apparition»)."
+    },
+    {
+      "map": 188219392,
+      "npc": 4295,
+      "cell": 315,
+      "orientation": 1,
+      "remove": true,
+      "why": "1956: Yopuka only appears when the priest has seen the heart."
+    },
+    {
+      "map": 188219392,
+      "npc": 4295,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1956&Qo>13724&Qo<13725",
+      "why": "The god Yopuka appears once the priest has seen the ancestral heart (13724) until the character has talked to him (Dofus pour les noobs («Craquements de cœur»): «Le Dieu Iop fait alors son apparition»). The derived cell."
+    },
+    {
+      "map": 234752517,
+      "npc": 7659,
+      "cell": 267,
+      "orientation": 3,
+      "why": "Cabo Goblasto (7659) at the Osavane outpost [0,18], in front of the speaker box (element 539050, cell 295) he listens to (57975 «se concentra en el krosmoglob»). The derived cell (328) is the anvil platform; INFERRED beside the bench."
+    },
+    {
+      "map": 234752517,
+      "npc": 2532,
+      "cell": 295,
+      "orientation": 3,
+      "criterion": "Qa=2520&Qo>19294&Qo<19295",
+      "why": "The commander's Krosmoglob (2532) on the speaker box (element 539050, cell 295) of the outpost: «Hablar con el krosmoglob» once Goblasto's machine has failed (58010 «crepita»); there until the compiler is repaired (19295)."
+    },
+    {
+      "map": 234752517,
+      "npc": 7659,
+      "cell": 328,
+      "remove": true,
+      "why": "Goblasto's derived cell (328) is the outpost's anvil platform, where the player works; his authored place is beside the bench in front of the Krosmoglob speaker (267)."
+    }
   ]
 }

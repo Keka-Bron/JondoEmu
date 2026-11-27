@@ -1327,6 +1327,23 @@ namespace Jondo.Unity.Server.Managers
                     goOffs.Remove(key);
         }
 
+        /// <summary>
+        /// Gives a spell of the behaviour's chain its go-offs back when the monster's own hooks cast
+        /// it again: Solar's Nadir (9439) casts Aurora (9436) once more, and Aurora's single
+        /// "792 9437 under TB" must go off again three turns later. Still counted from the fight's
+        /// start, the second Aurora never ended and the cycle stopped there.
+        /// </summary>
+        public static void GiveTheChainItsGoOffsBack(Fighter monster, int spell, int grade)
+        {
+            if (monster == null || monster.Conducta == (spell, grade)) return;
+            if (!BehaviourChain.TryGetValue(monster, out var chain)) return;
+            lock (chain) if (!chain.Contains((spell, grade))) return;
+            var goOffs = BehaviourGoOffs.GetOrCreateValue(monster);
+            lock (goOffs)
+                foreach (var key in goOffs.Keys.Where(k => k.Spell == spell && k.Grade == grade).ToList())
+                    goOffs.Remove(key);
+        }
+
         /// <summary>Whether a spell is the monster's behaviour or one that behaviour chains and hooks on it.</summary>
         private static bool IsTheBehaviourOrItsChain(Fighter monster, int spell, int grade)
         {
@@ -1649,6 +1666,9 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>«Disipa los glifos»: the target's glyphs go, the ones of the spell in the die when it names one.</summary>
         private const int DisipaLosGlifos = 2018;
 
+        /// <summary>«Dissipe les pièges» and «Dissipe les runes»: the same, for the target's traps and runes.</summary>
+        private const int DisipaLasTrampas = 2019, DisipaLasRunas = 2024;
+
         /// <summary>«Retira los embrujos»: every row that can be dispelled comes off the target.</summary>
         private const int Desembrujar = 132;
 
@@ -1672,7 +1692,10 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Whether a spell that lays runes also sets them off in one of its grades: Capitan Meno's
         /// 6804 lays them in grades 1-5 and its "792 grade 6" sets them all off (2023) at once.
-        /// Such runes are there to be set off, not stepped on.
+        /// Such runes are there to be set off, not stepped on. So are the ones whose OWN spell sets
+        /// runes off: Rainikron's behaviour (8917) and its 8915 lay the runes of 8916, whose red
+        /// grade activates the four round it, and the Minikron's step (8922) makes her activate the
+        /// one he lands on -- fired on the step too, each pink took two of her four life points.
         /// </summary>
         private static bool SetsOffItsOwnRunes(int hechizo)
         {
@@ -1722,7 +1745,7 @@ namespace Jondo.Unity.Server.Managers
         /// the blow. The Uginak's class sheet: "cuando el uginak y sus aliados infligen daños a
         /// una presa, se curan una parte de los daños que han ocasionado".
         /// </summary>
-        private const int CuraAlAtacante = 786;
+        private const int CuraAlAtacante = Jondo.Unity.World.Combat.EffectSupport.HealsTheAttacker;
 
         /// <summary>
         /// 788, «Castigo de #2 #1 durante #3 turnos»: a row under "D" on the bearer (the Mane
@@ -2881,6 +2904,8 @@ namespace Jondo.Unity.Server.Managers
         {
             if (hondo > HondoMaximo) return new List<Outcome>();
             if (!armar) combate.SinArmar++;
+            int spellOutside = _spellOfTheRows;
+            _spellOfTheRows = hechizo;
             var raizDeFuera = combate.RootCaster;
             int hechizoRaizDeFuera = combate.CastRootSpell, filasDeFuera = combate.CastRowsAfter;
             var struckDownOutside = combate.StruckDownThisCast;
@@ -2919,6 +2944,7 @@ namespace Jondo.Unity.Server.Managers
             }
             finally
             {
+                _spellOfTheRows = spellOutside;
                 if (!armar) combate.SinArmar--;
                 // Cast: from now on its triggered rows can answer for an attitude (see
                 // Buffs.GradosLanzados). After its rows, so a 406 of its own clears the older
@@ -3540,7 +3566,12 @@ namespace Jondo.Unity.Server.Managers
                     // owner on 259; then 273 -> 244, owner on 230). Only when the aimed cell is
                     // taken: Superposicionamiento's 30196 is a 63 too, aimed at a free cell, and
                     // landed one cell short of it -- or not at all when it was next door.
-                    if (efecto.DiceNum == 63 && !LibreYPisable(combat, aDonde))
+                    // A line from the caster that stops short of the aimed cell is read as a line:
+                    // the yellow rune's step on (9091 grade 2, "4 63" on l1/0) is aimed at
+                    // Rainikron's corner and takes the Minikron one cell towards it, not to her.
+                    bool lineaCorta = efecto.Forma == Jondo.Unity.World.Maps.Zone.Segmento
+                                      && !CasillasDelEfecto(efecto, caster.CellId, aDonde).Contains(aDonde);
+                    if (efecto.DiceNum == 63 && !lineaCorta && !LibreYPisable(combat, aDonde))
                     {
                         var walkable = MapManager.GetFightWalkable(combat.ArenaMapId);
                         int ownerCell = aDonde;
@@ -4170,6 +4201,14 @@ namespace Jondo.Unity.Server.Managers
                                       int desde = -1)
             => AQuien(combate, quienLanza, quien, efecto, desde >= 0 ? desde : quien.CellId).Contains(quien);
 
+        /// <summary>
+        /// The spell whose rows are being resolved (Resolver), so that a fighter immune to it is
+        /// nobody its rows can name: Otomai's toxin immunity potion (19507) leaves Toxina's
+        /// Toxinistrose no hold on its holder, neither a hit nor a poison set to tick
+        /// (Fighter.SpellImmunities). Resolver is synchronous, so the thread carries it.
+        /// </summary>
+        [ThreadStatic] private static int _spellOfTheRows;
+
         private static IEnumerable<Fighter> AQuien(FightInstance combate, Fighter quienLanza,
                                                    Fighter objetivo, SpellEffect efecto,
                                                    int celdaApuntada = -1,
@@ -4177,6 +4216,20 @@ namespace Jondo.Unity.Server.Managers
                                                    IReadOnlyDictionary<Fighter, int> celdas = null,
                                                    bool soloAlObjetivo = false,
                                                    bool includeDeadTarget = false)
+        {
+            var named = NamedByTheMask(combate, quienLanza, objetivo, efecto, celdaApuntada, estados, celdas,
+                                       soloAlObjetivo, includeDeadTarget);
+            int spell = _spellOfTheRows;
+            return spell == 0 ? named : named.Where(f => f == null || !f.SpellImmunities.Contains(spell));
+        }
+
+        private static IEnumerable<Fighter> NamedByTheMask(FightInstance combate, Fighter quienLanza,
+                                                   Fighter objetivo, SpellEffect efecto,
+                                                   int celdaApuntada,
+                                                   IReadOnlyDictionary<Fighter, HashSet<int>> estados,
+                                                   IReadOnlyDictionary<Fighter, int> celdas,
+                                                   bool soloAlObjetivo,
+                                                   bool includeDeadTarget)
         {
             var mascara = efecto.TargetMask ?? "";
 
@@ -5228,10 +5281,17 @@ namespace Jondo.Unity.Server.Managers
             // "Disipa los glifos": the glyphs of whoever the mask names -- the caster, with a
             // "C", in 72 of the 98 rows -- and only the ones his spell in the die laid, when the
             // die names one: Anutrof's 29575, 6537, 8139...
-            if (efecto.EffectId == DisipaLosGlifos)
+            // Its two siblings take the other marks: 2019 «Dissipe les pièges» the traps and 2024
+            // «Dissipe les runes» the runes. A 2018 leaves both: Rainikron's yellow rune (8916
+            // grade 1) has her cast grade 6 -- "2018 C" -- at the Minikron, and when it took her
+            // runes too, the whole board went blank at the first yellow step.
+            if (efecto.EffectId == DisipaLosGlifos || efecto.EffectId == DisipaLasTrampas || efecto.EffectId == DisipaLasRunas)
             {
                 if (sobre == null) return null;
                 var suyos = combate.Glifos.Where(g => g.Dueno == sobre.Id
+                                                   && (efecto.EffectId == DisipaLasTrampas ? g.Tipo == Trampa
+                                                       : efecto.EffectId == DisipaLasRunas ? g.Tipo == Runa
+                                                       : g.Tipo != Trampa && g.Tipo != Runa)
                                                    && (efecto.DiceNum <= 0 || g.HechizoQueLoPuso == efecto.DiceNum))
                                           .ToList();
                 if (suyos.Count == 0) return null;
@@ -5339,7 +5399,8 @@ namespace Jondo.Unity.Server.Managers
                     Trampa => Jondo.Unity.World.Fights.Disparo.AlPisar,
                     GlifoDeInicioDeTurno => Jondo.Unity.World.Fights.Disparo.AlEmpezarElTurno,
                     GlifoDeFinDeTurno => Jondo.Unity.World.Fights.Disparo.AlAcabarElTurno,
-                    Runa when !PlayerSpells.Contains(hechizo) && SetsOffItsOwnRunes(hechizo)
+                    Runa when !PlayerSpells.Contains(hechizo)
+                              && (SetsOffItsOwnRunes(hechizo) || SetsOffItsOwnRunes(efecto.DiceNum))
                         => Jondo.Unity.World.Fights.Disparo.AlActivarse,
                     _ => Jondo.Unity.World.Fights.Disparo.AlPisarYAlEmpezar,
                 };

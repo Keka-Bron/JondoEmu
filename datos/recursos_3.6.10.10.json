@@ -3,7 +3,10 @@
   "Grafico -> recurso recolectable, cruzando las capturas con el catalogo del cliente.",
   "tipo y habilidad los manda el servidor en el jss; oficio, objeto y nivel salen de",
   "skills.json (gatheredRessourceItem). Ver tools/recursos_recoleccion.py.",
-  "porElemento: mapa -> elemento -> recurso, lo que el servidor oficial declara para cada elemento en los mapas que entraron las capturas de paquetes (2026-11), donde el grafico no basta: cada punto de pesca de agua dulce es el grafico 1018 y cada uno tiene su pez. Gana sobre el grafico."
+  "porElemento: mapa -> elemento -> recurso, lo que el servidor oficial declara para cada elemento en los mapas que entraron las capturas de paquetes (2026-11), donde el grafico no basta: cada punto de pesca de agua dulce es el grafico 1018 y cada uno tiene su pez. Gana sobre el grafico.",
+  "Sea bass (1779) shares sea fishing drawing 1839 with other fish, so it is placed per element: only on maps where DofusDB /recoltable counts as many sea bass as the map has 1839 spots and lists no other fish of that drawing (interactive 271, skill 325).",
+  "Shells of quest 1758 (objective 11248): drawing 36326 carries no skill in any capture, so the five shells are placed per element as Shell (interactive 136, DofusDB) with skill 345 'Pick Up a Shell' (base job 1, item 18087).",
+  "Icefish (11106, quest 1443's key) on the sea-fishing drawing 1839, declared per element like Lard Bass: only on the Frigost maps where DofusDB /recoltable counts as many Icefish as the map has 1839 spots and lists no other fish of that drawing (54164797, 54167895, 54173479, 54176040, 54172965, 54171937, 54175015). Interactive 132 'Icefish' (DofusDB), skill 189 from the client catalogue (job 36, level 200)."
  ],
  "recursos": {
   "2204": {
@@ -634,6 +637,46 @@
    "visto": 0,
    "discrepa": false,
    "fuente": "DofusDB /recoltable harvest maps of Quisnoa (17993) match the client maps carrying this drawing one for one; type, skill, job and level from the client catalogue (skills.json gatheredRessourceItem, interactives). Not seen in a capture."
+  },
+  "667": {
+   "tipo": 47,
+   "habilidad": 58,
+   "oficio": 28,
+   "objeto": 405,
+   "nivel": 120,
+   "visto": 0,
+   "discrepa": false,
+   "fuente": "DofusDB /recoltable harvest maps of Malt (405): all 19 of its maps in the client dump carry this drawing, as many or more than DofusDB counts (13 one for one); interactive 47 Malt. Skill, job and level from the client catalogue (skills.json gatheredRessourceItem). Not seen in a capture."
+  },
+  "3227": {
+   "tipo": 260,
+   "habilidad": 307,
+   "oficio": 28,
+   "objeto": 16454,
+   "nivel": 160,
+   "visto": 0,
+   "discrepa": false,
+   "fuente": "DofusDB /recoltable harvest maps of Maize (16454): on all 8 of its maps drawings 3227+3228+3229 add up to the DofusDB count one for one (three growth variants, like rice 5864-5866); interactive 260 Corn. Skill, job and level from the client catalogue (skills.json gatheredRessourceItem). Not seen in a capture."
+  },
+  "3228": {
+   "tipo": 260,
+   "habilidad": 307,
+   "oficio": 28,
+   "objeto": 16454,
+   "nivel": 160,
+   "visto": 0,
+   "discrepa": false,
+   "fuente": "DofusDB /recoltable harvest maps of Maize (16454): on all 8 of its maps drawings 3227+3228+3229 add up to the DofusDB count one for one (three growth variants, like rice 5864-5866); interactive 260 Corn. Skill, job and level from the client catalogue (skills.json gatheredRessourceItem). Not seen in a capture."
+  },
+  "3229": {
+   "tipo": 260,
+   "habilidad": 307,
+   "oficio": 28,
+   "objeto": 16454,
+   "nivel": 160,
+   "visto": 0,
+   "discrepa": false,
+   "fuente": "DofusDB /recoltable harvest maps of Maize (16454): on all 8 of its maps drawings 3227+3228+3229 add up to the DofusDB count one for one (three growth variants, like rice 5864-5866); interactive 260 Corn. Skill, job and level from the client catalogue (skills.json gatheredRessourceItem). Not seen in a capture."
   }
  },
  "porElemento": {
@@ -13980,6 +14023,354 @@
     "oficio": 36,
     "objeto": 1750,
     "nivel": 50
+   }
+  },
+  "181144584": {
+   "510358": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "510359": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "181144586": {
+   "510360": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "510361": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "181145610": {
+   "510362": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "181146632": {
+   "510363": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "199756800": {
+   "517345": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "54168882": {
+   "501419": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "54169395": {
+   "501421": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "54169908": {
+   "501420": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "72617986": {
+   "528630": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "72618497": {
+   "501428": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501429": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501430": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501431": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "84410370": {
+   "501448": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "84410375": {
+   "501449": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "84410884": {
+   "501433": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "84411398": {
+   "501445": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501446": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501447": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "84412931": {
+   "501437": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   },
+   "501438": {
+    "tipo": 271,
+    "habilidad": 325,
+    "oficio": 36,
+    "objeto": 1779,
+    "nivel": 160
+   }
+  },
+  "168560650": {
+   "508382": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168560646": {
+   "508350": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168558598": {
+   "508379": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168558600": {
+   "508357": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "168559624": {
+   "508375": {
+    "tipo": 136,
+    "habilidad": 345,
+    "oficio": 1,
+    "objeto": 18087,
+    "nivel": 1
+   }
+  },
+  "54164797": {
+   "491350": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54167895": {
+   "458488": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470108": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470109": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54173479": {
+   "470116": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470117": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54176040": {
+   "457902": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "457904": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470179": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470180": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54172965": {
+   "470118": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54171937": {
+   "470137": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   }
+  },
+  "54175015": {
+   "470111": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
+   },
+   "470113": {
+    "tipo": 132,
+    "habilidad": 189,
+    "oficio": 36,
+    "objeto": 11106,
+    "nivel": 200
    }
   }
  }

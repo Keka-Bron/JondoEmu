@@ -537,10 +537,17 @@ namespace Jondo.Unity.World.Maps
                     // than the aimed cell when the zone stops at the target. "l1/63", the zone of
                     // what Empujoncito and Aspirador do to the bombs on the way, is the line from
                     // the cell after the Tymobot's to where it aims.
-                    var d = DireccionEntre(desde, centro);
+                    // Aimed off every line, it runs along the nearest of the four walked
+                    // directions, not a diagonal: Rainikron's corners 141, 152, 449 and 460 lie
+                    // one each way from the board's centre, and from most of the board two of them
+                    // were nearest the same diagonal, both glyphs landing on one cell.
+                    var d = EnLinea(desde, centro) ? DireccionEntre(desde, centro) : DireccionAndando(desde, centro);
                     if (d == null) { fuera.Add(centro); return fuera; }
                     var (x, y) = MapGeometry.CellToPoint(desde);
-                    int ultimo = Math.Max(0, tamano) + minimo - 1;
+                    // A length of 0 is the one cell param1 off the caster: Rainikron's "l1/0"
+                    // direction glyphs (8918-8921) and the yellow rune's step on (9091 grade 2)
+                    // each take the cell next to the Minikron, towards the corner they aim at.
+                    int ultimo = Math.Max(0, tamano) + Math.Max(1, minimo) - 1;
                     int hasta = stopAtTarget ? Math.Min(ultimo, MapGeometry.Distance(desde, centro)) : ultimo;
                     for (int paso = Math.Max(0, tamano); paso <= hasta; paso++)
                     {
@@ -616,6 +623,25 @@ namespace Jondo.Unity.World.Maps
         /// Which of the eight best resembles the path from one cell to another. It is what decides which way
         /// whoever receives a push goes flying.
         /// </summary>
+        /// <summary>Whether two cells share one of the eight lines.</summary>
+        private static bool EnLinea(int desde, int hasta)
+        {
+            if (!MapGeometry.IsValid(desde) || !MapGeometry.IsValid(hasta) || desde == hasta) return false;
+            var (ax, ay) = MapGeometry.CellToPoint(desde);
+            var (bx, by) = MapGeometry.CellToPoint(hasta);
+            return ax == bx || ay == by || Math.Abs(bx - ax) == Math.Abs(by - ay);
+        }
+
+        /// <summary>Which of the four walked directions (the odd ones) best resembles the path.</summary>
+        private static (int Dx, int Dy)? DireccionAndando(int desde, int hasta)
+        {
+            if (!MapGeometry.IsValid(desde) || !MapGeometry.IsValid(hasta) || desde == hasta) return null;
+            var (ax, ay) = MapGeometry.CellToPoint(desde);
+            var (bx, by) = MapGeometry.CellToPoint(hasta);
+            int dx = bx - ax, dy = by - ay;
+            return Math.Abs(dx) >= Math.Abs(dy) ? (Math.Sign(dx), 0) : (0, Math.Sign(dy));
+        }
+
         public static (int Dx, int Dy)? DireccionEntre(int desde, int hasta)
         {
             if (!MapGeometry.IsValid(desde) || !MapGeometry.IsValid(hasta) || desde == hasta) return null;

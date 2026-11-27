@@ -128,6 +128,79 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(1000, character.CurrentHP);
         }
 
+        /// <summary>
+        /// Pushed in the first round, as the live check did, and pushed again once his first 2610
+        /// is over and its four-round interval has gone by: each push sets 2212 off. The listener
+        /// is Salagüino's for the whole fight, not for his next turn alone.
+        /// </summary>
+        [Fact]
+        public async Task Every_push_of_the_fight_sets_off_his_heal_on_the_attacker()
+        {
+            if (!HasData || SpellEffects.De(2212, 1).Count == 0 || SpellEffects.De(2610, 1).Count == 0) return;
+            if (!SpellEffects.De(PushSpell, 1).Any(row => row.EffectId == 5)) return;
+            var (fight, boss, _, character) = await BoardAsync();
+
+            async Task PushAsync()
+            {
+                boss.CellId = 330;
+                character.CellId = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(330).First();
+                await FightHandler.AplicarEfectosAsync(null, fight, character, PushSpell, 1, boss,
+                                                       EffectEngine.AlLanzar, boss.CellId);
+                Assert.NotEqual(330, boss.CellId);
+            }
+
+            await PushAsync();
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+
+            int round = fight.RoundNumber;
+            while (fight.RoundNumber < round + 5) fight.NextTurn();
+            boss.Buffs.BarrerEnganches(fight.RoundNumber);
+            Assert.DoesNotContain(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2212);
+
+            await PushAsync();
+            Assert.Contains(boss.Buffs.ActiveSpells, hook => hook.Hechizo == 2610);
+        }
+
+        /// <summary>
+        /// How his shell (state 56, Salagüino's for good) comes off: Salagüino arms Refresgüino
+        /// (2608) on each enemy, whose 1160 under H casts its grade 2 when that enemy is healed --
+        /// 96 water to the enemies around and 952 of state 56 on «a,F2848» for six rounds, only
+        /// within its zone. Healed next to him, a character opens him to blows; healed away from
+        /// him, nothing comes off. 41 rounds of hits with no heal never scratched him.
+        /// </summary>
+        [Fact]
+        public async Task A_heal_next_to_him_breaks_his_shell_for_six_rounds()
+        {
+            if (!HasData || SpellEffects.De(2608, 2).Count == 0 || SpellEffects.De(SelfHeal, 1).Count == 0) return;
+            var (fight, boss, _, character) = await BoardAsync();
+            Assert.Contains(56, boss.Buffs.Estados);
+
+            int bossLife = boss.CurrentHP;
+            await FightHandler.HurtAsync(null, fight, character, 1, 1, boss, boss.CellId, tirada: new[] { Blow(400) });
+            Assert.Equal(bossLife, boss.CurrentHP);
+
+            // Away from him: healed, and the shell stays.
+            character.CurrentHP = 1000;
+            await FightHandler.AplicarEfectosAsync(null, fight, character, SelfHeal, 1, character,
+                                                   EffectEngine.AlLanzar, character.CellId);
+            Assert.True(character.CurrentHP > 1000);
+            Assert.DoesNotContain(boss.Buffs.Puestos, row => row.HechizoOrigen == 2608 && row.EffectId == 952);
+
+            // Next to him: the shell is off until six rounds on, and the blow lands.
+            character.CellId = Jondo.Unity.World.Maps.MapGeometry.GetNeighbors(boss.CellId).First();
+            character.CurrentHP = 1000;
+            await FightHandler.AplicarEfectosAsync(null, fight, character, SelfHeal, 1, character,
+                                                   EffectEngine.AlLanzar, character.CellId);
+            Assert.Contains(boss.Buffs.Puestos, row => row.HechizoOrigen == 2608 && row.EffectId == 952);
+
+            await FightHandler.HurtAsync(null, fight, character, 1, 1, boss, boss.CellId, tirada: new[] { Blow(400) });
+            Assert.True(boss.CurrentHP < bossLife);
+        }
+
+        /// <summary>Elixir Curativo: a heal on oneself, as the live check used.</summary>
+        private const int SelfHeal = 4155;
+
         private static SpellEffect Blow(int amount) => new()
         {
             EffectId = 100, EffectUid = 900100, DiceNum = amount, DiceSide = amount, Element = 0, TargetMask = "a,A",

@@ -11984,7 +11984,7 @@
      "npc": 3261,
      "cell": 356,
      "orientation": 1,
-     "criterion": "(Qf=1756)|Qa=1758|Qf=1758",
+     "criterion": "(Qf=1756)|Qa=1758|Qf=1758|(Qa=1756&Qo>11239)",
      "name": "Professor Nomis",
      "kept": "gives quest [1758] here; shown once it can be started (its start criterion), under way or done"
     }

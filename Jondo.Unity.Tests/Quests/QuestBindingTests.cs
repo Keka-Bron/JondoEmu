@@ -344,5 +344,24 @@ namespace Jondo.Unity.Tests.Quests
 
             Assert.True(wrong.Count == 0, string.Join("\n", wrong));
         }
+
+        /// <summary>
+        /// «Bricole Girl» (589) is handed over by Igoi Algueros's «Aceptar.» (7821) on his first
+        /// line, as the official server does: the workshop's tree had it on «Marcharte.» (81633)
+        /// one line further, so a character who accepted, read the directions and closed the
+        /// window never had the quest.
+        /// </summary>
+        [Fact]
+        public void Bricole_girl_starts_on_accepting_the_first_line()
+        {
+            var tree = Jondo.Unity.Server.Managers.NpcDialogues.For(1291, 54531097);
+            if (tree == null) return;
+
+            var accept = tree.Line(7792)?.Choices.SingleOrDefault(c => c.Reply == 7821);
+            Assert.NotNull(accept);
+            Assert.Equal(589, accept!.StartsQuest);
+            Assert.Equal(7795, accept.Next);
+            Assert.DoesNotContain(tree.Lines.SelectMany(l => l.Choices), c => c.StartsQuest == 589 && c.Reply != 7821);
+        }
     }
 }

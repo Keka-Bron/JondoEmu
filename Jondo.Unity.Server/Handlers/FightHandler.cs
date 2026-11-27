@@ -869,7 +869,7 @@ namespace Jondo.Unity.Server.Handlers
             // Or the one a quest's fight makes him, at the template's own sheet: the Entrenador of
             // «Barnabé en el espacio» (NpcFights).
             var questIncarnation = TakeNextIncarnation(GameState.CharacterId);
-            if (questIncarnation is { } asked && !Incarnate(playerFighter, asked.Monster, 0, asked.Grade - 1))
+            if (questIncarnation is { } asked && !Incarnate(playerFighter, asked.Monster, 0, asked.Grade - 1, asked.ActionPoints))
                 questIncarnation = null;
 
             var dream = Managers.Dreams.De(GameState.CharacterId);
@@ -1503,7 +1503,11 @@ namespace Jondo.Unity.Server.Handlers
                 WaterResPct = dbStats?.WaterResistance ?? Math.Min(50, monLevel / 4),
                 AirResPct = dbStats?.AirResistance ?? Math.Min(50, monLevel / 4),
                 LookBoneId = boneId,
-                SpellIds = dbStats?.SpellIds ?? new List<int>(),
+                // Not the spells its template gives level 0 at this grade: they are not its own
+                // there. Toxina (5187) holds Rassemblement du gang twice, 10116 at levels 40-80
+                // («1,40;2,60;3,80;0,100...») and 10115 from 100 («0,40;0,60;0,80;1,100...»);
+                // both were kept, the absent one at a made-up grade 1.
+                SpellIds = dbStats?.SpellIds.Where(s => !dbStats.SpellsAbsentAtGrade.Contains(s)).ToList() ?? new List<int>(),
                 SpellGrades = dbStats?.SpellGrades ?? new Dictionary<int, int>(),
                 // gradeXp from the monster template: the experience it awards on death, the
                 // same figure the client shows when hovering over the group.
@@ -2898,6 +2902,10 @@ namespace Jondo.Unity.Server.Handlers
             // A dimension dungeon's boss is fought in waves, as many monsters each as the first
             // now that the people who fight are known.
             PlanDimensionWaves(fight);
+
+            // And the spells a monster of the fight lends its enemies (MonsterLentSpells): the
+            // Crujidor de hielo's Grieta, before the bursts that carry each bar.
+            Managers.MonsterLentSpells.OnFightStarts(fight);
 
             // The placement is over: the swords go from the map (hpr). Nobody joins any more.
             await SwordsGoneAsync(fight);
@@ -4621,7 +4629,11 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.Glifos.Any(g => g != aura && EsAuraDeMonstruo(g) && g.Hechizo == aura.Hechizo
                                       && g.Dentro.Contains(quien.Id) && g.Cubre(quien.CellId)))
                 return;
-            var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo);
+            // The aura's own grade only: what it cast on with a duration of its own stays. Rainikron's
+            // direction glyph (8918 grade 2) casts grade 3, a state for the round, and the Minikron's
+            // step dispels the glyph right after landing on it -- taken with it, the yellow rune never
+            // saw the state that tells it which way to send him.
+            var quitados = quien.Buffs.QuitarDelHechizo(aura.Hechizo, aura.Grado);
             foreach (var quitado in quitados)
             {
                 await ATodosAsync(fight, new Game.FightEffectRemovedEvent(quien.Id, quitado.Numero));
@@ -5003,7 +5015,11 @@ namespace Jondo.Unity.Server.Handlers
                 if (EsAuraDeMonstruo(glifo))
                 {
                     soloElQueCae = true;
-                    desde = glifo.Centro >= 0 ? glifo.Centro : -1;
+                    // Unless it was a line run from its caster ("l"): its aimed cell is only where
+                    // the line points. Rainikron's direction glyphs (8918-8921) aim at the board's
+                    // corners and lie next to the Minikron; judged from the corner, their state
+                    // reached nobody on the glyph.
+                    desde = glifo.Centro >= 0 && glifo.ZoneShape != 'l' ? glifo.Centro : -1;
                 }
                 // Set off by its owner (Trashumancia, Posicion Defensiva), a glyph that hurts goes off
                 // over its ground: "danos inmediatos a todos los enemigos en su interior". Cast on the
@@ -6378,6 +6394,13 @@ namespace Jondo.Unity.Server.Handlers
                     int suya = Managers.EffectEngine.CaducidadDeLaFila(c.Efecto, ronda,
                                                                        deConducta && !CountsItsRoundsOffATrigger(c.Efecto, offATrigger));
                     if (suya < 0) { hasta = -1; break; }
+                    // A monster row with no duration of its own and a delay waits for its round:
+                    // Solar's Zenith (9437, cast by Aurora's hook) casts Twilight three turns later,
+                    // "792 9438 under TB, delay 3". Held for the round after the cast only, the hook
+                    // fell first, and he stayed in Zenith, invulnerable, for the rest of the fight.
+                    if (c.Efecto is { Duration: 0, Delay: > 0 } delayed)
+                        suya = Math.Max(suya, ronda + delayed.Delay
+                                              + (Managers.EffectEngine.CountsItsTriggerRounds(delayed) ? delayed.TriggerDuration : 1));
                     hasta = Math.Max(hasta, suya);
                     // A row's trigger duration is a duration of its own too, when it is a real count
                     // and the row is on its caster: the Sacurador's Tact, cast in his turn, is «when I
@@ -6454,6 +6477,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (armables.Count == 0) continue;
                 if (deConducta && hasta < 0 && grupo.Key.Sobre.Id == grupo.Key.Quien && !offATrigger)
                     Managers.EffectEngine.NoteBehaviourHook(grupo.Key.Sobre, grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen);
+                else if (offATrigger && grupo.Key.Sobre.Id == grupo.Key.Quien)
+                    Managers.EffectEngine.GiveTheChainItsGoOffsBack(grupo.Key.Sobre, grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen);
                 grupo.Key.Sobre.Buffs.ArmarFilas(grupo.Key.HechizoOrigen, grupo.Key.NivelOrigen, hasta, grupo.Key.Quien,
                                                  ronda, armables.Select(c => ClaveDeFila(c.Efecto)), critico,
                                                  fallsAtItsCastersTurn: (inItsCastersTurn || afterItsCastersTurn) && hasta >= 0
@@ -8523,7 +8548,7 @@ namespace Jondo.Unity.Server.Handlers
                         await ATodosAsync(fight, lanceAura || holmgang ? CombatMarks.Aura(glyph, c.NivelOrigen)
                             : CombatMarks.Glyph(glyph, apuntada, c.HechizoOrigen, c.NivelOrigen));
                     }
-                    Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s), " +
+                    Program.LogDebug($"[Fight] Glyph {c.Glifo.Id} of {dueno.Id}: {c.Glifo.Casillas.Count} cell(s) [{string.Join(",", c.Glifo.Casillas)}], " +
                                      $"casts {c.Glifo.Hechizo}, colour {c.Glifo.Color:X6}, drops in round {c.Glifo.CaducaEnRonda}.");
                     if (glyph.Cuando == Jondo.Unity.World.Fights.Disparo.AlPonerse && !holmgang
                         && (!lanceAura || glyph.Grado == 3))
@@ -11702,6 +11727,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     Id = spell,
                     Grade = grade,
+                    Strips = StrippingRows(spell, grade),
                     Cost = data.APCost,
                     MinRange = data.MinRange,
                     MaxRange = data.MaxRange,
@@ -11756,6 +11782,21 @@ namespace Jondo.Unity.Server.Handlers
             }
             return spells;
         }
+
+        /// <summary>
+        /// The rows of a spell that take an invulnerability off the enemies when it is cast (951 or
+        /// 952 on a state that shields), for the tactics to aim it at one who holds it.
+        /// </summary>
+        internal static IReadOnlyList<Managers.SpellEffect> StrippingRows(int spell, int grade)
+            => Managers.SpellEffects.De(spell, grade)
+                .Where(e => e.EffectId is Jondo.Unity.World.Combat.EffectSupport.RemoveState
+                                          or Jondo.Unity.World.Combat.EffectSupport.DisableState
+                            && !e.ForClientOnly
+                            && string.Equals(e.Triggers ?? "I", Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
+                            && NamesEnemies(e.TargetMask ?? "")
+                            && Managers.SpellStates.Of(e.Value) is { } state
+                            && (state.Invulnerable || state.InvulnerableMelee || state.InvulnerableRange))
+                .ToList();
 
         /// <summary>
         /// Whether a spell brings back the last ally to fall (780, 1034), or does nothing but pull
@@ -12167,11 +12208,13 @@ namespace Jondo.Unity.Server.Handlers
             fight.TimedWaves.RemoveAt(0);
 
             var group = MobSpawnManager.ComposeOffMap(next.Monsters);
-            if (group == null || group.Members.Count == 0) return false;
+            // And who comes in with it on the players' side: the Refuerzo steamers of 1943.
+            var allies = MobSpawnManager.ComposeMembers(next.Allies);
+            if ((group == null || group.Members.Count == 0) && allies.Count == 0) return false;
 
             int wave = fight.WaveNumber + 1;
             int turnsBeforeNext = fight.TimedWaves.Count > 0 ? fight.TimedWaves[0].Turns : 0;
-            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, monster =>
+            int arrivals = await BringWaveAsync(stream, fight, group, wave, turnsBeforeNext, allies: allies, shape: monster =>
             {
                 // A dimension dungeon's later waves come with a quarter less life.
                 if (fight.WaveLifePercent is > 0 and < 100)
@@ -12285,13 +12328,19 @@ namespace Jondo.Unity.Server.Handlers
         /// draws them one by one, each with the light falling on its cell
         /// (see <see cref="Network.FightProtocol.BuildNewWave"/>). How many came in.
         /// </summary>
+        /// <remarks>
+        /// <paramref name="allies"/> come in with it on the players' side, on a free attacker cell
+        /// or the nearest free one to the first player, and are drawn the same way: the client's
+        /// current wave is one for the whole board, and their blocks carry it too.
+        /// </remarks>
         private static async Task<int> BringWaveAsync(NetworkStream stream, FightInstance fight,
-                                                      MobSpawnManager.MobGroup group, int wave,
-                                                      int turnsBeforeNext, Action<Fighter> shape)
+                                                      MobSpawnManager.MobGroup? group, int wave,
+                                                      int turnsBeforeNext, Action<Fighter> shape,
+                                                      IReadOnlyList<MobSpawnManager.MobMember>? allies = null)
         {
             var fallen = fight.Rojo.LastOrDefault();
             var arrivals = new List<Fighter>();
-            foreach (var member in group.Members)
+            foreach (var member in group?.Members ?? new List<MobSpawnManager.MobMember>())
             {
                 int cell = fight.RedPlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
                 if (cell < 0) cell = CasillaLibreCerca(fight, fallen?.CellId ?? fight.RedPlacementCells.FirstOrDefault());
@@ -12302,6 +12351,19 @@ namespace Jondo.Unity.Server.Handlers
                 monster.Wave = wave;
                 fight.Join(monster);
                 arrivals.Add(monster);
+            }
+            var leader = fight.Todos.FirstOrDefault(f => f.TeamId == 0 && f.IsAlive && !f.IsMonster)
+                ?? fight.Todos.FirstOrDefault(f => f.TeamId == 0);
+            foreach (var member in allies ?? Array.Empty<MobSpawnManager.MobMember>())
+            {
+                int cell = fight.BluePlacementCells.Where(c => !Occupied(fight, c)).DefaultIfEmpty(-1).First();
+                if (cell < 0) cell = CasillaLibreCerca(fight, leader?.CellId ?? fight.BluePlacementCells.FirstOrDefault());
+                if (cell < 0) break;
+
+                var ally = BuildMonsterFighter(member, fight.SiguienteIdDeInvocado(), cell);
+                ally.Wave = wave;
+                fight.JoinBeside(ally);
+                arrivals.Add(ally);
             }
             if (arrivals.Count == 0) return 0;
 
@@ -12799,6 +12861,14 @@ namespace Jondo.Unity.Server.Handlers
             // first, the very fight that does it never let them fall.
             await QuestWatcher.FightEndedAsync(session, fight, won);
 
+            // An item a quest asks to obtain on a map closes its objective when it drops there, as
+            // a gathered one does: the three P'Koutoulou of «Fhtagn» (1765), 30 % each off the
+            // klutist of their own map, tick only the fight that lets one fall.
+            // The binding names the roleplay map, not the arena the fight is played on.
+            long dropMap = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : session.State.MapId;
+            foreach (int item in loot.Keys)
+                await Managers.Quests.OnGatheredAsync(session, item, dropMap);
+
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and
             // it is kolichas and vitorichas. The loser gets nothing, not even experience -- in the
@@ -12997,7 +13067,11 @@ namespace Jondo.Unity.Server.Handlers
                 // the same room forever.
                 // Nor on a guild raid's floor: inside a raid what is beaten stays beaten (the guides),
                 // and the floors stand again only when the next raid starts.
-                if (!DreamHandler.SalaLimpiada(session.CharacterId, muerto, fight.RoleplayMapId)
+                // Nor on a map a quest asks to clear (the barracks piano of 1912): a group put back
+                // at once kept it full forever. It stays empty a while once its last group falls.
+                bool toClear = Managers.Quests.Bindings.OnMap(fight.RoleplayMapId).Any(b => b.MapCleared);
+                if (toClear) MobSpawnManager.LeaveClearedFor(fight.RoleplayMapId, TimeSpan.FromMinutes(10));
+                else if (!DreamHandler.SalaLimpiada(session.CharacterId, muerto, fight.RoleplayMapId)
                     && !Managers.GuildRaidManager.IsRaidMap(fight.RoleplayMapId))
                 {
                     // A dungeon room comes back as itself -- its eight, its boss -- and not as a

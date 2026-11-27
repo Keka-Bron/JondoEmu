@@ -42,6 +42,10 @@ namespace Jondo.Unity.Server.Handlers
 
             var lectura = Readables.Of(mapId, elementId);
 
+            // A document guarded by a written fight: the first click on Gisgul's book sets the Bwork
+            // bibliophile on the reader (1914), and only after the win does the book read.
+            if (lectura != null && await ScriptedFightHandler.TryElementAsync(stream, mapId, elementId)) return;
+
             // It is noted before deciding what it does, and on purpose: there are conversations
             // that depend on having read something, and if this went after the dispatch an element
             // that ends up in «unknown use» -- like the tavern's notice, which is neither a zaap nor
@@ -115,9 +119,16 @@ namespace Jondo.Unity.Server.Handlers
                 if (InteractiveWays.Has(mapId, elementId)) await InteractiveWaysHandler.RefreshAsync(stream, mapId);
                 // A way the quest asked to take still takes the character: the mine's cart ticks
                 // «get in the cart» and then rides down, as any other use of it does.
-                if (InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out var way, out var ride)
-                    && ride.Kind == InteractiveActionKind.Teleport)
-                    await TeleportHandler.UseAsync(stream, way.Element.Id, ride.SkillId);
+                // So does a named way: the statue's «Hacia el territorio de los dioses» (48) is what
+                // «La colère des dieux» asks to take, and it leads to the gods' territory
+                // (content/interactives/ways.json); a way that leads nowhere, «Rezar», stays put.
+                if (InteractiveRegistry.TryResolveUse(mapId, elementId, skillInstanceId, out var way, out var ride))
+                {
+                    if (ride.Kind == InteractiveActionKind.Teleport)
+                        await TeleportHandler.UseAsync(stream, way.Element.Id, ride.SkillId);
+                    else if (ride.Kind == InteractiveActionKind.Way)
+                        await InteractiveWaysHandler.UseAsync(stream, way, ride);
+                }
                 return;
             }
 
@@ -335,7 +346,8 @@ namespace Jondo.Unity.Server.Handlers
                 Console.WriteLine($"[InteractiveMessages] Element {elementId} on {mapId}: «{said.Criterion}» not met.");
                 return;
             }
-            foreach (var (item, count) in InteractiveMessages.HandOut(said, Equipment.HowMany))
+            bool took = said.UpTo.Count > 0 && InteractiveMessages.Took(SessionContext.State.CharacterId, mapId, elementId);
+            foreach (var (item, count) in InteractiveMessages.HandOut(said, Equipment.HowMany, took))
             {
                 // a roleplay buff goes on as the official server put it on (Sufokia's 538581: iqx «Desarranjo
                 // Sufokiano» 31477, lof 21, kjm), anything else in the bag
