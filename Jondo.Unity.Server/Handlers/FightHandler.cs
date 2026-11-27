@@ -13466,7 +13466,9 @@ namespace Jondo.Unity.Server.Handlers
             await EngancheAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
             await NonPlayingSummonsAnswerAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
-            // And the turn-end glyphs under him (402).
+            // And the turn-end glyphs under him (402). His turn is over by then: what a glyph makes
+            // him cast is put outside it and lives through his next turn.
+            fight.CloseTheTurn();
             await TurnEndGlyphsAsync(stream, fight, ending);
 
             // A dimension dungeon's newcomer was invulnerable until this, its first turn, ended.
