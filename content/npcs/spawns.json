@@ -9383,7 +9383,7 @@
     {
       "map": 197921026,
       "npc": 4949,
-      "cell": 270,
+      "cell": 328,
       "orientation": 3,
       "criterion": "Qa=2079&Qo>15005&Qo<15006",
       "why": "The Red Death in her lair (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
@@ -9391,15 +9391,95 @@
     {
       "map": 197921026,
       "npc": 4948,
-      "cell": 270,
+      "cell": 342,
       "orientation": 3,
-      "criterion": "Qa=2079&Qo>15006&Qo<15019",
-      "why": "Tylezia in human form, where the dragon stood (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+      "criterion": "(Qa=2079&Qo>15006)|Qf=2079",
+      "why": "Tylezia in human form, where the dragon stood (Dofus pour les noobs («La mère des Dragoeufs»)), and there for «La Nuit-qui-rugit» (2081) too. On the cell of the catalogue's placement (datos/npc_spawns_derived.json), which it replaces: a different cell left two Tylezias, one of them shown to everybody. Cell INFERRED."
     },
   {"map": 186386180, "npc": 4309, "cell": 300, "orientation": 1, "criterion": "Qa=1947&Qo>13573&Qo<13576", "why": "Nekrobio at [-47,-84] (1947). INFERRED cell."},
   {"map": 200279040, "npc": 4950, "cell": 342, "orientation": 1, "why": "Oyukipoca in her nightmare (2080). INFERRED cell."},
   {"map": 200279040, "npc": 5002, "cell": 370, "orientation": 5, "why": "The rocky nightmare beside her (2080). INFERRED cell."},
   {"map": 200279299, "npc": 4950, "cell": 302, "orientation": 1, "why": "Oyukipoca once the nightmare is beaten (2080). INFERRED cell."},
-  {"map": 197922050, "npc": 5001, "cell": 297, "orientation": 1, "criterion": "Qo=15016", "why": "The pale arakne at the door of Oyukipoca's temple (2080), until it is beaten. INFERRED cell."}
+  {"map": 197922050, "npc": 5001, "cell": 297, "orientation": 1, "criterion": "Qo=15016", "why": "The pale arakne at the door of Oyukipoca's temple (2080), until it is beaten. INFERRED cell."},
+    {
+      "map": 198443010,
+      "npc": 4951,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15020&Qo<15022",
+      "why": "Ixchelonia, reached by the plinth (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197920770,
+      "npc": 4952,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15022&Qo<15025",
+      "why": "Kinichinti appears after the prayer at the cup (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197920770,
+      "npc": 5010,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15024&Qo<15025",
+      "why": "Kinichinti, revitalised by the flame (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 198445056,
+      "npc": 4953,
+      "cell": 380,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15026&Qo<15030",
+      "why": "Chaklaplok appears after the prayer at the well (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 198446084,
+      "npc": 4956,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15029&Qo<15035",
+      "why": "The devout cocuzkeno gathering algae (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197920002,
+      "npc": 5005,
+      "cell": 247,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15030&Qo<15033",
+      "why": "First miauguar drawn by the bait (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197920002,
+      "npc": 5005,
+      "cell": 261,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15030&Qo<15033",
+      "why": "Second miauguar drawn by the bait (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197921792,
+      "npc": 4950,
+      "cell": 356,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15037&Qo<15039",
+      "why": "Oyukipoca answers the prayer at the altar (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197921026,
+      "npc": 4950,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15038&Qo<15042",
+      "why": "Oyukipoca in the lair with Tylezia (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 197921026,
+      "npc": 4958,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=2081&Qo>15039&Qo<15041",
+      "why": "The god Osamodas arrives in the lair (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    }
   ]
 }

@@ -84535,7 +84535,8 @@
       "opening": 35626,
       "openings": [
         { "canStart": 2080, "message": 35630 },
-        { "canStart": 2081, "message": 35694 }
+        { "canStart": 2081, "message": 35694 },
+        { "criterion": "Qa=2081&Qo>15040&Qo<15041", "message": 35879 }
       ],
       "lines": [
         {
@@ -84590,9 +84591,15 @@
           "choices": [
             { "reply": 47166, "startsQuest": 2081, "params": [[34, 2081]] }
           ]
+        },
+        {
+          "message": 35879,
+          "choices": [
+            { "reply": 47449, "quest": 2081, "completes": 15041, "params": [[30, 15041]] }
+          ]
         }
       ],
-      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest. 2080 (Pesadilla Infinita): after 2079 Tylezia tells of her recurring dream (35630-35631); proposing Draconiros (47097) starts the quest (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080 end: back from the temple, «Hablar de tu encuentro con Oyukipoca» (47171) closes 15018 and leads through 35692-35694 to «Buscar la manera de ver a Ixchelonia» (47166), which starts «La Noche Rugiente» (2081, whose first step is message 35694 in the catalogue). The other answer of that talk, «Ya le he prestado servicio a Ixchelonia» (47169, 35695, 47168), has no known criterion and is not written. Reply order INFERRED from the message ids."
+      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest. 2080 (Pesadilla Infinita): after 2079 Tylezia tells of her recurring dream (35630-35631); proposing Draconiros (47097) starts the quest (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080 end: back from the temple, «Hablar de tu encuentro con Oyukipoca» (47171) closes 15018 and leads through 35692-35694 to «Buscar la manera de ver a Ixchelonia» (47166), which starts «La Noche Rugiente» (2081, whose first step is message 35694 in the catalogue). The other answer of that talk, «Ya le he prestado servicio a Ixchelonia» (47169, 35695, 47168), has no known criterion and is not written. Reply order INFERRED from the message ids. 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 4246,
@@ -84843,6 +84850,493 @@
         }
       ],
       "why": "The eleventh dream of Cocobur (2037, 14706), shown by a won dream room (Dreams.CocoburDreamOf): its template's one message and reply, «Blandir la espada Cocobur para reavivar su poder» (39620)."
+    },
+    {
+      "npc": 4976,
+      "map": 197918722,
+      "opening": 35704,
+      "lines": [
+        {
+          "message": 35704,
+          "choices": [
+            { "reply": 47200, "next": 35708, "criterion": "Qa=2081&Qo<15020" }
+          ]
+        },
+        {
+          "message": 35708,
+          "choices": []
+        }
+      ],
+      "why": "2081: the Torkelonia keyholder is asked to speak for the player to the moon goddess (47200, 35708). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4951,
+      "map": 198443010,
+      "opening": 35696,
+      "lines": [
+        {
+          "message": 35696,
+          "choices": [
+            { "reply": 47178, "next": 35697 }
+          ]
+        },
+        {
+          "message": 35697,
+          "choices": [
+            { "reply": 47177, "next": 35698 }
+          ]
+        },
+        {
+          "message": 35698,
+          "choices": [
+            { "reply": 47175, "next": 35699 }
+          ]
+        },
+        {
+          "message": 35699,
+          "choices": [
+            { "reply": 47173, "next": 35700 }
+          ]
+        },
+        {
+          "message": 35700,
+          "choices": [
+            { "reply": 47174, "next": 35701 }
+          ]
+        },
+        {
+          "message": 35701,
+          "choices": [
+            { "reply": 47176, "next": 35702 }
+          ]
+        },
+        {
+          "message": 35702,
+          "choices": [
+            { "reply": 47172, "quest": 2081, "completes": 15021, "params": [[30, 15021]] }
+          ]
+        }
+      ],
+      "why": "2081: Ixchelonia agrees if Kinichinti and Chaklaplok do (35696-35702; 47172 starts the search for their temples). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4952,
+      "map": 197920770,
+      "opening": 35709,
+      "lines": [
+        {
+          "message": 35709,
+          "choices": [
+            { "reply": 47205, "next": 35711 },
+            { "reply": 47206, "next": 35710 }
+          ]
+        },
+        {
+          "message": 35710,
+          "choices": [
+            { "reply": 47203, "next": 35711 }
+          ]
+        },
+        {
+          "message": 35711,
+          "choices": [
+            { "reply": 47204, "next": 35712 }
+          ]
+        },
+        {
+          "message": 35712,
+          "choices": [
+            { "reply": 47201, "next": 35713 },
+            { "reply": 47202 }
+          ]
+        },
+        {
+          "message": 35713,
+          "choices": [
+            { "reply": 47207, "quest": 2081, "completes": 15023, "params": [[30, 15023]], "gives": 21245 }
+          ]
+        }
+      ],
+      "why": "2081: Kinichinti asks the player to spread terror among the cocuzkenos with a sacred lizard at his side (follower 21245). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5010,
+      "map": 197920770,
+      "opening": 35714,
+      "lines": [
+        {
+          "message": 35714,
+          "choices": [
+            { "reply": 47209, "next": 35715 }
+          ]
+        },
+        {
+          "message": 35715,
+          "choices": [
+            { "reply": 47208, "quest": 2081, "completes": 15025, "params": [[30, 15025]] }
+          ]
+        }
+      ],
+      "why": "2081: Kinichinti keeps his word after the flame (35714-35715). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4953,
+      "map": 198445056,
+      "opening": 35720,
+      "lines": [
+        {
+          "message": 35720,
+          "choices": [
+            { "reply": 47240, "next": 35721, "criterion": "Qa=2081&Qo<15028" },
+            { "reply": 47242, "next": 35725, "criterion": "Qa=2081&Qo>15028&Qo<15029" }
+          ]
+        },
+        {
+          "message": 35721,
+          "choices": [
+            { "reply": 47239, "next": 35722 }
+          ]
+        },
+        {
+          "message": 35722,
+          "choices": [
+            { "reply": 47237, "next": 35723 }
+          ]
+        },
+        {
+          "message": 35723,
+          "choices": [
+            { "reply": 47238, "next": 35724 }
+          ]
+        },
+        {
+          "message": 35724,
+          "choices": [
+            { "reply": 47236, "quest": 2081, "completes": 15027, "params": [[30, 15027]] }
+          ]
+        },
+        {
+          "message": 35725,
+          "choices": [
+            { "reply": 47241, "quest": 2081, "completes": 15029, "params": [[30, 15029]] }
+          ]
+        }
+      ],
+      "why": "2081: Chaklaplok asks for blood anemones (35720-35724) and, once the well is fed, approves Oyukipoca (35725). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4956,
+      "map": 198446084,
+      "opening": 35830,
+      "lines": [
+        {
+          "message": 35830,
+          "choices": [
+            { "reply": 47389, "next": 35831 }
+          ]
+        },
+        {
+          "message": 35831,
+          "choices": [
+            { "reply": 47397, "next": 35832 }
+          ]
+        },
+        {
+          "message": 35832,
+          "choices": [
+            { "reply": 47396, "next": 35833 }
+          ]
+        },
+        {
+          "message": 35833,
+          "choices": [
+            { "reply": 47395, "next": 35834 }
+          ]
+        },
+        {
+          "message": 35834,
+          "choices": [
+            { "reply": 47394, "next": 35835 }
+          ]
+        },
+        {
+          "message": 35835,
+          "choices": [
+            { "reply": 47393, "next": 35836 }
+          ]
+        },
+        {
+          "message": 35836,
+          "choices": [
+            { "reply": 47392, "next": 35837 }
+          ]
+        },
+        {
+          "message": 35837,
+          "choices": [
+            { "reply": 47398 },
+            { "reply": 47399, "next": 35838, "takesAll": [17992, 17993], "takesCount": 10 }
+          ]
+        },
+        {
+          "message": 35838,
+          "choices": [
+            { "reply": 47400, "gives": 21247 }
+          ]
+        }
+      ],
+      "why": "2081: the devout cocuzkeno remembers Oyukipoca, asks for ten salikronias and ten quisnoas and follows to the temple (follower 21247). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5005,
+      "map": 197920002,
+      "opening": 35816,
+      "openings": [
+        { "criterion": "Qa=2081&Qo>15031", "message": 35817 }
+      ],
+      "lines": [
+        {
+          "message": 35816,
+          "choices": [
+            { "reply": 47373 }
+          ]
+        },
+        {
+          "message": 35817,
+          "choices": [
+            { "reply": 47374, "gives": 21246 }
+          ]
+        }
+      ],
+      "why": "2081: the miauguars smell the bait; 47373 starts the solo fight and 47374 takes the tamed one as a follower (21246). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4950,
+      "map": 197921792,
+      "opening": 35840,
+      "lines": [
+        {
+          "message": 35840,
+          "choices": [
+            { "reply": 47405, "next": 35841 }
+          ]
+        },
+        {
+          "message": 35841,
+          "choices": [
+            { "reply": 47403, "quest": 2081, "completes": 15038, "params": [[30, 15038]], "next": 35842, "teleport": 197921026 }
+          ]
+        },
+        {
+          "message": 35842,
+          "choices": []
+        }
+      ],
+      "why": "2081: Oyukipoca at her temple is reminded of her promise to Ixchelonia and leads the way to Tylezia's lair (35840-35842). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4950,
+      "map": 197921026,
+      "opening": 35850,
+      "lines": [
+        {
+          "message": 35850,
+          "choices": [
+            { "reply": 47412, "next": 35849 }
+          ]
+        },
+        {
+          "message": 35849,
+          "choices": [
+            { "reply": 47410, "next": 35847 }
+          ]
+        },
+        {
+          "message": 35847,
+          "choices": [
+            { "reply": 47411, "next": 35848 }
+          ]
+        },
+        {
+          "message": 35848,
+          "choices": []
+        }
+      ],
+      "why": "2081: Oyukipoca and Tylezia in the lair (35850, 35849, 35847, 35848). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4958,
+      "map": 197921026,
+      "opening": 35852,
+      "lines": [
+        {
+          "message": 35852,
+          "choices": [
+            { "reply": 47442, "next": 35872 }
+          ]
+        },
+        {
+          "message": 35872,
+          "choices": [
+            { "reply": 47440, "next": 35873 }
+          ]
+        },
+        {
+          "message": 35873,
+          "choices": [
+            { "reply": 47439, "next": 35874 }
+          ]
+        },
+        {
+          "message": 35874,
+          "choices": [
+            { "reply": 47441, "quest": 2081, "completes": 15040, "params": [[30, 15040]], "next": 35875 }
+          ]
+        },
+        {
+          "message": 35875,
+          "choices": [
+            { "reply": 47438, "next": 35876 }
+          ]
+        },
+        {
+          "message": 35876,
+          "choices": [
+            { "reply": 47437, "next": 35877 }
+          ]
+        },
+        {
+          "message": 35877,
+          "choices": [
+            { "reply": 47436, "next": 35878 }
+          ]
+        },
+        {
+          "message": 35878,
+          "choices": []
+        }
+      ],
+      "why": "2081: Osamodas thanks the player and takes Oyukipoca to Ingloriom (35852-35878). Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4948,
+      "map": 197921026,
+      "opening": 35845,
+      "openings": [
+        { "criterion": "Qa=2081&Qo>15040&Qo<15041", "message": 35879 }
+      ],
+      "lines": [
+        {
+          "message": 35845,
+          "choices": [
+            { "reply": 47410, "next": 35843 }
+          ]
+        },
+        {
+          "message": 35843,
+          "choices": [
+            { "reply": 47411, "next": 35844 }
+          ]
+        },
+        {
+          "message": 35844,
+          "choices": [
+            { "reply": 47409 }
+          ]
+        },
+        {
+          "message": 35879,
+          "choices": [
+            { "reply": 47449, "quest": 2081, "completes": 15041, "params": [[30, 15041]] }
+          ]
+        }
+      ],
+      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»))."
+    },
+    {
+      "npc": 2004,
+      "map": 108794630,
+      "opening": 14520,
+      "lines": [
+        {
+          "message": 14520,
+          "choices": [
+            { "reply": 16963, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "key" },
+            { "reply": 16964, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "keyring" },
+            { "reply": 16963, "door": "key" },
+            { "reply": 16964, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "Key keeper of Nileza's Laboratory (Dofus pour les noobs «Il faut mettre un terme aux maîtres», 1309): the key reply (16963) or the keyring (16964) starts the quest while its criteria hold and opens the door as the template did; afterwards they only open the door. INFERRED: the guide only says any NPC inside the four dungeons; the keeper's door replies are the ones we start from."
+    },
+    {
+      "npc": 2005,
+      "map": 108793118,
+      "opening": 14522,
+      "lines": [
+        {
+          "message": 14522,
+          "choices": [
+            { "reply": 16968, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "key" },
+            { "reply": 16969, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "keyring" },
+            { "reply": 16968, "door": "key" },
+            { "reply": 16969, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "Key keeper of Sylargh's Transporter (Dofus pour les noobs «Il faut mettre un terme aux maîtres», 1309): the key reply (16968) or the keyring (16969) starts the quest while its criteria hold and opens the door as the template did; afterwards they only open the door. INFERRED: the guide only says any NPC inside the four dungeons; the keeper's door replies are the ones we start from."
+    },
+    {
+      "npc": 2006,
+      "map": 108925717,
+      "opening": 14524,
+      "lines": [
+        {
+          "message": 14524,
+          "choices": [
+            { "reply": 16973, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "key" },
+            { "reply": 16974, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "keyring" },
+            { "reply": 16973, "door": "key" },
+            { "reply": 16974, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "Key keeper of Klim's Private Room (Dofus pour les noobs «Il faut mettre un terme aux maîtres», 1309): the key reply (16973) or the keyring (16974) starts the quest while its criteria hold and opens the door as the template did; afterwards they only open the door. INFERRED: the guide only says any NPC inside the four dungeons; the keeper's door replies are the ones we start from."
+    },
+    {
+      "npc": 2007,
+      "map": 108927238,
+      "opening": 14528,
+      "lines": [
+        {
+          "message": 14528,
+          "choices": [
+            { "reply": 16983, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "key" },
+            { "reply": 16984, "startsQuest": 1309, "params": [[34, 1309]], "criterion": "Qf=626&PL>49&Sc=703&Qf!1309&Qa!1309", "door": "keyring" },
+            { "reply": 16983, "door": "key" },
+            { "reply": 16984, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "Key keeper of Mizz Frizz's Cold Forge (Dofus pour les noobs «Il faut mettre un terme aux maîtres», 1309): the key reply (16983) or the keyring (16984) starts the quest while its criteria hold and opens the door as the template did; afterwards they only open the door. INFERRED: the guide only says any NPC inside the four dungeons; the keeper's door replies are the ones we start from."
+    },
+    {
+      "npc": 2008,
+      "map": 112460048,
+      "opening": 15157,
+      "lines": [
+        {
+          "message": 15157,
+          "choices": [
+            { "reply": 17821, "startsQuest": 1310, "params": [[34, 1310]], "criterion": "Qf=1309&Sc=703&Qf!1310&Qa!1310", "door": "key" },
+            { "reply": 17822, "startsQuest": 1310, "params": [[34, 1310]], "criterion": "Qf=1309&Sc=703&Qf!1310&Qa!1310", "door": "keyring" },
+            { "reply": 17821, "door": "key" },
+            { "reply": 17822, "door": "keyring" }
+          ]
+        }
+      ],
+      "why": "Duke Dorleans at the Clepsydra tower entrance (Dofus pour les noobs «Un comte de faits divers», 1310): the key reply (17821) or the keyring (17822) starts the quest after 1309 and opens the dungeon door as the template did. INFERRED: the guide only says to talk to Dorleans and use a key."
     }
   ]
 }

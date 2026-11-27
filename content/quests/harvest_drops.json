@@ -39,6 +39,18 @@
       "item": 13153,
       "criterion": "Qo=551&PO<13153,20",
       "why": "Orquídea salvaje: «Vous en obtiendrez une pour chaque Orchidée Freyesque récoltée dans la zone du Territoire des Dragodindes Sauvages. Pour récolter ces plantes il faut être alchimiste niveau 80 minimum» (Dofus pour les noobs, «Des fleurs épineuses»), while Maskara's twenty are not all carried."
-    }
+    },
+  {
+   "resource": 17992,
+   "item": 21196,
+   "criterion": "Qa=2081&Qo=15028&PO<21196,20",
+   "why": "Anemona de sangre: one for every salikronia gathered in the depths of Cocuzko's lake while the twenty for Chaklaplok's well are not all carried (Dofus pour les noobs, «La Nuit-qui-rugit»: «s'obtiennent automatiquement pour chaque Salikrone ou Quisnoa coupé ou fauché»). Area not restricted: INFERRED."
+  },
+  {
+   "resource": 17993,
+   "item": 21196,
+   "criterion": "Qa=2081&Qo=15028&PO<21196,20",
+   "why": "Anemona de sangre: one for every quisnoa gathered in the depths of Cocuzko's lake while the twenty for Chaklaplok's well are not all carried (Dofus pour les noobs, «La Nuit-qui-rugit»: «s'obtiennent automatiquement pour chaque Salikrone ou Quisnoa coupé ou fauché»). Area not restricted: INFERRED."
+  }
   ]
 }

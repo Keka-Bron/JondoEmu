@@ -10634,6 +10634,99 @@
     {"objective": 15013, "quest": 2080, "kind": "beat", "monster": 5825, "map": 200279040, "why": "«Vence la pesadilla con la ayuda de Oyukipoca»: the rocky nightmare (5825) of her dream, fought beside her."},
     {"objective": 15015, "quest": 2080, "kind": "enter", "map": 197922050, "why": "«Templo olvidado de Oyukipoca»: the map in front of the temple, [-79,-11], whose door leads in (197921792)."},
     {"objective": 15016, "quest": 2080, "kind": "beat", "monster": 5884, "map": 197922050, "why": "«Ábrete paso en el templo»: the pale arakne (5884) in front of it (Dofus pour les noobs («Cauchemar infini»))."},
-    {"objective": 15017, "quest": 2080, "kind": "click", "elements": [{"map": 197921792, "element": 517364}], "afterObjectives": [15016], "why": "«Reza en el templo de Oyukipoca»: the altar, the temple's one element besides its door (517290)."}
+    {"objective": 15017, "quest": 2080, "kind": "click", "elements": [{"map": 197921792, "element": 517364}], "afterObjectives": [15016], "why": "«Reza en el templo de Oyukipoca»: the altar, the temple's one element besides its door (517290)."},
+  {
+   "objective": 15020,
+   "quest": 2081,
+   "kind": "reply",
+   "replies": [47200],
+   "why": "«Haz que la diosa Ixchelonia se manifieste»: the keyholder's reply 47200 asks Torkelonia's leave to speak with the moon goddess. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15022,
+   "quest": 2081,
+   "kind": "click",
+   "elements": [{"map": 197920770, "element": 517371}],
+   "afterObjectives": [15021],
+   "why": "«Reza en el templo de Kinichinti»: the cup at the back of the temple. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15026,
+   "quest": 2081,
+   "kind": "click",
+   "elements": [{"map": 198445056, "element": 517372}],
+   "afterObjectives": [15025],
+   "why": "«Reza ante el pozo de Chaklaplok»: the red well. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15028,
+   "quest": 2081,
+   "kind": "click",
+   "elements": [{"map": 198445056, "element": 517372}],
+   "requires": [{"item": 21196, "count": 20}],
+   "spends": true,
+   "afterObjectives": [15027],
+   "why": "«Lanza una veintena de anemonas de sangre en el pozo»: the twenty blood anemones are thrown into the well. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15030,
+   "quest": 2081,
+   "kind": "click",
+   "elements": [{"map": 197920002, "element": 517373}],
+   "requires": [{"item": 17160, "count": 2}],
+   "spends": true,
+   "afterObjectives": [15029],
+   "why": "«Atrae a un miauguar ante el antro Tylezia»: the two tasty meats (Bidoche Goutue) go on the root that sticks out of the ground. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15031,
+   "quest": 2081,
+   "kind": "beat",
+   "monster": 5885,
+   "map": 197920002,
+   "why": "«Domar a los miauguares»: the solo fight against the miauguar (5885). (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15032,
+   "quest": 2081,
+   "kind": "enter",
+   "map": 197921792,
+   "requires": [{"item": 21246, "count": 1}],
+   "spends": true,
+   "afterObjectives": [15031],
+   "why": "«Guia a los miauguares hasta el templo de Oyukipoca»: the tamed miauguar (follower 21246) walks into the temple. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15033,
+   "quest": 2081,
+   "kind": "reply",
+   "replies": [47392],
+   "why": "«Convierte un cocodrail cocuzkeno al culto de Oyukipoca»: the devout's reply 47392 asks him to come to the temple. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15034,
+   "quest": 2081,
+   "kind": "enter",
+   "map": 197921792,
+   "requires": [{"item": 21247, "count": 1}],
+   "spends": true,
+   "afterObjectives": [15033],
+   "why": "«Escolta al cocuzkeno devoto hasta el templo»: the devout (follower 21247) walks into the temple. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15037,
+   "quest": 2081,
+   "kind": "click",
+   "elements": [{"map": 197921792, "element": 517364}],
+   "afterObjectives": [15032, 15034],
+   "why": "«Reza ante el altar para que Oyukipoca se manifieste»: the altar 517364. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15039,
+   "quest": 2081,
+   "kind": "reply",
+   "replies": [47409],
+   "why": "«Asiste al encuentro entre Tylezia y Oyukipoca»: the cold wind (47409) that brings Osamodas. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  }
   ]
 }
