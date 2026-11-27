@@ -3944,6 +3944,7 @@ namespace Jondo.Unity.Server.Managers
                                 Sobre = aQuien ?? candidato, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
                                 HeldCaster = lanzaElHijo, HeldSpell = efecto.DiceNum,
                                 HeldGrade = Math.Max(1, efecto.DiceSide), HeldCell = aQueCasilla, HeldCritical = critical,
+                                HechizoOrigen = spell, NivelOrigen = grade,
                             });
                             continue;
                         }
@@ -4069,6 +4070,7 @@ namespace Jondo.Unity.Server.Managers
                                 Sobre = sobre, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
                                 HeldCaster = lanzaElHijo, HeldSpell = hecho.HechizoEncadenado,
                                 HeldGrade = hecho.GradoEncadenado, HeldCell = casillaDelHijo, HeldCritical = critical,
+                                HechizoOrigen = spell, NivelOrigen = grade,
                             });
                             continue;
                         }

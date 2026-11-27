@@ -371,6 +371,50 @@ namespace Jondo.Unity.Server.Managers
                                          && string.Equals(r.Triggers ?? EffectEngine.AlLanzar, EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)
                                          && SummonsByRows(SpellEffects.De(r.DiceNum, Math.Max(1, r.DiceSide)), depth + 1))));
 
+            /// <summary>
+            /// The map cells its summon is worth more on: the ones a ';' zone names, in what the spell
+            /// casts on its caster when cast, for a creature by template, when the caster meets that
+            /// row's own conditions. A Kwapa's water bombombre born on the cells 16747 names, with
+            /// Nagate's state 1888 on the Kwapa, turns into the one that takes a fighter to her
+            /// islet; born anywhere else it stays a plain bombombre.
+            /// </summary>
+            public IReadOnlyList<int> SummonCellsFor(Fighter caster)
+            {
+                if (caster == null || !Summons && !SummonsByRow) return Array.Empty<int>();
+                var cells = new List<int>();
+                FixedSummonCells(SpellEffects.De(Id, Math.Max(1, Grade)), caster, 0, cells);
+                return cells;
+            }
+
+            private static void FixedSummonCells(IEnumerable<SpellEffect> rows, Fighter caster, int depth, List<int> cells)
+            {
+                foreach (var r in rows)
+                {
+                    if (r.ForClientOnly
+                        || !string.Equals(r.Triggers ?? EffectEngine.AlLanzar, EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    var parts = (r.TargetMask ?? "").Split(',').Select(p => p.Trim()).ToList();
+                    if (!CasterMeets(parts, caster, OnCaster(r))) continue;
+                    if (r.Forma == ';' && r.CeldasFijas.Count > 0 && parts.Any(p => p.Length > 1 && p[0] == 'F' && char.IsDigit(p[1])))
+                        cells.AddRange(r.CeldasFijas.Where(c => !cells.Contains(c)));
+                    else if (depth < SubCastDepth && EffectEngine.EsDeLaFamiliaDeSublanzar(r.EffectId) && r.DiceNum > 0 && OnCaster(r))
+                        FixedSummonCells(SpellEffects.De(r.DiceNum, Math.Max(1, r.DiceSide)), caster, depth + 1, cells);
+                }
+            }
+
+            /// <summary>The caster's states a mask asks for ("*E1888", and "E"/"e" on a row aimed at the caster itself).</summary>
+            private static bool CasterMeets(IEnumerable<string> parts, Fighter caster, bool onCaster)
+            {
+                foreach (var part in parts)
+                {
+                    string t = part.StartsWith("*") ? part.Substring(1) : onCaster ? part : "";
+                    if (t.Length < 2 || !int.TryParse(t.Substring(1), out int state)) continue;
+                    if (t[0] == 'E' && !caster.Buffs.TieneEstado(state)) return false;
+                    if (t[0] == 'e' && caster.Buffs.TieneEstado(state)) return false;
+                }
+                return true;
+            }
+
             /// <summary>Whether one of its rows lays a trap: it is then aimed at the cells the enemy may walk.</summary>
             public bool LaysTraps => Rows.Any(r => r.EffectId == EffectEngine.ColocaUnaTrampa);
 
@@ -1032,6 +1076,13 @@ namespace Jondo.Unity.Server.Managers
             if (spell.Summons)
             {
                 foreach (int cell in MapGeometry.GetNeighbors(from)) yield return (monster, cell);
+                // The cells its summon is worth more on (Spell.SummonCellsFor), those in its reach.
+                foreach (int cell in spell.SummonCellsFor(monster).Where(c => c != from && cache.Free(c)))
+                {
+                    int d = MapGeometry.Distance(from, cell);
+                    if (d >= spell.MinRange && d <= spell.ReachFor(monster) && OnItsLines(spell, from, cell))
+                        yield return (monster, cell);
+                }
                 // A summon that cannot be put next to its caster: the free cells nearest the
                 // enemy, in its reach. The Kralamoure's tentacles come out four to twelve cells
                 // away, and the cells around him are not walkable: aimed at its neighbours only,
@@ -1210,6 +1261,7 @@ namespace Jondo.Unity.Server.Managers
                 // caster shields him from nothing.
                 int Nearest(int cell) => enemies.Count == 0 ? 0 : enemies.Min(e => MapGeometry.Distance(cell, e.CellId));
                 value += 40 + monster.Level / 2.0 + 15 * (Nearest(from) - Nearest(aim));
+                if (spell.SummonCellsFor(monster).Contains(aim)) value += 60;
             }
 
             // Cast on itself, a spell for enemies is never aimed at one, and weighed as one it was

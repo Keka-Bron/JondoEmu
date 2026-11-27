@@ -72,5 +72,30 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.Contains(fight.Todos, f => f.IsAlive && f.MonsterId == WaterBombombre);
         }
+
+        /// <summary>
+        /// Born on a cell 16747 names, with Nagate's 1888 on its Kwapa, the bombombre turns (6234):
+        /// 16747 wants it without 1901, and the row after it gives it that state. Done at birth,
+        /// the 1901 came first and none ever turned.
+        /// </summary>
+        [Fact]
+        public async Task Born_on_a_named_cell_the_bombombre_turns()
+        {
+            if (SpellEffects.De(16747, 1).Count == 0) return;
+            const int Named = 256;
+            var (kwapa, enemy, fight, _) = Duel(6247);
+            kwapa.CellId = Enumerable.Range(0, MapGeometry.MaxCells).First(c => MapGeometry.Distance(c, Named) == 4);
+            enemy.CellId = Enumerable.Range(0, MapGeometry.MaxCells)
+                .First(c => MapGeometry.Distance(c, Named) == 8 && MapGeometry.Distance(c, kwapa.CellId) > 4);
+            kwapa.Buffs.PonerEstado(1888);
+            fight.StartFight();
+
+            var tactics = FightHandler.TacticsOf(kwapa);
+            Assert.Contains(Named, tactics.First(s => s.Id == Pepinobus).SummonCellsFor(kwapa));
+
+            await FightHandler.AplicarEfectosAsync(null, fight, kwapa, Pepinobus, 1, null, EffectEngine.AlLanzar, Named);
+
+            Assert.Contains(fight.Todos, f => f.IsAlive && f.MonsterId == 6234);
+        }
     }
 }
