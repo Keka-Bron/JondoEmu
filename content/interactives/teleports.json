@@ -2039,6 +2039,40 @@
     {
       "map": 147324928, "element": 487857, "cell": 248, "gfx": 48784, "type": -1, "skill": 184, "toMap": 147326976, "toCell": 297, "criterion": "Qa=1608&Qo<9413",
       "why": "Quest 1608, the undersea cave: Dofus pour les noobs («Le disparu de Sufokia»): «Cliquez sur le point lumineux au mur pour ouvrir la porte et franchissez la» - the glowing point (graphic 48784, no skill in the data) opens the stone doors into the sanctuary where Vardo waits. Type -1 and skill 184 as the measured passages. INFERRED landing cell 297 (the cell the walk-in lands on, left of the sanctuary). The sanctuary declares no element and Vardo's last reply is the way out, so the door opens only while he still waits (1608 under way, 9413 not done)."
+    },
+    {
+      "map": 196216844,
+      "element": 517277,
+      "cell": 215,
+      "gfx": 38095,
+      "type": 0,
+      "skill": 114,
+      "toMap": 196217868,
+      "toCell": 438,
+      "why": "2078: the door of the chief's house in the anomaly village [-4,26] (DPLN: enter the house). Landing cell INFERRED."
+    },
+    {
+      "map": 196217868,
+      "element": 517274,
+      "cell": 438,
+      "gfx": 3518,
+      "type": -1,
+      "skill": 114,
+      "toMap": 196216844,
+      "toCell": 215,
+      "why": "2078: the house's way out onto the anomaly village. Landing cell INFERRED."
+    },
+    {
+      "map": 196216844,
+      "element": 517368,
+      "cell": 345,
+      "gfx": 301294,
+      "type": 0,
+      "skill": 114,
+      "toMap": 88212481,
+      "toCell": 282,
+      "criterion": "POE21186,1",
+      "why": "2078: the anomaly village's exit back to the zaap of the Scarafeuilles plain, open only with the Dofus vulbis worn (DPLN: equip the Dofus, leave the anomaly)."
     }
   ]
 }

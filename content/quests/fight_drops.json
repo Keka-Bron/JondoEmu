@@ -260,6 +260,29 @@
       "monsters": [2848],
       "criterion": "Qs=1150&Qo>3779&PO!11261",
       "why": "577: «vous droperez l'anneau automatiquement sur le combat de la dernière salle» (Dofus pour les noobs, Pêche en eaux gelées); the last room of the Mansot Royal dungeon is the Morsagüino Real (2848). The ring is Damar's alliance (11261), once he has told of it."
+    },
+    {
+      "item": 34132,
+      "percent": 100,
+      "monsters": [
+        2917
+      ],
+      "criterion": "PT=413&Qa=592&Qo<3932&PO!34132",
+      "why": "«Prefiere morir en el mar» (592): the soul of Guzmán Onelsako (monster 2917, souls criterion 'Qo=3829&PO!34132') falls from the fight when the soul stone caught it (Dofus pour les noobs («Prefiere morir en el mar»))."
+    },
+    {
+      "item": 21186,
+      "percent": 100,
+      "monsters": [5868],
+      "criterion": "Qa=2078&Qo>14982&PO!21186",
+      "why": "2078 (Amaknomalia): the village chief drops the Dofus vulbis (DPLN: «vous dropez le Dofus Vulbis»). No other source in the engine."
+    },
+    {
+      "item": 21219,
+      "percent": 100,
+      "monsters": [5873],
+      "criterion": "Qa=2078&Qo>14988&Qo<14991",
+      "why": "2078: the captured energy ball fills the airtight box (21219) (DPLN: combat the ball and capture it). INFERRED to be the filled box 21219."
     }
   ]
 }

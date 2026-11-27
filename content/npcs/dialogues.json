@@ -18879,7 +18879,8 @@
             { "reply": 24524, "next": 20500, "quest": 1618, "beforeObjective": 9536 },
             { "reply": 24560, "next": 20523, "quest": 1620, "beforeObjective": 9560 },
             { "reply": 67861, "next": 50624, "quest": 2443, "beforeObjective": 18474, "completes": 18474, "params": [[30, 18474]] },
-            { "reply": 67866, "next": 50625, "criterion": "Qf=2443&PL>69", "beforeQuest": 2444 }
+            { "reply": 67866, "next": 50625, "criterion": "Qf=2443&PL>69", "beforeQuest": 2444 },
+            { "reply": 36328, "next": 30184, "quest": 1946, "afterObjective": 13541, "beforeObjective": 13542 }
           ]
         },
         {
@@ -19002,9 +19003,13 @@
             { "reply": 67862, "startsQuest": 2444, "params": [[34, 2444]] },
             { "reply": 67869, "startsQuest": 2444, "params": [[34, 2444]] }
           ]
+        },
+        {
+          "message": 30184,
+          "choices": []
         }
       ],
-      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539). «Después de él, el diluvio» (2443): «Evocar el ámbar encantado» with Hel Munster ends the quest (Dofus pour les noobs). Reply-to-message link INFERRED from the ids (67861, 50624). «Muchos cuerboks en la cabeza» (2444): Hel Munster has no time for the amber but points to the Ancestral Treechnid and Tronky's shortcut. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "Hel Munster, in his smithmagic workshop of the treechnid forest [-5,-13] (664). «C'est tout simple»: a little sadida eyeing his metaria jars (20500). «Munster lève le mystère» (1620) of Dofus pour les noobs: the araknas? never looked into it (20523, «Te imploro que me ayudes»: 9560, the magic cage 16199), a specimen with long teeth (20524, 20525); the cage on the table, a sleeping spell (20526, «Buscar la pócima»: the jar in his workshop); the potion poured, a magical origin, an egg of the queen (20527, 20528), an illusion to get in unseen, six arakhai glands (20529), the black mud, swallow it (20530: the arakhai disguise 16197), no fighting or the illusion goes (20531); the egg, an ancient spell, the Ancestral Treechnid (20535, 20536); «it was an accident», somebody wants to meet you in the Dark Forest's clearing (20537-20539). «Después de él, el diluvio» (2443): «Evocar el ámbar encantado» with Hel Munster ends the quest (Dofus pour les noobs). Reply-to-message link INFERRED from the ids (67861, 50624). «Muchos cuerboks en la cabeza» (2444): Hel Munster has no time for the amber but points to the Ancestral Treechnid and Tronky's shortcut. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 1946: «¿Cómo reduzco a polvo de necrónix con el triturador?» (36328, line 30184); the binding of 13542 takes the shard and hands the dust. Dofus pour les noobs («La mort de ma vie»)."
     },
   {
       "npc": 2876,
@@ -27790,7 +27795,8 @@
             { "reply": 198, "next": 248 },
             { "reply": 36223, "next": 30106, "criterion": "PL>49&Qa!1938&Qf!1938" },
             { "reply": 36223, "next": 30108, "criterion": "PL<50" },
-            { "reply": 29413, "quest": 1756, "next": 24481, "afterObjective": 11230, "beforeObjective": 11231 }
+            { "reply": 29413, "quest": 1756, "next": 24481, "afterObjective": 11230, "beforeObjective": 11231 },
+            { "reply": 47024, "next": 35579, "quest": 2079, "criterion": "Qa=2079&Qo>14993&Qo<14994" }
           ]
         },
         {
@@ -27899,9 +27905,51 @@
           "choices": [
             { "reply": 29407, "quest": 1756, "completes": 11231, "params": [[30, 11231]] }
           ]
+        },
+        {
+          "message": 35579,
+          "choices": [
+            { "reply": 47023, "next": 35580 }
+          ]
+        },
+        {
+          "message": 35580,
+          "choices": [
+            { "reply": 47022, "next": 35581 }
+          ]
+        },
+        {
+          "message": 35581,
+          "choices": [
+            { "reply": 47021, "next": 35582 }
+          ]
+        },
+        {
+          "message": 35582,
+          "choices": [
+            { "reply": 47020, "next": 35583 }
+          ]
+        },
+        {
+          "message": 35583,
+          "choices": [
+            { "reply": 47019, "next": 35584 }
+          ]
+        },
+        {
+          "message": 35584,
+          "choices": [
+            { "reply": 47018, "next": 35585 }
+          ]
+        },
+        {
+          "message": 35585,
+          "choices": [
+            { "reply": 47017, "quest": 2079, "completes": 14994, "params": [[30, 14994]] }
+          ]
         }
       ],
-      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869). «Protección divina» (2194), for the class-2 temple's own: «Estoy de camino al Bosque Maléfico» (52977), madness to go without protection, train against a dopeul and pray to the statue (40673); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40674); then Trimpize at the forest's edge (40675), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52974) is 16292 (Dofus pour les noobs, «Protection divine»). «El dragón blanco» (1905), objective 13012: «Il faudra vous rendre au temple Osamodas en [8,2] pour questionner Zeurg sur les bougies draconiques « Le questionner à propos des bougies draconiques et de leur utilité »» (Dofus pour les noobs): «¿Qué sabes de las velas dracónicas?, ¿para qué sirven?» (34437) -> the Osamodas light one to call the three great serpents (28716) -> «¿Dónde consigo una vela dracónica?» (34436) -> carve it yourself from wax and a wick, in Astrub's alchemists' workshop (28717) -> «¿Qué materiales hacen falta para fabricar la cera?» (34435) -> 28718, «¿Cómo elaboro la mecha?» (34434) -> 28719, «Partir en busca de los ingredientes» (34433) does 13012. INFERRED: the links between the three. «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36223), the towers' lair (30106), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36219) starts the quest and sends the character to pray before the class statue (30107, «Encontrar la estatua»); under level 50 he is told to wait (30108) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). Zeurg (42), «Quand les astres seront propices» (1756, Dofus pour les noobs): Bethel Akarna's exile and his return to Sufokia (24481-24486); the order of the replies is inferred."
+      "why": "Zeurg, master of the class-2 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 768, objective 4869). «Protección divina» (2194), for the class-2 temple's own: «Estoy de camino al Bosque Maléfico» (52977), madness to go without protection, train against a dopeul and pray to the statue (40673); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40674); then Trimpize at the forest's edge (40675), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52974) is 16292 (Dofus pour les noobs, «Protection divine»). «El dragón blanco» (1905), objective 13012: «Il faudra vous rendre au temple Osamodas en [8,2] pour questionner Zeurg sur les bougies draconiques « Le questionner à propos des bougies draconiques et de leur utilité »» (Dofus pour les noobs): «¿Qué sabes de las velas dracónicas?, ¿para qué sirven?» (34437) -> the Osamodas light one to call the three great serpents (28716) -> «¿Dónde consigo una vela dracónica?» (34436) -> carve it yourself from wax and a wick, in Astrub's alchemists' workshop (28717) -> «¿Qué materiales hacen falta para fabricar la cera?» (34435) -> 28718, «¿Cómo elaboro la mecha?» (34434) -> 28719, «Partir en busca de los ingredientes» (34433) does 13012. INFERRED: the links between the three. «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36223), the towers' lair (30106), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36219) starts the quest and sends the character to pray before the class statue (30107, «Encontrar la estatua»); under level 50 he is told to wait (30108) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). Zeurg (42), «Quand les astres seront propices» (1756, Dofus pour les noobs): Bethel Akarna's exile and his return to Sufokia (24481-24486); the order of the replies is inferred. 2079: Zeurg after the ambush tells of the slavery of the dragoeggs and sends the player to Osamodas' statue with a paragon (35579-35585). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
   {
       "npc": 41,
@@ -46052,15 +46100,27 @@
         {
           "message": 7722,
           "choices": [
-            { "reply": 8204, "quest": 665, "completes": 4048, "params": [[30, 4048]], "next": 8196, "holds": 11542 }
+            { "reply": 8204, "quest": 665, "completes": 4048, "params": [[30, 4048]], "next": 8196, "holds": 11542 },
+            { "reply": 7918, "next": 7900, "criterion": "PL>119&Qf=591&Qf=619&Qf=620&Qa!592&Qf!592" },
+            { "reply": 8021, "quest": 592, "completes": 3834, "params": [[30, 3834]], "holds": 11297, "next": 8023, "criterion": "Qa=592&Qo=3834" }
           ]
         },
         {
           "message": 8196,
           "choices": []
+        },
+        {
+          "message": 7900,
+          "choices": [
+            { "reply": 7919, "startsQuest": 592, "params": [[34, 592]] }
+          ]
+        },
+        {
+          "message": 8023,
+          "choices": []
         }
       ],
-      "why": "«Envío» (665): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8204 (4048) and his thanks (8196) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage»"
+      "why": "«Envío» (665): the letter of Tyler 'el Rencoroso' (11542) is handed to this NPC with «Toma la carta.»-like reply 8204 (4048) and his thanks (8196) follow. Dofus pour les noobs «Premier postage» ... «Quatorzième postage» «Prefiere morir en el mar» (592; Dofus pour les noobs («Prefiere morir en el mar»)): «Continuar con la conversación» (7918) leads to his missing father Guzmán (7900; «Vale» 7919 starts the quest); «Toma el botín de tu padre» (8021) hands the chest's letter over (3834) and he complains (8023). INFERRED order of the replies: the client carries sentences and answers but not which go together."
     },
   {
       "npc": 1245,
@@ -59291,6 +59351,9 @@
       "map": 0,
       "opening": 34368,
       "_source": "official server packet captures, 2026-11-17 to 11-21",
+      "openings": [
+        { "quest": 2078, "message": 35555, "pending": 14986 }
+      ],
       "lines": [
         {
           "message": 34368,
@@ -59303,7 +59366,9 @@
             { "reply": 43447, "next": 34489, "criterion": "Qf=2063&Qa!2064&Qf!2064" },
             { "reply": 43461, "next": 34493, "criterion": "Qa=2064&Qo>14881&Qo<14882" },
             { "reply": 45214, "criterion": "Qa=2064&Qo>14897&Qo<14898", "quest": 2064, "completes": 14898, "params": [[30, 14898]] },
-            { "reply": 50309, "next": 38633, "criterion": "Qf=2064&Qa!2097&Qf!2097" }
+            { "reply": 50309, "next": 38633, "criterion": "Qf=2064&Qa!2097&Qf!2097" },
+            { "reply": 46984, "next": 35552, "criterion": "PL>179&Qf=2064&Qa!2078&Qf!2078" },
+            { "reply": 46986, "next": 35554, "quest": 2078, "afterObjective": 15074, "beforeObjective": 14984, "completes": 14984, "params": [[30, 14984]] }
           ]
         },
         {
@@ -59504,9 +59569,52 @@
           "choices": [
             { "reply": 50305 }
           ]
+        },
+        {
+          "message": 35552,
+          "choices": [
+            { "reply": 46983, "next": 35553 }
+          ]
+        },
+        {
+          "message": 35553,
+          "choices": [
+            { "reply": 46981, "startsQuest": 2078, "params": [[34, 2078]] },
+            { "reply": 46982 }
+          ]
+        },
+        {
+          "message": 35554,
+          "choices": [
+            { "reply": 46987 }
+          ]
+        },
+        {
+          "message": 35555,
+          "choices": [
+            { "reply": 46992, "next": 35556 }
+          ]
+        },
+        {
+          "message": 35556,
+          "choices": [
+            { "reply": 46990, "next": 35557 }
+          ]
+        },
+        {
+          "message": 35557,
+          "choices": [
+            { "reply": 46989, "next": 35558 }
+          ]
+        },
+        {
+          "message": 35558,
+          "choices": [
+            { "reply": 46988, "gives": 21186, "quest": 2078, "completes": 14986, "params": [[30, 14986]] }
+          ]
         }
       ],
-      "why": "As the official server says it, with no quest under way. 2062 (Cada cosa a su tiempo): she is shown the perpetual pixel (43299 closes 14832), cannot study it herself and sends the player to Doctor Braun in Xelorium; at the end the report (43300) closes 14843. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): she accepts the player on the enquiry and sends them to the FBA (34382-34384; 43303 starts the quest), and takes the FBA's results at the end (43444 closes 14880). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): the same start from the opening for a player whose 2062 talk is long over. INFERRED reply order. 2064 (Sera mejor antes): the Envoyee notices Entropix (43447/43446 start the quest on 34489), answers about the zaaps of the cursed day (43461 -> 34493-34503; the last reply closes 14882 and sends the player to Doctor Bu in Sufokia) and takes the report on Martalo (45214 closes 14898). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2097 (Pesadillas premonitorias): 50309 (ask the Watchers' discoveries) opens 38633-38636; 38635 is the quest's step dialog, so 50306 starts it. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "As the official server says it, with no quest under way. 2062 (Cada cosa a su tiempo): she is shown the perpetual pixel (43299 closes 14832), cannot study it herself and sends the player to Doctor Braun in Xelorium; at the end the report (43300) closes 14843. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): she accepts the player on the enquiry and sends them to the FBA (34382-34384; 43303 starts the quest), and takes the FBA's results at the end (43444 closes 14880). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2063 (En la frontera de lo real): the same start from the opening for a player whose 2062 talk is long over. INFERRED reply order. 2064 (Sera mejor antes): the Envoyee notices Entropix (43447/43446 start the quest on 34489), answers about the zaaps of the cursed day (43461 -> 34493-34503; the last reply closes 14882 and sends the player to Doctor Bu in Sufokia) and takes the report on Martalo (45214 closes 14898). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2097 (Pesadillas premonitorias): 50309 (ask the Watchers' discoveries) opens 38633-38636; 38635 is the quest's step dialog, so 50306 starts it. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2078 (Amaknomalia): the Envoyee tells of the invisible anomalies (46984 -> 35552 -> 35553, 46981 accepts and starts the quest), takes the Dofus vulbis (46986 closes 14984, 35554), the ambush fight starts on 46987; afterwards she looks at the Dofus again (35555-35558) and sends the player to Xelorium (46988 closes 14986 and gives the dofus back). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
   {
       "npc": 104,
@@ -71521,7 +71629,10 @@
           "choices": [
             { "reply": 22939, "next": 19243, "criterion": "Qf=1572&Qa!1573&Qf!1573" },
             { "reply": 43312, "next": 34385, "quest": 2062, "criterion": "Qa=2062&Qo>14832&Qo<14835&PO=20822" },
-            { "reply": 43316, "next": 34392, "quest": 2062, "criterion": "Qa=2062&Qo>14841&Qo<14843" }
+            { "reply": 43316, "next": 34392, "quest": 2062, "criterion": "Qa=2062&Qo>14841&Qo<14843" },
+            { "reply": 47010, "next": 35566, "quest": 2078, "completes": 14988, "completesAll": [14987, 14988], "params": [[30, 14988]], "criterion": "Qa=2078&Qo>14986&Qo<14988" },
+            { "reply": 47015, "next": 35576, "criterion": "Qa=2078&Qo>14990&Qo<14991" },
+            { "reply": 47014, "next": 35577, "criterion": "Qf=2078&Qa!2079&Qf!2079" }
           ]
         },
         {
@@ -71607,9 +71718,81 @@
           "choices": [
             { "reply": 43313 }
           ]
+        },
+        {
+          "message": 35566,
+          "choices": [
+            { "reply": 47008, "next": 35567 }
+          ]
+        },
+        {
+          "message": 35567,
+          "choices": [
+            { "reply": 47009, "next": 35568 }
+          ]
+        },
+        {
+          "message": 35568,
+          "choices": [
+            { "reply": 47007, "next": 35569 }
+          ]
+        },
+        {
+          "message": 35569,
+          "choices": [
+            { "reply": 47006, "next": 35570 }
+          ]
+        },
+        {
+          "message": 35570,
+          "choices": [
+            { "reply": 47003, "next": 35571 }
+          ]
+        },
+        {
+          "message": 35571,
+          "choices": [
+            { "reply": 47005, "next": 35572 }
+          ]
+        },
+        {
+          "message": 35572,
+          "choices": [
+            { "reply": 47002, "next": 35573 }
+          ]
+        },
+        {
+          "message": 35573,
+          "choices": [
+            { "reply": 47004, "next": 35574 }
+          ]
+        },
+        {
+          "message": 35574,
+          "choices": [
+            { "reply": 47012, "next": 35575 }
+          ]
+        },
+        {
+          "message": 35575,
+          "choices": [
+            { "reply": 47011, "gives": 21218, "alsoGives": [21218, 21186] }
+          ]
+        },
+        {
+          "message": 35576,
+          "choices": [
+            { "reply": 47014, "quest": 2078, "completes": 14991, "params": [[30, 14991]], "next": 35577 }
+          ]
+        },
+        {
+          "message": 35577,
+          "choices": [
+            { "reply": 47013, "startsQuest": 2079, "params": [[34, 2079]] }
+          ]
         }
       ],
-      "why": "Doctor Emeterio Braun at the Xelorium outpost [1,6] (Dofus pour les noobs («Traitement de choc»): «Parlez au Doc Emiette Borgne à la suite de la quête précédente»): «Contarle lo que le ha ocurrido a la encargada de los zaaps» (22939) leads to his answers (19243 a century or two, 19244 the electro-ray, 19245 it only tickles) and, with the reservations (22936), 19265 sends a krosmoglob to the Temple; «Agarrar el electrorrayo» (22937) starts the quest and hands the electro-ray over. INFERRED order of the replies: the client carries sentences and answers but not which go together. 2062 (Cada cosa a su tiempo): the pixel is broken with a hammer and rebuilds itself (34385-34391; handed over and given back because the objective takes it), then Fraktal's megalith; later Entropix is presented (34392-34394). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "Doctor Emeterio Braun at the Xelorium outpost [1,6] (Dofus pour les noobs («Traitement de choc»): «Parlez au Doc Emiette Borgne à la suite de la quête précédente»): «Contarle lo que le ha ocurrido a la encargada de los zaaps» (22939) leads to his answers (19243 a century or two, 19244 the electro-ray, 19245 it only tickles) and, with the reservations (22936), 19265 sends a krosmoglob to the Temple; «Agarrar el electrorrayo» (22937) starts the quest and hands the electro-ray over. INFERRED order of the replies: the client carries sentences and answers but not which go together. 2062 (Cada cosa a su tiempo): the pixel is broken with a hammer and rebuilds itself (34385-34391; handed over and given back because the objective takes it), then Fraktal's megalith; later Entropix is presented (34392-34394). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2078 (Amaknomalia): the Doc analyses the Dofus vulbis (47010 -> 35566-35575, closes 14987+14988) and hands out the two airtight boxes (47011); after the two balls 47015 -> 35576, 47014 closes the quest. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079 (La madre de los dragohuevos): after 2078 the Doc suggests the temple of Osamodas (35577); 47013 starts the quest (offered also from the opening for whoever left the dialogue). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
   {
       "npc": 2652,
@@ -75127,7 +75310,8 @@
           "choices": [
             { "reply": 43341, "next": 34407 },
             { "reply": 45194, "next": 34411, "quest": 2064, "completes": 14893, "params": [[30, 14893]], "criterion": "Qa=2064&Qo>14892&Qo<14893" },
-            { "reply": 45194, "next": 34411, "teleport": 196215814, "quest": 2064, "completes": 14894, "params": [[30, 14894]], "criterion": "Qa=2064&Qo>14893&Qo<14894&POE21009,1&POE21010,1" }
+            { "reply": 45194, "next": 34411, "teleport": 196215814, "quest": 2064, "completes": 14894, "params": [[30, 14894]], "criterion": "Qa=2064&Qo>14893&Qo<14894&POE21009,1&POE21010,1" },
+            { "reply": 45194, "next": 34411, "teleport": 196216844, "quest": 2078, "completes": 14980, "params": [[30, 14980]], "criterion": "Qa=2078&Qo<14980" }
           ]
         },
         {
@@ -75173,7 +75357,7 @@
           ]
         }
       ],
-      "why": "2062 (Cada cosa a su tiempo): Entropix learns the player's name and agrees to follow to Doctor Braun (the follower itself is not modelled: it stands at each destination). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2064 (Sera mejor antes): Entropix writes the player's name and 'zaaps dia maldito' (34490-34491); 43448 (turn to the Envoyee) closes 14881. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2064 (Sera mejor antes): 45194 'can you follow me?' (stands in for the follower the engine lacks: closes 14893 in Amakna); in Tainela the same reply, with the cronoxygen bottle and the chronomantic diving suit WORN, enters the anomaly of the past (closes 14894). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "2062 (Cada cosa a su tiempo): Entropix learns the player's name and agrees to follow to Doctor Braun (the follower itself is not modelled: it stands at each destination). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2064 (Sera mejor antes): Entropix writes the player's name and 'zaaps dia maldito' (34490-34491); 43448 (turn to the Envoyee) closes 14881. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2064 (Sera mejor antes): 45194 'can you follow me?' (stands in for the follower the engine lacks: closes 14893 in Amakna); in Tainela the same reply, with the cronoxygen bottle and the chronomantic diving suit WORN, enters the anomaly of the past (closes 14894). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2078 (Amaknomalia): the zaap of the Scarafeuilles plain offers «Entrar en la anomalía invisible con Entropix» (803574), which the engine does not model; Entropix beside it stands in and 45194 enters the anomaly village (14980). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
     },
   {
       "npc": 3265,
@@ -79175,7 +79359,8 @@
           "choices": [
             { "reply": 35593, "next": 29626, "quest": 1943, "beforeObjective": 13505, "completes": 13505, "params": [[30, 13505]] },
             { "reply": 35599, "next": 29632, "quest": 1943, "afterObjective": 13508, "beforeObjective": 13509, "completes": 13509, "params": [[30, 13509]] },
-            { "reply": 36422, "quest": 1945, "afterObjective": 13746, "beforeObjective": 13747, "next": 30245 }
+            { "reply": 36422, "quest": 1945, "afterObjective": 13746, "beforeObjective": 13747, "next": 30245 },
+            { "reply": 35784, "next": 29776, "quest": 1947, "afterObjective": 13569, "beforeObjective": 13570 }
           ]
         },
         {
@@ -79205,9 +79390,27 @@
           "choices": [
             { "reply": 36420, "quest": 1945, "completes": 13747, "params": [[30, 13747]] }
           ]
+        },
+        {
+          "message": 29776,
+          "choices": [
+            { "reply": 35783, "next": 29775, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29775,
+          "choices": [
+            { "reply": 35782, "next": 29777, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29777,
+          "choices": [
+            { "reply": 35781, "quest": 1947, "completes": 13570, "params": [[30, 13570]] }
+          ]
         }
       ],
-      "why": "Gueymoff at the Silent Wrecks [-48,-78] (1943): he takes Zrons' instructions (13505) and hears of the machine's setback (13509). Dofus pour les noobs («Au-delà de la Côte»). «Toucher le fond» (1945, 13747): Gueymoff, «Hablemos sobre lo que ha dicho el espíritu torturado» (36422): rumours of disappearances are normal in a hostile zone (30245), he mentioned them unasked (30246) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+      "why": "Gueymoff at the Silent Wrecks [-48,-78] (1943): he takes Zrons' instructions (13505) and hears of the machine's setback (13509). Dofus pour les noobs («Au-delà de la Côte»). «Toucher le fond» (1945, 13747): Gueymoff, «Hablemos sobre lo que ha dicho el espíritu torturado» (36422): rumours of disappearances are normal in a hostile zone (30245), he mentioned them unasked (30246) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies). 1947: Gueymoff knows nothing of the krobes (13570). INFERRED: reply order. Dofus pour les noobs («Krobe en bourg»)."
     },
     {
       "npc": 4218,
@@ -79946,7 +80149,19 @@
             { "reply": 35584, "next": 29617, "quest": 1942, "afterObjective": 13503, "beforeObjective": 13504, "completes": 13504, "params": [[30, 13504]] },
             { "reply": 35575 },
             { "reply": 36466, "quest": 1945, "afterObjective": 13756, "beforeObjective": 13757, "next": 30280 },
-            { "reply": 36486, "quest": 1945, "afterObjective": 13763, "beforeObjective": 13764, "next": 30298 }
+            { "reply": 36486, "quest": 1945, "afterObjective": 13763, "beforeObjective": 13764, "next": 30298 },
+            { "reply": 35727, "next": 29730, "quest": 1946, "afterObjective": 13539, "beforeObjective": 13540, "completes": 13540, "params": [[30, 13540]] },
+            { "reply": 35734, "next": 29742, "quest": 1946, "afterObjective": 13542, "beforeObjective": 13543, "completes": 13543, "params": [[30, 13543]] },
+            { "reply": 35736, "next": 29743, "quest": 1946, "afterObjective": 13543, "beforeObjective": 13544, "criterion": "PO=19426", "completes": 13544, "params": [[30, 13544]] },
+            { "reply": 35749, "next": 29754, "quest": 1946, "afterObjective": 13548, "beforeObjective": 13549, "completes": 13549, "params": [[30, 13549]] },
+            { "reply": 35750, "next": 29755, "quest": 1946, "afterObjective": 13550, "beforeObjective": 13551, "completes": 13551, "params": [[30, 13551]] },
+            { "reply": 35751, "next": 29756, "quest": 1946, "afterObjective": 13551, "beforeObjective": 13552, "completes": 13552, "params": [[30, 13552]] },
+            { "reply": 35753, "next": 29757, "quest": 1946, "afterObjective": 13552, "beforeObjective": 13553, "completes": 13553, "params": [[30, 13553]] },
+            { "reply": 35763, "next": 29761, "quest": 1946, "afterObjective": 13556, "beforeObjective": 13557 },
+            { "reply": 35774, "next": 29769, "quest": 1947, "afterObjective": 13566, "beforeObjective": 13567 },
+            { "reply": 35780, "next": 29773, "quest": 1947, "afterObjective": 13568, "beforeObjective": 13569 },
+            { "reply": 35787, "next": 29778, "quest": 1947, "afterObjective": 13570, "beforeObjective": 13571 },
+            { "reply": 35791, "next": 29780, "quest": 1947, "afterObjective": 13575, "beforeObjective": 13576 }
           ]
         },
         {
@@ -80036,9 +80251,145 @@
           "choices": [
             { "reply": 36484, "quest": 1945, "completes": 13764, "params": [[30, 13764]] }
           ]
+        },
+        {
+          "message": 29730,
+          "choices": [
+            { "reply": 35726, "next": 29731, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29731,
+          "choices": [
+            { "reply": 35725, "next": 29732, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29732,
+          "choices": [
+            { "reply": 35724, "next": 29733, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29733,
+          "choices": [
+            { "reply": 35723, "next": 29734, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29734,
+          "choices": [
+            { "reply": 35722, "next": 29735, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29735,
+          "choices": [
+            { "reply": 35721, "next": 29736, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29736,
+          "choices": [
+            { "reply": 35720, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29742,
+          "choices": [
+            { "reply": 35735, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29743,
+          "choices": [
+            { "reply": 35752, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29754,
+          "choices": []
+        },
+        {
+          "message": 29755,
+          "choices": []
+        },
+        {
+          "message": 29756,
+          "choices": []
+        },
+        {
+          "message": 29757,
+          "choices": []
+        },
+        {
+          "message": 29761,
+          "choices": [
+            { "reply": 35762, "next": 29762, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29762,
+          "choices": [
+            { "reply": 35761, "quest": 1946, "completes": 13557, "params": [[30, 13557]] }
+          ]
+        },
+        {
+          "message": 29769,
+          "choices": [
+            { "reply": 35773, "next": 29770, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29770,
+          "choices": [
+            { "reply": 35772, "quest": 1947, "completes": 13567, "params": [[30, 13567]] }
+          ]
+        },
+        {
+          "message": 29773,
+          "choices": [
+            { "reply": 35779, "next": 29774, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29774,
+          "choices": [
+            { "reply": 35778, "quest": 1947, "completes": 13569, "params": [[30, 13569]] }
+          ]
+        },
+        {
+          "message": 29778,
+          "choices": [
+            { "reply": 35786, "next": 29779, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29779,
+          "choices": [
+            { "reply": 35785, "quest": 1947, "completes": 13571, "params": [[30, 13571]] }
+          ]
+        },
+        {
+          "message": 29780,
+          "choices": [
+            { "reply": 35790, "next": 29781, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29781,
+          "choices": [
+            { "reply": 35789, "next": 29782, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29782,
+          "choices": [
+            { "reply": 35788, "quest": 1947, "completes": 13576, "params": [[30, 13576]] }
+          ]
         }
       ],
-      "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»). «Toucher le fond» (1945, 13757, 13764): Zrid Rahys in the Frigost depths [-47,-80]. «Hablemos de la misión de los steamers» (36466, 30280-30283), the crumpled plan (36462, 30284) and «Ir en busca del vórtice submarino» (36461) after the steamer's account; after the way out, the report (36486, 30298, 30299) closed by «Seguir su consejo e ir a hablar con Lilia Nha» (36484) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies)."
+      "why": "Zrid Rahys at [-47,-80] (1942): the algae talk (29605-29608, 13492), the parasites shown (35571) and the fanatics' ambush (35570), the share of parasites (35576, 13499, he hands over his list 19416) and the crate (35584, 13504). INFERRED: the order inside the talks and that 35576 hands over the list. Dofus pour les noobs («Algue au rythme»). «Toucher le fond» (1945, 13757, 13764): Zrid Rahys in the Frigost depths [-47,-80]. «Hablemos de la misión de los steamers» (36466, 30280-30283), the crumpled plan (36462, 30284) and «Ir en busca del vórtice submarino» (36461) after the steamer's account; after the way out, the report (36486, 30298, 30299) closed by «Seguir su consejo e ir a hablar con Lilia Nha» (36484) (Dofus pour les noobs, «Toucher le fond»). Reply order INFERRED from the message ids (the guide gives the story, not the replies). 1946 «La muerte de mi vida»: Zrid's lines (list of tasks, dust, pearl, iris, wood, the experiment, the fiasco). Dofus pour les noobs («La mort de ma vie»). 1947 «Krobe en bourg»: Zrid's lines (the attack on the steamers, the lie, the confession, the reproaches). INFERRED: reply order. Dofus pour les noobs («Krobe en bourg»)."
     },
     {
       "npc": 3305,
@@ -83430,6 +83781,739 @@
         }
       ],
       "why": "Zap Gobdon in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20140 on, reply 24100 closes 9494), in any order; once Eco freezes them they only stare (20143). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 5817,
+      "map": 64754688,
+      "opening": 42500,
+      "lines": [
+        {
+          "message": 42500,
+          "choices": [
+            { "reply": 55356, "next": 42501 }
+          ]
+        },
+        {
+          "message": 42501,
+          "choices": [
+            { "reply": 55353, "next": 42502 }
+          ]
+        },
+        {
+          "message": 42502,
+          "choices": [
+            { "reply": 55355, "next": 42503 }
+          ]
+        },
+        {
+          "message": 42503,
+          "choices": [
+            { "reply": 55354, "next": 42504 }
+          ]
+        },
+        {
+          "message": 42504,
+          "choices": [
+            { "reply": 55352, "teaches": 413, "next": 42505 }
+          ]
+        },
+        {
+          "message": 42505,
+          "choices": []
+        }
+      ],
+      "why": "The Volatile Spirit in the Kwakwa's nest exit room [-4,-7] (Dofus pour les noobs, «Nid du Kwakwa»: «À la fin de ce donjon, vous pouvez obtenir le sort «Capture d'âmes» en parlant au PNJ «Esprit Volatile» après avoir battu le Kwakwa»): «How can I learn the spell Talma Esmya created?» (55353) and «Remember the Soul Capture spell» (55352) teach spell 413 (client text 767007). INFERRED order of the replies; the two bwak-attack replies (55356 is used as the way in, 55357 is left out)."
+    },
+    {
+      "npc": 1308,
+      "map": 0,
+      "opening": 7901,
+      "lines": [
+        {
+          "message": 7901,
+          "choices": [
+            { "reply": 7920, "next": 7902, "criterion": "Qa=592&Qo=3829" },
+            { "reply": 8015, "quest": 592, "completes": 3932, "params": [[30, 3932]], "holds": 34132, "next": 8020, "criterion": "Qa=592&Qo=3932" },
+            { "reply": 8017, "teleport": 59244544, "mutation": 11404, "criterion": "Qa=592&Qo>3829&Qo<3832" },
+            { "reply": 8019, "quest": 592, "completes": 3832, "params": [[30, 3832]], "next": 8021, "criterion": "Qa=592&Qo=3832" }
+          ]
+        },
+        {
+          "message": 7902,
+          "choices": [
+            { "reply": 8012 },
+            { "reply": 8014 }
+          ]
+        },
+        {
+          "message": 8020,
+          "choices": [
+            { "reply": 8017, "teleport": 59244544, "mutation": 11404, "criterion": "Qa=592&Qo>3829&Qo<3832" },
+            { "reply": 8016 }
+          ]
+        },
+        {
+          "message": 8021,
+          "choices": []
+        }
+      ],
+      "why": "Guzmán Onelsako, the spirit of the pirate [-56,-77] and, once his soul is caught, on the northern reefs [-58,-83] (Dofus pour les noobs («Prefiere morir en el mar»)): «¿Dónde se encuentra el botín para tu hijo?» (7920) asks for his soul (7902): «Luchar para capturar el alma» (8012) is the fight alone with the soul stone worn; «¿Puedo entrar en los restos del naufragio?» (8015) hands the soul over (3932) and he warns he turns the player into a pirate ghost (8020); «Entrar en los restos del naufragio» (8017) is the way into the rebel spirit's mini-dungeon with the mutation Pirate Ghost (item 11404); after it «¿Dónde está el botín?» (8019, 3832) says it lies south of the Cradle of Alma (8021). INFERRED order of the replies: the client carries sentences and answers but not which go together. Fix: the way in stays offered while the dungeon is not beaten (3830 closes at the first entry, 3831 is the boss)."
+    },
+    {
+      "npc": 4232,
+      "map": 0,
+      "opening": 29724,
+      "lines": [
+        {
+          "message": 29724,
+          "choices": [
+            { "reply": 35713, "next": 29725, "criterion": "Qf=1944&Qa!1946&Qf!1946", "beforeQuest": 1946 },
+            { "reply": 35719, "next": 29729, "quest": 1946, "afterObjective": 13538, "beforeObjective": 13539, "completes": 13539, "params": [[30, 13539]] },
+            { "reply": 35755, "next": 29758, "quest": 1946, "afterObjective": 13553, "beforeObjective": 13554 },
+            { "reply": 35765, "next": 29763, "quest": 1946, "afterObjective": 13557, "beforeObjective": 13558, "completes": 13558, "params": [[30, 13558]] }
+          ]
+        },
+        {
+          "message": 29725,
+          "choices": [
+            { "reply": 35712, "next": 30183, "startsQuest": 1946, "params": [[34, 1946]] }
+          ]
+        },
+        {
+          "message": 30183,
+          "choices": []
+        },
+        {
+          "message": 29729,
+          "choices": [
+            { "reply": 35718, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29758,
+          "choices": [
+            { "reply": 35754, "quest": 1946, "completes": 13554, "params": [[30, 13554]] }
+          ]
+        },
+        {
+          "message": 29763,
+          "choices": [
+            { "reply": 35764, "quest": 1946 }
+          ]
+        }
+      ],
+      "why": "Talmon (1946): the quest starts here at [-45,-80] (step line 30183); he takes Clarisa back (13539, 19423), is told to wait (13554) and hears the bad news (13558). Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4234,
+      "map": 0,
+      "opening": 29726,
+      "lines": [
+        {
+          "message": 29726,
+          "choices": [
+            { "reply": 35717, "next": 29727, "quest": 1946, "afterObjective": 13536, "beforeObjective": 13538 }
+          ]
+        },
+        {
+          "message": 29727,
+          "choices": [
+            { "reply": 35716, "next": 29728, "quest": 1946 },
+            { "reply": 35714, "quest": 1946, "afterObjective": 13536, "beforeObjective": 13538 }
+          ]
+        },
+        {
+          "message": 29728,
+          "choices": [
+            { "reply": 35715, "quest": 1946 }
+          ]
+        }
+      ],
+      "why": "Pring (Tryng) at [-46,-82] (1946, 13537-13538): «Liberar a Clarisa por la fuerza» (35714) starts the fight. INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4233,
+      "map": 0,
+      "opening": 29759,
+      "lines": [
+        {
+          "message": 29759,
+          "choices": [
+            { "reply": 35758, "next": 29760, "quest": 1946, "afterObjective": 13554, "beforeObjective": 13556 },
+            { "reply": 35760, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29760,
+          "choices": [
+            { "reply": 35759, "quest": 1946, "afterObjective": 13554, "beforeObjective": 13556 },
+            { "reply": 35757, "quest": 1946 }
+          ]
+        }
+      ],
+      "why": "Clarisa at Zrid's wreck [-47,-80] (1946, 13555-13556): «Defenderte contra el asalto de los fantasmas» (35759) starts the fight. INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4262,
+      "map": 0,
+      "opening": 29748,
+      "lines": [
+        {
+          "message": 29748,
+          "choices": [
+            { "reply": 35742, "next": 29749, "quest": 1946, "afterObjective": 13544, "beforeObjective": 13545 }
+          ]
+        },
+        {
+          "message": 29749,
+          "choices": [
+            { "reply": 35741, "quest": 1946, "criterion": "PO=19426" }
+          ]
+        }
+      ],
+      "why": "Vegan, ghost at [-47,-81] (1946, 13545): the pearl absorbs his soul. INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4263,
+      "map": 0,
+      "opening": 29750,
+      "lines": [
+        {
+          "message": 29750,
+          "choices": [
+            { "reply": 35746, "next": 29751, "quest": 1946, "afterObjective": 13545, "beforeObjective": 13546 },
+            { "reply": 35743, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29751,
+          "choices": [
+            { "reply": 35745, "next": 29752, "quest": 1946 }
+          ]
+        },
+        {
+          "message": 29752,
+          "choices": [
+            { "reply": 35744, "quest": 1946, "criterion": "PO=19426" }
+          ]
+        }
+      ],
+      "why": "Zhana (Zona), ghost at [-49,-82] (1946, 13546): «Patienter» then the pearl. INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4260,
+      "map": 0,
+      "opening": 29744,
+      "lines": [
+        {
+          "message": 29744,
+          "choices": [
+            { "reply": 35738, "next": 29745, "quest": 1946, "afterObjective": 13546, "beforeObjective": 13547 }
+          ]
+        },
+        {
+          "message": 29745,
+          "choices": [
+            { "reply": 35737, "quest": 1946, "criterion": "PO=19426" }
+          ]
+        }
+      ],
+      "why": "Hakun Hamatata, ghost at [-46,-83] (1946, 13547). INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4261,
+      "map": 0,
+      "opening": 29746,
+      "lines": [
+        {
+          "message": 29746,
+          "choices": [
+            { "reply": 35740, "next": 29747, "quest": 1946, "afterObjective": 13547, "beforeObjective": 13548 }
+          ]
+        },
+        {
+          "message": 29747,
+          "choices": [
+            { "reply": 35739, "quest": 1946, "criterion": "PO=19426" }
+          ]
+        }
+      ],
+      "why": "Civori (Vousici), ghost at [-45,-81] (1946, 13548). INFERRED: reply order. Dofus pour les noobs («La mort de ma vie»)."
+    },
+    {
+      "npc": 4971,
+      "map": 0,
+      "opening": 35559,
+      "lines": [
+        {
+          "message": 35559,
+          "choices": [
+            { "reply": 46993 }
+          ]
+        }
+      ],
+      "why": "2078: Grozilla's fight starts on 46993 (Atacar a los guardianes de la anomalia)."
+    },
+    {
+      "npc": 4972,
+      "map": 0,
+      "opening": 35560,
+      "lines": [
+        {
+          "message": 35560,
+          "choices": [
+            { "reply": 46994 }
+          ]
+        }
+      ],
+      "why": "2078: Grasmera's fight starts on 46994."
+    },
+    {
+      "npc": 4961,
+      "map": 0,
+      "opening": 35562,
+      "lines": [
+        {
+          "message": 35562,
+          "choices": [
+            { "reply": 46998, "next": 35563 }
+          ]
+        },
+        {
+          "message": 35563,
+          "choices": [
+            { "reply": 46999, "next": 35564 }
+          ]
+        },
+        {
+          "message": 35564,
+          "choices": [
+            { "reply": 46997, "next": 35565 }
+          ]
+        },
+        {
+          "message": 35565,
+          "choices": [
+            { "reply": 46996 }
+          ]
+        }
+      ],
+      "why": "2078: the chief fears for the ruby egg (35562-35565) and the fight starts on 46996. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 4974,
+      "map": 0,
+      "opening": 35578,
+      "lines": [
+        {
+          "message": 35578,
+          "choices": [
+            { "reply": 47016 }
+          ]
+        }
+      ],
+      "why": "2078: the energy ball (35578); 47016 'Intentar guardar la fuente en una caja hermetica' starts the capture fight."
+    },
+    {
+      "npc": 4946,
+      "map": 0,
+      "opening": 35586,
+      "lines": [
+        {
+          "message": 35586,
+          "choices": [
+            { "reply": 47036, "next": 35590, "criterion": "Qa=2079&Qo>14995&Qo<14996" },
+            { "reply": 47039, "next": 35592, "criterion": "Qa=2079&Qo>14997&Qo<14998" },
+            { "reply": 47040, "teleport": 199757826, "criterion": "Qa=2079&Qo>14999&Qo<15001" }
+          ]
+        },
+        {
+          "message": 35590,
+          "choices": [
+            { "reply": 47035, "next": 35591, "quest": 2079, "completes": 14996, "params": [[30, 14996]] }
+          ]
+        },
+        {
+          "message": 35591,
+          "choices": [
+            { "reply": 47034 }
+          ]
+        },
+        {
+          "message": 35592,
+          "choices": [
+            { "reply": 47038, "teleport": 199757826, "quest": 2079, "completes": 14998, "params": [[30, 14998]] }
+          ]
+        }
+      ],
+      "why": "2079: Dicton Karly refuses (35590), is shown the golden horn (47035, handed over), the dragoeggs ambush (47034), then lets the player in (47039 -> 35592 -> 47038). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 4947,
+      "map": 0,
+      "opening": 35593,
+      "lines": [
+        {
+          "message": 35593,
+          "choices": [
+            { "reply": 47044, "next": 35594, "criterion": "Qa=2079&Qo>14998&Qo<14999" },
+            { "reply": 47050, "next": 35596, "criterion": "Qa=2079&Qo>15000&Qo<15001" }
+          ]
+        },
+        {
+          "message": 35594,
+          "choices": [
+            { "reply": 47043, "next": 35595 }
+          ]
+        },
+        {
+          "message": 35595,
+          "choices": [
+            { "reply": 47042, "teleport": 84411397, "quest": 2079, "completes": 14999, "params": [[30, 14999]] }
+          ]
+        },
+        {
+          "message": 35596,
+          "choices": [
+            { "reply": 47049, "next": 35597 }
+          ]
+        },
+        {
+          "message": 35597,
+          "choices": [
+            { "reply": 47048, "next": 35598 }
+          ]
+        },
+        {
+          "message": 35598,
+          "choices": [
+            { "reply": 47047, "next": 35599 }
+          ]
+        },
+        {
+          "message": 35599,
+          "choices": [
+            { "reply": 47045, "quest": 2079, "completes": 15001, "params": [[30, 15001]] }
+          ]
+        }
+      ],
+      "why": "2079: Dragenerys demands the greedy adventurers be driven out (35594-35595, 47042 sends the player out), then tells of Crocuzko (35596-35599). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 4985,
+      "map": 0,
+      "opening": 35612,
+      "lines": [
+        {
+          "message": 35612,
+          "choices": [
+            { "reply": 47071 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4979,
+      "map": 0,
+      "opening": 35606,
+      "openings": [
+        { "quest": 2079, "pending": 15000, "message": 35606 }
+      ],
+      "lines": [
+        {
+          "message": 35606,
+          "choices": [
+            { "reply": 47065 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4978,
+      "map": 0,
+      "opening": 35605,
+      "openings": [
+        { "quest": 2079, "pending": 15000, "message": 35605 }
+      ],
+      "lines": [
+        {
+          "message": 35605,
+          "choices": [
+            { "reply": 47064 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4984,
+      "map": 0,
+      "opening": 35611,
+      "openings": [
+        { "quest": 2079, "pending": 15000, "message": 35611 }
+      ],
+      "lines": [
+        {
+          "message": 35611,
+          "choices": [
+            { "reply": 47070 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4977,
+      "map": 0,
+      "opening": 35604,
+      "lines": [
+        {
+          "message": 35604,
+          "choices": [
+            { "reply": 47063 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4980,
+      "map": 0,
+      "opening": 35607,
+      "openings": [
+        { "quest": 2079, "pending": 15000, "message": 35607 }
+      ],
+      "lines": [
+        {
+          "message": 35607,
+          "choices": [
+            { "reply": 47066 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4983,
+      "map": 0,
+      "opening": 35610,
+      "lines": [
+        {
+          "message": 35610,
+          "choices": [
+            { "reply": 47069 }
+          ]
+        }
+      ],
+      "why": "2079: sanctuary adventurer; his reply starts the fight."
+    },
+    {
+      "npc": 4986,
+      "map": 0,
+      "opening": 35613,
+      "lines": [
+        {
+          "message": 35613,
+          "choices": [
+            { "reply": 47072 }
+          ]
+        }
+      ],
+      "why": "2079: the dragoegg barring the lair; its reply starts the fight."
+    },
+    {
+      "npc": 4987,
+      "map": 0,
+      "opening": 35614,
+      "lines": [
+        {
+          "message": 35614,
+          "choices": [
+            { "reply": 47073 }
+          ]
+        }
+      ],
+      "why": "2079: the dragoegg barring the lair; its reply starts the fight."
+    },
+    {
+      "npc": 4949,
+      "map": 0,
+      "opening": 35615,
+      "lines": [
+        {
+          "message": 35615,
+          "choices": [
+            { "reply": 47080, "next": 35616 }
+          ]
+        },
+        {
+          "message": 35616,
+          "choices": [
+            { "reply": 47079, "next": 35617 }
+          ]
+        },
+        {
+          "message": 35617,
+          "choices": [
+            { "reply": 47078, "next": 35618 }
+          ]
+        },
+        {
+          "message": 35618,
+          "choices": [
+            { "reply": 47077, "next": 35619 }
+          ]
+        },
+        {
+          "message": 35619,
+          "choices": [
+            { "reply": 47076, "next": 35620 }
+          ]
+        },
+        {
+          "message": 35620,
+          "choices": [
+            { "reply": 47074, "next": 35621 }
+          ]
+        },
+        {
+          "message": 35621,
+          "choices": [
+            { "reply": 47085, "next": 35622 }
+          ]
+        },
+        {
+          "message": 35622,
+          "choices": [
+            { "reply": 47084, "next": 35623 }
+          ]
+        },
+        {
+          "message": 35623,
+          "choices": [
+            { "reply": 47083, "next": 35624 }
+          ]
+        },
+        {
+          "message": 35624,
+          "choices": [
+            { "reply": 47082, "next": 35625 }
+          ]
+        },
+        {
+          "message": 35625,
+          "choices": [
+            { "reply": 47086, "quest": 2079, "completes": 15006, "params": [[30, 15006]] }
+          ]
+        }
+      ],
+      "why": "2079: the Red Death hears the player out, has the Dofus vulbis handed over and destroyed, accepts the apology and turns into Tylezia (35615-35625). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+    },
+    {
+      "npc": 4948,
+      "map": 0,
+      "opening": 35626,
+      "lines": [
+        {
+          "message": 35626,
+          "choices": [
+            { "reply": 47096, "next": 35627, "quest": 2079, "completes": 15019, "params": [[30, 15019]] }
+          ]
+        },
+        {
+          "message": 35627,
+          "choices": [
+            { "reply": 47095, "next": 35628 }
+          ]
+        },
+        {
+          "message": 35628,
+          "choices": []
+        }
+      ],
+      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest."
+    },
+    {
+      "npc": 4246,
+      "map": 0,
+      "opening": 29764,
+      "lines": [
+        {
+          "message": 29764,
+          "choices": [
+            { "reply": 35767, "next": 29765, "criterion": "Qf=1942&Qf=1945&Qf=1946&Qa!1947&Qf!1947", "beforeQuest": 1947 },
+            { "reply": 35771, "next": 29766, "quest": 1947, "beforeObjective": 13567, "criterion": "PO=11503", "completes": 13566, "params": [[30, 13566]] }
+          ]
+        },
+        {
+          "message": 29765,
+          "choices": [
+            { "reply": 35766, "startsQuest": 1947, "params": [[34, 1947]] }
+          ]
+        },
+        {
+          "message": 29766,
+          "choices": [
+            { "reply": 35770, "next": 29767, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29767,
+          "choices": [
+            { "reply": 35769, "next": 29768, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29768,
+          "choices": [
+            { "reply": 35768, "quest": 1947 }
+          ]
+        }
+      ],
+      "why": "Matias Praton at [-47,-82] (1947): the quest starts here (he wants bread, 29765), the bread 11503 is handed over (13566) and he tells of the krobes. Dofus pour les noobs («Krobe en bourg»)."
+    },
+    {
+      "npc": 2633,
+      "map": 0,
+      "opening": 19055,
+      "lines": [
+        {
+          "message": 19055,
+          "choices": [
+            { "reply": 35777, "next": 29771, "quest": 1947, "afterObjective": 13567, "beforeObjective": 13568 }
+          ]
+        },
+        {
+          "message": 29771,
+          "choices": [
+            { "reply": 35776, "next": 29772, "quest": 1947 }
+          ]
+        },
+        {
+          "message": 29772,
+          "choices": [
+            { "reply": 35775, "quest": 1947 }
+          ]
+        }
+      ],
+      "why": "Ninae Charpe at [-84,-60] (1947, 13568): the krobes in the Silent Wrecks. INFERRED: the opening line 19055 and the reply order. Dofus pour les noobs («Krobe en bourg»)."
+    },
+    {
+      "npc": 4309,
+      "map": 0,
+      "opening": 30344,
+      "lines": [
+        {
+          "message": 30344,
+          "choices": [
+            { "reply": 36550, "quest": 1947, "afterObjective": 13574, "beforeObjective": 13575 },
+            { "reply": 36551, "quest": 1947 }
+          ]
+        }
+      ],
+      "why": "Nekrobio at [-47,-84] (1947, 13575): «Atacar a los krobios» (36550) starts the fight. Dofus pour les noobs («Krobe en bourg»)."
     }
   ]
 }

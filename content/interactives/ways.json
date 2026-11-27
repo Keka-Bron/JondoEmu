@@ -224,6 +224,10 @@
      "criterion": "Qa=2194&Qo>16294&Qo<16295"
     },
     {
+     "name": 104,
+     "criterion": "Qa=2079&Qo>14994&Qo<14995&PO=21189"
+    },
+    {
      "name": 47,
      "toMap": 192416776,
      "toCell": 483,

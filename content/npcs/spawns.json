@@ -9173,6 +9173,229 @@
       "orientation": 1,
       "criterion": "Qa=1611&Qo>9463&Qo<9466",
       "why": "The queen of Sramvil waits in the alley (9464, Dofus pour les noobs («S'emparer des commandes»)). Npc template 2824 (en.bin: Ecaflippy). INFERRED cell."
-    }
+    },
+    {
+      "map": 64754688,
+      "npc": 5817,
+      "cell": 301,
+      "orientation": 1,
+      "why": "The Volatile Spirit stands in the Kwakwa's nest exit room (Dofus pour les noobs, «Nid du Kwakwa»). INFERRED cell (open grass of the exit room)."
+    },
+    {
+      "map": 54161741,
+      "npc": 1308,
+      "cell": 318,
+      "orientation": 1,
+      "criterion": "Qa=592",
+      "why": "Dofus pour les noobs («Prefiere morir en el mar»): Guzmán Onelsako's spirit at [-56,-77], the Cradle of Alma. INFERRED cell."
+    },
+    {
+      "map": 54162771,
+      "npc": 1308,
+      "cell": 417,
+      "orientation": 1,
+      "criterion": "Qa=592",
+      "why": "Dofus pour les noobs («Prefiere morir en el mar»): Guzmán Onelsako's spirit again at [-58,-83] once the soul is caught, and on the dungeon's exit map. INFERRED cell."
+    },
+  {"map": 186387972, "npc": 4232, "cell": 300, "orientation": 1, "criterion": "Qf=1944&Qa!1946&Qf!1946", "why": "Talmon at [-45,-80] before the quest (1946). INFERRED cell."},
+  {"map": 186387972, "npc": 4232, "cell": 300, "orientation": 1, "criterion": "Qa=1946&Qo<13539", "why": "Talmon at [-45,-80] until Clarisa is back (1946). INFERRED cell."},
+  {"map": 186385924, "npc": 4232, "cell": 304, "orientation": 1, "criterion": "Qa=1946&Qo>13538&Qo<13558", "why": "Talmon at Zrid's wreck [-47,-80] (1946). INFERRED cell."},
+  {"map": 186386944, "npc": 4234, "cell": 328, "orientation": 1, "criterion": "Qa=1946&Qo>13536&Qo<13538", "why": "Pring at [-46,-82] (1946). INFERRED cell."},
+  {"map": 186385924, "npc": 4233, "cell": 314, "orientation": 1, "criterion": "Qa=1946&Qo>13554&Qo<13557", "why": "Clarisa at [-47,-80] (1946). INFERRED cell."},
+  {"map": 186385922, "npc": 4262, "cell": 311, "orientation": 1, "criterion": "Qa=1946&Qo>13544&Qo<13545", "why": "Vegan at [-47,-81] (1946). INFERRED cell."},
+  {"map": 186515968, "npc": 4263, "cell": 328, "orientation": 1, "criterion": "Qa=1946&Qo>13545&Qo<13546", "why": "Zhana at [-49,-82] (1946). INFERRED cell."},
+  {"map": 186387202, "npc": 4260, "cell": 312, "orientation": 1, "criterion": "Qa=1946&Qo>13546&Qo<13547", "why": "Hakun Hamatata at [-46,-83] (1946). INFERRED cell."},
+  {"map": 186387970, "npc": 4261, "cell": 318, "orientation": 1, "criterion": "Qa=1946&Qo>13547&Qo<13548", "why": "Civori at [-45,-81] (1946). INFERRED cell."},
+    {
+      "map": 88212481,
+      "npc": 4821,
+      "cell": 368,
+      "orientation": 3,
+      "criterion": "Qa=2078&Qo<14980",
+      "why": "Entropix beside the zaap of the Scarafeuilles plain [-1,24], the stand-in for the invisible-anomaly entry (803574 'Entrar en la anomalia invisible con Entropix'): Dofus pour les noobs («Amaknanomalie»). INFERRED cell."
+    },
+    {
+      "map": 196215820,
+      "npc": 4971,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2078&Qo>14980&Qo<14981",
+      "why": "Grozilla, guardian of the invisible anomaly, on the map above the village [-4,25] (Dofus pour les noobs («Amaknanomalie»)). INFERRED cell."
+    },
+    {
+      "map": 196215820,
+      "npc": 4972,
+      "cell": 302,
+      "orientation": 5,
+      "criterion": "Qa=2078&Qo>14980&Qo<14981",
+      "why": "Grasmera, guardian of the invisible anomaly, beside Grozilla (Dofus pour les noobs («Amaknanomalie»)). INFERRED cell."
+    },
+    {
+      "map": 196217868,
+      "npc": 4961,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2078&Qo>14981&Qo<14983",
+      "why": "The village chief (Jefe del pueblo, 4961) in the house of the burnt village, guarding the Dofus vulbis (Dofus pour les noobs («Amaknanomalie»)). INFERRED cell."
+    },
+    {
+      "map": 145228299,
+      "npc": 4974,
+      "cell": 276,
+      "orientation": 3,
+      "criterion": "Qa=2078&Qo>14988&Qo<14989",
+      "why": "The first energy ball in the outpost's first room (Dofus pour les noobs («Amaknanomalie»)). Room map and cell INFERRED."
+    },
+    {
+      "map": 145228303,
+      "npc": 4974,
+      "cell": 288,
+      "orientation": 3,
+      "criterion": "Qa=2078&Qo>14989&Qo<14990",
+      "why": "The second energy ball at the back of the outpost's second entrance (Dofus pour les noobs («Amaknanomalie»)). Room map and cell INFERRED."
+    },
+    {
+      "map": 84412418,
+      "npc": 4985,
+      "cell": 268,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84412418,
+      "npc": 4979,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84412418,
+      "npc": 4978,
+      "cell": 273,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84411395,
+      "npc": 4984,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410883,
+      "npc": 4977,
+      "cell": 274,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410883,
+      "npc": 4978,
+      "cell": 275,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410883,
+      "npc": 4979,
+      "cell": 276,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410883,
+      "npc": 4980,
+      "cell": 277,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410372,
+      "npc": 4983,
+      "cell": 268,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410372,
+      "npc": 4980,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84410372,
+      "npc": 4984,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14999&Qo<15000",
+      "why": "2079: a greedy adventurer of the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 197920002,
+      "npc": 4986,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>15003&Qo<15004",
+      "why": "2079: a dragoegg barring the entrance of the dragon's lair (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 197920002,
+      "npc": 4987,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>15003&Qo<15004",
+      "why": "2079: a dragoegg barring the entrance of the dragon's lair (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 183762946,
+      "npc": 42,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>14993&Qo<14995",
+      "why": "2079: Zeurg in the temple of Osamodas once the ambush is over (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 84411397,
+      "npc": 4946,
+      "cell": 277,
+      "orientation": 3,
+      "why": "Dicton Karly at the door of the dragoeggs' sanctuary [-4,29] (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 199757826,
+      "npc": 4947,
+      "cell": 258,
+      "orientation": 3,
+      "why": "Dragenerys inside the sanctuary of the dragoeggs (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 197921026,
+      "npc": 4949,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>15005&Qo<15006",
+      "why": "The Red Death in her lair (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+    {
+      "map": 197921026,
+      "npc": 4948,
+      "cell": 270,
+      "orientation": 3,
+      "criterion": "Qa=2079&Qo>15006&Qo<15019",
+      "why": "Tylezia in human form, where the dragon stood (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
+    },
+  {"map": 186386180, "npc": 4309, "cell": 300, "orientation": 1, "criterion": "Qa=1947&Qo>13573&Qo<13576", "why": "Nekrobio at [-47,-84] (1947). INFERRED cell."}
   ]
 }

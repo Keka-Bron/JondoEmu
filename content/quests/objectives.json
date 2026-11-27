@@ -10452,6 +10452,177 @@
    "map": 205260288,
    "afterObjectives": [16452],
    "why": "«Espera al Espíritu de la Roca» at the Bolsa stand."
-  }
+  },
+  {
+   "objective": 3828,
+   "quest": 592,
+   "kind": "enter",
+   "map": 54161741,
+   "why": "«Encuentra el alma de Guzmán Onelsako en La Cuna de Alma»: it closes on stepping onto the map [-56,-77] (Dofus pour les noobs («Prefiere morir en el mar»))."
+  },
+  {
+   "objective": 3829,
+   "quest": 592,
+   "kind": "beat",
+   "monster": 2917,
+   "map": 54161741,
+   "afterObjectives": [3828],
+   "why": "«Captura el alma de Guzmán Onelsako»: beating the soul (2917) with the soul stone; it drops the soul item 34132 (Dofus pour les noobs («Prefiere morir en el mar»))."
+  },
+  {
+   "objective": 3833,
+   "quest": 592,
+   "kind": "click",
+   "elements": [{"map": 54159687, "element": 457020}],
+   "gives": [{"item": 11297, "count": 1}],
+   "why": "«Consigue el botín»: the chest at [-52,-71] holds no treasure but a letter (Dofus pour les noobs («Prefiere morir en el mar»)), element 457020 of map 54159687."
+  },
+  {"objective": 13538, "quest": 1946, "kind": "beat", "monster": 5151, "afterObjectives": [13537], "why": "«Entrega a Clarisa» (740896): beating Pring (Tryng) frees Clarisa; the client's drop 19423 follows. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13541, "quest": 1946, "kind": "click", "elements": [{"map": 186908932, "element": 511912}], "afterObjectives": [13540], "gives": [{"item": 19424, "count": 1}], "why": "«Consigue esquirlas de necrónix» (740897): the rock of [-10,-31] (element 511912) hands the shard 19424. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13542, "quest": 1946, "kind": "reply", "replies": [36328], "afterObjectives": [13541], "requires": [{"item": 19424, "count": 1}], "spends": true, "gives": [{"item": 19425, "count": 1}], "why": "«Reduce al necrónix a polvo» (744202): Hel Munster crushes the shard (30184) and hands the dust 19425. INFERRED: it is his reply and not a click on the crusher. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13544, "quest": 1946, "kind": "click", "elements": [{"map": 186385926, "element": 512027}, {"map": 186385926, "element": 512028}, {"map": 186387972, "element": 512029}, {"map": 186384902, "element": 512025}, {"map": 186515972, "element": 512030}], "onlyGives": true, "afterObjectives": [13543], "gives": [{"item": 19426, "count": 1}], "why": "«Encuentra una perla de eternidad» (740900): the shells of the Silent Wrecks (gfx 1689). STAND-IN: the guide says only some shells hold the pearl (others a shoe); here every shell hands it. The objective is closed by the reply to Zrid. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13545, "quest": 1946, "kind": "reply", "replies": [35741], "afterObjectives": [13544], "why": "«Absorbe el alma de un fantasma» (740901): Vegan. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13546, "quest": 1946, "kind": "reply", "replies": [35744], "afterObjectives": [13545], "why": "«Absorbe el alma de un fantasma» (740902): Zhana. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13547, "quest": 1946, "kind": "reply", "replies": [35737], "afterObjectives": [13546], "why": "«Absorbe el alma de un fantasma» (740903): Hakun Hamatata. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13548, "quest": 1946, "kind": "reply", "replies": [35739], "afterObjectives": [13547], "why": "«Absorbe el alma de un fantasma» (740904): Civori. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13550, "quest": 1946, "kind": "click", "elements": [{"map": 186646534, "element": 512004}], "afterObjectives": [13549], "gives": [{"item": 19427, "count": 1}], "why": "«Recoge un oseoiris» (740905): the giant fish skeleton on the left of the grotto reached by the vortex (Dofus pour les noobs). INFERRED: element 512004 (cell 199, left side). Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13556, "quest": 1946, "kind": "beat", "monster": 5168, "afterObjectives": [13555], "why": "«Vence a Clarisa» (740906): the ghosts' assault fight. Dofus pour les noobs («La mort de ma vie»)."},
+  {"objective": 13536, "quest": 1946, "kind": "enter", "map": 186386944, "why": "«Busca a Clarisa, se la han llevado al norte» (744177): arriving at Pring's wreck [-46,-82], north of Talmon (Dofus pour les noobs, «La mort de ma vie»). INFERRED: the map, the objective names none."},
+  {
+   "objective": 14980,
+   "quest": 2078,
+   "kind": "reply",
+   "replies": [45194],
+   "why": "«Entra en la anomalia que ha senalado la enviada de Xelor»: closed when Entropix, the stand-in for the zaap's invisible-anomaly entry (803574), takes the player in (45194)."
+  },
+  {
+   "objective": 14981,
+   "quest": 2078,
+   "kind": "beat",
+   "monster": 5892,
+   "map": 196215820,
+   "afterObjectives": [14980],
+   "why": "Beat the guardians of the anomaly: Grozilla and Grasmera, from the fight 46993/46994 starts."
+  },
+  {
+   "objective": 14983,
+   "quest": 2078,
+   "kind": "beat",
+   "monster": 5868,
+   "map": 196217868,
+   "afterObjectives": [14982],
+   "why": "«Enfrentate al jefe del pueblo»: the chief of the village, from the fight 46996 starts."
+  },
+  {
+   "objective": 15074,
+   "quest": 2078,
+   "kind": "enter",
+   "map": 88212481,
+   "afterObjectives": [14983],
+   "why": "«Equipate el dofus y abandona la anomalia»: the village's exit passage only works with the Dofus vulbis worn (criterion POE21186,1) and leads back to the zaap map."
+  },
+  {
+   "objective": 14985,
+   "quest": 2078,
+   "kind": "beat",
+   "monster": 5870,
+   "map": 88081174,
+   "afterObjectives": [14984],
+   "why": "Beat the ambushing dragoeggs at the Envoyee (fight 46987)."
+  },
+  {
+   "objective": 14989,
+   "quest": 2078,
+   "kind": "beat",
+   "monster": 5873,
+   "map": 145228299,
+   "afterObjectives": [14988],
+   "why": "Capture the first energy ball in the outpost's first room (fight 47016)."
+  },
+  {
+   "objective": 14990,
+   "quest": 2078,
+   "kind": "beat",
+   "monster": 5873,
+   "map": 145228303,
+   "afterObjectives": [14989],
+   "why": "Capture the second energy ball at the back of the outpost's second entrance (fight 47016)."
+  },
+  {
+   "objective": 14982,
+   "quest": 2078,
+   "kind": "reply",
+   "replies": [46998],
+   "afterObjectives": [14981],
+   "why": "«Explora la anomalia del pueblo calcinado»: the objective's own map is the zaap's (88212481), so no enter binding on the house; closed when the player calms the chief (46998) in the burnt village's house."
+  },
+  {
+   "objective": 14992,
+   "quest": 2079,
+   "kind": "enter",
+   "map": 183762946,
+   "why": "«Ve al templo de Osamodas»: closed on entering the temple [8,2] (Dofus pour les noobs («La mère des Dragoeufs»))."
+  },
+  {
+   "objective": 14993,
+   "quest": 2079,
+   "kind": "beat",
+   "monster": 5872,
+   "map": 183762946,
+   "afterObjectives": [14992],
+   "why": "«Sobrevive a la emboscada de los dragohuevos»: the three dragoeggs that attack on entering the temple."
+  },
+  {
+   "objective": 14995,
+   "quest": 2079,
+   "kind": "click",
+   "skillName": 104,
+   "elements": [{"map": 183762950, "element": 511845}],
+   "requires": [{"item": 21189, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 21188, "count": 1}],
+   "afterObjectives": [14994],
+   "why": "«Consigue un parangon y dejalo a los pies de la estatua del dios Osamodas»: the offering on the Osamodas statue, who answers with the golden horn (21188) (Dofus pour les noobs («La mère des Dragoeufs»))."
+  },
+  {
+   "objective": 14997,
+   "quest": 2079,
+   "kind": "beat",
+   "monster": 5869,
+   "map": 84411397,
+   "afterObjectives": [14996],
+   "why": "«Vence a los asesinos dragohuevos»: the fight the ambush at the sanctuary door starts (47034)."
+  },
+  {
+   "objective": 15000,
+   "quest": 2079,
+   "kind": "beat",
+   "monsters": [5882, 5881, 5874, 5880],
+   "times": 4,
+   "afterObjectives": [14999],
+   "why": "«Lucha contra aventureros en el Santuario»: the four groups of [-2,26], [-4,27], [-5,27] and [-6,28]; counted as four fights (the engine cannot tell the four groups apart)."
+  },
+  {
+   "objective": 15003,
+   "quest": 2079,
+   "kind": "enter",
+   "map": 197920002,
+   "afterObjectives": [15002],
+   "why": "«Encuentra la salida del antro del dragon»: the lair's outdoor entrance [-80,-12]."
+  },
+  {
+   "objective": 15004,
+   "quest": 2079,
+   "kind": "beat",
+   "monster": 5872,
+   "map": 197920002,
+   "afterObjectives": [15003],
+   "why": "«Enfrentate a los dragohuevos que protegen la entrada»: the two dragoeggs of the entrance."
+  },
+  {"objective": 13568, "quest": 1947, "kind": "reply", "replies": [35777], "afterObjectives": [13567], "why": "«Busca informacion sobre los krobios» (741260): Ninae Charpe. Dofus pour les noobs («Krobe en bourg»)."},
+  {"objective": 13572, "quest": 1947, "kind": "click", "elements": [{"map": 186385920, "element": 512057}], "afterObjectives": [13571], "why": "«Busca a los krobios» (741261): the torn parchment at [-47,-82]. Dofus pour les noobs («Krobe en bourg»)."},
+  {"objective": 13573, "quest": 1947, "kind": "click", "elements": [{"map": 186386178, "element": 512039}], "afterObjectives": [13572], "why": "«Busca a los krobios» (741262): the torn parchment at [-47,-83]. Dofus pour les noobs («Krobe en bourg»)."},
+  {"objective": 13574, "quest": 1947, "kind": "click", "elements": [{"map": 186386180, "element": 512038}], "afterObjectives": [13573], "why": "«Busca a los krobios» (741263): INFERRED: the guide names two parchments and then the Nekrobio; the third objective is the element of the last map. Dofus pour les noobs («Krobe en bourg»)."},
+  {"objective": 13575, "quest": 1947, "kind": "beat", "monster": 5212, "afterObjectives": [13574], "why": "«Vencer a los nekrobios» (741264): the krobe fight. Dofus pour les noobs («Krobe en bourg»)."}
 ]
 }
