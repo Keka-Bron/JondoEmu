@@ -619,7 +619,7 @@ namespace Jondo.Unity.Server.Managers
             /// <summary>Whether his power was taken: "quand vous utilisez son pouvoir, le Gobelin disparaît".</summary>
             public bool GoblinGone { get; set; }
 
-            /// <summary>The Cocobur dream shown here once the room was won, by its NPC, or 0 (<see cref="CocoburDreamOf"/>).</summary>
+            /// <summary>The quest NPC shown here once the room was won -- a Cocobur dream (<see cref="CocoburDreamOf"/>) or Oyukipoca's prey (<see cref="OyukipocaPreyOf"/>) -- or 0.</summary>
             public int Cocobur { get; set; }
 
             /// <summary>Whether the Rey Gob stands here: the dreams saved before the other goblins say it so.</summary>
@@ -2232,6 +2232,40 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>The NPCs of the eleven dreams.</summary>
         public static IEnumerable<int> CocoburNpcs => CocoburDreams.Select(d => d.Npc);
+
+        // ---------------------------------------------------------------------------------------
+        //  Oyukipoca's prey (Tylezia's quest 2080)
+        // ---------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// «Encuentra el espíritu de Oyukipoca en las paradojas de los Sueños Infinitos» (15011): once
+        /// Draconiros has the three drops (15008 to 15010) and gave his key, a won room of a Paradox
+        /// or Nightmare dream -- «Paradoxe I à IV ou Cauchemar I à III, pas en Rêve» (Dofus pour les
+        /// noobs, Cauchemar infini) -- shows the Proie d'Oyukipoca (NPC 4998), whose reply takes the
+        /// player to Oyukipoca's Nightmare. The odds are INFERRED as the Cocobur dreams': the guide
+        /// only says to go through the dream until it is met.
+        /// </summary>
+        public const int OyukipocaPrey = 4998;
+        public const int OyukipocaPreyObjective = 15011;
+        public const int OyukipocaKeyObjective = 15008;
+        public const int ParadoxI = 4;
+        public const int OyukipocaPreyOneIn = 3;
+
+        /// <summary>The prey a won room shows (<see cref="OyukipocaPrey"/>), or 0.</summary>
+        public static int OyukipocaPreyOf(Sueno sueno, Sala sala, Func<int, bool> pending, Func<int, bool> done)
+        {
+            if (sueno.FromSouvenir || sala.EsFinal || sala.EsFavor || sala.EsFuente || sala.Fila == 0) return 0;
+            if (sala.Miembros.Count == 0 || sueno.Dificultad < ParadoxI) return 0;
+            if (!pending(OyukipocaPreyObjective) || !done(OyukipocaKeyObjective)) return 0;
+            return DiceOf(sueno, "oyukipoca", sala.Id).Next(OyukipocaPreyOneIn) == 0 ? OyukipocaPrey : 0;
+        }
+
+        /// <summary>The objective an NPC a won room shows stands for: a Cocobur dream's or the prey's.</summary>
+        public static int ObjectiveOfRoomNpc(int npc)
+            => npc == OyukipocaPrey ? OyukipocaPreyObjective : CocoburDreams.FirstOrDefault(d => d.Npc == npc).Objective;
+
+        /// <summary>Every NPC a won room may show for a quest.</summary>
+        public static IEnumerable<int> RoomQuestNpcs => CocoburNpcs.Append(OyukipocaPrey);
 
         /// <summary>
         /// Gobserico's power, 4033 ClearDreamRoom: "ce Gobelin s'occupe du groupe de monstre

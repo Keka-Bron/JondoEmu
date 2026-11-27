@@ -442,8 +442,12 @@ namespace Jondo.Unity.Server.Handlers
             if (session == null) return 0;
             using var context = SessionContext.Push(session);
             var resolver = PlayerCriteria.ResolverFor(sala.MapaDeLaSala);
-            return Dreams.CocoburDreamOf(sueno, sala, session.State.CharacterLevel,
-                                         objective => Jondo.Unity.World.Content.Criterion.Met($"Qo={objective}", resolver));
+            Func<int, bool> pending = objective => Jondo.Unity.World.Content.Criterion.Met($"Qo={objective}", resolver);
+            int cocobur = Dreams.CocoburDreamOf(sueno, sala, session.State.CharacterLevel, pending);
+            if (cocobur != 0) return cocobur;
+            // Or Oyukipoca's prey, for whoever has Draconiros' key to follow it (quest 2080).
+            return Dreams.OyukipocaPreyOf(sueno, sala, pending,
+                                          objective => Jondo.Unity.World.Content.Criterion.Met($"Qo>{objective}", resolver));
         }
 
         /// <summary>Whether the dreamer has yet to brandish the sword before a Cocobur dream.</summary>
@@ -451,7 +455,7 @@ namespace Jondo.Unity.Server.Handlers
         {
             var session = SessionRegistry.FindByCharacter(sueno.CharacterId);
             if (session == null) return false;
-            int objective = Dreams.CocoburDreams.FirstOrDefault(d => d.Npc == npc).Objective;
+            int objective = Dreams.ObjectiveOfRoomNpc(npc);
             if (objective == 0) return false;
             using var context = SessionContext.Push(session);
             return PlayerCriteria.Met($"Qo={objective}", session.MapId);
@@ -465,7 +469,7 @@ namespace Jondo.Unity.Server.Handlers
         private static void PlantCocobur(Dreams.Sueno sueno, Dreams.Sala sala)
         {
             if (sala.MapaDeLaSala == 0) return;
-            foreach (int npc in Dreams.CocoburNpcs) Managers.Npcs.QuitarDelSueno(sala.MapaDeLaSala, npc);
+            foreach (int npc in Dreams.RoomQuestNpcs) Managers.Npcs.QuitarDelSueno(sala.MapaDeLaSala, npc);
             if (sala.Cocobur == 0 || !sala.Hecha || !CocoburStillPending(sueno, sala.Cocobur)) return;
 
             Managers.Npcs.PonerDelSueno(sala.MapaDeLaSala, sala.Cocobur,
@@ -672,7 +676,7 @@ namespace Jondo.Unity.Server.Handlers
                 PlantCocobur(sueno, sala);
 
                 Console.WriteLine($"[Dreams] Room {sala.Id} cleared; {sueno.DreamPoints} dream points." +
-                                  (sala.Cocobur != 0 ? $" Cocobur's dream {sala.Cocobur} shows." : ""));
+                                  (sala.Cocobur != 0 ? $" quest NPC {sala.Cocobur} shows." : ""));
                 return true;
             }
 

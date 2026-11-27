@@ -84534,13 +84534,15 @@
       "map": 0,
       "opening": 35626,
       "openings": [
-        { "canStart": 2080, "message": 35630 }
+        { "canStart": 2080, "message": 35630 },
+        { "canStart": 2081, "message": 35694 }
       ],
       "lines": [
         {
           "message": 35626,
           "choices": [
-            { "reply": 47096, "next": 35627, "quest": 2079, "completes": 15019, "params": [[30, 15019]] }
+            { "reply": 47096, "next": 35627, "quest": 2079, "completes": 15019, "params": [[30, 15019]] },
+            { "reply": 47171, "next": 35692, "quest": 2080, "afterObjective": 15017, "completes": 15018, "params": [[30, 15018]] }
           ]
         },
         {
@@ -84570,9 +84572,27 @@
           "choices": [
             { "reply": 47098 }
           ]
+        },
+        {
+          "message": 35692,
+          "choices": [
+            { "reply": 47170, "next": 35693 }
+          ]
+        },
+        {
+          "message": 35693,
+          "choices": [
+            { "reply": 47167, "next": 35694 }
+          ]
+        },
+        {
+          "message": 35694,
+          "choices": [
+            { "reply": 47166, "startsQuest": 2081, "params": [[34, 2081]] }
+          ]
         }
       ],
-      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest. 2080 (Pesadilla Infinita): after 2079 Tylezia tells of her recurring dream (35630-35631); proposing Draconiros (47097) starts the quest (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies)."
+      "why": "2079: Tylezia in human form; the player introduces himself (47096 closes the quest) and may ask about her adoptive father. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2079: the line closing Tylezia's answer on her adoptive father; the rest of her story belongs to the next quest. 2080 (Pesadilla Infinita): after 2079 Tylezia tells of her recurring dream (35630-35631); proposing Draconiros (47097) starts the quest (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080 end: back from the temple, «Hablar de tu encuentro con Oyukipoca» (47171) closes 15018 and leads through 35692-35694 to «Buscar la manera de ver a Ixchelonia» (47166), which starts «La Noche Rugiente» (2081, whose first step is message 35694 in the catalogue). The other answer of that talk, «Ya le he prestado servicio a Ixchelonia» (47169, 35695, 47168), has no known criterion and is not written. Reply order INFERRED from the message ids."
     },
     {
       "npc": 4246,
@@ -84654,6 +84674,11 @@
       ],
       "why": "Nekrobio at [-47,-84] (1947, 13575): «Atacar a los krobios» (36550) starts the fight. Dofus pour les noobs («Krobe en bourg»)."
     },
+    {"npc": 4998, "map": 0, "opening": 35656, "_byHand": true, "lines": [{"message": 35656, "choices": [{"reply": 47118, "next": 35657}]}, {"message": 35657, "choices": [{"reply": 47117, "quest": 2080, "criterion": "PO=21237", "completes": 15011, "params": [[30, 15011]], "teleport": 200279040}]}], "why": "Oyukipoca's prey (2080, 15011), shown by a won room of a Paradox or Nightmare dream once the key is forged (Dreams.OyukipocaPreyOf). Dofus pour les noobs («Cauchemar infini»): talking to it with Oyukipoca's key (21237) takes you to her nightmare (200279040). Reply order INFERRED from the template ids."},
+    {"npc": 4950, "map": 200279040, "opening": 35679, "_byHand": true, "lines": [{"message": 35679, "choices": [{"reply": 47145, "quest": 2080, "beforeObjective": 15013}, {"reply": 47146, "next": 35680}, {"reply": 47188, "teleportBack": true}]}, {"message": 35680, "choices": [{"reply": 47147, "quest": 2080, "beforeObjective": 15013}, {"reply": 47189, "teleportBack": true}]}], "why": "Oyukipoca roaring at the rocky nightmare (2080): «Ayudar a la miauguar a superar la pesadilla» (47145, 47147) starts the fight beside her (content/fights/npc_fights.json); «Abandonar la pesadilla» (47188, 47189) takes you back to where the dream was entered. Talking to her closes 15012 (go and see). Reply order INFERRED from the template ids."},
+    {"npc": 5002, "map": 200279040, "opening": 35678, "_byHand": true, "lines": [{"message": 35678, "choices": [{"reply": 47144, "quest": 2080, "beforeObjective": 15013}]}], "why": "The rocky nightmare of Oyukipoca's dream (2080): «Ayudar a la miauguar...» (47144) starts the same fight as Oyukipoca's answer."},
+    {"npc": 4950, "map": 200279299, "opening": 35681, "_byHand": true, "lines": [{"message": 35681, "choices": [{"reply": 47148, "next": 35682}]}, {"message": 35682, "choices": [{"reply": 47153, "next": 35683}]}, {"message": 35683, "choices": [{"reply": 47152, "next": 35684}]}, {"message": 35684, "choices": [{"reply": 47151, "next": 35685}]}, {"message": 35685, "choices": [{"reply": 47149, "teleportBack": true}, {"reply": 47150, "teleportBack": true}]}], "why": "Oyukipoca once the nightmare is beaten (2080): talking to her closes 15014; she asks you to pray at her forgotten temple (Dofus pour les noobs («Cauchemar infini»)), and either last answer leaves the dream for where it was entered. Reply order INFERRED from the template ids."},
+    {"npc": 5001, "map": 197922050, "opening": 35676, "_byHand": true, "lines": [{"message": 35676, "choices": [{"reply": 47142, "quest": 2080, "beforeObjective": 15016}]}], "why": "The pale arakne in front of Oyukipoca's temple (2080): «Intentar hacer que las araknas se esfumen para entrar en el templo» (47142) starts the solo fight (Dofus pour les noobs («Cauchemar infini»))."},
     {
       "npc": 4657,
       "map": 0,

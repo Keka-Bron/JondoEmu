@@ -10630,6 +10630,10 @@
    "kind": "enter",
    "map": 238551040,
    "why": "«Entra en el plano astral» (768761): it closes on stepping into the well of the Infinite Dreams (the four arches land from it into Draconiros' room); INFERRED map from teleports.json. Dofus pour les noobs («Jusqu'au bout du rêve»)."
-  }
-]
+  },
+    {"objective": 15013, "quest": 2080, "kind": "beat", "monster": 5825, "map": 200279040, "why": "«Vence la pesadilla con la ayuda de Oyukipoca»: the rocky nightmare (5825) of her dream, fought beside her."},
+    {"objective": 15015, "quest": 2080, "kind": "enter", "map": 197922050, "why": "«Templo olvidado de Oyukipoca»: the map in front of the temple, [-79,-11], whose door leads in (197921792)."},
+    {"objective": 15016, "quest": 2080, "kind": "beat", "monster": 5884, "map": 197922050, "why": "«Ábrete paso en el templo»: the pale arakne (5884) in front of it (Dofus pour les noobs («Cauchemar infini»))."},
+    {"objective": 15017, "quest": 2080, "kind": "click", "elements": [{"map": 197921792, "element": 517364}], "afterObjectives": [15016], "why": "«Reza en el templo de Oyukipoca»: the altar, the temple's one element besides its door (517290)."}
+  ]
 }

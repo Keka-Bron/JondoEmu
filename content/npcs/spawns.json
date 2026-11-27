@@ -9396,6 +9396,10 @@
       "criterion": "Qa=2079&Qo>15006&Qo<15019",
       "why": "Tylezia in human form, where the dragon stood (Dofus pour les noobs («La mère des Dragoeufs»)). Cell INFERRED."
     },
-  {"map": 186386180, "npc": 4309, "cell": 300, "orientation": 1, "criterion": "Qa=1947&Qo>13573&Qo<13576", "why": "Nekrobio at [-47,-84] (1947). INFERRED cell."}
+  {"map": 186386180, "npc": 4309, "cell": 300, "orientation": 1, "criterion": "Qa=1947&Qo>13573&Qo<13576", "why": "Nekrobio at [-47,-84] (1947). INFERRED cell."},
+  {"map": 200279040, "npc": 4950, "cell": 342, "orientation": 1, "why": "Oyukipoca in her nightmare (2080). INFERRED cell."},
+  {"map": 200279040, "npc": 5002, "cell": 370, "orientation": 5, "why": "The rocky nightmare beside her (2080). INFERRED cell."},
+  {"map": 200279299, "npc": 4950, "cell": 302, "orientation": 1, "why": "Oyukipoca once the nightmare is beaten (2080). INFERRED cell."},
+  {"map": 197922050, "npc": 5001, "cell": 297, "orientation": 1, "criterion": "Qo=15016", "why": "The pale arakne at the door of Oyukipoca's temple (2080), until it is beaten. INFERRED cell."}
   ]
 }
