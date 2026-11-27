@@ -2150,6 +2150,15 @@
     { "npc": 4291, "map": 187695108, "reply": 36410,
       "monsters": [ { "monster": 5190, "grade": 0 } ],
       "why": "1956: the ancestral crujidor (5190) alone; may be done in a group (Dofus pour les noobs («Craquements de cœur»): «Claque Monumentale», «Lancer de Rocher»)." },
-    {"map": 54165811, "enter": true, "criterion": "Qa=579&Qo>3791&Qo<3792&PO=11265", "monsters": [{"monster": 2859, "grade": 0}, {"monster": 2860, "grade": 0}, {"monster": 2847, "grade": 0}], "marks": -579001, "why": "«Get Your Fresh Snapper Here!» (579), second delivery: «dès que vous arrivez sur la map vous vous faites agresser par un groupe de monstres» (Dofus pour les noobs «Il est frais mon pichon»), at the sawmill map [-64,-51] with the pingwobble in tow. INFERRED monsters: three of that map's own Frigost mobs (2859, 2860, 2847, level 132, the lowest grades of its group 3312); the guide does not name them."}
+    {"map": 54165811, "enter": true, "criterion": "Qa=579&Qo>3791&Qo<3792&PO=11265", "monsters": [{"monster": 2859, "grade": 0}, {"monster": 2860, "grade": 0}, {"monster": 2847, "grade": 0}], "marks": -579001, "why": "«Get Your Fresh Snapper Here!» (579), second delivery: «dès que vous arrivez sur la map vous vous faites agresser par un groupe de monstres» (Dofus pour les noobs «Il est frais mon pichon»), at the sawmill map [-64,-51] with the pingwobble in tow. INFERRED monsters: three of that map's own Frigost mobs (2859, 2860, 2847, level 132, the lowest grades of its group 3312); the guide does not name them."},
+    { "npc": 5638, "map": 205261570, "reply": 53036,
+      "monsters": [ { "monster": 6219, "grade": 0 }, { "monster": 6219, "grade": 0 } ],
+      "why": "«No dejarte intimidar y atacar al grupo de tanukis» (53036): Kaskoui group A of the first meeting place; Dofus pour les noobs («Au nom de l'Art») (Chimi Nuki, Moryo Nuki, Henshinobi...). INFERRED: the grade and the group." },
+    { "npc": 5638, "map": 205260290, "reply": 53036,
+      "monsters": [ { "monster": 6221, "grade": 0 }, { "monster": 6222, "grade": 0 }, { "monster": 6223, "grade": 0 } ],
+      "why": "Same reply at the second meeting place: Kaskoui group B (the geoglyph tanukis; DPLN lists Testirossa, Transpompoko, Valseuses...). INFERRED: the grade." },
+    { "npc": 5613, "map": 205261057, "reply": 53059,
+      "monsters": [ { "monster": 6194, "grade": 0 } ],
+      "why": "«Yo me presento voluntario para hacer valer la voluntad del Espíritu de la Roca» (53059): the solo fight against Tanuki Durtouki (Dulakolita), Dofus pour les noobs («Au nom de l'Art»). INFERRED: the grade." }
   ]
 }

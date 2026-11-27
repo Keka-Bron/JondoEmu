@@ -7533,12 +7533,12 @@
       "why": "Dofus pour les noobs («Le disparu de Sufokia»): the smuggler crew on the shore. INFERRED cells."
     },
     {
-      "map": 147324928,
+      "map": 147326976,
       "npc": 2778,
       "cell": 260,
       "orientation": 1,
       "criterion": "Qa=1608&Qo<9414",
-      "why": "Dofus pour les noobs («Le disparu de Sufokia»): Vardo imprisoned in the undersea sanctuary. The inner map 147326976 has no way in, so he waits at the cave entrance. INFERRED cell."
+      "why": "Dofus pour les noobs («Le disparu de Sufokia»): «Traversez une salle pour enfin arriver devant le tant recherche Vardo Tercar» - Vardo imprisoned in the sanctuary (147326976), reached through the stone doors of the cave. INFERRED cell."
     },
     {
       "map": 95422464,
@@ -9086,6 +9086,93 @@
       "cell": 328,
       "remove": true,
       "why": "Goblasto's derived cell (328) is the outpost's anvil platform, where the player works; his authored place is beside the bench in front of the Krosmoglob speaker (267)."
+    },
+    {
+      "map": 234750978,
+      "npc": 7731,
+      "cell": 259,
+      "orientation": 3,
+      "criterion": "Qa=2515&Qo>19278&Qo<19279",
+      "why": "Voz de Osamodas (7731) at the Statue of Osamodas, Osavora [2,16!] («Ça barde là-haut», Dofus pour les noobs: face the statue and speak to the Voice): standing on the statue's platform beside the priestess; INFERRED cell. There only while the Voice is the quest's business (2515, objective 19279)."
+    },
+    {
+      "map": 208932866,
+      "npc": 708,
+      "cell": 300,
+      "orientation": 3,
+      "why": "Tanukui San in the room after the boss of his workshop (dungeon 126). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205261570,
+      "npc": 5638,
+      "cell": 286,
+      "orientation": 3,
+      "criterion": "Qa=2152&Qo>16441&Qo<16445",
+      "why": "Tokape on duty at the first meeting place (16443), until the stolen ore is recovered (16444). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205260290,
+      "npc": 5638,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2152&Qo>16444&Qo<16447",
+      "why": "Tokape on duty at the second meeting place (16445), until the ore is recovered (16446). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 207621132,
+      "npc": 5611,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2152&Qo>16446&Qo<16449",
+      "why": "Tanuwang Yuanzhong at the last meeting place (16447) until he is watched with Whaska (16448). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 207621132,
+      "npc": 5612,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=2152&Qo>16446&Qo<16449",
+      "why": "Whaska beside Tanuwang Yuanzhong at the last meeting place (16447-16448). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205261057,
+      "npc": 5613,
+      "cell": 315,
+      "orientation": 3,
+      "criterion": "Qa=2152&Qo>16448&Qo<16451",
+      "why": "Dulakolita at the sculptors' workshop (16449-16450). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205261057,
+      "npc": 5611,
+      "cell": 273,
+      "orientation": 1,
+      "criterion": "Qa=2152&Qo>16448&Qo<16453",
+      "why": "Tanuwang Yuanzhong at the workshop (16449-16452). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205260288,
+      "npc": 5614,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2152&Qo>16452&Qo<16455",
+      "why": "The Rock Spirit appears at the Bolsa stand (16453-16454). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 205260288,
+      "npc": 5612,
+      "cell": 286,
+      "orientation": 1,
+      "criterion": "Qa=2152&Qo>16452&Qo<16455",
+      "why": "Whaska waits with the statue at the stand (16453-16454). «Au nom de l'Art» (2152), Dofus pour les noobs («Au nom de l'Art»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 134224898,
+      "npc": 2824,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=1611&Qo>9463&Qo<9466",
+      "why": "The queen of Sramvil waits in the alley (9464, Dofus pour les noobs («S'emparer des commandes»)). Npc template 2824 (en.bin: Ecaflippy). INFERRED cell."
     }
   ]
 }

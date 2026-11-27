@@ -7758,7 +7758,8 @@
    "npc": 2655,
    "map": 164364304,
    "afterObjectives": [9242],
-   "why": "«Únete a la encargada cerca del zaap de los caminos rocosos»: talking to her by the Cania zaap (Dofus pour les noobs («Le maître des zaaps»))."
+   "gives": [{"item": 15848, "count": 1}],
+   "why": "«Únete a la encargada cerca del zaap de los caminos rocosos»: talking to her by the Cania zaap; she joins as the follower 15848 (Dofus pour les noobs («Le maître des zaaps»))."
   },
   {
    "objective": 9244,
@@ -8092,9 +8093,10 @@
    "objective": 9412,
    "quest": 1608,
    "kind": "enter",
-   "map": 147324928,
+   "map": 147326976,
+   "overridesMap": true,
    "afterObjectives": [9411],
-   "why": "«Traspasa las puertas de piedra»: the undersea cave reached by the submarine (Dofus pour les noobs («Le disparu de Sufokia»)); the stone doors are not clickable in the engine, arrival counts."
+   "why": "«Traspasa las puertas de piedra»: the undersea cave is reached by the submarine and its glowing point on the wall (element 487857, teleports.json) opens the stone doors into the sanctuary (Dofus pour les noobs («Le disparu de Sufokia»): «Cliquez sur le point lumineux au mur pour ouvrir la porte et franchissez la»); stepping into the sanctuary ticks it."
   },
   {
    "objective": 9414,
@@ -10339,6 +10341,117 @@
    "gives": [{"item": 31705, "count": 1}],
    "onlyGives": true,
    "why": "A crate of the plate's materials ([0,31], cell 551): one «Sal de galvanización» (31705) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 16511,
+   "quest": 2152,
+   "kind": "enter",
+   "map": 205260802,
+   "afterObjectives": [16434],
+   "why": "«Au nom de l'Art»: «Entra en el Taller de Tanukui San» (850595): Tanugu Asuo's entrance map 205260802 [26,-24] (Dofus pour les noobs («Au nom de l'Art»))."
+  },
+  {
+   "objective": 19274,
+   "quest": 2515,
+   "kind": "reply",
+   "replies": [79108, 79114, 79117],
+   "why": "«Habla con el capitán Blair después de entrar en la dimensión Osavora»: the answer that sends him to the priestess (the three sermons end on 79108/79114/79117)."
+  },
+  {
+   "objective": 19279,
+   "quest": 2515,
+   "kind": "reply",
+   "replies": [79176, 79178, 79180, 79182],
+   "afterObjectives": [19275],
+   "why": "«Escucha la voz del dios Osamodas»: the Voice's last reply of either monologue."
+  },
+  {"objective": 4778, "quest": 737, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4779, "quest": 737, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4780, "quest": 737, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4781, "quest": 737, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4782, "quest": 737, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4783, "quest": 738, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4784, "quest": 738, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4786, "quest": 738, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4787, "quest": 738, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4788, "quest": 738, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4789, "quest": 739, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4790, "quest": 739, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4791, "quest": 739, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4792, "quest": 739, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4793, "quest": 739, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4794, "quest": 740, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4795, "quest": 740, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4796, "quest": 740, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4797, "quest": 740, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {"objective": 4798, "quest": 740, "kind": "order", "anyOrder": true, "why": "Safari of the souls: the five archmonster souls of a tier are independent hand-overs (DPLN lists them in no order; the client's reply 9508 takes whichever are carried)."},
+  {
+   "objective": 16441,
+   "quest": 2152,
+   "kind": "click",
+   "all": true,
+   "afterObjectives": [16440],
+   "elements": [{"map": 205260033, "element": 519645}, {"map": 205259780, "element": 519646}, {"map": 205259777, "element": 519647}],
+   "why": "«Descifra el código con la ayuda del libro Los geoglifos para torpes»: the three geoglyph circles in the book's order (DPLN: (24,-27), (24,-22), (24,-25))."
+  },
+  {
+   "objective": 16443,
+   "quest": 2152,
+   "kind": "enter",
+   "map": 205261570,
+   "afterObjectives": [16441],
+   "why": "«Acude al primer lugar de encuentro»: the first meeting place (Dofus pour les noobs («Au nom de l'Art»))."
+  },
+  {
+   "objective": 16444,
+   "quest": 2152,
+   "kind": "beat",
+   "monster": 6219,
+   "map": 205261570,
+   "afterObjectives": [16443],
+   "why": "«Recupera el mineral robado»: beating the Kaskoui group A there."
+  },
+  {
+   "objective": 16445,
+   "quest": 2152,
+   "kind": "enter",
+   "map": 205260290,
+   "afterObjectives": [16444],
+   "why": "«Acude al segundo lugar de encuentro»."
+  },
+  {
+   "objective": 16446,
+   "quest": 2152,
+   "kind": "beat",
+   "monster": 6221,
+   "map": 205260290,
+   "afterObjectives": [16445],
+   "why": "Recover the ore: Kaskoui group B."
+  },
+  {
+   "objective": 16447,
+   "quest": 2152,
+   "kind": "enter",
+   "map": 207621132,
+   "afterObjectives": [16446],
+   "why": "«Acude al último lugar de encuentro»."
+  },
+  {
+   "objective": 16449,
+   "quest": 2152,
+   "kind": "beat",
+   "monster": 6194,
+   "map": 205261057,
+   "afterObjectives": [16448],
+   "why": "«Convence a Dulakolita»: the solo fight is the convincing."
+  },
+  {
+   "objective": 16453,
+   "quest": 2152,
+   "kind": "enter",
+   "map": 205260288,
+   "afterObjectives": [16452],
+   "why": "«Espera al Espíritu de la Roca» at the Bolsa stand."
   }
 ]
 }

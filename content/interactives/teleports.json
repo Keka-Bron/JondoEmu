@@ -1909,6 +1909,7 @@
   },
     { "map": 54535201, "element": 457180, "cell": 338, "gfx": 21987, "type": 0, "skill": 114, "toMap": 54534177, "toCell": 310, "why": "The quest basement's door (54535201: element 457180, graphic 21987 on cell 338) back up into Albert Pess's house (54534177), landing on 310, where the official server puts the character." },
     { "map": 169082890, "element": 508182, "cell": 327, "gfx": 60371, "type": 0, "skill": 114, "toMap": 169082892, "toCell": 272, "criterion": "PO>17964,0", "refusal": 449, "refusalType": 1, "why": "The lift of [22,31] down to [22,32] («Utiliza un volante hidráulico para accionar el ascensor», quest 1743): it works with the hydraulic wheel (17964) in the bag, the interactive as in the game; the landing cell is INFERRED."},
+    {"map": 135270145, "element": 488036, "cell": 435, "gfx": 42468, "type": -1, "skill": 114, "toMap": 138150403, "toCell": 302, "criterion": "POE15990,1", "refusal": 449, "refusalType": 1, "why": "The sewer bars of the catacombs, «Encuentra el modo de atravesar las rejas» (9460): Dofus pour les noobs («S'emparer des commandes») says to equip the Rikiki Wand and pass between the bars; the lair landing cell is INFERRED."},
     {"map": 180486661, "element": 510884, "cell": 247, "gfx": 58946, "type": -1, "skill": 114, "toMap": 181404680, "toCell": 330, "criterion": "POE15990,1", "why": "The Village Miniature of the Sidimote moors [-14,34] (1911, 13113): «il faudra alors s'équiper d'1 Baguette Rikiki puis cliquer sur le Village Miniature» (Dofus pour les noobs, «Le bonheur est dans le spray»). The wand is item 15990: the quest does not hand it out, it is crafted by a Carver (job 13, level 40: 652, 8157 and 1672 in the recipe); the landing cell is INFERRED."},
     {"map": 181404680, "element": 510922, "cell": 401, "gfx": 13117, "type": -1, "skill": 114, "toMap": 180486661, "toCell": 261, "why": "The way out of the miniature village back to [-14,34] (1911). INFERRED: element 510922 (gfx 13117) is the only other element of the village besides the house door; the guide does not say how one leaves."},
     {"map": 117704200, "element": 508072, "cell": 240, "gfx": 42429, "type": -1, "skill": 114, "toMap": 117705224, "toCell": 479, "why": "Abyssal base, room beside the Cartographer's lift [22,18]: the wall door to the next room east (117705224), the way on to Kralab Rah's quarters (Dofus pour les noobs, «Relevez les niveaux»: two maps on from the Cartographer's lift). The 2.73 graph has no transition for it. The arrival cell 479 is INFERRED: where the base's other wall doors land."},
@@ -2034,6 +2035,10 @@
     {
       "map": 187440128, "element": 511978, "cell": 413, "gfx": 62501, "type": -1, "skill": 114, "toMap": 187439104, "toCell": 427,
       "why": "Bethel tower, Raval's room: the way back down (pair of 511977). INFERRED."
+    },
+    {
+      "map": 147324928, "element": 487857, "cell": 248, "gfx": 48784, "type": -1, "skill": 184, "toMap": 147326976, "toCell": 297, "criterion": "Qa=1608&Qo<9413",
+      "why": "Quest 1608, the undersea cave: Dofus pour les noobs («Le disparu de Sufokia»): «Cliquez sur le point lumineux au mur pour ouvrir la porte et franchissez la» - the glowing point (graphic 48784, no skill in the data) opens the stone doors into the sanctuary where Vardo waits. Type -1 and skill 184 as the measured passages. INFERRED landing cell 297 (the cell the walk-in lands on, left of the sanctuary). The sanctuary declares no element and Vardo's last reply is the way out, so the door opens only while he still waits (1608 under way, 9413 not done)."
     }
   ]
 }

@@ -41985,7 +41985,8 @@
           "choices": [
             { "reply": 21800, "next": 18190, "quest": 1521, "beforeObjective": 8651 },
             { "reply": 53364, "next": 40981, "quest": 2150, "afterObjective": 16372, "beforeObjective": 16373 },
-            { "reply": 53368, "next": 40983, "quest": 2150, "afterObjective": 16373, "beforeObjective": 16374 }
+            { "reply": 53368, "next": 40983, "quest": 2150, "afterObjective": 16373, "beforeObjective": 16374 },
+            { "reply": 53019, "next": 40704, "quest": 2152, "afterObjective": 16439, "beforeObjective": 16440 }
           ]
         },
         {
@@ -42029,9 +42030,15 @@
           "choices": [
             { "reply": 53365, "quest": 2150, "beforeObjective": 16374, "gives": 23136, "completes": 16374, "params": [[30, 16374]] }
           ]
+        },
+        {
+          "message": 40704,
+          "choices": [
+            { "reply": 53018, "quest": 2152, "completes": 16440, "params": [[30, 16440]], "buyPrice": 1000, "gives": 23127 }
+          ]
         }
       ],
-      "why": "Narber Rihen Levihawa, Pandala's librarian: «Buenas, amigo de la cultura» (2926). «Le livre des Taures», Pandala's library [21,-27] («Parlez à Narber Rihen Levihawa ... Narber n'a malheureusement pas le livre ni idée de l'endroit ou il pourrait se trouver»): 21800, 18190, 21799, 18191, and «Adiós» (21798) is objective 8651. «En la encrucijada de los mundos» (2150): «Vengo a solucionar el problema de los yokais.» (53364): not to kill them (40981, 53363), the noisy yokais upstairs (40982), «Dirigirte hacia las risas y las voces.» (53362) leaves the mark -2150001 that shows them; once they are quiet (16373), «Los espíritus se han marchado.» (53368), the sound of silence (40983, 53367, 40984), «El pandarín me ha exigido una serie de recomendaciones...» (53366), the document (40985), «Gracias, ¡hasta luego!» (53365) does 16374 and gives his recommendation (23136). Dofus pour les noobs («À la croisée des mondes»): «rencontrer Narber Rihen Levihawa et lui annoncer que vous êtes là pour mettre un terme au brouhaha» and «annoncer à Narber Rihen Levihawa que les esprits sont partis … vous remet donc 1 x Recommandation de Narber Rihen Levihawa»."
+      "why": "Narber Rihen Levihawa, Pandala's librarian: «Buenas, amigo de la cultura» (2926). «Le livre des Taures», Pandala's library [21,-27] («Parlez à Narber Rihen Levihawa ... Narber n'a malheureusement pas le livre ni idée de l'endroit ou il pourrait se trouver»): 21800, 18190, 21799, 18191, and «Adiós» (21798) is objective 8651. «En la encrucijada de los mundos» (2150): «Vengo a solucionar el problema de los yokais.» (53364): not to kill them (40981, 53363), the noisy yokais upstairs (40982), «Dirigirte hacia las risas y las voces.» (53362) leaves the mark -2150001 that shows them; once they are quiet (16373), «Los espíritus se han marchado.» (53368), the sound of silence (40983, 53367, 40984), «El pandarín me ha exigido una serie de recomendaciones...» (53366), the document (40985), «Gracias, ¡hasta luego!» (53365) does 16374 and gives his recommendation (23136). Dofus pour les noobs («À la croisée des mondes»): «rencontrer Narber Rihen Levihawa et lui annoncer que vous êtes là pour mettre un terme au brouhaha» and «annoncer à Narber Rihen Levihawa que les esprits sont partis … vous remet donc 1 x Recommandation de Narber Rihen Levihawa». «Au nom de l'Art»: «¿Tienes el libro ese de los geoglifos?» (53019) -> 40704 (a thousand kamas); «Comprar el libro» (53018) charges 1000 kamas, hands «Los geoglifos para torpes» (23127) and closes 16440 (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 783,
@@ -47920,7 +47927,8 @@
           "message": 40645,
           "choices": [
             { "reply": 54239, "next": 41666, "quest": 2164, "afterObjective": 16264, "beforeObjective": 16265 },
-            { "quest": 2164, "completes": 16265, "params": [[30, 16265]], "takes": 32275, "takesCount": 3, "gives": 23020, "afterObjective": 16264, "beforeObjective": 16265, "next": 41671, "reply": 54234 }
+            { "quest": 2164, "completes": 16265, "params": [[30, 16265]], "takes": 32275, "takesCount": 3, "gives": 23020, "afterObjective": 16264, "beforeObjective": 16265, "next": 41671, "reply": 54234 },
+            { "reply": 52944, "next": 40646, "quest": 2152, "afterObjective": 16432, "beforeObjective": 16433 }
           ]
         },
         {
@@ -47966,9 +47974,27 @@
           "choices": [
             { "reply": 54233 }
           ]
+        },
+        {
+          "message": 40646,
+          "choices": [
+            { "reply": 52943, "next": 40647 }
+          ]
+        },
+        {
+          "message": 40647,
+          "choices": [
+            { "reply": 52942, "next": 40648 }
+          ]
+        },
+        {
+          "message": 40648,
+          "choices": [
+            { "reply": 52941 }
+          ]
         }
       ],
-      "why": "Tanuha Ping, the potter of the Alfar [24,-24]: «Obtén un recipiente de los tanukis» (16265). 40645, «¿De qué hablas?» 54239, 41666, «Pues yo estoy buscando un recipiente mágico» 54238, 41667, «Se trataría, concretamente, de una maceta» 54237, 41668, «Puedo pagarte» 54236, 41669 (the magic pot), «¿Cuál sería el precio?» 54235, 41670 (three bunches of desert roses), «¿Dónde puedo encontrar ese tipo de flores minerales?» 81753 -> 59734 (under sandstone blocks near Plantala). «Darle las rosas minerales que has encontrado» (54234, DPLN's quote) takes 3 roses (32275), gives the Maceta mágica tanuki (23020) and closes 16265 (41671, «Agarrar el recipiente y marcharte» 54233). Order of the first replies INFERRED from the reply texts."
+      "why": "Tanuha Ping, the potter of the Alfar [24,-24]: «Obtén un recipiente de los tanukis» (16265). 40645, «¿De qué hablas?» 54239, 41666, «Pues yo estoy buscando un recipiente mágico» 54238, 41667, «Se trataría, concretamente, de una maceta» 54237, 41668, «Puedo pagarte» 54236, 41669 (the magic pot), «¿Cuál sería el precio?» 54235, 41670 (three bunches of desert roses), «¿Dónde puedo encontrar ese tipo de flores minerales?» 81753 -> 59734 (under sandstone blocks near Plantala). «Darle las rosas minerales que has encontrado» (54234, DPLN's quote) takes 3 roses (32275), gives the Maceta mágica tanuki (23020) and closes 16265 (41671, «Agarrar el recipiente y marcharte» 54233). Order of the first replies INFERRED from the reply texts. «Au nom de l'Art»: Tanuha Ping, asked about the stolen ore: 52944 -> 40646 -> 52943 -> 40647 -> 52942 -> 40648 -> 52941. He says the tokapes (the Kaskoui) take the ore back (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 184,
@@ -48431,7 +48457,9 @@
             { "reply": 55310, "next": 42470, "quest": 2170, "afterObjective": 16739, "beforeObjective": 16740 },
             { "reply": 53711, "next": 41240, "beforeQuest": 2151 },
             { "reply": 53717, "next": 41246, "quest": 2151, "afterObjective": 16400, "beforeObjective": 16401, "criterion": "PO>23414,0" },
-            { "reply": 53843, "next": 41344, "quest": 2151, "afterObjective": 16408, "beforeObjective": 16409 }
+            { "reply": 53843, "next": 41344, "quest": 2151, "afterObjective": 16408, "beforeObjective": 16409 },
+            { "reply": 53839, "next": 41348, "beforeQuest": 2152 },
+            { "reply": 52867, "next": 40585, "quest": 2152, "afterObjective": 16455, "beforeObjective": 16456 }
           ]
         },
         {
@@ -48668,11 +48696,47 @@
         {
           "message": 41347,
           "choices": [
-            { "reply": 53839 }
+            { "reply": 53839, "next": 41348 }
+          ]
+        },
+        {
+          "message": 41348,
+          "choices": [
+            { "reply": 53847, "next": 41349 }
+          ]
+        },
+        {
+          "message": 41349,
+          "choices": [
+            { "reply": 53846, "next": 41350 }
+          ]
+        },
+        {
+          "message": 41350,
+          "choices": [
+            { "reply": 53845, "next": 41351 }
+          ]
+        },
+        {
+          "message": 41351,
+          "choices": [
+            { "reply": 53844, "startsQuest": 2152, "params": [[34, 2152]] }
+          ]
+        },
+        {
+          "message": 40585,
+          "choices": [
+            { "reply": 52866, "next": 40586 }
+          ]
+        },
+        {
+          "message": 40586,
+          "choices": [
+            { "reply": 52865, "quest": 2152, "completes": 16456, "params": [[30, 16456]] }
           ]
         }
       ],
-      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken."
+      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken. «Au nom de l'Art» (2152): 52867 -> 40585 -> 52866 -> 40586 -> 52865 'Mostrarle la garra de la roca' closes 16456 (Dofus pour les noobs («Au nom de l'Art»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
     },
   {
       "npc": 5600,
@@ -66754,11 +66818,53 @@
       "npc": 5610,
       "map": 0,
       "opening": 41912,
-      "lines": [
-        { "message": 41912, "choices": [] }
+      "openings": [
+        { "quest": 2152, "objective": 16436, "message": 40689 }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "lines": [
+        {
+          "message": 41912,
+          "choices": []
+        },
+        {
+          "message": 40689,
+          "choices": [
+            { "reply": 52997, "next": 40690, "quest": 2152, "afterObjective": 16436, "beforeObjective": 16437 },
+            { "reply": 53005, "next": 40695, "quest": 2152, "afterObjective": 16437, "beforeObjective": 16439, "completes": 16439, "params": [[30, 16439]], "criterion": "PO=23098" }
+          ]
+        },
+        {
+          "message": 40690,
+          "choices": [
+            { "reply": 52996, "next": 40691, "quest": 2152, "completes": 16437, "params": [[30, 16437]], "gives": 23126 }
+          ]
+        },
+        {
+          "message": 40691,
+          "choices": [
+            { "reply": 52995 }
+          ]
+        },
+        {
+          "message": 40695,
+          "choices": [
+            { "reply": 53004, "next": 40696, "quest": 2152, "afterObjective": 16439, "beforeObjective": 16440 }
+          ]
+        },
+        {
+          "message": 40696,
+          "choices": [
+            { "reply": 53003, "next": 40697 }
+          ]
+        },
+        {
+          "message": 40697,
+          "choices": [
+            { "reply": 53002 }
+          ]
+        }
+      ],
+      "why": "Aihaye (Tanukai Yayai) at [23,-26]. «Au nom de l'Art» (2152): in pain he cannot talk (52997 -> 40690); «Vaya... ¿Cómo podría aliviarte?» (52996) -> 40691 hands the easy recipe of the dekojo balm (23126) and closes 16437 «Encuentra a un tanuki que acepte hablar del código»; with the balm (23098, taken) 53005 -> 40695 closes 16439; then 53004 -> 40696 -> 53003 -> 40697 -> 53002 sends the character to the book. Dofus pour les noobs («Au nom de l'Art»). INFERRED: the pairing by message order."
     },
   {
       "npc": 5630,
@@ -66804,46 +66910,141 @@
       "npc": 5616,
       "map": 0,
       "opening": 40658,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 40658, "choices": [] }
+        {
+          "message": 40658,
+          "choices": [
+            { "reply": 52959, "next": 40659, "quest": 2152, "afterObjective": 16432, "beforeObjective": 16433 }
+          ]
+        },
+        {
+          "message": 40659,
+          "choices": [
+            { "reply": 52958, "next": 40660 }
+          ]
+        },
+        {
+          "message": 40660,
+          "choices": [
+            { "reply": 52957, "quest": 2152, "completes": 16433, "params": [[30, 16433]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «Au nom de l'Art»: Tanutoki does not know a tokape personally and names Tanukas Kanueses: 52959 -> 40659 -> 52958 -> 40660 -> 52957 «Adiós, me voy» closes 16433 «Pregunta a los tanukis» (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 5609,
       "map": 0,
       "opening": 40664,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 40664, "choices": [] }
+        {
+          "message": 40664,
+          "choices": [
+            { "reply": 52964, "next": 40665, "quest": 2152, "afterObjective": 16433, "beforeObjective": 16434 }
+          ]
+        },
+        {
+          "message": 40665,
+          "choices": [
+            { "reply": 52969, "next": 40666 }
+          ]
+        },
+        {
+          "message": 40666,
+          "choices": [
+            { "reply": 52968, "next": 40667 }
+          ]
+        },
+        {
+          "message": 40667,
+          "choices": [
+            { "reply": 52967, "next": 40668 }
+          ]
+        },
+        {
+          "message": 40668,
+          "choices": [
+            { "reply": 52966, "next": 40669 }
+          ]
+        },
+        {
+          "message": 40669,
+          "choices": [
+            { "reply": 52965, "quest": 2152, "completes": 16434, "params": [[30, 16434]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «Au nom de l'Art»: Noazeth is only softened by anger: agree (52964) -> 40665 -> apologise (52969) -> 40666 -> answer angrily (52968) -> 40667 -> blink (52967) -> 40668 -> shake head (52966) -> 40669 -> 52965 «Olerte una buena pista e ir a buscar a Tanukui San» closes 16434 (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 5608,
       "map": 0,
       "opening": 40606,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 40606, "choices": [] }
+        {
+          "message": 40606,
+          "choices": [
+            { "reply": 52894, "next": 40607, "quest": 2152, "afterObjective": 16431, "beforeObjective": 16432 },
+            { "reply": 52896, "next": 40610, "quest": 2152, "afterObjective": 16454, "beforeObjective": 16455 }
+          ]
+        },
+        {
+          "message": 40607,
+          "choices": [
+            { "reply": 52893, "next": 40608 }
+          ]
+        },
+        {
+          "message": 40608,
+          "choices": [
+            { "reply": 52892, "next": 40609 }
+          ]
+        },
+        {
+          "message": 40609,
+          "choices": [
+            { "reply": 52891, "quest": 2152, "completes": 16432, "params": [[30, 16432]] }
+          ]
+        },
+        {
+          "message": 40610,
+          "choices": [
+            { "reply": 52895, "quest": 2152, "completes": 16455, "params": [[30, 16455]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «Au nom de l'Art»: Mira explains the late ore: 52894 -> 40607 -> 52893 -> 40608 -> 52892 -> 40609 -> 52891 closes 16432 (each reply sits under the line its text answers; the ids fall along the talk). Later «Darle el mineral robado y explicarle lo que ha pasado» (52896) -> 40610 -> «Alegrarte con la noticia y marcharte a informar a la daimia Hikomi» (52895) closes 16455 (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 5607,
       "map": 0,
       "opening": 40590,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 40590,
           "choices": [
-            { "reply": 53544 }
+            { "reply": 53544 },
+            { "reply": 52873, "next": 40591, "quest": 2152, "beforeObjective": 16431 }
+          ]
+        },
+        {
+          "message": 40591,
+          "choices": [
+            { "reply": 52872, "next": 40786 }
+          ]
+        },
+        {
+          "message": 40786,
+          "choices": [
+            { "reply": 53139, "quest": 2152, "completes": 16431, "params": [[30, 16431]] }
           ]
         }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «Au nom de l'Art» (2152): «Vengo de parte de la daimia.» (52873) opens the forge talk (40591, the ore has not arrived), «Puedo ir a buscar lo que necesitas» (52872) is answered by 40786 (only Terrdala ore will do) and «Pedir disculpas e ir en busca de Mira Hagata.» (53139) closes 16431 (Dofus pour les noobs («Au nom de l'Art»))."
     },
   {
       "npc": 4330,
@@ -71791,7 +71992,7 @@
     },
   {
       "npc": 2778,
-      "map": 147324928,
+      "map": 147326976,
       "opening": 19793,
       "lines": [
         {
@@ -71831,7 +72032,7 @@
           ]
         }
       ],
-      "why": "Vardo Tercar in the undersea cave (Dofus pour les noobs («Le disparu de Sufokia»)): he takes the player for a hallucination (19793-19794), tells his story (19795-19798) and «Escoltarlo hasta Sufokia» (23726 = 9413) takes both back to the submarine; the engine has no follower NPC, so he is placed in the submarine. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Vardo Tercar in the undersea sanctuary behind the cave's stone doors (Dofus pour les noobs («Le disparu de Sufokia»)): he takes the player for a hallucination (19793-19794), tells his story (19795-19798) and «Escoltarlo hasta Sufokia» (23726 = 9413) takes both back to the submarine; the engine has no follower NPC, so he is placed in the submarine. INFERRED order of the replies: the client carries sentences and answers but not which go together."
     },
   {
       "npc": 2778,
@@ -72828,8 +73029,8 @@
         {
           "message": 19876,
           "choices": [
-            { "reply": 23807, "next": 19877, "gives": 16064 },
-            { "reply": 23808, "next": 19878, "gives": 16064 }
+            { "reply": 23807, "next": 19877, "buyItem": 16064, "buyPrice": 30000 },
+            { "reply": 23808, "next": 19878, "gives": 16064, "holds": 15416, "takes": 15416 }
           ]
         },
         {
@@ -72841,7 +73042,7 @@
           "choices": []
         }
       ],
-      "why": "Eli Ksir, the elixir seller of the Sramvil market (Dofus pour les noobs («S'emparer des commandes»)): «Informarte sobre la pócima de transformación en sirena» (23809) -> 30 000 kamas or a Maligilante badge (19876); either answer (23807/23808, bound to 9443) gives the potion (16064). The price is not charged: replies cannot take kamas or the badge. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Eli Ksir, the elixir seller of the Sramvil market (Dofus pour les noobs («S'emparer des commandes»)): «Informarte sobre la pócima de transformación en sirena» (23809) -> 30 000 kamas or a Maligilante badge (19876); either answer (23807/23808, bound to 9443) gives the potion (16064). The price is not charged: replies cannot take kamas or the badge. INFERRED order of the replies: the client carries sentences and answers but not which go together. The potion is paid for as the guide says (Dofus pour les noobs («S'emparer des commandes»)): reply 23807 charges 30 000 kamas and hands over the potion (a short purse closes the talk), reply 23808 takes a Malitiamen Insignia (15416) and hands it over."
     },
   {
       "npc": 2810,
@@ -72929,8 +73130,8 @@
         {
           "message": 19896,
           "choices": [
-            { "reply": 23826, "next": 19898, "quest": 1611, "completes": 9451, "params": [[30, 9451]] },
-            { "reply": 23825, "next": 19897, "quest": 1611, "completes": 9451, "params": [[30, 9451]] },
+            { "reply": 23826, "next": 19898, "quest": 1611, "completes": 9451, "params": [[30, 9451]], "buyPrice": 10000 },
+            { "reply": 23825, "next": 19897, "quest": 1611, "completes": 9451, "params": [[30, 9451]], "buyPrice": 1000 },
             { "reply": 23824, "next": 19896 }
           ]
         },
@@ -72947,7 +73148,7 @@
           "choices": []
         }
       ],
-      "why": "The jailer of the Sramvil prison (Dofus pour les noobs («S'emparer des commandes»)): «Quiero que liberes al prisionero Vicente Trezz» (23827) -> a bribe of at least 1000 kamas (19896); 23825/23826 free him (19897/19898, close 9451), 23824 (100 kamas) is refused; later «¿Dónde están los documentos?» (23829) closes 9453 (19902). The bribe is not charged: replies cannot take kamas. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "The jailer of the Sramvil prison (Dofus pour les noobs («S'emparer des commandes»)): «Quiero que liberes al prisionero Vicente Trezz» (23827) -> a bribe of at least 1000 kamas (19896); 23825/23826 free him (19897/19898, close 9451), 23824 (100 kamas) is refused; later «¿Dónde están los documentos?» (23829) closes 9453 (19902). The bribe is not charged: replies cannot take kamas. INFERRED order of the replies: the client carries sentences and answers but not which go together. The bribe is charged as the guide says (Dofus pour les noobs («S'emparer des commandes»)): reply 23825 takes 1000 kamas and reply 23826 takes 10 000 kamas (a short purse closes the talk); 23824 (100 kamas) is refused."
     },
   {
       "npc": 2497,
@@ -73005,8 +73206,8 @@
         {
           "message": 19914,
           "choices": [
-            { "reply": 23840, "next": 19922 },
-            { "reply": 23844, "next": 19919 }
+            { "reply": 23840, "next": 19922, "holds": 6961, "takes": 6961 },
+            { "reply": 23844, "next": 19919, "buyPrice": 100000 }
           ]
         },
         {
@@ -73018,7 +73219,7 @@
           "choices": []
         }
       ],
-      "why": "Grima Fandanga, the skull seller (Dofus pour les noobs («S'emparer des commandes»)): «¿Has visto a alguien robar los documentos de Valentín?» (23843) -> everything has a price (19914); 100 000 kamas (23840) or the bandit's ring (23844) close 9457 and name Ratero Gris and the catacombs (19922/19919). Not charged: replies cannot take kamas. INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Grima Fandanga, the skull seller (Dofus pour les noobs («S'emparer des commandes»)): «¿Has visto a alguien robar los documentos de Valentín?» (23843) -> everything has a price (19914); 100 000 kamas (23840) or the bandit's ring (23844) close 9457 and name Ratero Gris and the catacombs (19922/19919). Not charged: replies cannot take kamas. INFERRED order of the replies: the client carries sentences and answers but not which go together. Grima's price is charged as the guide says (Dofus pour les noobs («S'emparer des commandes»)): reply 23840 takes a Gangster Ring (6961), reply 23844 charges 100 000 kamas."
     },
   {
       "npc": 2814,
@@ -78055,7 +78256,7 @@
     {
       "npc": 2585,
       "map": 0,
-      "opening": null,
+      "opening": 18980,
       "openings": [
         { "criterion": "Qa=1934&Qo>13415&Qo<13417", "message": 29692 },
         { "criterion": "Qa=1934&Qo>13414&Qo<13416", "message": 18980 },
@@ -82072,7 +82273,7 @@
           "message": 57970,
           "choices": [
             { "reply": 79244, "next": 57971, "beforeQuest": 2520 },
-            { "reply": 79246, "next": 57978, "quest": 2520, "afterObjective": 19285, "beforeObjective": 19286 },
+            { "reply": 79246, "next": 57978, "quest": 2520, "afterObjective": 19285, "beforeObjective": 19286, "criterion": "PO!31495" },
             { "reply": 79257, "next": 57987, "criterion": "Qa=2520&Qo>19286&Qo<19290&HA=758&HA=759&HA=760&HA=761", "completesAll": [19290, 19291, 19292, 19293], "params": [[30, 19290], [30, 19291], [30, 19292], [30, 19293]], "takesAlterations": [758, 759, 760, 761] },
             { "reply": 79258, "criterion": "Qa=2520&Qo>19285&Qo<19294" },
             { "reply": 79259, "criterion": "Qa=2520&Qo>19285&Qo<19294" }
@@ -82229,8 +82430,8 @@
         {
           "message": 57963,
           "choices": [
-            { "reply": 79226, "next": 57965 },
-            { "reply": 79227, "next": 57964 }
+            { "reply": 79226, "next": 57965, "gives": 31584, "givesCount": 5 },
+            { "reply": 79227, "next": 57964, "gives": 31584, "givesCount": 5 }
           ]
         },
         {
@@ -82246,7 +82447,7 @@
           ]
         }
       ],
-      "why": "Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Fix: the 79246 gate as quest/afterObjective/beforeObjective fields plus the look gone (PO!31495). Fix: isolate the 79246 gate (quest, afterObjective, beforeObjective only; the look-gone check dropped to find why the reply was hidden)."
+      "why": "Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Fix: the 79246 gate as quest/afterObjective/beforeObjective fields plus the look gone (PO!31495). Fix: isolate the 79246 gate (quest, afterObjective, beforeObjective only; the look-gone check dropped to find why the reply was hidden). Restore the look-gone gate of the telekametro reply (DPLN: lose the Mirgrillon look in a fight first); 31495 is the look item the reducer gives. Restore takesAlterations on 79257 (the hand-in of the four captured Kabombz alterations), lost when the line was rewritten. Veils: 5 eidolonic veils of the Fortachobz (31584) handed by the replies of 57963 (DPLN reward list; the client's step reward holds only 31494 and the Orichor)."
     },
     {
       "npc": 2532,
@@ -82315,6 +82516,717 @@
         }
       ],
       "why": "The commander's Krosmoglob (2532) on the outpost's speaker box [0,18]: 2520's compiler call (58010 to 58013), then once the compiler is examined (19297) the broken plate: a Bricoleur above level 19 («Preferiría ir en persona» 79296) goes to the crates and the anvil, any other hands three Orichor (15206, «tres bloques de oricor» 79294) and gets the plate (79293, 31499). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). The commander's Krosmoglob (2532) on the outpost's speaker box [0,18]: 2520's compiler call (58010 to 58013), then once the compiler is examined (19297) the broken plate: a Bricoleur above level 19 («Preferiría ir en persona» 79296) goes to the crates and the anvil, any other hands three Orichor (15206, «tres bloques de oricor» 79294) and gets the plate (79293, 31499). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph)."
+    },
+    {
+      "npc": 708,
+      "map": 208932866,
+      "opening": 2942,
+      "lines": [
+        {
+          "message": 2942,
+          "choices": [
+            { "reply": 52986, "next": 40679, "quest": 2152, "afterObjective": 16435, "beforeObjective": 16436 },
+            { "reply": 2578 }
+          ]
+        },
+        {
+          "message": 40679,
+          "choices": [
+            { "reply": 52985, "next": 40680, "quest": 2152 }
+          ]
+        },
+        {
+          "message": 40680,
+          "choices": [
+            { "reply": 52984, "next": 40681, "quest": 2152 }
+          ]
+        },
+        {
+          "message": 40681,
+          "choices": [
+            { "reply": 52983, "next": 40682, "quest": 2152 }
+          ]
+        },
+        {
+          "message": 40682,
+          "choices": [
+            { "reply": 52982, "quest": 2152, "completes": 16436, "params": [[30, 16436]] }
+          ]
+        }
+      ],
+      "why": "Tanukui San in the room after his workshop's boss (208932866, where he is on the map). «Au nom de l'Art» (2152): «Lui parler des Kaskouïs et des vols de minerai» (52986) -> 40679 -> 52985 -> 40680 -> 52984 -> 40681 -> 52983 -> 40682 -> 52982 «Comprendre que no te dirá nada más...» closes 16436; 2578 «Salir del Taller de Tanukui San» is the dungeon exit. Dofus pour les noobs («Au nom de l'Art»)."
+    },
+    {
+      "npc": 7640,
+      "map": 234751491,
+      "opening": 57870,
+      "lines": [
+        {
+          "message": 57870,
+          "choices": [
+            { "reply": 79107, "next": 57874, "startsQuest": 2515, "criterion": "PL>149&Qf=1484&Qa!2515&Qf!2515", "params": [[34, 2515]] }
+          ]
+        },
+        {
+          "message": 57874,
+          "choices": [
+            { "reply": 79111, "next": 57875 },
+            { "reply": 79112, "next": 57878 },
+            { "reply": 79113, "next": 57879 }
+          ]
+        },
+        {
+          "message": 57875,
+          "choices": [
+            { "reply": 79110, "next": 57876 }
+          ]
+        },
+        {
+          "message": 57876,
+          "choices": [
+            { "reply": 79109, "next": 57877 }
+          ]
+        },
+        {
+          "message": 57877,
+          "choices": [
+            { "reply": 79108, "quest": 2515, "completes": 19274, "params": [[30, 19274]] }
+          ]
+        },
+        {
+          "message": 57878,
+          "choices": [
+            { "reply": 79116, "next": 57880 }
+          ]
+        },
+        {
+          "message": 57880,
+          "choices": [
+            { "reply": 79115, "next": 57881 }
+          ]
+        },
+        {
+          "message": 57881,
+          "choices": [
+            { "reply": 79114, "quest": 2515, "completes": 19274, "params": [[30, 19274]] }
+          ]
+        },
+        {
+          "message": 57879,
+          "choices": [
+            { "reply": 79119, "next": 57882 }
+          ]
+        },
+        {
+          "message": 57882,
+          "choices": [
+            { "reply": 79118, "next": 57883 }
+          ]
+        },
+        {
+          "message": 57883,
+          "choices": [
+            { "reply": 79117, "quest": 2515, "completes": 19274, "params": [[30, 19274]] }
+          ]
+        }
+      ],
+      "why": "Capitán Blair (7640), Osavora outpost [1,17!]: «Ça barde là-haut» (2515, Dofus pour les noobs, «Ça barde là-haut»). 79107 «Soy un agente de los viajeros» starts the quest (57870 greets); 57874 asks the specialty and the three answers 79111/79112/79113 «don't matter» (DPLN) each lead to its sermon (57875/57878/57879, then 57876/57880/57882 and 57877/57881/57883) ending on «Ir a ver a la sacerdotisa» (79108/79114/79117), which closes 19274. Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Capitán Blair (7640), Osavora outpost [1,17!]: «Ça barde là-haut» (2515, Dofus pour les noobs, «Ça barde là-haut»). 79107 «Soy un agente de los viajeros» starts the quest (57870 greets); 57874 asks the specialty and the three answers 79111/79112/79113 «don't matter» (DPLN) each lead to its sermon (57875/57878/57879, then 57876/57880/57882 and 57877/57881/57883) ending on «Ir a ver a la sacerdotisa» (79108/79114/79117), which closes 19274. Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph)."
+    },
+    {
+      "npc": 7641,
+      "map": 234750978,
+      "opening": 57904,
+      "openings": [
+        { "criterion": "(WE=230|WE=255)&Qa=2515&Qo>19275&Qo<19279", "message": 57908 },
+        { "criterion": "(WE=229|WE=254)&Qa=2515&Qo>19275&Qo<19279", "message": 57907 },
+        { "criterion": "(WE=228|WE=252)&Qa=2515&Qo>19275&Qo<19279", "message": 57906 },
+        { "criterion": "Qa=2515&Qo>19279&Qo<19280", "message": 57884 },
+        { "criterion": "Qa=2515&Qo>19278&Qo<19279", "message": 58724 }
+      ],
+      "lines": [
+        {
+          "message": 57904,
+          "names": true,
+          "choices": [
+            { "reply": 79148, "next": 57902 }
+          ]
+        },
+        {
+          "message": 57902,
+          "choices": [
+            { "reply": 79149, "next": 57903 }
+          ]
+        },
+        {
+          "message": 57903,
+          "choices": [
+            { "reply": 79147, "next": 57905, "quest": 2515, "completes": 19275, "params": [[30, 19275]] }
+          ]
+        },
+        {
+          "message": 57905,
+          "choices": [
+            { "reply": 79142, "next": 57906, "criterion": "(WE=228|WE=252)&Qa=2515" },
+            { "reply": 79144, "next": 57907, "criterion": "(WE=229|WE=254)&Qa=2515" },
+            { "reply": 79146, "next": 57908, "criterion": "(WE=230|WE=255)&Qa=2515" }
+          ]
+        },
+        {
+          "message": 57906,
+          "choices": [
+            { "reply": 79153, "next": 57909, "criterion": "(WE=228|WE=252)&Qa=2515&Qo>19275&Qo<19279&PO>31480,2", "quest": 2515, "takes": 31480, "takesCount": 3, "completesAll": [19276, 19277, 19278], "completes": 19278, "params": [[30, 19278]] },
+            { "reply": 79141 }
+          ]
+        },
+        {
+          "message": 57907,
+          "choices": [
+            { "reply": 79153, "next": 57909, "criterion": "(WE=229|WE=254)&Qa=2515&Qo>19275&Qo<19279&PO>31481,2", "quest": 2515, "takes": 31481, "takesCount": 3, "completesAll": [19276, 19277, 19278], "completes": 19278, "params": [[30, 19278]] },
+            { "reply": 79143 }
+          ]
+        },
+        {
+          "message": 57908,
+          "choices": [
+            { "reply": 79153, "next": 57909, "criterion": "(WE=230|WE=255)&Qa=2515&Qo>19275&Qo<19279&PO>31482,2", "quest": 2515, "takes": 31482, "takesCount": 3, "completesAll": [19276, 19277, 19278], "completes": 19278, "params": [[30, 19278]] },
+            { "reply": 79145 }
+          ]
+        },
+        {
+          "message": 57909,
+          "choices": [
+            { "reply": 79150 }
+          ]
+        },
+        {
+          "message": 58724,
+          "choices": [
+            { "reply": 79151 }
+          ]
+        },
+        {
+          "message": 57884,
+          "choices": [
+            { "reply": 79122, "quest": 2515, "givesAlteration": 755, "completes": 19280, "params": [[30, 19280]] }
+          ]
+        }
+      ],
+      "why": "Sacerdotisa de Osamodas (7641), Osavora [2,16!]: 2515 (Dofus pour les noobs, «Ça barde là-haut»). First visit 57904 to 57905: 79148 (the blessing the captain mentioned), 79149 «Pretendo escalar hasta la cima», 79147, then the season's «Seguir escuchando» (79142/79144/79146) to the request 57906/57907/57908 (milk, blood, lymph; world events 228|252, 229|254, 230|255 as the client's own drop rows have them). 79153 «Aquí está el recurso» hands the three items of the season (its binding spends them) and 57909 pours them; 58724 sends her visitor to the statue's voice; once he has heard it 57884 and 79122 «Sentir el poder de la bendición» close the quest and put the alteration 755 «Bendición de Osamodas» on him. Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Sacerdotisa de Osamodas (7641), Osavora [2,16!]: 2515 (Dofus pour les noobs, «Ça barde là-haut»). First visit 57904 to 57905: 79148 (the blessing the captain mentioned), 79149 «Pretendo escalar hasta la cima», 79147, then the season's «Seguir escuchando» (79142/79144/79146) to the request 57906/57907/57908 (milk, blood, lymph; world events 228|252, 229|254, 230|255 as the client's own drop rows have them). 79153 «Aquí está el recurso» hands the three items of the season (its binding spends them) and 57909 pours them; 58724 sends her visitor to the statue's voice; once he has heard it 57884 and 79122 «Sentir el poder de la bendición» close the quest and put the alteration 755 «Bendición de Osamodas» on him. Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). The intro (57904 to 57905) ends by closing 19275 (the talk objective) so that it is not ticked on the greeting and the later visits open on the season's request."
+    },
+    {
+      "npc": 7731,
+      "map": 234750978,
+      "opening": 57918,
+      "lines": [
+        {
+          "message": 57918,
+          "choices": [
+            { "reply": 79175, "next": 57919 },
+            { "reply": 79190, "next": 57928 }
+          ]
+        },
+        {
+          "message": 57919,
+          "choices": [
+            { "reply": 79174, "next": 57920 }
+          ]
+        },
+        {
+          "message": 57920,
+          "choices": [
+            { "reply": 79173, "next": 57921 }
+          ]
+        },
+        {
+          "message": 57921,
+          "choices": [
+            { "reply": 79172, "next": 57922 }
+          ]
+        },
+        {
+          "message": 57922,
+          "choices": [
+            { "reply": 79171, "next": 57923 }
+          ]
+        },
+        {
+          "message": 57923,
+          "choices": [
+            { "reply": 79170, "next": 57924 }
+          ]
+        },
+        {
+          "message": 57924,
+          "choices": [
+            { "reply": 79169, "next": 57925 }
+          ]
+        },
+        {
+          "message": 57925,
+          "names": true,
+          "choices": [
+            { "reply": 79177, "next": 57926 },
+            { "reply": 79179, "next": 57927 }
+          ]
+        },
+        {
+          "message": 57926,
+          "choices": [
+            { "reply": 79176, "quest": 2515, "completes": 19279, "params": [[30, 19279]] }
+          ]
+        },
+        {
+          "message": 57927,
+          "choices": [
+            { "reply": 79178, "quest": 2515, "completes": 19279, "params": [[30, 19279]] }
+          ]
+        },
+        {
+          "message": 57928,
+          "choices": [
+            { "reply": 79189, "next": 57929 }
+          ]
+        },
+        {
+          "message": 57929,
+          "choices": [
+            { "reply": 79188, "next": 57930 }
+          ]
+        },
+        {
+          "message": 57930,
+          "choices": [
+            { "reply": 79187, "next": 57931 }
+          ]
+        },
+        {
+          "message": 57931,
+          "choices": [
+            { "reply": 79186, "next": 57932 }
+          ]
+        },
+        {
+          "message": 57932,
+          "choices": [
+            { "reply": 79185, "next": 57933 }
+          ]
+        },
+        {
+          "message": 57933,
+          "choices": [
+            { "reply": 79184, "next": 57934 }
+          ]
+        },
+        {
+          "message": 57934,
+          "names": true,
+          "choices": [
+            { "reply": 79181, "next": 57935 },
+            { "reply": 79183, "next": 57936 }
+          ]
+        },
+        {
+          "message": 57935,
+          "choices": [
+            { "reply": 79180, "quest": 2515, "completes": 19279, "params": [[30, 19279]] }
+          ]
+        },
+        {
+          "message": 57936,
+          "choices": [
+            { "reply": 79182, "quest": 2515, "completes": 19279, "params": [[30, 19279]] }
+          ]
+        }
+      ],
+      "why": "Voz de Osamodas (7731), the statue's voice at Osavora [2,16!]: 2515 (Dofus pour les noobs, «Ça barde là-haut»): 57918 is silent; «Se prosterner» (79175 or 79190, both work) starts one of the two parallel monologues (57919 to 57925 / 57928 to 57934), the affirmative answer (79177/79181 «Así es» or the hesitant 79179/79183, both work) leads to 57926/57927 or 57935/57936 and the last reply closes 19279. Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph)."
+    },
+    {
+      "npc": 5638,
+      "map": 205261570,
+      "opening": 40713,
+      "lines": [
+        {
+          "message": 40713,
+          "choices": [
+            { "reply": 53036 },
+            { "reply": 53037, "next": 40714 },
+            { "reply": 53038, "next": 40714 }
+          ]
+        },
+        {
+          "message": 40714,
+          "choices": []
+        }
+      ],
+      "why": "Tokape on duty, first meeting place: 53036 starts the fight (npc_fights); 53037 and 53038 are answered by 40714 (he only follows Tanukui San's orders). Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5638,
+      "map": 205260290,
+      "opening": 40713,
+      "lines": [
+        {
+          "message": 40713,
+          "choices": [
+            { "reply": 53036 },
+            { "reply": 53037, "next": 40714 },
+            { "reply": 53038, "next": 40714 }
+          ]
+        },
+        {
+          "message": 40714,
+          "choices": []
+        }
+      ],
+      "why": "Tokape on duty, second meeting place: 53036 starts the fight (npc_fights); 53037 and 53038 are answered by 40714 (he only follows Tanukui San's orders). Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5611,
+      "map": 207621132,
+      "opening": 40724,
+      "lines": [
+        {
+          "message": 40724,
+          "choices": [
+            { "reply": 53057, "next": 40725 }
+          ]
+        },
+        {
+          "message": 40725,
+          "choices": [
+            { "reply": 53056, "next": 40726 }
+          ]
+        },
+        {
+          "message": 40726,
+          "choices": [
+            { "reply": 53055, "next": 40727 }
+          ]
+        },
+        {
+          "message": 40727,
+          "choices": [
+            { "reply": 53054, "next": 40728 }
+          ]
+        },
+        {
+          "message": 40728,
+          "choices": [
+            { "reply": 53053, "next": 40729 }
+          ]
+        },
+        {
+          "message": 40729,
+          "choices": [
+            { "reply": 53052, "next": 40730, "quest": 2152, "completes": 16448, "params": [[30, 16448]] }
+          ]
+        },
+        {
+          "message": 40730,
+          "choices": []
+        }
+      ],
+      "why": "Tanuwang Yuanzhong at the last meeting place: the talk 40724-40729 (53057..53052) watches him and Whaska and 53052 closes 16448 (40730: we meet at the workshop). Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5612,
+      "map": 207621132,
+      "opening": 40731,
+      "lines": [
+        {
+          "message": 40731,
+          "choices": []
+        }
+      ],
+      "why": "Whaska carrying the last sack of ore (40731). Dofus pour les noobs («Au nom de l'Art»)."
+    },
+    {
+      "npc": 5613,
+      "map": 205261057,
+      "opening": 40732,
+      "openings": [
+        { "quest": 2152, "objective": 16449, "message": 40735 },
+        { "quest": 2152, "objective": 16448, "message": 40733 }
+      ],
+      "lines": [
+        {
+          "message": 40732,
+          "choices": []
+        },
+        {
+          "message": 40733,
+          "choices": [
+            { "reply": 53059 },
+            { "reply": 53060, "next": 40734 },
+            { "reply": 53062, "next": 40734 }
+          ]
+        },
+        {
+          "message": 40734,
+          "choices": []
+        },
+        {
+          "message": 40735,
+          "choices": [
+            { "reply": 53061 }
+          ]
+        }
+      ],
+      "why": "Dulakolita at the workshop: 53059 starts the solo fight (npc_fights; the win closes 16449 through the beat binding); 53060 and 53062 get 40734. After the win 40735 and 53061 'Darle las gracias...'. Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5611,
+      "map": 205261057,
+      "opening": 40736,
+      "openings": [
+        { "quest": 2152, "objective": 16451, "message": 40766 },
+        { "quest": 2152, "objective": 16450, "message": 40737 }
+      ],
+      "lines": [
+        {
+          "message": 40736,
+          "choices": []
+        },
+        {
+          "message": 40766,
+          "choices": [
+            { "reply": 53112, "next": 40767 }
+          ]
+        },
+        {
+          "message": 40767,
+          "choices": [
+            { "reply": 53111, "next": 40768 }
+          ]
+        },
+        {
+          "message": 40768,
+          "choices": [
+            { "reply": 53108, "next": 40769 },
+            { "reply": 53109, "next": 40776 },
+            { "reply": 53110, "next": 40776 }
+          ]
+        },
+        {
+          "message": 40769,
+          "choices": [
+            { "reply": 53114, "next": 40770 },
+            { "reply": 53115, "next": 40776 },
+            { "reply": 53116, "next": 40776 }
+          ]
+        },
+        {
+          "message": 40770,
+          "choices": [
+            { "reply": 53118, "next": 40772 },
+            { "reply": 53117, "next": 40776 },
+            { "reply": 53119, "next": 40776 }
+          ]
+        },
+        {
+          "message": 40772,
+          "choices": [
+            { "reply": 53123, "next": 40773 }
+          ]
+        },
+        {
+          "message": 40773,
+          "choices": [
+            { "reply": 53121, "next": 40774 },
+            { "reply": 53122, "next": 40776 },
+            { "reply": 53120, "next": 40776 }
+          ]
+        },
+        {
+          "message": 40774,
+          "choices": [
+            { "reply": 53126, "next": 40775 },
+            { "reply": 53124, "next": 40776 }
+          ]
+        },
+        {
+          "message": 40775,
+          "choices": [
+            { "reply": 53125, "quest": 2152, "completes": 16452, "params": [[30, 16452]] }
+          ]
+        },
+        {
+          "message": 40776,
+          "choices": [
+            { "reply": 53127, "next": 40766 }
+          ]
+        },
+        {
+          "message": 40737,
+          "choices": [
+            { "reply": 53065, "next": 40738 },
+            { "reply": 53064, "next": 40739 },
+            { "reply": 53063 }
+          ]
+        },
+        {
+          "message": 40738,
+          "choices": []
+        },
+        {
+          "message": 40739,
+          "choices": []
+        }
+      ],
+      "why": "Tanuwang Yuanzhong at the workshop: thanks (40736) is the talk that closes 16450; 40737 and 53065/53064/53063 point to the art exhibition at the Bolsa; once the stand is reserved (16451) 40766 starts the assembly: three right-or-wrong picks (53108, 53114, 53118), then 53123, 53121/53126 and 53125 closes 16452; any wrong pick gets 40776 and 53127 restarts. Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5639,
+      "map": 205260288,
+      "opening": 40740,
+      "lines": [
+        {
+          "message": 40740,
+          "choices": [
+            { "reply": 53067, "next": 40741 },
+            { "reply": 53066 }
+          ]
+        },
+        {
+          "message": 40741,
+          "choices": []
+        }
+      ],
+      "why": "Exhibitor tanuki: 53067 'Quisiera reservar un espacio...' is answered by 40741 (talk to Tanugui Met). Dofus pour les noobs («Au nom de l'Art»)."
+    },
+    {
+      "npc": 5630,
+      "map": 205260288,
+      "opening": 40752,
+      "lines": [
+        {
+          "message": 40752,
+          "choices": [
+            { "reply": 53088, "next": 40753 }
+          ]
+        },
+        {
+          "message": 40753,
+          "choices": [
+            { "reply": 53083, "next": 41797 },
+            { "reply": 53085, "next": 40754 },
+            { "reply": 53086, "next": 40758 }
+          ]
+        },
+        {
+          "message": 41797,
+          "choices": [
+            { "reply": 53090, "next": 40755, "quest": 2152, "afterObjective": 16450, "completes": 16451, "params": [[30, 16451]], "buyPrice": 10000, "refused": 42480 }
+          ]
+        },
+        {
+          "message": 40754,
+          "choices": [
+            { "reply": 53087, "next": 40757, "quest": 2152, "afterObjective": 16450, "completes": 16451, "params": [[30, 16451]], "buyPrice": 5000, "refused": 42477 }
+          ]
+        },
+        {
+          "message": 40758,
+          "choices": [
+            { "reply": 53092, "next": 40759, "quest": 2152, "afterObjective": 16450, "completes": 16451, "params": [[30, 16451]], "buyPrice": 7500, "refused": 42479 }
+          ]
+        },
+        {
+          "message": 40755,
+          "choices": []
+        },
+        {
+          "message": 40757,
+          "choices": []
+        },
+        {
+          "message": 40759,
+          "choices": []
+        },
+        {
+          "message": 42480,
+          "choices": []
+        },
+        {
+          "message": 42477,
+          "choices": []
+        },
+        {
+          "message": 42479,
+          "choices": []
+        }
+      ],
+      "why": "Tanugui Met at the Bolsa stands (the DPLN reserves the stand for 10000, 5000 or 7500 kamas depending on the manner): each payment reply closes 16451; an empty purse gets 42480/42477/42479. Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5614,
+      "map": 205260288,
+      "opening": 40626,
+      "lines": [
+        {
+          "message": 40626,
+          "choices": [
+            { "reply": 52924, "next": 40627 },
+            { "reply": 52923, "next": 40627 },
+            { "reply": 52922, "next": 40627 }
+          ]
+        },
+        {
+          "message": 40627,
+          "choices": [
+            { "reply": 52921, "next": 40628 }
+          ]
+        },
+        {
+          "message": 40628,
+          "choices": [
+            { "reply": 52920, "next": 40629 }
+          ]
+        },
+        {
+          "message": 40629,
+          "choices": [
+            { "reply": 52919, "next": 40630 }
+          ]
+        },
+        {
+          "message": 40630,
+          "choices": [
+            { "reply": 52918, "next": 40632, "gives": 23123 }
+          ]
+        },
+        {
+          "message": 40632,
+          "choices": [
+            { "reply": 52917, "next": 40633, "quest": 2152, "completes": 16454, "params": [[30, 16454]] }
+          ]
+        },
+        {
+          "message": 40633,
+          "choices": []
+        }
+      ],
+      "why": "The Rock Spirit at the stand: the three openers 52924/52923/52922 reach 40627, 52921-52918 lead to 40630 and 52918 hands the claw of the rock (23123); 52917 closes 16454 (40633: Tanu leaves). Dofus pour les noobs («Au nom de l'Art»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 2824,
+      "map": 134224898,
+      "opening": 19947,
+      "lines": [
+        {
+          "message": 19947,
+          "choices": [
+            { "reply": 23866, "quest": 1611, "criterion": "Qo>9463&Qo<9466", "next": 19948 }
+          ]
+        },
+        {
+          "message": 19948,
+          "choices": [
+            { "reply": 23865, "quest": 1611, "criterion": "PO!16063", "gives": 16063 }
+          ]
+        }
+      ],
+      "why": "The queen of Sramvil in the alley (Dofus pour les noobs («S'emparer des commandes»)): 23866 (notice she is the queen) -> the Smis family pays for the documents (19948) -> 23865 (grab the documents) hands over the spy reports (16063), which 9466 delivers to Gein the Silent."
     }
   ]
 }

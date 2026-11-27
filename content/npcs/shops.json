@@ -1298,8 +1298,8 @@
     },
     {
       "npc": 5595,
-      "items": [{"gid": 7045, "price": 40}, {"gid": 23179, "price": 40}, {"gid": 23180, "price": 40}],
-      "why": "Pantruku, keeper of the Pandazaap tavern [20,-29] (actions 1 and 3: he sells and talks), serves the Pandaburg (7045), the Pandasahi (23179) and the Pandaporo (23180), each at its template price (40). Dofus pour les noobs («À la croisée des mondes»): «La Pandaburg peut s'acheter à la taverne en [20,-29]» and «Pandazahi ou du Pandaporo (achat taverne en [20,-29])». INFERRED: the rest of his catalogue."
+      "items": [{"gid": 7045, "price": 40}, {"gid": 23179, "price": 40}, {"gid": 23180, "price": 40}, {"gid": 23482, "price": 1000}],
+      "why": "Quest 2152 (DPLN, Au nom de l'Art): «En [20,-29] achetez 1 x Alcool a 99% pour 1 000 kamas a Hintikou», so the keeper also sells the Alcohol 99% (23482), the balm's ingredient, at 1000 kamas. Pantruku, keeper of the Pandazaap tavern [20,-29] (actions 1 and 3: he sells and talks), serves the Pandaburg (7045), the Pandasahi (23179) and the Pandaporo (23180), each at its template price (40). Dofus pour les noobs («À la croisée des mondes»): «La Pandaburg peut s'acheter à la taverne en [20,-29]» and «Pandazahi ou du Pandaporo (achat taverne en [20,-29])». INFERRED: the rest of his catalogue."
     },
     {
       "npc": 81,

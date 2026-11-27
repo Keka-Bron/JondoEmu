@@ -620,6 +620,15 @@
     },
   {"dungeon": 67, "bossRoom": 110101506, "room": 110102530, "cell": 358, "npc": 2046, "replies": [17332, 17485], "why": "Sylargh's Transporter (dungeon 67): after Sylargh the winners are in the exit room (110102530) where Sylargh stands (1915, 13178). His 17332/17485 leaves. Cell 358 INFERRED."},
     {"dungeon": 109, "bossRoom": 187957512, "room": 187957516, "cell": 300, "npc": 4296, "replies": [], "why": "Solar tower: Dofus pour les noobs («Les coeurs livides») «monter les escaliers puis cliquer sur le cœur livide» before leaving; the quest names the room above the boss (187957516, «discover» 13729) where the livid heart is (13730). The win leads there, the god's room (187957518) is up the stairs, and the map panel's «Salir de la mazmorra» leaves from it. INFERRED: that the real game leaves the winners in the boss room with stairs; cell INFERRED."},
-    {"dungeon": 108, "bossRoom": 187437056, "room": 187439104, "cell": 300, "npc": 4292, "replies": [], "why": "Bethel tower: Dofus pour les noobs («Les coeurs livides») the same: room above the boss (187439104, 13734) with the livid heart (13735), Raval's room (187440128) up the stairs. INFERRED as in the Solar tower."}
+    {"dungeon": 108, "bossRoom": 187437056, "room": 187439104, "cell": 300, "npc": 4292, "replies": [], "why": "Bethel tower: Dofus pour les noobs («Les coeurs livides») the same: room above the boss (187439104, 13734) with the livid heart (13735), Raval's room (187440128) up the stairs. INFERRED as in the Solar tower."},
+    {
+      "dungeon": 126,
+      "bossRoom": 208932864,
+      "room": 208932866,
+      "cell": 300,
+      "npc": 708,
+      "replies": [2578],
+      "why": "Taller de Tanukui San (dungeon 126): after the boss (6218, room 208932864) the winners are in 208932866 where Tanukui San stands (spawns.json). His 'Salir del Taller de Tanukui San' (2578) leaves through the dungeon's own way out. INFERRED cell 300: a walkable cell of the map; Dofus pour les noobs («Au nom de l'Art») only says to talk to him after the last fight."
+    }
   ]
 }

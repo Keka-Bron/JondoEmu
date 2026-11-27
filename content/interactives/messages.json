@@ -10,6 +10,7 @@
     "Source: official server packet captures, 2026-11-17 to 11-21."
   ],
   "messages": [
+    {"map": 205260289, "element": 519617, "message": 0, "gives": [{"item": 23481, "count": 2}], "criterion": "Qo>16437&Qo<16440", "what": "Quest 2152 (DPLN, Au nom de l'Art): the big pebble column at the center of Tierradala [25,-25] hands 2 x Rock Dust (23481) while the balm is the objective in hand (16438). INFERRED element (graphic 66405, the central type -1 element)."},
     {
       "map": 190840834,
       "element": 515589,

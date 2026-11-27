@@ -494,6 +494,15 @@ namespace Jondo.Unity.Server.Handlers
                 Way.Down => scroll.BottomMapId,
                 _ => 0,
             };
+            // MapScrolls naming a map the world does not have is no answer: it left the character
+            // on the border for good (147851275 [-10,-4] names 147851787 on its right, where
+            // Sramvil's [-9,-4] is 135940). The coordinates still know the map next door.
+            if (written != 0 && MapManager.GetMapInfo(written) == null)
+            {
+                if (!quiet) Console.WriteLine($"[Move] The world data says {way} of {from} is {written}, " +
+                                  "which is not a map of the world; trying its coordinates.");
+                written = 0;
+            }
             if (written != 0)
             {
                 if (!quiet) Console.WriteLine($"[Move] The client asked for {asked}; the world data says " +
@@ -529,9 +538,28 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var candidate in MapManager.Maps.Values)
             {
                 if (candidate.PosX != x || candidate.PosY != y) continue;
-                if (best == null || Better(candidate, best, here)) best = candidate;
+                if (best == null || Better(candidate, best, here, way)) best = candidate;
             }
             return best?.MapId ?? 0;
+        }
+
+        /// <summary>
+        /// 2 when <paramref name="there"/>'s border the other way names <paramref name="here"/>,
+        /// 1 when it names nothing or a map the world does not have, 0 when it names another map.
+        /// </summary>
+        private static int WayBack(MapInfo there, MapInfo here, Way way)
+        {
+            var scroll = MapManager.GetScrollAction(there.MapId);
+            long back = scroll == null ? 0 : way switch
+            {
+                Way.Right => scroll.LeftMapId,
+                Way.Left => scroll.RightMapId,
+                Way.Up => scroll.BottomMapId,
+                Way.Down => scroll.TopMapId,
+                _ => 0,
+            };
+            if (back == here.MapId) return 2;
+            return back == 0 || MapManager.GetMapInfo(back) == null ? 1 : 0;
         }
 
         /// <summary>
@@ -544,8 +572,16 @@ namespace Jondo.Unity.Server.Handlers
         /// 27,2% of the real neighbours are not on the square next door at all — a good quarter of
         /// the borders in this game lead somewhere that is not simply one step over.
         /// </summary>
-        private static bool Better(MapInfo candidate, MapInfo best, MapInfo here)
+        private static bool Better(MapInfo candidate, MapInfo best, MapInfo here, Way way)
         {
+            // The way back says the most: a map whose border leads back here is the one, and a map
+            // whose border leads back to another map of the world belongs to that one. At [-9,-4]
+            // Amakna's 135940 leads back to 136452, a map the world no longer has, while the
+            // dimension's 129762306 leads back to its own 129761282.
+            int candidateBack = WayBack(candidate, here, way);
+            int bestBack = WayBack(best, here, way);
+            if (candidateBack != bestBack) return candidateBack > bestBack;
+
             if (candidate.Outdoor != best.Outdoor) return candidate.Outdoor;
 
             bool candidateSame = candidate.SubAreaId == here.SubAreaId;
