@@ -132,6 +132,16 @@ namespace Jondo.Unity.Server.Handlers
         /// les avantages qui sont liés». Its alignment and order quests go back to not done, so the
         /// level and the rank start again from nothing if he ever swears to it again.
         /// </remarks>
+        /// <summary>
+        /// A dialogue reply swears the character to a city: 1 Bonta, 2 Brakmar, as the criterion's
+        /// own numbering. It goes through the same switch as Chantal's oath, so the sheet, rank and
+        /// `CharacterAlignments` row are updated together.
+        /// </summary>
+        public static Task SwearAsync(NetworkStream stream, int criterionSide)
+            => criterionSide is 1 or 2
+                ? SwitchAsync(stream, criterionSide == 1 ? Alignments.Bonta : Alignments.Brakmar)
+                : Task.CompletedTask;
+
         private static async Task SwitchAsync(NetworkStream stream, int side)
         {
             int left = Alignments.CriterionSide(Me);

@@ -112,6 +112,11 @@ namespace Jondo.Unity.World.Content
         public int BeforeQuest { get; init; }
 
         /// <summary>
+        /// The city this reply swears the character to: 1 Bonta, 2 Brakmar, zero none.
+        /// </summary>
+        public int Swears { get; init; }
+
+        /// <summary>
         /// Replies of the same group are one reply, picked at random each time the line is said:
         /// Azar's four «Lanzar los dados sobre la mesa.» each lead to a different throw.
         /// </summary>
@@ -1251,6 +1256,7 @@ namespace Jondo.Unity.World.Content
                             Waited = Numbers(choice, "waited").Select(o => (int)o).ToArray(),
                             StillWaiting = Numbers(choice, "stillWaiting").Select(o => (int)o).ToArray(),
                             BeforeQuest = (int)Number(choice, "beforeQuest"),
+                            Swears = (int)Number(choice, "swears"),
                             RandomGroup = (int)Number(choice, "random"),
                             AfterElement = (int)Number(choice, "afterElement"),
                             BeforeElement = (int)Number(choice, "beforeElement"),
@@ -1452,6 +1458,8 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.BeforeQuest != 0)
                                 writer.WriteNumber("beforeQuest", choice.BeforeQuest);
+                            if (choice.Swears != 0)
+                                writer.WriteNumber("swears", choice.Swears);
                             if (choice.RandomGroup != 0)
                                 writer.WriteNumber("random", choice.RandomGroup);
                             if (choice.AfterElement != 0)
