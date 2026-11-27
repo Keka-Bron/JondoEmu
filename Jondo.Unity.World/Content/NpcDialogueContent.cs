@@ -280,6 +280,12 @@ namespace Jondo.Unity.World.Content
         public int GivesAlteration { get; init; }
 
         /// <summary>
+        /// The alterations this reply takes off the player: Goblasto collecting the four captured
+        /// Kabombz looks (758 to 761) of «Un problema de envergadura» (2520).
+        /// </summary>
+        public IReadOnlyList<int> TakesAlterations { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// The spell this reply teaches for good, or zero: the Sadida priestess's Nécronyx (9348) at
         /// the end of «L'arme fatale», whose envoûtement "Retournez voir la prêtresse de Sadida [...]
         /// pour le dissiper et apprendre l'envoûtement de façon définitive" (item 19395).
@@ -1285,6 +1291,7 @@ namespace Jondo.Unity.World.Content
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
                             GivesAlteration = (int)Number(choice, "givesAlteration"),
+                            TakesAlterations = Numbers(choice, "takesAlterations").Select(o => (int)o).ToArray(),
                             TeachesSpell = (int)Number(choice, "teaches"),
                             ThenNpc = (int)Number(choice, "thenNpc"),
                             ThenLine = Number(choice, "thenLine"),
@@ -1523,6 +1530,12 @@ namespace Jondo.Unity.World.Content
                             }
                             if (choice.GivesMutation != 0) writer.WriteNumber("mutation", choice.GivesMutation);
                             if (choice.GivesAlteration != 0) writer.WriteNumber("givesAlteration", choice.GivesAlteration);
+                            if (choice.TakesAlterations.Count > 0)
+                            {
+                                writer.WriteStartArray("takesAlterations");
+                                foreach (int alteration in choice.TakesAlterations) writer.WriteNumberValue(alteration);
+                                writer.WriteEndArray();
+                            }
                             if (choice.TeachesSpell != 0) writer.WriteNumber("teaches", choice.TeachesSpell);
                             if (choice.ThenNpc != 0) writer.WriteNumber("thenNpc", choice.ThenNpc);
                             if (choice.ThenLine != 0) writer.WriteNumber("thenLine", choice.ThenLine);

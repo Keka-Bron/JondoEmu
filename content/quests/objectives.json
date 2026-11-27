@@ -10210,6 +10210,135 @@
   {"objective": 13732, "quest": 1954, "kind": "enter", "map": 187432960, "afterObjectives": [13731], "why": "«Entra en la torre de Bethel» (744197): the tower's first room through its keeper (Dofus pour les noobs («Les coeurs livides»))."},
   {"objective": 13735, "quest": 1954, "kind": "click", "elements": [{"map": 187439104, "element": 511965}], "afterObjectives": [13734], "why": "«Concéntrate en los latidos del corazón de los sumergidos» (744199): the livid heart of the Bethel tower (element 511965, graphic 62555) (Dofus pour les noobs («Les coeurs livides»)). Which of the two elements is the heart is INFERRED."},
   {"objective": 3779, "quest": 577, "kind": "order", "anyOrder": true, "why": "«Damar, second visit»: anyOrder because the catalogue lists the ring hand-over (3778) before the second visit to Damar (3779), which the real quest does in the opposite order (Dofus pour les noobs «Pêche en eaux gelées»)."},
-  {"objective": 3778, "quest": 577, "kind": "order", "anyOrder": true, "afterObjectives": [3780], "why": "«Kristina, the ring»: anyOrder because the catalogue lists the ring hand-over (3778) before the second visit to Damar (3779), which the real quest does in the opposite order (Dofus pour les noobs «Pêche en eaux gelées»)."}
+  {"objective": 3778, "quest": 577, "kind": "order", "anyOrder": true, "afterObjectives": [3780], "why": "«Kristina, the ring»: anyOrder because the catalogue lists the ring hand-over (3778) before the second visit to Damar (3779), which the real quest does in the opposite order (Dofus pour les noobs «Pêche en eaux gelées»)."},
+  {
+   "objective": 19285,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79229],
+   "why": "«Prueba el reductor dimensional delante de Goblasto»: the reducer (31493) used shows the Mirgrillon look (31495) and Goblasto's reply 79229 «Dejar que el goblin examine el aparato» closes it (57969). INFERRED: 31493 carries no effect 30."
+  },
+  {
+   "objective": 19286,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79247, 79253],
+   "afterObjectives": [19285],
+   "why": "«Deshazte del eidolon residual y vuelve a hablar con Goblasto»: once the look is gone (a fight takes it) his «Recoger el material y dirigirte hacia los nidos» (79247/79253) closes it and hands the telekametro (31498)."
+  },
+  {
+   "objective": 19287,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 234620929,
+   "afterObjectives": [19286],
+   "why": "«Realiza un levantamiento topográfico del primer nido»: the first nest, Osavane [8,15]; the telekametro surveys on arriving (DPLN: «placez-vous sur le nid»)."
+  },
+  {
+   "objective": 19288,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 235146498,
+   "afterObjectives": [19287],
+   "why": "«Realiza un levantamiento topográfico del segundo nido»: the second nest, Reserva Tupida [5,10]."
+  },
+  {
+   "objective": 19289,
+   "quest": 2520,
+   "kind": "walk",
+   "map": 235405313,
+   "afterObjectives": [19288],
+   "why": "«Realiza un levantamiento topográfico del tercer nido»: the third nest, Pueblo rhoarim [11,5]."
+  },
+  {
+   "objective": 19290,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un fortachobz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19291,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un doctobz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19292,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un kamikabz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19293,
+   "quest": 2520,
+   "kind": "reply",
+   "replies": [79257],
+   "afterObjectives": [19286],
+   "why": "«Captura un cuadrabz en la Osabana y llévaselo a Goblasto»: the alteration the won fight leaves (win_alterations.json) is shown to him with 79257 «Mi caza de kabombz ha sido productiva»."
+  },
+  {
+   "objective": 19297,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539268}],
+   "afterObjectives": [19294],
+   "why": "«Examina el compilador que falla»: the microwave compiler (element 539268, cell 232) of the outpost, after the Krosmoglob's call."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539268}],
+   "requires": [{"item": 31499, "count": 1}],
+   "spends": true,
+   "afterObjectives": [19297],
+   "why": "«Repara el compilador de microondas»: the insulating plate (31499) set into the compiler, which takes it."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539052}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31702, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials (outpost, cell 425): one «Metal sin tratar» (31702) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234752517, "element": 539053}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31703, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials (outpost, cell 249): one «Mineral aislante» (31703) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234751491, "element": 539054}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31704, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials ([1,17], cell 89): one «Ácido goblídrico» (31704) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  },
+  {
+   "objective": 19295,
+   "quest": 2520,
+   "kind": "click",
+   "elements": [{"map": 234753031, "element": 539055}],
+   "afterObjectives": [19297],
+   "gives": [{"item": 31705, "count": 1}],
+   "onlyGives": true,
+   "why": "A crate of the plate's materials ([0,31], cell 551): one «Sal de galvanización» (31705) for the anvil's recipe (skill 429); only hands the item, the repair is the compiler's."
+  }
 ]
 }

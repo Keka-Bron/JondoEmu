@@ -52,5 +52,16 @@ namespace Jondo.Unity.Tests.World
             Assert.Empty(FightWinAlterations.Lost(159121666));
             Assert.Empty(FightWinAlterations.Lost(0));
         }
+
+        [Fact]
+        public void The_osavane_marks_fade_on_walking_into_the_next_subarea()
+        {
+            if (!File.Exists(Paths.ContentFile(FightWinAlterations.File))) return;
+
+            Assert.Equal(new[] { 758, 759, 760, 761 }, FightWinAlterations.LostEntering(1041).OrderBy(a => a));
+            Assert.Empty(FightWinAlterations.LostEntering(1040));
+            Assert.Empty(FightWinAlterations.LostEntering(0));
+            Assert.Equal(1041, FightWinAlterations.Parse("""{"wins":[{"monster":1,"subarea":2,"alteration":3,"lostEntering":1041}]}""")[0].LostEntering);
+        }
     }
 }

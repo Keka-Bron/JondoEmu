@@ -1746,6 +1746,10 @@ namespace Jondo.Unity.Server.Handlers
             // The alteration the reply puts on: Max Ymillán's «Supercaptura» for a medium soul stone.
             if (elegidaAhora != null && elegidaAhora.GivesAlteration != 0 && !sinPagar)
                 await AlterationHandler.GainAsync(stream, elegidaAhora.GivesAlteration);
+            // And the ones it takes: the captured Kabombz handed to Goblasto.
+            if (elegidaAhora != null && !sinPagar)
+                foreach (int alteration in elegidaAhora.TakesAlterations)
+                    await AlterationHandler.LoseAsync(stream, alteration);
 
             // The spell the reply teaches for good: the Sadida priestess's Nécronyx.
             if (elegidaAhora != null && elegidaAhora.TeachesSpell != 0 && !sinPagar)
@@ -1794,7 +1798,10 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // And an objective that is this very reply: Noken wishing the character luck.
-            await Managers.Quests.OnReplyChosenAsync(session, reply,
+            // A reply that ends the talk and «completes» an objective bound to itself (2520's
+            // «Recoger el material», which hands the telekametro): the binding closes it first, and
+            // the gift must not be lost for it.
+            var closedByReply = await Managers.Quests.OnReplyChosenAsync(session, reply,
                 () => elegidaAhora == null ? Quests.CanShareNpc(questNpcId) : CanShareQuestReply(questNpcId, elegidaAhora));
 
             // And does this NPC guard a dungeon's door? If he goes in, the conversation has ended in a
@@ -1906,7 +1913,8 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             if (completesAfterClosing != 0
-                && await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true))
+                && (closedByReply.Contains(completesAfterClosing)
+                    || await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true)))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in

@@ -9064,6 +9064,28 @@
       "orientation": 1,
       "criterion": "Qa=1956&Qo>13724&Qo<13725",
       "why": "The god Yopuka appears once the priest has seen the ancestral heart (13724) until the character has talked to him (Dofus pour les noobs («Craquements de cœur»): «Le Dieu Iop fait alors son apparition»). The derived cell."
+    },
+    {
+      "map": 234752517,
+      "npc": 7659,
+      "cell": 267,
+      "orientation": 3,
+      "why": "Cabo Goblasto (7659) at the Osavane outpost [0,18], in front of the speaker box (element 539050, cell 295) he listens to (57975 «se concentra en el krosmoglob»). The derived cell (328) is the anvil platform; INFERRED beside the bench."
+    },
+    {
+      "map": 234752517,
+      "npc": 2532,
+      "cell": 295,
+      "orientation": 3,
+      "criterion": "Qa=2520&Qo>19294&Qo<19295",
+      "why": "The commander's Krosmoglob (2532) on the speaker box (element 539050, cell 295) of the outpost: «Hablar con el krosmoglob» once Goblasto's machine has failed (58010 «crepita»); there until the compiler is repaired (19295)."
+    },
+    {
+      "map": 234752517,
+      "npc": 7659,
+      "cell": 328,
+      "remove": true,
+      "why": "Goblasto's derived cell (328) is the outpost's anvil platform, where the player works; his authored place is beside the bench in front of the Krosmoglob speaker (267)."
     }
   ]
 }

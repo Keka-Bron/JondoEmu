@@ -1475,11 +1475,13 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// A reply has been chosen in a conversation: an objective bound to it closes.
         /// </summary>
-        public static async Task OnReplyChosenAsync(GameSession session, long reply, Func<bool>? canShare = null)
+        /// <returns>The objectives it closed, so a reply that also «completes» one of them still hands its gift.</returns>
+        public static async Task<List<int>> OnReplyChosenAsync(GameSession session, long reply, Func<bool>? canShare = null)
         {
             using var context = SessionContext.Push(session);
+            var closed = new List<int>();
             var log = Log;
-            if (log == null || _book == null || reply <= 0) return;
+            if (log == null || _book == null || reply <= 0) return closed;
             foreach (var run in new List<QuestRun>(log.Doing()))
             {
                 var step = _book.Step(run.StepId);
@@ -1489,10 +1491,12 @@ namespace Jondo.Unity.Server.Managers
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Reply) continue;
                     if (!binding.Replies.Contains((int)reply)) continue;
-                    if (canShare == null) await CloseAsync(session, binding);
-                    else await CloseSharedAsync(session, binding, canShare);
+                    bool done = canShare == null ? await CloseAsync(session, binding)
+                                                 : await CloseSharedAsync(session, binding, canShare);
+                    if (done) closed.Add(objective.Id);
                 }
             }
+            return closed;
         }
 
         /// <summary>

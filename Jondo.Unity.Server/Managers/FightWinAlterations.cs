@@ -37,6 +37,12 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>The map where a won fight takes it back, or zero: never.</summary>
             public long LostAt { get; init; }
+
+            /// <summary>
+            /// The subarea that takes it away as it is entered, or zero: the Kabombz of «Un problema
+            /// de envergadura» (2520) lose their captured look in the Toorbz Boorzzbz zone.
+            /// </summary>
+            public int LostEntering { get; init; }
         }
 
         private static readonly List<Win> _wins = new();
@@ -83,6 +89,21 @@ namespace Jondo.Unity.Server.Managers
         /// The end of a fight for the character of the session: on a win, the alterations its
         /// beaten monsters hand over, and those the fight's map takes back.
         /// </summary>
+        /// <summary>The alterations entering that subarea takes away.</summary>
+        public static IReadOnlyList<int> LostEntering(int subArea)
+            => subArea == 0 ? Array.Empty<int>() : All.Where(w => w.LostEntering == subArea).Select(w => w.Alteration).Distinct().ToList();
+
+        /// <summary>A subarea entered: the alterations it takes away go, if the character has them.</summary>
+        public static async Task OnSubAreaEnteredAsync(NetworkStream stream, int subArea)
+        {
+            if (stream == null) return;
+            foreach (int alteration in LostEntering(subArea))
+            {
+                if (await Handlers.AlterationHandler.LoseAsync(stream, alteration))
+                    Console.WriteLine($"[Alterations] {SessionContext.State.CharacterName} loses {alteration} on entering subarea {subArea}.");
+            }
+        }
+
         public static async Task FightEndedAsync(NetworkStream stream, FightInstance fight, bool won)
         {
             if (!won || All.Count == 0) return;
@@ -155,6 +176,7 @@ namespace Jondo.Unity.Server.Managers
                     SubArea = (int)Number(row, "subarea"),
                     Alteration = (int)Number(row, "alteration"),
                     LostAt = Number(row, "lostAt"),
+                    LostEntering = (int)Number(row, "lostEntering"),
                 };
                 if (win.Monster > 0 && win.Alteration > 0) wins.Add(win);
             }

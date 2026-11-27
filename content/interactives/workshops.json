@@ -152,6 +152,14 @@
    "skills": [346],
    "why": "The workshop of the plateau of R'lyugluglu [26,26] beside Umra Tawil: «Utilisez l'atelier pour craft les objets» (Dofus pour les noobs, «L'odeur devant le seuil»). Skill 346 has only the iridescent globes (18082) and the protoplasmic flesh (18083); INFERRED which element."
   },
-  {"map": 186385924, "element": 511904, "gfx": 52977, "type": 13, "skills": [358], "why": "The improvised workshop at Zrid Rahys' camp [-47,-80]: «vous pouvez craft à l'aide de l'atelier de fortune présent sur la même map» the Zrid Gloves (19415, skill 358: 3 Quisnoa, 3 Sepiolite, 3 Salikronia) (Dofus pour les noobs, «Algue au rythme»). The only element of the map with no skill."}
+  {"map": 186385924, "element": 511904, "gfx": 52977, "type": 13, "skills": [358], "why": "The improvised workshop at Zrid Rahys' camp [-47,-80]: «vous pouvez craft à l'aide de l'atelier de fortune présent sur la même map» the Zrid Gloves (19415, skill 358: 3 Quisnoa, 3 Sepiolite, 3 Salikronia) (Dofus pour les noobs, «Algue au rythme»). The only element of the map with no skill."},
+  {
+   "map": 234752517,
+   "element": 539051,
+   "gfx": 69571,
+   "type": -1,
+   "skills": [429],
+   "why": "The anvil platform of the outpost [0,18] (element 539051, cell 355): «Fabricar una placa aislante» (skill 429, recipe 31499) of «Un problème de taille» (Dofus pour les noobs). INFERRED which element."
+  }
   ]
 }

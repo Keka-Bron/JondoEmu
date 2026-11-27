@@ -125,8 +125,14 @@ internal sealed class MapInformationService(IMapInformationBackend backend)
         public Task RestoreGuildHallAsync(GameSession session)
             => GuildHallHandler.OnMapLoadedAsync(session);
         public int SubAreaOf(long mapId) => MapManager.GetMapInfo(mapId)?.SubAreaId ?? 0;
-        public Task EnterQuestMapAsync(GameSession session, int subAreaId)
-            => Managers.Quests.OnMapEnteredAsync(session, session.MapId, subAreaId);
+        public async Task EnterQuestMapAsync(GameSession session, int subAreaId)
+        {
+            // A zone that takes a quest's alterations away as it is entered goes first: the quest
+            // then sees the character as he arrives.
+            using (SessionContext.Push(session))
+                await Managers.FightWinAlterations.OnSubAreaEnteredAsync(StreamOf(session), subAreaId);
+            await Managers.Quests.OnMapEnteredAsync(session, session.MapId, subAreaId);
+        }
         public Task EnterAchievementMapAsync(GameSession session, int subAreaId)
             => Managers.Achievements.OnMapEnteredAsync(session, session.MapId, subAreaId);
         public Task EnterConquestMapAsync(GameSession session, int subAreaId)

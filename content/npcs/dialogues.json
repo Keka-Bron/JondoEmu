@@ -82037,6 +82037,284 @@
         }
       ],
       "why": "Ordenalfabetist (Al Fabeticorder) at the fishermen's stall [-67,-54]. «Get Your Fresh Snapper Here!» (579, Dofus pour les noobs «Il est frais mon pichon»): «Vuelvo a hacer el reparto.» (7873) hands the first domesticated pingwobble (11265, a follower item that lasts 30 minutes) with his speech (7855) and closes 3789/3790; the same reply again hands a new one if it was lost before Aurora Boreal, with the reminder 7858. «Dame otro barrigüino.» (7875) hands the next one for Dillas and Clarys. «Ya he acabado el reparto.» (7878) closes 3794 and ends with 7864. INFERRED: 7858 as the answer to a repeated hand-over."
+    },
+    {
+      "npc": 7659,
+      "map": 234752517,
+      "opening": 57975,
+      "openings": [
+        { "criterion": "Qa=2520&Qo>19295&Qo<19296", "message": 57958 },
+        { "criterion": "Qa=2520&Qo>19294&Qo<19295", "message": 57968 },
+        { "criterion": "Qa=2520&Qo>19293&Qo<19294", "message": 57988 },
+        { "criterion": "Qa=2520&Qo<19285", "holds": 31495, "message": 57969 },
+        { "criterion": "Qa=2520", "message": 57970 }
+      ],
+      "lines": [
+        {
+          "message": 57975,
+          "choices": [
+            { "reply": 79245, "next": 57976 }
+          ]
+        },
+        {
+          "message": 57976,
+          "choices": [
+            { "reply": 79248, "next": 57977 }
+          ]
+        },
+        {
+          "message": 57977,
+          "choices": [
+            { "reply": 79254, "next": 57970 }
+          ]
+        },
+        {
+          "message": 57970,
+          "choices": [
+            { "reply": 79244, "next": 57971, "beforeQuest": 2520 },
+            { "reply": 79246, "next": 57978, "quest": 2520, "afterObjective": 19285, "beforeObjective": 19286 },
+            { "reply": 79257, "next": 57987, "criterion": "Qa=2520&Qo>19286&Qo<19290&HA=758&HA=759&HA=760&HA=761", "completesAll": [19290, 19291, 19292, 19293], "params": [[30, 19290], [30, 19291], [30, 19292], [30, 19293]], "takesAlterations": [758, 759, 760, 761] },
+            { "reply": 79258, "criterion": "Qa=2520&Qo>19285&Qo<19294" },
+            { "reply": 79259, "criterion": "Qa=2520&Qo>19285&Qo<19294" }
+          ]
+        },
+        {
+          "message": 57971,
+          "choices": [
+            { "reply": 79228, "next": 57972 },
+            { "reply": 79243, "next": 57972 }
+          ]
+        },
+        {
+          "message": 57972,
+          "choices": [
+            { "reply": 79242, "next": 57973 }
+          ]
+        },
+        {
+          "message": 57973,
+          "names": true,
+          "choices": [
+            { "reply": 79241, "next": 57974 }
+          ]
+        },
+        {
+          "message": 57974,
+          "choices": [
+            { "reply": 79240, "startsQuest": 2520, "gives": 31493, "params": [[34, 2520]] }
+          ]
+        },
+        {
+          "message": 57969,
+          "choices": [
+            { "reply": 79229, "next": 57970, "holds": 31495, "quest": 2520 }
+          ]
+        },
+        {
+          "message": 57978,
+          "choices": [
+            { "reply": 79230, "next": 57979 }
+          ]
+        },
+        {
+          "message": 57979,
+          "choices": [
+            { "reply": 79251, "next": 57980 }
+          ]
+        },
+        {
+          "message": 57980,
+          "choices": [
+            { "reply": 79250, "next": 57981 }
+          ]
+        },
+        {
+          "message": 57981,
+          "choices": [
+            { "reply": 79249, "next": 57982 },
+            { "reply": 79255, "next": 57985 }
+          ]
+        },
+        {
+          "message": 57982,
+          "choices": [
+            { "reply": 79250, "next": 57983 }
+          ]
+        },
+        {
+          "message": 57983,
+          "choices": [
+            { "reply": 79247, "quest": 2520, "gives": 31498, "completes": 19286, "params": [[30, 19286]] }
+          ]
+        },
+        {
+          "message": 57985,
+          "choices": [
+            { "reply": 79250, "next": 57986 }
+          ]
+        },
+        {
+          "message": 57986,
+          "choices": [
+            { "reply": 79253, "quest": 2520, "gives": 31498, "completes": 19286, "params": [[30, 19286]] }
+          ]
+        },
+        {
+          "message": 57987,
+          "choices": [
+            { "reply": 79261, "next": 57988 }
+          ]
+        },
+        {
+          "message": 57988,
+          "choices": [
+            { "reply": 79262, "next": 57989, "quest": 2520, "criterion": "Qo>19289", "takes": 31498, "completes": 19294, "params": [[30, 19294]] },
+            { "reply": 79258, "criterion": "Qo<19289" }
+          ]
+        },
+        {
+          "message": 57989,
+          "choices": [
+            { "reply": 79263, "next": 57966 }
+          ]
+        },
+        {
+          "message": 57966,
+          "choices": [
+            { "reply": 79238, "next": 57967 }
+          ]
+        },
+        {
+          "message": 57967,
+          "choices": [
+            { "reply": 79237, "next": 57968 }
+          ]
+        },
+        {
+          "message": 57968,
+          "choices": [
+            { "reply": 79256 }
+          ]
+        },
+        {
+          "message": 57958,
+          "choices": [
+            { "reply": 79231, "next": 57959 }
+          ]
+        },
+        {
+          "message": 57959,
+          "choices": [
+            { "reply": 79252, "next": 57960 }
+          ]
+        },
+        {
+          "message": 57960,
+          "choices": [
+            { "reply": 79260, "next": 57961 }
+          ]
+        },
+        {
+          "message": 57961,
+          "choices": [
+            { "reply": 79251, "next": 57962 }
+          ]
+        },
+        {
+          "message": 57962,
+          "choices": [
+            { "reply": 79250, "next": 57963 }
+          ]
+        },
+        {
+          "message": 57963,
+          "choices": [
+            { "reply": 79226, "next": 57965 },
+            { "reply": 79227, "next": 57964 }
+          ]
+        },
+        {
+          "message": 57964,
+          "choices": [
+            { "reply": 79225, "quest": 2520, "completes": 19296, "params": [[30, 19296]] }
+          ]
+        },
+        {
+          "message": 57965,
+          "choices": [
+            { "reply": 79232, "quest": 2520, "completes": 19296, "params": [[30, 19296]] }
+          ]
+        }
+      ],
+      "why": "Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Cabo Goblasto (7659), Osavane outpost: «Un problema de envergadura» / «Un problème de taille» (2520, Dofus pour les noobs, «Un problème de taille»). The client's lines in their order: he listens to the Krosmoglob (57975 to 57977), 57970 greets; the reducer (57971 to 57974, 79240 hands the quest and the reducer 31493); «Prueba el reductor delante de Goblasto» (19285) closes on 79229 once the look 31495 is on; 79246 once it is gone asks what failed (57978 to 57986) and 79247/79253 «Recoger el material» hands the telekametro (31498) and closes 19286; the deliveries (79257 closes the four captures and asks the four alterations: «Donnez lui les captures des Kabombz»; 79262 closes 19294 and takes the telekametro), the failed machine (57989, 57966 to 57968) and the end (57958 to 57965, 19296). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). Fix: the 79246 gate as quest/afterObjective/beforeObjective fields plus the look gone (PO!31495). Fix: isolate the 79246 gate (quest, afterObjective, beforeObjective only; the look-gone check dropped to find why the reply was hidden)."
+    },
+    {
+      "npc": 2532,
+      "map": 234752517,
+      "opening": 58010,
+      "openings": [
+        { "criterion": "Qa=2520&Qo>19297&Qo<19295", "message": 58016 }
+      ],
+      "lines": [
+        {
+          "message": 58010,
+          "choices": [
+            { "reply": 79299, "next": 58011 }
+          ]
+        },
+        {
+          "message": 58011,
+          "choices": [
+            { "reply": 79291, "next": 58012 }
+          ]
+        },
+        {
+          "message": 58012,
+          "choices": [
+            { "reply": 79290, "next": 58013 }
+          ]
+        },
+        {
+          "message": 58013,
+          "choices": [
+            { "reply": 79289 }
+          ]
+        },
+        {
+          "message": 58016,
+          "choices": [
+            { "reply": 79288, "next": 58014 }
+          ]
+        },
+        {
+          "message": 58014,
+          "choices": [
+            { "reply": 79287, "next": 58015, "criterion": "Pj<65,20" },
+            { "reply": 79298, "next": 58017, "criterion": "Pj>65,19" }
+          ]
+        },
+        {
+          "message": 58015,
+          "choices": [
+            { "reply": 79297, "next": 58017 }
+          ]
+        },
+        {
+          "message": 58017,
+          "choices": [
+            { "reply": 79294, "next": 58018, "criterion": "Pj<65,20", "takes": 15206, "takesCount": 3 },
+            { "reply": 79295, "criterion": "Pj<65,20" },
+            { "reply": 79296, "criterion": "Pj>65,19" }
+          ]
+        },
+        {
+          "message": 58018,
+          "choices": [
+            { "reply": 79293, "quest": 2520, "gives": 31499 }
+          ]
+        }
+      ],
+      "why": "The commander's Krosmoglob (2532) on the outpost's speaker box [0,18]: 2520's compiler call (58010 to 58013), then once the compiler is examined (19297) the broken plate: a Bricoleur above level 19 («Preferiría ir en persona» 79296) goes to the crates and the anvil, any other hands three Orichor (15206, «tres bloques de oricor» 79294) and gets the plate (79293, 31499). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph). The commander's Krosmoglob (2532) on the outpost's speaker box [0,18]: 2520's compiler call (58010 to 58013), then once the compiler is examined (19297) the broken plate: a Bricoleur above level 19 («Preferiría ir en persona» 79296) goes to the crates and the anvil, any other hands three Orichor (15206, «tres bloques de oricor» 79294) and gets the plate (79293, 31499). Reply wiring INFERRED from the client's message order and the guide (the client holds no dialogue graph)."
     }
   ]
 }
