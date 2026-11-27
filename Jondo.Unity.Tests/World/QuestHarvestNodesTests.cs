@@ -36,6 +36,8 @@ namespace Jondo.Unity.Tests.World
         [InlineData(168559624, 508375, 136, 345, 1, 18087, 1)]     // a shell of quest 1758, drawing 36326
         [InlineData(54167895, 458488, 132, 189, 36, 11106, 200)]   // Icefish on drawing 1839
         [InlineData(54176040, 470180, 132, 189, 36, 11106, 200)]   // Icefish on drawing 1839
+        [InlineData(23330816, 494743, 258, 305, 26, 16389, 180)]   // Mandrake, drawing 3226
+        [InlineData(87032320, 494763, 258, 305, 26, 16389, 180)]   // Mandrake, drawing 3226
         public void The_quest_resources_can_be_gathered_where_the_game_has_them(
             long map, int element, int type, int skill, int job, int item, int level)
         {

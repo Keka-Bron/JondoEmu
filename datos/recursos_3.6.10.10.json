@@ -628,6 +628,16 @@
    "discrepa": false,
    "fuente": "DofusDB /recoltable harvest maps of Salikronia (17992) match the client maps carrying this drawing one for one; type, skill, job and level from the client catalogue (skills.json gatheredRessourceItem, interactives). Not seen in a capture."
   },
+  "3226": {
+   "tipo": 258,
+   "habilidad": 305,
+   "oficio": 26,
+   "objeto": 16389,
+   "nivel": 180,
+   "visto": 0,
+   "discrepa": false,
+   "fuente": "Every captured element on this drawing is declared Mandrake (interactive 258, skill 305), and no other resource uses it; 54 of the 56 DofusDB /recoltable maps of Mandrake (16389) carry it. Job and level from the client catalogue (skills.json gatheredRessourceItem)."
+  },
   "3554": {
    "tipo": 289,
    "habilidad": 341,
