@@ -24240,7 +24240,7 @@
           "message": 47058,
           "choices": [
             { "reply": 62399, "next": 47066, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7908 },
-            { "reply": 62414, "next": 47075, "beforeQuest": 55 },
+            { "reply": 62414, "next": 47075, "beforeQuest": 55, "criterion": "Ps=1" },
             { "reply": 62416, "next": 47077, "quest": 55, "completes": 9602, "params": [[30, 9602]] },
             { "reply": 62417, "next": 47078, "beforeQuest": 56, "criterion": "Qf=55" },
             { "reply": 62419, "next": 47079, "quest": 56, "completes": 1482, "params": [[30, 1482]] },
@@ -24252,7 +24252,20 @@
             { "reply": 62439, "next": 47089, "beforeQuest": 60, "criterion": "Qf=59" },
             { "reply": 62440, "next": 47090, "quest": 60, "afterObjective": 1486, "beforeObjective": 1487, "criterion": "PO=1878&PO!1895" },
             { "reply": 62441, "next": 47091, "quest": 60, "completes": 1487, "params": [[30, 1487]], "takesAll": [1878, 1895], "criterion": "PO=1878&PO=1895" },
-            { "reply": 62393, "next": 47063 }
+            { "reply": 62393, "next": 47063, "criterion": "Ps=0" }
+          ]
+        },
+        {
+          "message": 47063,
+          "choices": [
+            { "reply": 62390, "next": 47062, "takes": 44, "takesCount": 10, "swears": 1, "criterion": "Ps=0" },
+            { "reply": 62392 }
+          ]
+        },
+        {
+          "message": 47062,
+          "choices": [
+            { "reply": 62391, "next": 47076 }
           ]
         },
         {
@@ -24381,6 +24394,7 @@
       "opening": 48039,
       "openings": [
         { "criterion": "Ps=1", "message": 48036 },
+        { "criterion": "Ps=2", "message": 48039 },
         { "criterion": "Ps=0", "message": 48037 }
       ],
       "lines": [
@@ -24395,7 +24409,20 @@
           "message": 48037,
           "choices": [
             { "reply": 65176, "next": 48900, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7909 },
+            { "reply": 63949, "next": 48038, "takes": 97, "takesCount": 10, "swears": 2, "criterion": "Ps=0" },
             { "reply": 63950 }
+          ]
+        },
+        {
+          "message": 48038,
+          "choices": [
+            { "reply": 63948, "next": 48047 }
+          ]
+        },
+        {
+          "message": 48047,
+          "choices": [
+            { "reply": 64896, "startsQuest": 375, "params": [[34, 375]] }
           ]
         },
         {

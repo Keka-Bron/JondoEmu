@@ -1702,6 +1702,12 @@ namespace Jondo.Unity.Server.Handlers
                         elegidaAhora.Takes.ToString(System.Globalization.CultureInfo.InvariantCulture))));
             }
 
+            // A reply that swears the character to a city: Amayiro's ten swords. The item handover
+            // above has already happened, and the switch writes the same alignment row as Chantal's
+            // oath, with the sheet and rank updates.
+            if (elegidaAhora != null && elegidaAhora.Swears != 0)
+                await AlignmentHandler.SwearAsync(stream, elegidaAhora.Swears);
+
             // A reply that does a conversation objective: before the next line when it goes on,
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
