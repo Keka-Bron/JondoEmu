@@ -73,12 +73,13 @@ namespace Jondo.Unity.Server.Handlers
             long mapId = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : SessionContext.State.MapId;
 
             var shared = new HashSet<(int QuestId, int StepId, int ObjectiveId)>();
-            await CreditKillsAsync(session, beaten, mapId, shared, isHero: false);
+            await CreditKillsAsync(session, beaten, mapId, shared, isCompanion: false);
             if (shared.Count == 0) return;
 
-            await Heroes.ShareQuestActionAsync(
-                hero => CreditKillsAsync(hero, beaten, mapId, shared, isHero: true),
-                hero => hero.Session.State.FightId == fight.FightId && fight.HaGanado(hero.CharacterId),
+            await QuestSharing.ShareQuestActionAsync(
+                companion => CreditKillsAsync(companion, beaten, mapId, shared, isCompanion: true),
+                companion => companion.Session is GameSession participant
+                    && participant.State.FightId == fight.FightId && fight.HaGanado(companion.CharacterId),
                 quests: shared.Select(key => key.QuestId).Distinct().ToList());
         }
 
@@ -125,7 +126,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         private static async Task CreditKillsAsync(GameSession session, Dictionary<int, int> beaten, long mapId,
-                                                   HashSet<(int QuestId, int StepId, int ObjectiveId)> shared, bool isHero)
+                                                   HashSet<(int QuestId, int StepId, int ObjectiveId)> shared, bool isCompanion)
         {
             var log = Quests.Log;
             var book = Quests.Book;
@@ -135,7 +136,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (run.Finished || run.StepId != step.Id || run.Done.Contains(objective.Id)) return false;
                 var key = (run.QuestId, step.Id, objective.Id);
-                if (isHero) return shared.Contains(key);
+                if (isCompanion) return shared.Contains(key);
                 shared.Add(key);
                 return true;
             }

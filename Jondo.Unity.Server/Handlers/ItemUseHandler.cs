@@ -317,13 +317,19 @@ namespace Jondo.Unity.Server.Handlers
             int left = item.Quantity - 1;
             if (!DatabaseManager.DestroyCharacterItem(session.CharacterId, uid, 1)) return false;
             Equipment.Remove(uid, 1);
-            await Achievements.CountAsync(session, "EI", item.Template, defer: session.Stream == null);   // «Dulces de Nawidad»: each one used
+            await ReportSpendAsync(session, item.Template, uid, left, 1, weigh);
+            return true;
+        }
+
+        internal static async Task ReportSpendAsync(GameSession session, int template, long uid, int left, int quantity, bool weigh)
+        {
+            for (int used = 0; used < quantity; used++)
+                await Achievements.CountAsync(session, "EI", template, defer: session.Stream == null);
             await session.SendAsync(left > 0
                 ? ConnectionProtocol.Push(Op.Ivj, ConnectionProtocol.BuildItemQuantity(uid, left))
                 : ConnectionProtocol.Push(Op.Ium, ConnectionProtocol.BuildItemGone(uid)));
             if (weigh) await session.SendAsync(ConnectionProtocol.Push(Op.Iun,
                 ConnectionProtocol.BuildPods(ConnectionProtocol.Carried(session.State), ConnectionProtocol.Capacity(session.State))));
-            return true;
         }
 
         /// <summary>

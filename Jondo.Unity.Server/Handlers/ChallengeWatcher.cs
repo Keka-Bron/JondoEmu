@@ -1192,7 +1192,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The challenges of this fight that carry an achievement, written down as done for one more
-        /// of its characters -- a hero, who has no stream to go through <see cref="FightEndedAsync"/>
+        /// of its characters -- a controlled companion with no stream to go through <see cref="FightEndedAsync"/>
         /// --, as they are for each player: the place does not impose them on him again.
         /// </summary>
         public static void RecordDoneFor(FightInstance fight, long characterId)

@@ -1,5 +1,5 @@
 # Build context for the server image (Dockerfile). Everything the server reads at run time is
-# .jondo-root, datos/ and content/; the rest is sources. launcher_assets/ stays: the server embeds
+# .jondo-root, datos/, content/ and mods/; the rest is sources. launcher_assets/ stays: the server embeds
 # launcher_assets/servidor_fondo.jpg. docs/ stays: some tests read it when SKIP_TESTS=false.
 .git
 .github
@@ -22,6 +22,8 @@ DofusClient
 **/*.db-wal
 **/*.exe
 **/*.dll
+!mods/JondoFix.dll
+mods/*/**
 *.csv
 *.pcap
 *.pcapng

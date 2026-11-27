@@ -39,7 +39,7 @@ internal sealed class QuestStateService(IQuestStateBackend backend)
     }
 
     /// <summary>
-    /// A hero taken in hand mid-session (HeroSwitch): his journal, and the followed box made his.
+    /// A companion taken in hand mid-session: his journal, and the followed box made his.
     /// </summary>
     /// <remarks>
     /// The client keeps its box across the switch and adds what an iel brings to it: the new one's

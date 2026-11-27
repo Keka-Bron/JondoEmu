@@ -12,8 +12,8 @@ off unless the server was started with `JONDO_TEST_KEY`.
 
 | Layer | What it drives | What the server needs |
 | --- | --- | --- |
-| Server | `server_start` / `stop` / `restart`, `server_logs`, `admin_call`, `test_call`, `run_tests`, `protocol_fields` | The control API on 8888 |
-| A character without a client | `headless_connect`, `game_*` (`game_dialogue`), `fight_*`, `hero_*`, `headless_send` | `/api/test/*` (JONDO_TEST_KEY) |
+| Server | `server_start` / `stop` / `restart`, `server_logs`, `admin_call`, `player_call`, `test_call`, `run_tests`, `protocol_fields` | The control API on 8888 |
+| A character without a client | `headless_connect`, `game_*` (`game_dialogue`), `fight_*`, `headless_send` | `/api/test/*` (JONDO_TEST_KEY) |
 | The real client | `client_enter_world`, `client_screenshot`, `client_click`, `client_ui`, `client_set_text`, `client_log`... | JondoFix with `JONDO_INPUT_PORT` |
 
 **Server.** `server_start` runs `Jondo.Unity.Server` headless with the run's test key. With
@@ -42,10 +42,10 @@ keeps the last 2,000 frames the server sent it (`headless_frames`). `headless_se
 message to its socket, so the message goes through the server's whole socket loop. `test_call
 inject` hands a message straight to its handler instead.
 
-**Heroes.** `hero_list`, `hero_connect`, `hero_disconnect` and `hero_switch` drive the hero mode as the
-heroes window does (`/api/heroes/*`, with the account's token). To act as a hero without taking him in
-hand, give `"hero": name or id` to any `test_call` body, or `hero=` to `game_state`, `game_give` and
-`game_dialogue`: the route then uses his session -- his quests, his bag.
+**Player control routes.** `player_call` sends JSON to a route under `/api/` with
+the test slot's account token. Use it for installed packages' authenticated routes.
+To act as an active companion in the test harness, pass `"companion": name or id` to
+`test_call`, or use `companion=` with `game_state`, `game_give` or `game_dialogue`.
 
 **Order.** A slot's actions run one after the other, never two at once in its session; what only reads
 is not held. But calls an agent sends together reach the tools in any order: steps that depend on one
@@ -53,7 +53,7 @@ another go in one call. `game_dialogue npc=... replies=[...]` talks to an NPC an
 in order (four replies sent at once ran the second first, and the NPC's conversation closed).
 
 **The real client.** `client_launch` starts Dofus as the launcher does, for the slot's test account.
-The mods come from the source checkout, and `JONDO_INPUT_PORT` is set. On that port JondoFix
+After the local test server accepts the test key, MCP verifies and activates the server's client manifest. `JONDO_INPUT_PORT` is set. On that port JondoFix
 (`TestInput.cs`, `TestInterface.cs`) answers one line per command:
 - a mouse and a keyboard of its own, so it does not move the computer's pointer and works with the
   window in the background;
@@ -106,7 +106,7 @@ run` writes its build output to stdout, which is the protocol's channel. For Ope
 | Variable | Default | What for |
 | --- | --- | --- |
 | `JONDO_EMULATOR_ROOT` | the folder with `.jondo-root` above the dll | The data the server reads: `bases/`, `content/`, `logs/` |
-| `JONDO_MCP_SOURCE` | the data root | The checkout the server is built from, whose `content/` it reads and whose mods the client is given. Point it at a worktree to try a branch against the main checkout's data |
+| `JONDO_MCP_SOURCE` | the data root | The checkout the server is built from, whose `content/` it reads and whose bundled client files it can use. Point it at a worktree to try a branch against the main checkout's data |
 | `JONDO_TEST_KEY` | drawn for each run | Set it to use a server started by hand with the same key |
 | `JONDO_CLIENT_EXECUTABLE` | as the launcher finds it | The client's `Dofus.exe` |
 
@@ -127,11 +127,9 @@ Then, with the client:
 ```text
 headless_disconnect
 client_enter_world character=Mcp-Yopuka       started, logged in, picked, in the world (~20 s)
-hero_connect character=Mcp-Feca               a hero beside him
-game_state hero=Mcp-Feca                      the hero's own session
 client_set_text element=ti_chatInput text=".item 39 1" submit=true
 client_screenshot x=0 y=640 width=290 height=260 zoom=2 savePath=C:/shots/chat.jpg
-client_log contains=[Heroes]
+client_log contains=[JondoFix]
 ```
 
 ## Things to know
@@ -140,7 +138,6 @@ client_log contains=[Heroes]
   written to the data root's databases, like any other account.
 - **The test key.** The key is a secret: with it, every test route is open. `Censura` keeps it out of
   the log. `server_logs` also leaves out the lines of the tools' own calls, unless `includeHarness`.
-- **The client's mods.** `client_launch` installs the source checkout's `JondoFix.dll`, `Heroes.dll`
-  and `Cazacabezas.dll` into the client, as the launcher installs the data root's. The next launch
-  from the launcher puts its own back if they differ.
+- **The client's mods.** `client_launch` uses the active server manifest. Older servers without
+  a manifest use the checkout’s standalone `mods/` DLLs.
 - **Windows only** for the client: the input port is JondoFix's, and JondoFix is a MelonLoader mod.

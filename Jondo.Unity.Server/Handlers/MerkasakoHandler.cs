@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -78,7 +80,7 @@ namespace Jondo.Unity.Server.Handlers
             byte[]? jbn = ConnectionProtocol.ReadPayload(payload, Op.Jbn);
             if (jbn == null) return;
             if (await Managers.Jail.KeepsInAsync(stream)) return;
-            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Merkasako)) return;
+            if (await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Merkasako)) return;
 
             long owner = 0;
             foreach (var field in ProtoMessage.Parse(jbn).Fields)
@@ -212,7 +214,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var field in ProtoMessage.Parse(jas).Fields)
                 if (field.FieldNumber == 2 && field.WireType == 0) accepted = field.VarIntValue != 0;
             // A hunted guest declines: a Merkasako is no place the hunter can follow him into.
-            if (accepted && await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Merkasako)) accepted = false;
+            if (accepted && await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Merkasako)) accepted = false;
 
             var host = SessionRegistry.FindByCharacter(invitation.Host);
             if (host != null)

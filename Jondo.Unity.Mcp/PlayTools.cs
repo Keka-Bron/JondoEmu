@@ -92,21 +92,21 @@ public static class PlayTools
     [Description("Where the slot's character is and what it is doing: its session (map, cell, level, kamas, fight) and, " +
                  "in a fight, the whole board (fighters with life, points, cells, buffs; turn order; marks).")]
     public static async Task<string> State(Emulator emulator, [Description(SlotHelp)] int slot = 0,
-        [Description(HeroHelp)] string? hero = null, CancellationToken cancellationToken = default)
+        [Description(CompanionHelp)] string? companion = null, CancellationToken cancellationToken = default)
     {
-        string session = await emulator.TestAsync("session", AsHero(hero), slot, cancellationToken);
-        string fight = await emulator.TestAsync("fight", AsHero(hero), slot, cancellationToken);
+        string session = await emulator.TestAsync("session", AsCompanion(companion), slot, cancellationToken);
+        string fight = await emulator.TestAsync("fight", AsCompanion(companion), slot, cancellationToken);
         return $"session: {session}\nfight: {fight}";
     }
 
-    private const string HeroHelp = "Act as this hero (his name or id), connected beside the slot's character, instead of " +
-                                    "the slot's character. Any test_call body takes \"hero\" the same way.";
+    private const string CompanionHelp = "Act as this companion (his name or id), connected beside the slot's character, instead of " +
+                                    "the slot's character. Any test_call body takes \"companion\" the same way.";
 
-    /// <summary>A body that acts as a hero, or an empty one.</summary>
-    internal static JsonObject AsHero(string? hero, JsonObject? body = null)
+    /// <summary>A body that acts as a companion, or an empty one.</summary>
+    internal static JsonObject AsCompanion(string? companion, JsonObject? body = null)
     {
         body ??= new JsonObject();
-        if (!string.IsNullOrWhiteSpace(hero)) body["hero"] = hero.Trim();
+        if (!string.IsNullOrWhiteSpace(companion)) body["companion"] = companion.Trim();
         return body;
     }
 
@@ -138,7 +138,7 @@ public static class PlayTools
         [Description("The NPC's id (game_world lists those on the map).")] int npc,
         [Description("The replies' ids, in the order they are chosen; empty to only open the conversation.")] int[]? replies = null,
         [Description(SlotHelp)] int slot = 0,
-        [Description(HeroHelp)] string? hero = null,
+        [Description(CompanionHelp)] string? companion = null,
         CancellationToken cancellationToken = default)
     {
         var text = new System.Text.StringBuilder();
@@ -152,7 +152,7 @@ public static class PlayTools
                 text.AppendLine("the conversation was closed by something else (a map just loaded?): once more.");
                 await Task.Delay(1500, cancellationToken);
             }
-            string answer = await emulator.TestAsync("talk", AsHero(hero, new JsonObject { ["npc"] = npc }), slot, cancellationToken);
+            string answer = await emulator.TestAsync("talk", AsCompanion(companion, new JsonObject { ["npc"] = npc }), slot, cancellationToken);
             text.AppendLine("talk: " + Line(answer));
             bool closedUnder = false;
             for (int i = 0; i < chosen.Length; i++)
@@ -163,7 +163,7 @@ public static class PlayTools
                     text.AppendLine($"stopped: the open line does not offer reply {reply}.");
                     break;
                 }
-                answer = await emulator.TestAsync("reply", AsHero(hero, new JsonObject { ["reply"] = reply }), slot, cancellationToken);
+                answer = await emulator.TestAsync("reply", AsCompanion(companion, new JsonObject { ["reply"] = reply }), slot, cancellationToken);
                 text.AppendLine($"{reply}: " + Line(answer));
                 // A reply the line offered that leads nowhere, more to choose after it: not the end.
                 if (i < chosen.Length - 1 && !IsOpen(answer) && answer.Contains("gives nothing", StringComparison.Ordinal))
@@ -231,9 +231,9 @@ public static class PlayTools
         [Description("The item template id (gid).")] int item,
         [Description("How many.")] int quantity = 1,
         [Description(SlotHelp)] int slot = 0,
-        [Description(HeroHelp)] string? hero = null,
+        [Description(CompanionHelp)] string? companion = null,
         CancellationToken cancellationToken = default)
-        => emulator.TestAsync("give", AsHero(hero, new JsonObject { ["item"] = item, ["quantity"] = quantity }), slot, cancellationToken);
+        => emulator.TestAsync("give", AsCompanion(companion, new JsonObject { ["item"] = item, ["quantity"] = quantity }), slot, cancellationToken);
 
     [McpServerTool(Name = "fight_team")]
     [Description("Starts a fight for the slot's character against JondoBots of the classes given (and with JondoBot " +
@@ -241,7 +241,7 @@ public static class PlayTools
     public static Task<string> Team(Emulator emulator,
         [Description("The foes' breeds, e.g. [8, 1].")] int[] foes,
         [Description("Allied bots' breeds.")] int[]? allies = null,
-        [Description("Play the allies as heroes, from the client (hero mode).")] bool heroes = false,
+        [Description("Control allied fighters from the client.")] bool companions = false,
         [Description("The arena map (0: the character's own).")] long map = 0,
         [Description(SlotHelp)] int slot = 0,
         CancellationToken cancellationToken = default)
@@ -250,7 +250,7 @@ public static class PlayTools
         {
             ["foes"] = new JsonArray(foes.Select(f => (JsonNode?)f).ToArray()),
             ["allies"] = new JsonArray((allies ?? Array.Empty<int>()).Select(a => (JsonNode?)a).ToArray()),
-            ["heroes"] = heroes,
+            ["companions"] = companions,
         };
         if (map > 0) body["map"] = map;
         return emulator.TestAsync("team", body, slot, cancellationToken);

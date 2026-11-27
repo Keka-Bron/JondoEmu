@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server.Network;
@@ -30,21 +30,19 @@ namespace Jondo.Unity.Server.Handlers
         private static readonly Dictionary<int, int> StatIdByEffectActionId = EffectActionIdByStatId.ToDictionary(k => k.Value, v => v.Key);
 
         /// <summary>
-        /// A hero's character into the current session -- one with no socket (Managers.Heroes) --:
+        /// A companion's character into the current session -- one with no socket --:
         /// his sheet, his bag and what he wears, as a selection loads them, and his gear's bonuses
         /// and his spells' variants and bar, as the way into the world does (GameEntryBackend);
         /// nothing of a client's: no last visit, no last connection, no actor details for a map.
         /// </summary>
-        internal static bool LoadForHero(long characterId)
+        internal static bool LoadForCompanion(long characterId)
         {
             if (!DatabaseManager.LoadCharacter(characterId)) return false;
             SessionContext.State.SetInventory(DatabaseManager.LoadInventory(characterId));
-            SessionContext.State.ClearEquippedItems();
-            foreach (var item in SessionContext.State.GetInventoryCopy())
-                Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
+            RestoreEquippedItems();
             Managers.Equipment.LoadFrom(characterId);
             Managers.SpellChoices.LoadFrom(characterId);
-            // His achievements and his own tallies: his fights count for him (Achievements.ForHeroAsync).
+            // His achievements and his own tallies: his fights count for him (Achievements.ForCompanionAsync).
             Managers.Achievements.LoadFrom(characterId);
             Managers.Quests.LoadFrom(characterId);
             // And the elements he has used and the marks he holds, which his quests' rows read.
@@ -88,9 +86,12 @@ namespace Jondo.Unity.Server.Handlers
 
             Console.WriteLine($"[Game Node] Selected character {characterIdToLoad}.");
 
-            // Somebody's hero until now: he is played from a client of his own from here on.
-            Managers.Heroes.Release(characterIdToLoad);
+            // Release an active follower before loading the same character into the real session.
+            return Managers.CompanionSessions.SelectCharacter(characterIdToLoad, () => LoadSelected(characterIdToLoad));
+        }
 
+        private static bool LoadSelected(long characterIdToLoad)
+        {
             // A sex change potion used last time: done now, before the character is read.
             Managers.CharacterRemodel.ApplySexChange(characterIdToLoad);
 
@@ -131,22 +132,25 @@ namespace Jondo.Unity.Server.Handlers
                     defaultItems.Add(item);
                 }
 
-                Jondo.Unity.Server.Network.SessionContext.State.SetInventory(defaultItems);
+                SessionContext.State.SetInventory(defaultItems);
                 DatabaseManager.SeedInventory(characterIdToLoad, defaultItems);
             }
             else
             {
                 Program.LogDebug($"[Inventory Load] Loaded {dbInventory.Count} items from database. Setting as active inventory.");
-                Jondo.Unity.Server.Network.SessionContext.State.SetInventory(dbInventory);
+                SessionContext.State.SetInventory(dbInventory);
             }
 
-            Jondo.Unity.Server.Network.SessionContext.State.ClearEquippedItems();
-            foreach (var item in Jondo.Unity.Server.Network.SessionContext.State.GetInventoryCopy())
-            {
-                Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
-            }
-
+            RestoreEquippedItems();
             return true;
+        }
+
+        private static void RestoreEquippedItems()
+        {
+            var state = SessionContext.State;
+            state.ClearEquippedItems();
+            foreach (var item in state.GetInventoryCopy())
+                Managers.Equipment.RememberWorn(item.Uid, item.Position, item.RawEffects);
         }
 
         internal static bool SelectCharacterOnServer(long characterId, GameSession session)

@@ -81,9 +81,9 @@ namespace Jondo.Unity.Server.Bots
             if (free && await GearUpAsync(session, stop)) return;
             if (_atWar && free)
             {
-                if (await HuntAsync(session, stop)) return;
+                if (await FollowEncounterAsync(session, stop)) return;
                 if (await BackToTheFrontAsync(session, stop)) return;
-                if (_dice.Next(100) < 4) TakeAnOrder(session);
+                if (_dice.Next(100) < 4) await FindEncounterAsync(session);
                 if (_dice.Next(100) < 70 && await AggressAsync(session, stop)) return;
                 if (_dice.Next(100) < 50 && await SeekAsync(session, stop)) return;
             }

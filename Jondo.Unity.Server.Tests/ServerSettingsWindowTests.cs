@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
+using System.Text.Json;
 using Jondo.Unity.Launcher.UI;
 using Jondo.Unity.Server.UI;
 using Xunit;
@@ -18,8 +19,8 @@ public sealed class ServerSettingsWindowTests
         WithWindow(width, height, window =>
         {
             var cards = Find<SettingsCardsPanel>(window, "SettingsCards");
-            Assert.Equal(10, cards.Children.Count);
-            // Ten cards fill a full-HD screen; on 1280x720 the panel scrolls instead, never overlapping.
+            Assert.Equal(9, cards.Children.Count);
+            // At full HD the cards fit; at 1280x720 the panel can scroll without overlap.
             bool fits = width > 1800;
             Assert.All(cards.Children, card =>
             {
@@ -54,36 +55,48 @@ public sealed class ServerSettingsWindowTests
     [InlineData(Language.Es)]
     [InlineData(Language.En)]
     [InlineData(Language.Fr)]
-    public void Bot_and_hunt_controls_edit_settings_and_follow_toggles(Language language)
+    public void Bot_controls_edit_settings_and_follow_toggle(Language language)
     {
-        var settings = new ServerSettings { SimulatedPlayers = false, HeadHunters = false };
-        var window = new ServerSettingsWindow(language, settings, settings);
+        var settings = new ServerSettings { SimulatedPlayers = false };
+        var view = new ServerSettingsView(language, settings, settings, () => { });
+        var window = new Window { Content = view };
         try
         {
             window.Show();
+            window.UpdateLayout();
             var botsMax = Find<NumericUpDown>(window, "BotsMax");
-            var hunt = Find<NumericUpDown>(window, "HuntMinutes");
-            var rest = Find<NumericUpDown>(window, "RestMinutes");
             Assert.False(botsMax.IsEffectivelyEnabled);
-            Assert.False(hunt.IsEffectivelyEnabled);
-            Assert.False(rest.IsEffectivelyEnabled);
             Find<ToggleSwitch>(window, "BotsOn").IsChecked = true;
-            Find<ToggleSwitch>(window, "HuntersOn").IsChecked = true;
             Assert.True(botsMax.IsEffectivelyEnabled);
-            Assert.True(hunt.IsEffectivelyEnabled);
-            Assert.True(rest.IsEffectivelyEnabled);
-            botsMax.Value = 25; hunt.Value = 30; rest.Value = 45;
+            botsMax.Value = 25;
+
             ServerSettings? saved = null;
-            window.Editor.Save(value => saved = value.Copy());
+            view.Editor.Save(value => saved = value.Copy());
             Assert.True(saved!.SimulatedPlayers);
-            Assert.True(saved.HeadHunters);
             Assert.Equal(25, saved.SimulatedPlayersMax);
-            Assert.Equal(30, saved.HeadHuntWindowMinutes);
-            Assert.Equal(45, saved.HeadHuntRestMinutes);
             Assert.False(settings.SimulatedPlayers);
-            Assert.False(settings.HeadHunters);
         }
         finally { window.Close(); }
+    }
+
+    [Fact]
+    public void Unknown_settings_and_empty_client_mod_order_round_trip()
+    {
+        var settings = ServerSettings.Read("""
+            {"LegacyToggle":false,"Fixture.Package":{"Delay":3,"Custom":["future value"]}}
+            """);
+        Assert.Equal(["JondoFix.dll"], settings.ClientMods);
+
+        var next = settings.Copy();
+        next.ClientMods = [];
+        next.ModSettings["fixture.package"] = JsonSerializer.SerializeToElement(new { Delay = 4 });
+        Assert.Equal(3, settings.ModSettings["fixture.package"].GetProperty("Delay").GetInt32());
+        Assert.Equal("future value", settings.ModSettings["fixture.package"].GetProperty("Custom")[0].GetString());
+
+        var read = ServerSettings.Read(JsonSerializer.Serialize(next));
+        Assert.Empty(read.ClientMods);
+        Assert.False(read.ModSettings["legacytoggle"].GetBoolean());
+        Assert.Equal(4, read.ModSettings["fixture.package"].GetProperty("Delay").GetInt32());
     }
 
     private static void WithWindow(double width, double height, Action<Window> check)

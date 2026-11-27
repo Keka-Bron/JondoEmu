@@ -36,6 +36,13 @@ internal static class ServerTheme
             BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(7), Padding = new Thickness(12),
         };
 
+    internal static Border TableRow(Control content) => new()
+    {
+        Child = content, Padding = new Thickness(14, 7), CornerRadius = new CornerRadius(6),
+        Background = Brush(LauncherPalette.SurfaceRaised), BorderBrush = Brush(LauncherPalette.Hairline),
+        BorderThickness = new Thickness(1),
+    };
+
     /// <summary>A card's title: small capitals in gold, as the launcher's cards have them.</summary>
     internal static SpacedText Heading(string text, double size = 12, uint color = LauncherPalette.SoftGold)
         => new() { Text = text, Spacing = 1.6, FontSize = size, FontWeight = FontWeight.Bold, Foreground = Brush(color),

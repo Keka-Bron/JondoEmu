@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -81,8 +81,8 @@ namespace Jondo.Unity.Server.Handlers
             // His own client walks or runs on its own, before any answer: its restrictions say so.
             await OverloadRestriction.SyncAsync(session, walking: true);
 
-            // His heroes walk after him (HeroPresence).
-            await HeroPresence.MasterWalkedAsync(session, cells);
+            // His companions walk after him (CompanionPresence).
+            await CompanionPresence.MasterWalkedAsync(session, cells);
 
             // If he leads a party, the ones following him learn where the walk ends, right behind
             // the jsj: that ikv is what makes their clients walk after him (PartyFollowHandler).

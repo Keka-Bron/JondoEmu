@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Jondo.Unity.Module.Tests</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
+    <Compile Include="$(MSBuildThisFileDirectory)Economy/ClientPipe.cs" Link="Infrastructure/ClientPipe.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestDatabases.cs" Link="Infrastructure/TestDatabases.cs" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Jondo.Unity.Server/Jondo.Unity.Server.csproj" />
+  </ItemGroup>
+
+  <Target Name="CopyModulePackage" AfterTargets="Build">
+    <Copy SourceFiles="@(ModuleAssembly);../manifest.json;@(ModuleClientAsset)"
+          DestinationFolder="$(TargetDir)ServerModFixtures/$(ModuleId)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

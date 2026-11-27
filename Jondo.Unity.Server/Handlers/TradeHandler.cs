@@ -1,3 +1,5 @@
+using Jondo.Unity.ServerMods;
+using Jondo.Unity.Server.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,14 +31,14 @@ namespace Jondo.Unity.Server.Handlers
         public bool Ended { get; set; }
 
         /// <summary>
-        /// The side nobody plays, or zero: a hero of the one who asked (Managers.Heroes), who has no
+        /// The side nobody plays, or zero: a companion of the one who asked, who has no
         /// client to accept, lay or be ready with. He takes what is laid down, ready whenever his
         /// master is.
         /// </summary>
-        public long Hero { get; init; }
+        public long AutomaticParticipant { get; init; }
 
-        /// <summary>Whether this side is ready: it said so, or it is the hero who always is.</summary>
-        public bool IsReady(long who) => who == Hero || Ready.Contains(who);
+        /// <summary>Whether this side is ready: it said so, or it is an automatic participant.</summary>
+        public bool IsReady(long who) => who == AutomaticParticipant || Ready.Contains(who);
 
         /// <summary>One of the two at a time: both write here, each from their own connection.</summary>
         public SemaphoreSlim Gate { get; } = new SemaphoreSlim(1, 1);
@@ -101,9 +103,9 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static long Carried(GameSession session) => ConnectionProtocol.Carried(session.State);
 
-        /// <summary>One side of a trade: a player's session, or a hero's, which is in no registry.</summary>
+        /// <summary>One side of a trade: a player's session, or a companion's, which is in no registry.</summary>
         private static GameSession? SessionOf(long characterId)
-            => SessionRegistry.FindByCharacter(characterId) ?? Heroes.SessionOf(characterId);
+            => SessionRegistry.FindByCharacter(characterId) ?? CompanionSessions.SessionOf(characterId);
 
         // ─── Asking ─────────────────────────────────────────────────────────────────────────
 
@@ -115,19 +117,11 @@ namespace Jondo.Unity.Server.Handlers
             long target = VarOf(keu, 2);
 
             var me = SessionContext.Current;
-            // Another player's hero is played from his master's client alone, which is his master's
-            // character: nobody could accept, and the request went nowhere without a word. It goes
-            // to the character that player is playing, who can.
-            var hero = Heroes.AsHero(target);
-            if (hero != null && hero.MasterId != me.CharacterId)
-            {
-                Console.WriteLine($"[Trade] {me.CharacterId} asks {target}, a hero of {hero.MasterId}: asked of him instead.");
-                target = hero.MasterId;
-                hero = null;
-            }
-
-            var other = hero?.Session ?? SessionRegistry.FindByCharacter(target);
-            if (other == null || (hero == null && !other.IsInWorld) || target == me.CharacterId || other.MapId != me.MapId)
+            var route = ServerModHooks.Get<ITradeRoutingPolicy>()?.ResolveTradeTarget(me.CharacterId, target) ?? (Target: target, AutoAcceptingSession: null);
+            target = route.Target;
+            var partner = (GameSession?)route.AutoAcceptingSession;
+            var other = partner ?? SessionRegistry.FindByCharacter(target);
+            if (other == null || (partner == null && !other.IsInWorld) || target == me.CharacterId || other.MapId != me.MapId)
             {
                 Console.WriteLine($"[Trade] {me.CharacterId} asks {target}, who is not on this map.");
                 return;
@@ -138,7 +132,7 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            var trade = new Trade { SourceId = me.CharacterId, TargetId = target, Hero = hero != null ? target : 0 };
+            var trade = new Trade { SourceId = me.CharacterId, TargetId = target, AutomaticParticipant = partner != null ? target : 0 };
             me.State.Trade = trade;
             other.State.Trade = trade;
 
@@ -146,13 +140,13 @@ namespace Jondo.Unity.Server.Handlers
             await SendBothAsync(me, other, Op.Kfz, kfz);
             Console.WriteLine($"[Trade] {me.CharacterId} asks {target} to trade.");
 
-            // One of his own heroes has no client to accept with: the window opens at once.
-            if (hero != null)
+            // One of his own companions has no client to accept with: the window opens at once.
+            if (partner != null)
             {
                 trade.Accepted = true;
                 await SendAsync(me, Op.Kbg, TradeProtocol.BuildStarted(me.CharacterId, Capacity(me), Carried(me),
                                                                      target, Capacity(other), Carried(other)));
-                Console.WriteLine($"[Trade] {me.CharacterId} trades with {target}, a hero of his.");
+                Console.WriteLine($"[Trade] {me.CharacterId} trades with {target}, a companion of his.");
             }
         }
 

@@ -72,6 +72,8 @@ namespace Jondo.Unity.Launcher
         /// </summary>
         public static string ServerSettingsFile => Path.Combine(Root, "config", "server_settings.json");
 
+        public static string ModsDirectory => Path.Combine(Root, "mods");
+
         /// <summary>
         /// The yearly events as the server's Events page leaves them: each one on its calendar, held
         /// open or held shut, and whether its monsters come out. Read again whenever it changes.

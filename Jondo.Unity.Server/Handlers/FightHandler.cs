@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -6,8 +6,10 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.ServerMods;
 using Jondo.Unity.World.Fights;
 using Jondo.Unity.World.Maps;
 using static Jondo.Unity.Server.Network.NetworkEnvelope;
@@ -89,9 +91,6 @@ namespace Jondo.Unity.Server.Handlers
                 if (esSuyo) _activeFights.TryRemove(par.Key, out _);
             }
 
-            GameState.IsInFight = true;
-            GameState.CurrentFightMobId = mobGroup.MobId;
-
             long fightId = System.Threading.Interlocked.Increment(ref _nextFightId);
             // A board the fight is sent to on purpose -- a quest's arena -- rather than the map's own.
             bool namedArena = arenaMapId > 0;
@@ -171,17 +170,22 @@ namespace Jondo.Unity.Server.Handlers
                 fight.SetPlacementCells(usable.Blue, usable.Red);
             }
 
-            // The four elementals IN FULL: what the player has put in points plus what the
-            // equipment gives. They are worked out up here because initiative needs them whole.
+            // A temporal anomaly's guardian is fought by four at most.
+            if (Managers.AnomalyPlaces.ByRoom(mapId) != null) fight.PeopleCap = Managers.AnomalyPlaces.PeopleCap;
+            // A quest's fight played alone has one place per side.
+            if (PlayedAlone(solo, namedArena ? arenaMapId : mapId)) fight.PeopleCap = 1;
+            var policy = FightParticipants.Policy;
+            var participants = policy?.SelectOpeningParticipants(yo, CapOf(fight) - 1);
+
+            GameState.IsInFight = true;
+            GameState.CurrentFightMobId = mobGroup.MobId;
+
+            // Build the player's full stats before adding fighters to the initiative order.
             var playerFighter = BuildPlayerFighter(fight);
             playerFighter.CellId = fight.BluePlacementCells.FirstOrDefault();
             fight.AddPlayer(playerFighter);
-            // A temporal anomaly's guardian is fought by four at most, heroes counted.
-            if (Managers.AnomalyPlaces.ByRoom(mapId) != null) fight.PeopleCap = Managers.AnomalyPlaces.PeopleCap;
-            // A quest's fight played alone: one a side, so neither his heroes nor anybody else come in.
-            if (PlayedAlone(solo, namedArena ? arenaMapId : mapId)) fight.PeopleCap = 1;
-            // And his heroes beside him, played from his client (FightHeroes.cs).
-            AddHeroes(fight, GameState.CharacterId);
+            if (policy != null && participants is { Count: > 0 })
+                AdmitOpeningParticipants(fight, SessionContext.Current, policy, participants);
 
             // Build Monster Fighters from real MobGroup data.
             // Fighter IDs for monsters MUST be sequential negative numbers per fight (-1, -2, -3...)
@@ -2108,7 +2112,7 @@ namespace Jondo.Unity.Server.Handlers
                 || session.State.IsInFight || session.State.SpectatingFightId != 0) return;
             using var context = SessionContext.Push(session); // Legacy hunt checks and fight creation.
             if (await DreamHandler.GuestMayNotFightAsync(session)) return;
-            if (await Managers.HeadHunts.HoldsAsync(session.Stream, Managers.HeadHunts.Hold.Fight)) return;
+            if (await PlayerPolicies.BlocksActivityAsync(session.Stream, PlayerActivity.Fight)) return;
             if (PhantomHandler.CannotFight(session.CharacterId)) return;
 
             long here = session.MapId;
@@ -2160,20 +2164,18 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The character whose client plays this fighter's side of things: his own, or -- a hero,
-        /// an ally played by hand -- the one who plays him. A hero's summons go to his master.
+        /// The client responsible for this fighter and their summons.
         /// </summary>
         private static long PlayerOf(Fighter fighter)
             => fighter.IsPlayedAlly && fighter.DrivenBy != 0 ? fighter.DrivenBy : fighter.Id;
 
         /// <summary>
-        /// Makes a character fighter -- a JondoBot for now -- one <paramref name="by"/> plays by
-        /// hand from his client, as a hero would be: his class bar and his turns go there
+        /// Makes a fighter playable by <paramref name="by"/>: his bar and his turns go there
         /// (<see cref="PlayedAllyBar"/>), and his casts are his class's spells at their grades.
         /// A summon keeps the bar it came out with: it has no spells of its own besides it, and
         /// Dramak's Pantin, handed to a player, came with an empty bar and no Desenlace (30669).
         /// </summary>
-        internal static void PlayAsHero(Fighter fighter, long by)
+        internal static void AssignAllyController(Fighter fighter, long by)
         {
             fighter.DrivenBy = by;
             fighter.IsPlayedAlly = true;
@@ -2185,10 +2187,10 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// The bar of an ally <paramref name="me"/> plays (jyy). A monster's -- Barnabé's -- is a
-        /// summon's. A character's -- a hero's -- is a character's, his class's spells and the
+        /// summon's. A character's is a character's, his class's spells and the
         /// weapon on slot 0, with <paramref name="me"/> as who plays him in f4.
         /// </summary>
-        private static byte[] PlayedAllyBar(Fighter played, long me)
+        internal static byte[] PlayedAllyBar(Fighter played, long me)
         {
             if (!played.IsCharacter)
                 return Network.FightProtocol.BuildSummonSpellBar(played.Id, me, played.HechizosDeInvocado);
@@ -2198,8 +2200,14 @@ namespace Jondo.Unity.Server.Handlers
 
         private static (IReadOnlyList<(int Spell, int Grade)> Spells, IReadOnlyList<(int Slot, int Spell)> Bar,
             bool WithWeapon) PlayedCharacterLayout(Fighter played)
-            => PackedHeroLayout(played) ?? (played.HechizosDeInvocado,
-                played.HechizosDeInvocado.Select((spell, i) => (Slot: i + 1, spell.Spell)).Prepend((0, 0)).ToArray(), true);
+        {
+            if (_controlledBars.TryGetValue(played, out var controlled))
+                return (controlled.Layout.Spells, controlled.Slots, controlled.Layout.WithWeapon);
+
+            return (played.HechizosDeInvocado, played.HechizosDeInvocado
+                .Select((spell, i) => (Slot: i + 1, spell.Spell))
+                .Prepend((0, Network.FightProtocol.HechizoCuerpoACuerpo)).ToArray(), true);
+        }
 
         /// <summary>
         /// Whose end-of-fight numbers a fighter's deeds go to: his own when he is a person,
@@ -3753,7 +3761,7 @@ namespace Jondo.Unity.Server.Handlers
                 // To his own client alone. Sent to everybody, every other person in a fight of
                 // several -- a koliseo, a duel, a group against monsters -- and every spectator
                 // got "you can play now" on somebody else's turn, its "pass your turn" button
-                // with it. A JondoBot has no client; one somebody plays -- a hero -- goes to his.
+                // with it. A controlled ally's turn goes to the controller's client.
                 var his = fighter.IsPlayedAlly ? owner
                         : fighter.IsBot ? null : SessionRegistry.FindByCharacter(fighter.Id);
                 if (his != null)
@@ -3798,11 +3806,10 @@ namespace Jondo.Unity.Server.Handlers
                 return;
             }
 
-            // A hero whose master switched on his automatic pass (the Heroes mod's group panel):
-            // his start-of-turn has gone out above, and the turn is handed on at once.
-            if (fighter.IsPlayedAlly && Managers.Heroes.PassesOnHisOwn(fighter.Id))
+            // Policy-driven auto-pass still sends the normal start-of-turn events above.
+            if (fighter.IsPlayedAlly && FightParticipants.Policy?.ShouldPassTurn(fighter.Id) == true)
             {
-                Program.LogDebug($"[Heroes] {fighter.Id} passes his turn on his own.");
+                Program.LogDebug($"[Fight] Auto-passing the turn of controlled ally {fighter.Id}.");
                 await PassTurnAsync(stream);
                 return;
             }
@@ -3869,7 +3876,7 @@ namespace Jondo.Unity.Server.Handlers
         /// casts its Desenlace (30669), which strips his invulnerability. The AI played it before:
         /// it cast Desenlace on the player and died. It goes to the nearest person of the other side
         /// (<see cref="SeizerOf"/>); while the row lasts he plays it as
-        /// an ally of his (<see cref="PlayAsHero"/>), its bar and its turns his, and when the row
+        /// an ally of his (<see cref="AssignAllyController"/>), its bar and its turns his, and when the row
         /// ends the monster plays on its own again.
         /// </summary>
         internal static async Task SeizeWhatAFoeTookAsync(FightInstance fight)
@@ -3894,7 +3901,7 @@ namespace Jondo.Unity.Server.Handlers
                 long foe = SeizerOf(fight, monster);
                 var session = foe != 0 ? SessionRegistry.FindByCharacter(foe) : null;
                 if (session == null) continue;
-                PlayAsHero(monster, foe);
+                AssignAllyController(monster, foe);
                 monster.SeizedByAFoe = true;
                 // Not the spell that laid the row: it is what its threshold casts, not a move of his.
                 monster.HechizosDeInvocado = monster.HechizosDeInvocado.Where(h => h.Spell != row!.HechizoOrigen).ToList();
@@ -5896,7 +5903,7 @@ namespace Jondo.Unity.Server.Handlers
             // seconds out with nobody able to move it or pass it.
             if (invocado.JuegaTurno && !invocado.PlaysOnItsOwn)
             {
-                // A hero's goes to his master, who plays him.
+                // A controlled ally's summon goes to the same client as the ally.
                 long jugador = PlayerOf(quienInvoca);
                 await ACadaUnoAsync(fight, async sesion =>
                 {
@@ -12651,6 +12658,8 @@ namespace Jondo.Unity.Server.Handlers
 
         private static async Task EndFightAsync(FightInstance fight)
         {
+            if (!fight.TryClaimSettlement()) return;
+
             // Who wins is a fact of the fight; «I won» depends on which side you were on. Against
             // monsters they are the same and that is why this was written with a single boolean,
             // but in a challenge the loser also has to get his screen and his return to the map:
@@ -12666,7 +12675,7 @@ namespace Jondo.Unity.Server.Handlers
                 return TerminarParaUnoAsync(sesion, fight,
                                             fight.HaGanado(sesion.State.CharacterId), azulGana);
             });
-            HeroesFightOver(fight);
+            SettleControlledParticipants(fight);
             ForgetRewards(fight);
             ForgetSurrenderVotes(fight);
             ChallengeWatcher.Forget(fight);
@@ -12674,8 +12683,8 @@ namespace Jondo.Unity.Server.Handlers
             // And the map: the people drawn again where they came back -- they went off it with
             // a kmu -- the count of fights one less, the group back or its replacement.
             foreach (var sesion in gente) await BackOnTheMapAsync(sesion);
-            // And their heroes beside them again, out of the fight with them (HeroPresence).
-            foreach (var sesion in gente) await HeroPresence.MasterMovedAsync(sesion, 0);
+            if (FightParticipants.Policy is { } policy)
+                foreach (var sesion in gente) await policy.RestoreFollowerPresenceAsync(sesion);
             await FightOffTheMapAsync(fight);
 
             await FightOverForTheWorldAsync(fight, azulGana);
@@ -13648,7 +13657,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The random loot's perfect pieces, which are in the loot too, are also listed in
         /// <paramref name="perfect"/>, so the delivery gives them their exo. What fell off a row with
         /// a criterion he met -- a quest's item -- is also counted in <paramref name="own"/>: his
-        /// alone, which a loot recipient does not take (GatherHeroLoot).
+        /// alone, which are kept by the character who earned them.
         /// </summary>
         private static Dictionary<int, int> RollLoot(FightInstance fight, int extra,
                                                      List<Managers.RandomLoot.Drop> perfect = null,

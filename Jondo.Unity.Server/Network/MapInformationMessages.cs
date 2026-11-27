@@ -56,9 +56,9 @@ internal sealed class MapInformationMessages(IMapInformationSource source)
                 if (DatabaseManager.GetCharacterById(other.CharacterId) is { } player)
                     actors.Add(MapActorMessages.Player(player, other.State.CellId, other.State.Orientation, other.AccountId));
             }
-            foreach (var hero in HeroPresence.On(session.MapId))
-                if (hero.Character.Id != character.Id)
-                    actors.Add(MapActorMessages.Player(hero.Character, hero.Cell, hero.Facing, hero.AccountId));
+            foreach (var companion in CompanionPresence.On(session.MapId))
+                if (companion.Character.Id != character.Id)
+                    actors.Add(MapActorMessages.Player(companion.Character, companion.Cell, companion.Facing, companion.AccountId));
             foreach (var group in MobSpawnManager.GetMobsForMap(session.MapId))
                 if (group.Members.Count > 0 && !FightHandler.IsGroupFighting(group.MobId)) actors.Add(MapActorMessages.MonsterGroup(group));
             Jondo.Unity.World.Content.Criterion.Resolver? resolver = null;

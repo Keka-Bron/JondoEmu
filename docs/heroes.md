@@ -4,16 +4,18 @@ The account's other characters connected beside the one in the world -- the mast
 his side and played by hand from his client in their turns. Ankama's Dofus 3 has none yet (« rien en
 2026 »); Wakfu's heroes and Dofus Touch's « Duo de choc » (1.72) are the model.
 
-Server setting: *Game modes → Hero mode*, on by default, and *Heroes at once* (3 by default, 7 at
-most: the window has eight places with the master).
+Install the [Heroes server package](server-mod-migration.md#heroes), add `heroes` to
+`ServerMods` and restart. In the package's settings, `Enabled` defaults to true,
+`MaxHeroes` defaults to 7, and `ReloadMapOnSwitch` defaults to false. The window has
+eight places including the master. The server advertises the package's client DLL
+while the package is active.
 
 ## How a hero exists
 
-`Managers/Heroes.cs`. A hero has no client: his character is loaded into a session with no socket
-(`GameSession.SinSocket`, `CharacterSelectionHandler.LoadForHero`) -- his sheet, bag and gear, as a
-selection loads them. That session is in no registry: nothing is sent to it, no map draws it, and a
-fight's people (`Publico`) leave it out. Everything written against a session's state reads and
-writes the hero's when run inside it.
+`Heroes.Server/HeroGroups.cs` owns the active group. The host loads each follower's sheet, bag
+and gear into a socketless session through the companion session service. The package
+holds that session and the host uses it for the follower's character state. Only client
+connections are in the host's session registry.
 
 - **Connect**: a character of the master's account, not the master, not played from a client of its
   own, not somebody's hero already, under the limit, and the master not in a fight.
@@ -23,8 +25,9 @@ writes the hero's when run inside it.
 
 ## On the map, and in the world for the others
 
-`Network/HeroPresence.cs`. A connected hero stands on his master's map, on a free walkable cell
-beside him, and is drawn for everybody there: every map's actor list carries the heroes of the
+`HeroGroups.World.cs` manages following and uses the host's companion presence service to
+update map actors. A connected hero stands on a free walkable cell beside his master, where
+everyone nearby can see him. every map's actor list carries the heroes of the
 people on it (`ConnectionProtocol.BuildMapActors`), a hero connecting is drawn (jsn) and one let go
 taken off (kmu). He walks after his master -- the master's own walk, the first hero stopping one step
 short of its end, the next two -- and goes with him from one map to the next
@@ -38,8 +41,8 @@ playing, as they see any character of it.
 
 ## In the game's party
 
-`Handlers/PartyHandler.cs`, its Heroes part. A connected hero is a member of his master's party,
-drawn in the game's own party window: the party the master is in, or a new one he leads (ing to
+The package supplies party behavior through the host's party hooks. A connected hero is a member
+of his master's party, drawn in the game's own party window: the party the master is in, or a new one he leads (ing to
 him, ink to the others). A hero never leads -- the lead passes to somebody played, never to a hero,
 and a party of heroes alone breaks up --, and nobody sends a hero anything: he has no client.
 
@@ -48,10 +51,10 @@ master is free to answer: that party is let go, and his heroes come back into wh
 (accepting, turning down, the invitation withdrawn). Leaving a party, or put out of it, he takes his
 heroes into one of their own around him. The leader putting out a hero of his own lets that hero go.
 Taking a hero in hand leaves the party as it is: the same characters stay in it --
-let go and taken back without it being told (`Heroes.HoldParty`) --, the one played takes the lead
+let go and taken back without it being told (held by the Heroes package) --, the one played takes the lead
 the other had, and his client is given the party again (`PartyHandler.SwitchedAsync`).
 
-The game's own «follow the leader» cannot move a hero (no client to walk): `HeroPresence` does.
+The package moves socketless members through the host’s companion presence service.
 
 ## Making a hero
 
@@ -87,7 +90,7 @@ the account's characters come, passing over whoever fights; not while a text fie
 
 ## In a fight
 
-`Handlers/FightHeroes.cs`. When the master opens a fight against monsters, each of his heroes is
+`Heroes.Server/HeroGroups.Fights.cs`. When the master opens a fight against monsters, each of his heroes is
 built as a player is -- inside his own session, so `BuildPlayerFighter` reads him -- and put on his
 side, ready. He is a *played ally* (`Fighter.IsPlayedAlly`, `DrivenBy` = the master), as Barnabé is:
 
@@ -107,14 +110,13 @@ fight panels are what play a controlled summon. Measured on 2026-11-15 with the 
 heroes moved, cast their class spells and passed their turns from the master's client.
 
 His share of a won fight is planned with his master's (`PlanRewards`, paid in his own session) and
-shown in the master's end screen; then it goes into his own sheet and bag -- experience and levels,
-kamas, items -- and he is saved where his master stands (`HeroesFightOver`).
+shown in the master's end screen. Experience, levels, kamas and items go to the participating
+character, who is saved where the master stands.
 
 ## The Heroes mod
 
-`Heroes/`, a MelonLoader mod built like Cazacabezas, which the launcher puts in every client's
-`Mods/`. **Ctrl+Tab**, or its button at the end of the MENUS bar (`gd_btnUis`, an icon the mod
-draws), opens a window of eight cards: the master (gold, a crown), his heroes (a light on), the
+`Heroes/` contains the MelonLoader mod that the launcher loads from the active package's client
+manifest. **Ctrl+Tab**, or the mod's button at the end of the MENUS bar (`gd_btnUis`), opens a window of eight cards: the master (gold, a crown), his heroes (a light on), the
 account's other characters to connect, empty places. Portraits are drawn by the server from the
 client's own bones, as the launcher draws its team (`Jondo.Unity.Sprites`), in the background as soon
 as the list is asked for, and the mod asks for it all along, so they are there at the first opening.
@@ -154,28 +156,28 @@ demandés». Once a quest, not again at each step after. The reason is the first
 The hero's quests button then stays **red**; under the pointer it names each quest and why, with the
 client's own quest and item names. It turns back by itself once the hero has caught up -- by doing the
 step himself -- and is cleared when his sharing is turned off. `heroes/list` carries it per hero as
-`questLag: [{ quest, step, reason, item, count }]` (`Heroes.LagsOf`).
+`questLag: [{ quest, step, reason, item, count }]` (`HeroGroups.LagsOf`).
 
 Each connected hero's card in the window has three more glyphs -- a chest, three bars, a star --
 that open his bag, his characteristics and his spells, to look at (`POST /api/heroes/sheet { id }`):
 ids from the server, named and drawn by the client's own data (`DataCenterModule`, its icon tiles).
 
 **Taking a hero in hand** (the panel's **PLAY**, or Tab) happens at once, in the same connection:
-`POST /api/heroes/switch { id }` (`HeroSwitch`). The master is saved and taken off his map, the hero
+`POST /api/heroes/switch { id }` (Heroes package). The master is saved and taken off his map, the hero
 selected into the same session where the master stood, and the client sent, mid-session, the burst
 a selection sends (the «character selected» with the hero's id, his sheet, bag, spells and
 shortcuts); it takes a second selection while in the world. The map is not loaded again: the actor
 played before is taken off for his own client too and the one played now drawn where he stood
-(`ServerSettings.HeroSwitchReloadsMap` brings the whole map back). Only the two of them change
+(the package setting `ReloadMapOnSwitch` brings the whole map back). Only the two of them change
 hands: the other heroes stay as they stand, on the map and with their switches, the new one's heroes
-from then on (`Heroes.HandOver`), and the one played before comes back as a hero at his place in
+from then on (`HeroGroups.HandOver`), and the one played before comes back as a hero at his place in
 the group's round, so that Tab goes round them all.
 
-`{ id, later: 1 }` asks for it at the client's next character list instead (`Heroes.AskSwitch`):
+`{ id, later: 1 }` asks for it at the client's next character list instead (`HeroGroups.AskSwitch`):
 the server picks the hero there itself, the way it picks a character still in a fight (the list with
 its kvd, the client's kwb, `GameEntryService.ResumeAsync`). A master leaving the
-world leaves his group aside for his account for three minutes (`Heroes.DisconnectAll(session)`);
-whoever of it comes back into the world takes it back (`Heroes.Regroup`, on entry): the one who led
+world leaves his group aside for his account for three minutes (`HeroGroups.DisconnectAll(session)`);
+whoever of it comes back into the world takes it back (`HeroGroups.Regroup`, on entry): the one who led
 it is a hero of his, the others are his heroes again with their switches. Quitting and coming back
 within the three minutes brings the group back the same way.
 
@@ -188,7 +190,9 @@ within the three minutes brings the group back the same way.
 | `POST /api/heroes/autopass` `{ id, on }` | a hero's turns passed on their own, or not |
 | `POST /api/heroes/loot` `{ id }` | the group's items to him; the same one again, back to each his own |
 
-All need the master in the world (`409 world`), with the session's own token.
+Every route requires the session's own token (`401 sesion`). Name suggestions, previews and owned
+portraits can be requested without a character in the world. The other routes require an active
+character (`409 world`). Disabling the package removes the routes (`404 ruta`) after restart.
 
 ## Not yet
 
@@ -200,5 +204,4 @@ All need the master in the world (`409 world`), with the session's own token.
 - The group panel's own «follow» and «show on the map» switches.
 - The spell book (the client's own) shows the master's spells, not the hero's.
 
-The `.heros` command (administrators) still opens the probe's fight: JondoBots at one's side,
-played as heroes, against as many JondoBots.
+The core `.allycontrol` command opens a developer test fight in which an administrator controls allied JondoBots.

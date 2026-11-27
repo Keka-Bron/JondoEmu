@@ -60,6 +60,9 @@ jobs:
 
       - name: Test server transport and desktop
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+      - name: Test optional server modules
+        shell: pwsh
+        run: ./.github/scripts/Test-ServerModules.ps1
 
       # Each failed test as an annotation, readable without signing in -- the log and the trx are
       # not: the run's page and its API show the annotations to anybody.
@@ -111,6 +114,9 @@ jobs:
         run: python3 Jondo.Unity.Protocol.Game.Wire/Import/test_import.py
       - name: Test server transport and headless desktop rendering
         run: dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj --configuration Release --no-build --artifacts-path host-artifacts --nologo --logger "trx;LogFileName=connection-server.trx" --results-directory TestResults
+      - name: Test optional server modules
+        shell: pwsh
+        run: ./.github/scripts/Test-ServerModules.ps1 -ArtifactsPath host-artifacts
       - name: Test November semantic protocol target
         run: dotnet msbuild Jondo.Unity.Server/Jondo.Unity.Server.csproj -t:RunTestsBeforePublish -p:JondoProtocolTarget=3.8.1.2
       - name: Test November asset projections

@@ -145,7 +145,7 @@ public sealed class ServerWindowPagesTests
         try
         {
             window.Show();
-            foreach (var page in new[] { "Console", "Players", "Events", "Settings" })
+            foreach (var page in new[] { "Console", "Players", "Events", "Settings", "Mods" })
             {
                 Click(window, "Nav." + page);
                 for (int i = 0; i < 30; i++) Dispatcher.UIThread.RunJobs();

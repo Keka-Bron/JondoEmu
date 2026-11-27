@@ -1198,12 +1198,17 @@ namespace Jondo.Unity.Launcher.UI
             }
 
             Ocupado(true);
-            List<string> fallos;
+            (List<string> fallos, bool launched) outcome;
             try
             {
-                fallos = await Task.Run(() =>
+                outcome = await Task.Run(() =>
                 {
                     var malos = new List<string>();
+                    bool launched = false;
+                    bool ApproveMods(string host, ClientModManifest manifest, string fingerprint)
+                        => Dispatcher.UIThread.InvokeAsync(() => ConfirmClientModsAsync(host, manifest, fingerprint))
+                            .GetAwaiter().GetResult();
+
                     foreach (var cuenta in elegidas)
                     {
                         if (LauncherService.IsActive(cuenta.AccountId)) continue;
@@ -1212,10 +1217,12 @@ namespace Jondo.Unity.Launcher.UI
                             malos.Add(cuenta.Nickname + " : " + _textos.SessionExpiredError);
                             continue;
                         }
-                        var resultado = LauncherService.LaunchClient(cuenta.Token);
-                        if (!resultado.Success) malos.Add(cuenta.Nickname + " : " + resultado.Message);
+                        var resultado = LauncherService.LaunchClient(cuenta.Token, ApproveMods);
+                        if (resultado.ModApprovalDeclined) break;
+                        if (resultado.Success) launched = true;
+                        else malos.Add(cuenta.Nickname + " : " + resultado.Message);
                     }
-                    return malos;
+                    return (malos, launched);
                 });
             }
             finally
@@ -1223,10 +1230,10 @@ namespace Jondo.Unity.Launcher.UI
                 Ocupado(false);
             }
 
-            if (fallos.Count > 0) Avisar(string.Join(Environment.NewLine, fallos));
+            if (outcome.fallos.Count > 0) Avisar(string.Join(Environment.NewLine, outcome.fallos));
 
             // Starting the client silences the launcher's music.
-            if (_musica != null && _musica.Playing)
+            if (outcome.launched && _musica != null && _musica.Playing)
             {
                 _musica.Stop();
                 RefrescarBotonDeMusica();
@@ -1237,6 +1244,37 @@ namespace Jondo.Unity.Launcher.UI
 
             // No confirmation window: the client opening already confirms it, and a modal
             // dialog would stay on top of the game waiting for someone to close it.
+        }
+
+        private Task<bool> ConfirmClientModsAsync(string host, ClientModManifest manifest, string fingerprint)
+        {
+            if (!IsVisible) return Task.FromResult(false);
+            var words = _idioma switch
+            {
+                Language.En => (
+                    Title: "Approve server mods",
+                    Description: "The server {0} offers these mods. Approving lets these DLLs run with your operating system account’s permissions. Verify the fingerprint with the server operator before approving.",
+                    Fingerprint: "Manifest fingerprint", Approve: "Trust and play", Cancel: "Cancel"),
+                Language.Fr => (
+                    Title: "Approuver les mods du serveur",
+                    Description: "Le serveur {0} propose ces mods. Si vous les approuvez, ces DLL s’exécuteront avec les autorisations de votre compte système. Vérifiez l’empreinte auprès du responsable du serveur avant d’approuver.",
+                    Fingerprint: "Empreinte du manifeste", Approve: "Approuver et jouer", Cancel: "Annuler"),
+                Language.Pt => (
+                    Title: "Aprovar mods do servidor",
+                    Description: "O servidor {0} oferece estes mods. Ao aprovar, essas DLLs serão executadas com as permissões da sua conta no sistema operacional. Confira a impressão digital com o responsável pelo servidor antes de aprovar.",
+                    Fingerprint: "Impressão digital do manifesto", Approve: "Confiar e jogar", Cancel: "Cancelar"),
+                _ => (
+                    Title: "Aprobar mods del servidor",
+                    Description: "El servidor {0} ofrece estos mods. Si los apruebas, estas DLL se ejecutarán con los permisos de tu cuenta del sistema operativo. Verifica la huella con el responsable del servidor antes de aprobar.",
+                    Fingerprint: "Huella del manifiesto", Approve: "Confiar y jugar", Cancel: "Cancelar")
+            };
+            var lines = new List<string>
+            {
+                string.Format(words.Description, host), "", $"{words.Fingerprint} (SHA-256)", fingerprint, ""
+            };
+            lines.AddRange(manifest.Mods.Select(entry => $"{entry.Name}{Environment.NewLine}{entry.Sha256}"));
+            return Dialogs.ConfirmAsync(this, words.Title, string.Join(Environment.NewLine, lines),
+                words.Approve, words.Cancel, scrollMessage: true);
         }
 
         private void Ocupado(bool si)

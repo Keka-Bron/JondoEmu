@@ -175,7 +175,7 @@ public static class ClientTools
         => clients.SendAsync(slot, $"settext{(submit ? "!" : "")} {element.Trim()} {text.Replace('\n', ' ')}", cancellationToken: cancellationToken);
 
     [McpServerTool(Name = "client_log", ReadOnly = true)]
-    [Description("The client's mod log (MelonLoader's Latest.log): what the mods -- Heroes, JondoFix -- wrote, and their " +
+    [Description("The client's mod log (MelonLoader's Latest.log): what the loaded mods wrote and their " +
                  "errors. Lines are numbered; pass the lastLine of the previous call as `since` to read only what is new.")]
     public static string Log(GameClients clients,
         [Description("Only lines after this one (0: from the start).")] int since = 0,

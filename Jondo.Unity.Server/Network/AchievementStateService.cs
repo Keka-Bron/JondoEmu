@@ -40,7 +40,7 @@ internal sealed class AchievementStateService(IAchievementStateBackend backend)
             await recipient.SendAsync(new AchievementFinishedEvent(achievement));
 
             // Preserve the existing inferred audience: only a non-fighting source broadcasts,
-            // but recipients are not filtered by fight ID. Heroes still exclude themselves.
+            // but recipients are not filtered by fight ID. Companions still exclude themselves.
             if (!state.IsInFight) await backend.NotifyMapAsync(source, information);
             Console.WriteLine($"[Achievements] {state.CharacterName} earns {achievementId}.");
         }

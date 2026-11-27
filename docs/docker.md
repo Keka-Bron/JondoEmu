@@ -98,6 +98,25 @@ The image runs as the non-root `app` user and sets:
 
 `JONDO_SIN_REGISTRO_DE_TRAFICO`, `JONDO_RAID_MIN_PLAYERS` and `TZ` can be set in `.env`.
 
+## Optional server mods
+
+Put standalone DLLs and unpacked packages in `mods/` on the Docker host and bind-mount
+it at `/app/mods`. Include `JondoFix.dll` and any other client DLLs the server should
+offer, because this mount replaces the image's built-in `mods/` directory. Add this
+to a Compose override file next to `docker-compose.yml`.
+
+```yaml
+services:
+  jondo-server:
+    volumes:
+      - ./mods:/app/mods:ro
+```
+
+Add the desired DLL filenames and package IDs to `ServerMods` in the container's
+`/app/config/server_settings.json`. Apply the new mount once with
+`docker compose up -d`. For later changes to the folder or the load order, use
+`docker compose restart jondo-server`. See the [server mod installation instructions](server-mod-contract.md#install-and-enable-server-mods).
+
 ## Ports and players
 
 | Port | Service |

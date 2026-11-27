@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DofusClientDir Condition="'$(DofusClientDir)' == ''">$(DOFUS_CLIENT_DIR)</DofusClientDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MelonLoader" HintPath="$(DofusClientDir)/MelonLoader/net6/MelonLoader.dll" Private="false" />
+    <Compile Include="../Jondo.Unity.Contract/ClientModManifest.cs" Link="ClientModManifest.cs" />
+    <Compile Include="../Jondo.Unity.Contract/Contract.cs" Link="Contract.cs" />
+  </ItemGroup>
+  <Target Name="GuardarMod" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

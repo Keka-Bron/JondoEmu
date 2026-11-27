@@ -124,10 +124,10 @@
         <item type="preparecommand" label="Finish a quest..." command="quest finish " help="quest finish &lt;id&gt; [player]"/>
         <item type="preparecommand" label="Forget a quest..." command="quest forget " help="quest forget &lt;id&gt; [player]: to play it again"/>
       </item>
-      <item type="menu" label="Heroes (administrator)">
-        <item type="sendcommand" label="One Iop hero" command="heros 8"/>
-        <item type="sendcommand" label="Two heroes: Feca and Eniripsa" command="heros 1 7"/>
-        <item type="preparecommand" label="Classes..." command="heros " help="heros &lt;classe&gt; [class...]"/>
+      <item type="menu" label="Allied fighter control (administrator)">
+        <item type="sendcommand" label="One Iop ally" command="allycontrol 8"/>
+        <item type="sendcommand" label="Two allies: Feca and Eniripsa" command="allycontrol 1 7"/>
+        <item type="preparecommand" label="Classes..." command="allycontrol " help="allycontrol &lt;classe&gt; [class...]"/>
       </item>
     </item>
 

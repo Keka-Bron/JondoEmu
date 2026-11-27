@@ -1,0 +1,56 @@
+{
+  "id": "cazacabezas",
+  "version": "1.0.0",
+  "serverApiVersion": 2,
+  "serverAssembly": "Cazacabezas.Server.dll",
+  "clientAsset": "Cazacabezas.dll",
+  "settings": {
+    "name": "Cazacabezas",
+    "fields": [
+      {
+        "key": "Enabled",
+        "default": true,
+        "legacyKey": "HeadHunters",
+        "label": {
+          "es": "Órdenes de caza",
+          "en": "Hunt orders",
+          "fr": "Ordres de traque"
+        },
+        "hint": {
+          "es": "Órdenes de caza contra la otra ciudad (F7).",
+          "en": "Hunt orders on the other city (F7).",
+          "fr": "Des ordres de traque contre l’autre cité (F7)."
+        }
+      },
+      {
+        "key": "HuntWindowMinutes",
+        "default": 15,
+        "legacyKey": "HeadHuntWindowMinutes",
+        "minimum": 1,
+        "maximum": 120,
+        "step": 5,
+        "unit": "min",
+        "label": {
+          "es": "Minutos de una caza",
+          "en": "Minutes of a hunt",
+          "fr": "Minutes d’une traque"
+        }
+      },
+      {
+        "key": "RestMinutes",
+        "default": 30,
+        "legacyKey": "HeadHuntRestMinutes",
+        "minimum": 0,
+        "maximum": 600,
+        "step": 5,
+        "unit": "min",
+        "label": {
+          "es": "Minutos de descanso entre cazas",
+          "en": "Minutes of respite between hunts",
+          "fr": "Minutes de répit entre traques"
+        }
+      }
+    ],
+    "activationSetting": "Enabled"
+  }
+}

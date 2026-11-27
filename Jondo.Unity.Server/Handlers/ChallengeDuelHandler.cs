@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 
 namespace Jondo.Unity.Server.Handlers
@@ -51,7 +52,7 @@ namespace Jondo.Unity.Server.Handlers
             if (targetId == 0 || challengerId == 0 || targetId == challengerId) return;
 
             // A hunt's prey fights nobody but his hunter, and nobody but the hunter fights him.
-            if (await Managers.HeadHunts.RefusesFightAsync(stream, challengerId, targetId)) return;
+            if (await PlayerPolicies.BlocksDuelAsync(stream, challengerId, targetId)) return;
 
             // Without its f2 it is no challenge but «Agredir» (PlayerMenuMaker.OnAttack): an
             // aggression, in a conquest's zone.
@@ -125,7 +126,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // Challenged before the hunt opened: declined, if it would be a fight the hunt forbids.
-            if (accepted && await Managers.HeadHunts.RefusesFightAsync(stream, desafio.TargetId, desafio.ChallengerId)) accepted = false;
+            if (accepted && await PlayerPolicies.BlocksDuelAsync(stream, desafio.TargetId, desafio.ChallengerId)) accepted = false;
 
             byte[] resultado = ConnectionProtocol.Push(Op.Hpv,
                 FightProtocol.BuildChallengeAnswered(

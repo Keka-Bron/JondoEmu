@@ -1434,10 +1434,10 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A hero connected or let go (Managers.Heroes): the others see his line as he stands,
+        /// A companion connected or let go: the others see his line as he stands,
         /// in the world or not, and on connecting whoever asked to be warned is.
         /// </summary>
-        public static async Task HeroConnectionAsync(long characterId)
+        public static async Task NotifyCharacterConnectionAsync(long characterId)
         {
             var alliance = AllianceStore.AllianceOf(characterId);
             if (alliance != null) await ConnectionChangedAsync(alliance, characterId, SessionRegistry.IsOnline(characterId));

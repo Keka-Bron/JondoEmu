@@ -125,7 +125,7 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>
             /// Whether the fight is played alone («solo»): true, nobody comes in beside the character,
-            /// his heroes neither -- «Le combat se lance et s'effectue seul» (Dofus pour les noobs,
+            /// his companions neither -- «Le combat se lance et s'effectue seul» (Dofus pour les noobs,
             /// «Mise à l'épreuve») --; false, a group may; absent, its board decides
             /// (<see cref="Handlers.FightHandler.PlayedAlone"/>). Keka-Bron/JondoEmu#209.
             /// </summary>

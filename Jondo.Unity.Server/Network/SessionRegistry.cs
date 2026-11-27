@@ -1,4 +1,4 @@
-﻿using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -331,17 +331,21 @@ namespace Jondo.Unity.Server.Network
         /// another way.
         /// </summary>
         // Capture the old instance before mutating map/house/bag state.
-        public static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien, GameMapAudience previousMap, int? porDonde = null)
+        public static Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien, GameMapAudience previousMap, int? porDonde = null)
+            => AnunciarMudanzaAsync(quien, previousMap, admitted: null, porDonde);
+
+        internal static async Task<(int seVa, int llega)> AnunciarMudanzaAsync(GameSession quien, GameMapAudience previousMap,
+            IReadOnlyList<Jondo.Unity.ServerMods.ICompanion>? admitted, int? porDonde = null)
         {
             var result = await MapPresenceService.Live.TravelAsync(quien, previousMap, porDonde);
             if (quien.IsInWorld && quien.CharacterId > 0)
-                await HeroPresence.MasterMovedAsync(quien, previousMap.MapId);
+                await CompanionPresence.MasterMovedAsync(quien, previousMap.MapId, admitted);
             return result;
         }
 
-        /// <summary>Whether a character is played by a client or present as somebody's hero.</summary>
+        /// <summary>Whether a character is played by a client or present as someone's companion.</summary>
         public static bool IsOnline(long characterId)
-            => FindByCharacter(characterId) != null || Managers.Heroes.AsHero(characterId) != null;
+            => FindByCharacter(characterId) != null || Managers.CompanionSessions.SessionOf(characterId) != null;
 
         /// <summary>Creates a new ticket for a specific account, server and client language.</summary>
         public static Ticket Issue(long accountId, int serverId, string language = "es")

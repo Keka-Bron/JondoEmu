@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 
@@ -12,8 +13,7 @@ namespace Jondo.Unity.Server.Handlers
 {
     /// <summary>
     /// The war between the cities in the field: an aggression between Bontarians and Brakmarians,
-    /// settled in honour (<see cref="Honour"/>) when it ends, and the head hunts it closes
-    /// (<see cref="HeadHunts"/>).
+    /// settled in honour (<see cref="Honour"/>) when it ends, and its optional PvP outcome hooks.
     /// </summary>
     /// <remarks>
     /// The settlement is worked out before the end screen goes out, so that its honour column
@@ -77,7 +77,7 @@ namespace Jondo.Unity.Server.Handlers
 
         /// <summary>
         /// After the end screen: each one is told what he won or lost, his sheet sent again, and his
-        /// look when his grade -- his wings -- changed; then the head hunts the fight closed.
+        /// look when his grade -- his wings -- changed; then invokes the PvP outcome hooks.
         /// </summary>
         public static async Task AnnounceAsync(FightInstance fight, bool attackersWon)
         {
@@ -98,7 +98,7 @@ namespace Jondo.Unity.Server.Handlers
                     }
                 }
             }
-            if (IsCitiesWar(fight)) await HeadHunts.AggressionEndedAsync(fight, attackersWon);
+            if (IsCitiesWar(fight)) await PlayerPolicies.AggressionEndedAsync(fight, attackersWon);
         }
 
         private static List<Honour.Fighter> Sworn(IEnumerable<Fighter> side)

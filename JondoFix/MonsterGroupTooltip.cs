@@ -23,7 +23,7 @@ namespace JondoFix
     /// <remarks>
     /// <para>
     /// Everything is the server's (Managers.GroupPreview), asked through the control API's
-    /// <c>monsters/tooltip</c> with the session's own token, as the Heroes mod asks. The tooltip
+    /// <c>monsters/tooltip</c> with the session's own token. The tooltip
     /// does not know the group's id, only what is in it -- the builder's group information, a
     /// leader and its underlings, each a template, a grade and a level -- so that is what is sent,
     /// and the answer is kept for a while by composition: hovering a group again shows it at once.

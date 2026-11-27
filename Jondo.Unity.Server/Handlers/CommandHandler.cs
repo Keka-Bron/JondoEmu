@@ -1,4 +1,4 @@
-﻿using Jondo.Unity.Launcher;
+using Jondo.Unity.Launcher;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -71,8 +71,7 @@ namespace Jondo.Unity.Server.Handlers
                 [".sueño"] = "usage.dream",
                 [".dream"] = "usage.dream",
                 [".reve"] = "usage.dream",
-                [".heros"] = "usage.heroes",
-                [".heroes"] = "usage.heroes",
+                [".allycontrol"] = "usage.allycontrol",
                 // The staff's commands (CommandHandler.Admin.cs): what the admin menu of the client runs.
                 [".who"] = "usage.who",
                 [".whoami"] = "usage.whoami",
@@ -327,8 +326,7 @@ namespace Jondo.Unity.Server.Handlers
                 case ".sueño":
                 case ".dream":
                 case ".reve": await DreamAsync(stream, rest, channel, accountId); break;
-                case ".heros":
-                case ".heroes": await HeroesProbeAsync(stream, rest, channel, accountId); break;
+                case ".allycontrol": await AllyControlProbeAsync(stream, rest, channel, accountId); break;
                 default: await AdminAsync(command, stream, rest, channel, accountId); break;
             }
         }
@@ -1080,16 +1078,8 @@ namespace Jondo.Unity.Server.Handlers
                 .Select(g => (g.Key, g.Sum(i => i.Quantity) * times))
                 .ToList();
 
-        // ─── .heros ────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// ".heros &lt;class&gt; [class...]" (".heroes"): the hero mode's probe. A fight on the spot
-        /// with a JondoBot of each class given at one's side, played by hand from one's own client
-        /// as a hero would be (FightHandler.PlayAsHero), against as many JondoBots of random
-        /// classes played by the server. For seeing whether the client lets a character be played
-        /// by another one -- his bar, his turn, his spells. Administrators only.
-        /// </summary>
-        private static async Task HeroesProbeAsync(NetworkStream stream, string rest, int channel, long accountId)
+        /// <summary>Start a probe fight with client-controlled allied bots. Administrators only.</summary>
+        private static async Task AllyControlProbeAsync(NetworkStream stream, string rest, int channel, long accountId)
         {
             var breeds = new List<int>();
             foreach (string word in rest.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -1097,19 +1087,19 @@ namespace Jondo.Unity.Server.Handlers
                 if (!int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out int breed)
                     || !SpellTable.ClassBreeds.Contains(breed))
                 {
-                    await NotifyAsync(stream, Usage(".heros"), channel, accountId);
+                    await NotifyAsync(stream, Usage(".allycontrol"), channel, accountId);
                     return;
                 }
                 breeds.Add(breed);
             }
             if (breeds.Count == 0 || breeds.Count > 3)
             {
-                await NotifyAsync(stream, Usage(".heros"), channel, accountId);
+                await NotifyAsync(stream, Usage(".allycontrol"), channel, accountId);
                 return;
             }
             if (GameState.IsInFight)
             {
-                await NotifyAsync(stream, T("heroes.in_fight"), channel, accountId);
+                await NotifyAsync(stream, T("allycontrol.in_fight"), channel, accountId);
                 return;
             }
             var me = SessionRegistry.FindByCharacter(GameState.CharacterId);
@@ -1122,14 +1112,14 @@ namespace Jondo.Unity.Server.Handlers
                 KoliseoBots.Forget(spec.Id);
                 return bot;
             }
-            var heroes = breeds.Select(Bot).ToList();
-            foreach (var hero in heroes) FightHandler.PlayAsHero(hero, GameState.CharacterId);
+            var allies = breeds.Select(Bot).ToList();
+            foreach (var ally in allies) FightHandler.AssignAllyController(ally, GameState.CharacterId);
             var classes = SpellTable.ClassBreeds.ToList();
-            var foes = heroes.Select(_ => Bot(classes[Random.Shared.Next(classes.Count)])).ToList();
+            var foes = allies.Select(_ => Bot(classes[Random.Shared.Next(classes.Count)])).ToList();
 
             bool started = await FightHandler.InitiatePvpAsync(new List<GameSession> { me }, new List<GameSession>(),
-                                                               GameState.MapId, blueBots: heroes, redBots: foes);
-            await NotifyAsync(stream, started ? T("heroes.started", heroes.Count) : T("heroes.not_started"),
+                                                               GameState.MapId, blueBots: allies, redBots: foes);
+            await NotifyAsync(stream, started ? T("allycontrol.started", allies.Count) : T("allycontrol.not_started"),
                               channel, accountId);
         }
 

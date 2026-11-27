@@ -22,6 +22,7 @@ COPY Jondo.Unity.Protocol.Game/Jondo.Unity.Protocol.Game.csproj Jondo.Unity.Prot
 COPY Jondo.Unity.Protocol.Game.Wire/Jondo.Unity.Protocol.Game.Wire.csproj Jondo.Unity.Protocol.Game.Wire/
 COPY Jondo.Unity.ProtocolGenerator/Jondo.Unity.ProtocolGenerator.csproj Jondo.Unity.ProtocolGenerator/
 COPY Jondo.Unity.World/Jondo.Unity.World.csproj Jondo.Unity.World/
+COPY Jondo.Unity.Sprites/Jondo.Unity.Sprites.csproj Jondo.Unity.Sprites/
 COPY Jondo.Unity.Server/Jondo.Unity.Server.csproj Jondo.Unity.Server/
 RUN dotnet restore Jondo.Unity.Server/Jondo.Unity.Server.csproj -r linux-x64
 
@@ -47,6 +48,7 @@ WORKDIR /app
 COPY --from=build /src/.jondo-root ./
 COPY --from=build /src/datos ./datos
 COPY --from=build /src/content ./content
+COPY --from=build /src/mods ./mods
 COPY --from=build ["/artifacts/publish/Jondo.Unity.Server/release_linux-x64/Jondo Server", "./"]
 
 # Everything the server writes lives in these three folders, each a volume. Created here and owned

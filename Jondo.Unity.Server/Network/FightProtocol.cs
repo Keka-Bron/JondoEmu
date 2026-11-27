@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Protocol;
@@ -2167,7 +2167,7 @@ namespace Jondo.Unity.Server.Network
         /// f3 and f4 carry the same fighter in the captures; what separates them is not known,
         /// because they have never been seen different. A summon's bar carries its owner in f4
         /// (<see cref="BuildSummonSpellBar"/>), so f4 is read as who plays it: a character
-        /// played by another one -- a hero -- goes with his player there.
+        /// played by another one -- a controlled companion -- goes with his player there.
         /// </summary>
         /// <param name="controllerId">Who plays him, when it is not himself; null for his own bar.</param>
         public static byte[] BuildSpellBar(long fighterId, IEnumerable<(int Spell, int Grade)> spells,

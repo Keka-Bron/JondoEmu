@@ -93,6 +93,27 @@ namespace Jondo.Unity.Tests.Content
         // ─── Round trip ───────────────────────────────────────────────────────────
 
         [Fact]
+        public void Extension_fields_round_trip_without_loading_a_package()
+        {
+            File.WriteAllText(_path, """
+                { "dialogues": [{ "npc": 1, "opening": 10, "lines": [
+                    { "message": 10, "choices": [{ "reply": 20, "extensionPrice": 7,
+                        "extensionMetadata": { "rule": "example" }, "trade": 8, "tradeCount": 2 }] }
+                ] }] }
+                """);
+
+            var original = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 1, 0)!;
+            NpcDialogueContent.Save(_path, [original]);
+            var choice = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 1, 0)!.Line(10)!.Choice(20)!;
+
+            Assert.Equal(7, choice.ExtensionFields["extensionPrice"].GetInt32());
+            Assert.Equal("example", choice.ExtensionFields["extensionMetadata"].GetProperty("rule").GetString());
+            Assert.Equal(2, choice.ExtensionFields.Count);
+            Assert.Equal(8, choice.Trades);
+            Assert.Equal(2, choice.TradeCount);
+        }
+
+        [Fact]
         public void A_tree_survives_being_written_and_read()
         {
             NpcDialogueContent.Save(_path, new[]

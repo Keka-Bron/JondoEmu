@@ -385,9 +385,7 @@ namespace Jondo.Unity.World.Content
         /// <summary>
         /// Where a <see cref="KothRole"/> reply leads when the role cannot be changed yet -- «Lo
         /// siento, aún no estás listo para cambiar de rol. Vuelve a verme dentro de unos minutos.»
-        /// --, or where a <see cref="Chapeuvepes"/> trade leads when they are not enough -- «No
-        /// tienes chapeuvepés suficientes para que podamos hacer un intercambio.» --, or where a
-        /// purchase leads when the kamas are not enough, or zero to end the conversation.
+        /// or where a trade or purchase leads when payment fails, or zero to end the conversation.
         /// </summary>
         public long RefusedNext { get; init; }
 
@@ -428,12 +426,11 @@ namespace Jondo.Unity.World.Content
         /// </summary>
         public IReadOnlyList<int> GivesOneOf { get; init; } = Array.Empty<int>();
 
-        /// <summary>
-        /// The chapeuvepés this reply costs (Managers.HeadHunts), or zero: Ema and Tomás Sacre's
-        /// trades, «Tomar una gema que contiene el alma del Escarajefe Dorado a cambio de 8
-        /// chapeuvepés.». It hands over <see cref="Trades"/>, <see cref="TradeCount"/> of them.
-        /// </summary>
-        public int Chapeuvepes { get; init; }
+        /// <summary>Additional dialogue fields available to server extensions and preserved by the editor.</summary>
+        public IReadOnlyDictionary<string, JsonElement> ExtensionFields { get; init; }
+            = System.Collections.ObjectModel.ReadOnlyDictionary<string, JsonElement>.Empty;
+
+        /// <summary>The item exchanged for an extension currency.</summary>
         public int Trades { get; init; }
         public int TradeCount { get; init; } = 1;
 
@@ -1286,7 +1283,7 @@ namespace Jondo.Unity.World.Content
                             Duel = choice.TryGetProperty("duel", out var duel) && duel.ValueKind == JsonValueKind.True,
                             Verdict = choice.TryGetProperty("verdict", out var verdict) && verdict.ValueKind == JsonValueKind.True,
                             GivesOneOf = Numbers(choice, "givesOneOf").Select(o => (int)o).ToArray(),
-                            Chapeuvepes = (int)Number(choice, "chapeuvepes"),
+                            ExtensionFields = ReadChoiceExtensions(choice),
                             Trades = (int)Number(choice, "trade"),
                             TradeCount = (int)Math.Max(1, Number(choice, "tradeCount")),
                             GivesMutation = (int)Number(choice, "mutation"),
@@ -1522,7 +1519,12 @@ namespace Jondo.Unity.World.Content
                                 foreach (int o in choice.GivesOneOf) writer.WriteNumberValue(o);
                                 writer.WriteEndArray();
                             }
-                            if (choice.Chapeuvepes != 0) writer.WriteNumber("chapeuvepes", choice.Chapeuvepes);
+                            foreach (var field in choice.ExtensionFields.OrderBy(field => field.Key, StringComparer.Ordinal))
+                                if (!KnownChoiceFields.Contains(field.Key))
+                                {
+                                    writer.WritePropertyName(field.Key);
+                                    field.Value.WriteTo(writer);
+                                }
                             if (choice.Trades != 0)
                             {
                                 writer.WriteNumber("trade", choice.Trades);
@@ -1697,6 +1699,29 @@ namespace Jondo.Unity.World.Content
             }
 
             return wrong;
+        }
+
+        private static readonly HashSet<string> KnownChoiceFields = new(StringComparer.Ordinal)
+        {
+            "afterElement", "afterObjective", "afterObjectives", "afterQuest", "alsoGives", "alsoLeaves",
+            "alsoShows", "beforeElement", "beforeObjective", "beforeQuest", "belowLevel", "buyCount",
+            "buyItem", "buyPrice", "cells", "chance", "compass", "completes", "completesAll", "criterion", "door",
+            "dreamFavor", "dreamPointsPercent", "duel", "endsMutation", "forfeits", "gives", "givesAlteration",
+            "givesCount", "givesKamas", "givesOneOf", "hand", "holds", "holdsCount", "kothRole", "leaves", "marks",
+            "marksBelow", "marksReached", "minLevel", "mutation", "next", "otherwise", "params", "partial",
+            "passage", "phantom", "quest", "random", "refused", "reply", "says", "shop", "showsNpc", "stagings",
+            "startsQuest", "step", "stillWaiting", "sulks", "takes", "takesAll", "takesCount", "teaches",
+            "teachesEmote", "teleport", "teleportBack", "thenLine", "thenNpc", "trade", "tradeCount", "verdict",
+            "waited"
+        };
+
+        private static IReadOnlyDictionary<string, JsonElement> ReadChoiceExtensions(JsonElement choice)
+        {
+            Dictionary<string, JsonElement>? fields = null;
+            foreach (var field in choice.EnumerateObject())
+                if (!KnownChoiceFields.Contains(field.Name))
+                    (fields ??= new(StringComparer.Ordinal))[field.Name] = field.Value.Clone();
+            return fields == null ? System.Collections.ObjectModel.ReadOnlyDictionary<string, JsonElement>.Empty : fields;
         }
 
         private static long Number(JsonElement element, string name)

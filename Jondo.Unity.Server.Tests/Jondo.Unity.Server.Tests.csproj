@@ -7,10 +7,22 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Fixtures\**\*.cs" />
+    <ProjectReference Include="Fixtures\ServerMod\Fixture.ServerMod.csproj"
+                      ReferenceOutputAssembly="false" OutputItemType="ServerModFixture" />
     <ProjectReference Include="..\Jondo.Unity.Server\Jondo.Unity.Server.csproj" />
     <PackageReference Include="Avalonia.Headless.XUnit" Version="11.2.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
   </ItemGroup>
+
+  <Target Name="CopyServerModFixture" AfterTargets="Build" Condition="'@(ServerModFixture)' != ''">
+    <ItemGroup>
+      <ServerModFixtureFile Include="@(ServerModFixture)" />
+      <ServerModFixtureFile Include="@(ServerModFixture->'%(RootDir)%(Directory)%(Filename).deps.json')" />
+      <ServerModFixtureFile Include="@(ServerModFixture->'%(RootDir)%(Directory)Fixture.ServerModDependency.dll')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ServerModFixtureFile)" DestinationFolder="$(TargetDir)ServerModFixture" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

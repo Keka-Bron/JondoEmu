@@ -30,7 +30,7 @@ namespace Jondo.Unity.Server.Network
     {
         private static readonly Regex MonsterGroup = new(@"\{monsterGroup,(-?\d+)\}", RegexOptions.Compiled);
 
-        /// <summary>The world map a map of the Twelve is drawn on, as the map links say it (HeadHunts).</summary>
+        /// <summary>The world map a map of the Twelve is drawn on, as the map links say it.</summary>
         private const int WorldOfTheTwelve = 1;
 
         /// <summary>

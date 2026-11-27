@@ -26,16 +26,20 @@ internal sealed class SettingsPage : UserControl, IServerPage
     }
 
     /// <summary>A fresh editor from the file: after Cancel or a restart started, and the first time.</summary>
-    internal void Rebuild()
+    internal void Rebuild() => Rebuild(_saved());
+
+    private void Rebuild(ServerSettings saved)
     {
-        View = new ServerSettingsView(_language, _saved(), _running(), Rebuild, embedded: true);
+        View = new ServerSettingsView(_language, saved, _running(), Rebuild, embedded: true, latest: _saved);
         if (Write != null) View.Write = Write;
         Content = View;
     }
 
     internal void EnsureBuilt()
     {
-        if (View == null) Rebuild();
+        if (View?.Editor.Dirty == true) return;
+        var saved = _saved();
+        if (View == null || !View.Editor.MatchesSaved(saved)) Rebuild(saved);
     }
 
     public void ApplyLanguage(Language language)

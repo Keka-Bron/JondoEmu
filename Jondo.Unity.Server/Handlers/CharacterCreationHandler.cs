@@ -195,8 +195,7 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// A character made on an account, by the creation screen's rules -- the one the creation
-        /// screen makes and the hero mode's (Network.ControlApiHeroes) alike: its id and "", or 0
+        /// Creates a character using the character creation screen's rules and returns its ID, or 0
         /// and why not: empty, breed, full, name, taken, failed. Colours of -1 are the breed's.
         /// </summary>
         public static (long Id, string Why) Make(long accountId, int serverId, string name, int breed, int sex,

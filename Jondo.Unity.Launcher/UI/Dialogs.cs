@@ -21,7 +21,7 @@ namespace Jondo.Unity.Launcher.UI
         public static async Task ShowAsync(Window owner, string title, string message, string accept)
         {
             var ok = Boton(Textos.Frase(accept), "launcher", "green");
-            var ventana = Ventana(owner, title, message, "info", ok);
+            var ventana = Ventana(owner, title, message, "info", false, ok);
             ok.Click += (_, _) => ventana.Close();
             await ventana.ShowDialog(owner);
         }
@@ -32,12 +32,12 @@ namespace Jondo.Unity.Launcher.UI
         /// change of server is asked too, but it is no deletion, and it goes in green.
         /// </param>
         public static async Task<bool> ConfirmAsync(Window owner, string title, string message, string yes, string no,
-                                                    bool peligro = true)
+                                                    bool peligro = true, bool scrollMessage = false)
         {
             bool answer = false;
             var confirm = peligro ? Boton(Textos.Frase(yes), "danger") : Boton(Textos.Frase(yes), "launcher", "green");
             var cancel = Boton(Textos.Frase(no), "secondary");
-            var ventana = Ventana(owner, title, message, peligro ? "alert" : "info", cancel, confirm);
+            var ventana = Ventana(owner, title, message, peligro ? "alert" : "info", scrollMessage, cancel, confirm);
             confirm.Click += (_, _) => { answer = true; ventana.Close(); };
             cancel.Click += (_, _) => ventana.Close();
             await ventana.ShowDialog(owner);
@@ -64,7 +64,8 @@ namespace Jondo.Unity.Launcher.UI
             return boton;
         }
 
-        private static Window Ventana(Window owner, string title, string message, string icon, params Button[] buttons)
+        private static Window Ventana(Window owner, string title, string message, string icon,
+                                      bool scrollMessage, params Button[] buttons)
         {
             // Most questions come with the window's own title, which says nothing: then the
             // message is the heading.
@@ -92,6 +93,13 @@ namespace Jondo.Unity.Launcher.UI
                     VerticalAlignment = VerticalAlignment.Center,
                 },
             };
+            TextBlock body = scrollMessage ? new SelectableTextBlock() : new TextBlock();
+            body.Text = message;
+            body.FontSize = conTitulo ? 13 : 14;
+            body.LineHeight = conTitulo ? 19 : 20;
+            body.Margin = new Thickness(0, conTitulo ? 0 : 9, 0, 0);
+            body.TextWrapping = TextWrapping.Wrap;
+            body.Foreground = new SolidColorBrush(conTitulo ? LauncherSkin.TextSecondary : LauncherSkin.CardText);
             var textos = new StackPanel
             {
                 Spacing = 6,
@@ -108,15 +116,7 @@ namespace Jondo.Unity.Launcher.UI
                         Foreground = new SolidColorBrush(LauncherSkin.CardText),
                         TextWrapping = TextWrapping.Wrap,
                     },
-                    new TextBlock
-                    {
-                        Text = message,
-                        FontSize = conTitulo ? 13 : 14,
-                        LineHeight = conTitulo ? 19 : 20,
-                        Margin = new Thickness(0, conTitulo ? 0 : 9, 0, 0),
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = new SolidColorBrush(conTitulo ? LauncherSkin.TextSecondary : LauncherSkin.CardText),
-                    },
+                    scrollMessage ? new ScrollViewer { Content = body, MaxHeight = 320 } : body,
                 },
             };
             Grid.SetColumn(textos, 1);

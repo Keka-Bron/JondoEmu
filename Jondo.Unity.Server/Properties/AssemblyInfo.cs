@@ -6,3 +6,4 @@ using System.Runtime.CompilerServices;
 // kind of thing that has no business being public.
 [assembly: InternalsVisibleTo("Jondo.Unity.Tests")]
 [assembly: InternalsVisibleTo("Jondo.Unity.Server.Tests")]
+[assembly: InternalsVisibleTo("Jondo.Unity.Module.Tests")]

@@ -1,3 +1,4 @@
+using Jondo.Unity.ServerMods;
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -255,17 +256,17 @@ namespace Jondo.Unity.Server.Managers
                 {
                     if (objective.NpcId != npcId) continue;
                     if (!await CompleteNpcObjectiveAsync(session, step, objective, run, npcId,
-                            team: () => HeroQuestItems.PoolAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
-                                hero => CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out _))))
+                            team: () => QuestSharing.PoolQuestItemsAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
+                                companion => CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out _))))
                         continue;
 
-                    await Heroes.ShareQuestActionAsync(async hero =>
+                    await QuestSharing.ShareQuestActionAsync(async companion =>
                     {
                         if (CanShareNpc(npcId) && SharedObjective(run.QuestId, step.Id, objective.Id, out var pending))
-                            await CompleteNpcObjectiveAsync(hero, step, objective, pending, npcId);
+                            await CompleteNpcObjectiveAsync(companion, step, objective, pending, npcId);
                     },
                     quests: new[] { run.QuestId },
-                    explain: hero => MissingFor(hero, objective));
+                    explain: companion => MissingFor(companion, objective));
                 }
 
                 if (run.QuestId == Almanax.Dragon.Quest) continue;
@@ -285,7 +286,7 @@ namespace Jondo.Unity.Server.Managers
         }
 
         internal static bool CanShareNpc(int npcId)
-            => Npcs.OnMap(SessionContext.State.MapId).Any(spawn => spawn.NpcId == npcId);
+            => QuestSharing.Policy?.CanShareNpc(npcId) == true;
 
         private static async Task<bool> CompleteNpcObjectiveAsync(GameSession session, QuestStep step,
                                                                   QuestObjective objective, QuestRun run, int npcId,
@@ -305,7 +306,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (objective.ItemId != 0 && objective.ConsumesItems
                 && Handlers.DungeonHandler.TakesAtTheDoor(npcId, mapId, objective.ItemId)) return false;
-            // The master's: what he and the heroes following him lack, out of the team's bags.
+            // The master's: what he and the companions following him lack, out of the team's bags.
             if (objective.ItemId != 0 && objective.ConsumesItems && team != null && !await team()) return false;
             if (objective.ItemId != 0 && !await HandOverAsync(session, objective)) return false;
             if (objective.SoulMonster != 0 && !await HandOverSoulsAsync(session, objective)) return false;
@@ -784,35 +785,35 @@ namespace Jondo.Unity.Server.Managers
             int stepId = Log?.Run(binding.QuestId)?.StepId ?? 0;
             bool shared = binding.SpawnsMonster == 0 && !binding.OnlyGives;
             Func<Task<bool>>? team = shared && binding.Starts == 0
-                ? () => HeroQuestItems.PoolAsync(session, binding.Requires,
-                    hero => canShare?.Invoke() != false && SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
+                ? () => QuestSharing.PoolQuestItemsAsync(session, binding.Requires,
+                    companion => canShare?.Invoke() != false && SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
                 : null;
             if (!await CloseAsync(session, binding, team)) return false;
 
             if (shared)
             {
-                await Heroes.ShareQuestActionAsync(async hero =>
+                await QuestSharing.ShareQuestActionAsync(async companion =>
                 {
                     if (canShare?.Invoke() == false) return;
 
                     if (binding.Starts != 0)
                     {
-                        await CloseAsync(hero, binding);
+                        await CloseAsync(companion, binding);
                     }
                     else if (SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
                     {
-                        await CloseAsync(hero, binding);
+                        await CloseAsync(companion, binding);
                     }
                 },
                 quests: new[] { binding.Starts != 0 ? binding.Starts : binding.QuestId },
-                explain: hero => MissingFor(hero, binding)
-                                 ?? (binding.Starts != 0 ? Heroes.CouldNotStart(hero, binding.Starts) : null));
+                explain: companion => MissingFor(companion, binding)
+                                 ?? (binding.Starts != 0 ? QuestSharing.CouldNotStart(companion, binding.Starts) : null));
             }
             return true;
         }
 
         /// <summary>
-        /// How far a character is in a quest, to compare a hero's with his master's: -1 without it,
+        /// How far a character is in a quest, to compare a companion's with his master's: -1 without it,
         /// the step's place in the quest then the objectives ticked on it, the most once it is over.
         /// </summary>
         internal static int ProgressOf(GameSession session, int questId)
@@ -833,29 +834,29 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// Why a hero could not hand an objective over with his master: the items it asks for, when
+        /// Why a companion could not hand an objective over with his master: the items it asks for, when
         /// he has fewer of them than it takes. Null when that is not what stopped him.
         /// </summary>
-        internal static Heroes.LagCause? MissingFor(GameSession hero, QuestObjective objective)
+        internal static LagCause? MissingFor(GameSession companion, QuestObjective objective)
         {
             if (objective.ItemId == 0) return null;
             int wanted = Math.Max(1, objective.ItemCount);
             int has;
-            using (SessionContext.Push(hero)) has = Equipment.HowMany(objective.ItemId);
+            using (SessionContext.Push(companion)) has = Equipment.HowMany(objective.ItemId);
             return has < wanted
-                ? new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, objective.ItemId, wanted - has)
+                ? new LagCause(QuestLagReason.MissingItems, objective.ItemId, wanted - has)
                 : null;
         }
 
         /// <summary>The same for an element or a binding that asks to carry items: the first one he lacks.</summary>
-        internal static Heroes.LagCause? MissingFor(GameSession hero, QuestBinding binding)
+        internal static LagCause? MissingFor(GameSession companion, QuestBinding binding)
         {
-            using (SessionContext.Push(hero))
+            using (SessionContext.Push(companion))
             {
                 foreach (var (item, count) in binding.Requires)
                 {
                     int has = Equipment.HowMany(item);
-                    if (has < count) return new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, item, count - has);
+                    if (has < count) return new LagCause(QuestLagReason.MissingItems, item, count - has);
                 }
             }
             return null;
@@ -976,7 +977,7 @@ namespace Jondo.Unity.Server.Managers
             // And the time it waits after one of them: the brew ferments for an hour first.
             if (!WaitedEnough(binding, log)) return false;
 
-            // The master's: what he and the heroes following him lack, out of the team's bags.
+            // The master's: what he and the companions following him lack, out of the team's bags.
             if (team != null && binding.SpendsRequired && binding.Requires.Count > 0 && !await team()) return false;
             if (!await CarriesWhatItAsksAsync()) return false;
 
@@ -1199,10 +1200,10 @@ namespace Jondo.Unity.Server.Managers
                         if (here && !run.Done.Contains(objective.Id) && Revealed(step, objective, run))
                         {
                             await TickAsync(session, run.QuestId, objective.Id);
-                            await Heroes.ShareQuestActionAsync(async hero =>
+                            await QuestSharing.ShareQuestActionAsync(async companion =>
                             {
                                 if (SharedObjective(run.QuestId, step.Id, objective.Id, out _))
-                                    await TickAsync(hero, run.QuestId, objective.Id);
+                                    await TickAsync(companion, run.QuestId, objective.Id);
                             },
                             quests: new[] { run.QuestId });
                         }
@@ -1296,7 +1297,7 @@ namespace Jondo.Unity.Server.Managers
                     {
                         if (!used.Contains(element)) { all = false; break; }
                     }
-                    // Read beside him by the heroes who followed him from one to the next: they have
+                    // Read beside him by the companions who followed him from one to the next: they have
                     // no client to open the statues with, and stayed behind at each.
                     if (all) await CloseSharedAsync(session, binding);
                 }
@@ -1323,17 +1324,17 @@ namespace Jondo.Unity.Server.Managers
                     if (binding == null || binding.Kind != QuestBindingKind.Read || binding.ItemId != itemId) continue;
                     if (run.Done.Contains(objective.Id) || !Revealed(step, objective, run)) continue;
                     if (!await CloseAsync(session, binding)) continue;
-                    // And by the heroes beside him who carry the book too, each his own copy: as the
+                    // And by the companions beside him who carry the book too, each his own copy: as the
                     // recipe of Incarnam's cake (ReadingItemHandler).
                     int stepId = run.StepId;
-                    await Heroes.ShareQuestActionAsync(async hero =>
+                    await QuestSharing.ShareQuestActionAsync(async companion =>
                     {
                         if (Equipment.HowMany(itemId) > 0 && SharedObjective(binding.QuestId, stepId, binding.ObjectiveId, out _))
-                            await CloseAsync(hero, binding);
+                            await CloseAsync(companion, binding);
                     },
                     quests: new[] { binding.QuestId },
-                    explain: hero => Equipment.HowMany(itemId) > 0 ? null
-                        : new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, itemId, 1));
+                    explain: companion => Equipment.HowMany(itemId) > 0 ? null
+                        : new LagCause(QuestLagReason.MissingItems, itemId, 1));
                 }
             }
         }
@@ -1354,7 +1355,7 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>
         /// Whether a quest of whoever is in session waits for that key to be handed to that guardian:
-        /// a hero who has it goes in on a key rather than by his keyring (DungeonHeroes).
+        /// The dungeon admission policy uses this when planning the follower's dungeon entry.
         /// </summary>
         internal static bool AwaitsKey(int npcId, int itemId) => KeyObjective(npcId, itemId) != null;
 
@@ -1767,13 +1768,13 @@ namespace Jondo.Unity.Server.Managers
         {
             using var context = SessionContext.Push(session);
             if (!await StartAsync(session, questId)) return false;
-            await Heroes.ShareQuestActionAsync(async hero =>
+            await QuestSharing.ShareQuestActionAsync(async companion =>
             {
                 if (canShare?.Invoke() != false)
-                    await StartAsync(hero, questId);
+                    await StartAsync(companion, questId);
             },
             quests: new[] { questId },
-            explain: hero => Heroes.CouldNotStart(hero, questId));
+            explain: companion => QuestSharing.CouldNotStart(companion, questId));
             return true;
         }
 
@@ -1821,9 +1822,9 @@ namespace Jondo.Unity.Server.Managers
             await TellAsync(session, QuestStartedMessage, questId);
             await session.SendAsync(new Game.QuestStartedEvent(questId));
 
-            // A hero's run, socketless, settles the objectives that are not his all the same
+            // A companion's run, socketless, settles the objectives that are not his all the same
             // (SendStepAsync writes nothing without a stream): «Consejo de clase» started for a
-            // hero by his master's talk asks his own class's master only.
+            // companion by his master's talk asks his own class's master only.
             await SendStepAsync(session, questId);
             if (!session.HasTransport) return true;
 
@@ -2264,7 +2265,7 @@ namespace Jondo.Unity.Server.Managers
         public static Task SendJournalAsync(GameSession session, bool box = false)
             => QuestStateService.Live.SendJournalAsync(session, box);
 
-        /// <summary>The journal of a hero just taken in hand, the box the one played before left made his.</summary>
+        /// <summary>The journal of a companion just taken in hand, the box the one played before left made his.</summary>
         public static Task SendSwitchedJournalAsync(GameSession session, long before)
             => QuestStateService.Live.SendSwitchedJournalAsync(session, before);
 
@@ -2387,7 +2388,7 @@ namespace Jondo.Unity.Server.Managers
 
             if (!move.QuestFinished)
             {
-                await SendStepAsync(session, questId);   // settles a hero's foreign objectives too
+                await SendStepAsync(session, questId);   // settles a companion's foreign objectives too
 
                 // And the marks again, as after every ieb and idz of the captures.
                 if (session.HasTransport && (move.ObjectiveTicked || move.StepFinished))

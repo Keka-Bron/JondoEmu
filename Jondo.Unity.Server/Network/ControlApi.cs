@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.Json;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server.Mods;
+using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Network
 {
@@ -56,6 +58,10 @@ namespace Jondo.Unity.Server.Network
         /// HAAPI carries on with its own.
         /// </summary>
         public static Respuesta? Responder(string ruta, string metodo, string cuerpo, string ip = "")
+            => Responder(ruta, metodo, cuerpo, ip, null);
+
+        internal static Respuesta? Responder(string ruta, string metodo, string cuerpo, string ip,
+            ClientModCatalog? clientMods, ServerModControlRoutes? modRoutes = null)
         {
             if (!ruta.StartsWith(Prefijo, StringComparison.Ordinal)) return null;
 
@@ -72,6 +78,8 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "estado": return Estado();
                     case Prefijo + "entrar": return Entrar(cuerpo, ip);
                     case Prefijo + "crear-cuenta": return CrearCuenta(cuerpo, ip);
+                    case ClientModManifest.Route:
+                        return Mods(metodo, clientMods ?? new ClientModCatalog(Paths.ModsDirectory, ServerSettings.Current.ClientMods));
 
                     // ─── With a session ─────────────────────────────────────────────────────
                     // A token the base recognises is needed. The role does not matter: they are things
@@ -82,24 +90,6 @@ namespace Jondo.Unity.Server.Network
                     case Prefijo + "lanzamiento": return ConSesion(cuerpo, cuenta => Lanzamiento(cuerpo, cuenta, ip));
                     case Prefijo + "fin-de-lanzamiento":
                         return ConSesion(cuerpo, cuenta => FinDeLanzamiento(cuerpo, cuenta));
-                    // The Cazacabezas mod's window: his own hunter's record, board and order.
-                    case Prefijo + "headhunts/status": return ConSesion(cuerpo, HeadHuntStatus);
-                    case Prefijo + "headhunts/board": return ConSesion(cuerpo, HeadHuntBoard);
-                    case Prefijo + "headhunts/take": return ConSesion(cuerpo, cuenta => HeadHuntTake(cuerpo, cuenta));
-                    case Prefijo + "headhunts/abandon": return ConSesion(cuerpo, HeadHuntAbandon);
-                    // The Heroes mod's window: his account's characters, connected beside him or not.
-                    case Prefijo + "heroes/list": return ConSesion(cuerpo, HeroesList);
-                    case Prefijo + "heroes/connect": return ConSesion(cuerpo, cuenta => HeroesConnect(cuerpo, cuenta));
-                    case Prefijo + "heroes/disconnect": return ConSesion(cuerpo, cuenta => HeroesDisconnect(cuerpo, cuenta));
-                    case Prefijo + "heroes/portrait": return ConSesion(cuerpo, cuenta => HeroesPortrait(cuerpo, cuenta));
-                    case Prefijo + "heroes/quests": return ConSesion(cuerpo, cuenta => HeroesQuestSync(cuerpo, cuenta));
-                    case Prefijo + "heroes/autopass": return ConSesion(cuerpo, cuenta => HeroesAutoPass(cuerpo, cuenta));
-                    case Prefijo + "heroes/loot": return ConSesion(cuerpo, cuenta => HeroesLootTo(cuerpo, cuenta));
-                    case Prefijo + "heroes/sheet": return ConSesion(cuerpo, cuenta => HeroesSheet(cuerpo, cuenta));
-                    case Prefijo + "heroes/switch": return ConSesion(cuerpo, cuenta => HeroesSwitch(cuerpo, cuenta));
-                    case Prefijo + "heroes/create": return ConSesion(cuerpo, cuenta => HeroesCreate(cuerpo, cuenta));
-                    case Prefijo + "heroes/name": return ConSesion(cuerpo, HeroesName);
-                    case Prefijo + "heroes/preview": return ConSesion(cuerpo, _ => HeroesPreview(cuerpo));
                     // JondoFix's monster group tooltip: its loot and achievements (ControlApiMonsterTooltip.cs).
                     case Prefijo + "monsters/tooltip": return ConSesion(cuerpo, cuenta => MonsterTooltip(cuerpo, cuenta));
                     case Prefijo + "palette/save": return ConSesion(cuerpo, cuenta => SavePalette(cuerpo, cuenta));
@@ -133,13 +123,37 @@ namespace Jondo.Unity.Server.Network
                             : ConRol(cuerpo, Roles.Administrador,
                                 cuenta => AdministrarPersonaje(cuerpo, cuenta));
 
-                    default: return Mal(404, "ruta");
+                    default:
+                        if (modRoutes != null && modRoutes.TryGet(ruta, out var handle))
+                        {
+                            return ConSesion(cuerpo, accountId =>
+                            {
+                                var reply = handle(new AuthenticatedControlRequest(accountId, metodo, cuerpo));
+                                return new Respuesta(reply.StatusCode, reply.Json);
+                            });
+                        }
+                        return Mal(404, "ruta");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Control] {ruta} ha reventado: {ex.Message}");
                 return Mal(500, ex.Message);
+            }
+        }
+
+        internal static Respuesta Mods(string metodo, ClientModCatalog clientMods)
+        {
+            if (!metodo.Equals("GET", StringComparison.OrdinalIgnoreCase)) return Mal(405, "metodo");
+
+            try
+            {
+                return Bien(clientMods.CreateManifest());
+            }
+            catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+            {
+                Console.WriteLine($"[Control] Client mod manifest unavailable: {ex.Message}");
+                return Mal(503, "mods-no-disponibles");
             }
         }
 
@@ -159,6 +173,10 @@ namespace Jondo.Unity.Server.Network
             if (cuenta <= 0) return Mal(401, "sesion");
             return hacer(cuenta);
         }
+
+        /// <summary>The account's character in the world, or null.</summary>
+        internal static GameSession? InTheWorld(long account)
+            => SessionRegistry.All().FirstOrDefault(s => s.AccountId == account && s.IsInWorld && s.HasCharacter);
 
         private static Respuesta ConRol(string cuerpo, int haceFalta, Func<long, Respuesta> hacer)
         {

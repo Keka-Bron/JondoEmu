@@ -99,6 +99,11 @@ namespace Jondo.Unity.World.Fights
         /// </summary>
         public bool TryClaimStart() => Interlocked.Exchange(ref _arrancado, 1) == 0;
 
+        private int _settlementStarted;
+
+        /// <summary>Only the first completion signal may settle this fight.</summary>
+        public bool TryClaimSettlement() => Interlocked.Exchange(ref _settlementStarted, 1) == 0;
+
         /// <summary>
         /// Lets through ONE single confirmation per turn.
         /// </summary>

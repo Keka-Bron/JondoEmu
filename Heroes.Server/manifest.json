@@ -1,0 +1,51 @@
+{
+  "id": "heroes",
+  "version": "1.0.0",
+  "serverApiVersion": 2,
+  "serverAssembly": "Heroes.Server.dll",
+  "clientAsset": "Heroes.dll",
+  "settings": {
+    "name": "Heroes",
+    "fields": [
+      {
+        "key": "Enabled",
+        "default": true,
+        "legacyKey": "HeroMode",
+        "label": {
+          "es": "Modo de héroes",
+          "en": "Hero mode",
+          "fr": "Mode Héros"
+        },
+        "hint": {
+          "es": "Conecta otros personajes de la cuenta (Ctrl+Tab).",
+          "en": "Connect other characters on the account (Ctrl+Tab).",
+          "fr": "Connectez les autres personnages du compte (Ctrl+Tab)."
+        }
+      },
+      {
+        "key": "MaxHeroes",
+        "default": 7,
+        "legacyKey": "HeroesMax",
+        "minimum": 1,
+        "maximum": 7,
+        "step": 1,
+        "label": {
+          "es": "Héroes a la vez",
+          "en": "Simultaneous heroes",
+          "fr": "Héros simultanés"
+        }
+      },
+      {
+        "key": "ReloadMapOnSwitch",
+        "default": false,
+        "legacyKey": "HeroSwitchReloadsMap",
+        "label": {
+          "es": "Recargar el mapa al cambiar",
+          "en": "Reload map on switch",
+          "fr": "Recharger la carte au changement"
+        }
+      }
+    ],
+    "activationSetting": "Enabled"
+  }
+}

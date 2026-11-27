@@ -162,6 +162,12 @@ Why it is grouped by message shape rather than by opcode, the measured field-num
 keeps a byte blob from posing as a structure, and the `.packets` command.
 *Go there* before hunting for a missing feature: the list says where to look.
 
+**[Writing server mods](writing-server-mods.md)** builds a server-only package and shows
+how to use host services, register gameplay hooks and add a new extension point to the server.
+The [server mod contract](server-mod-contract.md) describes package discovery, settings
+and client DLL distribution. The [migration guide](server-mod-migration.md) covers how
+to install and test the optional Cazacabezas and Heroes packages.
+
 **`cities-war.md`** — Bonta against Brakmar, and the head hunters.
 Who may attack whom and where, how honour, grades and dishonour are settled, the hunt orders and
 their chapeuvepés, the Cazacabezas mod's routes, and how the JondoBots join the war.

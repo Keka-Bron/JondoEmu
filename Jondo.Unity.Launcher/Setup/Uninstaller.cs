@@ -104,9 +104,13 @@ namespace Jondo.Unity.Launcher.Setup
             // The mods out of a client the player brought; one the installer downloaded goes with the folder.
             if (state.Client.Length > 0 && !IsInside(state.Client, root))
             {
-                string mods = Path.Combine(Path.GetDirectoryName(state.Client) ?? "", "Mods");
-                foreach (string mod in LauncherService.ShippedMods)
-                    TryDelete(Path.Combine(mods, mod + ".dll"));
+                string clientRoot = Path.GetDirectoryName(state.Client) ?? "";
+                string mods = Path.Combine(clientRoot, "Mods");
+                var managed = BundledClientMods.Discover(root).Keys.Concat(BundledClientMods.ManagedNames(clientRoot));
+                foreach (string mod in managed.Distinct(StringComparer.OrdinalIgnoreCase))
+                    TryDelete(Path.Combine(mods, mod));
+                string plugins = Path.Combine(Path.GetDirectoryName(state.Client) ?? "", "Plugins");
+                TryDelete(Path.Combine(plugins, ClientModManifest.BootstrapFileName));
             }
 
             foreach (string shortcut in SystemIntegration.ShortcutPaths()) TryDelete(shortcut);

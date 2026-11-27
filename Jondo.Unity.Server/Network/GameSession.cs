@@ -4,11 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Protocol.Game.Wire;
+using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>One connected game client and all state that belongs exclusively to it.</summary>
-    public sealed class GameSession
+    public sealed class GameSession : ICharacterSession
     {
         private static readonly IGameCodec DefaultCodec = new GameCodec();
         private static long _nextHaapiSessionUid;
@@ -92,6 +93,21 @@ namespace Jondo.Unity.Server.Network
         public bool IsAuthenticated => AccountId > 0;
         public bool HasCharacter => CharacterId > 0;
         public bool IsInWorld { get; private set; }
+
+        string ICharacterSession.CharacterName => State.CharacterName ?? "";
+        bool ICharacterSession.IsInFight => State.IsInFight;
+        bool ICharacterSession.HasClient => Stream != null;
+
+        CharacterPosition ICharacterSession.Position
+        {
+            get => new(State.MapId, State.CellId, State.Orientation);
+            set
+            {
+                State.MapId = value.MapId;
+                State.CellId = value.CellId;
+                State.Orientation = value.Orientation;
+            }
+        }
 
         /// <summary>
         /// A simulated player's: what is logged while serving it goes nowhere

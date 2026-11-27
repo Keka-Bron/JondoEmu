@@ -47,6 +47,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Protocol.Game.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jondo.Unity.Mcp", "Jondo.Unity.Mcp\Jondo.Unity.Mcp.csproj", "{74A84F69-38B2-4894-9C33-6DAEE6DED18F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Fixtures", "Test Fixtures", "{A8F92B06-E402-1E79-886D-1B1750DFB640}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixture.ServerMod", "Jondo.Unity.Server.Tests\Fixtures\ServerMod\Fixture.ServerMod.csproj", "{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixture.ServerModDependency", "Jondo.Unity.Server.Tests\Fixtures\ServerModDependency\Fixture.ServerModDependency.csproj", "{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +63,30 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|x64.Build.0 = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Debug|x86.Build.0 = Debug|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|x64.ActiveCfg = Release|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|x64.Build.0 = Release|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|x86.ActiveCfg = Release|Any CPU
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2}.Release|x86.Build.0 = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|x64.Build.0 = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662}.Release|x86.Build.0 = Release|Any CPU
 		{BA713A01-7461-4F3B-970B-042406D20006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA713A01-7461-4F3B-970B-042406D20006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA713A01-7461-4F3B-970B-042406D20006}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -327,5 +357,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B84B27C-5C65-46A0-A15E-1911ECB07E5D}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0EC3FF01-C137-4C6F-A7EF-B985C89D3DB2} = {A8F92B06-E402-1E79-886D-1B1750DFB640}
+		{AD44CAF3-A7A0-4D60-A8DD-0D46734C0662} = {A8F92B06-E402-1E79-886D-1B1750DFB640}
 	EndGlobalSection
 EndGlobal

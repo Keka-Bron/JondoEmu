@@ -150,8 +150,8 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         // the list goes out with the kvd behind it when the client asks (kvc).
         // Sending the list inside the burst and the kvd after it -- behind the
         // jtg -- put the client on the character screen anyway.
-        // Or a hero the account asked to take in hand (Heroes.AskSwitch): picked the same way.
-        bool resumable = characters.Any(c => backend.CanResumeFight(c.Id)) || Heroes.SwitchPending(session.AccountId);
+        // Or a companion the account asked to take in hand: picked the same way.
+        bool resumable = HasAutomaticSelection(characters);
         await backend.SendWelcomeAsync(session, characters, withList: !resumable);
         _listWentInWelcome = !resumable;
         return GameEntryResult.Handled;
@@ -162,10 +162,14 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         // On an ordinary login the client already has the list. When a character is still in a
         // fight the list is followed by the empty kvd: "do not stop here". The client answers kwb.
         var characters = backend.GetCharacters(session);
-        bool resumable = characters.Any(c => backend.CanResumeFight(c.Id)) || Heroes.SwitchPending(session.AccountId);
+        bool resumable = HasAutomaticSelection(characters);
         await backend.SendCharacterListAsync(session, characters, withInitialization: !resumable);
         if (resumable) await session.SendAsync(new CharacterForceSelectionEvent());
     }
+
+    private bool HasAutomaticSelection(IReadOnlyList<DbCharacter> characters)
+        => characters.Any(character => backend.CanResumeFight(character.Id))
+            || CompanionSessions.SwitchPending(session.AccountId);
 
     private async Task<GameEntryResult> SelectAsync(long characterId)
     {
@@ -185,16 +189,18 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
         // Automatic force-selection continuation: the empty request names nobody. Select only
         // an account-owned character on this server whose fight is still resumable.
         var characters = backend.GetCharacters(session);
-        // Or the hero the account asked to take in hand: he enters the world as any selection does,
-        // and his group comes back around him (Heroes.Regroup).
-        long hero = Heroes.TakeSwitch(session.AccountId);
-        if (hero != 0 && characters.Any(c => c.Id == hero) && !backend.CanResumeFight(hero))
+        // Or the companion the account asked to take in hand: he enters the world as any selection does,
+        // and his group comes back around him (CompanionSessions.Regroup).
+        long companion = CompanionSessions.TakeSwitch(session.AccountId);
+        if (companion != 0 && characters.Any(c => c.Id == companion) && !backend.CanResumeFight(companion))
         {
-            if (!backend.SelectCharacter(session, hero)) return GameEntryResult.Close;
-            return await EnterWorldAsync() ? GameEntryResult.Handled : GameEntryResult.Close;
+            if (!backend.SelectCharacter(session, companion)) return GameEntryResult.Close;
         }
-        var character = characters.FirstOrDefault(c => backend.CanResumeFight(c.Id));
-        if (character == null || !backend.ResumeFight(session, character.Id)) return GameEntryResult.Close;
+        else
+        {
+            var character = characters.FirstOrDefault(c => backend.CanResumeFight(c.Id));
+            if (character == null || !backend.ResumeFight(session, character.Id)) return GameEntryResult.Close;
+        }
         return await EnterWorldAsync() ? GameEntryResult.Handled : GameEntryResult.Close;
     }
 
@@ -219,8 +225,8 @@ internal sealed class GameEntryService(GameSession session, IGameEntryBackend ba
             await backend.AnnounceMapPresenceAsync(session, character);
 
         await backend.SendInitialStateAsync(session, character);
-        // The account's heroes, back around him when he comes from another of the group.
-        Heroes.Regroup(session);
+        // The account's companions, back around him when he comes from another of the group.
+        CompanionSessions.Regroup(session);
         await backend.RestoreGuildRaidAsync(session);
         await backend.NotifyGuildConnectionAsync(character.Id);
         await backend.NotifyFriendsAsync(session.AccountId);

@@ -21,31 +21,35 @@ namespace Jondo.Unity.Server.Network
         /// <param name="listener">The listener's tag for the console: "Game Server" or "Game Node".</param>
         public static async Task LeaveAsync(GameSession session, string listener)
         {
-            if (session.IsInWorld)
+            // Finish any in-flight companion control operation before leaving the world.
+            using (Managers.CompanionSessions.Policy == null ? null : await session.EnterTurnAsync())
             {
-                try
+                if (session.IsInWorld)
                 {
-                    await MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
-                }
-                catch { }
+                    try
+                    {
+                        await MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
+                    }
+                    catch { }
 
-                // And out of the party, if he was in one: the ones who stay have to be told,
-                // because otherwise they see a member who no longer exists.
-                try
-                {
-                    using (SessionContext.Push(session))
-                        await PartyHandler.DisconnectedAsync(session.CharacterId);
-                }
-                catch { }
+                    // And out of the party, if he was in one: the ones who stay have to be told,
+                    // because otherwise they see a member who no longer exists.
+                    try
+                    {
+                        using (SessionContext.Push(session))
+                            await PartyHandler.DisconnectedAsync(session.CharacterId);
+                    }
+                    catch { }
 
-                // And his alliance sees him disconnected.
-                try
-                {
-                    await AllianceHandler.DisconnectedAsync(session.CharacterId);
-                }
-                catch { }
+                    // And his alliance sees him disconnected.
+                    try
+                    {
+                        await AllianceHandler.DisconnectedAsync(session.CharacterId);
+                    }
+                    catch { }
 
-                session.LeaveWorld();
+                    session.LeaveWorld();
+                }
             }
 
             // A tax collector's items left in the recycling window go to the bag.
@@ -58,9 +62,9 @@ namespace Jondo.Unity.Server.Network
             try { await TradeHandler.AbandonAsync(session); } catch { }
             try { await ArtisanHandler.LeftAsync(session); } catch { }
 
-            // His heroes go with him, each saved; the group waits a while for whoever of it comes
+            // His companions go with him, each saved; the group waits a while for whoever of it comes
             // back -- changing character is how another of it is taken in hand.
-            if (session.State.CharacterId > 0) Managers.Heroes.DisconnectAll(session);
+            if (session.State.CharacterId > 0) Managers.CompanionSessions.OnSessionLeaving(session);
 
             // A turn of his that the fight is waiting on stops waiting for a client that is gone.
             if (session.State.CharacterId > 0)

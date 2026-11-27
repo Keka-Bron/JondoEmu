@@ -38,11 +38,11 @@ namespace Jondo.Unity.Server.Network
         [ThreadStatic] private static int _testSlot;
 
         /// <summary>
-        /// The hero this request acts as, read from its body's «hero» (his id or his name): one of
-        /// the heroes connected beside the slot's character, whose session every route then uses
+        /// The companion this request acts as, read from its body's «companion» (his id or his name): one of
+        /// the companions connected beside the slot's character, whose session every route then uses
         /// -- his quests, his bag --, without switching to him in the client. Empty: the slot's own.
         /// </summary>
-        [ThreadStatic] private static string? _testHero;
+        [ThreadStatic] private static string? _testCompanion;
 
         private static string TestLoginNow => _testSlot <= 0 ? TestLogin : $"{TestLogin}{_testSlot:D2}";
 
@@ -57,19 +57,19 @@ namespace Jondo.Unity.Server.Network
                 return Mal(401, "key");
 
             _testSlot = (int)Math.Clamp(Numero(cuerpo, "slot"), 0, 99);
-            _testHero = Texto(cuerpo, "hero") is { Length: > 0 } heroName ? heroName
-                      : Numero(cuerpo, "hero") is > 0 and var heroId ? heroId.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            _testCompanion = Texto(cuerpo, "companion") is { Length: > 0 } companionName ? companionName
+                      : Numero(cuerpo, "companion") is > 0 and var companionId ? companionId.ToString(System.Globalization.CultureInfo.InvariantCulture)
                       : null;
             try
             {
-                if (_testHero != null && TestSessionOnline() == null)
-                    return Mal(404, "hero: not one of the heroes connected beside the slot's character");
+                if (_testCompanion != null && TestSessionOnline() == null)
+                    return Mal(404, "companion: no matching character is attached to this session");
                 return TestDispatch(ruta.Substring(Prefijo.Length + "test/".Length), cuerpo);
             }
             finally
             {
                 _testSlot = 0;
-                _testHero = null;
+                _testCompanion = null;
             }
         }
 
@@ -225,10 +225,10 @@ namespace Jondo.Unity.Server.Network
         {
             long account = DatabaseManager.AccountIdOf(TestLoginNow);
             var own = SessionRegistry.All().FirstOrDefault(s => s.AccountId == account && s.IsInWorld);
-            if (own == null || _testHero == null) return own;
-            return Heroes.Of(own.CharacterId).FirstOrDefault(h =>
-                h.CharacterId.ToString(System.Globalization.CultureInfo.InvariantCulture) == _testHero
-                || string.Equals(h.Session.State.CharacterName, _testHero, StringComparison.OrdinalIgnoreCase))?.Session;
+            if (own == null || _testCompanion == null) return own;
+            return CompanionSessions.Of(own.CharacterId).FirstOrDefault(h =>
+                h.CharacterId.ToString(System.Globalization.CultureInfo.InvariantCulture) == _testCompanion
+                || string.Equals(h.Session.CharacterName, _testCompanion, StringComparison.OrdinalIgnoreCase))?.Session as GameSession;
         }
 
         /// <summary>How far the slot's client got: connected to the game, and in the world.</summary>
@@ -384,7 +384,7 @@ namespace Jondo.Unity.Server.Network
 
         /// <summary>
         /// A team fight for the harness: { allies: [breed...], foes: [breed...], blue: [slot...],
-        /// red: [slot...], heroes: bool }. With heroes, the allies are played from the client. The slot's character and the blue slots' on one side, the red slots'
+        /// red: [slot...], companions: bool }. With companions, the allies are played from the client. The slot's character and the blue slots' on one side, the red slots'
         /// in front, and JondoBots of the classes given filling either side -- each played by
         /// this slot's session (Fighter.DrivenBy), never by its own wits. Every real client still
         /// says it is ready (kaq) for the fight to start.
@@ -395,11 +395,11 @@ namespace Jondo.Unity.Server.Network
             if (session == null || session.Stream == null) return Mal(404, "offline");
             if (FightHandler.FightOf(session.State.CharacterId) != null) return Mal(409, "in-fight");
             var lists = new Dictionary<string, List<int>>();
-            bool heroes = false;
+            bool companions = false;
             try
             {
                 using var doc = System.Text.Json.JsonDocument.Parse(string.IsNullOrEmpty(cuerpo) ? "{}" : cuerpo);
-                heroes = doc.RootElement.TryGetProperty("heroes", out var h) && h.ValueKind == System.Text.Json.JsonValueKind.True;
+                companions = doc.RootElement.TryGetProperty("companions", out var h) && h.ValueKind == System.Text.Json.JsonValueKind.True;
                 foreach (string field in new[] { "allies", "foes", "blue", "red" })
                     lists[field] = doc.RootElement.TryGetProperty(field, out var a) && a.ValueKind == System.Text.Json.JsonValueKind.Array
                         ? a.EnumerateArray().Where(x => x.ValueKind == System.Text.Json.JsonValueKind.Number).Select(x => x.GetInt32()).ToList()
@@ -426,11 +426,11 @@ namespace Jondo.Unity.Server.Network
                 return bot;
             }).ToList();
             var allies = Bots("allies");
-            // The hero mode's probe: the allies are played from the client, as heroes would be --
+            // The allies are played from the client.
             // their class bar and their turn go to it (FightHandler.PlayedAllyBar), where a
             // harness's bot gets neither and is played over the socket.
-            if (heroes)
-                foreach (var ally in allies) FightHandler.PlayAsHero(ally, session.State.CharacterId);
+            if (companions)
+                foreach (var ally in allies) FightHandler.AssignAllyController(ally, session.State.CharacterId);
             var foes = Bots("foes");
             if (red.Count + foes.Count == 0) return Mal(400, "nobody-in-front");
 

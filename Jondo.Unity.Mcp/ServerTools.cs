@@ -96,7 +96,7 @@ public static class ServerTools
                  "table (MarketplaceTests' sales history): delete the checkout's bases/ to start from a fresh copy, or " +
                  "copy a clean world.db there.")]
     public static Task<string> RunTests(Emulator emulator,
-        [Description("A dotnet test --filter, e.g. \"FullyQualifiedName~HeroesTests\"; empty for every test.")] string? filter = null,
+        [Description("A dotnet test --filter, e.g. \"FullyQualifiedName~DungeonTests\"; empty for every test.")] string? filter = null,
         [Description("The checkout's folder; the source checkout when empty.")] string? path = null,
         [Description("The most failures told in full.")] int maxFailures = 20,
         CancellationToken cancellationToken = default)
@@ -117,8 +117,7 @@ public static class ServerTools
         Calls any /api/test/<route> of the server (the test harness's routes, ControlApiTest.cs and its partials),
         with the key and the slot added. The body is a JSON object. They act on the slot's test account
         (jondoplay, jondoplay01...), which must be in the world (headless_connect or a client) for most of them.
-        Add "hero": name or id to any body to act as a hero connected beside the slot's character (his quests,
-        his bag) without taking him in hand. A slot's actions run one after the other (reads are not held), but
+        Add "companion": name or id to any body to act as a companion connected beside the slot's character without taking him in hand. A slot's actions run one after the other (reads are not held), but
         calls sent at once arrive in any order: never send together calls whose order matters (an NPC's replies:
         use game_dialogue).
         Routes and bodies:
@@ -127,7 +126,7 @@ public static class ServerTools
           command {text}  (an admin chat command, e.g. ".item 39 1")   goto {map, cell?}   give {item, quantity, souls?}
           talk {npc|actor, action?}   reply {reply}   use {element, skill?}   useitem {item}   carried {item}
           quest {quest, op: start|finish|forget}   wanted {monster?}   items {group}   item {gid}   equip {gid|none}
-          team {allies:[breed], foes:[breed], blue:[slot], red:[slot], heroes?, map?}   (starts a fight vs JondoBots)
+          team {allies:[breed], foes:[breed], blue:[slot], red:[slot], companions?, map?}   (starts a fight vs JondoBots)
           cast {spell, cell, as?}   walk {fighter, cell, mark?}   place {fighter?, cell}   stage {spell, target|cell, as?, free?}
           sight {target, cells:[]}   refresh {keep?, noSummons?, hurt?, hurtTo?, as?}   endturn {allies?}
           state {as?, state, rounds}   crit {as?, on}   kill {fighter, by?}   finish {team?}
@@ -142,6 +141,15 @@ public static class ServerTools
         CancellationToken cancellationToken = default)
         => emulator.TestAsync(route.Trim('/'), Emulator.Object(body), slot, cancellationToken);
 
+    [McpServerTool(Name = "player_call")]
+    [Description("Calls a control route under /api/ with the test slot's account token. Use the installed mod's documentation for its routes and request fields.")]
+    public static Task<string> PlayerCall(Emulator emulator,
+        [Description("The route after /api/.")] string route,
+        [Description("The body, a JSON object (may be empty).")] string? body = null,
+        [Description("The test slot: 0 is jondoplay, n is jondoplayNN.")] int slot = 0,
+        CancellationToken cancellationToken = default)
+        => emulator.PlayerAsync(route, Emulator.Object(body), slot, cancellationToken);
+
     [McpServerTool(Name = "admin_call")]
     [Description("""
         Calls an administrator route of the control API (/api/<route>) as the test harness's administrator account,
@@ -154,5 +162,5 @@ public static class ServerTools
         [Description("The route after /api/, e.g. \"conectados\".")] string route,
         [Description("The body, a JSON object (may be empty).")] string? body = null,
         CancellationToken cancellationToken = default)
-        => emulator.AdminAsync(route.Trim('/'), Emulator.Object(body), cancellationToken);
+        => emulator.PlayerAsync(route, Emulator.Object(body), cancellationToken: cancellationToken);
 }

@@ -28,8 +28,8 @@ param(
     # Name in the folder -> the built file to put there.
     [Parameter(Mandatory)] [hashtable] $Executables,
     [string] $Ref = 'HEAD',
-    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets',
-                         'JondoFix/JondoFix.dll', 'Cazacabezas/Cazacabezas.dll', 'Heroes/Heroes.dll')
+    [string[]] $Data = @('.jondo-root', 'datos', 'content', 'launcher_assets', 'mods',
+                         'JondoModLoader/JondoModLoader.dll')
 )
 
 $ErrorActionPreference = 'Stop'

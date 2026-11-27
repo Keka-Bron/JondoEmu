@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" />
+    <ProjectReference Include="..\ServerModDependency\Fixture.ServerModDependency.csproj" />
+  </ItemGroup>
+</Project>

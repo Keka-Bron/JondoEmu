@@ -1,9 +1,11 @@
+using Jondo.Unity.ServerMods;
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Protocol;
 using Game = Jondo.Unity.Protocol.Game;
@@ -1236,19 +1238,18 @@ namespace Jondo.Unity.Server.Handlers
             }
         }
 
-        /// <summary>
-        /// Whether a reply's quest progress goes to the heroes too. A reply that only moves the master
-        /// -- a passage, a map it leads to -- moves them with him (HeroPresence), and is shared:
-        /// Incarnam's portal does «Utiliza el portal para ir a Astrub» (13931), and the heroes went
-        /// through it with nothing ticked, each to be brought back to cross it himself. What it costs,
-        /// a dungeon's door, the way home of a dream and a body changed on the way are not.
-        /// </summary>
         private static bool CanShareQuestReply(int npcId, DialogueChoice choice)
-            => Quests.CanShareNpc(npcId) && choice.BuysItem == 0 && choice.BuysPrice == 0
-               && choice.Takes == 0 && choice.TakesAll.Count == 0 && choice.Marks == 0
-               && choice.Door.Length == 0 && !choice.ReturnsHome
-               && choice.PhantomPhoenix == 0 && choice.GivesMutation == 0 && !choice.EndsMutation
-               && SeLeOfrece(choice);
+        {
+            var effects = QuestReplyEffects.None;
+            if (choice.BuysItem != 0 || choice.BuysPrice != 0) effects |= QuestReplyEffects.Purchase;
+            if (choice.Takes != 0 || choice.TakesAll.Count != 0) effects |= QuestReplyEffects.RemovesItems;
+            if (choice.Marks != 0) effects |= QuestReplyEffects.Marks;
+            if (choice.Door.Length != 0) effects |= QuestReplyEffects.DungeonDoor;
+            if (choice.ReturnsHome) effects |= QuestReplyEffects.ReturnsHome;
+            if (choice.PhantomPhoenix != 0) effects |= QuestReplyEffects.Phoenix;
+            if (choice.GivesMutation != 0 || choice.EndsMutation) effects |= QuestReplyEffects.Mutation;
+            return QuestSharing.Policy?.CanShareQuestReply(npcId, effects, () => SeLeOfrece(choice)) == true;
+        }
 
         private static async Task StartQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice)
         {
@@ -1257,22 +1258,22 @@ namespace Jondo.Unity.Server.Handlers
                 && await Quests.CompleteByReplyAsync(session, choice.StartsQuest, choice.Completes);
             if (!started) return;
 
-            await Heroes.ShareQuestActionAsync(async hero =>
+            await QuestSharing.ShareQuestActionAsync(async companion =>
             {
-                if (!CanShareQuestReply(npcId, choice) || !await Quests.StartAsync(hero, choice.StartsQuest)) return;
+                if (!CanShareQuestReply(npcId, choice) || !await Quests.StartAsync(companion, choice.StartsQuest)) return;
 
-                await GiveFromReplyAsync(hero.Stream!, choice);
+                await GiveFromReplyAsync(companion.Stream!, choice);
                 if (completed)
                 {
                     int stepId = Quests.Book?.Of(choice.StartsQuest)?.Steps.FirstOrDefault()?.Id ?? 0;
                     if (Quests.SharedObjective(choice.StartsQuest, stepId, choice.Completes, out _))
-                        await Quests.CompleteByReplyAsync(hero, choice.StartsQuest, choice.Completes);
+                        await Quests.CompleteByReplyAsync(companion, choice.StartsQuest, choice.Completes);
                 }
             },
             quests: new[] { choice.StartsQuest },
-            explain: hero => !CanShareQuestReply(npcId, choice)
-                ? new Heroes.LagCause(Heroes.QuestLagReason.NotShared)
-                : Heroes.CouldNotStart(hero, choice.StartsQuest));
+            explain: companion => !CanShareQuestReply(npcId, choice)
+                ? new LagCause(QuestLagReason.NotShared)
+                : QuestSharing.CouldNotStart(companion, choice.StartsQuest));
         }
 
         private static async Task<bool> CompleteQuestFromReplyAsync(GameSession session, int npcId, DialogueChoice choice,
@@ -1281,26 +1282,26 @@ namespace Jondo.Unity.Server.Handlers
             var book = Quests.Book;
             var objective = book?.Objective(objectiveId);
             var step = objective == null ? null : book!.Step(objective.StepId);
-            // What the heroes following lack, out of the team's bags first; all of them or nobody.
+            // What the companions following lack, out of the team's bags first; all of them or nobody.
             if (step != null && objective!.ItemId != 0 && objective.ConsumesItems
                 && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _)
-                && !await HeroQuestItems.PoolAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
-                    hero => CanShareQuestReply(npcId, choice) && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _)))
+                && !await QuestSharing.PoolQuestItemsAsync(session, new[] { (objective.ItemId, objective.ItemCount) },
+                    companion => CanShareQuestReply(npcId, choice) && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _)))
                 return false;
             if (!await Quests.CompleteByReplyAsync(session, choice.Quest, objectiveId)) return false;
             if (step == null) return true;
 
-            await Heroes.ShareQuestActionAsync(async hero =>
+            await QuestSharing.ShareQuestActionAsync(async companion =>
             {
                 if (!CanShareQuestReply(npcId, choice) || !Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _))
                     return;
-                if (await Quests.CompleteByReplyAsync(hero, step.QuestId, objectiveId) && giveFromReply)
-                    await GiveFromReplyAsync(hero.Stream!, choice);
+                if (await Quests.CompleteByReplyAsync(companion, step.QuestId, objectiveId) && giveFromReply)
+                    await GiveFromReplyAsync(companion.Stream!, choice);
             },
             quests: new[] { step.QuestId },
-            explain: hero => !CanShareQuestReply(npcId, choice)
-                ? new Heroes.LagCause(Heroes.QuestLagReason.NotShared)
-                : Quests.MissingFor(hero, objective!));
+            explain: companion => !CanShareQuestReply(npcId, choice)
+                ? new LagCause(QuestLagReason.NotShared)
+                : Quests.MissingFor(companion, objective!));
             return true;
         }
 
@@ -1814,8 +1815,8 @@ namespace Jondo.Unity.Server.Handlers
                 if (elegidaAhora != null && elegidaAhora.Door.Length > 0 && elegidaAhora.TakesAll.Count > 0)
                     await TakeAllAsync(stream, elegidaAhora);
                 // Going in can be what hands a quest over: Klasmor's «Criptología», at Kardorim's
-                // crypt. To the heroes too: they went in with him, each by his own way in
-                // (DungeonHeroes), and reached Kardorim without the quest his fight moves.
+                // crypt. To the companions too: they went in with him, each by his own way in
+                // and reached Kardorim without the quest his fight moves.
                 if (startsAfterClosing != 0) await Managers.Quests.StartSharedAsync(session, startsAfterClosing);
                 return;
             }
@@ -2010,26 +2011,30 @@ namespace Jondo.Unity.Server.Handlers
                 }
             }
 
-            // A trade of chapeuvepés (the Sacres): paid, then handed over; without enough, the line
-            // that says so.
-            if (elegida.Chapeuvepes > 0)
+            if (elegida.Trades > 0 || elegida.ExtensionFields.Count > 0)
             {
-                if (!Managers.HeadHunts.Pay(GameState.CharacterId, -elegida.Chapeuvepes))
+                var payment = ServerModHooks.All<IDialogueCurrency>()
+                    .Select(currency => (Currency: currency, Cost: currency.Cost(elegida.ExtensionFields)))
+                    .FirstOrDefault(quote => quote.Cost > 0);
+                if (payment.Cost > 0 || elegida.Trades > 0)
                 {
-                    next = elegida.RefusedNext;
-                    if (next == 0) return false;
-                }
-                else if (elegida.Trades != 0)
-                {
-                    if (!await Managers.Equipment.GiveAsync(stream, elegida.Trades, elegida.TradeCount))
+                    long characterId = GameState.CharacterId;
+                    if (payment.Currency?.AdjustBalance(characterId, -payment.Cost) != true)
                     {
-                        Managers.HeadHunts.Pay(GameState.CharacterId, elegida.Chapeuvepes);
-                        Console.WriteLine($"[NPC] {elegida.TradeCount}x{elegida.Trades} could not be handed over; " +
-                                          $"the {elegida.Chapeuvepes} chapeuvepés are given back.");
+                        next = elegida.RefusedNext;
+                        if (next == 0) return false;
                     }
-                    else
+                    else if (elegida.Trades > 0)
                     {
-                        Console.WriteLine($"[NPC] Traded {elegida.TradeCount}x{elegida.Trades} for {elegida.Chapeuvepes} chapeuvepés.");
+                        bool delivered = false;
+                        try
+                        {
+                            delivered = await Managers.Equipment.GiveAsync(stream, elegida.Trades, elegida.TradeCount);
+                        }
+                        finally
+                        {
+                            if (!delivered) payment.Currency.AdjustBalance(characterId, payment.Cost);
+                        }
                     }
                 }
             }

@@ -3,7 +3,9 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -72,7 +74,7 @@ namespace Jondo.Unity.Server.Handlers
 
             long hall = state.OpenDialogueMapId;
             if (state.IsInFight || hall != state.MapId) return Close;
-            if (await Jail.KeepsInAsync(stream) || await HeadHunts.HoldsAsync(stream, HeadHunts.Hold.Dungeon))
+            if (await Jail.KeepsInAsync(stream) || await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Dungeon))
                 return Close;
             if (expedition.MinLevel > state.CharacterLevel)
             {

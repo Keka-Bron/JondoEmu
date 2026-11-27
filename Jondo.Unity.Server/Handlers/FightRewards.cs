@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
 
@@ -48,7 +49,7 @@ namespace Jondo.Unity.Server.Handlers
 
             /// <summary>
             /// What of <see cref="Loot"/> dropped for him alone, off a row with a criterion he met --
-            /// a quest's item, mostly --: never sent to a loot recipient (GatherHeroLoot).
+            /// a quest's item, mostly --: kept by the character who earned it.
             /// </summary>
             public Dictionary<int, int> Own { get; set; } = new();
         }
@@ -153,7 +154,6 @@ namespace Jondo.Unity.Server.Handlers
                 // Who walked out gave the fight up: his side's win is not his, nor a part of its kamas.
                 if (fight.Gone.Contains(fighter.Id)) continue;
                 if (!fight.HaGanado(fighter.Id) && dream?.Finished != true) continue;
-                // A hero is paid in his own session, which is in no registry (Managers.Heroes).
                 var session = SessionToPay(fighter.Id);
                 if (session != null) winners.Add((fighter, session));
             }
@@ -230,8 +230,7 @@ namespace Jondo.Unity.Server.Handlers
                     Own = own,
                 };
             }
-            // A group with heroes may send its items to one of it (Heroes.LootTo).
-            if (dream == null) GatherHeroLoot(plan);
+            if (dream == null) RouteSharedLoot(plan);
             // A Gigalodón fight's salt goes into the raid's pool, the same amount for every winner.
             if (dream == null) GuildRaidManager.ShareFightSalt(fight.FightId, plan.ToDictionary(p => p.Key, p => p.Value.Loot));
             _rewards[fight.FightId] = plan;
@@ -248,6 +247,29 @@ namespace Jondo.Unity.Server.Handlers
                 Program.LogDebug($"[Fight] Share of #{fight.FightId} among {winners.Count}: " +
                                  string.Join(", ", plan.Select(p => $"{p.Key} {p.Value.Xp} xp {p.Value.Kamas} kamas " +
                                                                     $"{p.Value.Loot.Sum(l => l.Value)} item(s)")));
+            }
+        }
+
+        internal static void RouteSharedLoot(Dictionary<long, Reward> plan)
+        {
+            var recipients = FightParticipants.Policy?.SelectLootRecipients(plan.Keys.ToArray());
+            if (recipients == null) return;
+            foreach (var (giver, recipient) in recipients)
+            {
+                if (giver == recipient || !plan.TryGetValue(giver, out var reward)
+                    || !plan.TryGetValue(recipient, out var destination))
+                    continue;
+
+                var kept = new Dictionary<int, int>();
+                foreach (var (item, count) in reward.Loot)
+                {
+                    int own = Math.Min(count, reward.Own.GetValueOrDefault(item));
+                    if (own > 0) kept[item] = own;
+                    if (count > own) destination.Loot[item] = destination.Loot.GetValueOrDefault(item) + count - own;
+                }
+                destination.Perfect.AddRange(reward.Perfect);
+                reward.Loot = kept;
+                reward.Perfect = new List<RandomLoot.Drop>();
             }
         }
 

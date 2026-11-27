@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -19,15 +18,12 @@ namespace Jondo.Unity.Mcp;
 /// </summary>
 /// <remarks>
 /// A client is started as the launcher starts one (LauncherService.ClientStartInfo), for the slot's
-/// test account: the launch comes from /api/test/launch, the mods from the source checkout. The
+/// test account: the launch comes from /api/test/launch, the mods from the running server's manifest. The
 /// pointer and the keyboard are the mod's own, so a client in the background plays without taking
 /// the computer's mouse, and several play at once.
 /// </remarks>
 public sealed class GameClients : IDisposable
 {
-    /// <summary>The mods the emulator ships, each in its own folder of the checkout.</summary>
-    private static readonly string[] ShippedMods = { "JondoFix", "Cazacabezas", "Heroes" };
-
     private readonly Emulator _emulator;
     private readonly ConcurrentDictionary<int, Running> _running = new();
 
@@ -54,10 +50,16 @@ public sealed class GameClients : IDisposable
             ?? throw new McpException("No Dofus client found. Set JONDO_CLIENT_EXECUTABLE to its Dofus.exe.");
         if (!Directory.Exists(Path.Combine(installation.Root, "MelonLoader")))
             throw new McpException($"The client at {installation.Root} has no MelonLoader: the mods, and the input port, would not load.");
-        string installed = InstallMods(installation.Root);
-
         var launch = Emulator.Object(await _emulator.TestAsync("launch", new JsonObject { ["language"] = language }, slot, cancellationToken));
         string token = (string?)launch["token"] ?? "";
+        // The test launch has authenticated the local developer server before accepting its manifest.
+        var server = new UriBuilder(Uri.UriSchemeHttp, IPAddress.Loopback.ToString(), Contract.Puerto).Uri;
+        string cache = Path.Combine(UserDirectories.Data, "Jondo", "client-mods");
+        var modPlan = ClientModDeployment.Prepare(server, _emulator.Source, cache, "",
+            hasMelonLoader: true, requiresRedirectMod: true, approve: (_, _, _) => true);
+        string installed = modPlan.UsesManifest
+            ? "Using the server's client mod manifest."
+            : InstallMods(installation.Root);
         string hash = (string?)launch["hash"] ?? "";
         int instance = (int?)launch["instance"] ?? 0;
         int role = (int?)launch["role"] ?? 0;
@@ -75,6 +77,7 @@ public sealed class GameClients : IDisposable
         start.Environment["JONDO_ACCOUNT_ROLE"] = role.ToString(CultureInfo.InvariantCulture);
         start.Environment["JONDO_CONTROL_TOKEN"] = token;
         start.Environment["JONDO_PLAYER_TOKEN"] = token;
+        ClientModDeployment.Activate(installation.Root, _emulator.Source, modPlan, start);
         foreach (string argument in new[]
                  {
                      "-force-d3d11", "-screen-fullscreen", "0",
@@ -116,45 +119,10 @@ public sealed class GameClients : IDisposable
     /// <summary>The emulator's mods into the client's Mods, each when it differs, as the launcher does.</summary>
     private string InstallMods(string clientRoot)
     {
-        string mods = Path.Combine(clientRoot, "Mods");
-        var said = new List<string>();
-        foreach (string mod in ShippedMods)
-        {
-            string shipped = Path.Combine(_emulator.Source, mod, mod + ".dll");
-            if (!File.Exists(shipped)) continue;
-            string installed = Path.Combine(mods, mod + ".dll");
-            string aside = installed + ".old";
-            try
-            {
-                try { if (File.Exists(aside)) File.Delete(aside); } catch (IOException) { } catch (UnauthorizedAccessException) { }
-                if (File.Exists(installed) && SameContent(installed, shipped)) continue;
-                Directory.CreateDirectory(mods);
-                try
-                {
-                    File.Copy(shipped, installed, overwrite: true);
-                }
-                catch (IOException) when (File.Exists(installed) && !File.Exists(aside))
-                {
-                    // A client open holds it: a loaded file can be renamed, not overwritten.
-                    File.Move(installed, aside);
-                    File.Copy(shipped, installed, overwrite: true);
-                }
-                said.Add(mod);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                said.Add($"{mod} NOT updated ({ex.Message})");
-            }
-        }
-        return said.Count == 0 ? "Mods already up to date." : "Mods updated: " + string.Join(", ", said) + ".";
-    }
-
-    private static bool SameContent(string a, string b)
-    {
-        if (new FileInfo(a).Length != new FileInfo(b).Length) return false;
-        using var streamA = File.OpenRead(a);
-        using var streamB = File.OpenRead(b);
-        return SHA256.HashData(streamA).AsSpan().SequenceEqual(SHA256.HashData(streamB));
+        var updates = BundledClientMods.Install(_emulator.Source, clientRoot);
+        return updates.Count == 0 ? "Mods already up to date." : "Mods updated: " +
+            string.Join(", ", updates.Select(update => update.Error == null
+                ? update.Name : $"{update.Name} failed ({update.Error})")) + ".";
     }
 
     private static int FreePort()
@@ -271,8 +239,7 @@ public sealed class GameClients : IDisposable
             {
                 if (string.Equals(inWorld, character, StringComparison.OrdinalIgnoreCase))
                     return string.Join('\n', said.Append($"{character} is in the world.").Where(s => s.Length > 0));
-                throw new McpException($"The slot's client is in the world as {inWorld}, not {character}: hero_switch to him, " +
-                                       "or client_close and client_enter_world again.");
+                throw new McpException($"The slot's client is in the world as {inWorld}, not {character}. Use client_close and client_enter_world again.");
             }
 
             List<Shown> shown;

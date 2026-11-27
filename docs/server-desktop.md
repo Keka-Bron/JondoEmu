@@ -74,7 +74,7 @@ carries the same three for Windows.
 
 ## The window
 
-The window has four pages, reached from the sidebar or with Ctrl+1 to Ctrl+4. The top bar
+The window has five pages, reached from the sidebar or with Ctrl+1 to Ctrl+5. The top bar
 shows whether the world is online, how long it has run and how many players are in it.
 
 - **Console**: the world, network, machine and loaded-data counters, and the log with a
@@ -91,6 +91,8 @@ shows whether the world is online, how long it has run and how many players are 
   monsters are listed in `content/world/event_monsters.json` (Al Howin Gobballs and Tofus
   with pumpkin masks, the Kwismas Minotoball and Dragoturkeys in Frigost).
 - **Settings**: the settings that apply at the next start, available once the world is up.
+- **Mods** lists installed mods with activation switches, load-order arrows, and a
+  Settings button for mods with editable options.
 
 ## Settings and restart
 
@@ -104,6 +106,61 @@ Spanish, English and French are supported. The window language is saved immediat
 and does not require a restart. Clear only clears the displayed log, preserving disk
 logs and the read cursor. The log retains up to 4,000 rendered rows and virtualizes
 offscreen rows. Right-clicking a packet row opens the existing name-binding picker.
+
+### Client mods
+
+Place standalone client mod DLLs in the `mods/` directory at the emulator root.
+On **Mods**, use the **Active** switch to select a DLL and the arrows to change its
+position among active client mods. Reopen **Mods** with no unsaved changes to discover
+new files. **Save and restart** publishes the order. Missing DLLs are marked in the
+table and skipped when serving the list, so a DLL can be restored without losing its place.
+
+```json
+{
+  "ClientMods": ["JondoFix.dll"],
+  "ServerMods": ["Example.Audit.dll", "example.greeting"],
+  "example.greeting": {
+    "Enabled": true
+  }
+}
+```
+
+Keep your other settings when editing this file. An empty `ClientMods` array serves
+zero standalone DLLs. Active packages contribute their declared client DLLs in
+server load order. Saving from **Mods** clears separate `ClientMods` entries for
+DLLs declared by installed packages. See the [server mod contract](server-mod-contract.md) for ordering
+and conflicts. The server supports up to 128 available DLLs of up to 128 MiB each.
+Clients loading a manifest need MelonLoader 0.7.3 or newer.
+
+When the launcher asks a player to approve a manifest, share its SHA-256 digest
+through a channel the player already trusts. The digest is computed over the
+raw response body from `GET /api/mods` on the server's control port (8888).
+
+#### Joining from the launcher
+
+Select the server and press **Play**. If the launcher asks for approval, compare
+the displayed fingerprint with the one supplied by the server operator. Choose
+**Trust and play** to approve that manifest for the server, or **Cancel** to stop
+the launch. A changed approved manifest requires approval again.
+
+Keep `JondoFix.dll` available and in the configured order to support the Windows
+client, including the Windows client running under Wine. It redirects the client
+to the emulator. The launcher sets aside managed legacy copies from the client's MelonLoader
+`Mods/` directory. To retire a loose DLL from an older installation, move it
+out of the server's `mods/` folder and the client's MelonLoader `Mods/` folder.
+
+### Server mods
+
+Place standalone server DLLs in `mods/` at the emulator root. Extract a
+`*-server-mod.zip` into the same folder so its package directory contains
+`manifest.json`. In **Mods**, use **Active** to enable a server mod and the arrows
+to set its load order. **Settings** opens the package's editable options. Apply
+the dialog edits, then save or save and restart from the **Mods** page. For a headless
+server, edit `ServerMods` in `config/server_settings.json` using DLL filenames and
+package IDs in the order you want.
+
+See the [server mod contract](server-mod-contract.md) for the package layout and
+startup behavior and [Writing server mods](writing-server-mods.md) for the mod API.
 
 ## Verification
 

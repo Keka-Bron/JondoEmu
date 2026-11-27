@@ -124,10 +124,10 @@
         <item type="preparecommand" label="Terminer une quête..." command="quest finish " help="quest finish &lt;id&gt; [joueur]"/>
         <item type="preparecommand" label="Oublier une quête..." command="quest forget " help="quest forget &lt;id&gt; [joueur] : pour la rejouer"/>
       </item>
-      <item type="menu" label="Héros (administrateur)">
-        <item type="sendcommand" label="Un héros Iop" command="heros 8"/>
-        <item type="sendcommand" label="Deux héros : Féca et Eniripsa" command="heros 1 7"/>
-        <item type="preparecommand" label="Classes..." command="heros " help="heros &lt;classe&gt; [classe...]"/>
+      <item type="menu" label="Contrôle des alliés (administrateur)">
+        <item type="sendcommand" label="Un allié Iop" command="allycontrol 8"/>
+        <item type="sendcommand" label="Deux alliés : Féca et Eniripsa" command="allycontrol 1 7"/>
+        <item type="preparecommand" label="Classes..." command="allycontrol " help="allycontrol &lt;classe&gt; [classe...]"/>
       </item>
     </item>
 

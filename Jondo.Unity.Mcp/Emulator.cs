@@ -19,8 +19,8 @@ namespace Jondo.Unity.Mcp;
 /// Two folders, which are the same one unless said otherwise:
 ///   * the data root (<see cref="Paths.Root"/>, JONDO_EMULATOR_ROOT): the databases, the content,
 ///     the logs -- what a server reads;
-///   * the source (JONDO_MCP_SOURCE): the checkout the server is built from and whose mods the client
-///     is given, so that a branch in a worktree is tried against the data of the main one.
+///   * the source (JONDO_MCP_SOURCE): the checkout used for the server build and legacy bundled client mods.
+///     A worktree can run against the main checkout's data.
 ///
 /// The test routes only exist on a server started with JONDO_TEST_KEY, and every call carries it.
 /// The key is JONDO_TEST_KEY's when the tools are given one -- a server started by hand with the same
@@ -30,11 +30,11 @@ public sealed class Emulator : IDisposable
 {
     private const int MostOutputLines = 3000;
 
-    private readonly HttpClient _http = new() { BaseAddress = new Uri($"http://127.0.0.1:{Contract.Puerto}{Contract.Prefijo}"), Timeout = TimeSpan.FromMinutes(4) };
+    private readonly HttpClient _http = new(new HttpClientHandler { AllowAutoRedirect = false }) { BaseAddress = new Uri($"http://127.0.0.1:{Contract.Puerto}{Contract.Prefijo}"), Timeout = TimeSpan.FromMinutes(4) };
     private readonly ConcurrentQueue<string> _output = new();
     private readonly object _gate = new();
     private Process? _server;
-    private string? _adminToken;
+    private readonly ConcurrentDictionary<int, string> _playerTokens = new();
 
     public Emulator()
     {
@@ -135,24 +135,30 @@ public sealed class Emulator : IDisposable
         }
     }
 
-    /// <summary>
-    /// An administrator's route, as the test harness's account: its launcher token is asked for
-    /// once and asked for again when the server no longer knows it.
-    /// </summary>
-    public async Task<string> AdminAsync(string route, JsonObject? body = null, CancellationToken cancellationToken = default)
+    /// <summary>Sends a control request with the test slot's launcher token.</summary>
+    public async Task<string> PlayerAsync(string route, JsonObject? body = null, int slot = 0,
+        CancellationToken cancellationToken = default)
     {
+        string[] segments = route.Trim('/').Split('/');
+        if (segments.Any(segment => segment.Length == 0 || segment is "." or ".."))
+            throw new McpException("Provide the route below /api/, with no empty or relative path components.");
+        string path = string.Join('/', segments.Select(Uri.EscapeDataString));
+        var sent = body?.DeepClone().AsObject() ?? new JsonObject();
         for (int attempt = 0; ; attempt++)
         {
-            string token = _adminToken ??= Field(await TestAsync("token", cancellationToken: cancellationToken), "token");
-            var sent = body?.DeepClone().AsObject() ?? new JsonObject();
+            if (!_playerTokens.TryGetValue(slot, out string? token))
+            {
+                token = Field(await TestAsync("token", slot: slot, cancellationToken: cancellationToken), "token");
+                _playerTokens[slot] = token;
+            }
             sent["token"] = token;
             try
             {
-                return await CallAsync(route, sent, cancellationToken);
+                return await CallAsync(path, sent, cancellationToken);
             }
-            catch (McpException ex) when (attempt == 0 && ex.Message.StartsWith("HTTP 401"))
+            catch (McpException ex) when (attempt == 0 && ex.Message.StartsWith("HTTP 401", StringComparison.Ordinal))
             {
-                _adminToken = null;
+                _playerTokens.TryRemove(new KeyValuePair<int, string>(slot, token));
             }
         }
     }
@@ -263,7 +269,7 @@ public sealed class Emulator : IDisposable
         bool asked = false;
         if (await HasTestRoutesAsync(cancellationToken))
         {
-            await AdminAsync("apagar", cancellationToken: cancellationToken);
+            await PlayerAsync("apagar", cancellationToken: cancellationToken);
             asked = true;
         }
         else if (!force)
@@ -303,7 +309,7 @@ public sealed class Emulator : IDisposable
             server = _server;
             _server = null;
         }
-        _adminToken = null;
+        _playerTokens.Clear();
         if (server == null) return;
         try { if (!server.HasExited) server.Kill(entireProcessTree: true); }
         catch (InvalidOperationException) { }

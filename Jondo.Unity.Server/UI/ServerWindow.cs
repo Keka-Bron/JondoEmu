@@ -43,12 +43,12 @@ internal sealed record ServerWindowServices(
 }
 
 /// <summary>
-/// The server's window: a sidebar with the pages (console, players, events, settings), the
+/// The server's window: a sidebar with the pages (console, players, events, settings, mods), the
 /// language and the stop button, and a top bar with the server's state, uptime and players.
 /// </summary>
 internal sealed class ServerWindow : Window
 {
-    internal enum Page { Console, Players, Events, Settings }
+    internal enum Page { Console, Players, Events, Settings, Mods }
 
     private static readonly (Page Page, string Icon, string Key, string Subtitle)[] Navigation =
     {
@@ -56,6 +56,7 @@ internal sealed class ServerWindow : Window
         (Page.Players, "users", "NavPlayers", "PlayersSubtitle"),
         (Page.Events, "calendar", "NavEvents", "EventsSubtitle"),
         (Page.Settings, "sliders", "NavSettings", "Subtitle"),
+        (Page.Mods, "box", "NavMods", "ModsSubtitle"),
     };
 
     private readonly ServerLog _log;
@@ -64,6 +65,7 @@ internal sealed class ServerWindow : Window
     internal readonly PlayersPage Players;
     internal readonly EventsPage Events;
     internal readonly SettingsPage Settings;
+    internal readonly ModsPage Mods;
     private readonly Dictionary<Page, (Control View, Button Nav, TextBlock Label)> _pages = new();
     private readonly Dictionary<Language, Button> _languages = new();
     private readonly Button _stop;
@@ -114,6 +116,7 @@ internal sealed class ServerWindow : Window
         Players = new PlayersPage(_language, services.Players, services.Kick, services.Announce) { Name = "PlayersPage" };
         Events = new EventsPage(_language, services.Events, services.ApplyEvents, services.Clock) { Name = "EventsPage" };
         Settings = new SettingsPage(_language, services.SavedSettings, services.RunningSettings) { Name = "SettingsPage" };
+        Mods = new ModsPage(_language, services.SavedSettings, services.RunningSettings) { Name = "ModsPage" };
 
         var shell = new Grid { ColumnDefinitions = new ColumnDefinitions("236,*") };
         _stop = ServerTheme.Button("", async () => await Stop(), LauncherPalette.Red);
@@ -125,7 +128,10 @@ internal sealed class ServerWindow : Window
         content.Children.Add(BuildTopBar());
         var host = new Grid { Margin = new Thickness(0, 18, 0, 0) };
         Grid.SetRow(host, 1);
-        foreach (var (page, view) in new (Page, Control)[] { (Page.Console, Console), (Page.Players, Players), (Page.Events, Events), (Page.Settings, Settings) })
+        foreach (var (page, view) in new (Page, Control)[]
+        {
+            (Page.Console, Console), (Page.Players, Players), (Page.Events, Events), (Page.Settings, Settings), (Page.Mods, Mods),
+        })
         {
             view.IsVisible = page == Current;
             host.Children.Add(view);
@@ -149,7 +155,7 @@ internal sealed class ServerWindow : Window
         };
         KeyDown += (_, e) =>
         {
-            // Ctrl+1..4 go to the pages, as the sidebar's order.
+            // Ctrl+1..5 follow the sidebar order.
             if (!e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Control)) return;
             int index = e.Key - Avalonia.Input.Key.D1;
             if (index >= 0 && index < Navigation.Length) { Show(Navigation[index].Page); e.Handled = true; }
@@ -281,6 +287,11 @@ internal sealed class ServerWindow : Window
             if (!_services.IsReady()) return;
             Settings.EnsureBuilt();
         }
+        if (page == Page.Mods)
+        {
+            if (!_services.IsReady()) return;
+            Mods.EnsureBuilt();
+        }
         Current = page;
         foreach (var (key, (view, _, _)) in _pages) view.IsVisible = key == page;
         Paint();
@@ -348,6 +359,7 @@ internal sealed class ServerWindow : Window
         _playerCount.Text = string.Format(T("PlayersCount"), players);
         bool settings = ready && !_isShuttingDown();
         _pages[Page.Settings].Nav.IsEnabled = settings;
+        _pages[Page.Mods].Nav.IsEnabled = settings;
     }
 
     internal void ScrollLogToLatest() => Console.ScrollToLatest();

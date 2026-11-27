@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 
 namespace Jondo.Unity.Server.Handlers
@@ -127,7 +128,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             string name = DatabaseManager.DeleteCharacter(characterId, accountId);
-            if (name.Length > 0) Managers.HeadHunts.Erase(characterId);
+            if (name.Length > 0) PlayerPolicies.CharacterDeleted(characterId);
             if (name.Length == 0)
             {
                 Console.WriteLine($"[Characters] Character {characterId} was not deleted.");

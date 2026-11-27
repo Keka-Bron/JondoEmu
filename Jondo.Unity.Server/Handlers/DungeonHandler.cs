@@ -5,7 +5,9 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -148,7 +150,7 @@ namespace Jondo.Unity.Server.Handlers
             if (dungeon == null || dungeon.FirstRoom == 0) return false;
             // Before the key is spent.
             if (await Managers.Jail.KeepsInAsync(stream)) return false;
-            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Dungeon)) return false;
+            if (await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Dungeon)) return false;
 
             var state = SessionContext.State;
 
@@ -199,49 +201,26 @@ namespace Jondo.Unity.Server.Handlers
                 return false;
             }
 
-            // His heroes follow him in: a way in for each of them, or nobody goes (DungeonHeroes.cs).
-            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now, state.OpenDialogueNpcId) is not { } heroWays) return false;
+            var admission = await CommitAdmissionAsync(stream, dungeon, dungeon.FirstRoom, uid,
+                method == EntryMethod.Keyring, guardian: state.OpenDialogueNpcId);
+            if (admission == null) return false;
 
             if (uid != 0)
             {
-                // Spend one key and announce the remaining stack, or the removal of its last unit.
-                if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid, weigh: false))
-                {
-                    await TellAsync(stream, CommandTexts.Get("dungeon.missing_item"));
-                    return false;
-                }
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent.");
-
-                // The key went into the guardian's hand: a quest that asks for it to be given to
-                // him has had it (TakesAtTheDoor).
-                await Managers.Quests.OnKeyHandedOverAsync(SessionContext.Current, state.OpenDialogueNpcId, item);
+                await Quests.OnKeyHandedOverAsync(SessionContext.Current, state.OpenDialogueNpcId, item);
             }
 
             if (method == EntryMethod.Keyring)
-            {
-                // One free entry per dungeon per week, and the week turns over on Tuesday. See
-                // DungeonKeyring: this is the client's own help text, not a house rule.
-                DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: goes in with the keyring. The free entry " +
                                   $"comes back on {DungeonKeyring.NextReset(DateTime.Now):dd/MM}.");
-            }
 
-            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now))
-            {
-                await TellAsync(stream, CommandTexts.Get("dungeon.missing_item"));
-                return false;
-            }
-
-            // A hero who went in on a key handed one to the guardian too: Tassa's «the laboratory's
-            // key» is his as it is his master's -- whoever's bag it came out of, as a key is the
-            // group's (DungeonHeroes). Not one who went in by his keyring, as for the master.
-            var keyed = heroWays.Where(w => w.PaidBy != 0).Select(w => w.Hero.CharacterId).ToHashSet();
             int keyItem = item != 0 ? item : dungeon.Required.Select(r => r.Item).FirstOrDefault();
-            if (keyed.Count > 0 && keyItem != 0)
+            if (admission.KeyedFollowers.Count > 0 && keyItem != 0)
             {
                 int guardian = state.OpenDialogueNpcId;
-                await Heroes.ShareQuestActionAsync(hero => Managers.Quests.OnKeyHandedOverAsync(hero, guardian, keyItem),
-                    participates: hero => keyed.Contains(hero.CharacterId));
+                await QuestSharing.ShareQuestActionAsync(companion => Managers.Quests.OnKeyHandedOverAsync(companion, guardian, keyItem),
+                    participates: companion => admission.KeyedFollowers.Contains(companion.CharacterId));
             }
 
             // The guardian's window is closed before anybody is moved. The client does not close it
@@ -254,18 +233,17 @@ namespace Jondo.Unity.Server.Handlers
             Console.WriteLine($"[Dungeon] Enters {dungeon.Name}, room 1 of {dungeon.Rooms.Count}.");
             // A new run from the door: the rooms around a lobby are all to be won again.
             DungeonProgress.SetHubWin(state.CharacterId, dungeon, 0);
-            foreach (var way in heroWays) DungeonProgress.SetHubWin(way.Hero.CharacterId, dungeon, 0);
-            return await EnterNewRunAsync(stream, dungeon, dungeon.FirstRoom, heroWays);
+            foreach (long follower in admission.FollowerIds) DungeonProgress.SetHubWin(follower, dungeon, 0);
+            return await EnterNewRunAsync(dungeon, dungeon.FirstRoom, admission);
         }
 
-        private static async Task<bool> EnterNewRunAsync(NetworkStream stream, DungeonManager.Dungeon dungeon,
-                                                         long room, List<HeroWay> heroWays)
+        private static async Task<bool> EnterNewRunAsync(DungeonManager.Dungeon dungeon, long room, Admission admission)
         {
-            if (await TeleportHandler.ToMapAsync(stream, room) < 0) return false;
+            if (await admission.MoveAsync(room) < 0) return false;
 
             DungeonProgress.SetRoom(SessionContext.State.CharacterId, dungeon, room);
-            foreach (var way in heroWays)
-                DungeonProgress.SetRoom(way.Hero.CharacterId, dungeon, room);
+            foreach (long follower in admission.FollowerIds)
+                DungeonProgress.SetRoom(follower, dungeon, room);
             return true;
         }
 
@@ -294,7 +272,7 @@ namespace Jondo.Unity.Server.Handlers
 
             long room = ResumeRoom(dungeon, state.CharacterId);
             if (room == 0) return true;
-            if (await Jail.KeepsInAsync(stream) || await HeadHunts.HoldsAsync(stream, HeadHunts.Hold.Dungeon))
+            if (await Jail.KeepsInAsync(stream) || await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Dungeon))
                 return true;
             if (dungeon.MinLevel > state.CharacterLevel)
             {
@@ -302,15 +280,18 @@ namespace Jondo.Unity.Server.Handlers
                 return true;
             }
 
-            // TeleportHandler moves following heroes with the master, so each needs this checkpoint.
-            if (Following(state.CharacterId).Any(hero => DungeonProgress.SavedRoom(hero.CharacterId, dungeon) != room))
+            // TeleportHandler moves the admitted companions with the controller, so each needs this checkpoint.
+            var gameplay = ServerModHooks.Get<IDungeonPartyPolicy>();
+            var followers = gameplay?.DungeonFollowers(SessionContext.Current);
+            if (followers != null && !gameplay!.CanResumeDungeon(followers, room,
+                characterId => DungeonProgress.SavedRoom(characterId, dungeon)))
             {
-                await TellAsync(stream, CommandTexts.Get("dungeon.heroes_resume_room"));
+                await TellAsync(stream, CommandTexts.Get("dungeon.party_resume_room"));
                 return true;
             }
 
             await NpcHandler.CloseAsync(stream);
-            await TeleportHandler.ToMapAsync(stream, room);
+            await TeleportHandler.ToMapAsync(SessionContext.Current, room, TeleportHandler.MapCentre, followers);
             return true;
         }
 
@@ -360,24 +341,21 @@ namespace Jondo.Unity.Server.Handlers
                 await TellAsync(stream, Refusal(dungeon, method, false, freeEntryLeft, DateTime.Now));
                 return false;
             }
-            if (await WaysForHeroesAsync(stream, dungeon, uid != 0, DateTime.Now) is not { } heroWays) return false;
-            if (uid != 0)
-            {
-                if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, uid)) return false;
-                Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent by the search.");
-            }
-            if (method == EntryMethod.Keyring) DungeonKeyring.SpendFreeEntry(state.CharacterId, dungeon.Id, DateTime.Now);
-            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now)) return false;
-
             long to = room != 0 && dungeon.Rooms.Contains(room) ? room : dungeon.FirstRoom;
+            var admission = await CommitAdmissionAsync(stream, dungeon, to, uid, method == EntryMethod.Keyring,
+                weigh: true, warnOnFailure: false);
+            if (admission == null) return false;
+            if (uid != 0)
+                Console.WriteLine($"[Dungeon] {dungeon.Name}: one unit of item {item} is spent by the search.");
+
             if (to == dungeon.FirstRoom)
             {
                 DungeonProgress.SetHubWin(state.CharacterId, dungeon, 0);
-                foreach (var way in heroWays) DungeonProgress.SetHubWin(way.Hero.CharacterId, dungeon, 0);
+                foreach (long follower in admission.FollowerIds) DungeonProgress.SetHubWin(follower, dungeon, 0);
             }
             Console.WriteLine($"[Dungeon] {state.CharacterName} enters {dungeon.Name} by the search, " +
                               $"room {dungeon.Rooms.IndexOf(to) + 1} of {dungeon.Rooms.Count}.");
-            return await EnterNewRunAsync(stream, dungeon, to, heroWays);
+            return await EnterNewRunAsync(dungeon, to, admission);
         }
 
         /// <summary>
@@ -385,7 +363,7 @@ namespace Jondo.Unity.Server.Handlers
         /// consommer un Multygely pour être téléporté dans le donjon» and «vous serez directement
         /// téléporté dans la salle 1 du donjon» (Dofus pour les noobs, «Gelaxième Dimension»). Into
         /// the first room on the item's own cell, the item spent there, and a new run started as the
-        /// guardian's door starts one: the heroes along on a key each, the lobby's and the colours'
+        /// guardian's door starts one: the companions along on a key each, the lobby's and the colours'
         /// wins forgotten. False, nothing spent, when he cannot go in.
         /// </summary>
         internal static async Task<bool> EnterByItemAsync(NetworkStream stream, DungeonManager.Dungeon dungeon,
@@ -393,23 +371,20 @@ namespace Jondo.Unity.Server.Handlers
         {
             var state = SessionContext.State;
             if (dungeon.FirstRoom == 0) return false;
-            if (await HeadHunts.HoldsAsync(stream, HeadHunts.Hold.Dungeon)) return false;
+            if (await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Dungeon)) return false;
             if (dungeon.MinLevel > 0 && state.CharacterLevel < dungeon.MinLevel)
             {
                 Console.WriteLine($"[Dungeon] {dungeon.Name}: needs level {dungeon.MinLevel} and has {state.CharacterLevel}.");
                 await WarnAsync(stream, NotHighEnough);
                 return false;
             }
-            if (await WaysForHeroesAsync(stream, dungeon, true, DateTime.Now) is not { } heroWays) return false;
+            var admission = await CommitAdmissionAsync(stream, dungeon, dungeon.FirstRoom, itemUid,
+                masterKeyring: false, weigh: true, itemCell: cell);
+            if (admission == null) return false;
+            if (admission.Followers is { Count: > 0 })
+                await admission.MoveAsync(dungeon.FirstRoom, cell);
 
-            // The capture's order for a teleport item: the map change first, the item spent after.
-            if (await TeleportHandler.ToMapAsync(stream, dungeon.FirstRoom, cell) < 0) return false;
-            if (!await ItemUseHandler.SpendOneAsync(SessionContext.Current, itemUid))
-                Console.WriteLine($"[Dungeon] {dungeon.Name}: the item that led in could not be spent.");
-            if (!await SpendForHeroesAsync(stream, dungeon, heroWays, DateTime.Now))
-                Console.WriteLine($"[Dungeon] {dungeon.Name}: a hero's key was gone by the time he went in.");
-
-            foreach (long who in heroWays.Select(w => w.Hero.CharacterId).Prepend(state.CharacterId))
+            foreach (long who in admission.FollowerIds.Prepend(state.CharacterId))
             {
                 DungeonProgress.SetHubWin(who, dungeon, 0);
                 DungeonProgress.SetRoom(who, dungeon, dungeon.FirstRoom);

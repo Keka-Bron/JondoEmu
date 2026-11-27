@@ -52,8 +52,7 @@ dishonour washed, 155 not this time. The sheet's honour block is
 
 ## The Cazacabezas
 
-`Managers/HeadHunts.cs` holds the rules, `Network/ControlApiHeadHunts.cs` answers the mod, and the mod
-(`Cazacabezas/`) only shows and asks.
+`Cazacabezas.Server/HeadHunts.cs` owns the rules, and `Cazacabezas.Server/CazacabezasMod.cs` handles the package's control routes. Install the [Cazacabezas server package](server-mod-migration.md#cazacabezas), list `cazacabezas` in `ServerMods`, and set its `Enabled` gameplay setting to true.
 
 **Taking an order.** From level 50, sworn, PvP on and no dishonour. The board lists the enemies within
 reach: the other city, PvP on, level 30 or more, from 20 levels below the hunter to 50 above, seen
@@ -104,8 +103,7 @@ own session, which the launcher passes as `JONDO_PLAYER_TOKEN` to every client:
 | `POST /api/headhunts/take` `{ target }` | `ok`, or why not: `off`, `neutral`, `pvp`, `level`, `dishonour`, `locked`, `busy`, `target`, `full` |
 | `POST /api/headhunts/abandon` | gives his order up |
 
-All four need the character in the world (`409 world` otherwise). The launcher copies the mod into
-the client's `Mods/` with JondoFix.
+All four need the character in the world (`409 world` otherwise). The launcher loads the client DLL declared by the active package.
 
 ## The JondoBots at war
 

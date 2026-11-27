@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.ServerMods;
 using Jondo.Unity.World.Fights;
 
 namespace Jondo.Unity.Server.Handlers
@@ -140,7 +142,7 @@ namespace Jondo.Unity.Server.Handlers
             // A Koliseo fight is a trip to an arena: none for a prisoner, nor in a conquest, nor
             // for a hunt's prey.
             if (await Managers.Jail.KeepsInAsync(stream)) return;
-            if (await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Koliseo)) return;
+            if (await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Koliseo)) return;
             if (await ConquestHandler.HoldsInAsync(stream, ConquestHandler.NoKoliseoInAWar)) return;
 
             int indice = IndiceDeModalidad(lsm, 1);
@@ -232,7 +234,7 @@ namespace Jondo.Unity.Server.Handlers
             }
 
             // Enrolled before the hunt opened: the match is declined for him.
-            if (acepta && await Managers.HeadHunts.HoldsAsync(stream, Managers.HeadHunts.Hold.Koliseo)) acepta = false;
+            if (acepta && await PlayerPolicies.BlocksActivityAsync(stream, PlayerActivity.Koliseo)) acepta = false;
 
             // The acknowledgement always goes, yes or no: it is the answer to HIS request.
             await Jondo.Protocol.NetworkMessage.WriteFrameAsync(stream,

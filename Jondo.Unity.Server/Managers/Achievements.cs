@@ -306,27 +306,27 @@ namespace Jondo.Unity.Server.Managers
         }
 
         /// <summary>
-        /// A hero at his master's side again (Network.HeroPresence): what his fights set aside and
+        /// A companion at his master's side again (Network.CompanionPresence): what his fights set aside and
         /// his level, looked at in his own session and announced on his master's client.
         /// </summary>
         /// <remarks>
         /// The list is the account's, and the master's log stands for it while the group lasts:
-        /// what it earned since the hero was connected is shown to him before he is looked at, and
+        /// what it earned since the companion was connected is shown to him before he is looked at, and
         /// what he earns is shown to the master after. Each earns and is paid for his own, the
         /// others' included (AchievementLog.Owner), as every character of an account may.
         ///
         /// Given the map he reached beside his master (<paramref name="mapId"/>), what arriving on
         /// it earns is his too: the zone he explored with him, the maps he has been on. Only the
-        /// master's session gets the map's information, and the heroes following him through a
+        /// master's session gets the map's information, and the companions following him through a
         /// zone were left out of its exploration achievements (Keka-Bron/JondoEmu#213).
         /// </remarks>
-        public static async Task ForHeroAsync(GameSession master, GameSession hero, long mapId = 0, int subAreaId = 0)
+        public static async Task ForCompanionAsync(GameSession master, GameSession companion, long mapId = 0, int subAreaId = 0)
         {
             var book = _book;
             var account = master.State.Achievements;
             if (book == null || master.Stream == null) return;
 
-            using (SessionContext.Push(hero))
+            using (SessionContext.Push(companion))
             {
                 var state = SessionContext.State;
                 var log = Log;
@@ -350,7 +350,7 @@ namespace Jondo.Unity.Server.Managers
                             log.Restore(id, account.WasClaimed(id), account.AchieverOf(id) is var by && by != 0 ? by : master.CharacterId);
 
                 var earned = log.CheckAll(candidates.Distinct());
-                await AchievementStateService.Live.AnnounceAsync(hero, master, earned);
+                await AchievementStateService.Live.AnnounceAsync(companion, master, earned);
 
                 if (account == null) return;
                 foreach (int id in earned)

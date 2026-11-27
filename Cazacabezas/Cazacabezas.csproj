@@ -28,12 +28,7 @@
     </Reference>
   </ItemGroup>
 
-  <!-- The mod is of no use in bin/: MelonLoader loads it from the client's Mods folder. It is
-       copied on its own when building, just as the server's .exe goes on its own to the root. It is skipped with
-       -p:SkipModDeploy=true, and if there is no client at hand nothing happens either. -->
-  <!-- And beside the project, where it is kept in the repository: the launcher installs that one
-       in every client's Mods (LauncherService.InstallMod), so whoever has a client with
-       MelonLoader gets the mod's changes with the emulator, not with a new client. -->
+  <!-- The server module stages this DLL with its package. -->
   <Target Name="GuardarMod" AfterTargets="Build">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" OverwriteReadOnlyFiles="true" />
   </Target>

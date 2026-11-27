@@ -159,12 +159,7 @@ internal sealed class PlayersPage : UserControl, IServerPage
         // A simulated player has no connection to close: the bots' own settings remove them.
         kick.IsEnabled = !player.Simulated;
         Grid.SetColumn(kick, 8); grid.Children.Add(kick);
-        return new Border
-        {
-            Child = grid, Padding = new Thickness(14, 7), CornerRadius = new CornerRadius(6),
-            Background = ServerTheme.Brush(LauncherPalette.SurfaceRaised), BorderBrush = ServerTheme.Brush(LauncherPalette.Hairline),
-            BorderThickness = new Thickness(1),
-        };
+        return ServerTheme.TableRow(grid);
     }
 
     internal async Task KickClicked(ServerControl.Player player)

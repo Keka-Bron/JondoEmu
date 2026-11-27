@@ -155,9 +155,19 @@ namespace Jondo.Unity.Server.Handlers
         public static Task<int> ToMapAsync(NetworkStream stream, long mapId, int targetCell = MapCentre)
             => ToMapAsync(SessionContext.Current, mapId, targetCell);
 
-        public static async Task<int> ToMapAsync(GameSession session, long mapId, int targetCell = MapCentre)
+        public static Task<int> ToMapAsync(GameSession session, long mapId, int targetCell = MapCentre)
+            => ToMapAsync(session, mapId, targetCell, admitted: null);
+
+        internal static async Task<int> ToMapAsync(GameSession session, long mapId, int targetCell,
+            IReadOnlyList<Jondo.Unity.ServerMods.ICompanion>? admitted)
         {
-            if (mapId <= 0) return -1;
+            if (!await CanTeleportAsync(session, mapId)) return -1;
+            return await MoveToMapAsync(session, mapId, targetCell, admitted);
+        }
+
+        internal static async Task<bool> CanTeleportAsync(GameSession session, long mapId)
+        {
+            if (mapId <= 0) return false;
 
             // A prisoner goes nowhere until his time is up: see Managers.Jail. Every road that
             // ends in a teleport ends here, so this is the one that cannot be forgotten.
@@ -165,7 +175,7 @@ namespace Jondo.Unity.Server.Handlers
             if (refusal != null)
             {
                 await session.SendAsync(new Game.TextInformationEvent(Game.TextInformationType.TextInformationMessage, InfoMessages.FreeText, [refusal]));
-                return -1;
+                return false;
             }
 
             // A map that is not in the world data is a map the client cannot load either: it gets
@@ -174,9 +184,14 @@ namespace Jondo.Unity.Server.Handlers
             if (MapManager.GetMapInfo(mapId) == null)
             {
                 Console.WriteLine($"[Teleport] Map {mapId} is not in the world data. Not going.");
-                return -1;
+                return false;
             }
+            return true;
+        }
 
+        internal static async Task<int> MoveToMapAsync(GameSession session, long mapId, int targetCell,
+            IReadOnlyList<Jondo.Unity.ServerMods.ICompanion>? admitted = null)
+        {
             var previousMap = session.Map;
             session.State.MapId = mapId;
             session.State.CellId = MapManager.GetNearestWalkableCell(mapId, targetCell);
@@ -184,7 +199,7 @@ namespace Jondo.Unity.Server.Handlers
 
             // The other two maps involved: the one he leaves and the one he enters. Without this,
             // teleporting left a ghost where he was and he arrived invisible where he went.
-            await SessionRegistry.AnunciarMudanzaAsync(session, previousMap);
+            await SessionRegistry.AnunciarMudanzaAsync(session, previousMap, admitted: admitted);
 
             // The traveler's orientation resets to zero; peer removal belongs to the map transition above.
             await session.SendAsync(new Game.MapChangeOrientationEvent(session.CharacterId, Game.Direction.East));

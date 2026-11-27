@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Jondo.Unity.Launcher.UI
 {
@@ -27,6 +28,7 @@ namespace Jondo.Unity.Launcher.UI
         private const string ClaveWeb = "web";
         private const string ClaveCliente = "cliente";
         private const string ClaveCuentas = "cuentas";
+        private static readonly object WriteLock = new();
 
         internal sealed class SavedAccount
         {
@@ -76,19 +78,28 @@ namespace Jondo.Unity.Launcher.UI
 
         private static void Escribir(string clave, string valor)
         {
-            try
+            lock (WriteLock)
             {
-                var valores = Leer();
-                valores[clave] = valor;
+                try
+                {
+                    var valores = Leer();
+                    valores[clave] = valor;
 
-                string? carpeta = System.IO.Path.GetDirectoryName(Path);
-                if (!string.IsNullOrEmpty(carpeta) && !Directory.Exists(carpeta)) Directory.CreateDirectory(carpeta);
+                    string? carpeta = System.IO.Path.GetDirectoryName(Path);
+                    if (!string.IsNullOrEmpty(carpeta) && !Directory.Exists(carpeta)) Directory.CreateDirectory(carpeta);
 
-                var lineas = new List<string>();
-                foreach (var par in valores) lineas.Add(par.Key + "=" + par.Value);
-                File.WriteAllLines(Path, lineas);
+                    var lineas = new List<string>();
+                    foreach (var par in valores) lineas.Add(par.Key + "=" + par.Value);
+                    string pending = Path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                    try
+                    {
+                        File.WriteAllLines(pending, lineas);
+                        File.Move(pending, Path, overwrite: true);
+                    }
+                    finally { File.Delete(pending); }
+                }
+                catch { }
             }
-            catch { }
         }
 
         // ─── Language ───────────────────────────────────────────────────────────
@@ -155,6 +166,15 @@ namespace Jondo.Unity.Launcher.UI
             }
             set => Escribir(ClaveServidor, (value ?? "").Trim());
         }
+
+        public static string TrustedModManifest(string host)
+            => Leer().GetValueOrDefault(ModTrustKey(host), "");
+
+        public static void TrustModManifest(string host, string fingerprint)
+            => Escribir(ModTrustKey(host), fingerprint);
+
+        private static string ModTrustKey(string host)
+            => "modTrust." + Convert.ToHexString(Encoding.UTF8.GetBytes(host.Trim().ToLowerInvariant()));
 
         /// <summary>
         /// The texts in the language the launcher has set.

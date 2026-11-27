@@ -117,7 +117,7 @@ character in a fight is refused. The staff is told `Done on Name: ...`.
 | `spawn npc <id>` / `spawn monster <id>[:grade] ...` | game master | On one's own cell, up to eight monsters (`MapAdmin`, as the F10 window) |
 | `remove npc\|group <id>` | game master | Takes one off the map; ids from `mapinfo` (they are negative) |
 | `gift <item> [qty] [Name]` | game master | A gift in the shop's gifts window of the account |
-| `item`, `itemset`, `receta`, `relative`, `heros` | administrator | As ever, `item`, `itemset` and `receta` with a target |
+| `item`, `itemset`, `receta`, `relative`, `allycontrol` | administrator | As ever, `item`, `itemset` and `receta` with a target |
 | `announce <text>` | **administrator** | A notice for everybody connected, in each one's language |
 | `save` | administrator | Every connected character written to the database |
 | `reload` | administrator | The content read again (`ContentReload`, shared with the harness's reload route) |
@@ -131,7 +131,7 @@ The dangerous ones -- `ban`, `shutdown` -- are administrator's, and the menu put
 
 The tree is `JondoFix/Admin/menuadmin.fr.xml` itself (the English and Spanish ones are its translations); its top level is `Jondo - Admin`:
 Modération (movement, information, prison, mute, warn, kick, ban), Personnage (kamas, level,
-characteristics, life and energy, size, jobs, items, quests, heroes), Monde (teleport, monsters and
+characteristics, life and energy, size, jobs, items, quests, allied fighter control), Monde (teleport, monsters and
 NPCs, quests for testing), Informations, Serveur (announcements, save, reload, stop) and "Recharger ce
 menu". Commands that take a free value are `preparecommand`s: the console opens with the beginning
 written, and the value (and a name, to act on another character) is typed after it.

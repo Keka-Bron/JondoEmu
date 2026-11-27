@@ -9,7 +9,7 @@ namespace Jondo.Unity.Mcp;
 /// dotnet test on a checkout, as by hand but without what went wrong by hand: the checkout as
 /// JONDO_EMULATOR_ROOT (its content is what is tested), its bases/ filled with copies of the data
 /// root's databases when it has none (a worktree's bases/ is not in git: an empty world.db made by
-/// the first test failed every hero test), and the build where the tests look for the repository's
+/// a failed fixture affected every related test), and the build where the tests look for the repository's
 /// files (with --artifacts-path in %TEMP%, AdminMenuTests did not find JondoFix/Admin/*.xml).
 /// </summary>
 internal static class TestRunner

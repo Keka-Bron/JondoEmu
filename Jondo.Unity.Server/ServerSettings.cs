@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Jondo.Unity.Launcher;
 
 namespace Jondo.Unity.Server
@@ -99,37 +100,19 @@ namespace Jondo.Unity.Server
         /// <summary>The most simulated players in the world at once; how many are in varies under it.</summary>
         public int SimulatedPlayersMax { get; set; } = 20;
 
-        /// <summary>
-        /// The Cazacabezas, the head hunters (<see cref="Managers.HeadHunts"/>): orders on the other
-        /// city's players, hunts while they are in the world, and chapeuvepés for their heads.
-        /// </summary>
-        public bool HeadHunters { get; set; }
+        /// <summary>Client mods to serve, in their configured load order.</summary>
+        public string[] ClientMods { get; set; } = ["JondoFix.dll"];
 
-        /// <summary>How long a hunt lasts once the prey is in the world, in minutes.</summary>
-        public int HeadHuntWindowMinutes { get; set; } = 15;
+        /// <summary>Server mod filenames and package manifest IDs in startup order.</summary>
+        public string[] ServerMods { get; set; } = [];
 
-        /// <summary>The prey's respite between two hunts, in minutes.</summary>
-        public int HeadHuntRestMinutes { get; set; } = 30;
-
-        /// <summary>
-        /// The hero mode (<see cref="Managers.Heroes"/>): the other characters of one's account
-        /// connected beside one's own, fighting at one's side and played by hand in their turns.
-        /// </summary>
-        public bool HeroMode { get; set; } = true;
-
-        /// <summary>
-        /// Whether taking a hero in hand loads the map again in the client (Network.HeroSwitch).
-        /// Off, only the map's actors are told anew: quicker. Set in the file.
-        /// </summary>
-        public bool HeroSwitchReloadsMap { get; set; }
-
-        /// <summary>How many heroes a character may have connected at once, himself not counted.</summary>
-        public int HeroesMax { get; set; } = 7;
+        /// <summary>Package settings and unrecognized fields preserved when the server saves this file.</summary>
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ModSettings { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// How many characters an account may have per category of server: the server list's
-        /// «Clásico (5/8)». Eight by default, a whole group of heroes with its master; the real
-        /// server's is five. Not in the settings window, full at its smallest size: set in the file.
+        /// «Clásico (5/8)». Eight by default; the official server's is five.
         /// </summary>
         public int CharacterSlots { get; set; } = 8;
 
@@ -169,7 +152,7 @@ namespace Jondo.Unity.Server
             {
                 string file = Paths.ServerSettingsFile;
                 if (!File.Exists(file)) return new ServerSettings();
-                return JsonSerializer.Deserialize<ServerSettings>(File.ReadAllText(file), Json) ?? new ServerSettings();
+                return Read(File.ReadAllText(file));
             }
             catch (Exception ex)
             {
@@ -178,16 +161,52 @@ namespace Jondo.Unity.Server
             }
         }
 
+        internal static ServerSettings Read(string json)
+        {
+            using var doc = JsonDocument.Parse(json);
+            var settings = doc.RootElement.Deserialize<ServerSettings>(Json) ?? new ServerSettings();
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return settings;
+
+            settings.ClientMods ??= new ServerSettings().ClientMods;
+            settings.ServerMods ??= [];
+            var extra = new Dictionary<string, JsonElement>(StringComparer.OrdinalIgnoreCase);
+            foreach (var (key, value) in settings.ModSettings)
+                extra[key] = value;
+            settings.ModSettings = extra;
+            return settings;
+        }
+
         /// <summary>Writes these settings to the file, for the next start.</summary>
         public void Save()
         {
             string file = Paths.ServerSettingsFile;
             Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-            File.WriteAllText(file, JsonSerializer.Serialize(this, Json));
+            string pending = file + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                File.WriteAllText(pending, JsonSerializer.Serialize(this, Json));
+                File.Move(pending, file, overwrite: true);
+            }
+            finally
+            {
+                File.Delete(pending);
+            }
         }
 
         /// <summary>A copy, for the window to edit.</summary>
-        public ServerSettings Copy() => (ServerSettings)MemberwiseClone();
+        public ServerSettings Copy()
+        {
+            var copy = (ServerSettings)MemberwiseClone();
+            copy.CopyModsFrom(this);
+            return copy;
+        }
+
+        internal void CopyModsFrom(ServerSettings source)
+        {
+            ClientMods = (string[])source.ClientMods.Clone();
+            ServerMods = (string[])source.ServerMods.Clone();
+            ModSettings = new(source.ModSettings, StringComparer.OrdinalIgnoreCase);
+        }
 
         /// <summary>Whether two settings differ in anything that needs a restart.</summary>
         public bool DiffersFrom(ServerSettings other)

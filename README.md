@@ -108,7 +108,7 @@ Then it goes through each step with an animated progress bar, the step's name, i
 4. Download and install the emulator
 5. Check or download the Dofus client
 6. Install MelonLoader 0.7.3 into the client
-7. Install Jondo's mods (JondoFix, Cazacabezas, Heroes) into the client's `Mods/`
+7. Install the bundled standalone client DLLs into the client's `Mods/`
 8. The client's first decompilation: MelonLoader's first start, the long one, run hidden
 9. Prepare the world database
 10. Start the server, when it runs on this computer
@@ -144,7 +144,7 @@ The live game is on 3.6.11.12 and Ankama's launcher only provides the current ve
 
 It is the stock Ankama client. A 3.6.10.11 or 3.6.10.10 install from before the patch also works: keep the official launcher from updating it.
 
-What the mods do: **JondoFix** sends the client's sockets, Named Pipes and DNS queries to the emulator (ports `8888`, `5555`, `15881`, `6337`), accepts its self-signed certificate and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window, the loot and achievements to the monster group tooltip, and the [admin window (F10)](#-admin-window-f10). **Cazacabezas** is the [head hunters' window](#-head-hunters) and **Heroes** the [hero mode](docs/heroes.md)'s window (Ctrl+Tab). The launcher puts the three into the client's `Mods/` each time it starts it, if the ones there differ.
+What the mods do: **JondoFix** sends the client's sockets, Named Pipes and DNS queries to the emulator (ports `8888`, `5555`, `15881`, `6337`), accepts its self-signed certificate and injects the environment variables the client expects. It also adds the JondoBots card to the Koliseo window, the loot and achievements to the monster group tooltip, and the [admin window (F10)](#-admin-window-f10). **Cazacabezas** is the [head hunters' window](#-head-hunters) and **Heroes** the [hero mode](docs/heroes.md)'s window (Ctrl+Tab). The launcher uses the server’s client manifest. To enable the optional Heroes or Cazacabezas gameplay, install and select the corresponding server package. See the [server package setup](docs/server-mod-migration.md).
 
 MelonLoader drops a **`version.dll`** next to `Dofus.exe`: renaming it to `version.dll.disabled` turns the mods off to play the official game, and renaming it back turns them on. It writes a log per run under **`MelonLoader/Logs/`**: if the client starts but never reaches the emulator, look there first.
 
@@ -187,8 +187,10 @@ bases/                        writable databases and backups
 docs/                         technical documentation
 launcher_assets/              launcher artwork and music
 JondoFix/                     the MelonLoader mod, source and compiled dll
-Cazacabezas/                  the head hunters' mod, source and compiled dll
-Heroes/                       the hero mode's mod, source and compiled dll
+Cazacabezas/                  the head hunters' client mod
+Cazacabezas.Server/           the optional head hunters' server package
+Heroes/                       the hero mode's client mod
+Heroes.Server/                the optional hero mode server package
 Jondo.Unity.*/                source code
 ```
 
@@ -254,7 +256,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
   | Simulate players | Jondobot-Xx bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
-  | Head hunters | The [Cazacabezas](#-head-hunters): hunt orders on players of the other city, with how long a hunt stays open and how long the prey rests between two |
+  | Server mods | Drop DLLs or unpack packages into `mods/`, set their load order, and restart. See [Server mods](docs/server-desktop.md#server-mods). |
 
   **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
   by challenges and the drop bonus) of dropping two to five items around its level: ordinary
@@ -962,8 +964,7 @@ Bonta against Brakmar, wherever the map allows it.
 
 ### 🪓 Head hunters
 
-The *Cazacabezas* mod: hunt a player of the other city for a bounty. **F7**, or the *HEAD HUNTERS*
-button beside the honour bar in the alignment tab, opens its window.
+With the [Cazacabezas server package](docs/server-mod-migration.md#cazacabezas) active, players can hunt a player of the other city for a bounty. **F7**, or the *HEAD HUNTERS* button beside the honour bar in the alignment tab, opens its window.
 
 - ✅ **Board**: the enemies within reach — winged, level 30 or more, from 20 levels below you to 50
   above — online first, each with its bounty and its hunters (three at most)
@@ -1201,8 +1202,11 @@ Shared:
 
 The protocol toolchain, which the emulator does not depend on:
 * **`Jondo.Unity.Reversing`**, **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
-* **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
-* **`Cazacabezas`** — the head hunters' client mod, source plus the compiled dll
+Client integration and optional packages:
+
+* **`JondoFix`** — core MelonLoader client integration.
+* **`Cazacabezas`** and **`Cazacabezas.Server`** — optional head hunters client and server code.
+* **`Heroes`** and **`Heroes.Server`** — optional hero mode client and server code.
 
 Documentation index in `docs/README.md`.
 

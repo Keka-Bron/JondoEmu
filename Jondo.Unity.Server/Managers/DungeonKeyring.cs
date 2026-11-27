@@ -116,5 +116,21 @@ namespace Jondo.Unity.Server.Managers
 
         /// <summary>When the free entry comes back, for telling the player.</summary>
         public static DateTime NextReset(DateTime now) => WeekOf(now).AddDays(7);
+
+        internal static bool TrySpendFreeEntry(SqliteConnection connection, SqliteTransaction transaction,
+            long characterId, int dungeonId, DateTime now)
+        {
+            if (characterId <= 0 || dungeonId <= 0) return true;
+
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText =
+                "INSERT INTO CharacterKeyring (CharacterId, DungeonId, Week) VALUES ($c, $d, $w) " +
+                "ON CONFLICT (CharacterId, DungeonId) DO UPDATE SET Week = $w WHERE Week <> $w;";
+            command.Parameters.AddWithValue("$c", characterId);
+            command.Parameters.AddWithValue("$d", dungeonId);
+            command.Parameters.AddWithValue("$w", WeekKey(now));
+            return command.ExecuteNonQuery() == 1;
+        }
     }
 }

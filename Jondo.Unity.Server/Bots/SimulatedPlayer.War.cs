@@ -1,12 +1,13 @@
+using Jondo.Unity.ServerMods;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
 
 namespace Jondo.Unity.Server.Bots
@@ -16,9 +17,9 @@ namespace Jondo.Unity.Server.Bots
     /// Brakmar the odd --; from level 20 they wear their wings and live on the war ground, the
     /// area next to the home one with the most maps that allow an aggression (the Cania
     /// Plains, beside Astrub), coming in on its front, the stretch nearest to the home area. There they look for
-    /// the enemy and aggress one of their size, and from the hunters' level they take an order
-    /// from the Cazacabezas board, through the mod's own door, and go after their prey while its
-    /// hunt is open.
+    /// the enemy and aggress one of their size, and from the eligible level they take an encounter
+    /// from an optional PvP encounter provider and follow the target while its
+    /// encounter is active.
     /// </summary>
     internal sealed partial class SimulatedPlayer
     {
@@ -126,13 +127,13 @@ namespace Jondo.Unity.Server.Bots
         /// An enemy on its map it may aggress («Agredir», the hph without its f2): of the other
         /// city with its wings out, not fighting, of its size -- three fifths of its level at the
         /// least, for a bot does not humiliate -- and not set upon by a bot in the last five minutes,
-        /// unless it is the prey it hunts.
+        /// unless it is their active encounter target.
         /// </summary>
-        private async Task<bool> AggressAsync(GameSession session, CancellationToken stop, long prey = 0)
+        private async Task<bool> AggressAsync(GameSession session, CancellationToken stop, long specificTarget = 0)
         {
             long map = session.State.MapId;
             if (!Alignments.MapAllowsAggression(map)) return false;
-            var enemies = Enemies(session, prey).Where(s => s.MapId == map).ToList();
+            var enemies = Enemies(session, specificTarget).Where(s => s.MapId == map).ToList();
             if (enemies.Count == 0) return false;
             var enemy = enemies[_dice.Next(enemies.Count)];
             LastAggressed[enemy.CharacterId] = DateTime.UtcNow;
@@ -146,17 +147,17 @@ namespace Jondo.Unity.Server.Bots
         }
 
         /// <summary>The characters in the world it may aggress, wherever they are (see <see cref="AggressAsync"/>).</summary>
-        private IEnumerable<GameSession> Enemies(GameSession session, long prey = 0)
+        private IEnumerable<GameSession> Enemies(GameSession session, long specificTarget = 0)
         {
             int level = session.State.CharacterLevel;
             var now = DateTime.UtcNow;
             return SessionRegistry.All()
                 .Where(s => s.IsInWorld && s.HasCharacter && s.CharacterId != _characterId
-                            && (prey == 0 || s.CharacterId == prey)
+                            && (specificTarget == 0 || s.CharacterId == specificTarget)
                             && !s.State.IsInFight && s.State.FightId == 0
                             && Alignments.MayAggress(_characterId, level, s.CharacterId, s.State.CharacterLevel)
                             && Math.Min(s.State.CharacterLevel, 200) * 5 >= Math.Min(level, 200) * 3
-                            && (prey != 0 || !LastAggressed.TryGetValue(s.CharacterId, out var last) || now - last > Respite));
+                            && (specificTarget != 0 || !LastAggressed.TryGetValue(s.CharacterId, out var last) || now - last > Respite));
         }
 
         /// <summary>
@@ -178,7 +179,7 @@ namespace Jondo.Unity.Server.Bots
             return true;
         }
 
-        /// <summary>Back to the front when a hunt took it away from the war ground: a step towards its nearest map.</summary>
+        /// <summary>Back to the front when an encounter took it away from the war ground: a step towards its nearest map.</summary>
         private async Task<bool> BackToTheFrontAsync(GameSession session, CancellationToken stop)
         {
             long here = session.State.MapId;
@@ -195,50 +196,41 @@ namespace Jondo.Unity.Server.Bots
             return await TakeTheWayAsync(session, nearer.OrderBy(w => Apart(w.To, map)).First(), stop);
         }
 
-        // ─── The Cazacabezas ─────────────────────────────────────────────────────────────────
+        // ─── Optional encounters ─────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// An order from the board, now and then, as a player takes one in the Cazacabezas window:
-        /// the same requests to the control API, with its session's token. Only a prey in the world
-        /// is chosen -- a bot is not in for days to wait for one.
+        /// Asks the encounter provider for a target already in the world.
         /// </summary>
-        private void TakeAnOrder(GameSession session)
+        private async Task FindEncounterAsync(GameSession session)
         {
-            if (!HeadHunts.On || HeadHunts.OrderOf(_characterId) != null
-                || HeadHunts.CannotHunt(_characterId, session.State.CharacterLevel) != null) return;
-            if (Ask("board") is not JsonElement board || !board.TryGetProperty("prey", out var list)) return;
-            var online = list.EnumerateArray()
-                .Where(p => p.GetProperty("online").GetBoolean() && p.GetProperty("hunters").GetInt32() < HeadHunts.HuntersPerTarget)
-                .Select(p => p.GetProperty("id").GetInt64())
-                .ToList();
-            if (online.Count == 0) return;
-            long target = online[_dice.Next(online.Count)];
-            if (Ask("take", ",\"target\":" + target) != null)
-                Console.WriteLine($"[Bots] {_name} takes a head hunter's order.");
-        }
-
-        /// <summary>One of the mod's requests, answered as the mod is answered; null unless it went well.</summary>
-        private JsonElement? Ask(string route, string more = "")
-        {
-            var answer = ControlApi.Responder("/api/headhunts/" + route, "POST", "{\"token\":\"" + _token + "\"" + more + "}");
-            if (answer is not { Codigo: 200 } ok) return null;
-            return JsonDocument.Parse(ok.Json).RootElement.Clone();
+            var encounter = ServerModHooks.Get<ISimulatedPlayerEncounters>();
+            if (encounter == null) return;
+            try
+            {
+                using var context = SessionContext.Push(session);
+                if (await encounter.TryFindEncounterAsync(_characterId, session.State.CharacterLevel,
+                    session.IsInWorld && session.HasCharacter, _dice.Next))
+                    Console.WriteLine($"[Bots] {_name} starts a PvP encounter.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Bots] {_name} could not start a PvP encounter: {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Its hunt while it is open: on the prey's map, «Agredir» on it; elsewhere the way out
-        /// nearest to where the prey is, as a player follows the hunt's sightings.
+        /// Its PvP encounter while it is open: on the target's map, «Agredir» on it; elsewhere the way out
+        /// nearest to where the prey is, as a player follows the target's location.
         /// </summary>
-        private async Task<bool> HuntAsync(GameSession session, CancellationToken stop)
+        private async Task<bool> FollowEncounterAsync(GameSession session, CancellationToken stop)
         {
-            var order = HeadHunts.OrderOf(_characterId);
-            if (order == null || !order.Open(HeadHunts.Clock())) return false;
-            var prey = SessionRegistry.FindByCharacter(order.Target);
-            if (prey == null || !prey.IsInWorld || prey.State.IsInFight) return false;
-            if (prey.MapId == session.State.MapId) return await AggressAsync(session, stop, prey.CharacterId);
+            if (ServerModHooks.Get<ISimulatedPlayerEncounters>()?.EncounterTarget(_characterId) is not { } target) return false;
+            var targetSession = SessionRegistry.FindByCharacter(target);
+            if (targetSession == null || !targetSession.IsInWorld || targetSession.State.IsInFight) return false;
+            if (targetSession.MapId == session.State.MapId) return await AggressAsync(session, stop, targetSession.CharacterId);
 
-            var there = MapManager.GetMapInfo(prey.MapId);
-            return there != null && there.Outdoor && await TowardsAsync(session, prey.MapId, stop);
+            var there = MapManager.GetMapInfo(targetSession.MapId);
+            return there != null && there.Outdoor && await TowardsAsync(session, targetSession.MapId, stop);
         }
     }
 }

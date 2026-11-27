@@ -1,3 +1,4 @@
+using Jondo.Unity.ServerMods;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -66,9 +67,9 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The heroes beside him read it with him, each his own copy: the objective done for whoever
+        /// The companions beside him read it with him, each his own copy: the objective done for whoever
         /// shares quests and has the book in his bag too. The cake of the recipe asks for its reading
-        /// to be crafted («Qa=1637&amp;Qo&gt;9805»), and a hero who was given the recipe with the
+        /// to be crafted («Qa=1637&amp;Qo&gt;9805»), and a companion who was given the recipe with the
         /// quest but had not opened it himself was told nothing came out of the ingredients.
         /// </summary>
         private static async Task ShareReadingAsync(int template, int objectiveId)
@@ -77,14 +78,14 @@ namespace Jondo.Unity.Server.Handlers
             var objective = book?.Objective(objectiveId);
             var step = objective == null ? null : book!.Step(objective.StepId);
             if (step == null) return;
-            await Heroes.ShareQuestActionAsync(async hero =>
+            await QuestSharing.ShareQuestActionAsync(async companion =>
             {
                 if (Equipment.HowMany(template) > 0 && Quests.SharedObjective(step.QuestId, step.Id, objectiveId, out _))
-                    await Quests.CompleteByReplyAsync(hero, step.QuestId, objectiveId);
+                    await Quests.CompleteByReplyAsync(companion, step.QuestId, objectiveId);
             },
             quests: new[] { step.QuestId },
-            explain: hero => Equipment.HowMany(template) > 0 ? null
-                : new Heroes.LagCause(Heroes.QuestLagReason.MissingItems, template, 1));
+            explain: companion => Equipment.HowMany(template) > 0 ? null
+                : new LagCause(QuestLagReason.MissingItems, template, 1));
         }
 
         /// <summary>A document opened (kkt { f2 }), its close button awaited.</summary>

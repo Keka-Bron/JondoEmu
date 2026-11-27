@@ -26,9 +26,7 @@
     </Reference>
   </ItemGroup>
 
-  <!-- Kept beside the project, where the launcher takes it from for every client's Mods
-       (LauncherService.ShippedMods), and copied into this machine's client when there is one;
-       -p:SkipModDeploy=true skips the second. -->
+  <!-- The server module stages this DLL with its package. -->
   <Target Name="GuardarMod" AfterTargets="Build">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" OverwriteReadOnlyFiles="true" />
   </Target>

@@ -8,6 +8,7 @@ internal sealed class ServerSettingsEditor
     internal ServerSettings Edited { get; }
     internal bool Dirty => Edited.DiffersFrom(_saved);
     internal bool Pending => _saved.DiffersFrom(_running);
+    internal bool MatchesSaved(ServerSettings settings) => !_saved.DiffersFrom(settings);
 
     internal ServerSettingsEditor(ServerSettings saved, ServerSettings running)
     {

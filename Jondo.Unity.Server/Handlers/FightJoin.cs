@@ -6,7 +6,9 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.Network;
+using Jondo.Unity.ServerMods;
 using Jondo.Unity.World.Fights;
 using static Jondo.Protocol.NetworkMessage;
 using Game = Jondo.Unity.Protocol.Game;
@@ -453,7 +455,7 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (FightById(fightId) != fight || !me.IsInWorld || me.CharacterId != character || me.State.SpectatingFightId != 0) return;
                 if (named == 0) await WatchAsync(me, fight, fromTheMap: true);
-                else if (!await Managers.HeadHunts.HoldsAsync(me.Stream, Managers.HeadHunts.Hold.Fight))
+                else if (!await PlayerPolicies.BlocksActivityAsync(me.Stream, PlayerActivity.Fight))
                     await JoinCheckedAsync(me, fight, named);
             });
         }

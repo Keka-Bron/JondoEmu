@@ -124,10 +124,10 @@
         <item type="preparecommand" label="Terminar una misión..." command="quest finish " help="quest finish &lt;id&gt; [jugador]"/>
         <item type="preparecommand" label="Olvidar una misión..." command="quest forget " help="quest forget &lt;id&gt; [jugador]: para volver a jugarla"/>
       </item>
-      <item type="menu" label="Héroes (administrador)">
-        <item type="sendcommand" label="Un héroe Yopuka" command="heros 8"/>
-        <item type="sendcommand" label="Dos héroes: Feca y Aniripsa" command="heros 1 7"/>
-        <item type="preparecommand" label="Clases..." command="heros " help="heros &lt;classe&gt; [clase...]"/>
+      <item type="menu" label="Control de aliados (administrador)">
+        <item type="sendcommand" label="Un aliado Yopuka" command="allycontrol 8"/>
+        <item type="sendcommand" label="Dos aliados: Feca y Aniripsa" command="allycontrol 1 7"/>
+        <item type="preparecommand" label="Clases..." command="allycontrol " help="allycontrol &lt;classe&gt; [clase...]"/>
       </item>
     </item>
 
