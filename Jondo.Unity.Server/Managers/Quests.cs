@@ -1879,9 +1879,16 @@ namespace Jondo.Unity.Server.Managers
             return shown.Any(o => !done.Contains(o)) ? shown : objectives.ToList();
         }
 
-        /// <summary>The same, for a quest of this character's journal.</summary>
-        private static List<int> Shown(QuestLog log, QuestRun run, IReadOnlyList<int> objectives)
-            => Shown(objectives, run.Done, Bindings.Of, before => log.ObjectiveDone(before));
+        /// <summary>The same, using the reveal rule the dialogue and actions already use.</summary>
+        private static List<int> Shown(QuestLog log, QuestRun run, QuestStep step, IReadOnlyList<int> objectives)
+        {
+            var byId = step.Objectives.ToDictionary(objective => objective.Id);
+            var shown = objectives
+                .Where(id => run.Done.Contains(id)
+                             || (byId.TryGetValue(id, out var objective) && Revealed(step, objective, run)))
+                .ToList();
+            return shown.Any(id => !run.Done.Contains(id)) ? shown : objectives.ToList();
+        }
 
         /// <summary>
         /// Tells the client where a quest has got to (idu), which is what the ieo asks for.
@@ -1913,7 +1920,7 @@ namespace Jondo.Unity.Server.Managers
             if (settled) Save(questId, run);
 
             await session.SendAsync(new Game.QuestStepInformationEvent(
-                QuestMessages.Active(questId, run.StepId, Shown(log, run, objectives), run.Done)));
+                QuestMessages.Active(questId, run.StepId, Shown(log, run, step, objectives), run.Done)));
         }
 
         /// <summary>
@@ -2285,7 +2292,7 @@ namespace Jondo.Unity.Server.Managers
                 if (step == null) continue;
 
                 var objectives = step.Objectives.Select(objective => objective.Id).ToArray();
-                doing.Add(QuestMessages.Active(run.QuestId, run.StepId, Shown(log, run, objectives), run.Done));
+                doing.Add(QuestMessages.Active(run.QuestId, run.StepId, Shown(log, run, step, objectives), run.Done));
             }
 
             var finished = new List<int>();
