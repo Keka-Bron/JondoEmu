@@ -74,8 +74,11 @@ public sealed class ClientModSyncTests : IDisposable
         Assert.True(File.Exists(Prepare(http, "", (_, _, _) => true).ManifestPath));
     }
 
-    [Fact]
-    public void An_empty_manifest_sets_aside_bundled_and_previously_installed_mods()
+    [Theory]
+    [InlineData("JondoFix.dll")]
+    [InlineData("Cazacabezas.dll")]
+    [InlineData("heroes.DLL")]
+    public void An_empty_manifest_sets_aside_bundled_and_previously_installed_mods(string legacyName)
     {
         const string bundledName = "Bundled.dll";
         const string unrelatedName = "Custom.dll";
@@ -87,6 +90,7 @@ public sealed class ClientModSyncTests : IDisposable
         File.WriteAllBytes(Path.Combine(mods, bundledName), [2]);
         File.WriteAllBytes(Path.Combine(mods, unrelatedName), [3]);
         File.WriteAllBytes(Path.Combine(mods, retiredName), [4]);
+        File.WriteAllBytes(Path.Combine(mods, legacyName), [5]);
         BundledClientMods.Remember(client, retiredName);
         using var feed = new Feed();
         using var http = new HttpClient(feed);
@@ -98,6 +102,8 @@ public sealed class ClientModSyncTests : IDisposable
         Assert.Single(Directory.GetFiles(mods, bundledName + ".jondo-legacy-*"));
         Assert.False(File.Exists(Path.Combine(mods, retiredName)));
         Assert.Single(Directory.GetFiles(mods, retiredName + ".jondo-legacy-*"));
+        Assert.False(File.Exists(Path.Combine(mods, legacyName)));
+        Assert.Single(Directory.GetFiles(mods, legacyName + ".jondo-legacy-*"));
         Assert.True(File.Exists(Path.Combine(mods, unrelatedName)));
     }
 

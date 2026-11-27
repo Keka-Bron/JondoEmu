@@ -9,6 +9,9 @@ public static class BundledClientMods
     private const string ReceiptDirectory = ".jondo-managed";
     private const string ReceiptSuffix = ".receipt";
 
+    // Launchers before manifest support installed these directly without receipts.
+    private static readonly string[] LegacyDllNames = [RedirectDll, "Cazacabezas.dll", "Heroes.dll"];
+
     public static IReadOnlyDictionary<string, string> Discover(string root)
     {
         var files = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -93,6 +96,7 @@ public static class BundledClientMods
         string modsDirectory = Path.Combine(clientRoot, "Mods");
         if (!Directory.Exists(modsDirectory)) return;
         var managed = names.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        managed.UnionWith(LegacyDllNames);
         foreach (string legacy in Directory.EnumerateFiles(modsDirectory))
         {
             if (!managed.Contains(Path.GetFileName(legacy))) continue;
