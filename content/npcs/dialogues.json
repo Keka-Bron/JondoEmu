@@ -24313,6 +24313,7 @@
       "opening": 48039,
       "openings": [
         { "criterion": "Ps=1", "message": 48036 },
+        { "criterion": "Ps=2", "message": 48039 },
         { "criterion": "Ps=0", "message": 48037 }
       ],
       "lines": [
@@ -24327,7 +24328,20 @@
           "message": 48037,
           "choices": [
             { "reply": 65176, "next": 48900, "quest": 1424, "afterObjective": 7906, "beforeObjective": 7909 },
+            { "reply": 63949, "next": 48038, "takes": 97, "takesCount": 10, "swears": 2, "criterion": "Ps=0" },
             { "reply": 63950 }
+          ]
+        },
+        {
+          "message": 48038,
+          "choices": [
+            { "reply": 63948, "next": 48047 }
+          ]
+        },
+        {
+          "message": 48047,
+          "choices": [
+            { "reply": 64896, "startsQuest": 375, "params": [[34, 375]] }
           ]
         },
         {
