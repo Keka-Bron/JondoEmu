@@ -10623,6 +10623,13 @@
   {"objective": 13572, "quest": 1947, "kind": "click", "elements": [{"map": 186385920, "element": 512057}], "afterObjectives": [13571], "why": "«Busca a los krobios» (741261): the torn parchment at [-47,-82]. Dofus pour les noobs («Krobe en bourg»)."},
   {"objective": 13573, "quest": 1947, "kind": "click", "elements": [{"map": 186386178, "element": 512039}], "afterObjectives": [13572], "why": "«Busca a los krobios» (741262): the torn parchment at [-47,-83]. Dofus pour les noobs («Krobe en bourg»)."},
   {"objective": 13574, "quest": 1947, "kind": "click", "elements": [{"map": 186386180, "element": 512038}], "afterObjectives": [13573], "why": "«Busca a los krobios» (741263): INFERRED: the guide names two parchments and then the Nekrobio; the third objective is the element of the last map. Dofus pour les noobs («Krobe en bourg»)."},
-  {"objective": 13575, "quest": 1947, "kind": "beat", "monster": 5212, "afterObjectives": [13574], "why": "«Vencer a los nekrobios» (741264): the krobe fight. Dofus pour les noobs («Krobe en bourg»)."}
+  {"objective": 13575, "quest": 1947, "kind": "beat", "monster": 5212, "afterObjectives": [13574], "why": "«Vencer a los nekrobios» (741264): the krobe fight. Dofus pour les noobs («Krobe en bourg»)."},
+  {
+   "objective": 14611,
+   "quest": 2037,
+   "kind": "enter",
+   "map": 238551040,
+   "why": "«Entra en el plano astral» (768761): it closes on stepping into the well of the Infinite Dreams (the four arches land from it into Draconiros' room); INFERRED map from teleports.json. Dofus pour les noobs («Jusqu'au bout du rêve»)."
+  }
 ]
 }

@@ -164,7 +164,11 @@ namespace Jondo.Unity.Tests.Content
 
                         if (quest.Givers.Count == 0) continue;
 
-                        bool his = quest.Givers.Any(g => g.NpcId == tree.NpcId);
+                        // A giver standing on the same map is the same scene, not another quest's
+                        // page: the catalogue names Volkaragnar 3922 for 2037 at his forge, while the
+                        // replies that hand it over (39477, 39480) are in the template of 3923 there.
+                        bool his = quest.Givers.Any(g => g.NpcId == tree.NpcId
+                                                        || (tree.MapId != 0 && g.MapId == tree.MapId));
                         if (!his)
                         {
                             wrong.Add($"npc {tree.NpcId}: reply {choice.Reply} hands over quest " +
