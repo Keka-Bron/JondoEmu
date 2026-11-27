@@ -181,10 +181,17 @@ namespace Jondo.Unity.Server.Managers
         /// lines only make sense so: the Wp=1..5 rune lines are the guide's runes palier by palier
         /// (minor and average in I and II, major and astounding in III, ...), and the "Wi&gt;3" of
         /// every rune line keeps them from the three Rêve intensities, the guide's no legends and
-        /// no astral runes there and the client's droplegend 0. Anything else in a criterion --
-        /// the quests' Qa and Qo, Wv, Sc -- is not answered, and those lines do not drop.
+        /// no astral runes there and the client's droplegend 0.
+        ///
+        /// The player's own letters -- the quests' Qa, Qo and PO, Sc -- go to <paramref name="player"/>,
+        /// the winner's resolver; without one they are not answered and those lines do not drop.
+        /// Wv is INFERRED to be whether the dream is a souvenir: every quest line of the table
+        /// (2080, 2138, 2424, 2498) asks "Wv=false", so false is a dream played for real, and a
+        /// souvenir pays nothing anyway.
         /// </remarks>
-        public static Dictionary<int, int> LootOf(int difficulty, int row, int lootBonus, Func<double> roll)
+        public static Dictionary<int, int> LootOf(int difficulty, int row, int lootBonus, Func<double> roll,
+                                                  Jondo.Unity.World.Content.Criterion.Resolver? player = null,
+                                                  bool souvenir = false)
         {
             var loot = new Dictionary<int, int>();
             void Add(int item, int count)
@@ -202,7 +209,7 @@ namespace Jondo.Unity.Server.Managers
                     Add(line.Item, ReflectionsFor(lootBonus));
                     continue;
                 }
-                if (!Jondo.Unity.World.Content.Criterion.Met(line.Criterion, c => AnswerOf(c, palier, difficulty)))
+                if (!Jondo.Unity.World.Content.Criterion.Met(line.Criterion, c => AnswerOf(c, palier, difficulty, souvenir, player)))
                     continue;
                 double chance = line.Scaled ? line.Percent * lootBonus / 100.0 : line.Percent;
                 if (roll() < Math.Min(100.0, chance)) Add(line.Item, 1);
@@ -223,15 +230,35 @@ namespace Jondo.Unity.Server.Managers
             return lines;
         }
 
-        /// <summary>The two letters of a dream's criteria this server answers: Wp, the palier, and Wi, the intensity.</summary>
+        /// <summary>
+        /// A dream's own letters -- Wp, the palier, Wi, the intensity, Wv, a souvenir -- and the
+        /// player's, which <paramref name="player"/> answers when there is one.
+        /// </summary>
         private static Jondo.Unity.World.Content.Answer AnswerOf(Jondo.Unity.World.Content.Condition condition,
-                                                                 int palier, int intensity)
+                                                                 int palier, int intensity, bool souvenir,
+                                                                 Jondo.Unity.World.Content.Criterion.Resolver? player)
             => condition.Code switch
             {
                 "Wp" => Jondo.Unity.World.Content.Criterion.Compare(condition.Operator, palier, condition.Value),
                 "Wi" => Jondo.Unity.World.Content.Criterion.Compare(condition.Operator, intensity, condition.Value),
+                "Wv" => SouvenirAnswer(condition, souvenir),
+                _ => player?.Invoke(condition) ?? Jondo.Unity.World.Content.Answer.Unknown,
+            };
+
+        /// <summary>"Wv=false" or "Wv=true", "!" for not: anything else is not answered.</summary>
+        private static Jondo.Unity.World.Content.Answer SouvenirAnswer(Jondo.Unity.World.Content.Condition condition,
+                                                                       bool souvenir)
+        {
+            if (condition.Args.Count != 1 || !bool.TryParse(condition.Args[0], out bool asked))
+                return Jondo.Unity.World.Content.Answer.Unknown;
+            bool equal = souvenir == asked;
+            return condition.Operator switch
+            {
+                '=' => equal ? Jondo.Unity.World.Content.Answer.True : Jondo.Unity.World.Content.Answer.False,
+                '!' => equal ? Jondo.Unity.World.Content.Answer.False : Jondo.Unity.World.Content.Answer.True,
                 _ => Jondo.Unity.World.Content.Answer.Unknown,
             };
+        }
 
         /// <summary>
         /// The dream points a dream starts with: the f11 of the izg at the entrance. Ten in the

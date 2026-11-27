@@ -119,14 +119,42 @@ namespace Jondo.Unity.Tests.World
             Assert.True(DreamData.IntensityOf(4)!.DropsLegends);
         }
 
-        /// <summary>A line whose criterion asks for a quest never drops: nothing answers it in a dream.</summary>
+        /// <summary>A line whose criterion asks for a quest does not drop when no player answers it.</summary>
         [Fact]
         public void Quest_lines_do_not_drop()
         {
             var loot = Dreams.LootOf(10, 23, 300, () => 0);
-            foreach (int quest in new[] { 22436, 25907, 30054, 30055, 30056, 30057, 30058, 21190, 21191, 21192, 32092 })
+            foreach (int quest in new[] { 22436, 25907, 30054, 30055, 30056, 30057, 30058, 21190, 21191, 21192 })
                 Assert.DoesNotContain(quest, loot.Keys);
             Assert.Contains(22161, loot.Keys);   // Sueñoscudo estrella, no criterion at all
+            Assert.Contains(32092, loot.Keys);   // only the dream's letters, Wv=false in a dream played for real
+        }
+
+        /// <summary>
+        /// The Vulbis quest's three items drop for the winner who is on quest 2080 with the
+        /// objective still open and none of the item held, from an intensity above 3, and not
+        /// in a souvenir.
+        /// </summary>
+        [Fact]
+        public void A_quest_line_drops_for_the_winner_on_the_quest()
+        {
+            Jondo.Unity.World.Content.Answer OnTheQuest(Jondo.Unity.World.Content.Condition c) => c.Code switch
+            {
+                "Qa" => c.Value == 2080 ? Jondo.Unity.World.Content.Answer.True : Jondo.Unity.World.Content.Answer.False,
+                "Qo" => Jondo.Unity.World.Content.Answer.True,
+                "PO" => Jondo.Unity.World.Content.Answer.True,
+                _ => Jondo.Unity.World.Content.Answer.Unknown,
+            };
+
+            var loot = Dreams.LootOf(4, 23, 168, () => 0, OnTheQuest);
+            foreach (int item in new[] { 21190, 21191, 21192 }) Assert.Contains(item, loot.Keys);
+            Assert.DoesNotContain(25907, loot.Keys);   // quest 2424's, not on it
+
+            var reve = Dreams.LootOf(3, 23, 140, () => 0, OnTheQuest);
+            Assert.DoesNotContain(21190, reve.Keys);   // Wi>3
+
+            var souvenir = Dreams.LootOf(4, 23, 168, () => 0, OnTheQuest, souvenir: true);
+            Assert.DoesNotContain(21190, souvenir.Keys);
         }
 
         /// <summary>

@@ -183,7 +183,7 @@ namespace Jondo.Unity.Server.Handlers
                 Dictionary<int, int> loot;
                 var perfect = new List<RandomLoot.Drop>();
                 var own = new Dictionary<int, int>();
-                if (dream != null) loot = DreamLootOf(fight, dream);
+                if (dream != null) using (SessionContext.Push(session)) loot = DreamLootOf(fight, dream);
                 else using (SessionContext.Push(session)) loot = RollLoot(fight, extra, perfect, own);
 
                 // A dream pays its own, the same to everyone. Elsewhere the group is the players of
@@ -342,7 +342,9 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static Dictionary<int, int> DreamLootOf(FightInstance fight, DreamHandler.DreamPay dream)
         {
-            var loot = Dreams.LootOf(dream.Difficulty, dream.Row, dream.LootBonus, TirarPorcentaje);
+            // The winner's own letters -- a quest's Qa, Qo and PO -- are his, judged in his session.
+            var loot = Dreams.LootOf(dream.Difficulty, dream.Row, dream.LootBonus, TirarPorcentaje,
+                                     Managers.PlayerCriteria.ResolverFor(fight.RoleplayMapId), dream.Souvenir);
             void Add(int item, int count)
             {
                 if (count <= 0) return;
