@@ -105,6 +105,7 @@ internal sealed class ServerSettingsView : UserControl
             var current = (latest ?? ServerSettings.Load)();
             var next = settings.Copy();
             next.CopyModsFrom(current);
+            next.FailOnServerModError = current.FailOnServerModError;
             next.WindowLanguage = current.WindowLanguage;
             Write(next);
         }, leave,

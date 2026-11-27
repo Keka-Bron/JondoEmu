@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -13,6 +14,29 @@ namespace Jondo.Unity.Server.Tests;
 
 public sealed class ModsPageTests
 {
+    [AvaloniaFact]
+    public void StartupIssuesAppearWhileThePageHasUnsavedChanges()
+    {
+        var running = new ServerSettings { ServerMods = ["sample", "dependent"] };
+        var issues = ImmutableDictionary.Create<string, ServerModStartupIssue>(StringComparer.OrdinalIgnoreCase);
+        var page = new ModsPage(Language.En, () => running, () => running,
+            () => [new("sample", "Sample", "1.0", null, null), new("dependent", "Dependent", "1.0", null, null)],
+            () => [], () => issues);
+        page.EnsureBuilt();
+        Find<ToggleSwitch>(page, "Active.Server.dependent").IsChecked = false;
+
+        issues = issues.Add("SAMPLE", new(false, "Incompatible API."))
+            .Add("dependent", new(true, "Required mod 'sample' did not initialize."));
+        page.Tick();
+
+        var labels = page.GetLogicalDescendants().OfType<TextBlock>().ToArray();
+        Assert.Equal("Incompatible API.", ToolTip.GetTip(Assert.Single(labels, label => label.Text == "Failed to start")));
+        Assert.Contains(labels, label => label.Text == "Skipped");
+        Assert.True(Find<ToggleSwitch>(page, "Active.Server.sample").IsChecked);
+        Assert.Equal(["sample"], page.Editor!.Edited.ServerMods);
+        Assert.True(page.Editor.Dirty);
+    }
+
     [AvaloniaFact]
     public void Package_activation_order_and_dialog_changes_are_staged_until_save()
     {
@@ -104,12 +128,14 @@ public sealed class ModsPageTests
             Find<NumericUpDown>(page, "Xp").Value = 25;
             latest.ServerMods = ["sample"];
             latest.ClientMods = [];
+            latest.FailOnServerModError = true;
             latest.ModSettings["sample"] = JsonSerializer.SerializeToElement(new { Minutes = 30 });
             Click(page, "SaveSettings");
             Assert.False(page.View!.Editor.Dirty);
             Assert.Equal(25, latest.ExperienceBonusPercent);
             Assert.Equal(["sample"], latest.ServerMods);
             Assert.Empty(latest.ClientMods);
+            Assert.True(latest.FailOnServerModError);
             Assert.Equal(30, latest.ModSettings["sample"].GetProperty("Minutes").GetInt32());
         }
         finally { window.Close(); }

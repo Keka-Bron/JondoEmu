@@ -8,6 +8,7 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using Jondo.Unity.Launcher.UI;
 using Jondo.Unity.Server.Managers;
+using Jondo.Unity.Server.Mods;
 using Jondo.Unity.Server.UI.Pages;
 using Jondo.Unity.Server.UI.Skin;
 
@@ -27,7 +28,8 @@ internal sealed record ServerWindowServices(
     Func<DateTime> Clock,
     Func<ServerSettings> SavedSettings,
     Func<ServerSettings> RunningSettings,
-    Action<Language>? RememberLanguage = null)
+    Action<Language>? RememberLanguage = null,
+    Func<IReadOnlyDictionary<string, ServerModStartupIssue>>? ModStartupIssues = null)
 {
     internal static ServerWindowServices Live => new(
         () => Program.Ready,
@@ -39,7 +41,8 @@ internal sealed record ServerWindowServices(
         () => Almanax.Clock(),
         ServerSettings.Load,
         () => ServerSettings.Current,
-        language => ServerPreferences.Language = language);
+        language => ServerPreferences.Language = language,
+        () => Program.ModStartupIssues);
 }
 
 /// <summary>
@@ -116,7 +119,8 @@ internal sealed class ServerWindow : Window
         Players = new PlayersPage(_language, services.Players, services.Kick, services.Announce) { Name = "PlayersPage" };
         Events = new EventsPage(_language, services.Events, services.ApplyEvents, services.Clock) { Name = "EventsPage" };
         Settings = new SettingsPage(_language, services.SavedSettings, services.RunningSettings) { Name = "SettingsPage" };
-        Mods = new ModsPage(_language, services.SavedSettings, services.RunningSettings) { Name = "ModsPage" };
+        Mods = new ModsPage(_language, services.SavedSettings, services.RunningSettings,
+            startupIssues: services.ModStartupIssues) { Name = "ModsPage" };
 
         var shell = new Grid { ColumnDefinitions = new ColumnDefinitions("236,*") };
         _stop = ServerTheme.Button("", async () => await Stop(), LauncherPalette.Red);

@@ -157,7 +157,9 @@ Place standalone server DLLs in `mods/` at the emulator root. Extract a
 to set its load order. **Settings** opens the package's editable options. Apply
 the dialog edits, then save or save and restart from the **Mods** page. For a headless
 server, edit `ServerMods` in `config/server_settings.json` using DLL filenames and
-package IDs in the order you want.
+package IDs in the order you want. Enabled requirements start before the mods that depend on them.
+
+The **Mods** page marks startup failures and skipped dependents. Hover over the status to see the reason. The server starts with the mods that loaded successfully. Set `"FailOnServerModError": true` in `config/server_settings.json` to abort on mod startup errors.
 
 See the [server mod contract](server-mod-contract.md) for the package layout and
 startup behavior and [Writing server mods](writing-server-mods.md) for the mod API.

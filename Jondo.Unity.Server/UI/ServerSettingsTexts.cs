@@ -63,6 +63,8 @@ internal static class ServerSettingsTexts
         ["ModUp"] = ("Subir", "Move up", "Monter"),
         ["ModDown"] = ("Bajar", "Move down", "Descendre"),
         ["ModMissing"] = ("no disponible", "missing", "absent"),
+        ["ModFailed"] = ("Error al iniciar", "Failed to start", "Échec du démarrage"),
+        ["ModSkipped"] = ("Omitido", "Skipped", "Ignoré"),
         ["NoMods"] = ("Coloca los paquetes y las DLL en la carpeta mods.",
                       "Place packages and DLLs in the mods folder.",
                       "Placez les paquets et les DLL dans le dossier mods."),

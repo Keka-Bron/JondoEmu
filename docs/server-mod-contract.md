@@ -18,9 +18,11 @@ Place each package in its own directory under `<emulator root>/mods/`. The follo
 
 `serverAssembly` and `clientAsset` are package-relative file paths. Each declared file must exist. Use `/` for nested folders. The loader rejects absolute paths, `.` and `..` components, and links or junctions in package paths. Omit `clientAsset` or set it to `null` for a server-only mod.
 
-After a package initializes successfully, its declared client asset contributes one entry to `GET /api/mods` if its filename meets the client DLL naming rules. Download URLs use the exact filename from that manifest. The server looks up the approved file by name. Server assemblies, private dependencies, manifests, and other package paths are private.
+An optional `dependencies` array lists required package IDs or standalone server DLL filenames. For example, `"dependencies": ["example.audit", "Example.Shared.dll"]` requires both entries to be enabled. The loader resolves IDs case-insensitively and starts requirements before their dependents. A missing, inactive, failed, or cyclic requirement causes its dependents to be skipped.
 
-Configured standalone DLLs in `mods/` keep their load order. A package DLL with the same name, ignoring case, takes the standalone entry's slot. Other package DLLs follow in `ServerMods` order. If multiple packages declare the same filename, the first enabled package wins. If the winning file becomes unavailable, its entry is omitted until it returns.
+After a package completes startup, its declared client asset contributes one entry to `GET /api/mods` if its filename meets the client DLL naming rules. Download URLs use the exact filename from that manifest. The server looks up the approved file by name. Server assemblies, private dependencies, manifests, and other package paths are private.
+
+Configured standalone DLLs in `mods/` keep their load order. A package DLL with the same name, ignoring case, takes the standalone entry's slot. Other package DLLs follow server startup order. If multiple packages declare the same filename, the first package to start wins. If the winning file becomes unavailable, its entry is omitted until it returns.
 
 A standalone client DLL can still load when listed in `ClientMods` and no active package supplies that filename. When switching to a package, remove the old filename from `ClientMods` if the replacement uses a different filename or if disabling the package should stop serving the old DLL. For manifest-based launches, the launcher sets aside managed copies from the game's `Mods/` folder so the game loads the versions selected by the manifest.
 
@@ -38,7 +40,7 @@ Drop a standalone server mod DLL directly into `<emulator root>/mods/`. Add its 
 }
 ```
 
-The server uses the listed order and starts each entry once, ignoring case. An omitted, null, or empty list enables zero mods. Restart the desktop or headless server to apply settings, installs, or updates. Installing a compatible mod requires no server rebuild. If a configured entry is missing, the server logs it and continues startup. Startup fails when more than one installed mod matches an entry or a selected mod fails to load or initialize. The log records the entry and reason.
+The server visits entries in the listed order and starts each entry once, starting any enabled requirements first. An omitted, null, or empty list enables zero mods. Restart the desktop or headless server to apply settings, installs, or updates. Installing a compatible mod requires no server rebuild. By default, the server logs mod failures and continues with the mods that can start. If the mods directory cannot be read, it starts without server mods. Set `"FailOnServerModError": true` in `config/server_settings.json` to abort on directory I/O errors or selected mod startup exceptions. Missing packages and unavailable dependencies are logged and skipped.
 
 A standalone DLL must implement the same `IServerMod` entry point as a package. Use a package to declare an API version, include private dependencies or a client DLL, or expose settings in the desktop editor. A standalone mod can read settings from a JSON object keyed by its filename.
 
@@ -70,9 +72,9 @@ Call `host.GetService<T>()` for authoritative game operations and `host.Register
 
 Target .NET 10 and reference `Jondo.Unity.Contract`. The server assembly must export exactly one concrete `Jondo.Unity.ServerMods.IServerMod` implementation with a public parameterless constructor. The server calls `Initialize(IServerModHost host)` once, after loading the database and world services and before opening network listeners or signaling readiness. `host.Log` labels messages with the package and mod ID.
 
-The server calls the optional `StartGameplay()` in `ServerMods` order after opening listeners and starting gameplay services. Use it to begin timers and other background work that needs those services. A failure during this phase stops startup and shuts down the initialized packages.
+The server calls the optional `StartGameplay()` in initialization order after opening listeners and starting gameplay services. Use it to begin timers and other background work that needs those services. If this call fails, the server shuts down the failed mod and any initialized dependents in reverse order before continuing. With `FailOnServerModError` enabled, it shuts down all initialized mods and aborts startup.
 
-Use `host.RegisterCleanup(Action)` immediately after acquiring a resource so its cleanup runs even if a later step in initialization fails. On shutdown or startup rollback, the server calls `Shutdown()` on successfully initialized mods in reverse startup order, while their host services are still available. Each mod's registered callbacks run in reverse registration order after its shutdown hook. If initialization throws, the server runs that mod's registered callbacks before stopping the previously initialized mods. The server logs shutdown and callback errors and continues cleanup.
+Use `host.RegisterCleanup(Action)` immediately after acquiring a resource so its cleanup runs even if a later step in initialization fails. On shutdown or startup rollback, the server calls `Shutdown()` on successfully initialized mods in reverse startup order, while their host services are still available. Each mod's registered callbacks run in reverse registration order after its shutdown hook. If initialization throws, the server runs that mod's registered callbacks immediately. The server logs shutdown and callback errors and continues cleanup.
 
 The server supplies its own `Jondo.Unity.Contract` assembly, including in single-file builds. Leave the contract DLL out of distributed packages. Each package has its own assembly load context. Put private managed DLLs beside the server assembly, or include the assembly's `.deps.json` and its referenced files within the package. Mods run with the server process's permissions.
 

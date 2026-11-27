@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -11,37 +12,62 @@ using Jondo.Unity.ServerMods;
 
 namespace Jondo.Unity.Server.Mods;
 
-internal sealed class ServerModLoader(Action<string> log) : IDisposable
+internal sealed class ServerModLoader(Action<string> log, bool failFast,
+    Action<ImmutableDictionary<string, ServerModStartupIssue>>? publishIssues) : IDisposable
 {
     private const string ManifestFile = "manifest.json";
     private static readonly Regex ModId = new(@"\A[A-Za-z0-9][A-Za-z0-9._-]*\z", RegexOptions.CultureInvariant);
-    private readonly Stack<Host> _started = new();
+    private static readonly StringComparer Ids = StringComparer.OrdinalIgnoreCase;
+    private readonly List<Host> _started = [];
     private int _stopped;
 
     internal ServerModControlRoutes ControlRoutes { get; } = new();
+    internal ImmutableDictionary<string, ServerModStartupIssue> StartupIssues { get; private set; } =
+        ImmutableDictionary.Create<string, ServerModStartupIssue>(Ids);
 
-    public ClientModCatalog.Asset[] ClientAssets => _started.Reverse().Select(host => host.ClientAsset)
+    public ClientModCatalog.Asset[] ClientAssets => _started.Select(host => host.ClientAsset)
         .OfType<ClientModCatalog.Asset>().ToArray();
 
     internal static ServerModLoader LoadConfigured(string directory, ServerSettings settings, Action<string> log,
-        Func<string, IServerMod>? createMod = null)
-        => Load(directory, settings.ServerMods, log, settings, createMod);
+        Func<string, IServerMod>? createMod = null,
+        Action<ImmutableDictionary<string, ServerModStartupIssue>>? publishIssues = null)
+        => Load(directory, settings, log, createMod, publishIssues);
 
     public static ServerModLoader Load(string directory, string[] enabledIds, Action<string> log)
-        => Load(directory, enabledIds, log, new ServerSettings(), null);
+        => LoadConfigured(directory, new ServerSettings { ServerMods = enabledIds }, log);
 
-    private static ServerModLoader Load(string directory, string[] enabledIds, Action<string> log, ServerSettings settings,
-        Func<string, IServerMod>? createMod)
+    private static ServerModLoader Load(string directory, ServerSettings settings, Action<string> log,
+        Func<string, IServerMod>? createMod, Action<ImmutableDictionary<string, ServerModStartupIssue>>? publishIssues)
     {
-        var loader = new ServerModLoader(log);
+        var loader = new ServerModLoader(log, settings.FailOnServerModError, publishIssues);
+        var enabledIds = settings.ServerMods.Distinct(Ids).ToArray();
         if (enabledIds.Length == 0) return loader;
 
         try
         {
-            var installed = Discover(directory, enabledIds[0], log);
-            foreach (string id in enabledIds.Distinct(StringComparer.OrdinalIgnoreCase))
-                loader.StartMod(directory, installed, id, settings, createMod);
+            ILookup<string, InstalledMod> installed;
+            try { installed = Discover(directory, log); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                string message = $"Could not read mods directory '{directory}': {ex.Message}";
+                log($"[Server mods] {message}");
+                foreach (string id in enabledIds)
+                    loader.RecordIssue(id, skipped: false, message);
+                if (settings.FailOnServerModError) throw StartupError(enabledIds[0], ex);
+                return loader;
+            }
+
+            var pending = enabledIds.ToHashSet(Ids);
+            var initialized = new HashSet<string>(Ids);
+            foreach (string id in enabledIds) Start(id);
             return loader;
+
+            bool Start(string id)
+            {
+                if (pending.Remove(id) && loader.StartMod(directory, installed, id, settings, createMod, Start))
+                    initialized.Add(id);
+                return initialized.Contains(id);
+            }
         }
         catch
         {
@@ -53,21 +79,43 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _stopped, 1) != 0) return;
-        while (_started.TryPop(out var host))
-            host.Stop();
+        for (int i = _started.Count - 1; i >= 0; i--) _started[i].Stop();
+        _started.Clear();
     }
 
     internal void StartGameplay()
     {
-        foreach (var host in _started.Reverse())
-            host.Mod.StartGameplay();
+        for (int i = 0; i < _started.Count; i++)
+        {
+            var host = _started[i];
+            try { host.Mod.StartGameplay(); }
+            catch (Exception ex)
+            {
+                HandleFailure(host.Id, ex);
+                var stopped = new HashSet<string>(Ids) { host.Id };
+                for (int j = i + 1; j < _started.Count; j++)
+                {
+                    var dependent = _started[j];
+                    if (dependent.Dependencies.FirstOrDefault(stopped.Contains) is not { } dependency) continue;
+                    stopped.Add(dependent.Id);
+                    SkipDependency(dependent.Id, dependency, "start gameplay");
+                }
+                for (int j = _started.Count - 1; j >= i; j--)
+                {
+                    if (!stopped.Contains(_started[j].Id)) continue;
+                    _started[j].Stop();
+                    _started.RemoveAt(j);
+                }
+                i--;
+            }
+        }
     }
 
     internal static ServerModDescription[] ListInstalled(string directory)
     {
         try
         {
-            return Discover(directory, "", _ => { }).Where(group => group.Count() == 1)
+            return Discover(directory, _ => { }).Where(group => group.Count() == 1)
                 .Select(group =>
                 {
                     var entry = group.Single();
@@ -82,7 +130,7 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
                         ClientModManifest.IsDllName(asset) ? asset : null, schema);
                 }).OfType<ServerModDescription>().ToArray();
         }
-        catch (InvalidOperationException ex) when (ex.InnerException is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             return [];
         }
@@ -115,8 +163,7 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
 
     private sealed record InstalledMod(string Path, JsonElement? Manifest);
 
-    private static ILookup<string, InstalledMod> Discover(
-        string directory, string firstEnabledId, Action<string> log)
+    private static ILookup<string, InstalledMod> Discover(string directory, Action<string> log)
     {
         string[] packages;
         string[] standaloneAssemblies;
@@ -131,10 +178,6 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
         {
             packages = [];
             standaloneAssemblies = [];
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            throw StartupError(firstEnabledId, ex);
         }
 
         var installed = new List<(string Id, InstalledMod Mod)>();
@@ -167,8 +210,8 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
         return installed.ToLookup(entry => entry.Id, entry => entry.Mod, StringComparer.OrdinalIgnoreCase);
     }
 
-    private void StartMod(string directory, ILookup<string, InstalledMod> installedMods,
-        string id, ServerSettings settings, Func<string, IServerMod>? createMod)
+    private bool StartMod(string directory, ILookup<string, InstalledMod> installedMods,
+        string id, ServerSettings settings, Func<string, IServerMod>? createMod, Func<string, bool> startDependency)
     {
         Host host = null;
         try
@@ -179,7 +222,7 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
             if (matches.Length == 0)
             {
                 log($"[Server mods] {id}: package not found in '{directory}'; skipped.");
-                return;
+                return false;
             }
             if (matches.Length > 1)
                 throw new InvalidDataException($"Duplicate mod ID in packages or standalone DLLs: {string.Join(", ", matches.Select(match => Path.GetFileName(match.Path)))}.");
@@ -191,8 +234,16 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
             var schema = installed.Manifest is { } metadata ? ServerModConfiguration.Read(metadata) : null;
             var configuration = ServerModConfiguration.Resolve(settings, modId, schema);
             if (!ServerModConfiguration.IsActive(schema, configuration))
-                return;
-            host = new Host(log, label, ControlRoutes, configuration);
+                return false;
+            string[] dependencies = manifest?.Dependencies ?? [];
+            if (dependencies.Any(dependency => dependency == null || !ModId.IsMatch(dependency)))
+                throw new InvalidDataException("Invalid mod ID in 'dependencies'.");
+            if (dependencies.FirstOrDefault(dependency => !startDependency(dependency)) is { } unavailable)
+            {
+                SkipDependency(id, unavailable, "initialize");
+                return false;
+            }
+            host = new Host(log, label, ControlRoutes, configuration, modId, dependencies);
             string? clientPath = null;
             var mod = manifest == null
                 ? LoadAssembly(Path.GetDirectoryName(installed.Path), installed.Path, null, host, modId, createMod)
@@ -206,13 +257,37 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
             }
             string version = manifest == null ? "" : $" (version {manifest.Version})";
             log($"[Server mods] {label} initialized{version}.");
-            _started.Push(host);
+            _started.Add(host);
+            return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ModStartupException)
         {
             host?.Stop();
-            throw StartupError(id, ex);
+            HandleFailure(id, ex);
+            return false;
         }
+    }
+
+    private void HandleFailure(string id, Exception error)
+    {
+        var failure = StartupError(id, error);
+        RecordIssue(id, skipped: false, failure.InnerException!.Message);
+        if (failFast) throw failure;
+        log($"[Server mods] {failure}");
+    }
+
+    private void SkipDependency(string id, string dependency, string phase)
+    {
+        string message = $"Required mod '{dependency}' did not {phase}.";
+        RecordIssue(id, skipped: true, message);
+        log($"[Server mods] {id}: {message} Skipped.");
+    }
+
+    private void RecordIssue(string id, bool skipped, string message)
+    {
+        if (id == null) return;
+        StartupIssues = StartupIssues.SetItem(id, new(skipped, message));
+        publishIssues?.Invoke(StartupIssues);
     }
 
     private static IServerMod LoadPackage(string package, Manifest manifest, Host host,
@@ -286,12 +361,14 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
         catch (DirectoryNotFoundException) { }
     }
 
-    private static Exception StartupError(string id, Exception error)
+    private static ModStartupException StartupError(string id, Exception error)
     {
         if (error is TargetInvocationException { InnerException: { } cause })
             error = cause;
-        return new InvalidOperationException($"Server mod '{id ?? "(null)"}' failed to start: {error.Message}", error);
+        return new ModStartupException($"Server mod '{id ?? "(null)"}' failed to start: {error.Message}", error);
     }
+
+    private sealed class ModStartupException(string message, Exception cause) : InvalidOperationException(message, cause);
 
     private static void ReportError(Action<string> log, string package, Exception error)
         => log($"[Server mods] {package} error: {error.Message}");
@@ -301,15 +378,19 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
         [property: JsonPropertyName("version")] string Version,
         [property: JsonPropertyName("serverApiVersion")] int ServerApiVersion,
         [property: JsonPropertyName("serverAssembly")] string ServerAssembly,
-        [property: JsonPropertyName("clientAsset")] string ClientAsset);
+        [property: JsonPropertyName("clientAsset")] string ClientAsset,
+        [property: JsonPropertyName("dependencies")] string[]? Dependencies);
 
-    private sealed class Host(Action<string> log, string label, ServerModControlRoutes controlRoutes, JsonElement settings)
+    private sealed class Host(Action<string> log, string label, ServerModControlRoutes controlRoutes, JsonElement settings,
+        string id, string[] dependencies)
         : IServerModHost
     {
         private readonly Stack<Action> _cleanup = new();
         private bool _stopping;
         internal IServerMod Mod { get; set; }
         internal ClientModCatalog.Asset? ClientAsset { get; set; }
+        internal string Id => id;
+        internal string[] Dependencies => dependencies;
 
         public void Log(string message) => log($"[Server mods] {label}: {message}");
 
@@ -417,3 +498,5 @@ internal sealed class ServerModLoader(Action<string> log) : IDisposable
 
 internal sealed record ServerModDescription(string Id, string? Name, string? Version, string? ClientAsset,
     ServerModConfiguration? Configuration, bool IsStandalone = false);
+
+internal sealed record ServerModStartupIssue(bool Skipped, string Message);

@@ -13,9 +13,12 @@ namespace Jondo.Unity.Server.Network
         private static bool _isRunning;
 
         public static void Start(int port)
-            => Start(port, new ClientModCatalog(Paths.ModsDirectory, ServerSettings.Current.ClientMods));
+        {
+            var clientMods = new ClientModCatalog(Paths.ModsDirectory, ServerSettings.Current.ClientMods);
+            Start(port, () => clientMods);
+        }
 
-        internal static void Start(int port, ClientModCatalog clientMods, ServerModControlRoutes? modRoutes = null)
+        internal static void Start(int port, Func<ClientModCatalog> clientMods, ServerModControlRoutes? modRoutes = null)
         {
             if (_isRunning) return;
             _isRunning = true;
@@ -46,7 +49,7 @@ namespace Jondo.Unity.Server.Network
                         // With a ceiling. Before, it was dispatched bare with «_ = ...», with no queue or limit,
                         // so N simultaneous requests added up their bodies in memory and their
                         // PBKDF2 in threads. The semaphore rejects nobody: it makes them wait.
-                        _ = AtenderConTechoAsync(ctx, clientMods, modRoutes);
+                        _ = AtenderConTechoAsync(ctx, clientMods(), modRoutes);
                     }
                     catch (Exception ex)
                     {

@@ -106,6 +106,9 @@ namespace Jondo.Unity.Server
         /// <summary>Server mod filenames and package manifest IDs in startup order.</summary>
         public string[] ServerMods { get; set; } = [];
 
+        /// <summary>Abort server startup when mod discovery, loading, or startup throws.</summary>
+        public bool FailOnServerModError { get; set; }
+
         /// <summary>Package settings and unrecognized fields preserved when the server saves this file.</summary>
         [JsonExtensionData]
         public Dictionary<string, JsonElement> ModSettings { get; set; } = new(StringComparer.OrdinalIgnoreCase);

@@ -1,11 +1,13 @@
 using Jondo.Unity.Launcher;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.Server.Handlers;
+using Jondo.Unity.Server.Mods;
 
 namespace Jondo.Unity.Server
 {
@@ -76,6 +78,9 @@ namespace Jondo.Unity.Server
         private static volatile string _failure;
         internal static bool Ready => _ready && !IsShuttingDown;
         internal static string Failure => _failure;
+        private static volatile ImmutableDictionary<string, ServerModStartupIssue> _modStartupIssues =
+            ImmutableDictionary.Create<string, ServerModStartupIssue>(StringComparer.OrdinalIgnoreCase);
+        internal static ImmutableDictionary<string, ServerModStartupIssue> ModStartupIssues => _modStartupIssues;
 
         internal static async Task RunServerAsync()
         {
@@ -243,7 +248,7 @@ namespace Jondo.Unity.Server
             RegressionGuardTests.Run();
 
             await RunEmulationAsync(Paths.ModsDirectory, ServerSettings.Current, ShutdownRequested,
-                RunEmulationServicesAsync, StopServices, Console.WriteLine);
+                RunEmulationServicesAsync, StopServices, Console.WriteLine, issues => _modStartupIssues = issues);
 
             // The backend has stopped. Give the process a bounded time to exit.
             _ = Task.Run(async () =>
@@ -255,12 +260,13 @@ namespace Jondo.Unity.Server
         }
 
         internal static async Task RunEmulationAsync(string modsDirectory, ServerSettings settings, Task shutdown,
-            Func<Mods.ServerModLoader, ClientModCatalog, Task> serve, Action stopServices, Action<string> log)
+            Func<Mods.ServerModLoader, ClientModCatalog, Task> serve, Action stopServices, Action<string> log,
+            Action<ImmutableDictionary<string, ServerModStartupIssue>>? publishIssues = null)
         {
             if (shutdown.IsCompleted) return;
             try
             {
-                using var mods = Mods.ServerModLoader.LoadConfigured(modsDirectory, settings, log);
+                using var mods = Mods.ServerModLoader.LoadConfigured(modsDirectory, settings, log, publishIssues: publishIssues);
                 if (!shutdown.IsCompleted)
                     await serve(mods, new ClientModCatalog(modsDirectory, settings.ClientMods, mods.ClientAssets));
             }
@@ -272,6 +278,7 @@ namespace Jondo.Unity.Server
 
         private static async Task RunEmulationServicesAsync(Mods.ServerModLoader mods, ClientModCatalog clientMods)
         {
+            var activeClientMods = new ClientModCatalog(Paths.ModsDirectory, ServerSettings.Current.ClientMods);
             Console.WriteLine("[+] Starting services...");
             try
             {
@@ -281,7 +288,7 @@ namespace Jondo.Unity.Server
                     Console.WriteLine("[!] Public binding does not encrypt traffic. Use it only on " +
                                       "a trusted network or behind a VPN/tunnel.");
                 }
-                HaapiServer.Start(haapiPort, clientMods, mods.ControlRoutes);
+                HaapiServer.Start(haapiPort, () => Volatile.Read(ref activeClientMods), mods.ControlRoutes);
                 ZaapServer.Start(port);
                 GameServerProxy.Start(gamePort);
                 GameNodeProxy.Start(gameNodePort);
@@ -341,7 +348,11 @@ namespace Jondo.Unity.Server
             // ports just opened, as clients do (Bots.SimulatedPlayers).
             Bots.SimulatedPlayers.Start(ServerSettings.Current);
 
+            var initializationIssues = mods.StartupIssues;
             mods.StartGameplay();
+            if (mods.StartupIssues != initializationIssues)
+                clientMods = new ClientModCatalog(Paths.ModsDirectory, ServerSettings.Current.ClientMods, mods.ClientAssets);
+            Volatile.Write(ref activeClientMods, clientMods);
 
             await using var monsterWalks = new System.Threading.Timer(
                 _ =>

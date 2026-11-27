@@ -90,9 +90,8 @@ public sealed class ServerModLoaderTests : IDisposable
         CopyFixture(AssemblyFile, _root.FullName);
 
         Assert.Empty(ServerModLoader.ListInstalled(_root.FullName));
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, [AssemblyFile], _messages.Add));
-        Assert.Contains("Duplicate mod ID", failure.Message);
+        using var mods = ServerModLoader.Load(_root.FullName, [AssemblyFile], _messages.Add);
+        Assert.Contains("Duplicate mod ID", mods.StartupIssues[AssemblyFile].Message);
     }
 
     [Fact]
@@ -182,9 +181,9 @@ public sealed class ServerModLoaderTests : IDisposable
         CopyFixture(AssemblyFile, package);
         CopyFixture(DependencyFile, package);
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, ["fixture.private"], _messages.Add));
-        Assert.Contains("'clientAsset' cannot be a private server dependency", failure.ToString());
+        using var mods = ServerModLoader.Load(_root.FullName, ["fixture.private"], _messages.Add);
+        Assert.Contains("'clientAsset' cannot be a private server dependency", _messages[^1]);
+        Assert.False(mods.StartupIssues["fixture.private"].Skipped);
     }
 
     [Fact]
@@ -193,10 +192,9 @@ public sealed class ServerModLoaderTests : IDisposable
         CreatePackage("first", id: "fixture.duplicate");
         CreatePackage("second", id: "Fixture.Duplicate");
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, ["fixture.duplicate"], _messages.Add));
-        Assert.Contains("Server mod 'fixture.duplicate' failed to start: Duplicate mod ID", failure.Message);
-        Assert.Contains("first, second", failure.Message);
+        using var mods = ServerModLoader.Load(_root.FullName, ["fixture.duplicate"], _messages.Add);
+        Assert.Contains("Server mod 'fixture.duplicate' failed to start: Duplicate mod ID", Assert.Single(_messages));
+        Assert.Contains("first, second", mods.StartupIssues["fixture.duplicate"].Message);
     }
 
     [Theory]
@@ -212,9 +210,8 @@ public sealed class ServerModLoaderTests : IDisposable
         string package = CreatePackage("bad", api: api, serverAssembly: serverAssembly, clientAsset: clientAsset);
         CopyFixture(AssemblyFile, package);
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, ["fixture.bad"], _messages.Add));
-        Assert.StartsWith($"Server mod 'fixture.bad' failed to start: {error}", failure.Message);
+        using var mods = ServerModLoader.Load(_root.FullName, ["fixture.bad"], _messages.Add);
+        Assert.StartsWith(error, mods.StartupIssues["fixture.bad"].Message);
     }
 
     [Fact]
@@ -225,10 +222,9 @@ public sealed class ServerModLoaderTests : IDisposable
         string package = CreatePackage("no-entry", serverAssembly: DependencyFile);
         CopyFixture(DependencyFile, package);
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, ["fixture.no-entry"], _messages.Add));
-        Assert.StartsWith("[Server mods] bad-json error:", Assert.Single(_messages));
-        Assert.Contains("Server mod 'fixture.no-entry' failed to start: Expected exactly one public IServerMod", failure.Message);
+        using var mods = ServerModLoader.Load(_root.FullName, ["fixture.no-entry"], _messages.Add);
+        Assert.StartsWith("[Server mods] bad-json error:", _messages[0]);
+        Assert.Contains("Expected exactly one public IServerMod", mods.StartupIssues["fixture.no-entry"].Message);
     }
 
     [Fact]
@@ -237,10 +233,9 @@ public sealed class ServerModLoaderTests : IDisposable
         string package = CreatePackage("missing-dependency");
         CopyFixture(AssemblyFile, package);
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            ServerModLoader.Load(_root.FullName, ["fixture.missing-dependency"], _messages.Add));
-        Assert.StartsWith("Server mod 'fixture.missing-dependency' failed to start:", failure.Message);
-        Assert.Contains("Fixture.ServerModDependency", failure.Message);
+        using var mods = ServerModLoader.Load(_root.FullName, ["fixture.missing-dependency"], _messages.Add);
+        Assert.Contains("Server mod 'fixture.missing-dependency' failed to start:", _messages[^1]);
+        Assert.Contains("Fixture.ServerModDependency", mods.StartupIssues["fixture.missing-dependency"].Message);
     }
 
     [Fact]
@@ -258,6 +253,24 @@ public sealed class ServerModLoaderTests : IDisposable
             }, () => _messages.Add("host stopped"), _messages.Add);
 
         Assert.Equal(["ready", "host stopped"], _messages);
+    }
+
+    [Fact]
+    public void DiscoveryIoErrorIsReportedAndOnlyThrowsInFailFastMode()
+    {
+        string path = Path.Combine(_root.FullName, new string('x', 32_768));
+        var settings = new ServerSettings { ServerMods = ["fixture.first", "fixture.second"] };
+        using var mods = ServerModLoader.LoadConfigured(path, settings, _messages.Add);
+
+        Assert.Empty(mods.ClientAssets);
+        Assert.Equal(2, mods.StartupIssues.Count);
+        Assert.All(mods.StartupIssues.Values, issue => Assert.False(issue.Skipped));
+        Assert.StartsWith("[Server mods] Could not read mods directory", Assert.Single(_messages));
+
+        settings.FailOnServerModError = true;
+        var exception = Assert.ThrowsAny<InvalidOperationException>(() =>
+            ServerModLoader.LoadConfigured(path, settings, _ => { }));
+        Assert.IsAssignableFrom<IOException>(exception.InnerException);
     }
 
     [Theory]
@@ -340,9 +353,12 @@ public sealed class ServerModLoaderTests : IDisposable
         CopyFixture(AssemblyFile, broken);
         InstallFixture("later");
 
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var exception = await Assert.ThrowsAnyAsync<InvalidOperationException>(() =>
             Program.RunEmulationAsync(_root.FullName,
-                new ServerSettings { ServerMods = ["fixture.first", "fixture.broken", "fixture.later"] },
+                new ServerSettings
+                {
+                    ServerMods = ["fixture.first", "fixture.broken", "fixture.later"], FailOnServerModError = true,
+                },
                 new TaskCompletionSource().Task, (_, _) => throw new Xunit.Sdk.XunitException("Listeners started"),
                 () => _messages.Add("host stopped"), _messages.Add));
 
@@ -360,6 +376,69 @@ public sealed class ServerModLoaderTests : IDisposable
             "[Server mods] first (fixture.first): first resource released",
             "host stopped"
         ], _messages);
+    }
+
+    [Fact]
+    public async Task FailedInitializationSkipsDependentsAndStillReachesAdmission()
+    {
+        InstallFixture("broken");
+        File.Delete(Path.Combine(_root.FullName, "broken", DependencyFile));
+        InstallFixture("dependent", dependencies: ["Fixture.Broken"]);
+        InstallFixture("transitive", dependencies: ["fixture.dependent"]);
+        InstallFixture("healthy", "Healthy.dll", [1]);
+
+        await Program.RunEmulationAsync(_root.FullName,
+            ServerSettings.Read("""{"ServerMods":["fixture.transitive","fixture.healthy","fixture.broken","fixture.dependent"]}"""),
+            new TaskCompletionSource().Task, (mods, catalog) =>
+            {
+                Assert.False(mods.StartupIssues["fixture.broken"].Skipped);
+                Assert.True(mods.StartupIssues["fixture.dependent"].Skipped);
+                Assert.True(mods.StartupIssues["fixture.transitive"].Skipped);
+                Assert.Equal("Healthy.dll", Assert.Single(catalog.CreateManifest().Mods).Name);
+                _messages.Add("ready");
+                return Task.CompletedTask;
+            }, () => _messages.Add("host stopped"), _messages.Add);
+
+        Assert.Contains("ready", _messages);
+        Assert.DoesNotContain(_messages, message => message.Contains("transitive (fixture.transitive)"));
+        Assert.Contains("[Server mods] broken (fixture.broken): first resource released", _messages);
+    }
+
+    [Fact]
+    public void FailedGameplayRemovesDependentRoutesAndAssetsBeforeHealthyGameplayStarts()
+    {
+        InstallFixture("broken", "Broken.dll", [1]);
+        InstallFixture("dependent", "Dependent.dll", [2], dependencies: ["fixture.broken"]);
+        InstallFixture("healthy", "Healthy.dll", [3]);
+        var settings = new ServerSettings { ServerMods = ["fixture.dependent", "fixture.healthy", "fixture.broken"] };
+        using var mods = ServerModLoader.LoadConfigured(_root.FullName, settings, _messages.Add,
+            id => new GameplayFixture(id, _messages));
+
+        mods.StartGameplay();
+
+        Assert.False(mods.StartupIssues["fixture.broken"].Skipped);
+        Assert.True(mods.StartupIssues["fixture.dependent"].Skipped);
+        Assert.False(mods.ControlRoutes.TryGet("/api/fixture.broken", out _));
+        Assert.False(mods.ControlRoutes.TryGet("/api/fixture.dependent", out _));
+        Assert.True(mods.ControlRoutes.TryGet("/api/fixture.healthy", out _));
+        Assert.Equal("Healthy.dll", Assert.Single(mods.ClientAssets).Name);
+        Assert.Equal([
+            "fixture.broken gameplay", "fixture.dependent stopped", "fixture.broken stopped", "fixture.healthy gameplay",
+        ], _messages.Where(message => !message.StartsWith("[Server mods]")));
+    }
+
+    private sealed class GameplayFixture(string id, List<string> messages) : IServerMod
+    {
+        public void Initialize(IServerModHost host) =>
+            host.RegisterAuthenticatedControlRoute($"/api/{id}", _ => new(200, "{}"));
+
+        public void StartGameplay()
+        {
+            messages.Add($"{id} gameplay");
+            if (id == "fixture.broken") throw new InvalidOperationException("Gameplay failed.");
+        }
+
+        public void Shutdown() => messages.Add($"{id} stopped");
     }
 
     [Fact]
@@ -433,9 +512,9 @@ public sealed class ServerModLoaderTests : IDisposable
         }
     }
 
-    private void InstallFixture(string folder, string? clientAsset = null, byte[]? bytes = null)
+    private void InstallFixture(string folder, string? clientAsset = null, byte[]? bytes = null, string[]? dependencies = null)
     {
-        string package = CreatePackage(folder, clientAsset: clientAsset);
+        string package = CreatePackage(folder, clientAsset: clientAsset, dependencies: dependencies);
         CopyFixture(AssemblyFile, package);
         CopyFixture(DependencyFile, package);
         if (clientAsset != null)
@@ -447,7 +526,7 @@ public sealed class ServerModLoaderTests : IDisposable
     }
 
     private string CreatePackage(string name, string? id = null, int api = ServerModApi.Version,
-        string serverAssembly = AssemblyFile, string? clientAsset = null, object? settings = null)
+        string serverAssembly = AssemblyFile, string? clientAsset = null, object? settings = null, string[]? dependencies = null)
     {
         var package = Directory.CreateDirectory(Path.Combine(_root.FullName, name));
         File.WriteAllText(Path.Combine(package.FullName, "manifest.json"), JsonSerializer.Serialize(new
@@ -457,7 +536,8 @@ public sealed class ServerModLoaderTests : IDisposable
             serverApiVersion = api,
             serverAssembly,
             clientAsset,
-            settings
+            settings,
+            dependencies
         }));
         return package.FullName;
     }

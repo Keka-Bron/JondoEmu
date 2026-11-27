@@ -17,6 +17,8 @@ internal sealed class ModsPage : UserControl, IServerPage
     private readonly Func<ServerSettings> _saved, _running;
     private readonly Func<ServerModDescription[]> _packages;
     private readonly Func<string[]> _clientFiles;
+    private readonly Func<IReadOnlyDictionary<string, ServerModStartupIssue>>? _startupIssues;
+    private IReadOnlyDictionary<string, ServerModStartupIssue>? _shownIssues;
     private readonly StackPanel _rows = new() { Name = "ModRows", Spacing = 4 };
     private readonly Grid _layout = new() { RowDefinitions = new RowDefinitions("*,Auto") };
     private Language _language;
@@ -30,11 +32,13 @@ internal sealed class ModsPage : UserControl, IServerPage
     internal Action<ServerSettings> Write { get; set; } = settings => settings.Save();
 
     internal ModsPage(Language language, Func<ServerSettings> saved, Func<ServerSettings> running,
-        Func<ServerModDescription[]>? packages = null, Func<string[]>? clientFiles = null)
+        Func<ServerModDescription[]>? packages = null, Func<string[]>? clientFiles = null,
+        Func<IReadOnlyDictionary<string, ServerModStartupIssue>>? startupIssues = null)
     {
         _language = language;
         _saved = saved;
         _running = running;
+        _startupIssues = startupIssues;
         _packages = packages ?? (() => ServerModLoader.ListInstalled(Paths.ModsDirectory));
         _clientFiles = clientFiles ?? (() => ClientModCatalog.ListAvailable(Paths.ModsDirectory));
         var card = ServerTheme.Card(_rows);
@@ -80,7 +84,10 @@ internal sealed class ModsPage : UserControl, IServerPage
         if (Editor != null) Render();
     }
 
-    public void Tick() { }
+    public void Tick()
+    {
+        if (Editor != null && !ReferenceEquals(_shownIssues, _startupIssues?.Invoke())) Render();
+    }
 
     private string T(string key) => ServerSettingsTexts.Get(_language, key);
 
@@ -95,6 +102,7 @@ internal sealed class ModsPage : UserControl, IServerPage
 
     private void Render(string? focusName = null)
     {
+        _shownIssues = _startupIssues?.Invoke();
         _rows.Children.Clear();
         var settings = Editor!.Edited;
         var serverOrder = settings.ServerMods.Where(id => !string.IsNullOrWhiteSpace(id)).Distinct(Ids).ToArray();
@@ -102,7 +110,9 @@ internal sealed class ModsPage : UserControl, IServerPage
             .Distinct(Ids).ToArray();
         var packages = _installed.ToDictionary(mod => mod.Id, Ids);
         var clientFiles = _standalone.ToHashSet(Ids);
-        if (serverOrder.Length + packages.Count + clientOrder.Length + clientFiles.Count == 0)
+        var serverIds = serverOrder.Union(packages.Keys.Order(Ids), Ids)
+            .Union((_shownIssues?.Keys ?? []).Where(id => !string.IsNullOrWhiteSpace(id)).Order(Ids), Ids).ToArray();
+        if (serverIds.Length + clientOrder.Length + clientFiles.Count == 0)
         {
             _rows.Children.Add(ServerTheme.Text(T("NoMods"), 13, LauncherPalette.TextTertiary));
             return;
@@ -119,7 +129,6 @@ internal sealed class ModsPage : UserControl, IServerPage
         }
         _rows.Children.Add(headings);
 
-        var serverIds = serverOrder.Union(packages.Keys.Order(Ids), Ids).ToArray();
         var activeServerIds = serverOrder.Where(id => !packages.TryGetValue(id, out var mod) ||
             ServerModConfiguration.IsActive(mod.Configuration,
                 ServerModConfiguration.Resolve(settings, id, mod.Configuration))).ToArray();
@@ -174,7 +183,15 @@ internal sealed class ModsPage : UserControl, IServerPage
         title.FontWeight = FontWeight.SemiBold;
         title.TextTrimming = TextTrimming.CharacterEllipsis;
         ToolTip.SetTip(title, title.Text);
-        AddCell(grid, title, 1);
+        if (server && _shownIssues?.TryGetValue(id, out var issue) == true)
+        {
+            var status = ServerTheme.Text(T(issue.Skipped ? "ModSkipped" : "ModFailed"), 12,
+                issue.Skipped ? LauncherPalette.SoftGold : LauncherPalette.Danger);
+            ToolTip.SetTip(status, issue.Message);
+            AutomationProperties.SetHelpText(status, issue.Message);
+            AddCell(grid, new StackPanel { Children = { title, status } }, 1);
+        }
+        else AddCell(grid, title, 1);
         var version = ServerTheme.Text(mod?.Version ?? "—", 12, LauncherPalette.TextSecondary);
         version.TextTrimming = TextTrimming.CharacterEllipsis;
         ToolTip.SetTip(version, version.Text);
