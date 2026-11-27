@@ -1015,6 +1015,7 @@ namespace Jondo.Unity.Server.Handlers
         /// </summary>
         private static bool SeLeOfrece(Jondo.Unity.World.Content.DialogueChoice choice)
         {
+            if (!HasTradeCurrency(choice)) return false;
             var diario = SessionContext.State.Quests;
             if (diario == null) return choice.Always;
             if (!Jondo.Unity.World.Content.DialogueLine.Shows(choice,
@@ -1071,10 +1072,19 @@ namespace Jondo.Unity.Server.Handlers
             return Managers.Quests.NotYetRevealed(choice.Completes);
         }
 
+        private static bool HasTradeCurrency(DialogueChoice choice)
+            => choice.Trades <= 0 || DialoguePayment(choice).Currency != null;
+
+        private static (IDialogueCurrency? Currency, int Cost) DialoguePayment(DialogueChoice choice)
+            => ServerModHooks.All<IDialogueCurrency>()
+                .Select(currency => (Currency: currency, Cost: currency.Cost(choice.ExtensionFields)))
+                .FirstOrDefault(quote => quote.Cost > 0);
+
         private static long[] LasQueTocan(DialogueLine linea)
         {
             var diario = SessionContext.State.Quests;
-            if (diario == null) return linea.Replies();
+            if (diario == null)
+                return linea.Choices.Where(HasTradeCurrency).Select(choice => choice.Reply).ToArray();
 
             var replies = linea.RepliesFor(
                 diario.Active,
@@ -2013,9 +2023,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (elegida.Trades > 0 || elegida.ExtensionFields.Count > 0)
             {
-                var payment = ServerModHooks.All<IDialogueCurrency>()
-                    .Select(currency => (Currency: currency, Cost: currency.Cost(elegida.ExtensionFields)))
-                    .FirstOrDefault(quote => quote.Cost > 0);
+                var payment = DialoguePayment(elegida);
                 if (payment.Cost > 0 || elegida.Trades > 0)
                 {
                     long characterId = GameState.CharacterId;

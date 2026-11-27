@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Cazacabezas.Server;
 using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -16,6 +18,7 @@ using Jondo.Unity.Server.Network;
 using Jondo.Unity.ServerMods;
 using Jondo.Unity.Tests.Economy;
 using Jondo.Unity.World.Fights;
+using Jondo.Unity.World.Quests;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -353,6 +356,43 @@ namespace Jondo.Unity.Tests.World
                 DatabaseManager.DeleteCharacter(prey, PreyAccount);
                 Alignments.Forget(hunter);
                 Alignments.Forget(prey);
+            }
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        public async Task The_chapeuvepe_trade_is_offered_only_with_its_currency(bool modLoaded, bool hasQuestLog)
+        {
+            var settings = ServerSettings.Read(modLoaded ? """{"ServerMods":["cazacabezas"]}""" : """{"ServerMods":[]}""");
+            using var mods = ServerModLoader.LoadConfigured(Packages, settings, Console.WriteLine, _ => new CazacabezasMod());
+            await using var pipe = await ClientPipe.OpenAsync(8_980_000_003, 8_980_000_098, Map);
+            var state = pipe.Session.State;
+            if (hasQuestLog)
+                state.Quests = new QuestLog(new QuestCatalogue(), () => state.CharacterLevel, () => state.MapId);
+            state.OpenDialogueNpcId = 6379;
+            state.OpenDialogueMapId = Map;
+            state.OpenDialogueMessage = 47280;
+
+            // Open the trade list, then select its first trade even if it was hidden.
+            await NpcHandler.ReplyAsync(pipe.Session, new(62786));
+            var frame = await Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer).WaitAsync(TimeSpan.FromSeconds(10));
+            var question = Assert.IsType<NpcDialogQuestionEvent>(new GameCodec().Decode(frame).Content);
+            Assert.Equal(47281, question.MessageId);
+            int[] expectedReplies = modLoaded ? [62780, 62781, 62782, 62783, 62784, 62785, 62862] : [62862];
+            Assert.Equal(expectedReplies, question.VisibleReplies.Select(reply => reply.ReplyId));
+
+            await NpcHandler.ReplyAsync(pipe.Session, new(62780));
+            if (modLoaded)
+            {
+                await pipe.Next(Op.Ios);
+                Assert.Equal(47282, state.OpenDialogueMessage);
+            }
+            else
+            {
+                await pipe.Next(Op.Kld);
+                Assert.Equal(0, state.OpenDialogueMessage);
             }
         }
 
