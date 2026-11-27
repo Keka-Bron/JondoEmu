@@ -6232,6 +6232,9 @@
       "map": 0,
       "opening": 32574,
       "_byHand": true,
+      "openings": [
+        { "criterion": "Qa=2082&Qo>15045&Qo<15046", "message": 35906 }
+      ],
       "lines": [
         {
           "message": 32574,
@@ -6402,9 +6405,33 @@
           "choices": [
             { "reply": 81475 }
           ]
+        },
+        {
+          "message": 35906,
+          "choices": [
+            { "reply": 47489, "next": 35907 }
+          ]
+        },
+        {
+          "message": 35907,
+          "choices": [
+            { "reply": 47488, "next": 35908 }
+          ]
+        },
+        {
+          "message": 35908,
+          "choices": [
+            { "reply": 47487, "next": 35909 }
+          ]
+        },
+        {
+          "message": 35909,
+          "choices": [
+            { "reply": 47486, "quest": 2082, "completes": 15046, "params": [[30, 15046]] }
+          ]
         }
       ],
-      "why": "2097 (Pesadillas premonitorias): Draconiros denies, then asks for four nightmare stones (38640-38643); 50315 closes 15191. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080: Draconiros explains the key (35637-35639, 47101 ends the talk objective), then takes the garra/sombra/rugido and forges Oyukipoca's key (21237) (35640-35649) (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «Jusqu'au bout du rêve» (2037, Dofus pour les noobs («Jusqu'au bout du rêve»)): «Presentarte y hablarle de Cocobur» (81466) -> 59599 -> 59600, closed by «Gracias, voy rumbo al pozo» (81467), ticks 14612; afterwards «¿Soy lo bastante fuerte...?» (81474) -> 59601 under level 130 or 59605, and «¿Puedes darme más detalles...?» (81476) -> 59604. INFERRED reply order from the template ids; 59602/59603/59606-59609 (the later difficulty advice) are not written."
+      "why": "2097 (Pesadillas premonitorias): Draconiros denies, then asks for four nightmare stones (38640-38643); 50315 closes 15191. Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 2080: Draconiros explains the key (35637-35639, 47101 ends the talk objective), then takes the garra/sombra/rugido and forges Oyukipoca's key (21237) (35640-35649) (Dofus pour les noobs («Cauchemar infini»)). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). «Jusqu'au bout du rêve» (2037, Dofus pour les noobs («Jusqu'au bout du rêve»)): «Presentarte y hablarle de Cocobur» (81466) -> 59599 -> 59600, closed by «Gracias, voy rumbo al pozo» (81467), ticks 14612; afterwards «¿Soy lo bastante fuerte...?» (81474) -> 59601 under level 130 or 59605, and «¿Puedes darme más detalles...?» (81476) -> 59604. INFERRED reply order from the template ids; 59602/59603/59606-59609 (the later difficulty advice) are not written. 2082: Draconiros explains what Terrakurial needs (35906-35909). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 5130,
@@ -68746,7 +68773,8 @@
             { "reply": 67325, "next": 50415, "criterion": "Qf=1781&PL>39&Qa=439", "beforeQuest": 2442 },
             { "reply": 67840, "next": 50605, "criterion": "Qf=2442&PL>39", "beforeQuest": 2443 },
             { "reply": 35986, "next": 29940, "quest": 1937, "afterObjective": 13457, "beforeObjective": 13458, "completes": 13458, "params": [[30, 13458]] },
-            { "reply": 35992, "next": 29945, "quest": 1937, "afterObjective": 13458, "beforeObjective": 13459, "completes": 13459, "params": [[30, 13459]] }
+            { "reply": 35992, "next": 29945, "quest": 1937, "afterObjective": 13458, "beforeObjective": 13459, "completes": 13459, "params": [[30, 13459]] },
+            { "reply": 47498, "next": 35911, "criterion": "Qa=2082&Qo>15046&Qo<15048" }
           ]
         },
         {
@@ -68921,9 +68949,39 @@
           "choices": [
             { "reply": 35990, "quest": 1937, "gives": 19507 }
           ]
+        },
+        {
+          "message": 35911,
+          "choices": [
+            { "reply": 47497, "next": 35912 }
+          ]
+        },
+        {
+          "message": 35912,
+          "choices": [
+            { "reply": 47496, "next": 35913 }
+          ]
+        },
+        {
+          "message": 35913,
+          "choices": [
+            { "reply": 47493, "next": 35914, "quest": 2082, "completes": 15048, "params": [[30, 15048]], "gives": 21198 }
+          ]
+        },
+        {
+          "message": 35914,
+          "choices": [
+            { "reply": 47495, "next": 35915 }
+          ]
+        },
+        {
+          "message": 35915,
+          "choices": [
+            { "reply": 47494 }
+          ]
         }
       ],
-      "why": "Otomai on his island's treetop [-55,15] (Dofus pour les noobs, «Le Dofus et l'alchimiste»: «Dès que vous engagez la conversation avec Otomaï, la quête se termine automatiquement, mais en continuant « En savoir plus sur lui »...»): the greeting (4058) ends 1781 by itself (objective 11465, «Ve a ver a Otomai»); «Cuéntame cosas sobre ti» (3543) -> his arch and the lost creatures (6161). INFERRED: which reply leads to which line; the later chains (439, 2442-2448) extend this tree. «La razón del más fuerte» (2442): «Hablar con Otomai» once «El dofus y el alquimista» is done and «La eterna cosecha» (439) is in hand (Dofus pour les noobs). The reply-to-message links are INFERRED from the order of the message ids (50415-50425, 50409, 50410): the DPLN page gives the story, not the replies. «Después de él, el diluvio» (2443): «Hablar con Otomai» once «La razón del más fuerte» (2442) is done; he hands the Ocre ring (Dofus pour les noobs). The reply-to-message links are INFERRED from the order of the message ids (50605-50614) and reply ids (67840-67851). «El juramento del ámbar» (2448): «Informar a Otomai del éxito de la misión y devolverle el anillo ocre» (68144); he says what he knows of the demoness and that a dream may tell the rest (Dofus pour les noobs). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 1937: Otomai asks for the toxic bark (13458) and takes the three barks (13459). Dofus pour les noobs («Le piège se referme»). 1937: reply 35990 hands over the Pocion de toxinmunidad (19507) (Dofus pour les noobs: Otomai fabrique une potion de toximmunite). 1937: the engine takes the three barks itself when the reply completes the bring objective 13459 (an explicit takes ran first and left the check short)."
+      "why": "Otomai on his island's treetop [-55,15] (Dofus pour les noobs, «Le Dofus et l'alchimiste»: «Dès que vous engagez la conversation avec Otomaï, la quête se termine automatiquement, mais en continuant « En savoir plus sur lui »...»): the greeting (4058) ends 1781 by itself (objective 11465, «Ve a ver a Otomai»); «Cuéntame cosas sobre ti» (3543) -> his arch and the lost creatures (6161). INFERRED: which reply leads to which line; the later chains (439, 2442-2448) extend this tree. «La razón del más fuerte» (2442): «Hablar con Otomai» once «El dofus y el alquimista» is done and «La eterna cosecha» (439) is in hand (Dofus pour les noobs). The reply-to-message links are INFERRED from the order of the message ids (50415-50425, 50409, 50410): the DPLN page gives the story, not the replies. «Después de él, el diluvio» (2443): «Hablar con Otomai» once «La razón del más fuerte» (2442) is done; he hands the Ocre ring (Dofus pour les noobs). The reply-to-message links are INFERRED from the order of the message ids (50605-50614) and reply ids (67840-67851). «El juramento del ámbar» (2448): «Informar a Otomai del éxito de la misión y devolverle el anillo ocre» (68144); he says what he knows of the demoness and that a dream may tell the rest (Dofus pour les noobs). Reply order INFERRED from the message ids (Dofus pour les noobs gives the story, not the replies). 1937: Otomai asks for the toxic bark (13458) and takes the three barks (13459). Dofus pour les noobs («Le piège se referme»). 1937: reply 35990 hands over the Pocion de toxinmunidad (19507) (Dofus pour les noobs: Otomai fabrique une potion de toximmunite). 1937: the engine takes the three barks itself when the reply completes the bring objective 13459 (an explicit takes ran first and left the check short). 2082: Otomai, guardian of the Ocre, sculpts the offering (35911-35915). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
   {
       "npc": 1458,
@@ -85244,7 +85302,12 @@
       "map": 197921026,
       "opening": 35845,
       "openings": [
-        { "criterion": "Qa=2081&Qo>15040&Qo<15041", "message": 35879 }
+        { "criterion": "Qa=2081&Qo>15040&Qo<15041", "message": 35879 },
+        { "criterion": "Qf=2081&Qa!2082&Qf!2082", "message": 35880 },
+        { "criterion": "Qa=2082&Qo<15046", "message": 35883 },
+        { "criterion": "Qa=2082&Qo>15045&Qo<15050", "message": 35917 },
+        { "criterion": "Qa=2082&Qo>15049&Qo<15053", "message": 35883 },
+        { "criterion": "Qa=2082&Qo>15053&Qo<15054", "message": 35937 }
       ],
       "lines": [
         {
@@ -85268,11 +85331,99 @@
         {
           "message": 35879,
           "choices": [
-            { "reply": 47449, "quest": 2081, "completes": 15041, "params": [[30, 15041]] }
+            { "reply": 47449, "quest": 2081, "completes": 15041, "params": [[30, 15041]], "next": 35880 }
+          ]
+        },
+        {
+          "message": 35880,
+          "choices": [
+            { "reply": 47448, "next": 35881 }
+          ]
+        },
+        {
+          "message": 35881,
+          "choices": [
+            { "reply": 47447, "next": 35882, "startsQuest": 2082, "params": [[34, 2082]] }
+          ]
+        },
+        {
+          "message": 35882,
+          "choices": [
+            { "reply": 47444 }
+          ]
+        },
+        {
+          "message": 35883,
+          "choices": []
+        },
+        {
+          "message": 35917,
+          "choices": [
+            { "reply": 47507, "next": 35918 }
+          ]
+        },
+        {
+          "message": 35918,
+          "choices": [
+            { "reply": 47506, "next": 35919 }
+          ]
+        },
+        {
+          "message": 35919,
+          "choices": [
+            { "reply": 47505, "next": 35920 }
+          ]
+        },
+        {
+          "message": 35920,
+          "choices": [
+            { "reply": 47504, "next": 35921 }
+          ]
+        },
+        {
+          "message": 35921,
+          "choices": [
+            { "reply": 47503, "quest": 2082, "completes": 15050, "params": [[30, 15050]], "gives": 21200 }
+          ]
+        },
+        {
+          "message": 35937,
+          "choices": [
+            { "reply": 47534, "next": 35938 }
+          ]
+        },
+        {
+          "message": 35938,
+          "choices": [
+            { "reply": 47533, "next": 35939 }
+          ]
+        },
+        {
+          "message": 35939,
+          "choices": [
+            { "reply": 47532, "next": 35940 }
+          ]
+        },
+        {
+          "message": 35940,
+          "choices": [
+            { "reply": 47530, "next": 35941 }
+          ]
+        },
+        {
+          "message": 35941,
+          "choices": [
+            { "reply": 47529, "next": 35942 }
+          ]
+        },
+        {
+          "message": 35942,
+          "choices": [
+            { "reply": 47527, "quest": 2082, "completes": 15054, "params": [[30, 15054]] }
           ]
         }
       ],
-      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»))."
+      "why": "2081: Tylezia remembers the nightmare with Oyukipoca; 47409 (the wind) brings Osamodas. Dofus pour les noobs («La Nuit-qui-rugit»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies). 2081: after Osamodas leaves, Tylezia worries about her father's attack; 47449 closes the quest (Dofus pour les noobs («La Nuit-qui-rugit»)). 2082: Tylezia asks the player to reach her father, gives her ruby (35917-35921) and, at the end, learns of her child (35937-35942). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     },
     {
       "npc": 2004,
@@ -85358,6 +85509,246 @@
         }
       ],
       "why": "Duke Dorleans at the Clepsydra tower entrance (Dofus pour les noobs «Un comte de faits divers», 1310): the key reply (17821) or the keyring (17822) starts the quest after 1309 and opens the dungeon door as the template did. INFERRED: the guide only says to talk to Dorleans and use a key."
+    },
+    {
+      "npc": 2218,
+      "map": 160513,
+      "opening": 26081,
+      "lines": [
+        {
+          "message": 26081,
+          "choices": [
+            { "reply": 31272, "next": 26082, "criterion": "Qf=1791" }
+          ]
+        },
+        {
+          "message": 26082,
+          "choices": [
+            { "reply": 31269, "next": 26083 }
+          ]
+        },
+        {
+          "message": 26083,
+          "choices": [
+            { "reply": 31268, "next": 26084 }
+          ]
+        },
+        {
+          "message": 26084,
+          "choices": [
+            { "reply": 31267, "quest": 2082, "completes": 15042, "params": [[30, 15042]], "teleport": 171181058 }
+          ]
+        }
+      ],
+      "why": "2082: Tungusa gives the broth niros and sends the player into the dragon's dream (26081-26084); needs the dragon quest 1791. Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4640,
+      "map": 238551040,
+      "opening": 35889,
+      "openings": [
+        { "criterion": "Qa=2082&Qo>15045&Qo<15053", "message": 35894 }
+      ],
+      "lines": [
+        {
+          "message": 35889,
+          "choices": [
+            { "reply": 47462, "next": 35890, "criterion": "Qa=2082&Qo<15042" },
+            { "reply": 47454, "next": 35890, "criterion": "Qa=2082&Qo<15042" }
+          ]
+        },
+        {
+          "message": 35890,
+          "choices": [
+            { "reply": 47460, "next": 35891 }
+          ]
+        },
+        {
+          "message": 35891,
+          "choices": [
+            { "reply": 47459, "next": 35892 }
+          ]
+        },
+        {
+          "message": 35892,
+          "choices": [
+            { "reply": 47457, "next": 35893, "buyPrice": 1000000 }
+          ]
+        },
+        {
+          "message": 35893,
+          "choices": [
+            { "reply": 47455, "quest": 2082, "completes": 15042, "params": [[30, 15042]], "teleport": 171181058 }
+          ]
+        },
+        {
+          "message": 35894,
+          "choices": [
+            { "reply": 47455, "teleport": 171182084 }
+          ]
+        }
+      ],
+      "why": "2082: the Sandman sells a shortcut into Terrakurial's dream for 1,000,000 kamas (35889-35893) and later takes the player back to the sleeping dragon (35894). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 3498,
+      "map": 171181313,
+      "opening": 35896,
+      "lines": [
+        {
+          "message": 35896,
+          "choices": [
+            { "reply": 31311, "criterion": "Qa=2082", "teleport": 171182084 }
+          ]
+        }
+      ],
+      "why": "2082: the polter takes the player before Terrakurial (31311). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 3499,
+      "map": 171182084,
+      "opening": 35897,
+      "openings": [
+        { "criterion": "Qa=2082&Qo>15049&Qo<15052", "message": 35899 }
+      ],
+      "lines": [
+        {
+          "message": 35897,
+          "choices": [
+            { "reply": 47468, "next": 35898, "criterion": "Qa=2082&Qo<15044" }
+          ]
+        },
+        {
+          "message": 35898,
+          "choices": [
+            { "reply": 47467, "next": 35899 }
+          ]
+        },
+        {
+          "message": 35899,
+          "choices": [
+            { "reply": 47466, "quest": 2082, "completes": 15044, "params": [[30, 15044]], "criterion": "Qa=2082&Qo<15044" },
+            { "reply": 47519, "next": 35923, "criterion": "Qa=2082&Qo>15049&Qo<15052", "quest": 2082, "completes": 15052, "params": [[30, 15052]], "takesAll": [21197, 21198, 21199, 21200, 21201], "takesCount": 1 }
+          ]
+        },
+        {
+          "message": 35923,
+          "choices": [
+            { "reply": 47518, "next": 35924 }
+          ]
+        },
+        {
+          "message": 35924,
+          "choices": [
+            { "reply": 47520, "next": 35925 }
+          ]
+        },
+        {
+          "message": 35925,
+          "choices": [
+            { "reply": 47526, "next": 35926 }
+          ]
+        },
+        {
+          "message": 35926,
+          "choices": [
+            { "reply": 47525, "next": 35927 }
+          ]
+        },
+        {
+          "message": 35927,
+          "choices": [
+            { "reply": 47524, "next": 35928 }
+          ]
+        },
+        {
+          "message": 35928,
+          "choices": [
+            { "reply": 47523, "next": 35929 }
+          ]
+        },
+        {
+          "message": 35929,
+          "choices": [
+            { "reply": 47522, "next": 35930 }
+          ]
+        },
+        {
+          "message": 35930,
+          "choices": [
+            { "reply": 47521, "quest": 2082, "completes": 15053, "params": [[30, 15053]], "teleport": 197921026 }
+          ]
+        }
+      ],
+      "why": "2082: Terrakurial hears the reason of the visit (35897-35899), receives the five offerings (47519, 35923) and tells of Tyzerion (35924-35930). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5006,
+      "map": 171182084,
+      "opening": 35900,
+      "lines": [
+        {
+          "message": 35900,
+          "choices": [
+            { "reply": 47484, "next": 35901 },
+            { "reply": 47469, "sulks": 5 },
+            { "reply": 47485, "sulks": 5 }
+          ]
+        },
+        {
+          "message": 35901,
+          "choices": [
+            { "reply": 47481, "next": 35902 },
+            { "reply": 47482, "sulks": 5 },
+            { "reply": 47483, "sulks": 5 },
+            { "reply": 47470, "sulks": 5 }
+          ]
+        },
+        {
+          "message": 35902,
+          "choices": [
+            { "reply": 47478, "next": 35903 },
+            { "reply": 47479, "sulks": 5 },
+            { "reply": 47480, "sulks": 5 }
+          ]
+        },
+        {
+          "message": 35903,
+          "choices": [
+            { "reply": 47476, "next": 35904 },
+            { "reply": 47477, "sulks": 5 },
+            { "reply": 47472, "sulks": 5 }
+          ]
+        },
+        {
+          "message": 35904,
+          "choices": [
+            { "reply": 47475, "next": 35905 },
+            { "reply": 47473, "sulks": 5 }
+          ]
+        },
+        {
+          "message": 35905,
+          "choices": [
+            { "reply": 47474, "quest": 2082, "completes": 15045, "params": [[30, 15045]], "teleport": 238551040 }
+          ]
+        }
+      ],
+      "why": "2082: the five-reply sequence with the creature of Terrakurial's anger (35900-35905); wrong answers (attack, flee, retreat) make it vanish for a while. Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5027,
+      "map": 88605702,
+      "opening": 35818,
+      "lines": [
+        {
+          "message": 35818,
+          "choices": [
+            { "reply": 47375 }
+          ]
+        }
+      ],
+      "why": "2082: the abrajidor's bark is taken after a solo fight (47375). Dofus pour les noobs («La Colère de Terrakurial»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
     }
   ]
 }

@@ -2236,6 +2236,8 @@
     {"npc": 5001, "map": 197922050, "reply": 47142, "solo": true, "monsters": [{"monster": 5884, "grade": 0}], "why": "«Pesadilla Infinita» (2080): the pale arakne (5884) bars Oyukipoca's temple; Dofus pour les noobs («Cauchemar infini»): a solo fight before going in."},
     { "npc": 5005, "map": 197920002, "reply": 47373, "solo": true,
       "monsters": [ { "monster": 5885, "grade": 0 } ],
-      "why": "Miauguar tamed alone (Dofus pour les noobs («La Nuit-qui-rugit»), un combat seul): the guide's fight against one miauguar." }
+      "why": "Miauguar tamed alone (Dofus pour les noobs («La Nuit-qui-rugit»), un combat seul): the guide's fight against one miauguar." },
+  {"npc": 5027, "map": 88605702, "reply": 47375, "solo": true, "criterion": "Qa=2082&Qo>15046&Qo<15049", "monsters": [{"monster": 5886, "grade": 0}], "why": "2082 «Recupera un trozo de corteza del árbol Hakam» (15049): the abrajidor Hakam Abrakleur (5886) alone (Dofus pour les noobs («La Colère de Terrakurial»))."},
+  {"map": 183768072, "element": 517374, "solo": true, "criterion": "Qa=2082&Qo>15046&Qo<15047", "monsters": [{"monster": 5867, "grade": 0}], "why": "2082 «Recupera un recuerdo de Maminala» (15047): the trunk in the last room of the Sadida temple wakes the Historic Doll (5867) alone (Dofus pour les noobs («La Colère de Terrakurial»))."}
   ]
 }

@@ -9480,6 +9480,38 @@
       "orientation": 1,
       "criterion": "Qa=2081&Qo>15039&Qo<15041",
       "why": "The god Osamodas arrives in the lair (Dofus pour les noobs («La Nuit-qui-rugit»)). Cell INFERRED."
+    },
+    {
+      "map": 160513,
+      "npc": 2218,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=2082&Qo<15042",
+      "why": "Tungusa waits by the dragon's skull to send the player into the dream (Dofus pour les noobs («La Colère de Terrakurial»)). Cell INFERRED."
+    },
+    {
+      "map": 238551040,
+      "npc": 4640,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qa=2082",
+      "why": "The Sandman (Arenero) in the Well of Dreams room: the dream-entry alternative with the 1M fee. Map INFERRED (Dofus pour les noobs («La Colère de Terrakurial»)). Cell INFERRED."
+    },
+    {
+      "map": 171182084,
+      "npc": 5006,
+      "cell": 342,
+      "orientation": 1,
+      "criterion": "Qa=2082&Qo>15044&Qo<15046",
+      "why": "The anger creature of Terrakurial (Dofus pour les noobs («La Colère de Terrakurial»)). Cell INFERRED."
+    },
+    {
+      "map": 88605702,
+      "npc": 5027,
+      "cell": 342,
+      "orientation": 1,
+      "criterion": "Qa=2082&Qo>15046&Qo<15049",
+      "why": "The abrajidor of the Hakam tree. Map INFERRED (Dofus pour les noobs («La Colère de Terrakurial»)). Cell INFERRED."
     }
   ]
 }

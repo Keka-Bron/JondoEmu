@@ -10727,6 +10727,62 @@
    "kind": "reply",
    "replies": [47409],
    "why": "«Asiste al encuentro entre Tylezia y Oyukipoca»: the cold wind (47409) that brings Osamodas. (Dofus pour les noobs («La Nuit-qui-rugit»))"
+  },
+  {
+   "objective": 15043,
+   "quest": 2082,
+   "kind": "enter",
+   "map": 171181313,
+   "afterObjectives": [15042],
+   "why": "«Explora el sueño»: the player walks into the polter's room, beyond the light of the second dream room. (Dofus pour les noobs («La Colère de Terrakurial»))"
+  },
+  {
+   "objective": 15047,
+   "quest": 2082,
+   "anyOrder": true,
+   "kind": "beat",
+   "monster": 5867,
+   "map": 183768072,
+   "afterObjectives": [15046],
+   "gives": [{"item": 21197, "count": 1}],
+   "why": "«Recupera un recuerdo de Maminala»: the solo fight against the Historic Doll (5867) in the last room of the Sadida temple; the leaf (21197) is the drop. (Dofus pour les noobs («La Colère de Terrakurial»))"
+  },
+  {
+   "objective": 15049,
+   "quest": 2082,
+   "anyOrder": true,
+   "kind": "beat",
+   "monster": 5886,
+   "map": 88605702,
+   "afterObjectives": [15046],
+   "gives": [{"item": 21199, "count": 1}],
+   "why": "«Recupera un trozo de corteza del árbol Hakam»: the solo fight against the abrajidor (5886); the bark (21199) is the drop. (Dofus pour les noobs («La Colère de Terrakurial»))"
+  },
+  {
+   "objective": 15051,
+   "quest": 2082,
+   "anyOrder": true,
+   "kind": "click",
+   "elements": [{"map": 183762948, "element": 511847}],
+   "afterObjectives": [15046],
+   "gives": [{"item": 21201, "count": 1}],
+   "why": "«Recoge el soplido de Spiritia»: the candles of the second Osamodas temple room yield the breath (21201). (Dofus pour les noobs («La Colère de Terrakurial»))"
+  },
+  {
+   "objective": 15048,
+   "quest": 2082,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [15046],
+   "why": "2082: the five offerings are fetched in any order (Dofus pour les noobs, La Colere de Terrakurial)."
+  },
+  {
+   "objective": 15050,
+   "quest": 2082,
+   "kind": "order",
+   "anyOrder": true,
+   "afterObjectives": [15045],
+   "why": "2082: the five offerings are fetched in any order (Dofus pour les noobs, La Colere de Terrakurial)."
   }
   ]
 }

@@ -2073,6 +2073,17 @@
       "toCell": 282,
       "criterion": "POE21186,1",
       "why": "2078: the anomaly village's exit back to the zaap of the Scarafeuilles plain, open only with the Dofus vulbis worn (DPLN: equip the Dofus, leave the anomaly)."
+    },
+    {
+      "map": 171182082,
+      "element": 509437,
+      "cell": 319,
+      "gfx": 39767,
+      "type": 0,
+      "skill": 114,
+      "toMap": 171181313,
+      "toCell": 343,
+      "why": "2082 Explora el sueno: the light of the second dream room leads on to the polter room (the generated pairing sent it back to 171181058). Link INFERRED, Dofus pour les noobs («La Colère de Terrakurial»)."
     }
   ]
 }
