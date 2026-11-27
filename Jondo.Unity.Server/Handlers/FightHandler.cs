@@ -8958,7 +8958,11 @@ namespace Jondo.Unity.Server.Handlers
                     if (nuevo != null) nacidos.Add((c.HechizoOrigen, c.NivelOrigen, c.Invoca, c.Efecto.Forma,
                                                     c.Efecto.Tamano, c.Efecto.TamanoMinimo));
                     if (nuevo != null) ChallengeWatcher.PuppetSummoned(fight, nuevo, invoca);
-                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo);
+                    // A behaviour's summon gets what it writes for it as that behaviour, for the whole
+                    // fight: Hyrkul's starting spell (9104) casts 9105 on his tomb, whose "when hit
+                    // in melee, die" waits on "D" with no duration of its own. Cast as a plain spell,
+                    // that hook was gone after round one, and the tomb (and his invulnerability) stayed.
+                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo, conducta);
                     if (nuevo != null) await RevisarLosRecuentosAsync(stream, fight);
                     // The summoner has summoned (CI), with the new one as what set it off -- the "u"
                     // of the rows it fires: Pacto Bestial sacrifices "sus invocaciones ... futuras".
@@ -8974,7 +8978,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var invoca = c.Caster ?? quienLanza;
                     await AnunciarElDobleAsync(stream, fight, invoca, c.Doble);
-                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, c.Doble);
+                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, c.Doble, conducta);
                     await RevisarLosRecuentosAsync(stream, fight);
                     Disparo(invoca, Managers.EffectEngine.AlInvocar, c.Doble);
                     continue;
