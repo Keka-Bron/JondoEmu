@@ -154,6 +154,9 @@ namespace Jondo.Unity.Tests.Combat
 
             bool Free(int c) => floor.Contains(c) && !fight.Todos.Any(f => f.IsAlive && f.CellId == c);
             int RuneOn(int c) => fight.Glifos.Where(g => g.Tipo == 2022 && g.Cubre(c)).Select(g => g.Color).DefaultIfEmpty(-1).Last();
+            // The pinks stay out of the step: the cell ahead is cleared of runes below, and a pink
+            // there or under his feet would go with it, which says nothing about the yellow.
+            bool OnPink(int c) => fight.Glifos.Any(g => g.Tipo == 2022 && g.Color == Pink && g.Cubre(c));
             int Ahead(int from, int to)
             {
                 var (fx, fy) = MapGeometry.CellToPoint(from);
@@ -165,7 +168,7 @@ namespace Jondo.Unity.Tests.Combat
             // of anything else that could set something off.
             var pick = fight.Glifos.Where(g => g.Tipo == 2022 && g.Color == Yellow).SelectMany(g => g.Casillas)
                 .SelectMany(y => MapGeometry.GetNeighbors(y).Where(Free).Select(from => (from, y, ahead: Ahead(from, y))))
-                .FirstOrDefault(t => Free(t.ahead) && RuneOn(t.from) != -1);
+                .FirstOrDefault(t => Free(t.ahead) && RuneOn(t.from) != -1 && !OnPink(t.from) && !OnPink(t.ahead));
             Assert.NotEqual(0, pick.y);
             // The cell he is sent to keeps no rune here: one there goes off in turn and carries
             // the chain on, which is the game's but not what this test looks at.
