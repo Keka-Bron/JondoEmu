@@ -384,7 +384,7 @@ namespace Jondo.Unity.Server.Handlers
         /// The tax collectors' rows of the end screen, among the winners: each with its alliance's block
         /// and what it took, as the real game lists them.
         /// </summary>
-        private static IEnumerable<Network.FightProtocol.FightResult> CollectorRows(FightInstance fight)
+        private static IEnumerable<Jondo.Unity.Protocol.Game.FightResultListEntry> CollectorRows(FightInstance fight)
         {
             if (!_collectors.TryGetValue(fight.FightId, out var taken)) yield break;
             foreach (var (tc, items) in taken)
@@ -396,15 +396,10 @@ namespace Jondo.Unity.Server.Handlers
                 // The row's name is the len's f3 when the client does not know the collector's entity
                 // (fkv.gdl: its first and last name otherwise): the alliance's tag in brackets, «[TAG]», as
                 // the game shows a collector there -- not the alliance's whole name.
-                var block = Pb.New()
-                    .Msg(2, Network.AllianceProtocol.Emblem(alliance))
-                    .Str(3, $"[{alliance.Tag}]")
-                    .Str(4, alliance.Uuid)
-                    .Str(5, alliance.Tag);
-                yield return new Network.FightProtocol.FightResult
-                {
-                    Fighter = tc.ContextId, Winner = true, Spoils = spoils, Collector = block,
-                };
+                var identity = MapActorMessages.Alliance(alliance) with { Name = $"[{alliance.Tag}]" };
+                yield return new(FightSettlementMessages.Loot(spoils), new(tc.ContextId, true,
+                    new Jondo.Unity.Protocol.Game.FighterListEntryCaseTaxCollector(new(identity))),
+                    Jondo.Unity.Protocol.Game.FightOutcome.ResultVictory);
             }
         }
     }

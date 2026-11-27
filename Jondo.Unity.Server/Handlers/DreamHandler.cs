@@ -783,14 +783,13 @@ namespace Jondo.Unity.Server.Handlers
         /// kaz: where a fight on this map would place everybody, answered by jxj -- the cells a
         /// fight here is placed from, computed as the fight computes them.
         /// </summary>
-        public static async Task PositionsAsync(GameSession session, byte[] payload)
+        internal static async Task PositionsAsync(GameSession session, int uid)
         {
             long map = session.MapId;
             long arena = MapManager.ResolveArenaMapId(map);
-            var (attackers, defenders) = FightHandler.Placement(map);
-            await session.SendAsync(
-                ConnectionProtocol.Answer(Op.Jxj, DreamProtocol.BuildPositions(arena, map, attackers, defenders),
-                                          ConnectionProtocol.RequestId(payload)));
+            var (attackers, defenders) = FightHandler.NextPlacement(map, arena);
+            await session.SendAsync(new Game.FightMapInformationResponse(arena, map,
+                new Game.FightStartingPositions(attackers.ToArray(), defenders.ToArray())), uid);
             Console.WriteLine($"[Dreams] Positions of map {map}: {attackers.Count} and {defenders.Count} cells.");
         }
 
@@ -1097,7 +1096,7 @@ namespace Jondo.Unity.Server.Handlers
         /// "Sueño III-pelear-morir-reaparecer en sala" shows -- the f17 gone after the death, the
         /// player back in the room. A dream that ends sends the player out, where he came from.
         /// </remarks>
-        internal static (long MapOut, int CellOut, string? Notice, bool Ended, byte[]? Result) AfterTheFight(
+        internal static (long MapOut, int CellOut, string? Notice, bool Ended, Game.InfiniteDreamEndEvent? Result) AfterTheFight(
             GameSession session, Jondo.Unity.World.Fights.FightInstance fight, bool won)
         {
             if (!Dreams.IsDreamMap(fight.RoleplayMapId)) { _finales.TryRemove(fight.FightId, out _); return (0, 0, null, false, null); }
@@ -1130,7 +1129,7 @@ namespace Jondo.Unity.Server.Handlers
                     // The dream fragments of the waves were paid with the fight's spoils
                     // (FightHandler.PlanRewards); the notice says how many.
                     int fragments = sueno.FromSouvenir ? 0 : Dreams.FragmentsFor(sueno.Dificultad, cleared);
-                    var result = ResultOf(sueno, fight, won: true, cleared);
+                    var result = ResultOf(sueno, fight, won: true, final);
                     RankTheDream(sueno, cleared, final.ClearedAtRound);
 
                     // A trial won: «Vencer en el combate final de la prueba» (EJ) for whoever fought it.
@@ -1156,7 +1155,7 @@ namespace Jondo.Unity.Server.Handlers
                 return (0, 0, CommandTexts.Get(session.State.Language, "dream.arena"), false, null);
             }
 
-            var lost = ResultOf(sueno, fight, won: false, final?.Cleared ?? 0);
+            var lost = ResultOf(sueno, fight, won: false, final);
             var (outMap, outCell) = End(sueno);
             return (outMap, outCell, CommandTexts.Get(session.State.Language, "dream.over"), true, lost);
         }
@@ -1198,13 +1197,13 @@ namespace Jondo.Unity.Server.Handlers
         /// the characters of the fight that ended it --, and the last wave of its end and the
         /// round it fell on. How many dreams each has won is not kept: one, this one -- INFERRED.
         /// </summary>
-        private static byte[] ResultOf(Dreams.Sueno sueno, Jondo.Unity.World.Fights.FightInstance fight, bool won, int waves)
+        private static Game.InfiniteDreamEndEvent ResultOf(Dreams.Sueno sueno, Jondo.Unity.World.Fights.FightInstance fight, bool won, FinalFight? final)
         {
             var players = fight.Azul.Concat(fight.Rojo)
                                .Where(f => !f.IsMonster && !f.EsInvocado && !f.EsIlusion && !f.IsBot)
                                .Select(f => new DreamProtocol.ResultPlayer(f.Id, f.Name ?? "", f.Sex, f.Breed, 1))
                                .ToList();
-            return DreamProtocol.BuildResult(sueno, won, players, waves, waves > 0 ? fight.RoundNumber : 0);
+            return DreamProtocol.BuildResult(sueno, won, players, final?.Cleared ?? 0, final?.ClearedAtRound ?? 0);
         }
 
         /// <summary>A dream over: forgotten, off the base, and where the player goes out to.</summary>

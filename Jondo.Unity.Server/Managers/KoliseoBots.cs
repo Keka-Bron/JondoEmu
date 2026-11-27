@@ -324,14 +324,16 @@ namespace Jondo.Unity.Server.Managers
             => SpellTable.KnownFor(spec.Breed, Level, spec.Choices).Select(k => (k.SpellId, k.Grade)).ToList();
 
         // The queued spec can be forgotten before this fight stops showing its fighter.
-        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, Jondo.Unity.Protocol.Game.EntityLook> FighterLooks = new();
-        internal static Jondo.Unity.Protocol.Game.EntityLook? PlacementLook(Fighter fighter)
-            => FighterLooks.TryGetValue(fighter, out var look) ? look : null;
+        private sealed record Looks(Jondo.Unity.Protocol.Game.EntityLook Normal, Jondo.Unity.Protocol.Game.EntityLook OnFoot);
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Fighter, Looks> FighterLooks = new();
+        internal static Jondo.Unity.Protocol.Game.EntityLook? PlacementLook(Fighter fighter, bool onFoot = false)
+            => FighterLooks.TryGetValue(fighter, out var look) ? (onFoot ? look.OnFoot : look.Normal) : null;
 
         /// <summary>The JondoBot as a fighter, full of life and points, ready from the start.</summary>
         public static Fighter BuildFighter(Spec spec)
         {
             var look = SemanticLookOf(spec);
+            var onFoot = SemanticLookOf(spec, onFoot: true);
             var fighter = new Fighter
             {
                 Id = spec.Id,
@@ -362,9 +364,9 @@ namespace Jondo.Unity.Server.Managers
                 IsBot = true,
                 IsReady = true,
                 BotLook = CharacterLookBuilder.WriteLook(look).Build(),
-                BotLookOnFoot = LookOf(spec, onFoot: true),
+                BotLookOnFoot = CharacterLookBuilder.WriteLook(onFoot).Build(),
             };
-            FighterLooks.Add(fighter, look);
+            FighterLooks.Add(fighter, new(look, onFoot));
 
             // The rest of the sheet as a character's is filled: flee and tackle a tenth of agility,
             // and the erosion every fighter starts with.

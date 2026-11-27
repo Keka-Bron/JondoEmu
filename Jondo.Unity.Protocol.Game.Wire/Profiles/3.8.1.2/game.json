@@ -46,9 +46,12 @@
     "lgq": {
       "name": "FighterLightInformation",
       "fields": {
+        "gdmo": "Wave",
         "gdmr": "Gender",
         "gdmp": "Alive",
-        "gdms": "Id"
+        "gdmq": "BreedId",
+        "gdms": "Id",
+        "gdmt": "Level"
       },
       "oneofs": {
         "gdmy": {
@@ -66,15 +69,27 @@
             "gdmw": {
               "type": "FighterLightInformationCaseMonsterInformation",
               "member": "Value"
+            },
+            "gdmx": {
+              "type": "FighterLightInformationCaseEntityInformation",
+              "member": "Value"
             }
           }
         }
       }
     },
+    "llq": {
+      "name": "FighterEntityLightInformation",
+      "fields": {
+        "gelh": "MasterId",
+        "gelj": "EntityModelId"
+      }
+    },
     "lhr": {
       "name": "FighterTaxCollectorLightInformation",
       "fields": {
-        "gdse": "FirstNameId"
+        "gdse": "FirstNameId",
+        "gdsd": "LastNameId"
       }
     },
     "lhi": {
@@ -3134,13 +3149,18 @@
     "lpz": {
       "name": "FightMark",
       "fields": {
+        "gffq": "Param3",
+        "gffs": "MarkType",
         "gfft": "Cells",
         "gffu": "SpellLevel",
         "gffv": "MarkImpactCell",
         "gffw": "SpellId",
         "gffz": "Active",
+        "gfga": "Param1",
+        "gfgd": "Team",
         "gfge": "AuthorId",
-        "gfgf": "MarkId"
+        "gfgf": "MarkId",
+        "gfgh": "Param2"
       },
       "oneofs": {},
       "ignoredStableMembers": [],
@@ -3878,6 +3898,7 @@
       "oneofs": {
         "gdlu": {
           "member": "FighterCase",
+          "noneType": "FightFighterInformationCaseNone",
           "cases": {
             "gdlt": {
               "type": "FightFighterInformationCaseAiFighter",
@@ -6553,7 +6574,11 @@
     },
     "lru": {
       "name": "ChallengeTarget",
-      "fields": {},
+      "fields": {
+        "gfor": "FighterId",
+        "gfos": "CellId",
+        "gfot": "AttackersId"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -8021,7 +8046,21 @@
     },
     "izx": {
       "name": "InfiniteDreamEndEvent",
-      "fields": {},
+      "fields": {
+        "fuuj": "Seed",
+        "fuuk": "Intensity",
+        "fuup": "BonusLevels",
+        "fuuq": "DreamPoints",
+        "fuur": "Life",
+        "fuus": "Maps",
+        "fuut": "Rerolls",
+        "fuuu": "KilledWaveNumber",
+        "fuuv": "ScaledLevel",
+        "fuuw": "CumulatedDuration",
+        "fuux": "KilledWaveGlobalTurn",
+        "fuuy": "Owner",
+        "fuuz": "Bonuses"
+      },
       "oneofs": {
         "fuvc": {
           "member": "Outcome",
@@ -8045,7 +8084,9 @@
     },
     "izt": {
       "name": "InfiniteDreamWinResult",
-      "fields": {},
+      "fields": {
+        "futq": "Players"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -8053,7 +8094,21 @@
     },
     "izu": {
       "name": "InfiniteDreamLossResult",
-      "fields": {},
+      "fields": {
+        "futw": "LastRoomId",
+        "futy": "LastStage"
+      },
+      "oneofs": {},
+      "ignoredStableMembers": [],
+      "defaultOnAbsence": [],
+      "defaultOneofs": {}
+    },
+    "izv": {
+      "name": "InfiniteDreamWinPlayer",
+      "fields": {
+        "fuud": "Character",
+        "fuue": "WinQuantity"
+      },
       "oneofs": {},
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
@@ -8477,10 +8532,12 @@
     "lpx": {
       "name": "FightMarkedCell",
       "fields": {
-        "gffj": "Id"
+        "gffj": "Id",
+        "gffk": "CellsType",
+        "gffl": "ZoneSize"
       },
       "oneofs": {},
-      "ignoredStableMembers": [],
+      "ignoredStableMembers": ["Color"],
       "defaultOnAbsence": [],
       "defaultOneofs": {}
     },
@@ -8623,6 +8680,9 @@
           "member": "ResponseCase",
           "noneType": "SurrenderAvailabilityCaseNone",
           "cases": {
+            "ggam": {
+              "type": "SurrenderAvailabilityCaseAvailable"
+            },
             "ggap": {
               "type": "SurrenderAvailabilityCaseBeforeTurn",
               "member": "Value"
@@ -8633,6 +8693,10 @@
       "ignoredStableMembers": [],
       "defaultOnAbsence": [],
       "defaultOneofs": {}
+    },
+    "luw": {
+      "name": "SurrenderAvailabilityCaseAvailable",
+      "fields": {}
     },
     "lux": {
       "name": "SurrenderBeforeTurn",
@@ -8653,8 +8717,7 @@
           "noneType": "SurrenderVoteAvailabilityCaseNone",
           "cases": {
             "ggbl": {
-              "type": "SurrenderVoteAvailabilityCaseWaiting",
-              "member": "Value"
+              "type": "SurrenderVoteAvailabilityCaseAvailable"
             },
             "ggbp": {
               "type": "SurrenderVoteAvailabilityCaseBeforeTurn",
@@ -8678,7 +8741,7 @@
       "defaultOneofs": {}
     },
     "lvg": {
-      "name": "SurrenderVoteWaiting",
+      "name": "SurrenderVoteAvailabilityCaseAvailable",
       "fields": {
         "ggbh": "VoteUnlockTimeStamp"
       },
@@ -8885,6 +8948,26 @@
     }
   },
   "enums": {
+    "lpt": {
+      "name": "FightMarkType",
+      "values": {
+        "fdwk": "Glyph",
+        "fdwl": "Trap",
+        "fdwm": "Wall",
+        "fdwn": "Portal",
+        "fdwo": "Rune",
+        "fdwp": "PrisonGlyph",
+        "fdwq": "Preview"
+      }
+    },
+    "lpu": {
+      "name": "FightMarkCellsType",
+      "values": {
+        "fdwr": "CellsCircle",
+        "fdws": "CellsCross",
+        "fdwt": "CellsSquare"
+      }
+    },
     "jsn": {
       "name": "MapObstacleState",
       "values": {

@@ -866,7 +866,7 @@ namespace Jondo.Unity.World.Fights
         // automatico y entrada automatica siguiendo a lider de grupo» (a party member pulled in
         // behind his leader) and «Busqueda grupo/busqueda automatica de grupo...» (four players
         // into one dungeon fight, the monster side rebuilt at every arrival). What travels is in
-        // Network/FightJoinProtocol.cs; this is only who fits where.
+        // the server's fight join handler; this is only who fits where.
 
         /// <summary>When the placement opened: what the kaa of a late joiner counts down from.</summary>
         public DateTime PlacementOpenedUtc { get; } = DateTime.UtcNow;

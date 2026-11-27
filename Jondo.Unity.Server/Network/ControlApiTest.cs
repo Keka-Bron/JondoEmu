@@ -354,7 +354,7 @@ namespace Jondo.Unity.Server.Network
                 var mark = (fight.RoundNumber, fight.CurrentTurnIndex, current);
                 var driver = current == null ? null : DriverOf(session, current);
                 WaitTillItBegins(fight, current);
-                if (driver != null && fight.CurrentFighter == current) RunAsClient(driver, "jxy", Pb.New().Build());
+                if (driver != null && fight.CurrentFighter == current) RunFightRequest(driver, new Jondo.Unity.Protocol.Game.FightTurnFinishRequest(false));
                 var until = DateTime.UtcNow.AddSeconds(90);
                 while (DateTime.UtcNow < until && fight.State == FightState.Ongoing
                        && (fight.RoundNumber, fight.CurrentTurnIndex, fight.CurrentFighter) == mark)
@@ -528,8 +528,12 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The ops a harness may send in the character's name, and the handler each goes to.</summary>
         private static readonly HashSet<string> FightOps = new()
         {
-            Op.Jwh, Op.Jwn, "jxy", "jwz",
+            Op.Jwh, Op.Jwn, "jxy",
         };
+
+        private static List<string> RunFightRequest(GameSession session, Jondo.Unity.Protocol.Game.GameRequest request)
+            => RunInSession(session, _ => GameNodeProxy.DispatchTypedAsync(session, new(request, -1),
+                new GameEntryService(session, new GameEntryBackend())));
 
         /// <summary>A client frame as the client wraps it: { f2 { f1 Any { f1 uri, f2 body }, f2 -1 } }.</summary>
         private static byte[] ClientFrame(string op, byte[] body)
@@ -547,7 +551,6 @@ namespace Jondo.Unity.Server.Network
         private static List<string> RunAsClient(GameSession session, string op, byte[] body)
         {
             byte[] frame = ClientFrame(op, body);
-            string routing = ConnectionProtocol.UriPrefix + op;
             var capture = new List<string>();
             var work = Task.Run(async () =>
             {
@@ -561,10 +564,9 @@ namespace Jondo.Unity.Server.Network
                         // Movement uses the same typed boundary as the socket loop.
                         if (op == Op.Jrw || op == Op.Jqk)
                             await MovementDispatch.TryHandleAsync(session, GameNodeProxy.DecodeRequest(session, frame));
-                         else if (op == Op.Kaq || op == Op.Jzy || op == Op.Hqa || op == Op.Kme)
+                        else if (FightOps.Contains(op) || op == Op.Kaq || op == Op.Jzy || op == Op.Hqa || op == Op.Kme || op == "jwz")
                             await GameNodeProxy.DispatchTypedAsync(session, GameNodeProxy.DecodeRequest(session, frame),
                                 new GameEntryService(session, new GameEntryBackend()));
-                         else if (FightOps.Contains(op)) await FightHandler.HandleFightMessageAsync(stream, frame, routing);
                         else if (op == Op.Hmt) await SpellHandler.HandleVariantAsync(stream, frame);
                         // A workshop's recipe chosen and crafted, as the craft window sends them: a
                         // quest's «Fabricar» objective played without dragging items about the screen.
@@ -1058,7 +1060,7 @@ namespace Jondo.Unity.Server.Network
             try
             {
                 WaitTillItBegins(fight, me);
-                lines = RunAsClient(session, "jxy", Pb.New().Build());
+                lines = RunFightRequest(session, new Jondo.Unity.Protocol.Game.FightTurnFinishRequest(false));
                 var until = DateTime.UtcNow.AddSeconds(150);
                 var handedOn = new HashSet<(int, int)>();
                 while (DateTime.UtcNow < until)
@@ -1094,7 +1096,7 @@ namespace Jondo.Unity.Server.Network
                         // ghost's tomb, on its timer) has handed it on already, and the pass
                         // would end the next one's.
                         if (fight.CurrentFighter == current && current.IsAlive)
-                            lines.AddRange(RunAsClient(driver, "jxy", Pb.New().Build()));
+                            lines.AddRange(RunFightRequest(driver, new Jondo.Unity.Protocol.Game.FightTurnFinishRequest(false)));
                     }
                 }
             }
@@ -1135,7 +1137,7 @@ namespace Jondo.Unity.Server.Network
             int grade = FightHandler.CastingGradeOf(me, spell);
             var aimedAt = fight.Todos.FirstOrDefault(f => f.IsAlive && f.CellId == cell);
             var snapshot = Managers.FightInvariants.Snapshot(fight, me, spell);
-            var lines = RunAsClient(driver, Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build());
+            var lines = RunFightRequest(driver, new Jondo.Unity.Protocol.Game.GameActionFightCastRequest(cell, spell));
             // The rules every fight keeps, after this cast: a corpse left standing, a life over its
             // maximum, an unmovable one moved, an invulnerable one hurt...
             var invariants = Managers.FightInvariants.Check(fight, withTime: true)

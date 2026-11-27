@@ -306,6 +306,7 @@ namespace Jondo.Unity.Launcher.Setup
             }
         }
 
+        [UnsupportedOSPlatform("windows")]
         private static void LinuxShortcut(string root)
         {
             string launcher = Path.Combine(root, InstallLayout.LauncherFileName);

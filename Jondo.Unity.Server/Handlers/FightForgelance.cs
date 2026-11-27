@@ -1,3 +1,4 @@
+using Game = Jondo.Unity.Protocol.Game;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -17,10 +18,8 @@ namespace Jondo.Unity.Server.Handlers
             if (limits.LevelId <= 0) return;
             // Eclipse's automatic impact uses the full cast animation at the end of its chain.
             bool chained = spell != ForgelanceCombat.SigelDisc || grade is not (3 or 6);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                FightProtocol.BuildAction(caster.Id, FightProtocol.Cast,
-                    FightProtocol.CastAt(caster.Id, target?.Id ?? 0, cell, spell, limits.LevelId,
-                        critical: false, noTarget: target == null, chained: chained), FightProtocol.CastDetail)));
+            await ATodosAsync(fight, CombatActions.Cast(caster.Id, target?.Id ?? 0, cell, spell, limits.LevelId,
+                        critical: false, noTarget: target == null, chained: chained));
         }
 
         /// <summary>
@@ -48,8 +47,7 @@ namespace Jondo.Unity.Server.Handlers
                 else
                 {
                     foreach (var row in owner.Buffs.QuitarEstadoConEmbrujos(ForgelanceCombat.NearLance))
-                        await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
-                            FightProtocol.BuildBuffGone(owner.Id, row.Numero)));
+                        await ATodosAsync(fight, new Game.FightEffectRemovedEvent(owner.Id, row.Numero));
                     await DispararAsync(stream, fight, owner,
                         EffectEngine.AlQuitarseElEstado(ForgelanceCombat.NearLance));
                 }
@@ -80,8 +78,7 @@ namespace Jondo.Unity.Server.Handlers
                 }
                 else if (!inside && row != null && ally.Buffs.QuitarFila(row))
                 {
-                    await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jya,
-                        FightProtocol.BuildBuffGone(ally.Id, row.Numero)));
+                    await ATodosAsync(fight, new Game.FightEffectRemovedEvent(ally.Id, row.Numero));
                 }
             }
         }
@@ -91,7 +88,7 @@ namespace Jondo.Unity.Server.Handlers
             var marks = fight.Glifos.Where(g => g.Dueno == lance.Id && ForgelanceCombat.IsAura(fight, g)).ToList();
             foreach (var mark in marks) fight.Glifos.Remove(mark);
             foreach (var mark in marks)
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, FightProtocol.BuildGlyphGone(mark.Dueno, mark.Id)));
+                await ATodosAsync(fight, CombatActions.GlyphGone(mark.Dueno, mark.Id));
 
             await SyncLanceProtectionAsync(stream, fight, lance);
         }

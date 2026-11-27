@@ -138,7 +138,8 @@ namespace Jondo.Unity.Tests.Combat
         [Fact]
         public async Task Returning_from_guard_is_broadcast_to_both_fighters()
         {
-            var owner = Person(); var ally = Person(Player + 1, 9, 314);
+            var owner = KoliseoBots.BuildFighter(new() { Id = Player, Breed = 20 });
+            var ally = Person(Player + 1, 9, 314);
             var fight = Board(owner, ally);
             await using var a = await PortalTests.Wire.Open(owner.Id);
             await using var b = await PortalTests.Wire.Open(ally.Id);
@@ -147,7 +148,9 @@ namespace Jondo.Unity.Tests.Combat
             {
                 var frame = Assert.Single(await wire.Drain());
                 Assert.Equal(149, Value(frame.Payload, 14));
-                AssertLook(Convert.FromHexString(ArmedLook), Sub(Sub(frame.Payload, 26), 3));
+                var normal = KoliseoBots.PlacementLook(owner, onFoot: true)!;
+                var expected = normal with { Bones = 1, Skins = normal.Skins.Where(s => s != ForgelanceCombat.LanceSkin).Append(ForgelanceCombat.LanceSkin).ToArray() };
+                AssertLook(CharacterLookBuilder.WriteLook(expected).Build(), Sub(Sub(frame.Payload, 26), 3));
             }
         }
 
@@ -443,7 +446,7 @@ namespace Jondo.Unity.Tests.Combat
             var frames = await wire.Drain();
             foreach (var mark in marks)
             {
-                var removal = FightProtocol.BuildGlyphGone(lance.Id, mark.Id);
+                var removal = CombatRecordingCodec.MappedCapture("jwe", FightProtocol.BuildGlyphGone(lance.Id, mark.Id));
                 Assert.Single(frames, f => f.Op == "jwe" && f.Payload.SequenceEqual(removal));
             }
             Assert.True(owner.Buffs.TieneEstado(3360));

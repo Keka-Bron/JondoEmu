@@ -43,7 +43,7 @@ namespace Jondo.Unity.Tests.Combat
             {
                 var flea = fight.Todos.Single(f => f.MonsterId == id);
                 Assert.True(flea.Buffs.TieneEstado(state), $"flea {id} lacks {state}");
-                Assert.Single(new[] { 334, 335, 336 }.Where(flea.Buffs.TieneEstado));
+                Assert.Single(new[] { 334, 335, 336 }, flea.Buffs.TieneEstado);
             }
             // With the three fleas alive the boss carries all three of their states (6326), which
             // no row of 6327 reads as one or two fleas lost: no 339 or 340 yet.

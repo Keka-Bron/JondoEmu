@@ -4,7 +4,15 @@ namespace Jondo.Unity.Protocol.Game;
 
 public sealed record AttackMonsterRequest(long MonsterGroupId) : GameRequest;
 public sealed record GameActionFightCastOnTargetRequest(long TargetId, int SpellId) : GameRequest;
-public sealed record FightMarkedCell(int Id);
+public sealed record FightMarkedCell(int Id, int Color = 0, int ZoneSize = 0, FightMarkCellsType CellsType = FightMarkCellsType.CellsCircle);
+public enum FightMarkCellsType { CellsCircle, CellsCross, CellsSquare }
+public enum FightMarkType
+{
+    Glyph, Trap, Wall, Portal, Rune, PrisonGlyph,
+#if JONDO_PROTOCOL_3_8_1_2
+    Preview,
+#endif
+}
 public sealed record FightNewWaveEvent(Team Team, int WaveId, int TurnLeftBeforeNextWave) : GameEvent;
 public sealed record ApplySpellModifierEvent(SpellModifier? Modifier, long ActorId) : GameEvent;
 public sealed record RemoveSpellModifierEvent(SpellModifierType ModifierType, SpellModifierActionType ActionType, int SpellId, long ActorId) : GameEvent;
@@ -79,22 +87,32 @@ public sealed record SurrenderInfoResponse(bool HasSanction, SurrenderAvailabili
     SurrenderVoteAvailability? SurrenderVoteResponse) : GameResponse;
 public sealed record SurrenderAvailability(SurrenderAvailabilityCase ResponseCase);
 [JsonDerivedType(typeof(SurrenderAvailabilityCaseNone), "None")]
+[JsonDerivedType(typeof(SurrenderAvailabilityCaseAvailable), "Available")]
 [JsonDerivedType(typeof(SurrenderAvailabilityCaseBeforeTurn), "BeforeTurn")]
 public abstract record SurrenderAvailabilityCase;
 public sealed record SurrenderAvailabilityCaseNone() : SurrenderAvailabilityCase;
+public sealed record SurrenderAvailabilityCaseAvailable() : SurrenderAvailabilityCase;
 public sealed record SurrenderAvailabilityCaseBeforeTurn(SurrenderBeforeTurn Value) : SurrenderAvailabilityCase;
 public sealed record SurrenderBeforeTurn(int MinTurnForSurrender);
 
 public sealed record SurrenderVoteAvailability(SurrenderVoteAvailabilityCase ResponseCase);
 [JsonDerivedType(typeof(SurrenderVoteAvailabilityCaseNone), "None")]
+[JsonDerivedType(typeof(SurrenderVoteAvailabilityCaseAvailable), "Available")]
+#if !JONDO_PROTOCOL_3_8_1_2
 [JsonDerivedType(typeof(SurrenderVoteAvailabilityCaseWaiting), "Waiting")]
+#endif
 [JsonDerivedType(typeof(SurrenderVoteAvailabilityCaseBeforeTurn), "BeforeTurn")]
 public abstract record SurrenderVoteAvailabilityCase;
 public sealed record SurrenderVoteAvailabilityCaseNone() : SurrenderVoteAvailabilityCase;
+#if JONDO_PROTOCOL_3_8_1_2
+public sealed record SurrenderVoteAvailabilityCaseAvailable(string VoteUnlockTimeStamp = "") : SurrenderVoteAvailabilityCase;
+#else
+public sealed record SurrenderVoteAvailabilityCaseAvailable() : SurrenderVoteAvailabilityCase;
 public sealed record SurrenderVoteAvailabilityCaseWaiting(SurrenderVoteWaiting Value) : SurrenderVoteAvailabilityCase;
+public sealed record SurrenderVoteWaiting(string VoteUnlockTimeStamp);
+#endif
 public sealed record SurrenderVoteAvailabilityCaseBeforeTurn(SurrenderVoteBeforeTurn Value) : SurrenderVoteAvailabilityCase;
 public sealed record SurrenderVoteBeforeTurn(int MinTurnForSurrenderVote);
-public sealed record SurrenderVoteWaiting(string VoteUnlockTimeStamp);
 public sealed record SurrenderVoteCastRequest(bool Vote) : GameRequest;
 public sealed record SurrenderVoteEndEvent(bool VoteResult) : GameEvent;
 public sealed record SurrenderVoteStartEvent(int ParticipantNumber, int CastedVoteNumber, int VoteDuration) : GameEvent;
@@ -133,7 +151,10 @@ public sealed record KothEndEvent(AllianceInformation? Winner) : GameEvent;
 
 public sealed record AlterationRemovedEvent(Alteration? Alteration) : GameEvent;
 public sealed record ObjectModifiedEvent(ObjectItemInventory? Object) : GameEvent;
-public sealed record InfiniteDreamEndEvent(InfiniteDreamEndEventCase Outcome) : GameEvent;
+public sealed record InfiniteDreamEndEvent(int Life, int Intensity, int KilledWaveNumber, int ScaledLevel,
+    string Seed, IReadOnlyList<InfiniteDreamMap> Maps, IReadOnlyList<InfiniteDreamBonus> Bonuses,
+    int Rerolls, int DreamPoints, int BonusLevels, int KilledWaveGlobalTurn, long CumulatedDuration,
+    InfiniteDreamCharacter? Owner, InfiniteDreamEndEventCase Outcome) : GameEvent;
 [JsonDerivedType(typeof(InfiniteDreamEndEventCaseNone), "None")]
 [JsonDerivedType(typeof(InfiniteDreamEndEventCaseWin), "Win")]
 [JsonDerivedType(typeof(InfiniteDreamEndEventCaseLoss), "Loss")]
@@ -141,5 +162,6 @@ public abstract record InfiniteDreamEndEventCase;
 public sealed record InfiniteDreamEndEventCaseNone() : InfiniteDreamEndEventCase;
 public sealed record InfiniteDreamEndEventCaseWin(InfiniteDreamWinResult Value) : InfiniteDreamEndEventCase;
 public sealed record InfiniteDreamEndEventCaseLoss(InfiniteDreamLossResult Value) : InfiniteDreamEndEventCase;
-public sealed record InfiniteDreamLossResult();
-public sealed record InfiniteDreamWinResult();
+public sealed record InfiniteDreamLossResult(string LastRoomId, InfiniteDreamStage LastStage);
+public sealed record InfiniteDreamWinResult(IReadOnlyList<InfiniteDreamWinPlayer> Players);
+public sealed record InfiniteDreamWinPlayer(InfiniteDreamCharacter? Character, int WinQuantity);

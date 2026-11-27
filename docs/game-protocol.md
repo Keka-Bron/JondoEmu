@@ -88,9 +88,59 @@ the body cannot be converted. The existing raw traffic file and its redaction/
 enablement behavior remain in place; no additional disk log is introduced.
 Mapped-log failure is isolated from outbound raw capture.
 
-The logger, world-movement handlers and mapped entry boundary use the typed API.
-Other gameplay and combat handlers continue through their existing packet paths
-during migration.
+The logger, world movement, entry and the live fight path use the typed API.
+See [live combat coverage](#live-combat) for the remaining fight-specific exceptions.
+
+## Live combat
+
+`GameNodeProxy` decodes pass-turn, cell and portrait casts, and surrender requests
+once. `FightHandler.HandleLiveRequestAsync` takes the fight turn inside the session
+turn, rechecks the current fight, then flushes a pending ending before applying
+another action. Only the controller can pass or cast on the client's behalf;
+server timers and forced passes keep their internal entry points. Portrait targets
+are resolved under the fight turn. Spell ID zero still selects a weapon or punch.
+
+`CombatActions` constructs action cases from resolved effects. Public events go
+through each fighter's and spectator's codec; private cooldowns, voter notices,
+hidden casts and viewer-specific characteristic sheets retain their own audiences.
+Lazy sequences open before their first send and close with the engine's action ID.
+The two control paths (TCP listener and test harness) use the same typed dispatch.
+
+`FightSettlementMessages` constructs result rows and each player's statistics
+after reward calculation. Settlement sends the experience notification, results,
+owner-only statistics, then inventory changes. New stacks are additions; existing
+stacks get their new total. The result screen and the later return to roleplay do
+not recalculate or re-award loot.
+
+When the run ends, both profiles send `InfiniteDreamEndEvent` to the dream owner.
+It includes the seed, ordered stage maps, bonuses, owner, run counters and cumulative
+fight time in milliseconds. A win lists players and their win counts; a loss identifies
+the final room and dream stage (the same stage used on the map).
+
+Both profiles send typed marks for walls, spell glyphs, traps, portals and Forgelance
+auras. A hidden trap goes to its owner's team first; the opposing team receives its
+placement immediately before the public trigger. Allied Roublardise copies carry the
+copy's actor ID and the original fighter's former position, but no nested fighter ID
+and no identity oneof branch. The opposing team gets the named disguise.
+
+In an ongoing Koliseo fight, `SurrenderInfoRequest` receives a typed `SurrenderInfoResponse`
+on both profiles. Only the requester receives it, with the original signed UID. Leave and
+vote each select their `Available` branch, even with an empty payload. August has a separate
+`Waiting` vote branch; beta's `Available` branch carries the unlock timestamp, left empty
+for the immediate vote. Ordinary fights do not answer this request.
+
+Surrender and the core fight-result sends are typed. Feature callbacks reached during
+settlement still have raw sends, including soul capture, mount capture and guild-raid
+notices. Koliseo queue and admission traffic is separate from the in-fight vote.
+
+### Profile limitations
+
+| Case | Current behavior and missing evidence |
+|---|---|
+| Mark color | August binds per-cell color. Beta binds cell ID, size and shape only; mark-level parameters are preserved without substituting for missing per-cell color. Wall and portal colors need a beta client visual check. |
+
+The beta publish gate exercises pass-turn, both weapon targeting forms, stale-fight
+refusal, surrender options, voting and pending settlement through the production dispatcher.
 
 ## Session and map messaging
 
@@ -257,8 +307,17 @@ The force-selection event is constructed directly as `CharacterForceSelectionEve
 The client automatically answers with `CharacterForceSelectionReadyRequest`; the
 server's existing policy selects the account's character whose fight can be rejoined.
 This continuation is permitted after identification and before world entry.
-`FightMapRequest` follows the same selected-character/in-world guard as other map
-readiness requests, retaining the existing spectator/resume ordering and fight locks.
+`FightMapRequest` uses the selected-character/in-world guard and returns a
+correlated `FightMapInformationResponse` with the arena ID, the current map ID,
+and both sides' preview cells. The preview reads the same placement as the next
+fight without consuming it. Fight-board readiness is handled separately.
+
+The spectator window uses typed light-team summaries and fighter detail rows on
+both Game profiles. Both replies echo the exact signed request UID. The reviewed
+fighter mappings carry breed, level, wave, both tax collector name IDs, and
+companion model and master IDs. On `3.6.10.10`, typed watch-by-player can enter
+from another map and defers board delivery to the existing readiness path.
+Watch-by-player on `3.8.1.2` still requires the spectator board migration.
 
 `GuildWeeklyResetDateRequest` replaces the provisional guild-mission request name.
 Its handler sends `GuildWeeklyResetDateResponse` directly through the owning session

@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
 using Game = Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.World.Fights;
-using static Jondo.Protocol.NetworkMessage;
 
 namespace Jondo.Unity.Server.Handlers
 {
@@ -20,14 +18,9 @@ namespace Jondo.Unity.Server.Handlers
     /// </summary>
     /// <remarks>
     /// <para>
-    /// No capture watches a fight; this is read off the client. Its spectator join is kab { f1 the
-    /// named teams, f2 ..., f3 the kaa }: fff.bdzg raises the spectator flag (+0x168) and enters the
-    /// fight context, fjq.bfuk reads the kaa inside and marks the fight state spectating (| 8). The
-    /// rest is a fighter's way in and a reconnection's board without what is a fighter's own: kml,
-    /// kmp, the arena's map; then, when the client asks with ijm/kmv, the fight as it stands --
-    /// ijq, kam, kab, every fighter (jxg), where they stand (kmk), jxb, the turn (jzc), the round,
-    /// the option, the teams, the buffs, the map -- and from then on every frame the fighters all
-    /// get. Leaving (kme) and the fight's end are a placement's way out: jxa, kml, kmp, the map.
+    /// After loading the arena, the client asks for the current board. The spectator join puts it
+    /// in spectator mode; the snapshot contains the public fight state without the private player
+    /// controls sent on reconnection. The spectator then receives the fight's public updates.
     /// </para>
     /// <para>
     /// A spectator is no fighter: FightOf does not find him, so nothing he sends plays. His
@@ -72,17 +65,20 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// kal { f2 the character }: the fight that character is in, watched from wherever one
+        /// The fight that character is in, watched from wherever one
         /// stands -- the lists that offer it are the friends', the guild's and the alliance's.
         /// </summary>
-        public static async Task WatchCharacterAsync(NetworkStream stream, byte[] payload)
+        internal static async Task WatchCharacterAsync(GameSession session, Game.FightSpectatePlayerRequest request)
         {
-            byte[]? kal = ConnectionProtocol.ReadPayload(payload, Op.Kal);
-            long target = 0;
-            if (kal != null)
-                foreach (var field in ProtoMessage.Parse(kal).Fields)
-                    if (field.FieldNumber == 2 && field.WireType == 0) target = field.VarIntValue;
-            await WatchAsync(SessionContext.Current, target == 0 ? null : FightOf(target), fromTheMap: false);
+            var fight = FightOf(request.PlayerId);
+            if (fight == null) return;
+            // The dispatcher owns the session turn. Recheck membership after taking the fight turn.
+            await InTurnAsync(fight, async () =>
+            {
+                if (FightById(fight.FightId) != fight || fight.Gone.Contains(request.PlayerId)
+                    || !fight.Todos.Any(f => f.Id == request.PlayerId)) return;
+                await WatchAsync(session, fight, fromTheMap: false);
+            });
         }
 
         private static async Task WatchAsync(GameSession me, FightInstance? fight, bool fromTheMap)
@@ -116,61 +112,119 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>The fight this session still owes its spectator's board, once its client asked for it.</summary>
-        public static FightInstance? PendingSpectatorBoard()
+        internal static FightInstance? PendingSpectatorBoard(GameSession session)
         {
-            var state = SessionContext.State;
+            var state = session.State;
             if (!state.SpectatorBoardPending || state.SpectatingFightId == 0) return null;
             var fight = FightById(state.SpectatingFightId);
             return fight != null && fight.State == FightState.Ongoing ? fight : null;
         }
 
-        /// <summary>The fight as it stands, to its new spectator: a reconnection's board, kab for its kaa.</summary>
-        public static async Task SendSpectatorBoardAsync(NetworkStream stream, FightInstance fight)
+        /// <summary>The ongoing board, privately to the spectator, under their session turn and the fight turn.</summary>
+        internal static async Task SendSpectatorBoardAsync(GameSession session, FightInstance fight)
         {
-            SessionContext.State.SpectatorBoardPending = false;
+            if (PendingSpectatorBoard(session) != fight) return;
+            session.State.SpectatorBoardPending = false;
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Ijq, FightProtocol.BuildMapReady()));
+            await session.SendAsync(new Game.FightPingsEvent(new Dictionary<int, int>(), new Dictionary<long, int>()));
 
             var monsters = fight.Reglas.EnfrenteHayMonstruos && fight.TaxCollectorUuid == null
-                ? fight.Rojo.ConvertAll(f => (long)f.MonsterId)
-                : new List<long>();
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kam,
-                FightProtocol.BuildFightAnnounced(fight.Reglas.TipoDelKam, fight.DefenderLeaderId, monsters, fight.FightId, 0)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kab,
-                FightProtocol.BuildSpectatorJoined(fight.Reglas.KaaConCuentaAtras ? fight.Reglas.TipoDelKam : 0)));
+                ? fight.Rojo.Where(f => f.IsMonster).Select(f => f.MonsterId).ToArray() : [];
+            var type = FightTypeOf(fight);
+            await session.SendAsync(new Game.FightStartingEvent(false, type, monsters, checked((int)fight.FightId), 0));
+            // The nested spectator summary historically has the first flag set and the fourth unset.
+            // Preserve that combination; the outer message selects spectator mode.
+            await session.SendAsync(new Game.FightSpectatorJoinEvent(new(
+                IsTeamPhase: true, IsFightStarted: false, TimeMaxBeforeFightStart: 0,
+                FightType: fight.Reglas.KaaConCuentaAtras ? type : Game.FightType.Challenge)));
 
-            foreach (var fighter in TodosLosCombatientes(fight))
+            var fighters = TodosLosCombatientes(fight).ToArray();
+            var snapshots = new Dictionary<Fighter, Game.ActorPositionInformation>();
+            Game.ActorPositionInformation Snapshot(Fighter fighter)
             {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxg,
-                    fighter.IsMonster
-                        ? CreatureFighter(fight, fighter)
-                        : BuildPlayerAppearance(fight, fighter)));
+                if (!snapshots.TryGetValue(fighter, out var actor))
+                    snapshots[fighter] = actor = BoardFighter(fight, fighter, ongoing: true);
+                return actor;
             }
 
-            var spots = new List<(int Cell, int Orientation, long Fighter)>();
-            foreach (var fighter in TodosLosCombatientes(fight))
-                if (fighter.IsAlive) spots.Add((fighter.CellId, FacingOf(fight, fighter), fighter.Id));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kmk, FightProtocol.BuildFightersPlaced(spots)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxb,
-                FightProtocol.BuildAllFighters(FighterBlocksInPlayOrder(fight))));
+            foreach (var fighter in fighters)
+                await session.SendAsync(new Game.FightFighterShowEvent(Snapshot(fighter)));
 
+            await session.SendAsync(new Game.EntitiesDispositionEvent(fighters.Where(f => f.IsAlive)
+                .Select(f => PlacementSpot(fight, f)).ToArray()));
+            await session.SendAsync(new Game.FightSynchronizeEvent(FightersInPlayOrder(fight)
+                .Select(Snapshot).ToArray()));
+
+            if (ResumedTurn(fight) is { } turn) await session.SendAsync(turn);
+
+            await session.SendAsync(new Game.FightNewRoundEvent(0, fight.RoundNumber));
+            await session.SendAsync(OptionUpdate(fight, FightInstance.Azules, FightInstance.OptionSecret,
+                fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)));
+            await session.SendAsync(FightTimeline(fight));
+            await session.SendAsync(FightBuffSnapshot(fight));
+            await session.SendAsync(FightMapSnapshot(fight));
+            await session.SendAsync(new Game.AreaFightModifierUpdateEvent([]));
+        }
+
+        private static Game.FightTurnEvent? ResumedTurn(FightInstance fight)
+        {
             var announced = fight.LastAnnouncedTurn;
-            if (announced.Announced)
-            {
-                await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzc,
-                    FightProtocol.BuildTurnResumed(announced.FighterId, announced.Deciseconds,
-                                                   announced.RemainingDeciseconds(DateTime.UtcNow),
-                                                   announced.Round, announced.Carried)));
-            }
+            if (!announced.Announced) return null;
+            int remaining = announced.RemainingDeciseconds(DateTime.UtcNow);
+            return new(announced.FighterId, announced.Deciseconds, AdditionalId: "", RemainingDeciseconds: announced.Carried,
+                TurnTimeOverrideDeciseconds: remaining > 0 ? remaining : null, TurnOrder: 0);
+        }
 
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jxz, FightProtocol.BuildRound(fight.RoundNumber)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Kau,
-                FightProtocol.BuildFightOption(FightInstance.Azules, FightInstance.OptionSecret,
-                    fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret), fight.FightId)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jzu, TeamsOf(fight)));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jwq, FightProtocol.BuildBuffSync(LiveBuffFrames(fight))));
-            await WriteFrameAsync(stream, ConnectionProtocol.Push(Op.Jrk, FightHandler.FightMapOf(fight)));
-            await WriteFrameAsync(stream, ConnectionProtocol.BuildActorsComplete());
+        private static Game.FightEffectsRefreshEvent FightBuffSnapshot(FightInstance fight)
+            => new(LiveBuffs(fight).Select(row => BoardEffect(row.Target, row.Buff)).ToArray());
+
+        private static Game.FightTurnListEvent FightTimeline(FightInstance fight)
+        {
+            var turns = new List<Game.FightTurnEntity>();
+            var extra = fight.AdditionalShown;
+            foreach (long id in CarouselOrder(fight))
+            {
+                turns.Add(new Game.FightTurnEntityCaseWithFlag(new(false, id)));
+                if (extra?.After != id) continue;
+                turns.Add(new Game.FightTurnEntityCaseWithAdditionalId(new(extra.Fighter.Id, extra.Id)));
+                extra = null;
+            }
+            if (extra != null) turns.Add(new Game.FightTurnEntityCaseWithAdditionalId(new(extra.Fighter.Id, extra.Id)));
+            return new(turns);
+        }
+
+        private static Game.FightRemovableEffectExtendedInformation BoardEffect(Fighter target, Buff buff)
+        {
+            var (category, boost) = DatabaseManager.EffectFamily(buff.EffectId);
+            var kind = FightProtocol.FamiliaDelEmbrujo(buff.EffectId, category, boost) switch
+            {
+                2 => Game.FightEffectKind.State,
+                4 => Game.FightEffectKind.Unknown4,
+                FightProtocol.HiddenFamily => Game.FightEffectKind.Triggered,
+                _ => Game.FightEffectKind.Unknown0,
+            };
+            var trigger = FightProtocol.WireTrigger(buff.Disparador);
+            var (param1, param2, param3) = BoardEffectParameters(buff);
+            return new(new(param1, target.Id, buff.Numero, buff.NivelOrigen, new(buff.CaducaEnRonda, 0),
+#if JONDO_PROTOCOL_3_8_1_2
+                new Game.FightEffectTrigger(null, [], trigger),
+#else
+                trigger,
+#endif
+                 buff.EffectUid, buff.Critico, param3, new(-1, -1), param2, buff.HechizoOrigen,
+                 kind, Game.EffectDissipationState.Dissipated), buff.Quien, buff.EffectId);
+        }
+
+        private static (int Param1, int Param2, int Param3) BoardEffectParameters(Buff buff)
+        {
+            if (buff.AnnouncedParameters is { } announced) return announced;
+
+            // Engine-created damage-taken rows can have only the resolved percentage. The
+            // client multiplies by Param1 for effect 1163; placing it in Param3 makes previews zero.
+            if (buff.EffectId == Buffs.DanoSufridoPorCiento) return (buff.Cuanto, 0, 0);
+            if (buff.Dado != 0 || buff.Cara != 0 || buff.Valor != 0) return (buff.Dado, buff.Cara, buff.Valor);
+
+            return (0, 0, buff.Estado != 0 && buff.Cuanto == 0 ? buff.Estado : buff.Cuanto);
         }
 
         /// <summary>
@@ -232,51 +286,77 @@ namespace Jondo.Unity.Server.Handlers
         /// The map's fights (jrv → jyc), as SpectatorUi lists them: each with its kind, its start,
         /// whether it takes spectators, and each side's size, mean level and options.
         /// </summary>
-        public static async Task RunningFightsAsync(NetworkStream stream, byte[] payload)
+        internal static async Task RunningFightsAsync(GameSession session, int uid)
         {
-            var listed = new List<Pb>();
-            foreach (var fight in FightsOnMap(SessionContext.State.MapId))
+            var listed = new List<Game.RunningFightInformation>();
+            foreach (var fight in FightsOnMap(session.MapId))
             {
-                bool secret = fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)
-                              || fight.OptionOn(FightInstance.Rojos, FightInstance.OptionSecret);
-                var teams = new List<(Pb, bool)>();
-                foreach (int team in new[] { FightInstance.Azules, FightInstance.Rojos })
+                await InTurnAsync(fight, () =>
                 {
-                    var side = fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive).ToList();
-                    var shown = TeamOnMap(fight, team, withMembers: false);
-                    var kindAndLeader = ProtoMessage.Parse(shown.Build());
-                    int sideKind = (int)(kindAndLeader.Fields.Find(f => f.FieldNumber == 2)?.VarIntValue ?? 0);
-                    long leader = kindAndLeader.Fields.Find(f => f.FieldNumber == 3)?.VarIntValue ?? 0;
-                    int mean = side.Count == 0 ? 0 : (int)side.Average(f => f.Level);
-                    teams.Add((FightJoinProtocol.LightTeam(team, leader, sideKind, side.Count, mean),
-                               fight.OptionOn(team, FightInstance.OptionPartyOnly)));
-                }
-                listed.Add(FightJoinProtocol.RunningFight(fight.FightId, fight.Reglas.TipoDelKam, fight.StartedAt, secret, teams));
+                    if (FightById(fight.FightId) == fight && fight.State != FightState.Ended)
+                    {
+                        bool secret = fight.OptionOn(FightInstance.Azules, FightInstance.OptionSecret)
+                                      || fight.OptionOn(FightInstance.Rojos, FightInstance.OptionSecret);
+                        listed.Add(new(null, new(checked((int)fight.FightId), FightTypeOf(fight),
+                            fight.StartedAt.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
+                            secret, [ListTeam(fight, FightInstance.Azules), ListTeam(fight, FightInstance.Rojos)])));
+                    }
+                    return Task.CompletedTask;
+                });
             }
-            await WriteFrameAsync(stream, ConnectionProtocol.Answer(Op.Jyc, FightJoinProtocol.BuildRunningFights(listed),
-                                                                    ConnectionProtocol.RequestId(payload)));
+            await session.SendAsync(new Game.MapRunningFightsResponse(listed), uid);
         }
 
-        /// <summary>One fight's people (jrz { f1 the fight } → jqy), for the spectator window's detail.</summary>
-        public static async Task FightDetailsAsync(NetworkStream stream, byte[] payload)
+        private static IEnumerable<Fighter> ListedFighters(FightInstance fight, int team)
+            => fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive);
+
+        private static Game.FightTeamsWithOptions ListTeam(FightInstance fight, int team)
         {
-            byte[]? jrz = ConnectionProtocol.ReadPayload(payload, Op.Jrz);
-            long fightId = 0;
-            if (jrz != null)
-                foreach (var field in ProtoMessage.Parse(jrz).Fields)
-                    if (field.FieldNumber == 1 && field.WireType == 0) fightId = field.VarIntValue;
-            var fight = FightById(fightId);
+            var (type, leader) = MapTeamLeader(fight, team);
+            var side = ListedFighters(fight, team).ToArray();
+            int mean = side.Length == 0 ? 0 : (int)side.Average(f => f.Level);
+            // The spectator window consumes the light case, not the map's member-list case.
+            var light = new Game.FightTeamLightInformation(false, false, side.Length, false, false, false, mean);
+            return new(new(type, leader, Game.Alignment.Without, TeamIdentity(team), 0,
+                           new Game.FightTeamInformationCaseLightInformation(light)),
+                       new(false, fight.OptionOn(team, FightInstance.OptionPartyOnly), false, false));
+        }
+
+        /// <summary>One fight's people, for the spectator window's detail.</summary>
+        internal static async Task FightDetailsAsync(GameSession session, Game.MapRunningFightDetailsRequest request, int uid)
+        {
+            var fight = FightById(request.FightId);
             if (fight == null) return;
 
-            // A character's sex is his row's; a bot carries its own.
-            int SexOf(Fighter f) => f.IsMonster ? 0 : f.IsBot ? f.Sex : DatabaseManager.GetCharacterById(f.Id)?.Sex ?? 0;
-            IEnumerable<Pb> PeopleOf(int team) => fight.Bando(team).Where(f => !f.EsInvocado && f.IsAlive)
-                .Select(f => FightJoinProtocol.FighterInDetails(f.Id, f.Level, f.IsMonster ? f.MonsterId : 0, f.Name,
-                                                                f.TaxCollectorFirstName, f.TaxCollectorLastName,
-                                                                f.Breed, SexOf(f) == 1));
-            await WriteFrameAsync(stream, ConnectionProtocol.Answer(Op.Jqy,
-                FightJoinProtocol.BuildFightDetails(fight.FightId, PeopleOf(FightInstance.Azules), PeopleOf(FightInstance.Rojos)),
-                ConnectionProtocol.RequestId(payload)));
+            Game.MapRunningFightDetailsResponse? details = null;
+            await InTurnAsync(fight, () =>
+            {
+                if (FightById(request.FightId) == fight)
+                    details = new(ListedFighters(fight, FightInstance.Rojos).Select(FighterDetail).ToArray(),
+                                  ListedFighters(fight, FightInstance.Azules).Select(FighterDetail).ToArray());
+                return Task.CompletedTask;
+            });
+            if (details != null) await session.SendAsync(details, uid);
+        }
+
+        private static Game.FighterLightInformation FighterDetail(Fighter fighter)
+        {
+            const int monsterBreed = -2; // The spectator portrait uses the monster ID for this breed.
+            if (fighter.TaxCollectorFirstName != 0 || fighter.TaxCollectorLastName != 0)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, 0, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseTaxCollectorInformation(
+                        new(fighter.TaxCollectorFirstName, fighter.TaxCollectorLastName)));
+            if (fighter.IsCompanion)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, fighter.Breed, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseEntityInformation(new(fighter.DrivenBy, fighter.CompanionId)));
+            if (fighter.IsMonster && fighter.MonsterId != 0)
+                return new(Game.Gender.Male, fighter.IsAlive, fighter.Id, monsterBreed, fighter.Level, fighter.Wave,
+                    new Game.FighterLightInformationCaseMonsterInformation(new(fighter.MonsterId)));
+
+            // A character's gender comes from its stored row; a bot carries its own.
+            int sex = fighter.IsMonster ? 0 : fighter.IsBot ? fighter.Sex : DatabaseManager.GetCharacterById(fighter.Id)?.Sex ?? 0;
+            return new(sex == 1 ? Game.Gender.Female : Game.Gender.Male, fighter.IsAlive, fighter.Id,
+                fighter.Breed, fighter.Level, fighter.Wave, new Game.FighterLightInformationCaseNamedInformation(new(fighter.Name ?? "")));
         }
 
         /// <summary>A spectator gone: off the fight's list. His map is put back by the save on the way out.</summary>

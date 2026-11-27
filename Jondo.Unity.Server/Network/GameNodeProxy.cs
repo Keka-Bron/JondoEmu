@@ -951,11 +951,6 @@ namespace Jondo.Unity.Server.Network
                     // The loot table of the dream's room.
                     await DreamHandler.DropTableAsync(session, payload);
                 }
-                else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Kaz)))
-                {
-                    // Where a fight here would place everybody.
-                    await DreamHandler.PositionsAsync(session, payload);
-                }
                 else if (isAuthenticated && payloadStr.Contains(Op.Uri(Op.Izh)))
                 {
                     // The astral storm.
@@ -1336,13 +1331,6 @@ namespace Jondo.Unity.Server.Network
                     // A pet fed from the «Alimentar» window.
                     await PetFeedHandler.FeedAsync(stream, payload);
                 }
-                else if (payloadStr.Contains(Op.Uri(Op.Kso)))
-                {
-                    // The option chosen in a choice: a fight's -- a trial's guardian or hero -- or
-                    // the one an item proposed, an ankla's dungeon.
-                    if (!await FightHandler.AnswerChoiceAsync(stream, payload))
-                        await TravelItemHandler.ChooseAsync(stream, payload);
-                }
                 else if (payloadStr.Contains("type.ankama.com/kla"))
                 {
                     // The dialogue's close button. It goes empty and expects an answer: khd if what
@@ -1496,29 +1484,6 @@ namespace Jondo.Unity.Server.Network
                 else if (payloadStr.Contains(Op.Uri(Op.Hor)))
                 {
                     await EmoteHandler.MoodAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Jrv)))
-                {
-                    // The spectator window's list of the map's fights.
-                    await FightHandler.RunningFightsAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Jrz)))
-                {
-                    // And one of them, its people.
-                    await FightHandler.FightDetailsAsync(stream, payload);
-                }
-                else if (payloadStr.Contains(Op.Uri(Op.Kal)))
-                {
-                    // Watching a friend's, a guild mate's or an alliance mate's fight.
-                    await FightHandler.WatchCharacterAsync(stream, payload);
-                }
-                else if (payloadStr.Contains("type.ankama.com/jwz") || payloadStr.Contains("type.ankama.com/jxy")
-                         || payloadStr.Contains(Op.Uri(Op.Jwh))
-                         || payloadStr.Contains(Op.Uri(Op.Jwn))
-                         || payloadStr.Contains(Op.Uri(Op.Jti))
-                          || payloadStr.Contains(Op.Uri(Op.Ltf)) || payloadStr.Contains(Op.Uri(Op.Lsp)))
-                {
-                    await FightHandler.HandleFightMessageAsync(stream, payload, payloadStr);
                 }
                 else if (payloadStr.Contains("type.ankama.com/kqn"))
                 {
@@ -1693,6 +1658,22 @@ namespace Jondo.Unity.Server.Network
                 case Game.FightJoinRequest join:
                     await FightHandler.JoinRequestAsync(session, join);
                     break;
+                case Game.FightMapRequest preview:
+                    if (GameEntryDispatch.IsAllowed(session, preview))
+                        await DreamHandler.PositionsAsync(session, frame.Uid.Value);
+                    break;
+                case Game.MapRunningFightsRequest list:
+                    if (GameEntryDispatch.IsAllowed(session, list))
+                        await FightHandler.RunningFightsAsync(session, frame.Uid.Value);
+                    break;
+                case Game.MapRunningFightDetailsRequest details:
+                    if (GameEntryDispatch.IsAllowed(session, details))
+                        await FightHandler.FightDetailsAsync(session, details, frame.Uid.Value);
+                    break;
+                case Game.FightSpectatePlayerRequest spectate:
+                    if (GameEntryDispatch.IsAllowed(session, spectate))
+                        await FightHandler.WatchCharacterAsync(session, spectate);
+                    break;
                 case Game.ContextQuitRequest:
                     await FightHandler.QuitAsync(session);
                     break;
@@ -1710,6 +1691,21 @@ namespace Jondo.Unity.Server.Network
                     break; // Placement panel mode and hover notifications have no reply.
                 case Game.FightReadyRequest ready:
                     await FightHandler.HandleReadyAsync(session, ready);
+                    break;
+                case Game.ChoiceSelectedRequest choice:
+                    if (GameEntryDispatch.IsAllowed(session, choice))
+                    {
+                        using var context = SessionContext.Push(session);
+                        if (!await FightHandler.AnswerChoiceAsync(session, choice.Position) && !session.State.IsInFight)
+                            await TravelItemHandler.ChooseAsync(session.Stream, choice.Position);
+                    }
+                    break;
+                case Game.FightTurnReadyRequest or Game.GameActionAcknowledgementRequest:
+                    await FightHandler.HandleCombatConfirmationAsync(session, (Game.GameRequest)frame.Content);
+                    break;
+                case Game.FightTurnFinishRequest or Game.GameActionFightCastRequest or Game.GameActionFightCastOnTargetRequest
+                    or Game.SurrenderInfoRequest or Game.SurrenderVoteCastRequest:
+                    await FightHandler.HandleLiveRequestAsync(session, (Game.GameRequest)frame.Content, frame.Uid.Value);
                     break;
                 case Game.ShowCellRequest marker:
                     await FightHandler.MarkCellAsync(session, marker);

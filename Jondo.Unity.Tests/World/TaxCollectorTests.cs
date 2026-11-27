@@ -143,27 +143,6 @@ namespace Jondo.Unity.Tests.World
                          TaxCollectorProtocol.BuildDialog(AllianceThree, 429, 20, 23836));
         }
 
-        /// <summary>The tax collector's side on the map (kae): kind 3, led by its actor, it by its names.</summary>
-        [Fact]
-        public void Its_side_matches_the_capture()
-        {
-            var side = FightJoinProtocol.Team(FightInstance.Rojos, -20074, FightJoinProtocol.TaxCollectorSide,
-                                              new[] { FightJoinProtocol.TaxCollectorOnTeam(-1, 35, 109) });
-            Assert.Equal(Hex("0a2610031896e3feffffffffffff0120012a130a1110ffffffffffffffffff011a040823106d300110c401"),
-                         FightJoinProtocol.BuildTeamUpdate(side, 196));
-        }
-
-        /// <summary>The fight's announcement (kam): type 5, the tax collector's actor, no monster list.</summary>
-        [Fact]
-        public void The_announcement_matches_the_capture()
-        {
-            Assert.Equal(Hex("10051896e3feffffffffffff0128c4013081f092cbdd08"),
-                         FightProtocol.BuildFightAnnounced(FightRules.ContraRecaudador.TipoDelKam, -20074,
-                                                           new List<long>(), 196, 300000000001));
-            Assert.Equal(Hex("1801200128bb033005"),
-                         FightProtocol.BuildFightSummary(FightRules.ContraRecaudador.TipoDelKam, 443));
-        }
-
         /// <summary>
         /// Its identity as a fighter: the other case of the monsters' oneof, its names and the
         /// monster «Recaudador», as in the jxg of the attack ({35, 109, 3859}).

@@ -346,7 +346,8 @@ namespace Jondo.Unity.Tests.Combat
             Assert.NotNull(fight.Portales.ById(2));
             Assert.NotNull(fight.Portales.ById(3));
             var frames = (await wire.Drain()).Where(f => f.Op == "jwe").Select(f => f.Payload).ToList();
-            Assert.Contains(frames, f => f.SequenceEqual(FightProtocol.BuildGlyphGone(-1, 1)));
+            var removed = CombatRecordingCodec.MappedCapture("jwe", FightProtocol.BuildGlyphGone(-1, 1));
+            Assert.Contains(frames, f => f.SequenceEqual(removed));
         }
 
         /// <summary>
@@ -579,7 +580,7 @@ namespace Jondo.Unity.Tests.Combat
             var frames = await wire.Drain();
             Assert.Equal(new[] { "jto", "jsj", "jto", "jxw", "jwi", "jwe", "jwe", "jwe", "jwe", "jwe", "jwe", "jwi" },
                          frames.Select(f => f.Op));
-            Assert.Equal(Hex("0a04bd02af021007289ba4afb8c501"), frames[1].Payload);                        // 180
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[1].Op, Hex("0a04bd02af021007289ba4afb8c501")), frames[1].Payload);                        // 180
             Assert.Equal(Hex("189ba4afb8c5014a0c08af02109ba4afb8c501200a70b302"), frames[6].Payload);    // 185
             Assert.Equal(Hex("189ba4afb8c501709d098a0102080a"), frames[7].Payload);                      // 186
             Assert.Equal(Hex("189ba4afb8c501709d098a01020807"), frames[8].Payload);                      // 187
@@ -595,7 +596,7 @@ namespace Jondo.Unity.Tests.Combat
             await FightHandler.PortalsAtTurnStartAsync(fight, fight.Buscar(-1));
             frames = await wire.Drain();
             Assert.Equal(new[] { "jto", "jwe", "jwe", "jwi" }, frames.Select(f => f.Op));
-            Assert.Equal(Hex("08ffffffffffffffffff011002"), frames[0].Payload);
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[0].Op, Hex("08ffffffffffffffffff011002")), frames[0].Payload);
             Assert.Equal(Hex("18ffffffffffffffffff01709d098a010408071001"), frames[1].Payload);
             Assert.Equal(Hex("18ffffffffffffffffff01709d098a0104080a1001"), frames[2].Payload);
         }
@@ -644,7 +645,7 @@ namespace Jondo.Unity.Tests.Combat
             var frames = await wire.Drain();
             Assert.Equal(new[] { "jwe", "jwe", "jto", "jwe", "jwe", "jwi" }, frames.Select(f => f.Op));
             Assert.Equal(Hex("189ba4afb8c501709d098a01020807"), frames[0].Payload);                       // 7
-            Assert.Equal(Hex("089ba4afb8c5011002"), frames[2].Payload);                                   // 69
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[2].Op, Hex("089ba4afb8c5011002")), frames[2].Payload);                                   // 69
             Assert.Equal(Hex("189ba4afb8c501709d098a010408071001"), frames[3].Payload);                   // 70
             Assert.Equal(Hex("189ba4afb8c501709d098a010408081001"), frames[4].Payload);                   // 71
         }
@@ -749,7 +750,7 @@ namespace Jondo.Unity.Tests.Combat
             var frames = await wire.Drain();
             Assert.Equal(new[] { "jwe", "jto", "jxw", "jwi", "jwe" }, frames.Select(f => f.Op));
             Assert.Equal(Hex("189ba4afb8c501709d098a01020807"), frames[0].Payload);                   // 7
-            Assert.Equal(Hex("089ba4afb8c5011003"), frames[1].Payload);                               // 8
+            Assert.Equal(CombatRecordingCodec.MappedCapture(frames[1].Op, Hex("089ba4afb8c5011003")), frames[1].Payload);                               // 8
             Assert.Equal(Hex("189ba4afb8c5017078a201090801109ba4afb8c501"), frames[4].Payload);       // 11
         }
 
@@ -890,7 +891,24 @@ namespace Jondo.Unity.Tests.Combat
             /// <summary>Every frame that has come, until none comes for a moment.</summary>
             public async Task<List<(string Op, byte[] Payload)>> Drain()
             {
-                var frames = new List<(string, byte[])>();
+                return (await DrainFrames()).Select(frame =>
+                {
+                    string op = OpcodeOf(frame);
+                    return (op, ConnectionProtocol.ReadPayload(frame, op));
+                }).ToList();
+            }
+
+            internal async Task<List<Jondo.Unity.Protocol.Game.GameActionFightEvent>> DrainActions()
+            {
+                var codec = new Jondo.Unity.Protocol.Game.Wire.GameCodec();
+                var alias = codec.ReadEnvelope(codec.Encode(new(CombatActions.GlyphGone(0, 0)))).Alias;
+                return (await DrainFrames()).Where(f => codec.ReadEnvelope(f).Alias == alias)
+                    .Select(f => Assert.IsType<Jondo.Unity.Protocol.Game.GameActionFightEvent>(codec.Decode(f).Content)).ToList();
+            }
+
+            private async Task<List<byte[]>> DrainFrames()
+            {
+                var frames = new List<byte[]>();
                 while (true)
                 {
                     // A read left waiting by the last drain is the one that gets the next frame.
@@ -902,9 +920,7 @@ namespace Jondo.Unity.Tests.Combat
                         _pending = read;
                         return frames;
                     }
-                    byte[] frame = await read;
-                    string op = OpcodeOf(frame);
-                    frames.Add((op, ConnectionProtocol.ReadPayload(frame, op)));
+                    frames.Add(await read);
                 }
             }
 

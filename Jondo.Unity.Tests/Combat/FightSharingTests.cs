@@ -1,4 +1,3 @@
-using System;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
 using Jondo.Unity.World.Fights;
@@ -11,8 +10,6 @@ namespace Jondo.Unity.Tests.Combat
     /// </summary>
     public class FightSharingTests
     {
-        private static byte[] Hex(string hex) => Convert.FromHexString(hex);
-
         // ─── The shares ─────────────────────────────────────────────────────────────────
 
         /// <summary>Solo also applies the level mismatch and individual cap.</summary>
@@ -58,20 +55,6 @@ namespace Jondo.Unity.Tests.Combat
         }
 
         // ─── The options ────────────────────────────────────────────────────────────────
-
-        /// <summary>The kau with its side and its state, as the captures carry it.</summary>
-        [Fact]
-        public void The_option_frames_are_the_captures()
-        {
-            // The defenders' side closed, in the sword capture (frame 34).
-            Assert.Equal(Hex("08011802200128bb26"), Server.Network.FightProtocol.BuildFightOption(1, 2, true, 4923));
-            // The attackers' side kept to its party, in the follow capture (136).
-            Assert.Equal(Hex("1801200128e703"), Server.Network.FightProtocol.BuildFightOption(0, 1, true, 487));
-            // No spectators, in the poutch capture (115).
-            Assert.Equal(Hex("200128ad27"), Server.Network.FightProtocol.BuildFightOption(0, 0, true, 5037));
-            // And the board's four, all off.
-            Assert.Equal(Hex("180228b307"), Server.Network.FightProtocol.BuildFightOption(2, 947));
-        }
 
         /// <summary>A side kept to its party on the map: { f4: 1 } in its options block.</summary>
         [Fact]

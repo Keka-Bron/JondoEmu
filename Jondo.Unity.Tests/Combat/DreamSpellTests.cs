@@ -40,7 +40,7 @@ namespace Jondo.Unity.Tests.Combat
             public async Task CastAsync(int spell, int cell)
             {
                 using (SessionContext.Push(Pipe.Session))
-                    await FightHandler.CastAsync(Pipe.ToClient, ConnectionProtocol.Push(Op.Jwh, Pb.New().Var(1, cell).Var(4, spell).Build()));
+                    await FightHandler.CastAsync(Pipe.ToClient, Fight, cell, spell);
             }
 
             public async ValueTask DisposeAsync()

@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jondo.Unity.Protocol;
+using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
-using Jondo.Unity.Tests.Economy;
 using Jondo.Unity.World.Fights;
 using Xunit;
 
@@ -33,27 +31,11 @@ namespace Jondo.Unity.Tests.Combat
             return person;
         }
 
-        /// <summary>Every frame that arrives until the line goes quiet.</summary>
-        private static async Task<List<string>> DrainAsync(ClientPipe pipe)
-        {
-            var opcodes = new List<string>();
-            while (true)
-            {
-                var read = Jondo.Protocol.NetworkMessage.ReadFrameAsync(pipe.FromServer);
-                if (await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(1.5))) != read) return opcodes;
-                byte[] frame = await read;
-                if (frame == null) return opcodes;
-                opcodes.Add(ConnectionProtocol.ReadOpcode(frame) ?? "");
-            }
-        }
-
         [Fact]
         public async Task The_board_s_start_happens_once_after_everybody_s_burst()
         {
             const long first = 8_300_000_001, second = 8_300_000_002;
             const long map = 188744196;
-            await using var a = await ClientPipe.OpenAsync(8301, first, map, "A");
-            await using var b = await ClientPipe.OpenAsync(8302, second, map, "B");
             var fight = new FightInstance(9301, map, 191105032) { Reglas = FightRules.ContraMonstruos };
             fight.SetPlacementCells(new[] { 300, 301 }, new[] { 180, 181 });
             fight.AddPlayer(Person(first, 300));
@@ -62,22 +44,48 @@ namespace Jondo.Unity.Tests.Combat
             fight.SetFighterReady(first);
             fight.SetFighterReady(second);
 
-            await FightHandler.StartFightAsync(fight);
-
-            foreach (var opcodes in new[] { await DrainAsync(a), await DrainAsync(b) })
+            var sent = new List<(long Recipient, GamePayload Message, int AttitudesApplied)>();
+            var a = CreateClient(first);
+            var b = CreateClient(second);
+            Assert.True(SessionRegistry.Register(a));
+            try
             {
-                int kai = opcodes.IndexOf(Op.Kai);
-                Assert.True(kai >= 0, "no kai: " + string.Join(",", opcodes));
+                Assert.True(SessionRegistry.Register(b));
+                await FightHandler.StartFightAsync(fight);
 
-                // The opening's own sequence, and one for each attitude: two people, one each.
-                Assert.Equal(3, opcodes.Count(o => o == Op.Jto));
-                Assert.True(opcodes.IndexOf(Op.Jto) > kai, "a sequence came before the kai: " + string.Join(",", opcodes));
+                var prompts = sent.Where(row => row.Message is FightIsTurnReadyEvent).ToArray();
+                Assert.Equal(new[] { first, second }.Order(), prompts.Select(row => row.Recipient).Order());
+                Assert.All(prompts, row => Assert.Equal(2, row.AttitudesApplied));
+                Assert.Equal(prompts, sent.TakeLast(2));
 
-                // And the first turn asked for once, last.
-                Assert.Equal(1, opcodes.Count(o => o == Op.Jxh));
-                Assert.True(opcodes.LastIndexOf(Op.Jto) < opcodes.IndexOf(Op.Jxh));
+                foreach (long id in new[] { first, second })
+                {
+                    var burst = sent.Where(row => row.Recipient == id).ToList();
+                    int start = burst.FindIndex(row => row.Message is FightStartEvent);
+                    int close = burst.FindIndex(row => row.Message is SequenceEndEvent);
+                    Assert.True(start >= 0 && close > start);
+                    Assert.Equal(0, burst[close].AttitudesApplied);
+                    Assert.Single(fight.Buscar(id).Buffs.Puestos, buff => buff.Estado == 56);
+                }
             }
-            Assert.Single(fight.Buscar(first).Buffs.Puestos, p => p.Estado == 56);
+            finally
+            {
+                SessionRegistry.Unregister(a);
+                SessionRegistry.Unregister(b);
+            }
+
+            GameSession CreateClient(long id)
+            {
+                // Opening attitudes still send legacy action sequences. Observe their applied state instead.
+                var session = new GameSession(new CombatRecordingCodec(frame => sent.Add((id, frame.Content,
+                    fight.Azul.Sum(fighter => fighter.Buffs.Puestos.Count(buff => buff.Estado == 56))))),
+                    _ => Task.CompletedTask);
+                session.BindAccount(id + 1, 1);
+                session.State.CharacterId = id;
+                session.State.MapId = map;
+                session.EnterWorld();
+                return session;
+            }
         }
     }
 }

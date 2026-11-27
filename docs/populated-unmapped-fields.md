@@ -245,6 +245,62 @@ changes outbound behavior: `jondo-11-08-2026` found no native use witness, but
 caller coverage is incomplete, so client use is indeterminate. These tag and
 property numbers are not evidence for the beta profile.
 
+### Spectator fight details
+
+The retired August `BuildFightDetails` wrote the fight ID into `jqy` tag **1**
+(property **198418**). The inspected handler `Core.fhs.bffv` (`0x52ce370`)
+reads the two fighter lists, not that scalar. The August MCP audit found no use
+witness, with incomplete caller coverage. The typed reply omits the scalar and
+retains the request UID in the response envelope.
+
+### Spectator board
+
+The typed spectator announcement omits the defender ID (`kam` tag **3**) under
+the same policy as participant placement. The legacy spectator turn snapshot
+wrote the announced round into `jzc` tag **8** (property **199394**). The August
+native audit found no use witness and incomplete caller coverage. The typed
+board omits that scalar and still sends the current round in the separate
+`FightNewRoundEvent`. Neither omission uses a raw fallback.
+
+### Participant reconnect board
+
+The reconnect announcement likewise omits `kam` tag **3**. Its ordinary
+`FightJoinEvent` keeps both mapped true flags (`kaa` tags **1** and **4**), with
+no countdown, and omits the historical `true` in tag **3** under the placement
+policy above. Reconnect uses the same turn snapshot as spectating (omits `jzc`
+tag **8**, with a separate round event). Its trailing turn-ready notification
+uses the empty typed `FightIsTurnReadyEvent` described below. No raw fallback.
+
+### Combat startup, turn confirmation, and fight endings
+
+The typed opening sequence omits `SequenceStartEvent` / `jto` tag **1** (the former
+author ID, property **198700**) and `SequenceEndEvent` / `jwi` tag **3** (the former
+sequence kind, property **199065**). It retains the reviewed start kind and the
+end's action and author IDs. `FightIsTurnReadyEvent` / `jxh` omits the former fighter
+ID (tag **2**, property **199176**) and sends the empty notification. The August
+MCP audit reported **indeterminate** use with incomplete caller coverage for all
+three fields. The shared typed turn announcement omits `jzc` tag **8** under the
+same policy as the spectator snapshot. These are not findings of global non-use.
+
+The typed sequence for declining reentry makes the same `jto` and `jwi`
+omissions. It retains the character-death start kind, the death action and
+updated timeline, and the closing action and author IDs. If the departure ends
+the ongoing fight, the confirmation uses the same empty `FightIsTurnReadyEvent`
+as other fight endings, including in-fight surrender and forced defeats.
+
+### Live casts, effects and settlement
+
+The August writer populated these unmapped fields. `code.identify_decoys` classified
+client use as **indeterminate** on `jondo-11-08-2026` because caller coverage was incomplete.
+
+- `SpellCastCount` tag 3 (property 198950): cast interval.
+- `FightRemovableEffect` tag 11 (property 202689): parent buff ID.
+- `GameMapMovementEvent` tag 2 (property 198553): fighter facing.
+- `FightActionTackled` tag 1 (property 198913): tackler IDs.
+- `EntitySpawnCharacter` tag 2 (property 198639): the summoned double's level.
+- `FightExperienceData` tags 8 and 9 (properties 203314 and 203315): both set to `1` in the XP result block.
+- `FightPvpData` tags 2, 3 and 5 (properties 203320, 203321 and 203323): the PvP result writer supplied the honour grade, grade floor and current honour, respectively.
+
 ## Quest-journal construction policy
 
 The **16 November 2026** journal/followed/marks migration applies the existing

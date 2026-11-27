@@ -48,7 +48,7 @@ namespace Jondo.Unity.Tests.Combat
             boss.Buffs.QuitarEstadoConEmbrujos(215);
             Assert.False(boss.Buffs.TieneEstado(215));
             await FightHandler.DispararAsync(null, fight, boss, EffectEngine.AlAcabarElTurno);
-            Assert.False(boss.Buffs.Puestos.Any(b => b.HechizoOrigen == 4971 && b.EffectId == 141));
+            Assert.DoesNotContain(boss.Buffs.Puestos, b => b.HechizoOrigen == 4971 && b.EffectId == 141);
         }
     }
 }

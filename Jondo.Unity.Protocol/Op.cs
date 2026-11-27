@@ -2750,7 +2750,7 @@ public static class Op
     /// <summary>Present in 25 of the 31 capture folders (399 messages, 90 files). Nothing established.</summary>
     public const string Kmu = "kmu";
 
-    // ─── A fight on the map, and coming into one (Network/FightJoinProtocol.cs) ──────────
+    // ─── A fight on the map, and coming into one ───────────────────────────────
 
     /// <summary>Server to client: the swords of a fight in its placement appear on the map.</summary>
     public const string Hpy = "hpy";

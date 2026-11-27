@@ -29,7 +29,7 @@ namespace Jondo.Unity.Tests.Combat
                 DiceNum = 123,
                 Triggers = EffectEngine.AlLanzar,
             };
-            var sent = new List<byte[]>();
+            var sent = new List<Jondo.Unity.Protocol.Game.TextInformationEvent>();
 
             bool paid = await FightHandler.TryPayCastCostAsync(
                 fight, caster, new[] { summonEffect }, cost: 3,
@@ -41,14 +41,10 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.False(paid);
             Assert.Equal(6, caster.CurrentAP);
-            Assert.Single(sent);
-            Assert.Equal(
-                ConnectionProtocol.Push(Op.Lqn,
-                    ConnectionProtocol.BuildInfoMessage(
-                        InfoMessages.Warning,
-                        InfoMessages.SummonLimitReached,
-                        FightHandler.BasePlayerSummonLimit.ToString())),
-                sent[0]);
+            var warning = Assert.Single(sent);
+            Assert.Equal(InfoMessages.SummonLimitReached, warning.MessageId);
+            Assert.Equal(Jondo.Unity.Protocol.Game.TextInformationType.TextInformationError, warning.MessageType);
+            Assert.Equal(FightHandler.BasePlayerSummonLimit.ToString(), Assert.Single(warning.Parameters));
         }
 
         [Fact]
@@ -143,7 +139,7 @@ namespace Jondo.Unity.Tests.Combat
                 DiceNum = 123,
                 Triggers = EffectEngine.AlLanzar,
             };
-            var sent = new List<byte[]>();
+            var sent = new List<Jondo.Unity.Protocol.Game.TextInformationEvent>();
 
             bool paid = await FightHandler.TryPayCastCostAsync(
                 fight, caster, new[] { summonEffect }, cost: 3,

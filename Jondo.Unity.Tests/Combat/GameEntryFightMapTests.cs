@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Jondo.Unity.Protocol.Game;
-using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -31,9 +30,8 @@ public sealed class GameEntryFightMapTests
         {
             Id = 7_100_852 + shift;
             Fight = new(Id, 990_100_851 + shift, 990_100_852 + shift) { OpenerId = 990_000_852 + shift };
-            var codec = new GameCodec();
             _ownsSession = opener == null;
-            Session = opener ?? new(codec, packet => { Frames.Add(codec.Decode(packet)); return Task.CompletedTask; });
+            Session = opener ?? new(new CombatRecordingCodec(Frames.Add), CombatRecordingCodec.RequireTypedPacketAsync);
             if (_ownsSession)
             {
                 Session.BindAccount(Id, 1);
@@ -130,11 +128,14 @@ public sealed class GameEntryFightMapTests
         const long id = 990_000_852;
         var a = new ChallengeCodec();
         var b = new ChallengeCodec();
-        await using var opener = await ClientPipe.OpenAsync(id + 100, id, 990_100_851, codec: a);
+        await using var opener = await ClientPipe.OpenAsync(id + 100, id, 990_100_851, codec: a.Recorder);
         using var setup = new Board(opener.Session);
         var fight = setup.Fight;
         fight.BluePlacementCells.AddRange([300, 314]);
-        await using var joiner = await ClientPipe.OpenAsync(id + 101, id + 1, fight.RoleplayMapId, codec: b);
+        // Let at least one decisecond elapse before loading the joiner's board.
+        await Task.Delay(150);
+        int placementLimit = fight.Reglas.RelojDeColocacion;
+        await using var joiner = await ClientPipe.OpenAsync(id + 101, id + 1, fight.RoleplayMapId, codec: b.Recorder);
         async Task Send(ClientPipe pipe, GameRequest request)
         {
             using var turn = await pipe.Session.EnterTurnAsync();
@@ -180,6 +181,16 @@ public sealed class GameEntryFightMapTests
             await Send(joiner, load);
         }
         await Send(joiner, load); // Duplicate map-ready must not replay the choice again.
+        var start = Assert.Single(b.Events.OfType<FightStartingEvent>());
+        Assert.Equal(id, start.AttackerId);
+        Assert.Equal(FightType.PvM, start.FightType);
+        Assert.Equal((int)fight.FightId, start.FightId);
+        var joinState = Assert.Single(b.Events.OfType<FightJoinEvent>());
+        Assert.InRange(joinState.TimeMaxBeforeFightStart, 1, placementLimit - 1);
+        var ownSide = Assert.Single(b.Events.Skip(b.Events.IndexOf(start)).OfType<FightTeamUpdateEvent>()).Team;
+        Assert.Equal(Team.Challenger, ownSide.Team);
+        Assert.Equal(id, ownSide.LeaderId);
+        Assert.Empty(Assert.IsType<FightTeamInformationCaseMembers>(ownSide.TeamInformationCase).Value.Members);
         if (!twoSlots) await Send(joiner, new ChallengeReadyRequest());
         foreach (var codec in new[] { a, b })
             Assert.Equal(choice.ChallengeId, Assert.Single(codec.Events.OfType<ChallengeAddEvent>()).Challenge.ChallengeId);
@@ -196,17 +207,10 @@ public sealed class GameEntryFightMapTests
         }
     }
 
-    private sealed class ChallengeCodec : IGameCodec
+    private sealed class ChallengeCodec
     {
-        private readonly GameCodec _wire = new();
         internal readonly List<GameEvent> Events = [];
-        public byte[] Encode(GameFrame frame)
-        {
-            var bytes = _wire.Encode(frame);
-            if (_wire.Decode(bytes).Content is GameEvent e) Events.Add(e);
-            return bytes;
-        }
-        public GameFrame Decode(ReadOnlySpan<byte> bytes) => _wire.Decode(bytes);
+        internal IGameCodec Recorder => new CombatRecordingCodec(frame => Events.Add(Assert.IsAssignableFrom<GameEvent>(frame.Content)));
     }
 
     [Theory]
@@ -273,6 +277,34 @@ public sealed class GameEntryFightMapTests
 public sealed class GameEntryFightMapInfoTests
 {
     [Theory]
+    [InlineData(FightType.PvpArena)]
+    [InlineData(FightType.PvT)]
+    public async Task Timed_board_keeps_the_fight_type_and_the_source_coordinates_at_the_origin(FightType type)
+    {
+        using var board = new GameEntryFightMapTests.Board(shift: 5_000);
+        var fight = board.Fight;
+        fight.Reglas = type == FightType.PvpArena ? FightRules.Koliseo : FightRules.ContraRecaudador;
+        if (type == FightType.PvT)
+        {
+            fight.TaxCollectorUuid = "collector";
+            fight.DefenderLeaderId = -20_074;
+        }
+        Assert.True(MapManager.Maps.TryAdd(fight.RoleplayMapId, new() { SubAreaId = 77, PosX = 0, PosY = 0 }));
+        try { await board.Send(new ContextReadyRequest(fight.MapId)); }
+        finally { MapManager.Maps.Remove(fight.RoleplayMapId); }
+
+        var events = board.Frames.Select(f => f.Content).ToArray();
+        var start = Assert.Single(events.OfType<FightStartingEvent>());
+        Assert.Equal(type, start.FightType);
+        Assert.Empty(start.MonsterIds);
+        var join = Assert.Single(events.OfType<FightJoinEvent>());
+        Assert.Equal(type, join.FightType);
+        Assert.InRange(join.TimeMaxBeforeFightStart, 1, fight.Reglas.RelojDeColocacion);
+        Assert.Equal(new FightMapInformation(77, fight.MapId, new FightMapInformationPositionCaseCoords(new(0, 0))),
+            Assert.Single(events.OfType<FightMapInformation>()));
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task Defender_gets_own_placement_cells_and_distinct_companion_and_collector_identities(bool duel)
@@ -303,6 +335,9 @@ public sealed class GameEntryFightMapInfoTests
         Assert.Equal(9, Assert.IsType<FightFighterInformationCaseEntityFighter>(actors[-5].FighterCase).Value.EntityModelId);
         var ai = Assert.IsType<FightFighterInformationCaseAiFighter>(actors[collector.Id].FighterCase).Value;
         Assert.Equal(new FightTaxCollectorInformation(35, 109, 492), Assert.IsType<FightAIFighterInformationCaseTaxCollector>(ai.FighterCase).Value);
+        var turns = Assert.Single(events.OfType<FightTurnListEvent>()).Turns;
+        Assert.Equal(new[] { -5L, -1L, defender.Id }.Order(),
+            turns.Select(turn => Assert.IsType<FightTurnEntityCaseWithFlag>(turn).Value.EntityId).Order());
         Assert.Equal(new FightMapInformation(77, fight.MapId, new FightMapInformationPositionCaseCoords(new(-4, 10))),
             Assert.Single(events.OfType<FightMapInformation>()));
         if (duel)

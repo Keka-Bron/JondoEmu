@@ -1,4 +1,3 @@
-using System.Net.Sockets;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Server.Handlers;
 
@@ -112,16 +111,24 @@ internal sealed class GameEntryBackend : IGameEntryBackend
         if (request is FightPingsRequest or ContextReadyRequest)
         {
             // A spectator's client has the arena: the fight as it stands, once.
-            if (FightHandler.PendingSpectatorBoard() is { } watched)
+            if (FightHandler.PendingSpectatorBoard(session) is { } watched)
             {
-                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(StreamOf(session), watched));
+                if (request is ContextReadyRequest { MapId: var mapId } && mapId != 0 && mapId != watched.MapId)
+                    return true; // Readiness from the map just left does not consume the board.
+
+                await FightHandler.InTurnAsync(watched, () => FightHandler.SendSpectatorBoardAsync(session, watched));
                 return true;
             }
             // Back into a fight already running: the board as it is now, once. Placement
             // goes through preparation below, from scratch, as the capture does.
-            if (FightHandler.PendingResume() is { } resumed)
+            if (FightHandler.PendingResume(session) is { } resumed)
             {
-                await FightHandler.InTurnAsync(resumed, () => FightHandler.ResumeForOneAsync(StreamOf(session), resumed));
+                if (request is ContextReadyRequest { MapId: var mapId } && mapId != 0 && mapId != resumed.MapId)
+                    return true; // A late notification from the last map does not consume the board.
+
+                long character = session.CharacterId;
+                await FightHandler.InTurnAsync(resumed, () => session.CharacterId == character
+                    ? FightHandler.ResumeForOneAsync(session, resumed) : Task.CompletedTask);
                 return true;
             }
         }
@@ -160,6 +167,7 @@ internal sealed class GameEntryBackend : IGameEntryBackend
                 await FightHandler.SendPreparationAsync(session, prepared);
                 await session.SendAsync(new AreaFightModifierUpdateEvent([]));
                 prepared.MarkPrepared(character);
+                session.State.FightRejoinPending = false;
             });
             return true;
         }
@@ -195,9 +203,6 @@ internal sealed class GameEntryBackend : IGameEntryBackend
 
     public Task RemoveFromMapAsync(GameSession session)
         => MapPresenceService.Live.RemoveAsync(session.Map, session.CharacterId, session.Id);
-
-    private static NetworkStream StreamOf(GameSession session)
-        => session.Stream ?? throw new InvalidOperationException("World entry requires a connected game session.");
 
     public string WelcomeMessage => ServerSettings.Current.WelcomeMessage;
 }

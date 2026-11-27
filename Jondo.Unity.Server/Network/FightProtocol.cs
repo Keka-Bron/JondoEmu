@@ -6,38 +6,7 @@ using Jondo.Unity.Protocol;
 namespace Jondo.Unity.Server.Network
 {
     /// <summary>
-    /// The fight messages of 3.6.10.10, measured from the fifteen captures of
-    /// <c>Wireshark captures from real game\Combate</c>.
-    ///
-    /// It was necessary to start from scratch: of the forty-eight opcodes the fight handler
-    /// used only seven still exist in this version, and in the captures two hundred and
-    /// seventy-one appear that the code did not name. What is reused is the state machine
-    /// —teams, placement, turns, loot—: what was wrong was the wire, not the design.
-    ///
-    /// This class covers for now the PREPARATION, which is what there is a complete measurement of. The rest
-    /// of the fight is half deciphered and will be added here; what is missing is noted in
-    /// docs/fight.md.
-    ///
-    /// The preparation thread, read from the real order of the capture (tools/hilo.py merges both
-    /// directions by clock, which is what `pcap.streams` cannot do):
-    ///
-    ///   client   hqa { f1: monster group id }            attack
-    ///   server   jsq                                     empty, acknowledged
-    ///   server   ...the normal map change: kub, jru, lva...
-    ///   server   jxg   one per fighter
-    ///   server   kba   the blue cells and the red ones
-    ///   server   jzu   who goes in each team
-    ///   server   jwq   empty
-    ///   server   jrk { f2: 10, f4: map }
-    ///   client   jzy { f1: who, f2: cell }               places himself
-    ///   server   kmk { f1: cell, f2: orientation, f3: who }
-    ///   client   kaq { f1: 1 }                           the ready button
-    ///   server   kah { f1: who, f3: 1 }
-    ///
-    /// A detail that saves work: between the cells and the ready button the server sends NO
-    /// timer —only the kqo heartbeats—, so the placement countdown is kept by
-    /// the client on its own. The server only has to start the fight when the
-    /// time runs out.
+    /// Legacy 3.6.10.10 combat payloads for paths that still use raw sends.
     /// </summary>
     public static class FightProtocol
     {
@@ -50,223 +19,10 @@ namespace Jondo.Unity.Server.Network
         /// </summary>
         public const long Nobody = -1;
 
-        // ─── Starting ───────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// "The coming map is a fight one" (kmp).
-        ///
-        /// This is THE mark, and it goes inside the map change, before loading it. It is what makes
-        /// the client ask for the fight with an empty ijm instead of asking for the contents of a normal
-        /// map with jrh.
-        ///
-        /// The correlation leaves no room for doubt: in the thirty-nine fight entries of the
-        /// twenty-three captures, the last kmp before the kam carried f1: 1 —thirty-nine out of
-        /// thirty-nine— and in the seven hundred and eighteen ordinary map loads it went empty or did not
-        /// go, without a single exception.
-        ///
-        /// Without this the client loads the tactical map but stays in normal map mode, and everything
-        /// that comes after —the fighters, the cells, the teams— reaches it without a fight
-        /// to belong to. What is seen then is the board drawn and nothing on it.
-        /// </summary>
-        public static byte[] BuildFightMapComing() => Pb.New().Var(1, 1).Build();
-
-        /// <summary>End of the preparation batch (jwq). It also goes empty.</summary>
-        public static byte[] BuildPlacementDone() => Array.Empty<byte>();
-
-        /// <summary>
-        /// The same jwq when a fight is already running: every live buff of everybody, each
-        /// entry being exactly the payload its jxm carried. Measured in the reconnection
-        /// capture, where the jwq of the burst is 1,449 bytes of jxm bodies where the one of a
-        /// fresh fight is empty.
-        /// </summary>
-        public static byte[] BuildBuffSync(IEnumerable<byte[]> buffs)
-        {
-            var jwq = Pb.New();
-            foreach (byte[] buff in buffs) jwq.Bytes(1, buff);
-            return jwq.Build();
-        }
-
-        /// <summary>
-        /// Which map the fight is on (jrk).
-        ///
-        ///   f2: the subarea      f3: its coordinates {1 x, 2 y}      f4: the map
-        ///
-        /// The client names the place from f2 and f3: it looks f2 up with GetSubAreaById and
-        /// writes the coordinates of f3 beside it, which is the label of the fight's map. Every
-        /// fight said "Amakna (Amakna village) 0,0 - level 10" while f2 went as a constant 10 and
-        /// f3 empty. They are those of the map where the fight was started, so an arena, which
-        /// has no place of its own, is shown where it is fought from; f4 stays the map the fight
-        /// is drawn on. f3 goes present even at 0,0, as the captures send it.
-        /// </summary>
-        public static byte[] BuildFightMap(long mapId, int subAreaId, int x, int y)
-            => Pb.New().Var(2, subAreaId).Msg(3, Pb.New().VarIfNotZero(1, x).VarIfNotZero(2, y)).Var(4, mapId).Build();
-
-        // ─── The fight exists ───────────────────────────────────────────────────
-
-        /// <summary>
-        /// The map is ready (ijq). It goes empty and goes out right before the fight is announced.
-        /// </summary>
-        public static byte[] BuildMapReady() => Array.Empty<byte>();
-
-        /// <summary>
-        /// There is a fight here (kam). It is THE message that creates the fight for the client.
-        ///
-        ///   f2: what type           f3: against whom
-        ///   f4: [the monsters' templates]
-        ///   f5: the fight's id      f6: who started it
-        ///
-        /// Without this there is no fight to speak of and everything that comes after falls on deaf ears. It is seen
-        /// in the client's own log: on receiving the jwq it blows up with
-        ///
-        ///   NullReferenceException
-        ///     at gum.blww (Google.Protobuf.Collections.RepeatedField`1[T] a)
-        ///     at guk.blvw (jwq a)
-        ///
-        /// which is the client walking the fighter list of a fight that does not exist.
-        ///
-        /// What each field carries, measured in the fourteen openings of the captures:
-        ///
-        ///   f2  4 against monsters, 7 in the koliseo, and absent in a challenge between players.
-        ///   f3  the monster group, with its NEGATIVE contextual id, just as it travels in the jss.
-        ///       In a challenge it is the other player's id, positive.
-        ///   f4  a packed list with one entry PER MONSTER: against one poutch it goes [494] and
-        ///       against four it goes [494, 494, 494, 494]. In a group of eight, eight different numbers
-        ///       come out, and they match the creatures' templates.
-        ///   f5  the fight's id, which is repeated later in the kae and in each kau.
-        /// </summary>
-        public static byte[] BuildFightAnnounced(int kind, long defender, IEnumerable<long> monsters,
-                                                 long fightId, long starter)
-        {
-            var kam = Pb.New()
-                .VarIfNotZero(2, kind)
-                .Var(3, defender);
-
-            var list = new List<long>(monsters);
-            if (list.Count > 0) kam.Packed(4, list);
-
-            return kam.Var(5, fightId).VarIfNotZero(6, starter).Build();
-        }
-
-        /// <summary>Against monsters. The koliseo is 7 and a challenge between players carries no type.</summary>
-        public const int AgainstMonsters = 4;
-
-        /// <summary>The koliseo. Measured: its kam arrives «100728ee0a», that is f2=7.</summary>
-        public const int Koliseo = 7;
-
-        /// <summary>
-        /// How long placement lasts in the koliseo, in tenths.
-        /// </summary>
-        /// <remarks>
-        /// The 592 of the capture's kaa, as is. It is the sixty seconds minus what the frame took to
-        /// arrive, just as the 445 of an ordinary fight is the forty-five.
-        /// </remarks>
-        public const int KoliseoPlacementDeciseconds = 592;
-
-        /// <summary>
-        /// A challenge's kaa: six bytes and NO countdown.
-        /// </summary>
-        /// <remarks>
-        /// Measured in «enviar desafio y el otro acepta»: «f2=1 f3=1 f4=1» arrives and nothing else. Neither
-        /// the time's f5 nor the type's f6. That is why no placement clock appears in a duel: it is not
-        /// that it is hidden, it is that the real server sends none.
-        /// </remarks>
-        public static byte[] BuildDuelSummary()
-            => Pb.New().Var(2, 1).Var(3, 1).Var(4, 1).Build();
-
-        /// <summary>
-        /// The kaa of a fight already running, for whoever comes back into it: f1 = 1 and no
-        /// countdown. "0801180120013004" in both resumes of the reconnection capture; a duel's
-        /// would carry no f6, which is not measured.
-        /// </summary>
-        public static byte[] BuildFightInProgressSummary(int kind)
-            => Pb.New().Var(1, 1).Var(3, 1).Var(4, 1).VarIfNotZero(6, kind).Build();
-
-        /// <summary>
-        /// A spectator's way into a running fight (kab): f3 the kaa of a fight in progress, without
-        /// the two flags a fighter's carries (f3 and f4: nothing for him to be ready for).
-        /// </summary>
-        public static byte[] BuildSpectatorJoined(int kind)
-            => Pb.New().Msg(3, Pb.New().Var(1, 1).VarIfNotZero(6, kind)).Build();
-
-        /// <summary>
-        /// What accompanies the announcement (kaa).
-        ///
-        ///   f3: 1      f4: 1      f5: ?      f6: the fight type
-        ///
-        /// f3 and f4 are 1 in the thirty-nine openings and f6 repeats the kam's type.
-        ///
-        /// f5 is THE PLACEMENT COUNTDOWN, in tenths of a second. It was worked out with the capture's
-        /// clock: in one it is 445 and twenty-seven-odd seconds later it is 173, that is 272
-        /// units in 27.4 seconds, 9.92 per second. It matches the values seen —442,
-        /// 444, 445, 446, which are the forty-five seconds minus what it took to arrive— and
-        /// the koliseo's 592, which gives its sixty. It goes absent when the fight is already past
-        /// placement.
-        ///
-        /// Here the time the server will really wait before starting on its own is sent,
-        /// so that the client's clock and the server's count the same.
-        /// </summary>
-        public static byte[] BuildFightSummary(int kind, int placementDeciseconds)
-            => Pb.New()
-                .Var(3, 1)
-                .Var(4, 1)
-                .VarIfNotZero(5, placementDeciseconds)
-                .VarIfNotZero(6, kind)
-                .Build();
-
-        /// <summary>
-        /// A fight option (kau): locking out spectators, closing it to the party and so on.
-        ///
-        ///   f3: which one   f5: the fight's id
-        ///
-        /// Four come out in a row at each opening, with f3 being 2, 1, 3 and the fourth without f3.
-        /// </summary>
-        public static byte[] BuildFightOption(int option, long fightId)
-            => BuildFightOption(0, option, false, fightId);
-
-        /// <summary>
-        /// The same with its side and its state: { f1: the side, f3: which, f4: on, f5: the fight }.
-        /// "08011802200128bb26" is the defenders' side closed in the sword capture (frame 34),
-        /// "1801200128e703" the attackers' restricted to their party in the follow capture (136).
-        /// </summary>
-        public static byte[] BuildFightOption(int team, int option, bool on, long fightId)
-            => Pb.New().VarIfNotZero(1, team).VarIfNotZero(3, option).VarIfNotZero(4, on ? 1 : 0).Var(5, fightId).Build();
-
         /// <summary>The four the real server sends, in their order.</summary>
         public static readonly int[] FightOptions = { 2, 1, 3, 0 };
 
         // ─── Who fights ─────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// A fighter (jxg).
-        ///
-        ///   f2 { f1 { f1: cell, f2: orientation, f4: 0 }
-        ///        f2 { f2: the sheet, f3: the look }
-        ///        f3: who it is }
-        ///
-        /// Mind the outer f2, which wraps EVERYTHING and is easy to overlook: without it the client
-        /// parses the message, finds no fighter inside and draws nothing. The board
-        /// comes out with its blue and red cells and there is nobody on it.
-        ///
-        /// The envelope is THE SAME as that of a map actor in the jss: cell and orientation
-        /// in front, the body in the middle and the id behind. That is why the client knows how to draw a
-        /// fighter with the code it already has, and why here it can be passed the look
-        /// block the map already builds without touching it.
-        ///
-        /// The sheet is a list of characteristics with the same numbering the emulator uses in
-        /// datos/characteristics.json: 0 life, 1 AP, 23 MP, 27 and 28 dodges, 33 to 37 the
-        /// resistances. During placement almost all travel empty —the real value does not
-        /// arrive until the fight starts—, so replicating it is sending the slot set and with no
-        /// number inside.
-        /// </summary>
-        public static byte[] BuildFighter(int cell, int orientation, long fighterId,
-                                          IEnumerable<(int Characteristic, long Base, long Gear)> sheet,
-                                          byte[] look, Pb identity, bool isMonster, long summoner = 0,
-                                          int? team = null, bool companion = false,
-                                          IReadOnlyDictionary<int, long>? scrolls = null)
-            => Pb.New()
-                .Msg(2, FighterBlock(cell, orientation, fighterId, sheet, look, identity, isMonster,
-                                     team: team, summoner: summoner, companion: companion, scrolls: scrolls))
-                .Build();
 
         /// <summary>
         /// All the fighters at once, with the sheet full (jxb).
@@ -472,14 +228,6 @@ namespace Jondo.Unity.Server.Network
         // ─── The real fight ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// "Placement is over" (kai). It goes empty all ten times it appears.
-        ///
-        /// It is the only clean cut between the two phases: everything before is placement and everything
-        /// after —jyy, jxz, jxc, jto, jxb, jwi— is the loading of the fight already started.
-        /// </summary>
-        public static byte[] BuildFightBegins() => Array.Empty<byte>();
-
-        /// <summary>
         /// Giving up unlocked, or not, in a Koliseo fight (ltm): <c>f2</c> is what the client
         /// enables its leave button with; the rest goes empty.
         /// </summary>
@@ -572,17 +320,8 @@ namespace Jondo.Unity.Server.Network
         /// </remarks>
         public const int SurrenderSequence = 5;
 
-        /// <summary>The fight's start sequence.</summary>
-        public const int OpeningSequence = 8;
-
         /// <summary>The end-of-turn one.</summary>
         public const int TurnEndSequence = 7;
-
-        /// <summary>
-        /// "Confirm to me" (jxh). The server sends it before each turn and waits for the client's jwz
-        /// to go on.
-        /// </summary>
-        public static byte[] BuildConfirmTurn(long fighterId) => Pb.New().Var(2, fighterId).Build();
 
         /// <summary>
         /// Whose turn it is (jzc).
@@ -629,21 +368,6 @@ namespace Jondo.Unity.Server.Network
         /// <summary>The longest a character's turn can be, carried time and all: a minute and a half.</summary>
         public const int MaxTurnDeciseconds = 900;
 
-        /// <summary>
-        /// The same jzc for somebody who comes back in the middle of the turn: f6 is what is
-        /// left of it, in tenths. One sample, and it adds up to the tenth: in the reconnection
-        /// capture the turn of 350 had started 21.8 seconds before the burst and f6 says 132.
-        /// That frame carries no f7, so neither does this one.
-        /// </summary>
-        public static byte[] BuildTurnResumed(long fighterId, int deciseconds, int remaining, int round, int carried = 0)
-            => Pb.New()
-                .Var(1, fighterId)
-                .Var(2, deciseconds)
-                .VarIfNotZero(4, carried)
-                .VarIfNotZero(6, remaining)
-                .VarIfNotZero(8, round)
-                .Build();
-
         /// <summary>How long a turn lasts, in tenths: a character, a monster and a summon.</summary>
         public const int PlayerTurnDeciseconds = 400;
         public const int MonsterTurnDeciseconds = 290;
@@ -662,52 +386,6 @@ namespace Jondo.Unity.Server.Network
         public static byte[] BuildYourTurn() => Array.Empty<byte>();
 
         // ─── Moving and casting ─────────────────────────────────────────────────
-
-        /// <summary>
-        /// Which cell is cast at and with what (jwh).
-        ///
-        ///   f1: the target cell          f4: the spell, and if it does not come it is a weapon hit
-        /// </summary>
-        public static (int Cell, int Spell) ReadCast(byte[] payload)
-        {
-            byte[]? jwh = ConnectionProtocol.ReadPayload(payload, Op.Jwh);
-            if (jwh == null) return (0, 0);
-
-            int cell = 0, spell = 0;
-            foreach (var field in ProtoMessage.Parse(jwh).Fields)
-            {
-                if (field.WireType != 0) continue;
-                if (field.FieldNumber == 1) cell = (int)field.VarIntValue;
-                else if (field.FieldNumber == 4) spell = (int)field.VarIntValue;
-            }
-            return (cell, spell);
-        }
-
-        /// <summary>
-        /// Casting by targeting FROM THE CAROUSEL (jwn): { f1: at whom, f2: the spell }.
-        ///
-        /// The id comes WITH A SIGN —monsters have it negative— and in sixty-four-bit two's
-        /// complement, so it has to be read as a <c>long</c> and not as an <c>int</c>:
-        /// two of the four real samples are minus one.
-        ///
-        ///   08ffffffffffffffffff01 10ca63   =  at fighter −1, spell 12746
-        ///   0881f092cbdd08 10b21b           =  at oneself, spell 3506
-        /// </summary>
-        public static (long Fighter, int Spell) ReadCastAtFighter(byte[] payload)
-        {
-            byte[]? jwn = ConnectionProtocol.ReadPayload(payload, Op.Jwn);
-            if (jwn == null) return (0, 0);
-
-            long quien = 0;
-            int spell = 0;
-            foreach (var field in ProtoMessage.Parse(jwn).Fields)
-            {
-                if (field.WireType != 0) continue;
-                if (field.FieldNumber == 1) quien = unchecked((long)field.VarIntValue);
-                else if (field.FieldNumber == 2) spell = (int)field.VarIntValue;
-            }
-            return (quien, spell);
-        }
 
         /// <summary>
         /// The buff's FAMILY, which goes in f15 and decides whether the client DRAWS it or not.
@@ -893,22 +571,6 @@ namespace Jondo.Unity.Server.Network
         public const int ShownRowFlag = 4;
 
         public const int SpellEffectsRemoved = 406;
-
-        /// <summary>
-        /// Which sequence the client acknowledges (jti): <c>f2</c> carries the same action number it
-        /// was closed with, that of the jwi's <c>f1</c>. Returns zero if it does not come.
-        /// </summary>
-        public static int ReadSequenceAck(byte[] payload)
-        {
-            byte[]? jti = ConnectionProtocol.ReadPayload(payload, Op.Jti);
-            if (jti == null) return 0;
-
-            foreach (var field in ProtoMessage.Parse(jti).Fields)
-            {
-                if (field.WireType == 0 && field.FieldNumber == 2) return (int)field.VarIntValue;
-            }
-            return 0;
-        }
 
         /// <summary>
         /// What happens (jwe). <c>f14</c> says what it is about:
@@ -2058,9 +1720,6 @@ namespace Jondo.Unity.Server.Network
 
         // ─── It is over ─────────────────────────────────────────────────────────
 
-        /// <summary>The fight is over (kuf). It goes empty.</summary>
-        public static byte[] BuildFightOver() => Array.Empty<byte>();
-
         /// <summary>What one takes from the fight.</summary>
         public sealed class Spoils
         {
@@ -2428,56 +2087,6 @@ namespace Jondo.Unity.Server.Network
         private static Pb AdditionalEntry(long fighter, string id) => Pb.New().Msg(1, Pb.New().Var(1, fighter).Str(2, id ?? ""));
 
         /// <summary>
-        /// Where one can be placed (kba).
-        ///
-        ///   f1 { f1: [team 0's cells], f2: [team 1's] }
-        ///
-        /// Both lists go packed, and in the captures they are sixteen cells per side.
-        /// </summary>
-        public static byte[] BuildPlacementCells(IEnumerable<long> blue, IEnumerable<long> red)
-            => Pb.New()
-                .Msg(1, Pb.New().Packed(1, blue).Packed(2, red))
-                .Build();
-
-        // ─── Taking a place ─────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Who is on which cell (kmk).
-        ///
-        ///   f2 (repeated) { f1: cell, f2: orientation, f3: who }
-        ///
-        /// Moving during placement travels as TWO entries in a single message: the cell
-        /// left, with <see cref="Nobody"/>, and the one taken, with who takes it. Sending only the
-        /// new one leaves the onlooker seeing the same one twice.
-        /// </summary>
-        public static byte[] BuildFightersPlaced(IEnumerable<(int Cell, int Orientation, long Fighter)> spots)
-        {
-            var kmk = Pb.New();
-            foreach (var (cell, orientation, fighter) in spots)
-            {
-                kmk.Msg(2, Pb.New()
-                    .Var(1, cell)
-                    .VarIfNotZero(2, orientation)
-                    .Var(3, fighter));
-            }
-            return kmk.Build();
-        }
-
-        /// <summary>A single one, which is the ordinary case.</summary>
-        public static byte[] BuildFighterPlaced(int cell, int orientation, long fighter)
-            => BuildFightersPlaced(new[] { (cell, orientation, fighter) });
-
-        /// <summary>A jxy's "IsAfk" (f1): the client passing the turn on its own, its player idle.</summary>
-        public static bool ReadIdlePass(byte[] payload)
-        {
-            byte[]? jxy = ConnectionProtocol.ReadPayload(payload, "jxy");
-            if (jxy == null) return false;
-            foreach (var field in ProtoMessage.Parse(jxy).Fields)
-                if (field.FieldNumber == 1 && field.WireType == 0) return field.VarIntValue != 0;
-            return false;
-        }
-
-        /// <summary>
         /// The challenge offered (hqc): who challenges, whom, and the id.
         /// </summary>
         /// <remarks>
@@ -2655,38 +2264,6 @@ namespace Jondo.Unity.Server.Network
 
             return ldd.VarIfNotZero(4, percent).Var(5, ChallengeState).Build();
         }
-
-        /// <summary>How many challenges have to be chosen (kxa): { f1: n }. One outside a dungeon.</summary>
-        public static byte[] BuildChallengeCount(int howMany) => Pb.New().Var(1, howMany).Build();
-
-        /// <summary>
-        /// The candidate list (kwx): { f1: the timer, f2 (repeated): the challenges }.
-        ///
-        /// There are always two, and they are alternatives: in the captures two were offered together that the
-        /// client's table marks as incompatible with each other.
-        /// </summary>
-        public static byte[] BuildChallengeList(IEnumerable<byte[]> challenges)
-        {
-            var kwx = Pb.New().Var(1, ChallengeTimer);
-            foreach (byte[] uno in challenges) kwx.Bytes(2, uno);
-            return kwx.Build();
-        }
-
-        /// <summary>A challenge is fixed (kww): { f1: the challenge }.</summary>
-        public static byte[] BuildChallengeChosen(byte[] challenge)
-            => Pb.New().Bytes(1, challenge).Build();
-
-        /// <summary>The final list (kwu): { f2 (repeated): the challenges }. It goes stuck to the jyy.</summary>
-        public static byte[] BuildChallengeFinalList(IEnumerable<byte[]> challenges)
-        {
-            var kwu = Pb.New();
-            foreach (byte[] uno in challenges) kwu.Bytes(2, uno);
-            return kwu.Build();
-        }
-
-        /// <summary>The confirmation of the panel setting (kwn), with the same value that arrived.</summary>
-        public static byte[] BuildChallengeSettings(long value)
-            => Pb.New().VarIfNotZero(1, value).Build();
 
         /// <summary>
         /// A challenge's TARGET (kwm): { f2: the challenge, with its target inside }.

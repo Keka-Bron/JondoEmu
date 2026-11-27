@@ -162,7 +162,7 @@ namespace Jondo.Unity.Tests.World
                 Assert.True(FightHandler.WaitsForChoice(who));
 
                 using (SessionContext.Push(pipe.Session))
-                    Assert.True(await FightHandler.AnswerChoiceAsync(pipe.ToClient, ConnectionProtocol.Push(Op.Kso, Pb.New().Var(1, 1).Build())));
+                    Assert.True(await FightHandler.AnswerChoiceAsync(pipe.Session, 1));
                 Assert.False(FightHandler.WaitsForChoice(who));
                 Assert.NotEmpty(player.GrantedSpells);
                 Assert.Contains(31795, player.Buffs.Actitudes);

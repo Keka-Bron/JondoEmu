@@ -42,6 +42,7 @@ namespace Jondo.Unity.Server
             // protobuf parsing, password hashing, log censorship and session isolation.
             AssertCharacterSelectionNeedsAnAccount();
             AssertItemUidsAreServerWide();
+            AssertCharacterExperienceTable();
             AssertJondoCoinTemplateExists();
             AssertShopCurrencyIsOptional();
             AssertPacketShapesAreTelling();
@@ -760,6 +761,13 @@ namespace Jondo.Unity.Server
                     $"[RegressionGuard FAILED] Expected {expected.Count} interactives, got " +
                     $"{Managers.InteractiveRegistry.Count}.");
             }
+        }
+
+        private static void AssertCharacterExperienceTable()
+        {
+            if (!ExperienceTable.IsLoaded)
+                throw new InvalidOperationException(
+                    "[RegressionGuard FAILED] The character experience table (character_xp.json) is missing or empty.");
         }
 
         private static void AssertProfessionCatalog()

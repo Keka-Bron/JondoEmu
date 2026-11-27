@@ -1,5 +1,6 @@
 using System.Linq;
-using System.Text;
+using Jondo.Unity.Protocol.Game;
+using Jondo.Unity.Protocol.Game.Wire;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -98,18 +99,17 @@ namespace Jondo.Unity.Tests.World
             var dream = Whole();
             var end = dream.Salas.Single(r => r.EsFinal);
 
-            var graphs = ProtoMessage.Parse(DreamProtocol.BuildDreamState(dream).Payload()).Fields.Where(f => f.FieldNumber == 16).ToList();
+            var codec = new GameCodec();
+            var frame = codec.Decode(codec.Encode(new(DreamProtocol.BuildDreamState(dream))));
+            var graphs = Assert.IsType<InfiniteDreamStateEvent>(frame.Content).Maps;
             Assert.Equal(Dreams.Bands, graphs.Count);
 
-            var rooms = ProtoMessage.Parse(graphs[^1].BytesValue).Fields.Where(f => f.FieldNumber == 1);
-            var entry = rooms.Select(r => ProtoMessage.Parse(r.BytesValue).Fields)
-                             .Single(r => Encoding.UTF8.GetString(r.Single(f => f.FieldNumber == 1).BytesValue) == end.Id.ToString());
-            var body = ProtoMessage.Parse(entry.Single(f => f.FieldNumber == 2).BytesValue).Fields;
-
-            Assert.Equal(4, (int)body.Single(f => f.FieldNumber == 5).VarIntValue);
-            Assert.Equal(26, (int)body.Single(f => f.FieldNumber == 6).VarIntValue);
-            Assert.Equal(1, (int)body.Single(f => f.FieldNumber == 7).VarIntValue);
-            Assert.Equal(end.Score, (int)body.Single(f => f.FieldNumber == 1).VarIntValue);
+            var room = graphs[^1].Rooms[end.Id.ToString()];
+            Assert.Equal(InfiniteDreamStage.Stage5, graphs[^1].Stage);
+            Assert.Equal(InfiniteDreamRoomType.Boss, room.RoomType);
+            Assert.Equal(26, room.Floor);
+            Assert.Equal(InfiniteDreamRoomDifficulty.Hard, room.Difficulty);
+            Assert.Equal(end.Score, room.Score);
         }
 
         /// <summary>The guide's figures for the Fin du rêve, by difficulty.</summary>
@@ -247,8 +247,12 @@ namespace Jondo.Unity.Tests.World
             }
             Assert.Null(DreamHandler.NextWave(fight));
 
-            var (map, cell, notice, ended, _) = DreamHandler.AfterTheFight(session, fight, won: true);
+            var (map, cell, notice, ended, summary) = DreamHandler.AfterTheFight(session, fight, won: true);
             Assert.True(ended);
+            Assert.NotNull(summary);
+            Assert.IsType<InfiniteDreamEndEventCaseWin>(summary.Outcome);
+            Assert.Equal(5, summary.KilledWaveNumber);
+            Assert.Equal(fight.RoundNumber, summary.KilledWaveGlobalTurn);
             Assert.Equal(100, map);
             Assert.Equal(200, cell);
             Assert.Contains("5 oleada", notice);
@@ -322,7 +326,7 @@ namespace Jondo.Unity.Tests.World
 
             var result = DreamHandler.AfterTheFight(session, new FightInstance(7_000_005, room.MapaDeLaSala), won: true);
 
-            Assert.Equal((0L, 0, (string?)null, false, (byte[]?)null), result);
+            Assert.Equal((0L, 0, (string?)null, false, (InfiniteDreamEndEvent?)null), result);
             Assert.Same(dream, Dreams.De(Dreamer));
         });
     }

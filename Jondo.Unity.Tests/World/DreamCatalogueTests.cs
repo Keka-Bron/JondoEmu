@@ -212,13 +212,18 @@ namespace Jondo.Unity.Tests.World
             var fighter = new Fighter { Id = 870000000004 };
             fighter.EverySpell[SpellAspect.AlcanceMaximo] = 1;
             fighter.EverySpell[SpellAspect.CastIntervalDown] = 1;
-            var sent = new List<byte[]>();
+            var sent = new List<Jondo.Unity.Protocol.Game.ApplySpellModifierEvent>();
             await FightHandler.SendEverySpellModifiersAsync(p => { sent.Add(p); return Task.CompletedTask; },
                                                             new FightInstance(1, 1), fighter, new[] { 0, 368, 24016 });
 
             Assert.Equal(2, sent.Count);
-            var first = ConnectionProtocol.ReadPayload(sent[0], Op.Hnd);
-            Assert.Equal("0a0910011801200c28f0021084f8a980a919", Convert.ToHexString(first!).ToLowerInvariant());
+            Assert.Equal(new[] { 368, 24016 }, sent.Select(e => e.Modifier!.SpellId));
+            Assert.All(sent, e =>
+            {
+                Assert.Equal(fighter.Id, e.ActorId);
+                Assert.Equal(Jondo.Unity.Protocol.Game.SpellModifierType.RangeMax, e.Modifier!.ModifierType);
+                Assert.Equal(1, e.Modifier.Context);
+            });
         }
 
         /// <summary>Vent Arrière: the dream's side plays first, whatever the monsters' initiative.</summary>

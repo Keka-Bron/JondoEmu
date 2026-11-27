@@ -163,62 +163,20 @@ namespace Jondo.Unity.Server.Network
         /// InfiniteDreamResultUi, is made of -- with the dream's code to copy, "à la fin de chaque
         /// songe, que vous perdiez ou que vous gagniez, vous pouvez récupérer un code".
         /// </summary>
-        /// <remarks>
-        /// No capture holds one. The fields are the client's reading of it, eft::xhd @0x181663580
-        /// into an InfiniteDreamResultInfo, the numbers its iya's own:
-        ///
-        /// <code>
-        ///   f1  the sands left (life)            f2  the difficulty (its intensity plus one)
-        ///   f3  the last wave killed             f4  the dreamer's level (scaledLevel)
-        ///   f5  the code                         f6  (repeated) one graph per band, as the izg's f16
-        ///   f7  (repeated) the bonuses, as the izg's f15 -- 3405 its spells, 792 its passives
-        ///   f10 storms left (reRoll)             f11 dream points (money)
-        ///   f12 the dreamer levels (bonusLevel)  f13 the global turn the last wave fell on
-        ///   f16 the time it took, in milliseconds (the window's TimeSpan.FromMilliseconds)
-        ///   f17 its owner, as the izg's f1: { f1 name, f2 sex, f3 id, f4 breed }
-        ///   f14 won  { f1 (repeated) { f3 a player as f17, f4 the dreams he has won } }
-        ///   f18 lost { f1 the room it ended in, as a string, f2 that room's kind }
-        /// </code>
-        ///
-        /// The window's "isWin" is whether f14 is the one set. Whose the dreams won count is is
-        /// the one player of f14 whose id is the reader's.
-        /// </remarks>
-        public static byte[] BuildResult(Dreams.Sueno sueno, bool won, IReadOnlyList<ResultPlayer> players,
-                                         int lastWave = 0, int lastWaveTurn = 0)
+        public static InfiniteDreamEndEvent BuildResult(Dreams.Sueno sueno, bool won, IReadOnlyList<ResultPlayer> players,
+                                                        int lastWave = 0, int lastWaveTurn = 0)
         {
-            var iya = Pb.New()
-                .VarIfNotZero(1, sueno.Arena)
-                .Var(2, sueno.Dificultad)
-                .VarIfNotZero(3, lastWave)
-                .Var(4, Dreams.DreamerLevel(sueno))
-                .Str(5, sueno.Seed);
-            for (int band = 1; band <= sueno.Franja; band++) iya.Msg(6, Graph(sueno, band));
-            foreach (var bono in sueno.Ganados) iya.Msg(7, BonusEntry(bono));
-            iya.VarIfNotZero(10, sueno.Tormentas)
-               .VarIfNotZero(11, sueno.DreamPoints)
-               .VarIfNotZero(12, sueno.DreamerLevels)
-               .VarIfNotZero(13, lastWaveTurn)
-               .VarIfNotZero(16, sueno.FightMs)
-               .Msg(17, Player(sueno.CharacterId, sueno.Nombre, players.FirstOrDefault(p => p.Id == sueno.CharacterId)?.Sex ?? 0, sueno.Breed));
-
-            if (won)
-            {
-                var win = Pb.New();
-                foreach (var player in players)
-                    win.Msg(1, Pb.New().Msg(3, Player(player.Id, player.Name, player.Sex, player.Breed)).Var(4, player.Wins));
-                iya.Msg(14, win);
-            }
-            else
-            {
-                var room = sueno.SalaActual;
-                iya.Msg(18, Pb.New().Str(1, Texto(room?.Id ?? sueno.Actual)).VarIfNotZero(2, room == null ? 0 : KindOf(room)));
-            }
-            return iya.Build();
+            var ownerGender = (Gender)(players.FirstOrDefault(p => p.Id == sueno.CharacterId)?.Sex ?? 0);
+            return new(Life: sueno.Arena, Intensity: sueno.Dificultad, KilledWaveNumber: lastWave,
+                ScaledLevel: Dreams.DreamerLevel(sueno), Seed: sueno.Seed, Maps: SnapshotMaps(sueno),
+                Bonuses: sueno.Ganados.Select(SnapshotBonus).ToArray(), Rerolls: sueno.Tormentas,
+                DreamPoints: sueno.DreamPoints, BonusLevels: sueno.DreamerLevels, KilledWaveGlobalTurn: lastWaveTurn,
+                CumulatedDuration: sueno.FightMs, Owner: new(sueno.Nombre, ownerGender, sueno.CharacterId, sueno.Breed),
+                Outcome: won
+                    ? new InfiniteDreamEndEventCaseWin(new(players.Select(p => new InfiniteDreamWinPlayer(
+                        new(p.Name, (Gender)p.Sex, p.Id, p.Breed), p.Wins)).ToArray()))
+                    : new InfiniteDreamEndEventCaseLoss(new(Texto(sueno.Actual), StageOfBand(sueno.Franja))));
         }
-
-        /// <summary>A dreamer as the result names him: the izg's f1, with his sex.</summary>
-        private static Pb Player(long id, string name, int sex, int breed)
-            => Pb.New().Str(1, name).VarIfNotZero(2, sex).Var(3, id).VarIfNotZero(4, breed);
 
         /// <summary>A room's kind, the f5 of its body: see <see cref="TipoDeCombate"/>.</summary>
         private static int KindOf(Dreams.Sala sala)
@@ -363,17 +321,22 @@ namespace Jondo.Unity.Server.Network
                 Monsters: fightPending && bestiary != null ? bestiary : [], Doors: doors, Party: [],
                 Rewards: (fountain || favourPending) && room?.Offers is { } offers ? offers.Select(SnapshotReward).ToArray() : [],
                 Rerolls: sueno.Tormentas, LootBonusPercent: sueno.Bonus, DreamPoints: sueno.DreamPoints,
-                Stage: (InfiniteDreamStage)(sueno.Franja - 1), CurrentRoomId: Texto(sueno.Actual), BonusLevels: sueno.DreamerLevels,
+                Stage: StageOfBand(sueno.Franja), CurrentRoomId: Texto(sueno.Actual), BonusLevels: sueno.DreamerLevels,
                 Bonuses: sueno.Ganados.Select(SnapshotBonus).ToArray(),
-                Maps: Enumerable.Range(1, sueno.Franja).Select(band => SnapshotMap(sueno, band)).ToArray(), Life: sueno.Arena,
+                Maps: SnapshotMaps(sueno), Life: sueno.Arena,
                 CanReroll: fightPending || fountain || favourPending, RoomCleared: !fightPending && !favourPending,
                 ScaledLevel: Dreams.DreamerLevel(sueno), Training: false, ExperienceBonusPercent: sueno.BaseBonus);
         }
 
+        private static InfiniteDreamStage StageOfBand(int band) => (InfiniteDreamStage)(band - 1);
+
+        private static InfiniteDreamMap[] SnapshotMaps(Dreams.Sueno dream)
+            => Enumerable.Range(1, dream.Franja).Select(band => SnapshotMap(dream, band)).ToArray();
+
         private static InfiniteDreamMap SnapshotMap(Dreams.Sueno dream, int band)
         {
             var rooms = RoomsInBand(dream, band);
-            return new(rooms.ToDictionary(r => Texto(r.Id), SnapshotRoom), (InfiniteDreamStage)(band - 1),
+            return new(rooms.ToDictionary(r => Texto(r.Id), SnapshotRoom), StageOfBand(band),
                 dream.Visited.Select(Texto).ToArray(),
                 rooms.Where(r => r.Salidas.Count != 0 && !(Dreams.Closes(r) && r.Franja == band))
                      .ToDictionary(r => Texto(r.Id), r => new InfiniteDreamRoomLinks(r.Salidas.Select(Texto).ToArray())));
@@ -453,19 +416,6 @@ namespace Jondo.Unity.Server.Network
                     .Fixed32(5, BitConverter.GetBytes((float)percent)));
             return izo.Build();
         }
-
-        /// <summary>
-        /// jxj: where a fight on a map would place everybody. { f1: the fight's map, f2: the map,
-        /// f3 { f1: attackers' cells, f2: defenders' cells, packed } }, as in the capture.
-        /// </summary>
-        public static byte[] BuildPositions(long fightMap, long map, IEnumerable<int> attackers, IEnumerable<int> defenders)
-            => Pb.New()
-                .Var(1, fightMap)
-                .Var(2, map)
-                .Msg(3, Pb.New()
-                    .Packed(1, attackers.Select(c => (long)c))
-                    .Packed(2, defenders.Select(c => (long)c)))
-                .Build();
 
         /// <summary>The izj accompanying the astral storm: «1001» from the capture.</summary>
         public static byte[] BuildStorm() => Pb.New().Var(2, 1).Build();

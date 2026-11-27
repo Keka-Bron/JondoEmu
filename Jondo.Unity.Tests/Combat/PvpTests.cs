@@ -298,17 +298,5 @@ namespace Jondo.Unity.Tests.Combat
             Assert.Equal(-1, KoliseoQueue.Leave(7));
         }
 
-        [Fact]
-        public void El_koliseo_se_anuncia_como_tipo_siete_y_con_reloj()
-        {
-            // «1801200128d0043007» from the capture: f3=1 f4=1 f5=592 f6=7. The challenge brings neither
-            // f5 nor f6, and that is exactly the difference between the two.
-            byte[] kaa = FightProtocol.BuildFightSummary(
-                FightProtocol.Koliseo, FightProtocol.KoliseoPlacementDeciseconds);
-
-            Assert.Equal("1801200128d0043007", Convert.ToHexString(kaa).ToLowerInvariant());
-            Assert.Equal(7, FightProtocol.Koliseo);
-        }
-
     }
 }

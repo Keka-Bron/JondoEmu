@@ -1,3 +1,4 @@
+using Game = Jondo.Unity.Protocol.Game;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -46,7 +47,7 @@ namespace Jondo.Unity.Server.Handlers
             foreach (var portal in fight.Portales.All.ToList())
             {
                 fight.Portales.Remove(portal);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, FightProtocol.BuildGlyphGone(portal.Owner, portal.Id)));
+                await ATodosAsync(fight, CombatActions.GlyphGone(portal.Owner, portal.Id));
             }
         }
 
@@ -61,8 +62,7 @@ namespace Jondo.Unity.Server.Handlers
             if (displaced != null)
             {
                 fight.Portales.Remove(displaced);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildGlyphGone(owner.Id, displaced.Id)));
+                await ATodosAsync(fight, CombatActions.GlyphGone(owner.Id, displaced.Id));
             }
 
             var portal = new Portal
@@ -86,13 +86,10 @@ namespace Jondo.Unity.Server.Handlers
             long then = c.PortalOccupant;
             long OccupantThen(int where) => where == cell ? then : fight.OccupantOf(where);
             portal.Active = fight.Portales.ShouldBeActive(portal, OccupantThen, ignoring: owner.Id);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                FightProtocol.BuildPortal(owner.Id, portal.Id, cell, portal.DiceNum, portal.DiceSide,
-                                          portal.Grade, portal.LayingSpell, portal.Active)));
+            await ATodosAsync(fight, CombatMarks.Portal(portal));
             if (!portal.Active)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildPortalState(owner.Id, portal.Id, active: false)));
+                await ATodosAsync(fight, CombatActions.PortalState(owner.Id, portal.Id, active: false));
             }
             Program.LogDebug($"[Portal] {owner.Id} lays portal {portal.Id} on {cell} " +
                              $"({(portal.Active ? "on" : "off")}){(displaced != null ? $", portal {displaced.Id} goes" : "")}.");
@@ -109,7 +106,7 @@ namespace Jondo.Unity.Server.Handlers
                 var portal = fight.Portales.At(cell);
                 if (portal == null) continue;
                 fight.Portales.Remove(portal);
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe, FightProtocol.BuildGlyphGone(portal.Owner, portal.Id)));
+                await ATodosAsync(fight, CombatActions.GlyphGone(portal.Owner, portal.Id));
                 any = true;
             }
             if (any) await RefreshPortalsAsync(fight);
@@ -139,8 +136,7 @@ namespace Jondo.Unity.Server.Handlers
             if (fight.Portales.Count == 0) return;
             foreach (var portal in fight.Portales.Refresh(occupantOf ?? fight.OccupantOf))
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildPortalState(author != 0 ? author : portal.Owner, portal.Id, portal.Active)));
+                await ATodosAsync(fight, CombatActions.PortalState(author != 0 ? author : portal.Owner, portal.Id, portal.Active));
             }
         }
 
@@ -155,15 +151,12 @@ namespace Jondo.Unity.Server.Handlers
             var changed = fight.Portales.Refresh(fight.OccupantOf);
             if (changed.Count == 0) return;
 
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                FightProtocol.BuildSequenceStart(fighter.Id, FightProtocol.GlyphSequence)));
+            await ATodosAsync(fight, new Game.SequenceStartEvent(Game.SequenceType.GlyphTrap));
             foreach (var portal in changed)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildPortalState(fighter.Id, portal.Id, portal.Active)));
+                await ATodosAsync(fight, CombatActions.PortalState(fighter.Id, portal.Id, portal.Active));
             }
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), fighter.Id, FightProtocol.GlyphSequence)));
+            await ATodosAsync(fight, new Game.SequenceEndEvent(fight.SiguienteAccion(), fighter.Id));
         }
 
         // ─── Going through ────────────────────────────────────────────────────────────────────
@@ -204,8 +197,7 @@ namespace Jondo.Unity.Server.Handlers
 
             if (walkedIn)
             {
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildGlyphTriggered(entry.Owner, entry.Id, entry.Cell, traveller.Id, walkedIn: false)));
+                await ATodosAsync(fight, CombatActions.GlyphTriggered(entry.Owner, entry.Id, entry.Cell, traveller.Id, walkedIn: false));
             }
 
             entry.Used = true;
@@ -214,18 +206,15 @@ namespace Jondo.Unity.Server.Handlers
             {
                 if (!portal.Active) continue;
                 portal.Active = false;
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildPortalState(portal.Owner, portal.Id, active: false)));
+                await ATodosAsync(fight, CombatActions.PortalState(portal.Owner, portal.Id, active: false));
             }
 
             int from = traveller.CellId;
             traveller.MoverA(exit.Cell);
             CarriedFollows(fight, traveller);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                FightProtocol.BuildTeleport(traveller.Id, traveller.Id, exit.Cell)));
+            await ATodosAsync(fight, CombatActions.Teleport(traveller.Id, traveller.Id, exit.Cell));
             await RefreshPortalsAsync(fight);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                FightProtocol.BuildGlyphTriggered(exit.Owner, exit.Id, exit.Cell, traveller.Id, walkedIn: false)));
+            await ATodosAsync(fight, CombatActions.GlyphTriggered(exit.Owner, exit.Id, exit.Cell, traveller.Id, walkedIn: false));
 
             Program.LogDebug($"[Portal] {traveller.Id} goes through portals {string.Join(", ", chain.Select(p => p.Id))}: " +
                              $"{from} to {exit.Cell}.");
@@ -288,9 +277,7 @@ namespace Jondo.Unity.Server.Handlers
 
                 leg = EffectEngine.PastThePortal(fight, pusher, leg);
                 if (leg == null) return;
-                await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwe,
-                    FightProtocol.BuildDisplacement(pusher.Id, FightProtocol.Alejarse, moved.Id,
-                                                    leg.CasillaDesde, leg.CasillaHasta)));
+                await ATodosAsync(fight, CombatActions.Displacement(pusher.Id, FightProtocol.Alejarse, moved.Id, leg.CasillaDesde, leg.CasillaHasta));
                 Program.LogDebug($"[Portal] Spell {spell} goes on moving {moved.Id} from the way out, " +
                                  $"{leg.CasillaDesde} to {leg.CasillaHasta}.");
                 await DanoDeColisionAsync(stream, fight, pusher, leg);
@@ -372,14 +359,12 @@ namespace Jondo.Unity.Server.Handlers
             if (best.Count - 1 > steps) best = best.Take(steps + 1).ToList();
 
             int facing = leader.LastFacing >= 0 ? leader.LastFacing : StepOrientation(best[best.Count - 2], best[best.Count - 1]);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jto,
-                FightProtocol.BuildSequenceStart(follower.Id, FightProtocol.WalkSequence)));
+            await ATodosAsync(fight, new Game.SequenceStartEvent(Game.SequenceType.Move));
             // Unseen, to his own side alone, as his own steps (AnnounceStretchAsync).
-            var followed = ConnectionProtocol.BuildActorMoved(follower.Id, best.Select(c => (long)c).ToList(), facing);
+            var followed = new Game.GameMapMovementEvent(best.ToArray(), follower.Id, false);
             if (MonsterTactics.IsInvisible(follower)) await ASuBandoAsync(fight, follower.TeamId, followed);
             else await ATodosAsync(fight, followed);
-            await ATodosAsync(fight, ConnectionProtocol.Push(Op.Jwi,
-                FightProtocol.BuildSequenceEnd(fight.SiguienteAccion(), follower.Id, FightProtocol.WalkSequence)));
+            await ATodosAsync(fight, new Game.SequenceEndEvent(fight.SiguienteAccion(), follower.Id));
             follower.MoverA(best[best.Count - 1]);
             follower.LastFacing = facing;
             CarriedFollows(fight, follower);
