@@ -48708,11 +48708,11 @@
         {
           "message": 41349,
           "choices": [
-            { "reply": 53846, "next": 41350 }
+            { "reply": 53846, "next": 40782 }
           ]
         },
         {
-          "message": 41350,
+          "message": 40782,
           "choices": [
             { "reply": 53845, "next": 41351 }
           ]
@@ -48736,7 +48736,7 @@
           ]
         }
       ],
-      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken. «Au nom de l'Art» (2152): 52867 -> 40585 -> 52866 -> 40586 -> 52865 'Mostrarle la garra de la roca' closes 16456 (Dofus pour les noobs («Au nom de l'Art»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken. «Au nom de l'Art» (2152): 52867 -> 40585 -> 52866 -> 40586 -> 52865 'Mostrarle la garra de la roca' closes 16456 (Dofus pour les noobs («Au nom de l'Art»)). The offer of 2152 runs through 40782, the line its step declares, which says the same words as 41350. INFERRED: reply-to-line pairing follows the message order of the client texts."
     },
   {
       "npc": 5600,
@@ -72394,7 +72394,7 @@
           "message": 20003,
           "choices": [
             { "reply": 23954 },
-            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613" },
+            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613", "gives": 16067 },
             { "reply": 23921, "quest": 1609, "completes": 9469, "params": [[30, 9469]], "next": 20004 }
           ]
         },
@@ -72406,7 +72406,7 @@
             { "reply": 24000, "next": 20007, "criterion": "Qa=1609&Qa!1612&Qf!1612" },
             { "reply": 24007, "next": 20055, "criterion": "Qa=1609&PO=16059|PO=16063|PO=16062" },
             { "reply": 24011, "next": 20059, "criterion": "Qa=1609&Qf=1610&Qf=1611&Qf=1612" },
-            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613" },
+            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609&Qa!1613&Qf!1613", "gives": 16067 },
             { "reply": 23953 }
           ]
         },
@@ -72478,11 +72478,11 @@
         {
           "message": 20060,
           "choices": [
-            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609" }
+            { "reply": 24014, "startsQuest": 1613, "params": [[34, 1613]], "criterion": "Qf=1609", "gives": 16067 }
           ]
         }
       ],
-      "why": "Lonyon the Silent in the Sram temple's crypt (Dofus pour les noobs («Rendez-vous avec la mort»)): he reads out his papers (19995-20003: 'a fine day to die', the Forgotten Brotherhood, the orichor box) and «Te ayudaré» (23921 = 9469) makes the player his spokesman; 20004 is where he hands out the three messages (the three sub-quests add their own replies) and, with the three proofs in, the evidence is shown (20055-20059; 24011 = 9470). INFERRED order of the replies: the client carries sentences and answers but not which go together. The three messages (Dofus pour les noobs («Rendez-vous avec la mort», «Secret de fabrication»)): «Leer el mensaje que lleva la palabra Anutropía/Sramvil/Xelorium» (23991, 23995, 24000) open 20005 / 20006 / 20007-20008, whose accept replies (23988/23989, 23992/23993, 23996/23997) start 1610 / 1611 / 1612. The proofs (24002, 24004, 24006) are the three sub-quests' own hand-overs (9440, 9466, 9484); 24012 closes 9470 and 24014 on line 20060 (the step line of 1613) starts «Crisis de identidad». INFERRED order of the replies: the client carries sentences and answers but not which go together. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open."
+      "why": "Lonyon the Silent in the Sram temple's crypt (Dofus pour les noobs («Rendez-vous avec la mort»)): he reads out his papers (19995-20003: 'a fine day to die', the Forgotten Brotherhood, the orichor box) and «Te ayudaré» (23921 = 9469) makes the player his spokesman; 20004 is where he hands out the three messages (the three sub-quests add their own replies) and, with the three proofs in, the evidence is shown (20055-20059; 24011 = 9470). INFERRED order of the replies: the client carries sentences and answers but not which go together. The three messages (Dofus pour les noobs («Rendez-vous avec la mort», «Secret de fabrication»)): «Leer el mensaje que lleva la palabra Anutropía/Sramvil/Xelorium» (23991, 23995, 24000) open 20005 / 20006 / 20007-20008, whose accept replies (23988/23989, 23992/23993, 23996/23997) start 1610 / 1611 / 1612. The proofs (24002, 24004, 24006) are the three sub-quests' own hand-overs (9440, 9466, 9484); 24012 closes 9470 and 24014 on line 20060 (the step line of 1613) starts «Crisis de identidad». INFERRED order of the replies: the client carries sentences and answers but not which go together. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open. Reply 24011 is also offered from the opening once the three quests are finished, so the closing talk of 1609 can be reached again after the last hand-over. Reply 24014 (starting 1613) is also offered from the opening once 1609 is finished, because the closing talk (20059-20060) is only reachable while 1609 is open. Starting 1613 (reply 24014) hands over the summoning potion 16067 (Dofus pour les noobs («Crise d'identité»): Gein gives a potion that lets him join the player in the Travelers Tower)."
     },
   {
       "npc": 6680,
@@ -73949,19 +73949,21 @@
       "npc": 2335,
       "map": 130025987,
       "opening": 20110,
+      "openings": [
+        { "quest": 1613, "criterion": "Qa=1613&Qo>9489&Qo>9490&Qo>9491&Qo>9492&Qo>9493&Qo>9494&Qo<9495", "message": 20112 }
+      ],
       "lines": [
         {
           "message": 20110,
           "choices": [
-            { "reply": 24078, "criterion": "Qa=1613&Qo>9486&Qo<9487", "quest": 1613, "completes": 9487, "params": [[30, 9487]], "next": 20113 },
-            { "reply": 24080, "criterion": "Qa=1613&Qo>9494&Qo<9495", "quest": 1613, "completes": 9495, "params": [[30, 9495]], "next": 20117 }
+            { "reply": 24078, "criterion": "Qa=1613&Qo>9486&Qo<9487", "quest": 1613, "completes": 9487, "params": [[30, 9487]], "next": 20113 }
           ]
         },
         {
           "message": 20113,
           "names": true,
           "choices": [
-            { "reply": 24076, "quest": 1613, "next": 20111 }
+            { "reply": 24076, "quest": 1613, "next": 20111, "takes": 16067, "criterion": "PO=16067" }
           ]
         },
         {
@@ -73973,9 +73975,15 @@
           "choices": [
             { "reply": 24079, "quest": 1613 }
           ]
+        },
+        {
+          "message": 20112,
+          "choices": [
+            { "reply": 24080, "criterion": "Qa=1613&Qo>9489&Qo>9490&Qo>9491&Qo>9492&Qo>9493&Qo>9494&Qo<9495", "quest": 1613, "completes": 9495, "params": [[30, 9495]], "next": 20117 }
+          ]
         }
       ],
-      "why": "Exploranciana in the information room (Dofus pour les noobs («Crise d'identité»)): «Tengo cosas importantes que revelar» (24078) closes 9487 and leads to the vial (24076); once every traveller has heard the proofs «No eres quién para hablar de confianza» (24080) closes 9495 and she shows her true form (20117). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+      "why": "Exploranciana in the information room (Dofus pour les noobs («Crise d'identité»)): «Tengo cosas importantes que revelar» (24078) closes 9487 and leads to the vial (24076); once every traveller has heard the proofs «No eres quién para hablar de confianza» (24080) closes 9495 and she shows her true form (20117). INFERRED order of the replies: the client carries sentences and answers but not which go together. Reply 24076 (empty the flask Gein gave) needs and takes the potion 16067. She answers (20112, «No eres quién para hablar de confianza» 24080) only after the six travellers have heard the proofs."
     },
   {
       "npc": 2823,
@@ -83227,6 +83235,201 @@
         }
       ],
       "why": "The queen of Sramvil in the alley (Dofus pour les noobs («S'emparer des commandes»)): 23866 (notice she is the queen) -> the Smis family pays for the documents (19948) -> 23865 (grab the documents) hands over the spy reports (16063), which 9466 delivers to Gein the Silent."
+    },
+    {
+      "npc": 2337,
+      "map": 130025987,
+      "opening": 20105,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20109 },
+        { "quest": 1613, "objective": 9489, "message": 20108 },
+        { "quest": 1613, "objective": 9488, "message": 20106 }
+      ],
+      "lines": [
+        {
+          "message": 20105,
+          "choices": []
+        },
+        {
+          "message": 20106,
+          "choices": [
+            { "reply": 24073, "quest": 1613, "next": 20107 }
+          ]
+        },
+        {
+          "message": 20107,
+          "choices": [
+            { "reply": 24071, "quest": 1613, "completes": 9489, "params": [[30, 9489]], "next": 20108 }
+          ]
+        },
+        {
+          "message": 20108,
+          "choices": [
+            { "reply": 24072, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Colonel Onil in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20106 on, reply 24073 closes 9489), in any order; once Eco freezes them they only stare (20109). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2339,
+      "map": 130025987,
+      "opening": 20121,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20123 },
+        { "quest": 1613, "objective": 9490, "message": 20122 }
+      ],
+      "lines": [
+        {
+          "message": 20121,
+          "choices": [
+            { "reply": 24086, "quest": 1613, "completes": 9490, "params": [[30, 9490]], "next": 20122 }
+          ]
+        },
+        {
+          "message": 20122,
+          "choices": [
+            { "reply": 24084, "quest": 1613 },
+            { "reply": 24085, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Commander Qu in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20121 on, reply 24086 closes 9490), in any order; once Eco freezes them they only stare (20123). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2340,
+      "map": 130025987,
+      "opening": 20124,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20128 },
+        { "quest": 1613, "objective": 9491, "message": 20127 },
+        { "quest": 1613, "objective": 9488, "message": 20125 }
+      ],
+      "lines": [
+        {
+          "message": 20124,
+          "choices": []
+        },
+        {
+          "message": 20125,
+          "choices": [
+            { "reply": 24089, "quest": 1613, "completes": 9491, "params": [[30, 9491]], "next": 20126 }
+          ]
+        },
+        {
+          "message": 20126,
+          "choices": [
+            { "reply": 24087, "quest": 1613, "next": 20127 }
+          ]
+        },
+        {
+          "message": 20127,
+          "choices": [
+            { "reply": 24088, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Gladis in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20125 on, reply 24089 closes 9491), in any order; once Eco freezes them they only stare (20128). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2338,
+      "map": 130025987,
+      "opening": 20130,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20133 },
+        { "quest": 1613, "objective": 9492, "message": 20132 },
+        { "quest": 1613, "objective": 9488, "message": 20131 }
+      ],
+      "lines": [
+        {
+          "message": 20130,
+          "choices": []
+        },
+        {
+          "message": 20131,
+          "choices": [
+            { "reply": 24094, "quest": 1613, "completes": 9492, "params": [[30, 9492]], "next": 20132 }
+          ]
+        },
+        {
+          "message": 20132,
+          "choices": [
+            { "reply": 24092, "quest": 1613 },
+            { "reply": 24093, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Doctor Boing Boing in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20131 on, reply 24094 closes 9492), in any order; once Eco freezes them they only stare (20133). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2343,
+      "map": 130025987,
+      "opening": 20134,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20138 },
+        { "quest": 1613, "objective": 9493, "message": 20137 },
+        { "quest": 1613, "objective": 9488, "message": 20135 }
+      ],
+      "lines": [
+        {
+          "message": 20134,
+          "choices": []
+        },
+        {
+          "message": 20135,
+          "choices": [
+            { "reply": 24097, "quest": 1613, "completes": 9493, "params": [[30, 9493]], "next": 20136 }
+          ]
+        },
+        {
+          "message": 20136,
+          "choices": [
+            { "reply": 24095, "quest": 1613, "next": 20137 }
+          ]
+        },
+        {
+          "message": 20137,
+          "choices": [
+            { "reply": 24096, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Deil Harden in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20135 on, reply 24097 closes 9493), in any order; once Eco freezes them they only stare (20138). INFERRED order of the replies: the client carries sentences and answers but not which go together."
+    },
+    {
+      "npc": 2344,
+      "map": 130025987,
+      "opening": 20139,
+      "openings": [
+        { "quest": 1613, "objective": 9496, "message": 20143 },
+        { "quest": 1613, "objective": 9494, "message": 20142 },
+        { "quest": 1613, "objective": 9488, "message": 20140 }
+      ],
+      "lines": [
+        {
+          "message": 20139,
+          "choices": []
+        },
+        {
+          "message": 20140,
+          "choices": [
+            { "reply": 24100, "quest": 1613, "completes": 9494, "params": [[30, 9494]], "next": 20141 }
+          ]
+        },
+        {
+          "message": 20141,
+          "choices": [
+            { "reply": 24098, "quest": 1613, "next": 20142 }
+          ]
+        },
+        {
+          "message": 20142,
+          "choices": [
+            { "reply": 24099, "quest": 1613 }
+          ]
+        }
+      ],
+      "why": "Zap Gobdon in the information room (Dofus pour les noobs («Crise d'identité»)): once the player has read Lonyon's message each traveller hears the proofs (20140 on, reply 24100 closes 9494), in any order; once Eco freezes them they only stare (20143). INFERRED order of the replies: the client carries sentences and answers but not which go together."
     }
   ]
 }

@@ -7841,7 +7841,7 @@
       "npc": 2337,
       "cell": 244,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Colonel Onil in the information room. INFERRED cell."
     },
     {
@@ -7849,7 +7849,7 @@
       "npc": 2339,
       "cell": 270,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Commander Qu in the information room. INFERRED cell."
     },
     {
@@ -7857,7 +7857,7 @@
       "npc": 2340,
       "cell": 304,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Gladis in the information room. INFERRED cell."
     },
     {
@@ -7865,7 +7865,7 @@
       "npc": 2338,
       "cell": 339,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Doctor Boing Boing in the information room. INFERRED cell."
     },
     {
@@ -7873,7 +7873,7 @@
       "npc": 2343,
       "cell": 368,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Deil Harden in the information room. INFERRED cell."
     },
     {
@@ -7881,7 +7881,7 @@
       "npc": 2344,
       "cell": 422,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9486&Qo<9496",
+      "criterion": "Qa=1613&Qo>9486&Qo<9498",
       "why": "Dofus pour les noobs («Crise d'identité»): Zap Gobdon in the information room. INFERRED cell."
     },
     {
@@ -7889,7 +7889,7 @@
       "npc": 2803,
       "cell": 304,
       "orientation": 1,
-      "criterion": "Qa=1613&Qo>9495&Qo<9498",
+      "criterion": "Qa=1613&Qo>9495&Qo<9497",
       "why": "Dofus pour les noobs («Crise d'identité»): Exploranciana in her true form (Eco). INFERRED cell."
     },
     {
