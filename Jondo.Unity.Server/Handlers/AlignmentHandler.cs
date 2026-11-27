@@ -123,16 +123,6 @@ namespace Jondo.Unity.Server.Handlers
         }
 
         /// <summary>
-        /// The side changed: kept, and the character drawn again with it, his sheet and rank too.
-        /// </summary>
-        /// <remarks>
-        /// Leaving a city forgets what was done for its militia, as Morry Gann warns before the
-        /// signature: «¡Perderás todo lo que has dedicado a la milicia de tu ciudad, ya sea Bonta o
-        /// Brakmar! No podrás dar marcha atrás.» -- «tu perdras ton grade au sein de ta milice et tous
-        /// les avantages qui sont liés». Its alignment and order quests go back to not done, so the
-        /// level and the rank start again from nothing if he ever swears to it again.
-        /// </remarks>
-        /// <summary>
         /// A dialogue reply swears the character to a city: 1 Bonta, 2 Brakmar, as the criterion's
         /// own numbering. It goes through the same switch as Chantal's oath, so the sheet, rank and
         /// `CharacterAlignments` row are updated together.
@@ -142,6 +132,16 @@ namespace Jondo.Unity.Server.Handlers
                 ? SwitchAsync(stream, criterionSide == 1 ? Alignments.Bonta : Alignments.Brakmar)
                 : Task.CompletedTask;
 
+        /// <summary>
+        /// The side changed: kept, and the character drawn again with it, his sheet and rank too.
+        /// </summary>
+        /// <remarks>
+        /// Leaving a city forgets what was done for its militia, as Morry Gann warns before the
+        /// signature: «¡Perderás todo lo que has dedicado a la milicia de tu ciudad, ya sea Bonta o
+        /// Brakmar! No podrás dar marcha atrás.» -- «tu perdras ton grade au sein de ta milice et tous
+        /// les avantages qui sont liés». Its alignment and order quests go back to not done, so the
+        /// level and the rank start again from nothing if he ever swears to it again.
+        /// </remarks>
         private static async Task SwitchAsync(NetworkStream stream, int side)
         {
             int left = Alignments.CriterionSide(Me);
