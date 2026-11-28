@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Jondo.Unity.World.Content;
 using Xunit;
 
@@ -91,6 +92,27 @@ namespace Jondo.Unity.Tests.Content
         }
 
         // ─── Round trip ───────────────────────────────────────────────────────────
+
+        [Fact]
+        public void A_reply_that_takes_alterations_writes_the_field_once()
+        {
+            File.WriteAllText(_path, """
+                { "dialogues": [{ "npc": 1, "opening": 10, "lines": [
+                    { "message": 10, "choices": [{ "reply": 20, "takesAlterations": [871, 872] }] }
+                ] }] }
+                """);
+
+            var original = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 1, 0)!;
+            NpcDialogueContent.Save(_path, [original]);
+            var choice = NpcDialogueContent.For(NpcDialogueContent.Load(_path), 1, 0)!.Line(10)!.Choice(20)!;
+
+            using var saved = JsonDocument.Parse(File.ReadAllText(_path));
+            var savedChoice = saved.RootElement.GetProperty("dialogues")[0]
+                .GetProperty("lines")[0].GetProperty("choices")[0];
+            Assert.Single(savedChoice.EnumerateObject(), field => field.NameEquals("takesAlterations"));
+            Assert.Equal(new[] { 871, 872 }, choice.TakesAlterations);
+            Assert.False(choice.ExtensionFields.ContainsKey("takesAlterations"));
+        }
 
         [Fact]
         public void Extension_fields_round_trip_without_loading_a_package()

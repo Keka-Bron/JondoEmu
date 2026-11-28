@@ -1710,7 +1710,7 @@ namespace Jondo.Unity.World.Content
             "givesCount", "givesKamas", "givesOneOf", "hand", "holds", "holdsCount", "kothRole", "leaves", "marks",
             "marksBelow", "marksReached", "minLevel", "mutation", "next", "otherwise", "params", "partial",
             "passage", "phantom", "quest", "random", "refused", "reply", "says", "shop", "showsNpc", "stagings",
-            "startsQuest", "step", "stillWaiting", "sulks", "takes", "takesAll", "takesCount", "teaches",
+            "startsQuest", "step", "stillWaiting", "sulks", "takes", "takesAll", "takesAlterations", "takesCount", "teaches",
             "teachesEmote", "teleport", "teleportBack", "thenLine", "thenNpc", "trade", "tradeCount", "verdict",
             "waited"
         };
