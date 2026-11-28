@@ -75,6 +75,39 @@ public sealed class ClientModSyncTests : IDisposable
     }
 
     [Theory]
+    [InlineData(true, Roles.Jugador, false)]
+    [InlineData(true, Roles.Administrador, true)]
+    [InlineData(false, Roles.Jugador, false)]
+    [InlineData(false, Roles.Administrador, false)]
+    public void Tokens_require_bundled_mod_contents_even_after_approval(bool bundledOnly, int role, bool controlToken)
+    {
+        const string name = "Bundled.dll";
+        const string token = "session-token";
+        string bundled = Directory.CreateDirectory(Path.Combine(_cache, "bundle", "mods")).FullName;
+        File.WriteAllBytes(Path.Combine(bundled, name), [1]);
+        byte[] serverDll = bundledOnly ? [1] : [2];
+        using var feed = new Feed(Entry(name, serverDll));
+        feed.Blobs.Add(name, serverDll);
+        using var http = new HttpClient(feed);
+
+        var plan = Prepare(http, "", (_, _, _) => !bundledOnly);
+        Assert.Equal(bundledOnly, plan.NewApproval.Length == 0);
+        var reused = Prepare(http, plan.NewApproval, (_, _, _) => throw new InvalidOperationException("Unexpected approval"));
+
+        foreach (var launchPlan in new[] { plan, reused })
+        {
+            var start = new ProcessStartInfo();
+            start.Environment.Clear();
+            LauncherService.SetClientAccountEnvironment(start, launchPlan, role, token);
+
+            Assert.Equal(bundledOnly, start.Environment.ContainsKey("JONDO_PLAYER_TOKEN"));
+            Assert.Equal(controlToken, start.Environment.ContainsKey("JONDO_CONTROL_TOKEN"));
+            if (bundledOnly) Assert.Equal(token, start.Environment["JONDO_PLAYER_TOKEN"]);
+            if (controlToken) Assert.Equal(token, start.Environment["JONDO_CONTROL_TOKEN"]);
+        }
+    }
+
+    [Theory]
     [InlineData("Cazacabezas.dll")]
     [InlineData("heroes.DLL")]
     public void An_empty_manifest_sets_aside_bundled_and_previously_installed_mods(string legacyName)
@@ -98,6 +131,7 @@ public sealed class ClientModSyncTests : IDisposable
 
         ClientModDeployment.Activate(client, Path.Combine(_cache, "bundle"), plan, new ProcessStartInfo());
 
+        Assert.True(plan.BundledOnly);
         Assert.False(File.Exists(Path.Combine(mods, bundledName)));
         Assert.Single(Directory.GetFiles(mods, bundledName + ".jondo-legacy-*"));
         Assert.False(File.Exists(Path.Combine(mods, retiredName)));
@@ -123,6 +157,7 @@ public sealed class ClientModSyncTests : IDisposable
         ClientModDeployment.Activate(client, bundle, plan, new ProcessStartInfo());
 
         Assert.False(plan.UsesManifest);
+        Assert.True(plan.BundledOnly);
         Assert.Empty(feed.Downloads);
         Assert.Empty(BundledClientMods.Discover(bundle));
         Assert.True(BundledClientMods.SameContent(shippedFix, Path.Combine(client, "Mods", ClientModManifest.RequiredClientDll)));

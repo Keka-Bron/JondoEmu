@@ -1253,19 +1253,19 @@ namespace Jondo.Unity.Launcher.UI
             {
                 Language.En => (
                     Title: "Approve server mods",
-                    Description: "The server {0} offers these mods. Approving lets these DLLs run with your operating system account’s permissions. Verify the fingerprint with the server operator before approving.",
+                    Description: "Approving these mods lets the server {0} run code on your computer with your operating system account’s permissions. Verify the fingerprint with the server operator before approving.",
                     Fingerprint: "Manifest fingerprint", Approve: "Trust and play", Cancel: "Cancel"),
                 Language.Fr => (
                     Title: "Approuver les mods du serveur",
-                    Description: "Le serveur {0} propose ces mods. Si vous les approuvez, ces DLL s’exécuteront avec les autorisations de votre compte système. Vérifiez l’empreinte auprès du responsable du serveur avant d’approuver.",
+                    Description: "En approuvant ces mods, vous autorisez le serveur {0} à exécuter du code sur votre ordinateur avec les droits de votre compte système. Vérifiez l’empreinte auprès du responsable du serveur avant d’approuver.",
                     Fingerprint: "Empreinte du manifeste", Approve: "Approuver et jouer", Cancel: "Annuler"),
                 Language.Pt => (
                     Title: "Aprovar mods do servidor",
-                    Description: "O servidor {0} oferece estes mods. Ao aprovar, essas DLLs serão executadas com as permissões da sua conta no sistema operacional. Confira a impressão digital com o responsável pelo servidor antes de aprovar.",
+                    Description: "Ao aprovar estes mods, você permite que o servidor {0} execute código no seu computador com as permissões da sua conta no sistema operacional. Confira a impressão digital com o responsável pelo servidor antes de aprovar.",
                     Fingerprint: "Impressão digital do manifesto", Approve: "Confiar e jogar", Cancel: "Cancelar"),
                 _ => (
                     Title: "Aprobar mods del servidor",
-                    Description: "El servidor {0} ofrece estos mods. Si los apruebas, estas DLL se ejecutarán con los permisos de tu cuenta del sistema operativo. Verifica la huella con el responsable del servidor antes de aprobar.",
+                    Description: "Al aprobar estos mods, permites que el servidor {0} ejecute código en tu ordenador con los permisos de tu cuenta del sistema operativo. Verifica la huella con el responsable del servidor antes de aprobar.",
                     Fingerprint: "Huella del manifiesto", Approve: "Confiar y jugar", Cancel: "Cancelar")
             };
             var lines = new List<string>

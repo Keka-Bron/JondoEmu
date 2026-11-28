@@ -9,7 +9,8 @@ public static class ClientModDeployment
 {
     private static readonly HttpClient Http = new(new HttpClientHandler { AllowAutoRedirect = false });
 
-    public sealed record Plan(string ManifestPath, bool UsesManifest, string NewApproval, IReadOnlyList<string> ManagedNames);
+    public sealed record Plan(string ManifestPath, bool UsesManifest, string NewApproval, IReadOnlyList<string> ManagedNames,
+        bool BundledOnly);
 
     public static Plan Prepare(Uri server, string bundleRoot, string cache, string trusted,
         bool hasMelonLoader, Func<string, ClientModManifest, string, bool>? approve)
@@ -26,7 +27,7 @@ public static class ClientModDeployment
         using var request = new HttpRequestMessage(HttpMethod.Get, manifestUri);
         using var response = http.Send(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token);
         if (response.StatusCode == HttpStatusCode.NotFound && trusted.Length == 0)
-            return new Plan("", UsesManifest: false, "", []);
+            return new Plan("", UsesManifest: false, "", [], BundledOnly: true);
         response.EnsureSuccessStatusCode();
 
         using var contents = new MemoryStream();
@@ -61,7 +62,7 @@ public static class ClientModDeployment
         var managedNames = bundledMods.Keys.Concat(manifest.Mods.Select(mod => mod.Name))
             .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         if (manifest.Mods.Length == 0)
-            return new Plan("", UsesManifest: true, newApproval, managedNames);
+            return new Plan("", UsesManifest: true, newApproval, managedNames, bundledOnly);
         string blobs = Path.Combine(cache, "blobs");
         Directory.CreateDirectory(blobs);
         foreach (ClientModEntry mod in manifest.Mods)
@@ -89,7 +90,8 @@ public static class ClientModDeployment
         Directory.CreateDirectory(manifestDirectory);
         string launchFingerprint = Convert.ToHexStringLower(SHA256.HashData(json));
         string path = Path.Combine(manifestDirectory, launchFingerprint + ".json");
-        if (Matches(path, json.Length, launchFingerprint)) return new Plan(path, UsesManifest: true, newApproval, managedNames);
+        var plan = new Plan(path, UsesManifest: true, newApproval, managedNames, bundledOnly);
+        if (Matches(path, json.Length, launchFingerprint)) return plan;
         string pending = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
@@ -100,7 +102,7 @@ public static class ClientModDeployment
         {
             File.Delete(pending);
         }
-        return new Plan(path, UsesManifest: true, newApproval, managedNames);
+        return plan;
     }
 
     public sealed class ApprovalDeclinedException : Exception { }
