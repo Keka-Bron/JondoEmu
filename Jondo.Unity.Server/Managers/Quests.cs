@@ -602,6 +602,15 @@ namespace Jondo.Unity.Server.Managers
                         moved = true;
                         break;
                     }
+                    // Nothing left to give because it is all carried already -- a quest taken
+                    // again keeps what the bag held --: the gathering is done all the same. Without
+                    // this the element said nothing and the objective never moved.
+                    if (!binding.OnlyGives && InHand(binding) && CarriesEveryOne(binding))
+                    {
+                        await TickAsync(session, binding.QuestId, binding.ObjectiveId);
+                        moved = true;
+                        break;
+                    }
                     continue;
                 }
                 // One press per map of the row's list, and the objective is done with the last map's:

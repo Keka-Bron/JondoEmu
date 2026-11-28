@@ -97,5 +97,47 @@ namespace Jondo.Unity.Tests.Combat
 
             Assert.Contains(fight.Todos, f => f.IsAlive && f.MonsterId == 6234);
         }
+
+        /// <summary>
+        /// The turned bombombre (6234) hit from next door: whoever hit it casts 16771 at it, which
+        /// pushes it a cell back, and when it cannot go back he casts 16745 at it -- "4 on L63" --
+        /// and lands on the first free cell past it. That is the way onto Nagate's islet.
+        /// </summary>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Hit_from_next_door_the_bombombre_steps_back_or_lets_him_through(bool blocked)
+        {
+            if (SpellEffects.De(16771, 1).Count == 0 || SpellEffects.De(16745, 1).Count == 0) return;
+            var (x, y) = MapGeometry.CellToPoint(300);
+            int hitter = MapGeometry.PointToCell(x - 1, y), behind = MapGeometry.PointToCell(x + 1, y),
+                further = MapGeometry.PointToCell(x + 2, y);
+            var (kwapa, enemy, fight, _) = Duel(6247);
+            kwapa.CellId = MapGeometry.PointToCell(x, y + 5);
+            enemy.CellId = hitter;
+            var bomb = new Fighter { Id = -2, TeamId = 1, IsMonster = true, MonsterId = 6234, Level = 200, CellId = 300,
+                                     MaxHP = 500, CurrentHP = 500, MaxAP = 1, CurrentAP = 1 };
+            fight.AddMonster(bomb);
+            if (blocked)
+            {
+                var wall = new Fighter { Id = -3, TeamId = 1, IsMonster = true, MonsterId = 6247, Level = 200, CellId = behind,
+                                         MaxHP = 500, CurrentHP = 500 };
+                fight.AddMonster(wall);
+            }
+            fight.StartFight();
+
+            await FightHandler.AplicarEfectosAsync(null, fight, enemy, 16771, 1, null, EffectEngine.AlLanzar, 300);
+
+            if (blocked)
+            {
+                Assert.Equal(300, bomb.CellId);
+                Assert.Equal(further, enemy.CellId);
+            }
+            else
+            {
+                Assert.Equal(behind, bomb.CellId);
+                Assert.Equal(hitter, enemy.CellId);
+            }
+        }
     }
 }
