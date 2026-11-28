@@ -162,6 +162,22 @@ namespace Jondo.Unity.World.Quests
             = new Dictionary<(long, int), int>();
 
         /// <summary>
+        /// With <see cref="GivesEach"/>: what one element wakes up instead of the row's «spawns».
+        /// Two of the four eggs of «Épidémiologie» may set a playful puceronde or lucrane on whoever
+        /// samples them, fought alone, and the other two never do (Dofus pour les noobs).
+        /// </summary>
+        public IReadOnlyDictionary<(long MapId, int ElementId), QuestSpawn> ElementSpawns { get; init; }
+            = new Dictionary<(long, int), QuestSpawn>();
+
+        /// <summary>What pressing this element brings out: its own «spawns», else the row's, else nothing.</summary>
+        public QuestSpawn? SpawnAt(long mapId, int elementId)
+            => ElementSpawns.TryGetValue((mapId, elementId), out var own) ? own : RowSpawn;
+
+        /// <summary>The row's own «spawns», or null when it brings out nothing.</summary>
+        public QuestSpawn? RowSpawn => SpawnsMonster == 0 ? null
+            : new QuestSpawn(SpawnsMonster, SpawnsCount, SpawnsWithAll, SpawnsAttack, SpawnsChance, SpawnsAlone);
+
+        /// <summary>
         /// The skill the element offers. <c>Utiliser</c> unless a row says otherwise.
         /// </summary>
         /// <remarks>
@@ -238,6 +254,9 @@ namespace Jondo.Unity.World.Quests
         /// the fight instead of leaving a group on the map to be clicked.
         /// </summary>
         public bool SpawnsAttack { get; init; }
+
+        /// <summary>Whether the fight they start is the presser's alone («spawns»'s «alone»), locked to others.</summary>
+        public bool SpawnsAlone { get; init; }
 
         /// <summary>
         /// How many fights against <see cref="MonsterId"/> a beat binding asks for: the three
@@ -584,6 +603,7 @@ namespace Jondo.Unity.World.Quests
             var elements = new List<(long, int)>();
             var elementItems = new Dictionary<(long, int), int>();
             var elementSays = new Dictionary<(long, int), int>();
+            var elementSpawns = new Dictionary<(long, int), QuestSpawn>();
             if (row.TryGetProperty("elements", out var list) && list.ValueKind == JsonValueKind.Array)
             {
                 foreach (var one in list.EnumerateArray())
@@ -596,6 +616,9 @@ namespace Jondo.Unity.World.Quests
                     if (own != 0) elementItems[(map, element)] = own;
                     int says = Int(one, "says");
                     if (says != 0) elementSays[(map, element)] = says;
+                    if (one.TryGetProperty("spawns", out var wakes) && wakes.ValueKind == JsonValueKind.Object
+                        && QuestSpawn.Read(wakes) is { } woken)
+                        elementSpawns[(map, element)] = woken;
                 }
             }
 
@@ -645,7 +668,7 @@ namespace Jondo.Unity.World.Quests
 
             int spawnMonster = 0, spawnCount = 0, spawnWith = 0;
             var spawnWithAll = new List<int>();
-            bool spawnAttacks = false;
+            bool spawnAttacks = false, spawnAlone = false;
             int spawnChance = 0;
             if (row.TryGetProperty("spawns", out var spawn) && spawn.ValueKind == JsonValueKind.Object)
             {
@@ -664,6 +687,7 @@ namespace Jondo.Unity.World.Quests
                 }
                 if (spawnWith == 0 && spawnWithAll.Count > 0) spawnWith = spawnWithAll[0];
                 spawnAttacks = spawn.TryGetProperty("attacks", out var attacks) && attacks.ValueKind == JsonValueKind.True;
+                spawnAlone = spawn.TryGetProperty("alone", out var alone) && alone.ValueKind == JsonValueKind.True;
             }
 
             int skill = Int(row, "skill");
@@ -689,6 +713,7 @@ namespace Jondo.Unity.World.Quests
                 SkillName = Int(row, "skillName"),
                 ElementItems = elementItems,
                 ElementSays = elementSays,
+                ElementSpawns = elementSpawns,
                 Gives = gives,
                 Requires = requires,
                 Worn = worn,
@@ -699,6 +724,7 @@ namespace Jondo.Unity.World.Quests
                 SpawnsWith = spawnWith,
                 SpawnsWithAll = spawnWithAll,
                 SpawnsAttack = spawnAttacks,
+                SpawnsAlone = spawnAlone,
                 SpawnsChance = spawnChance,
                 Times = Math.Max(1, Int(row, "times")),
                 Lost = row.TryGetProperty("lost", out var lost) && lost.ValueKind == JsonValueKind.True,
@@ -786,5 +812,31 @@ namespace Jondo.Unity.World.Quests
 
         private static long Long(JsonElement row, string name)
             => row.TryGetProperty(name, out var value) && value.TryGetInt64(out long number) ? number : 0;
+    }
+
+    /// <summary>What pressing an element brings out: a monster, how many, who comes with them, and how.</summary>
+    public sealed record QuestSpawn(int Monster, int Count, IReadOnlyList<int> With, bool Attacks, int Chance, bool Alone)
+    {
+        /// <summary>Reads a «spawns» object; null when it names no monster.</summary>
+        public static QuestSpawn? Read(JsonElement spawn)
+        {
+            int monster = spawn.TryGetProperty("monster", out var m) && m.TryGetInt32(out int id) ? id : 0;
+            if (monster == 0) return null;
+            int count = spawn.TryGetProperty("count", out var c) && c.TryGetInt32(out int n) ? Math.Max(1, n) : 1;
+            int chance = spawn.TryGetProperty("chance", out var p) && p.TryGetInt32(out int odds) ? Math.Clamp(odds, 0, 100) : 0;
+            var with = new List<int>();
+            if (spawn.TryGetProperty("with", out var w))
+            {
+                if (w.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var one in w.EnumerateArray())
+                        if (one.ValueKind == JsonValueKind.Number) with.Add(one.GetInt32());
+                }
+                else if (w.TryGetInt32(out int single) && single != 0) with.Add(single);
+            }
+            bool attacks = spawn.TryGetProperty("attacks", out var a) && a.ValueKind == JsonValueKind.True;
+            bool alone = spawn.TryGetProperty("alone", out var l) && l.ValueKind == JsonValueKind.True;
+            return new QuestSpawn(monster, count, with, attacks, chance, alone);
+        }
     }
 }

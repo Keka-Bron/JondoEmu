@@ -592,10 +592,11 @@ namespace Jondo.Unity.Server.Managers
                     if (await GiveEachAsync(session, binding, mapId, elementId))
                     {
                         SessionContext.State.QuestElementsTaken.Add((binding.ObjectiveId, elementId));
-                        // What guards the element: the dostrogo a dodoune egg wakes up, now and then.
-                        if (binding.SpawnsMonster != 0
-                            && (binding.SpawnsChance == 0 || Random.Shared.Next(100) < binding.SpawnsChance))
-                            await SpawnAsync(session, binding);
+                        // What guards the element: the dostrogo a dodoune egg wakes up, now and then;
+                        // or what guards that one element only, as two of the eggs of «Épidémiologie».
+                        if (binding.SpawnAt(mapId, elementId) is { } wakes
+                            && (wakes.Chance == 0 || Random.Shared.Next(100) < wakes.Chance))
+                            await SpawnAsync(session, binding, wakes);
                         // Without «onlyGives» the gathering IS the objective: «Recoge tres maderas de
                         // cuerbok» is done once each of the three trunks' wood is in the bag.
                         if (!binding.OnlyGives && CarriesEveryOne(binding))
@@ -1092,16 +1093,20 @@ namespace Jondo.Unity.Server.Managers
         /// It is only sent to whoever triggered it. It is his quest, his element and his creature; nothing
         /// appears for the others in the middle of the map.
         /// </remarks>
-        private static async Task SpawnAsync(GameSession session, QuestBinding binding)
+        private static Task SpawnAsync(GameSession session, QuestBinding binding)
+            => binding.RowSpawn is { } spawn ? SpawnAsync(session, binding, spawn) : Task.CompletedTask;
+
+        /// <summary>The same, for what one element of the row brings out.</summary>
+        private static async Task SpawnAsync(GameSession session, QuestBinding binding, QuestSpawn spawn)
         {
             var stream = session.Stream;
             long mapId = SessionContext.State.MapId;
-            var grupo = MobSpawnManager.SpawnNamed(mapId, binding.SpawnsMonster, binding.SpawnsCount, binding.SpawnsWithAll.ToArray());
+            var grupo = MobSpawnManager.SpawnNamed(mapId, spawn.Monster, spawn.Count, spawn.With.ToArray());
 
             if (grupo == null)
             {
                 Console.WriteLine($"[Quests] Objective {binding.ObjectiveId} had to bring out " +
-                                  $"monster {binding.SpawnsMonster} and could not.");
+                                  $"monster {spawn.Monster} and could not.");
                 return;
             }
 
@@ -1110,13 +1115,14 @@ namespace Jondo.Unity.Server.Managers
 
             await MapInformationService.Live.RefreshActorsAsync(session, ficha);
 
-            Console.WriteLine($"[Quests] Monster {binding.SpawnsMonster} comes out " +
-                              $"(x{binding.SpawnsCount}) on cell {grupo.CellId}.");
+            Console.WriteLine($"[Quests] Monster {spawn.Monster} comes out " +
+                              $"(x{spawn.Count}) on cell {grupo.CellId}.");
 
             // And, when they come out attacking, the fight starts right there: the yellow puddle
             // of «Cien por cien natural» is a fight, not a group left standing to be clicked.
-            if (binding.SpawnsAttack)
-                await Handlers.FightHandler.InitiateFightFromMobCollision(stream, grupo, mapId);
+            // «alone»: the playful puceronde is fought by whoever sampled its egg, nobody else.
+            if (spawn.Attacks)
+                await Handlers.FightHandler.InitiateFightFromMobCollision(stream, grupo, mapId, solo: spawn.Alone);
         }
 
         /// <summary>
