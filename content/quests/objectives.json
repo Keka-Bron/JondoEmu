@@ -11099,6 +11099,254 @@
    "requires": [{"item": 23166, "count": 1}],
    "spends": true,
    "why": "Hang the eight enigmas back on the lantern trees of the region (840304). INFERRED: the eight trees are the lantern-tree interactives (gfx 59477/59478) of Fuegodala and the Hinaba road; one enigma is spent on each. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {"objective": 8600, "quest": 1514, "kind": "click", "elements": [{"map": 129763330, "element": 485085}], "gives": [{"item": 15375, "count": 1}], "why": "«Recupera 1 cristal azul» (885055): the glowing crystal at [-8,-4] (Retiro de los Eternos) gives the Cristal azul (15375) Wello's hand-over asks for. Dofus pour les noobs («Coiffeur de génie»). INFERRED: the element, the only gather prop of the map."},
+  {"objective": 8601, "quest": 1514, "kind": "click", "elements": [{"map": 129762304, "element": 485080}], "gives": [{"item": 15376, "count": 1}], "why": "«Recupera 1 pepita dorada» (885056): the nugget at [-9,-5] gives the Pepita dorada (15376). Dofus pour les noobs («Coiffeur de génie»). INFERRED: the element, the only gather prop of the map."},
+  {"objective": 8602, "quest": 1514, "kind": "click", "elements": [{"map": 129761538, "element": 485073}], "gives": [{"item": 15377, "count": 1}], "why": "«Recupera 1 bolsa» (885057): the bag at [-10,-6] gives the Bolsa (15377). Dofus pour les noobs («Coiffeur de génie»). INFERRED: which of the two gather props of the map (the other is the kamas barrel of 1494)."},
+  {"objective": 8530, "quest": 1515, "kind": "beat", "monsters": [3653, 3655], "map": 129763330, "afterObjectives": [8529], "why": "«Vencer a los compañeros de Avarar» (885096): the fight of replies 21280/21281. Dofus pour les noobs («Reconnaissance de dettes»)."},
+  {"objective": 8534, "quest": 1515, "kind": "use", "afterObjectives": [8533], "requires": [{"item": 15333, "count": 1}], "spends": true, "why": "«Comprueba el pago» (885097): double-click the Bolsa de Avarar 15333 (chocolate kamas). Dofus pour les noobs («Reconnaissance de dettes»)."},
+  {
+   "objective": 8714,
+   "quest": 1538,
+   "kind": "beat",
+   "monster": 3764,
+   "map": 134222850,
+   "afterObjectives": [8713],
+   "why": "«Defiende al agente Hangk Lung y vuelve a hablar con él» (885324): ticks when Kartush Detinta, the band's chief, falls (Dofus pour les noobs («Fanfouille»))."
+  },
+  {
+   "objective": 8715,
+   "quest": 1538,
+   "kind": "click",
+   "elements": [{"map": 134223874, "element": 485405}],
+   "afterObjectives": [8714],
+   "why": "«Toma prestados unos kamas a los habitantes de Sramvil» (885325): last of the three loans, the bag on the blue base of [8,3] (Dofus pour les noobs («Fanfouille»)). INFERRED element: the only prop of that map."
+  },
+  {
+   "objective": 8716,
+   "quest": 1538,
+   "kind": "reply",
+   "replies": [21642],
+   "afterObjectives": [8715],
+   "why": "«Soborna a la milicia de Sramvil» (885326): the three bribes (turbulento, al acecho, arrogante); the last one, 21642 to the arrogant Maligilante, closes it (Dofus pour les noobs («Fanfouille»))."
+  },
+  {
+   "objective": 8725,
+   "quest": 1539,
+   "kind": "enter",
+   "map": 135397893,
+   "why": "«Busca a los agentes en las catacombrías» (885347): ticks on reaching the first map of the catacombs where Jen waits [4,9] (Dofus pour les noobs («Les brigades de l'abîme»))."
+  },
+  {
+   "objective": 8726,
+   "quest": 1539,
+   "kind": "beat",
+   "monster": 3768,
+   "map": 135397893,
+   "afterObjectives": [8725],
+   "why": "«Defiende a la agente Jen O. Pato y vuelve a hablar con ella» (885348): ticks when Perfícnida Jina falls (Dofus pour les noobs («Les brigades de l'abîme»))."
+  },
+  {
+   "objective": 8749,
+   "quest": 1539,
+   "kind": "reply",
+   "replies": [21663],
+   "afterObjectives": [8735],
+   "why": "«Vence al enjambre de escoliopendras y, luego, dale el krosmoglob a la agente Jen O. Pato» (453808): closes on handing the doctor's signal over (21663; Dofus pour les noobs («Les brigades de l'abîme»))."
+  },
+  {
+   "objective": 8758,
+   "quest": 1540,
+   "kind": "beat",
+   "monster": 3733,
+   "map": 136054018,
+   "afterObjectives": [8757],
+   "why": "«Defiende al agente Oterces y vuelve a hablar con él» (885298): ticks when the thieves' band falls (Dofus pour les noobs («Balance la sauce»))."
+  },
+  {
+   "objective": 8760,
+   "quest": 1540,
+   "kind": "click",
+   "elements": [{"map": 137367812, "element": 485548}],
+   "afterObjectives": [8759],
+   "why": "«Busca los documentos escondidos» (885299): click the jar in the common grave [6,-2] (887674 «Agarra el tarro»; the large jar, element 485548 at cell 393 by the client map drawing; Dofus pour les noobs («Balance la sauce»))."
+  },
+  {
+   "objective": 8762,
+   "quest": 1540,
+   "kind": "beat",
+   "monster": 3733,
+   "map": 136052998,
+   "afterObjectives": [8761],
+   "why": "«Dale una paliza a Grant Nuja para recuperar los documentos» (885300): ticks when Grant Nuja's gang falls (Dofus pour les noobs («Balance la sauce»))."
+  },
+  {
+   "objective": 8766,
+   "quest": 1541,
+   "kind": "reply",
+   "replies": [22292],
+   "why": "«Interroga a los habitantes de Sramvil» (885341): the first question to the Myopic Skull (Dofus pour les noobs («La seinoise»))."
+  },
+  {
+   "objective": 8767,
+   "quest": 1541,
+   "kind": "reply",
+   "replies": [22297],
+   "afterObjectives": [8766],
+   "why": "«Encuentra e interroga al cráneo testigo de la escena» (885342): the Myopic Skull's second answer (Dofus pour les noobs («La seinoise»))."
+  },
+  {
+   "objective": 8772,
+   "quest": 1541,
+   "kind": "reply",
+   "replies": [22308],
+   "afterObjectives": [8771],
+   "why": "«Busca el modo de presionar a Queca Mela» (885343): the Myopic Skull tells where her hoard is (Dofus pour les noobs («La seinoise»))."
+  },
+  {
+   "objective": 8773,
+   "quest": 1541,
+   "kind": "click",
+   "elements": [{"map": 134218754, "element": 485439}],
+   "afterObjectives": [8772],
+   "gives": [{"item": 15492, "count": 1}],
+   "why": "«Descubre el escondite del botín de Queca Mela» (885344): click the grille to take her plush (15492; the only element of [3,3], INFERRED; Dofus pour les noobs («La seinoise»))."
+  },
+  {
+   "objective": 8868,
+   "quest": 1553,
+   "kind": "enter",
+   "map": 137367810,
+   "afterObjectives": [8867],
+   "why": "«Guarida del Carnicero» (452532): the objective names its map (Dofus pour les noobs («Viande fraîche»))."
+  },
+  {
+   "objective": 8870,
+   "quest": 1553,
+   "kind": "beat",
+   "monster": 3810,
+   "map": 137367810,
+   "afterObjectives": [8869],
+   "why": "«Vence al Carnicero y háblale de nuevo» (885368): the Butcher alone (3810) (Dofus pour les noobs («Viande fraîche»))."
+  },
+  {
+   "objective": 9038,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135267841, "element": 485612}],
+   "afterObjectives": [9037],
+   "gives": [{"item": 15643, "count": 1}],
+   "why": "«Consigue 1 cenizas mortuorias (885333) [6,7]»: click the urn/bowl of the map (element 485612 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15643 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9039,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135268867, "element": 485613}],
+   "afterObjectives": [9038],
+   "gives": [{"item": 15645, "count": 1}],
+   "why": "«Consigue 1 cenizas mortuorias (885334) [7,8]»: click the urn/bowl of the map (element 485613 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15645 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9040,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135397893, "element": 485614}],
+   "afterObjectives": [9039],
+   "gives": [{"item": 15646, "count": 1}],
+   "why": "«Consigue 1 cenizas mortuorias (885335) [7,9]»: click the urn/bowl of the map (element 485614 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15646 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9041,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135268869, "element": 485615}],
+   "afterObjectives": [9040],
+   "gives": [{"item": 15644, "count": 1}],
+   "why": "«Consigue 1 cenizas mortuorias (885336) [4,9]»: click the urn/bowl of the map (element 485615 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15644 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9046,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135266821, "element": 485616}],
+   "afterObjectives": [9045],
+   "gives": [{"item": 15648, "count": 1}],
+   "why": "«Consigue 1 osamenta en las catacombrías (885337) [4,8]»: click the urn/bowl of the map (element 485616 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15648 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9047,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135397891, "element": 485617}],
+   "afterObjectives": [9046],
+   "gives": [{"item": 15647, "count": 1}],
+   "why": "«Consigue 1 osamenta en las catacombrías (885338) [5,9]»: click the urn/bowl of the map (element 485617 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15647 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 9048,
+   "quest": 1554,
+   "kind": "click",
+   "elements": [{"map": 135269889, "element": 485618}],
+   "afterObjectives": [9047],
+   "gives": [{"item": 15649, "count": 1}],
+   "why": "«Consigue 1 osamenta en las catacombrías (885339) [8,7]»: click the urn/bowl of the map (element 485618 of gfx 46072/460xx, the skill-less prop; INFERRED), it yields item 15649 (Dofus pour les noobs («La morte Adèle»))."
+  },
+  {
+   "objective": 8788,
+   "quest": 1533,
+   "kind": "beat",
+   "monster": 3775,
+   "map": 134218752,
+   "afterObjectives": [8645],
+   "why": "«Ayuda al agente Naz a vencer a El Troolito» (453764): ticks when Troolito falls (Dofus pour les noobs («Ça katche ou ça casse»))."
+  },
+  {
+   "objective": 8789,
+   "quest": 1533,
+   "kind": "beat",
+   "monster": 3777,
+   "map": 134221826,
+   "afterObjectives": [8645],
+   "why": "«Ayuda al agente Naz a vencer a Dré, el Gigante» (453758): ticks when Dré falls (Dofus pour les noobs («Ça katche ou ça casse»))."
+  },
+  {
+   "objective": 8775,
+   "quest": 1533,
+   "kind": "beat",
+   "monster": 3774,
+   "map": 134224898,
+   "afterObjectives": [8645],
+   "why": "«Ayuda al agente Naz a vencer a Leny, el Zollo» (453778): ticks when Leny falls (Dofus pour les noobs («Ça katche ou ça casse»))."
+  },
+  {
+   "objective": 8369,
+   "quest": 1488,
+   "kind": "beat",
+   "monsters": [3658],
+   "map": 128974848,
+   "gives": [{"item": 15291}],
+   "why": "«Test the nugget chucker on a Young Dhreamer and note the results»: the creature's reply starts the fight, winning it ticks the test and the character keeps a test report (15291, three are handed over). INFERRED monster grade."
+  },
+  {
+   "objective": 8370,
+   "quest": 1488,
+   "kind": "beat",
+   "monsters": [3661],
+   "map": 128976900,
+   "afterObjectives": [8369],
+   "gives": [{"item": 15291}],
+   "why": "«Test the nugget chucker on a Mature Perfidhius and note the results»: the creature's reply starts the fight, winning it ticks the test and the character keeps a test report (15291, three are handed over). INFERRED monster grade."
+  },
+  {
+   "objective": 8371,
+   "quest": 1488,
+   "kind": "beat",
+   "monsters": [3659],
+   "map": 128977924,
+   "afterObjectives": [8370],
+   "gives": [{"item": 15291}],
+   "why": "«Test the nugget chucker on an Old Digshot and note the results»: the creature's reply starts the fight, winning it ticks the test and the character keeps a test report (15291, three are handed over). INFERRED monster grade."
   }
   ]
 }

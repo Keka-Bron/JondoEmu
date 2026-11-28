@@ -619,7 +619,7 @@ played through.
 | Frigost Island | `████░░░░░░` **36%** | 82/228 |
 | World Quests | `█████░░░░░` **48%** | 69/145 |
 | Astrub | `██████████` **100%** | 51/51 |
-| Sufokia | `███████░░░` **74%** | 42/57 |
+| Sufokia | `████████░░` **77%** | 44/57 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
@@ -633,8 +633,9 @@ played through.
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
 | Towers of the Brotherhood of the Forgotten | `███████░░░` **67%** | 12/18 |
 | Kwismas | `█░░░░░░░░░` **13%** | 10/79 |
+| Enurado | `███░░░░░░░` **30%** | 10/33 |
 | Moon Island | `██████████` **100%** | 10/10 |
-| Enurado | `██░░░░░░░░` **24%** | 8/33 |
+| Srambad | `███░░░░░░░` **27%** | 9/33 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
 | Bonta Alignment | `█░░░░░░░░░` **5%** | 6/115 |
 | Bonta | `██████████` **100%** | 5/5 |
@@ -645,8 +646,7 @@ played through.
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Evil Forest | `████████░░` **75%** | 3/4 |
 | Osavora | `█░░░░░░░░░` **10%** | 2/21 |
-| Srambad | `█░░░░░░░░░` **6%** | 2/33 |
-| **All quests** | **29.4%** | **581/1976** |
+| **All quests** | **30.0%** | **592/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

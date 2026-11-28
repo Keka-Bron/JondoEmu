@@ -300,6 +300,20 @@
    "monsters": [6251, 6252, 6253, 6254],
    "criterion": "Qa=2154&Qo=16544",
    "why": "«Recupera los enigmas» (2154): the firefux (6251-6254) that stole the talismans leave the calligraphed enigmas (23166). Chance INFERRED. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "item": 15487,
+   "percent": 100,
+   "monsters": [3769],
+   "criterion": "Qa=1539&Qo>8735&Qo<8749&PO!15487",
+   "why": "«Vence al enjambre de escoliopendras y, luego, dale el krosmoglob a la agente Jen O. Pato» (453808): the doctor's signal (15487) is recovered from the swarm and handed over to Jen (Dofus pour les noobs («Les brigades de l'abîme»))."
+  },
+  {
+   "item": 15489,
+   "percent": 100,
+   "monsters": [3732, 3733],
+   "criterion": "Qa=1540&Qo>8761&Qo<8764&PO!15489",
+   "why": "«Dale una paliza a Grant Nuja para recuperar los documentos» (885300): the documents (15489) are recovered from Grant Nuja's gang (Dofus pour les noobs («Balance la sauce»))."
   }
   ]
 }

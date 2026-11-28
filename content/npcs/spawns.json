@@ -9716,6 +9716,210 @@
   {"map": 184289280, "npc": 4273, "cell": 342, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
   {"map": 182977028, "npc": 4270, "cell": 371, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
   {"map": 182977028, "npc": 4274, "cell": 385, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
-  {"map": 182978570, "npc": 4284, "cell": 168, "orientation": 1, "criterion": "Qa=1952&Qo>13691&Qo<13693", "why": "Zombigne (4284) beside Jauel at [-27,34] (1952, 13692). INFERRED cell."}
+  {"map": 182978570, "npc": 4284, "cell": 168, "orientation": 1, "criterion": "Qa=1952&Qo>13691&Qo<13693", "why": "Zombigne (4284) beside Jauel at [-27,34] (1952, 13692). INFERRED cell."},
+  {"map": 129764610, "npc": 2412, "cell": 270, "orientation": 1, "why": "Gravia, the blue feca selling pills at the Retiro de los Eternos [-7,-6] (1515). Dofus pour les noobs («Reconnaissance de dettes»). INFERRED cell."},
+    {
+      "map": 134223876,
+      "npc": 2494,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1538&Qo>8714&Qo<8716",
+      "why": "Lucas Tellán (Luc Chateaulent) wants to steal the lightning. INFERRED cell; Dofus pour les noobs («Fanfouille»)."
+    },
+    {
+      "map": 134222082,
+      "npc": 2496,
+      "cell": 342,
+      "orientation": 1,
+      "criterion": "Qa=1538&Qo>8715&Qo<8716",
+      "why": "The arrogant Maligilante of [6,1]. INFERRED cell; Dofus pour les noobs («Fanfouille»)."
+    },
+    {
+      "map": 134224898,
+      "npc": 2498,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1538&Qo>8715&Qo<8716",
+      "why": "The turbulent Maligilante of [9,3]. INFERRED cell; Dofus pour les noobs («Fanfouille»)."
+    },
+    {
+      "map": 134222848,
+      "npc": 2497,
+      "cell": 330,
+      "orientation": 1,
+      "criterion": "Qa=1538&Qo>8715&Qo<8716",
+      "why": "The lurking Maligilante of the ledge [7,2] («à droite sur la corniche»). INFERRED cell; Dofus pour les noobs («Fanfouille»)."
+    },
+    {
+      "map": 135397893,
+      "npc": 2439,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo<8728",
+      "why": "Jen O. Pato waits among the dead of her team [4,9]. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 135397893,
+      "npc": 2499,
+      "cell": 297,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo>8726&Qo<8728",
+      "why": "The sergeant's krosmoglob appears after the fight. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 135266821,
+      "npc": 2439,
+      "cell": 324,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo>8727&Qo<8731",
+      "why": "Jen O. Pato follows to [5,9]. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 135266819,
+      "npc": 2439,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo>8730&Qo<8734",
+      "why": "Jen O. Pato follows to [5,8]. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 135266817,
+      "npc": 2439,
+      "cell": 324,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo>8731&Qo<8754",
+      "why": "Jen O. Pato follows to [5,7]. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 135266817,
+      "npc": 2499,
+      "cell": 338,
+      "orientation": 1,
+      "criterion": "Qa=1539&Qo>8752",
+      "why": "The sergeant's krosmoglob, activated by Jen. INFERRED cell near the arrival cell; Dofus pour les noobs («Les brigades de l'abîme»)."
+    },
+    {
+      "map": 136052998,
+      "npc": 2502,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1540&Qo>8761&Qo<8764",
+      "why": "Grant Nuja runs to the next map and waits there (18084). INFERRED cell on open floor; Dofus pour les noobs («Balance la sauce»)."
+    },
+    {
+      "map": 134218754,
+      "npc": 2478,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1541",
+      "why": "Myopic Skull on his crate in [3,3]. INFERRED cell on open floor; Dofus pour les noobs («La seinoise»)."
+    },
+    {
+      "map": 134220034,
+      "npc": 2586,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Tony Socráneo in the alley of Sramvil [4,1]. INFERRED cell on open floor; Dofus pour les noobs («Viande fraîche»)."
+    },
+    {
+      "map": 134219776,
+      "npc": 2479,
+      "cell": 304,
+      "orientation": 1,
+      "why": "Cráneo antipático in the alley [4,2]. INFERRED cell on open floor; Dofus pour les noobs («Viande fraîche»)."
+    },
+    {
+      "map": 134223874,
+      "npc": 2461,
+      "cell": 312,
+      "orientation": 1,
+      "why": "Cráneo cotilla, the curious skull, in the alley [8,3]. INFERRED cell on open floor; Dofus pour les noobs («Viande fraîche»)."
+    },
+    {
+      "map": 136185090,
+      "npc": 2462,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qa=1553",
+      "why": "Cráneo receloso [4,0] while «Carne fresca» is open: his only derived spawn is tied to quest 1556, so he stood nowhere for 1553 (Dofus pour les noobs, «Viande fraîche»: «posez des questions au Crâne Méfiant»). Same cell as the derived one."
+    },
+    {
+      "map": 134218752,
+      "npc": 2548,
+      "cell": 304,
+      "orientation": 1,
+      "criterion": "Qa=1533",
+      "why": "Troolito's trainer in [3,2] while «Cuenta fuera» is open. INFERRED cell on open floor; Dofus pour les noobs («Ça katche ou ça casse»)."
+    },
+    {
+      "map": 134221826,
+      "npc": 2546,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1533",
+      "why": "Dré the Giant in [6,3] while «Cuenta fuera» is open. INFERRED cell on open floor; Dofus pour les noobs («Ça katche ou ça casse»)."
+    },
+    {
+      "map": 134224898,
+      "npc": 2549,
+      "cell": 302,
+      "orientation": 1,
+      "criterion": "Qa=1533",
+      "why": "Jolge in [9,3] while «Cuenta fuera» is open. INFERRED cell on open floor; Dofus pour les noobs («Ça katche ou ça casse»)."
+    },
+    {
+      "map": 135269889,
+      "npc": 2561,
+      "cell": 330,
+      "orientation": 1,
+      "why": "Doctor Dil Linguer in the catacombs [8,7], where the walkthrough starts the quest. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+    },
+    {
+      "map": 136055044,
+      "npc": 2560,
+      "cell": 383,
+      "orientation": 1,
+      "why": "Patxi Misce on the dark summit [7,-1]. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+    },
+    {
+      "map": 136055044,
+      "npc": 2564,
+      "cell": 398,
+      "orientation": 1,
+      "criterion": "Qa=1555&Qo>8877&Qo<8882",
+      "why": "Caducabuelo, the disguised divinutrof (the walkthrough's Pepperime), on the dark summit while the quest looks for clues. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+    },
+    {
+      "map": 137369604,
+      "npc": 2563,
+      "cell": 409,
+      "orientation": 1,
+      "criterion": "Qa=1555&Qo>8882&Qo<8884",
+      "why": "Viejutanasio in the Oseorfanato [8,5] once the hidden passage is open. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+    },
+    {
+      "map": 128974848,
+      "npc": 2404,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1488&Qo<8369",
+      "why": "Young Dhreamer for «Crache Test» (1488) at the Gold Quarry; Dofus pour les noobs («Crache Test»). INFERRED cell."
+    },
+    {
+      "map": 128976900,
+      "npc": 2405,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1488&Qo>8369&Qo<8370",
+      "why": "Mature Perfidhius for «Crache Test» (1488) at the Gold Quarry; Dofus pour les noobs («Crache Test»). INFERRED cell."
+    },
+    {
+      "map": 128977924,
+      "npc": 2406,
+      "cell": 334,
+      "orientation": 1,
+      "criterion": "Qa=1488&Qo>8370&Qo<8371",
+      "why": "Old Digshot for «Crache Test» (1488) at the Gold Quarry; Dofus pour les noobs («Crache Test»). INFERRED cell."
+    }
   ]
 }

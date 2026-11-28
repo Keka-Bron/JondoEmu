@@ -2086,6 +2086,18 @@
       "why": "2082 Explora el sueno: the light of the second dream room leads on to the polter room (the generated pairing sent it back to 171181058). Link INFERRED, Dofus pour les noobs («La Colère de Terrakurial»)."
     },
   {"map": 182978568, "element": 4271001, "npc": 4271, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 184287240, "toCell": 282},
-  {"map": 184287240, "element": 4258001, "npc": 4258, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 182978568, "toCell": 282}
+  {"map": 184287240, "element": 4258001, "npc": 4258, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 182978568, "toCell": 282},
+  {
+   "map": 134223878,
+   "element": 485490,
+   "cell": 248,
+   "gfx": 2870,
+   "type": 0,
+   "skill": 114,
+   "toMap": 137369604,
+   "toCell": 451,
+   "criterion": "Qa=1555&Qo>8881&Qo<8883",
+   "why": "«Busca el pasaje escondido hacia el Oseorfanato» (452533/885311): the element of the catacombs [8,5] opens the secret passage to the sewers' Oseorfanato (same grid position [8,5]); only for whoever has the objective open, as the walkthrough says every character must click it himself. Landing cell INFERRED; Dofus pour les noobs («Comme un poison dans l'eau»)."
+  }
   ]
 }
