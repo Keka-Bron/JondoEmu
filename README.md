@@ -56,7 +56,7 @@ chained sub-spells against what each spell's sheet says.
 | Class | How | Bugs found | Fixed | Still open |
 |---|---|:---:|:---:|---|
 | Foggernaut | Played by hand ([#100](https://github.com/Keka-Bron/JondoEmu/issues/100)) | 9 | 9 | — |
-| Xelor | Multi-turn audit of all 44 spells, then fixes, each checked in a fight but the server's own cast-in-line check (the client offers no other cell): **44/44 with no known bug** | 14 | 14 | — |
+| Xelor | Multi-turn audit of all 44 spells, every fix checked in a fight: **44/44 with no known bug** | 14 | 14 | — |
 
 ---
 
@@ -64,7 +64,7 @@ chained sub-spells against what each spell's sheet says.
 
 | 🖥️ [Launcher](#%EF%B8%8F-launcher) | 🧩 [Server](#-server) | 🛠️ [Jondo Studio](#%EF%B8%8F-jondo-studio) |
 |:---|:---|:---|
-| The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Five listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Nine sections over the client's data, writing a reviewable diff instead of a 240 MB binary. |
+| The player's window, in Avalonia. A team of up to eight accounts, each with its character drawn from the client's own bones. | The emulator itself. Five listeners in one process, one session per socket, and guards that refuse to boot on bad data. | The world editor. Eleven pages over the client's data, writing a reviewable diff instead of a 240 MB binary. |
 
 &nbsp;
 
@@ -80,7 +80,7 @@ chained sub-spells against what each spell's sheet says.
 
 - 📚 &nbsp;**Content** &nbsp;— &nbsp;[NPCs and monsters](#-npcs-and-monsters) · [Quests](#-quests) · [Achievements](#-achievements) · [Almanax](#-almanax) · [Dungeons](#-dungeons) · [Infinite Dreams](#-infinite-dreams) · [Jondo Coin](#-jondo-coin)
 
-- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, four rulebooks](#%EF%B8%8F-one-engine-four-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#%EF%B8%8F-koliseo) · [Cities' war](#%EF%B8%8F-cities-war) · [Head hunters](#-head-hunters) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
+- ⚔️ &nbsp;**Combat** &nbsp;— &nbsp;[One engine, nine rulebooks](#%EF%B8%8F-one-engine-nine-rulebooks) · [PvM](#-pvm-combat) · [Duels](#-duels) · [Koliseo](#%EF%B8%8F-koliseo) · [Cities' war](#%EF%B8%8F-cities-war) · [Head hunters](#-head-hunters) · [Spell effect engine](#-spell-effect-engine) · [Spell check-list](#-spell-check-list) · [Combat challenges](#-combat-challenges)
 
 - 🔎 &nbsp;**Tools** &nbsp;— &nbsp;[Admin window (F10)](#-admin-window-f10) · [Jondo Studio](#%EF%B8%8F-jondo-studio) · [Surviving the next patch](#-surviving-the-next-patch)
 
@@ -207,7 +207,7 @@ Player and administrator actions are logged in `logs/activity.jsonl`. Credential
 
 Built with **Avalonia**, the same toolkit as the Studio.
 
-- ✅ Three screens — *Play*, *Accounts*, *Settings* — with the server status in the header
+- ✅ Four screens — *Play*, *Accounts*, *News*, *Settings* — with the server status in the header
 - ✅ Account cards with the character drawn in them, as they look in the world: head, equipment and cosmetics
 - ✅ A team of up to 8 accounts, one independent Dofus process each
 - ✅ Account creation and login; saved credentials are encrypted
@@ -219,7 +219,7 @@ Built with **Avalonia**, the same toolkit as the Studio.
 - ✅ The Windows or Linux client from Ankama's CDN in *Settings*: downloads it whole, or checks the one in use and fetches only what is missing or damaged; on Windows the Linux client can be saved to take to another computer
 - ✅ *News* page: the notes of the latest GitHub release, kept for offline starts, and the roadmap
 - ✅ Animated neon sign and falling stars
-- 🚧 OAuth sign-in
+- 🟡 Sign-in through the website (browser, PKCE), for servers that have one configured
 
 ### 🧩 Server
 <img width="2558" height="1508" alt="image" src="https://github.com/user-attachments/assets/df3cce87-166d-4f5a-8aff-a4fcd2575c87" />
@@ -240,7 +240,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 - ✅ Runs on another machine with `JONDO_PUBLIC_BIND=1`; the launcher relays the client to it
 - ✅ A **Settings** window (the *SETTINGS* button) for what the game itself does not decide, stored in
   `config\server_settings.json`. *SAVE AND RESTART* warns every player, counts down a minute and
-  restarts the server with the new values. Every setting at its default leaves the game as it is.
+  restarts the server with the new values. At their defaults the settings leave the game as it is; the head hunters start off.
   Maximized, it spreads its cards over the whole screen; on a small screen the hints move into tooltips
   so that every setting is still in sight.
 
@@ -254,7 +254,10 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
   | Random loot | See below |
   | Welcome message | A line in the chat on coming into the world |
   | Simulate players | Jondobot-Xx bots of a random class, each over its own connection: they walk, fight monsters, gather, go to the Koliseo and accept every duel; how many are in varies under the maximum chosen. Three of every five go to the [cities' war](#%EF%B8%8F-cities-war) |
-  | Head hunters | The [Cazacabezas](#-head-hunters): hunt orders on players of the other city, with how long a hunt stays open and how long the prey rests between two |
+  | Heroes | Up to seven extra characters of the account in your fights (on by default) |
+  | Character slots | Characters per account (8 by default) |
+  | Zaaps to discover | Off opens every zaap from the start |
+  | Head hunters | Off by default. The [Cazacabezas](#-head-hunters): hunt orders on players of the other city, with how long a hunt stays open and how long the prey rests between two |
 
   **Random loot.** Besides its own table, each monster beaten has a chance (10 % by default, raised
   by challenges and the drop bonus) of dropping two to five items around its level: ordinary
@@ -299,7 +302,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 
 - ✅ Zaaps discovered on reaching their map, each character his own and his heroes with him, remembered (the server's settings file can open them all); Frigost's only from level 50
 - ✅ Saving your position at a zaap: a lost fight and the recall potion bring you back there
-- ✅ Zaapis of Bonta (24) and Brakmar (21)
+- ✅ Zaapis of Bonta (24), Brakmar (21), Sufokia (6) and Frigost (7)
 <img width="2560" height="1484" alt="image" src="https://github.com/user-attachments/assets/472e09f2-a49d-431e-8935-f60355457cdd" />
 
 - ✅ Boats
@@ -332,7 +335,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
   kaxaforme; the zone shows the anomaly, its zaap the vestige, and the clocks tell the hour
 <img width="2560" height="1514" alt="image" src="https://github.com/user-attachments/assets/942d4d71-9711-45f1-9156-5381f7ad14b8" />
 
-- ✅ **5,347 interactive teleports** and passages that fire when you step on a cell — the suns and
+- ✅ **5,328 interactive teleports** and passages that fire when you step on a cell — the suns and
   stars of houses and caves among them
 - ✅ 510 more cells that move you on — the stairs and holes drawn into dungeons and caves, the Dragocerdo's
   labyrinth, the Gélifux caverns, Otomai's ark… —, the ones a quest gates only for those on it
@@ -342,7 +345,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 
 ### 🏘️ Houses, bins and haven bags
 
-- ✅ **765 houses** (1,437 door spots on 553 maps), all enterable, with **261 house models**
+- ✅ **765 houses** (1,652 doors on 605 maps), all enterable, with **261 house models**
 <img width="1112" height="920" alt="image" src="https://github.com/user-attachments/assets/1506283c-f6cd-45b5-b9c4-f345273f67bb" />
 
 - ✅ Every house can be bought, each with a model of its own neighbourhood
@@ -356,7 +359,7 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 - ✅ Each house is its own copy of its interior: owners of different houses never meet inside
 - ✅ The estate agency of Bonta and Brakmar: every house on sale, searched by price, area, rooms and
   chests
-- ✅ Several owners per building, as in the real game: the Casa grande de Bonta has 24 copies, and
+- ✅ Several owners per building, as in the real game: the Casa grande de Bonta has many copies, and
   the door lists each owner's and the next free one
 - ✅ The Palacio de los Lagos encantados: its door leads into the palace, and its stars, doors and
   stairs take you through its fifteen rooms; the vault door opens on the treasure room's six chests
@@ -428,135 +431,29 @@ See [Server desktop and Linux deployment](docs/server-desktop.md) for requiremen
 
 ### ⚜️ Guilds and raids
 
-**Guilds**
+- ✅ Guilds: founding, emblem and renaming, ranks and rights, members, applications, logbook and directory
+- ✅ The weekly tier, contributions, the oracle shop and the twelve weekly missions, counted as you play
+- ✅ The guild chest, the houses shared with the guild and the guild halls of the seven nations
+- ✅ Guild experience from missions and the raids ladder
+- ✅ Raids on the client's own screens, bought in the guild shop: the Eternal Gardens Sanctuary and the Gigalodón Abyss
+- ✅ The Abyss: its floors and lifts, the light bands, the luminomachines, the Exécrabe and the Gigalodón
+- ✅ The Sanctuary: the four guardians and their enigmas, the castle, the Reina Escarlata and the Princesa Maldita
+- ✅ The final score, the weekly frieze rewards and the raids ladder
 
-- ✅ Founding at the Guild Temple's altar with the client's own editor, or with `.gremio crear`
-- ✅ Gremia, outside the temple, sells the guildalogem, the guild book and the guild shield
-- ✅ The guild's name and emblem changed by its leader with the renaming and emblem potions, which Gremia
-  sells too
-- ✅ The guild shows under every member's name
-- ✅ The guild window: header, levels 1 to 20, ranks and rights, members, notes, log, directory profile
-  and directory search
-- ✅ Applications and invitations, accepting and refusing
-- ✅ Leaving and expelling; assigning ranks; handing the guild over
-- ✅ The weekly activity tier, contributions (with their *gremichas* in the bag) and the oracle shop
-- ✅ The guild chest — see [Banks and marketplaces](#-banks-and-marketplaces)
-- ✅ The *Encargos* tab's twelve weekly missions, drawn in the ranks and categories the guild chose
-- ✅ Dungeon, expedition, monster-family and Infinite Dreams missions count as you play, once per member,
-  with the «¡Encargo terminado!» notice, *gremichas* and activity points
-- ✅ Rerolling a mission with guild kamas, and marking missions as interesting for the rest of the guild
-- ✅ Your weekly rewards window, with the guild acknowledgments the milestones leave and its *Recuperar*
-- ✅ Saving next week's tier and the missions' ranks and categories from their own windows
-- ✅ The *Casas* tab: the houses the members share with the guild, and *Ir* to go into them
-- ✅ The guild halls of the seven nations: walking through their rooms, choosing one for the guild and
-  giving it one of the looks its level opens; the guild hall and guild home potions
-- ✅ A guild's card from its name in the chat or the friends list
-- ✅ Joining a guild of open recruitment at once
-- ✅ A warning when a guild mate comes on line
-- ✅ The message of the day and the logbook's bulletin, with who wrote them and when
-- ✅ Ranks deleted (their members moved to the rank chosen) and dragged into another order
-- ✅ The logbook: members joining, leaving or turned down, ranks given, created and changed, levels
-  and chest tabs reached, weekly milestones, the tier and missions changed, missions done and
-  rerolled, raids bought, captained, described, left and finished
-- ✅ Dream-trial missions, done by finishing the trial
-- ✅ Anomaly missions: monsters and dungeon guardians beaten in an anomaly with an uchronic elixir on,
-  and the anomaly fragments and loops it drops there
-
-**Raids** — the Eternal Gardens Sanctuary and the Gigalodón Abyss — run on the client's own screens.
-
-- ✅ Buying a raid in the guild shop; joining, leaving, groups, captaincy, invitations
-- ✅ Starting with the raid's minimum of players (lowered in the server settings for small guilds)
-- ✅ The tracking panel: participants, countdown, score, goals and the Abyss's salt
-- ✅ Goals and floors that open with them; the Abyss's lifts, passages, outpost and arenas
-- ✅ The Luminarium puzzle, the key fragments, the light bands and their monster boost, the salt
-  deposits, the luminomachines, the Exécrabe's forms and statues, the treasure chest and the Gigalodón
-- ✅ The Sanctuary: its hub, its 20 health, its four guardians and their unlocking scripts
-- ✅ The Sanctuary's castle: the corridor's doors and the tower's stairs, opened by the guardians and
-  the corridor; sixty monsters fought alone with their protectors' bonuses; the Reina and the Princesa
-- ✅ The Sanctuary's arenas, the manuscript's five pages and the client's own names for its ways
-- ✅ The final score screen, the weekly frieze rewards and the raids ladder
-- ✅ Monster aggression inside raids
-- ✅ The Sanctuary's Obra monocromática: the pedestals' objects, the paper flowers in their order, the red
-  flash of a lost life and the zone taking its colour
-- ✅ The Sanctuary's Enclave de los protectores: the gardens' statues copied on the Patio's miniature
-  boards, the statue rising in the Obra's colour and its sixteen protectors, the wrong one lost at once
-- ✅ The Abyss's light drawn on its maps and fight arenas: bands fading every two minutes, the lamps
-  blinking before they do, the luminomachines lighting them up again
-- ✅ The Sanctuary's Reserva de Belladona: six paper boats found in the Obra and sunk in turns on the
-  two battleship boards, a miss floating them all again
-- ✅ The Sanctuary's chess in the Patio de Efedra: Belladona's rules, her pieces found green or red on
-  the Reserva's four boards, and her game where four players, turned into rooks and bishops, take their
-  places before her fourth turn
-- ✅ The Sanctuary's guardians wake by their statues once the four enigmas are solved, their logos lit
-  in the hub; each one beaten ends its zone, and the fourth dissolves the corridor's door
-- ✅ The guardians remember the enigmas: the Vigilante is freed only by the Enclave statue's kind
-  falling first, the Guardián's glyphs lie beside their objects and only the flowers' four are safe;
-  a wrong one ends the fight
-- ✅ The Defensor plays twice a round once its companions are gone, its second turn shown in the
-  timeline
-- ✅ The Reina Escarlata's fight starts in her four jails: two monsters in each sharing their damage,
-  a Floráculo before each, everyone out and healed when the last of them falls
-- ✅ The Reina's Exilio Imperial locks a player in a free jail, passing his turns; breaking its Floráculo
-  lets him out, Évadé; everybody jailed loses the fight
-- ✅ The Reina's second phase: healed and invulnerable until her Pommeau and Lame fall, playing twice a
-  round, with the Volonté de la Princesse to beat as well
-- ✅ The Princesa Maldita's Aura turns to stone whoever she sees from her second turn, summons hiding
-  players from it; her Flor Maldita stands in the middle on four cells
-- ✅ The Flor Maldita at its threshold goes over to the players for two rounds, healing and boosting
-  whichever camp it is in
-- ✅ The Princesa's second phase: healed and invulnerable, playing twice a round with the Volonté de la
-  Reine; the Flor's purple glyph gives a one-use Encantamiento Floral, and two of them break her
-  invulnerability
-- ✅ Guild experience from missions and the raids ladder raises the guild's level
+Full list in **`docs/guilds.md`**.
 
 ### 🔱 Alliances
 
 An alliance is made of characters, not guilds.
 
-- ✅ Founding at the Temple of Alliances with an alliance gem (sold by Gremia)
-- ✅ The tag under every member's name
-- ✅ The directory and its search; joining an alliance with open recruitment
-- ✅ The alliance window: card, members, ranks and their eighteen rights
-- ✅ Applications and invitations
-- ✅ The recruitment card, the alliance message and the bulletin
-- ✅ Changing the name, tag or emblem with their potions
-- ✅ The alliance chat channel
-- ✅ Tax collectors: placed with a tax collector potion, outdoors or in a dungeon, one per alliance
-  for a territory and its dungeon, gathering from fights there, talked to, collected or attacked
-  (five attackers and five defenders at most), with their own window — seven equipment slots and
-  six spells — and the alliance's default spells
-- ✅ Collecting a tax collector: what is not taken or recycled before closing the window is gone
-  with it
-- ✅ Defending tax collectors and prisms from the alliance window's fights tab; giving up a defence
-- ✅ Prisms: one per subarea, in their alliance's emblem, listed on the world map, talked to, with
-  their teleport; attacked and defended
-- ✅ 25 % more experience from fights where one's own alliance holds the prism
-- ✅ The alliance fight switch
-- ✅ The *Pócima del templo de las alianzas*; Hal Ylanza at the temple sells what Gremia sells
-- ✅ Nuggets: recycling resources at the neutral prism beside the temple; collecting a tax collector
-  recycles its bag half for you, half for the alliance's pot, more with neighbouring territories held
-- ✅ The alliance's nugget pot, handed out to the members' banks by those with the right
-- ✅ The alliance's share of the nuggets kept in its prisms, more in higher-level zones; at a
-  conquest's end the prism's nuggets go to the winner and the alliance that dominated most
-- ✅ A beaten prism turns weakened, then vulnerable a day later, with the territory's warnings
-- ✅ Conquests (King of the Hill): the conquest window's score each minute, points for the maps held
-  by numbers and for aggressions won, twenty minutes of domination to win
-- ✅ Attacking enemy alliance fighters in a conquest's zone
-- ✅ The winner's thirty minutes alone to place its prism, born pacified
-- ✅ Weakened hours, conquest length, invulnerability and a new prism's protection in the server settings
-- ✅ Pacifying crystals: Pepito at the temple trades them for nuggets, and one protects a prism for
-  twelve hours (four per prism), with no teleport to it meanwhile
-- ✅ Conquest roles chosen with Hal Ylanza, each alliance's limit per role, and the role icons over
-  the fighters (a seer sees the enemies')
-- ✅ The champion's fights count double, the scout's points are handed in with his potion on the
-  prism's map, and the sentinel's potion makes him attack enemies passing near
-- ✅ No zaap, travel item, haven bag or Koliseo search from a conquest's zone; a new prism cannot be
-  attacked in its first hour
-- ✅ Taking a defender's place in an alliance fight
-- ✅ Losing an aggression in a conquest leaves a tomb: an allied resurrector raises it, an enemy
-  gravedigger frees its soul, or the fallen frees it himself; a champion's soul goes at once
-- ✅ The top tax collectors on the board in front of the Temple of Alliances: the ten richest in
-  the world and the ten richest in dungeons
+- ✅ Founding, the tag under the name, the directory, ranks and their eighteen rights, chat and bulletin
+- ✅ Tax collectors: placed, gathering, collected, attacked and defended, with their equipment and spells
+- ✅ Prisms: one per subarea, with their teleport, attacked and defended, weakened and then vulnerable
+- ✅ Nuggets: recycling, the alliance's pot and the prisms' share
+- ✅ Conquests (King of the Hill): the score, aggressions, roles, tombs and pacifying crystals
+- ✅ Conquest times and protections in the server settings
+
+Full list in **`docs/alliances.md`**.
 
 ### 🎒 Character and inventory
 
@@ -648,7 +545,7 @@ An alliance is made of characters, not guilds.
 - ✅ The bodies tab: your class's «base» or «retro» body
 - ✅ The colours tab: recolour your character, slot by slot
 - ✅ Face, body and pose items unlock their payable look for every character of the account
-- 🟡 The idles tab: your class's idle is kept, but the others do not see it yet
+- 🟡 The idles tab: your idle is kept and shown to everybody; not yet checked against the real client
 - ✅ Saved outfits: keep a look under a name and an icon, star it, copy it, put it on with one click or throw it away
 - ✅ A build can be given an outfit, and putting the build on puts the outfit on too
 - ✅ Auras: the one you pick is kept between sessions, and other players see it
@@ -719,8 +616,8 @@ played through.
 
 | Area | Played | Quests |
 |---|:---|:---:|
-| Frigost Island | `███░░░░░░░` **35%** | 79/228 |
-| World Quests | `█████░░░░░` **47%** | 68/145 |
+| Frigost Island | `████░░░░░░` **36%** | 82/228 |
+| World Quests | `█████░░░░░` **48%** | 69/145 |
 | Astrub | `██████████` **100%** | 51/51 |
 | Sufokia | `███████░░░` **74%** | 42/57 |
 | Class Temple | `██████████` **100%** | 39/39 |
@@ -731,24 +628,25 @@ played through.
 | Cania | `█████████░` **88%** | 23/26 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
-| Pandala Island | `███░░░░░░░` **31%** | 17/55 |
+| Pandala Island | `███░░░░░░░` **33%** | 18/55 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
+| Towers of the Brotherhood of the Forgotten | `███████░░░` **67%** | 12/18 |
 | Kwismas | `█░░░░░░░░░` **13%** | 10/79 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Enurado | `██░░░░░░░░` **24%** | 8/33 |
-| Towers of the Brotherhood of the Forgotten | `████░░░░░░` **44%** | 8/18 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
 | Bonta Alignment | `█░░░░░░░░░` **5%** | 6/115 |
 | Bonta | `██████████` **100%** | 5/5 |
 | Brakmar | `██████████` **100%** | 5/5 |
 | Guided Tutorial | `██████████` **100%** | 5/5 |
 | Archipelago of Vulkania | `█░░░░░░░░░` **7%** | 4/60 |
+| Xelorium | `█░░░░░░░░░` **11%** | 3/28 |
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Evil Forest | `████████░░` **75%** | 3/4 |
-| Xelorium | `█░░░░░░░░░` **7%** | 2/28 |
 | Osavora | `█░░░░░░░░░` **10%** | 2/21 |
-| **All quests** | **28.8%** | **569/1976** |
+| Srambad | `█░░░░░░░░░` **6%** | 2/33 |
+| **All quests** | **29.4%** | **581/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs
@@ -795,11 +693,8 @@ Full workings in **`docs/achievements.md`**.
 - ✅ The temple follows the seasons: the sanctuary's door opens on the hall of today's season, its door on
   the room of today's month, and the other seasons' rooms lie asleep
 - ✅ Every day its saint, alone in the room of its month
-- ✅ The day's bonuses, for everybody, to fights (experience, drops, challenges and an extra one, a second loot in dungeons — by zone,
-  dungeon, monster family or item worn), the Koliseo, quests, jobs, harvests, crafting (ingredients
-  saved, a second item, runes kept), tax collectors, breeding and paddock items, resources' respawn, life
-  regeneration and healing consumables, resource protectors, archmonsters, the quality of what a city crafts,
-  pets, wanted criminals, the hunters' meat and the loot in the Dreams
+- ✅ The day's bonuses, for everybody: fights, dungeons, the Koliseo, quests, jobs, crafting, breeding,
+  tax collectors, pets, the Dreams and more
 - ✅ «El año del dragón»: every offering gives a page of the calendar, and Ontoral Zo trades 365 of them
   for the Dolmanax
 
@@ -829,32 +724,20 @@ Entered from the Plano Astral's well: a dream of 26 rooms in depth, walked band 
 <img width="2560" height="1496" alt="image" src="https://github.com/user-attachments/assets/002bdcb9-da34-44ff-95c3-b2f84e578c6b" />
 <img width="2560" height="1506" alt="image" src="https://github.com/user-attachments/assets/7b2732db-be45-44a2-b405-282091d35f4a" />
 
-- ✅ Ten difficulties in three families (Sueño, Paradoja, Pesadilla)
-- ✅ Five bands with fountains, dream favours, fights and the **Fin du rêve** in waves
-- ✅ Rewards, dream points, bonuses and dreamer levels shown in the HUD
-- ✅ Dream loot and dream fragments
-- ✅ The fountains' shop and the dream favours with the guide's whole catalogue
-- ✅ Dream spells cast from their bar, with charges and a shared cooldown
-- ✅ Every bonus works in fights, for summons too; passives like Vent Arrière and Suelta
-- ✅ The dreamer's level and the monsters' rise band by band
-- ✅ Goblins: Bog, Gobledore, Gobserico and the Rey Gob
-- ✅ Dream codes: replay a dream, training mode, the result window at the end
-- ✅ Astral storms, Draconiros arenas, three-minute placement and 90-second turns
-- ✅ The Dream Market: Neru Stalar and Gobribe
-- ✅ A dream is saved and resumed after a disconnection or a restart
-- ✅ `.sueno [row]` for administrators
-- ✅ The trial FONSOCAC's rules: weapons cheaper, faster and harder-hitting, monsters with double life
-- ✅ Dreams in a group: the owner invites his party, who follow him room to room and fight beside him
-- ✅ Clicking a room on the dream's map takes you there, once the room you stand in is cleared
-- ✅ The trials REVERSED (fight as the dungeon guardian you choose against adventurers' scraps), NILEZAFF (a hit from afar swaps places and sends the damage back around), SINJSONJ (fight as Simueño beside its Monórico) and DOFOUSSE (fight as Yoy, RamboPL, Snyler or Crvor)
-- ✅ Each trial at its own difficulty, with its achievement for winning its final fight
+- ✅ Ten difficulties in three families (Sueño, Paradoja, Pesadilla), five bands and the **Fin du rêve** in waves
+- ✅ Fountains, dream favours, dream spells, rewards, loot and dreamer levels
+- ✅ Goblins, astral storms, Draconiros arenas and the Dream Market
+- ✅ Dreams in a group, dream codes and training mode; a dream survives a disconnection or a restart
+- ✅ The trials (FONSOCAC, REVERSED, NILEZAFF, SINJSONJ…), each with its achievement
+
+Full list in **`docs/dreams.md`**.
 
 ### 🪙 Jondo Coin
 
 A currency of this server's own.
 <img width="1676" height="1102" alt="image" src="https://github.com/user-attachments/assets/aee2eb3f-b2a3-4c35-a35c-fafe69669355" />
 
-- ✅ Drops from every monster: one coin per 25 monster levels
+- ✅ Drops from every monster: one coin per 25 monster levels, up to 9 per monster
 - ✅ Its own description in the five client languages
 - ✅ Vendors that charge in coins, appearance shops among them
 
@@ -862,9 +745,10 @@ See `docs/jondo-coin.md`.
 
 ---
 
-## ⚔️ One engine, four rulebooks
+## ⚔️ One engine, nine rulebooks
 
-One fight engine serves four kinds of fight:
+One fight engine serves nine kinds of fight: against monsters, duels, the Koliseo, training,
+aggressions, tax collectors, prisms, dreams and the Gigalodon's escape. The four most common:
 
 | | Against monsters | Duel | Koliseo | Training |
 |---|:---:|:---:|:---:|:---:|
@@ -1003,28 +887,7 @@ is missing. The table is [`docs/effect-coverage.txt`](docs/effect-coverage.txt).
 Every class spell resolves in the engine. *Seen working* counts the spells checked against the real
 game; the list is generated by `tools/spell_checklist.py`.
 
-| Class | Seen working | Resolve on paper | Spells |
-|---|:---:|:---:|:---:|
-| Feca | 44 | 44 | 44 |
-| Osamodas | 44 | 44 | 44 |
-| Enutrof | 44 | 44 | 44 |
-| Sram | 44 | 44 | 44 |
-| Xelor | 44 | 44 | 44 |
-| Ecaflip | 44 | 44 | 44 |
-| Eniripsa | 44 | 44 | 44 |
-| Iop | 44 | 44 | 44 |
-| Cra | 44 | 44 | 44 |
-| Sadida | 44 | 44 | 44 |
-| Sacrier | 44 | 44 | 44 |
-| Pandawa | 44 | 44 | 44 |
-| Rogue | 44 | 44 | 44 |
-| Masqueraider | 44 | 44 | 44 |
-| Foggernaut | 44 | 44 | 44 |
-| Eliotrope | 44 | 44 | 44 |
-| Huppermage | 44 | 44 | 44 |
-| Ouginak | 44 | 44 | 44 |
-| Forgelance | 44 | 44 | 44 |
-| **All** | **836** | **836** | **836** |
+**836/836** class spells seen working: the 44 of each of the 19 classes.
 
 ### 🎯 Combat challenges
 
@@ -1051,65 +914,18 @@ the «[!] Sorts admins» set — and every attitude of the game.
 
 <img width="2050" height="1426" alt="image" src="https://github.com/user-attachments/assets/e126bd4c-00ef-4266-ab2a-10c57cd872fa" />
 
-### What it needs
-
-- **An administrator account** (see `docs/role.md`). The test account is one.
-- **The game started from the Jondo launcher.**
-- The server on the same machine, or on another one opened with `JONDO_PUBLIC_BIND=1`.
-
-### The window
-
-- Resizable, see-through while the pointer is elsewhere.
-- Wherever a character is chosen, the connected characters are in a drop-down.
-- The line at the bottom of each tab says what the server answered.
-
-### The right-click menu and the staff console
-
-- Right-click a character with a staff account for the client's own admin menu, in French, English or
-  Spanish: go to them, bring them, jail, mute, warn, kick, ban, and the game master's tools.
-- **F11** opens the client's staff console for moderators and above.
-- The server checks every command against the account's role, and staff only act on lower roles.
-
-### Items
-
-- **Search** the client's catalogue by name, type, id or level range; filter by category and type.
-- **Give · MAX stats** or **Give · RANDOM stats**, to yourself or any connected character, up to 100
-  at a time. `.item <id> [quantity] random` does the same from the chat.
-- **Gift**: the item waits on that player's account, in the shop's gifts window, for any of its
-  characters to take.
-
-### Character
-
-- **Level**, the six base characteristics and **kamas**, for yourself or any connected character.
-- **Give mount**.
-
-### Teleport
-
-- **Find a place** by name, coordinates or map id, then **Teleport**.
-- **Go to them** and **Bring here**.
-
-### Spawn
-
-- **NPCs** and **groups of monsters** (up to eight, any grades) on your own cell.
-- **On this map** lists every NPC and monster group on your map, each with **Remove**.
-
-### Jail
-
-Ten minutes in the game's own GM prison.
-
-- **Jail** a player: they cannot leave, use commands or speak but in private and on the general
-  channel.
-- **In jail** lists the prisoners with their time left; **Release** lets one out early. The time keeps
-  running offline and across restarts.
-- **Go to the jail** takes you to the corridor.
+- ✅ Needs an administrator account (see `docs/role.md`) and the game started from the Jondo launcher
+- ✅ **Items**: search the catalogue, give with max or random stats, or gift one to an account
+- ✅ **Character**: level, characteristics, kamas and mounts
+- ✅ **Teleport**: find a place, go to a player or bring one
+- ✅ **Spawn**: NPCs and monster groups on your cell, and removing them from the map
+- ✅ **Jail**: ten minutes in the GM prison, with early release from the list
+- ✅ Right-click a character for the client's own admin menu; **F11** for the staff console
+- ✅ Every button is a request to the server's control API, checked against the account's role
 
 <img width="2560" height="1498" alt="image" src="https://github.com/user-attachments/assets/1b35bc2b-56b6-41ce-af52-6f43f79cc6d5" />
 
-### How it works
-
-JondoFix builds the window at runtime out of the client's own interface components. Every button is
-a request to the server's control API, signed with the account's launcher token and checked against
-the administrator role. The routes are in **[`docs/live-character-admin.md`](docs/live-character-admin.md)**.
+Full workings in **`docs/admin-window.md`** and **`docs/live-character-admin.md`**.
 
 ---
 
@@ -1132,25 +948,27 @@ a dialogue leads to which line, where an NPC stands, which passage leads where. 
 - ✅ **Overview**, **Traffic** (the live client-server conversation) and **Packets**
 - ✅ **NPCs**, **Dialogues** and **Monsters**
 - ✅ **Spells** — every spell with its effects and its reach drawn on the map
+- ✅ **Quests** — every quest with its steps and objectives (read-only)
 - ✅ **Passages** — join two maps both ways
 - ✅ **Map cells** — paint the walkable, line-of-sight and combat layers
 - ✅ Spanish, English and French
 - 🚧 NPC actions, editing spells, shops, loot tables, dungeons and quests
 
-The full plan is in **`docs/world-editor.md`**.
+Architecture notes and history in **`docs/world-editor.md`**.
 
 ---
 
 ## 🧪 Tests
 
-All three xUnit suites target portable .NET 10 and run in CI on Linux and Windows.
+All four xUnit suites target portable .NET 10 and run in CI on Linux and Windows.
 `Jondo.Unity.Tests` contains the general tests grouped by domain, including headless
-Avalonia rendering. The focused suites cover connection conversion/codec behavior and
-server transport/desktop behavior.
+Avalonia rendering. The focused suites cover the connection and game protocol codecs and
+the server's transport and window.
 
 ```bash
 dotnet test Jondo.Unity.Tests
 dotnet test Jondo.Unity.Protocol.Connection.Tests
+dotnet test Jondo.Unity.Protocol.Game.Tests
 dotnet test Jondo.Unity.Server.Tests
 ```
 
@@ -1195,15 +1013,18 @@ Shared:
 * **`Jondo.Unity.Contract`** — paths, settings and the shared palette
 * **`Jondo.Unity.Core`** — the file lookup: `datos/`, then `bases/`, then the root
 * **`Jondo.Unity.Protocol`** — message definitions and the generated `Op` layer
+* **`Jondo.Unity.Protocol.Connection`**, **`Jondo.Unity.Protocol.Game`** (and their `.Wire`) — the connection and game message codecs
 * **`Jondo.Unity.World`** — world and fight logic, buffs, areas, geometry and criteria
 * **`Jondo.Unity.Sprites`** — draws characters and NPCs out of the client's own bones and skins
 * **`Jondo.Unity.Cytrus`** — reads Ankama's Cytrus manifests for the texture packs
-* **`Jondo.Unity.Tests`** — the xUnit tests, and the gate on publishing
+* **`Jondo.Unity.Tests`** and the three `*.Tests` suites — the xUnit tests, and the gate on publishing
+* **`Jondo.Unity.Mcp`** — the MCP server that plays the emulator through the real client, for testing
+* **`Heroes`** — the heroes' client mod: extra characters of the account in your fights
 
 The protocol toolchain, which the emulator does not depend on:
-* **`Jondo.Unity.Reversing`**, **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
-* **`JondoFix`** — the MelonLoader client mod, source plus the compiled dll
-* **`Cazacabezas`** — the head hunters' client mod, source plus the compiled dll
+* **`Jondo.Unity.Reversing`**, **`Jondo.Unity.ProtocolGenerator`**, **`Jondo.Unity.ProtocolBuilder`** → `protocolbuilder`, **`Jondo.Unity.Deobfuscator`** → `Jondo Desofuscador.exe`
+* **`JondoFix`** — the MelonLoader client mod
+* **`Cazacabezas`** — the head hunters' client mod
 
 Documentation index in `docs/README.md`.
 

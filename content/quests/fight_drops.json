@@ -292,6 +292,14 @@
    "why": "«La jetée des enfants perdus»: the enchanted kuapa water (23211) from the kuapas of the fisher's fight, later given to Kuatalo (Dofus pour les noobs («La jetée des enfants perdus»))."
   },
   {"item": 19513, "percent": 100, "monsters": [5186], "criterion": "Qa=1950&Qo>13645&Qo<13647&PO!19513", "why": "Ys's talisman (19513) falls on the first win of «Defender tu piel» (1950). Dofus pour les noobs («Du feu de dieu»)."},
-  {"item": 19484, "percent": 100, "monsters": [5102, 5103, 5104, 5105], "criterion": "Qa=1951&Qo<13663", "why": "«Plantas contra mediomuertos» (1951): the stone of the calcinados (19484), 100 % while it is asked for. Dofus pour les noobs («Plantes contre Trépamorts»)."}
+  {"item": 19484, "percent": 100, "monsters": [5102, 5103, 5104, 5105], "criterion": "Qa=1951&Qo<13663", "why": "«Plantas contra mediomuertos» (1951): the stone of the calcinados (19484), 100 % while it is asked for. Dofus pour les noobs («Plantes contre Trépamorts»)."},
+  {"item": 19491, "percent": 100, "monsters": [4968, 4969, 4970, 4971, 4972], "criterion": "Qa=1952&Qo<13686&PO<19491,8", "why": "«El héroe de las plantas contra los mediomuertos» (1952): the ashes of quemaalmas (19491, dropMonsterIds of the item), 100 % while the talisman step is open. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»)."},
+  {
+   "item": 23166,
+   "percent": 12,
+   "monsters": [6251, 6252, 6253, 6254],
+   "criterion": "Qa=2154&Qo=16544",
+   "why": "«Recupera los enigmas» (2154): the firefux (6251-6254) that stole the talismans leave the calligraphed enigmas (23166). Chance INFERRED. Dofus pour les noobs («Le festival de la lanterne»)"
+  }
   ]
 }

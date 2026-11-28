@@ -10910,6 +10910,195 @@
    "elements": [{"map": 183763982, "element": 511751}],
    "afterObjectives": [15060],
    "why": "«Entra en el reloj de Xelor»: the great clock of the temple of Xelor (Dofus pour les noobs («Le temps des secrets»))."
+  },
+  {"objective": 13703, "quest": 1953, "kind": "click", "elements": [{"map": 182978061, "element": 511926}, {"map": 182978061, "element": 511983}], "afterObjectives": [13702], "gives": [{"item": 19542, "count": 1}], "why": "«Registra el lugar indicado» (743824): the red ore beside the notice board at [-28,27]; it gives the Mineral residual (19542, brought to Berkle by 13706). INFERRED: the element ids (the guide gives a picture). Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."},
+  {"objective": 13704, "quest": 1953, "kind": "click", "elements": [{"map": 182978061, "element": 511939}, {"map": 182978061, "element": 511985}], "afterObjectives": [13703], "why": "«Sigue registrando cerca del mineral» (746670): the dump two cells behind the ore. INFERRED: the element ids. Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."},
+  {
+   "objective": 16410,
+   "quest": 2153,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "The opening questions (farmer, fisher, fight, tavern) can be done in any order (Dofus pour les noobs («La jetée des enfants perdus»))."
+  },
+  {
+   "objective": 16411,
+   "quest": 2153,
+   "kind": "order",
+   "anyOrder": true
+  },
+  {
+   "objective": 16412,
+   "quest": 2153,
+   "kind": "beat",
+   "monster": 6278,
+   "map": 204997378,
+   "anyOrder": true,
+   "why": "«Ayuda al pescador»: beating the kuapas on Yuminh's map."
+  },
+  {
+   "objective": 16414,
+   "quest": 2153,
+   "kind": "order",
+   "anyOrder": true
+  },
+  {
+   "objective": 16415,
+   "quest": 2153,
+   "kind": "enter",
+   "map": 204998401,
+   "afterObjectives": [16413, 16414],
+   "why": "«Explora la región para encontrar un kuapa aislado»: [20,-24], where the hunters surround him."
+  },
+  {
+   "objective": 16416,
+   "quest": 2153,
+   "kind": "beat",
+   "monster": 6272,
+   "map": 204998401,
+   "afterObjectives": [16415],
+   "why": "«Derrota a los cazadores de recompensas»."
+  },
+  {
+   "objective": 16417,
+   "quest": 2153,
+   "kind": "order",
+   "afterObjectives": [16416],
+   "why": "Talk to the isolated kuapa once the hunters are beaten (Dofus pour les noobs («La jetée des enfants perdus»))."
+  },
+  {
+   "objective": 16418,
+   "quest": 2153,
+   "kind": "click",
+   "elements": [{"map": 204998657, "element": 520699}, {"map": 204997634, "element": 520700}, {"map": 204999170, "element": 520701}, {"map": 204998659, "element": 520702}, {"map": 204999171, "element": 520703}, {"map": 204999172, "element": 520704}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 23097, "count": 6}],
+   "why": "«Recoge seis pepinos silvestres» (16418, the objective brings item 23097 x6): the six wild cucumber plants, graphic 302826, elements 520699-520704, one on each of six Akwadala maps (Dofus pour les noobs, «La jetée des enfants perdus»). One cucumber from each while the quest is in hand; the kuapa takes them with reply 53959."
+  },
+  {
+   "objective": 16419,
+   "quest": 2153,
+   "kind": "order",
+   "afterObjectives": [16418],
+   "why": "Go with Kuatalo to the stairs once he has his cucumbers."
+  },
+  {
+   "objective": 16420,
+   "quest": 2153,
+   "kind": "beat",
+   "monster": 6276,
+   "map": 204999425,
+   "afterObjectives": [16419],
+   "why": "«Libera al pandawito»: beating the kidnappers."
+  },
+  {
+   "objective": 16421,
+   "quest": 2153,
+   "kind": "reply",
+   "replies": [53960],
+   "afterObjectives": [16420],
+   "why": "«Entra en el Valle de la Dama del Agua» (the objective's map is the Valle's entrance 204999425): Kuatalo's «Marcharte con Kuatalo al Valle de la Dama del Agua» (53960) goes in by the dungeon door (Dofus pour les noobs, «La jetée des enfants perdus»)."
+  },
+  {
+   "objective": 16422,
+   "quest": 2153,
+   "kind": "beat",
+   "monster": 6256,
+   "map": 208146432,
+   "afterObjectives": [16421],
+   "why": "«Derrota a Nagate»: the boss of the Valle."
+  },
+  {
+   "objective": 16426,
+   "quest": 2153,
+   "kind": "click",
+   "elements": [{"map": 204999681, "element": 518704}],
+   "afterObjectives": [16425],
+   "afterElement": -2153015,
+   "why": "«Pide el deseo»: the waterfall's wish (element 518704, cell 260) once the four ranadinas are paid in order (Dofus pour les noobs («La jetée des enfants perdus»))."
+  },
+  {"objective": 13635, "quest": 1950, "kind": "enter", "map": 182978571, "afterObjectives": [13634], "why": "«Busca huellas de los pániels desaparecidos» (742232): the tracks at [-27,25]. Dofus pour les noobs («Du feu de dieu»)."},
+  {"objective": 13636, "quest": 1950, "kind": "reply", "replies": [36074], "afterObjectives": [13635], "why": "«Busca supervivientes» (742233): Guy's story ends on 36074 (his rock at [-27,23]). Dofus pour les noobs («Du feu de dieu»)."},
+  {"objective": 13655, "quest": 1950, "kind": "beat", "monsters": [4984], "map": 184287240, "afterObjectives": [13654], "why": "«Vence a Triki Güest» (742253): Claude M'Se beaten in the secret room [-27,22]. Dofus pour les noobs («Du feu de dieu»)."},
+  {"objective": 13659, "quest": 1951, "kind": "click", "givesEach": true, "gives": [{"item": 19483, "count": 5}], "anyOrder": true, "elements": [{"map": 182978571, "element": 511940}, {"map": 182978568, "element": 511938}, {"map": 182977034, "element": 511941}, {"map": 182977032, "element": 511943}, {"map": 183108105, "element": 511942}], "why": "«Consigue objetos desechados» (742371): five discarded objects (19483) lying about the Marches Magmatiques, one on each of five maps (elements 511940, 511938, 511941, 511943, 511942). Dofus pour les noobs («Plantes contre Trépamorts»). INFERRED: the guide's list of places is a picture."},
+  {"objective": 13674, "quest": 1951, "kind": "click", "elements": [{"map": 183108105, "element": 511953}], "afterObjectives": [13673], "requires": [{"item": 19487, "count": 1}], "spends": true, "why": "«Inspecciona el primer repetidor» (742372): the giant ribs at [-31,23]. Dofus pour les noobs («Plantes contre Trépamorts»). Element INFERRED (the quest's 5119xx series)."},
+  {"objective": 13675, "quest": 1951, "kind": "click", "elements": [{"map": 182977030, "element": 511954}], "afterObjectives": [13673], "requires": [{"item": 19487, "count": 1}], "spends": true, "why": "«Inspecciona el segundo repetidor» (742373): the chain at [-30,19]. Dofus pour les noobs («Plantes contre Trépamorts»). Element INFERRED."},
+  {"objective": 13676, "quest": 1951, "kind": "click", "elements": [{"map": 183108100, "element": 511955}], "afterObjectives": [13673], "requires": [{"item": 19487, "count": 1}], "spends": true, "why": "«Inspecciona el tercer repetidor» (742374): the pointed shield at [-31,16]. Dofus pour les noobs («Plantes contre Trépamorts»). Element INFERRED."},
+  {"objective": 13677, "quest": 1951, "kind": "click", "elements": [{"map": 183109635, "element": 511956}], "afterObjectives": [13673], "requires": [{"item": 19487, "count": 1}], "spends": true, "why": "«Inspecciona el cuarto repetidor» (742375): the fumarole at [-33,15]. Dofus pour les noobs («Plantes contre Trépamorts»). Element INFERRED."},
+  {"objective": 13685, "quest": 1952, "kind": "click", "givesEach": true, "gives": [{"item": 19489, "count": 5}], "anyOrder": true, "elements": [{"map": 183500806, "element": 511957}, {"map": 183500808, "element": 511960}, {"map": 183500810, "element": 511963}, {"map": 183500812, "element": 511967}, {"map": 183500814, "element": 511970}], "why": "«Consigue cinco objetos etéreos en el cuartel del Día sin Fin» (742418): one ethereal object (19489) on each of five barracks maps (elements 511957, 511960, 511963, 511967, 511970 of the 5119xx series). Dofus pour les noobs («Le héros de Plantes contre Trépamorts»). INFERRED: which five of the series."},
+  {"objective": 13686, "quest": 1952, "kind": "use", "afterObjectives": [13685], "requires": [{"item": 19489, "count": 5}, {"item": 19491, "count": 8}], "spends": true, "why": "«Utiliza el talismán de Jauel Indio con ocho cenizas de quemaalmas» (742422): the talisman 19490 (its effect 30; it gives the black fire pearl 19492), the five objects and eight ashes spent. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»)."},
+  {"objective": 13692, "quest": 1952, "kind": "beat", "monsters": [5182], "map": 182978570, "afterObjectives": [13691], "why": "«Vence a los asaltantes calcinados» (742424): Zombigne beaten in the fight Jauel's plants join. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»)."},
+  {
+   "objective": 16536,
+   "quest": 2154,
+   "kind": "reply",
+   "replies": [54054],
+   "gives": [{"item": 23146, "count": 1}],
+   "why": "«Pídele un informe de la situación al guardia de Fuegodala» (840203): the guard's last briefing reply (54054) closes it and hands the rice paper (23146) he speaks of in 41528. Dofus pour les noobs («Le festival de la lanterne»)."
+  },
+  {
+   "objective": 16537,
+   "quest": 2154,
+   "kind": "click",
+   "elements": [{"map": 207355904, "element": 518437}],
+   "requires": [{"item": 23144, "count": 1}, {"item": 23145, "count": 1}, {"item": 23146, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 23147, "count": 1}],
+   "afterObjectives": [16536],
+   "why": "«Confecciona un farol ceremonial» (890556): the work table of the Centella gate room [18,-30], with the black ink, the flexible bamboo and the rice paper; it makes the ceremonial lantern 23147 (the data carries no recipe for it, so the table is a click with the three things). Dofus pour les noobs («Le festival de la lanterne»)."
+  },
+  {
+   "objective": 16539,
+   "quest": 2154,
+   "kind": "click",
+   "elements": [{"map": 206045189, "element": 518416}],
+   "afterObjectives": [16538],
+   "why": "Light the ceremonial lantern at the primordial lantern of the Fuegodala sanctuary. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "objective": 16541,
+   "quest": 2154,
+   "kind": "beat",
+   "monster": 6293,
+   "map": 206045189,
+   "afterObjectives": [16540],
+   "why": "Beat the will-o'-wisps (6293, 6294). Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "objective": 16542,
+   "quest": 2154,
+   "kind": "reply",
+   "replies": [54500],
+   "afterObjectives": [16541],
+   "why": "Tell Ozulan of the wisps and their threat. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "objective": 16551,
+   "quest": 2154,
+   "kind": "enter",
+   "map": 207618054,
+   "afterObjectives": [16550],
+   "why": "Enter the paper workshop. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "objective": 16552,
+   "quest": 2154,
+   "kind": "beat",
+   "monster": 6257,
+   "map": 207618054,
+   "afterObjectives": [16551],
+   "why": "Beat the firefux threatening the qilin. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "objective": 16546,
+   "quest": 2154,
+   "kind": "click",
+   "all": true,
+   "afterObjectives": [16544],
+   "elements": [{"map": 206176774, "element": 518409}, {"map": 206176772, "element": 518410}, {"map": 206177284, "element": 518410}, {"map": 206045702, "element": 518402}, {"map": 206045191, "element": 518408}, {"map": 206045703, "element": 518411}, {"map": 206046721, "element": 518412}, {"map": 206045190, "element": 518408}],
+   "requires": [{"item": 23166, "count": 1}],
+   "spends": true,
+   "why": "Hang the eight enigmas back on the lantern trees of the region (840304). INFERRED: the eight trees are the lantern-tree interactives (gfx 59477/59478) of Fuegodala and the Hinaba road; one enigma is spent on each. Dofus pour les noobs («Le festival de la lanterne»)"
   }
   ]
 }

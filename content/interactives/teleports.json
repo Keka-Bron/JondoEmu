@@ -2084,6 +2084,8 @@
       "toMap": 171181313,
       "toCell": 343,
       "why": "2082 Explora el sueno: the light of the second dream room leads on to the polter room (the generated pairing sent it back to 171181058). Link INFERRED, Dofus pour les noobs («La Colère de Terrakurial»)."
-    }
+    },
+  {"map": 182978568, "element": 4271001, "npc": 4271, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 184287240, "toCell": 282},
+  {"map": 184287240, "element": 4258001, "npc": 4258, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 182978568, "toCell": 282}
   ]
 }

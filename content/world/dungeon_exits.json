@@ -632,6 +632,15 @@
       "npc": 708,
       "replies": [2578],
       "why": "Taller de Tanukui San (dungeon 126): after the boss (6218, room 208932864) the winners are in 208932866 where Tanukui San stands (spawns.json). His 'Salir del Taller de Tanukui San' (2578) leaves through the dungeon's own way out. INFERRED cell 300: a walkable cell of the map; Dofus pour les noobs («Au nom de l'Art») only says to talk to him after the last fight."
+    },
+    {
+      "dungeon": 123,
+      "bossRoom": 208146432,
+      "room": 208146434,
+      "cell": 300,
+      "npc": 5619,
+      "replies": [53999],
+      "why": "Valle de la Dama del Agua (dungeon 123): after Nagate (6256, room 208146432) the winners are in 208146434 where Nagate, Kuatalo and the pandawito stand. Her 'Irte del valle' (53999) leaves through the dungeon's own way out. INFERRED cell 300: a walkable cell of the map; Dofus pour les noobs («La jetée des enfants perdus»)."
     }
   ]
 }

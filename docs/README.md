@@ -135,6 +135,11 @@ triggered rows armed on every fighter they name, the 30-odd triggers fired, stat
 telefrags and the T/W masks, life thresholds, revives, glyphs, and what is still missing.
 *Go there* before touching a boss, or when a monster does something its guide says it should not.
 
+**`guilds.md`**, **`alliances.md`**, **`dreams.md`**, **`admin-window.md`** — The full feature lists.
+What the README sums up in a few lines for guilds and their raids, alliances and conquests, the
+Infinite Dreams and the in-game admin window (F10), item by item.
+*Go there* to know whether a given part of those systems is done.
+
 **`item-commands.md`** — Administrator item creation commands.
 The exact syntax and behavior of `.item`, `.itemset` and `.receta`, including role checks, template,
 set and recipe data sources, maximum factory effects, stacking, persistence, inventory updates and

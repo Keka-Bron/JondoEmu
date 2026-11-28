@@ -18505,7 +18505,8 @@
           "message": 3444,
           "choices": [
             { "reply": 53394, "next": 41003, "quest": 2150, "afterElement": -2150003, "beforeElement": -2150002, "criterion": "PO<23148,1&Qf=158" },
-            { "reply": 53394, "next": 41004, "quest": 2150, "afterElement": -2150003, "beforeElement": -2150002, "criterion": "PO<23148,1&Qf!158" }
+            { "reply": 53394, "next": 41004, "quest": 2150, "afterElement": -2150003, "beforeElement": -2150002, "criterion": "PO<23148,1&Qf!158" },
+            { "reply": 36310, "next": 30172, "quest": 1953, "afterObjective": 13706, "beforeObjective": 13707 }
           ]
         },
         {
@@ -18536,9 +18537,15 @@
             { "reply": 53392, "buyItem": 20799, "buyCount": 100, "buyPrice": 50000, "gives": 6670, "givesCount": 100 },
             { "reply": 53393 }
           ]
+        },
+        {
+          "message": 30172,
+          "choices": [
+            { "reply": 36309, "quest": 1953, "completes": 13707, "params": [[30, 13707]] }
+          ]
         }
       ],
-      "why": "Argui Ñaño, cook of the Amakna tavern [-2,-1]: want something to eat? (3444). «Ça est frugal, une fois» of Dofus pour les noobs: a unique dish, the filtunga, Mus Buf has the recipe (3443: 640), the recipe, find the ingredients (3448), he cooks, wait (3449), the filtunga done (3452: the warm dish 8508, and one for the character). «En la encrucijada de los mundos» (2150): once Ghao Zuo has spoken of the hungry yokais (mark -2150003), «Tengo un hambre insaciable. ¿Qué es lo más sustancioso que tienes por ahí?» (53394): to whoever has finished «Muy frugal, sí señor» (158) his overdosed filtunga, free (41003, «Gracias por tu generosidad.», 53391, item 23148); to anyone else the winning menu of the year 649 (41004), «Comprar 100 burgregs y 100 patatas fritas de golpe por 50 000 kamas.» (53392: 100 × 20799 bought, 100 × 6670 with them) or «Pensártelo antes de gastarte semejante suma.» (53393). Dofus pour les noobs («À la croisée des mondes»): «Soit Bol Pokus vous offre une Filtounga revisitée gratuitement soit il vous demande de payer 50 000 kamas pour un lot de 100 frites et burger (la proposition gratuite doit être proposée si vous avez terminé la quête Ça est frugal, une fois.)»."
+      "why": "Argui Ñaño, cook of the Amakna tavern [-2,-1]: want something to eat? (3444). «Ça est frugal, une fois» of Dofus pour les noobs: a unique dish, the filtunga, Mus Buf has the recipe (3443: 640), the recipe, find the ingredients (3448), he cooks, wait (3449), the filtunga done (3452: the warm dish 8508, and one for the character). «En la encrucijada de los mundos» (2150): once Ghao Zuo has spoken of the hungry yokais (mark -2150003), «Tengo un hambre insaciable. ¿Qué es lo más sustancioso que tienes por ahí?» (53394): to whoever has finished «Muy frugal, sí señor» (158) his overdosed filtunga, free (41003, «Gracias por tu generosidad.», 53391, item 23148); to anyone else the winning menu of the year 649 (41004), «Comprar 100 burgregs y 100 patatas fritas de golpe por 50 000 kamas.» (53392: 100 × 20799 bought, 100 × 6670 with them) or «Pensártelo antes de gastarte semejante suma.» (53393). Dofus pour les noobs («À la croisée des mondes»): «Soit Bol Pokus vous offre une Filtounga revisitée gratuitement soit il vous demande de payer 50 000 kamas pour un lot de 100 frites et burger (la proposition gratuite doit être proposée si vous avez terminé la quête Ça est frugal, une fois.)». 1953: negotiating the food for Berkle's men (13707). Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."
     },
   {
       "npc": 826,
@@ -28629,10 +28636,14 @@
             { "reply": 52897, "quest": 2194, "beforeObjective": 16292, "criterion": "PG=13", "next": 40611 },
             { "reply": 8737, "next": 8705 },
             { "reply": 36071, "next": 30019, "criterion": "PL>49&Qa!1938&Qf!1938" },
-            { "reply": 36071, "next": 30057, "criterion": "PL<50" }
+            { "reply": 36071, "next": 30057, "criterion": "PL<50" },
+            { "reply": 36322, "next": 30180, "quest": 1953, "afterObjective": 13709, "beforeObjective": 13710 }
           ]
         },
-        { "message": 9659, "choices": [] },
+        {
+          "message": 9659,
+          "choices": []
+        },
         {
           "message": 40611,
           "choices": [
@@ -28651,7 +28662,10 @@
             { "reply": 52898, "quest": 2194, "completes": 16292, "params": [[30, 16292]] }
           ]
         },
-        { "message": 8705, "choices": [] },
+        {
+          "message": 8705,
+          "choices": []
+        },
         {
           "message": 30019,
           "choices": [
@@ -28667,9 +28681,15 @@
         {
           "message": 30057,
           "choices": []
+        },
+        {
+          "message": 30180,
+          "choices": [
+            { "reply": 36321, "quest": 1953, "completes": 13710, "params": [[30, 13710]] }
+          ]
         }
       ],
-      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877). «Protección divina» (2194), for the class-13 temple's own: «Estoy de camino al Bosque Maléfico» (52897), madness to go without protection, train against a dopeul and pray to the statue (40611); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40612); then Trimpize at the forest's edge (40613), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52898) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36071), the towers' lair (30019), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36070) starts the quest and sends the character to pray before the class statue (30020, «Encontrar la estatua»); under level 50 he is told to wait (30057) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»)."
+      "why": "Agente Smis, master of the class-13 temple: «Faire preuve de son dévouement» (Dofus pour les noobs, Dévotion) once the Envoyée has sent the character, and the line that sends the character to the temple's book (quest 770, objective 4877). «Protección divina» (2194), for the class-13 temple's own: «Estoy de camino al Bosque Maléfico» (52897), madness to go without protection, train against a dopeul and pray to the statue (40611); the creatures' aggressiveness the blessing lowers and Wally Oluconom's notes (40612); then Trimpize at the forest's edge (40613), and «Tomar buena nota y marcharte a ver al adiestrador de dopeuls» (52898) is 16292 (Dofus pour les noobs, «Protection divine»). «La colère des dieux» (1938): the temple master's «Hablar de las torres de la Hermandad de los Olvidados.» (36071), the towers' lair (30019), «Estoy listo para enfrentarme a los soldados de la Hermandad.» (36070) starts the quest and sends the character to pray before the class statue (30020, «Encontrar la estatua»); under level 50 he is told to wait (30057) (Dofus pour les noobs («La colère des dieux»): «La quête se lance auprès du maître de votre temple de classe en lui parlant Évoquer les Tours de la Fratrie des Oubliés puis Répondre que vous êtes prêt»). 1953: negotiating the logistic help (13710). Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."
     },
   {
       "npc": 1429,
@@ -44260,6 +44280,7 @@
       "map": 207619074,
       "opening": 40902,
       "openings": [
+        { "quest": 2154, "objective": 16536, "message": 40902, "pending": 16537 },
         { "after": 2163, "message": 42376 },
         { "quest": 2163, "message": 42375 },
         { "canStart": 2163, "message": 42374 }
@@ -44269,7 +44290,8 @@
           "message": 40902,
           "choices": [
             { "reply": 55193 },
-            { "reply": 55192, "next": 42374 }
+            { "reply": 55192, "next": 42374 },
+            { "reply": 53274, "next": 40903, "quest": 2154, "beforeObjective": 16537 }
           ]
         },
         {
@@ -44291,9 +44313,15 @@
           "choices": [
             { "reply": 55193 }
           ]
+        },
+        {
+          "message": 40903,
+          "choices": [
+            { "reply": 53273, "quest": 2154, "beforeObjective": 16537, "gives": 23144, "criterion": "PO!23144&PO!23147" }
+          ]
         }
       ],
-      "why": "Fhang in the alchemists' workshop, Pandala [23,-29]. Dofus pour les noobs («Infâme pourriture»): she studies mildew samples (42374), «Yo podría ayudarte» (55190) starts it and she asks for more samples (42375); «Aquí tienes las muestras de mildiu» (55194) hands them over, thanks (42376). The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them)."
+      "why": "Fhang in the alchemists' workshop, Pandala [23,-29]. Dofus pour les noobs («Infâme pourriture»): she studies mildew samples (42374), «Yo podría ayudarte» (55190) starts it and she asks for more samples (42375); «Aquí tienes las muestras de mildiu» (55194) hands them over, thanks (42376). The hand-over is the engine's own «bring» objective (the reply is offered only with the items carried, and takes them). «El festival del farol» (2154): «Necesito tinta para mi farol. Me envía la daimia.» (53274) -> 40903 and 53273 hands the black ink 23144 (Dofus pour les noobs («Le festival de la lanterne»))."
     },
   {
       "npc": 5895,
@@ -48667,7 +48695,11 @@
             { "reply": 53717, "next": 41246, "quest": 2151, "afterObjective": 16400, "beforeObjective": 16401, "criterion": "PO>23414,0" },
             { "reply": 53843, "next": 41344, "quest": 2151, "afterObjective": 16408, "beforeObjective": 16409 },
             { "reply": 53839, "next": 41348, "beforeQuest": 2152 },
-            { "reply": 52867, "next": 40585, "quest": 2152, "afterObjective": 16455, "beforeObjective": 16456 }
+            { "reply": 52867, "next": 40585, "quest": 2152, "afterObjective": 16455, "beforeObjective": 16456 },
+            { "reply": 53886, "next": 41383, "beforeQuest": 2153, "criterion": "Qf=2152&PL>109" },
+            { "reply": 53892, "next": 41387, "quest": 2153, "afterObjective": 16429, "beforeObjective": 16430 },
+            { "reply": 53898, "next": 41392, "beforeQuest": 2154, "criterion": "Qf=2153&PL>119" },
+            { "reply": 53361, "next": 40979, "quest": 2154, "afterObjective": 16562, "beforeObjective": 16563 }
           ]
         },
         {
@@ -48940,11 +48972,156 @@
         {
           "message": 40586,
           "choices": [
-            { "reply": 52865, "quest": 2152, "completes": 16456, "params": [[30, 16456]] }
+            { "reply": 52865, "quest": 2152, "completes": 16456, "params": [[30, 16456]], "next": 41378 }
+          ]
+        },
+        {
+          "message": 41378,
+          "choices": [
+            { "reply": 53891, "next": 41379 }
+          ]
+        },
+        {
+          "message": 41379,
+          "choices": [
+            { "reply": 53890, "next": 41380 }
+          ]
+        },
+        {
+          "message": 41380,
+          "choices": [
+            { "reply": 53889, "next": 41381 }
+          ]
+        },
+        {
+          "message": 41381,
+          "choices": [
+            { "reply": 53888, "next": 41382 }
+          ]
+        },
+        {
+          "message": 41382,
+          "choices": [
+            { "reply": 53887, "startsQuest": 2153, "params": [[34, 2153]] }
+          ]
+        },
+        {
+          "message": 41383,
+          "choices": [
+            { "reply": 53885, "next": 41384 }
+          ]
+        },
+        {
+          "message": 41384,
+          "choices": [
+            { "reply": 53884, "next": 41385 }
+          ]
+        },
+        {
+          "message": 41385,
+          "choices": [
+            { "reply": 53883, "next": 41386 }
+          ]
+        },
+        {
+          "message": 41386,
+          "choices": [
+            { "reply": 53882, "startsQuest": 2153, "params": [[34, 2153]] }
+          ]
+        },
+        {
+          "message": 41387,
+          "choices": [
+            { "reply": 53896, "next": 41388 }
+          ]
+        },
+        {
+          "message": 41388,
+          "choices": [
+            { "reply": 53895, "next": 41389 }
+          ]
+        },
+        {
+          "message": 41389,
+          "choices": [
+            { "reply": 53894, "next": 41390 }
+          ]
+        },
+        {
+          "message": 41390,
+          "choices": [
+            { "reply": 53893, "next": 41391, "quest": 2153, "completes": 16430, "params": [[30, 16430]] }
+          ]
+        },
+        {
+          "message": 41391,
+          "choices": [
+            { "reply": 53897 },
+            { "reply": 53898, "next": 40861, "beforeQuest": 2154, "criterion": "Qf=2153&PL>119" }
+          ]
+        },
+        {
+          "message": 40861,
+          "choices": [
+            { "reply": 53901, "next": 40862 }
+          ]
+        },
+        {
+          "message": 40862,
+          "choices": [
+            { "reply": 53902, "next": 40863 }
+          ]
+        },
+        {
+          "message": 40863,
+          "choices": [
+            { "reply": 53900, "next": 40864 }
+          ]
+        },
+        {
+          "message": 40864,
+          "choices": [
+            { "reply": 53899, "startsQuest": 2154, "params": [[34, 2154]] }
+          ]
+        },
+        {
+          "message": 41392,
+          "choices": [
+            { "reply": 53901, "next": 41393 }
+          ]
+        },
+        {
+          "message": 41393,
+          "choices": [
+            { "reply": 53902, "next": 41394 }
+          ]
+        },
+        {
+          "message": 41394,
+          "choices": [
+            { "reply": 53900, "next": 41395 }
+          ]
+        },
+        {
+          "message": 41395,
+          "choices": [
+            { "reply": 53899, "startsQuest": 2154, "params": [[34, 2154]] }
+          ]
+        },
+        {
+          "message": 40979,
+          "choices": [
+            { "reply": 53360, "next": 40980, "quest": 2154, "completes": 16563, "params": [[30, 16563]] }
+          ]
+        },
+        {
+          "message": 40980,
+          "choices": [
+            { "reply": 53359 }
           ]
         }
       ],
-      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken. «Au nom de l'Art» (2152): 52867 -> 40585 -> 52866 -> 40586 -> 52865 'Mostrarle la garra de la roca' closes 16456 (Dofus pour les noobs («Au nom de l'Art»)). The offer of 2152 runs through 40782, the line its step declares, which says the same words as 41350. INFERRED: reply-to-line pairing follows the message order of the client texts."
+      "why": "Daimia Hikomi in the audience room (207624194) in «En la encrucijada de los mundos» (2150). Her greeting (40581); «Inclinarte ante la Daimia.» (53440), once the Pandarin has let the character in (16379): «¿Por qué estás aquí?» (41025); the shaman's advice (53439, 41026); «Deseo encarecidamente hablar con Pandawelo.» (53438): he lives on the astral plane (41027) and in the sacred precinct (41028); she will bring the meeting about (41029, «Así es.», 53435); first the test of the Pandasiman (41030, 53434); Master Kuatinbe in the dojo (41031); «Darle las gracias e inclinarte antes de despedirte.» (53433) does 16380. Back from the Ether: «Tratar de resumir lo acontecido en la encrucijada de los mundos.» (53444): «¿La cumplirás…?» (41032); «Cumpliré la misión de principio a fin.» (53442) does 16386 and ends the quest, then the old spirits to find (41033, «La verdad es que no sé por dónde empezar.», 53441, where 2151 «Sous le bois de sa colère» follows); «Voy a pensármelo.» (53443) leaves it for later. Dofus pour les noobs («À la croisée des mondes»): «Enfin parlez à la Daimya Hikomi et inclinez-vous devant elle « S'incliner devant la Daimya »» and «« Répondre que vous accomplirez cette quête jusqu'au bout »». «Claro como el aguardiente» (2170, Dofus pour les noobs («Les habitudes ont l'eau-de-vie dure»)): «Darle la botella de shake a la daimia explicándole la situación.» (55301) hands over the exceptional shake (16734) -> 42465, 55300 -> 42466, 55299 -> 42467, 55298 leaves; after the raid «Explicar los eventos más recientes.» (55310) -> 42470 ... 42475 and «Prepararte para volver a Akwadala.» (55304) is 16740, with her decree (23055). Chain order INFERRED from the descending ids. «Más leña al fuego» (2151): at the end of 2150 «La verdad es que no sé por dónde empezar.» (53441, to whoever may take 2151) and, from her greeting, «Todo listo por mi parte para ir en busca de la primera garra elemental.» (53711) lead to the same talk: explore Plantala (41234/41240, «Cuéntame más.» 53704/53710), bamboo (41235/41241, «¿Qué es lo que os preocupa?» 53703/53709), the attacks and the ranger lost to the spirit (41236/41242, «Seguir escuchando.» 53702/53708), the shortage (41237/41243, «¿A qué se debe la ira del Espíritu?» 53701/53707), speak to the spirit (41238/41244); «Aceptar esta misión que te permitirá ver al Espíritu del Bosque.» (53700/53706) starts 2151 and its step line «Ve a ver a Kykori al taller de leñadores.» (41239/41245, «Seguiré tu sugerencia.» 53699/53705). With the register (23414) after the fight (16400): «Contarle lo que has averiguado de la sobreexplotación del bambú y enseñarle el registro de Kykori.» (53717): consternation (41246), «Tú intentaste arreglarlo enviando a la guardabosques.» (53716), 41247, «Puede que la ira del protector del bosque se acabe calmando con el tiempo.» (53715), soften the guardian (41248), «Ver al pandawa salir de la sala.» (53714), a blessed shoot for Kodámade (41249), «Me parece una buena iniciativa.» (53713), you will give it (41250), «Agradecerle su ayuda y esperar al sirviente.» (53712) takes the register, calls the servant (5674) and does 16401. With the claw (16408): «Kodámade ha aceptado el brote de bambú sagrado.» (53843), her prayer (41344), «Mostrarle la garra del bosque con cierto orgullo.» (53842), how was it (41345), «Tuve que hacer un pacto con el espíritu.» (53841) does 16409 and ends the quest, «Siempre hay un coste» (41346), «¿Cuál es el siguiente viaje?» (53840), Tierradala (41347), «¿Qué sabes de la región?» (53839) closes until «En nombre del Arte» (2152) is written. Dofus pour les noobs («Sous le bois de sa colère»): «La quête se lance à la suite de la précédente … auprès de Daimya Hikomi», «montrez ce registre à la Daimya Hikomi» and «La quête se termine mais en continuant votre conversation avec la Daimya, vous obtenez la prochaine quête». INFERRED: the register is taken. «Au nom de l'Art» (2152): 52867 -> 40585 -> 52866 -> 40586 -> 52865 'Mostrarle la garra de la roca' closes 16456 (Dofus pour les noobs («Au nom de l'Art»)). The offer of 2152 runs through 40782, the line its step declares, which says the same words as 41350. INFERRED: reply-to-line pairing follows the message order of the client texts. «La jetée des enfants perdus» (2153): Daimia Hikomi starts it after 2152 (53891..53887, or 53886..53882 from the opening) and closes 16430 (53892..53893, then 53897). INFERRED: the reply pairing follows message order. Dofus pour les noobs («La jetée des enfants perdus») «El festival del farol» (2154): Daimia Hikomi starts it from 2153's farewell (53898 on 41391, or from the opening) through 40861..40864 (53901, 53902, 53900, 53899) and closes 16563 with 53361 (40979), 53360 (40980) and 53359. Dofus pour les noobs («Le festival de la lanterne»). INFERRED: reply-to-line pairing follows the message order of the client texts."
     },
   {
       "npc": 5600,
@@ -50189,7 +50366,7 @@
         {
           "message": 41434,
           "choices": [
-            { "reply": 53942 }
+            { "reply": 53942, "quest": 2153, "beforeObjective": 16414, "completes": 16414, "params": [[30, 16414]] }
           ]
         },
         {
@@ -50234,7 +50411,7 @@
           ]
         }
       ],
-      "why": "Sakwaba, the tavern keeper of Akwadala [20,-20]. Her ordinary lines (41432-41434, «Pedir la especialidad de la casa»...) stay. With Surivitna's letter in hand (16592 done): «Entregarle la carta del ayudante del chamán» 54411 -> 41823 (she looks at it without touching it: bring her a drink), «¿Cómo te sientes?» 54415 -> 41824, «Buscar algo de beber» 54414 leaves. With the Vaso lleno (23323, from the table's glass of fermented bamboo milk) she opens with 41824: «Tenderle un vaso lleno» 54413 takes it -> 41825 (feeling better, what is his excuse?), «Entregarle la carta repitiéndole lo que te dijo el ayudante» 54412 is the engine's own hand-over of the letter (16593) -> 41829 (he forgot his debt), «No.» 54421 -> 41830 (50 000 kamas or my gorillas): «Pagar los 50 000 kamas» 54419 pays and does 16611, «Solucionar el asunto haciendo uso de la fuerza» 54420 is the fight (npc_fights.json), «Irte precipitadamente» 54835 leaves; back later, «Quiero saldar la deuda del ayudante de Surivitna» 54424 -> 41831 with the same two ways (54422, 54423). Dofus pour les noobs («Les métamorphoses d'un Tanuki»): pay 50 000 kamas or fight the tavern's guards. The order is INFERRED; 54410 («¿Mm? La tabernera eres tú, ¿no?») has no place in DPLN and is not offered."
+      "why": "Sakwaba, the tavern keeper of Akwadala [20,-20]. Her ordinary lines (41432-41434, «Pedir la especialidad de la casa»...) stay. With Surivitna's letter in hand (16592 done): «Entregarle la carta del ayudante del chamán» 54411 -> 41823 (she looks at it without touching it: bring her a drink), «¿Cómo te sientes?» 54415 -> 41824, «Buscar algo de beber» 54414 leaves. With the Vaso lleno (23323, from the table's glass of fermented bamboo milk) she opens with 41824: «Tenderle un vaso lleno» 54413 takes it -> 41825 (feeling better, what is his excuse?), «Entregarle la carta repitiéndole lo que te dijo el ayudante» 54412 is the engine's own hand-over of the letter (16593) -> 41829 (he forgot his debt), «No.» 54421 -> 41830 (50 000 kamas or my gorillas): «Pagar los 50 000 kamas» 54419 pays and does 16611, «Solucionar el asunto haciendo uso de la fuerza» 54420 is the fight (npc_fights.json), «Irte precipitadamente» 54835 leaves; back later, «Quiero saldar la deuda del ayudante de Surivitna» 54424 -> 41831 with the same two ways (54422, 54423). Dofus pour les noobs («Les métamorphoses d'un Tanuki»): pay 50 000 kamas or fight the tavern's guards. The order is INFERRED; 54410 («¿Mm? La tabernera eres tú, ¿no?») has no place in DPLN and is not offered. «La jetée des enfants perdus» (2153): 53944 -> 41433 -> 53943 -> 41434 -> 53942 closes 16414 «Pregunta a la tabernera de Osakwa» (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
     },
   {
       "npc": 5700,
@@ -52068,11 +52245,12 @@
         {
           "message": 40907,
           "choices": [
+            { "reply": 53278, "quest": 2154, "beforeObjective": 16537, "gives": 23145, "criterion": "PO!23145&PO!23147" },
             { "reply": 53278 }
           ]
         }
       ],
-      "why": "Takeono in the woodcutters' workshop (40904). «Más leña al fuego» (2151), after the scribe (16389): «Hola. ¿Dónde está Kykori?» (53737): she has left in a hurry (41274); «¿Qué piensas tú del origen de este problema?» (53741): plant creatures (41275); «Ese sacrificio no se hace con violencia.» (53740): conscious plants (41276); «Bueno, no voy a entrar en ese debate. ¿Sabes adónde ha ido Kykori?» (53739): to the exploitation (41277); «Ir al bosque.» (53738) does 16390. Dofus pour les noobs («Sous le bois de sa colère»): «parlez à Takeono qui vous apprend que Kykori s'est absentée». «El festival del farol» (2154) while its lantern is not made (16537): «¿Cómo hago un armazón de bambú? Me envía la daimia.» (53277), freshly cut bamboo (40905, «Seguir escuchando.», 53276), a little favour (40906, «Retener un suspiro.», 53275), only a joke (40907, «Gracias, ¡hasta luego!», 53278). INFERRED for 2154: what 53278 hands over is left to that quest."
+      "why": "Takeono in the woodcutters' workshop (40904). «Más leña al fuego» (2151), after the scribe (16389): «Hola. ¿Dónde está Kykori?» (53737): she has left in a hurry (41274); «¿Qué piensas tú del origen de este problema?» (53741): plant creatures (41275); «Ese sacrificio no se hace con violencia.» (53740): conscious plants (41276); «Bueno, no voy a entrar en ese debate. ¿Sabes adónde ha ido Kykori?» (53739): to the exploitation (41277); «Ir al bosque.» (53738) does 16390. Dofus pour les noobs («Sous le bois de sa colère»): «parlez à Takeono qui vous apprend que Kykori s'est absentée». «El festival del farol» (2154) while its lantern is not made (16537): «¿Cómo hago un armazón de bambú? Me envía la daimia.» (53277), freshly cut bamboo (40905, «Seguir escuchando.», 53276), a little favour (40906, «Retener un suspiro.», 53275), only a joke (40907, «Gracias, ¡hasta luego!», 53278). INFERRED for 2154: what 53278 hands over is left to that quest. «El festival del farol» (2154): 40905..40907 then 53278 hands the flexible bamboo wood 23145 (Dofus pour les noobs («Le festival de la lanterne»))."
     },
   {
       "npc": 5601,
@@ -53938,7 +54116,7 @@
             { "reply": 26098, "next": 21712, "quest": 1658, "afterObjective": 10018, "beforeObjective": 10020 },
             { "reply": 26100, "next": 21714, "quest": 1658, "afterObjective": 10027, "completes": 10028, "params": [[30, 10028]], "gives": 17034 },
             { "reply": 5657, "next": 6387, "quest": 309, "beforeObjective": 2731, "completes": 2731, "params": [[30, 2731]] },
-            { "reply": 36496, "next": 30305, "quest": 1951 },
+            { "reply": 36496, "next": 30305, "quest": 1951, "beforeObjective": 13660 },
             { "reply": 2775, "next": 3152 }
           ]
         },
@@ -53967,7 +54145,7 @@
         {
           "message": 30305,
           "choices": [
-            { "reply": 36495 }
+            { "reply": 36495, "quest": 1951, "gives": 19485, "completes": 13660, "params": [[30, 13660]], "givesCount": 5 }
           ]
         },
         {
@@ -53975,7 +54153,7 @@
           "choices": []
         }
       ],
-      "why": "Fidji Merlín in the tinkerers' workshop of Brakmar [-29,36]. «Altar del Norte» (1658): «¿Has hablado con Nobir últimamente?» (26098) -> «¿El salteadorillo? Llevo varias semanas sin verlo» (21712) -> «Se supone que Nobir tenía que hablar contigo para intercambiar el cerebromotor...» (26097) -> a storm over the Altos de los Aullidos yesterday (21713) -> «Gracias por la información. Me voy en dirección a los Altos de los Aullidos» (26096) does 10020; with the automaton boxes (10028, the engine's bring objective: offered only with 17033 carried, and takes it) «Tengo los robots que envió Berbiquí» (26100) gives the Cerebromotor (17034): «¡Un cerebromotor, justo lo que pediste! Ten cuidado, es muy frágil» (21714) -> «Gracias. Hasta luego» (26099). Dofus pour les noobs («Autel du Nord»): «Demandez alors à Fidji Merline la bricoleuse si Nobir est venu la voir [...] il y a eu une tempête du côté de la route de Brâkmar», «Donnez les automates à Fidji afin qu'elle vous donner le cervomotor». Her other lines, kept now that she has a tree: «Una grieta en su caparazón» (309, objective 2731) «Pedir las llaves de Mulic Bere» (5657) -> she forgot to give them back (6387); «Plantas contra mediomuertos» (1951) «Pedir el material para Jauel Indio» (36496) -> 30305 -> «Tomar las cajas» (36495), only the text: its hand-out is that quest's to write (13660 still ticks on the greeting); and «Informarte sobre el oficio de manitas» (2775) -> 3152. INFERRED: 5657 doing 2731."
+      "why": "Fidji Merlín in the tinkerers' workshop of Brakmar [-29,36]. «Altar del Norte» (1658): «¿Has hablado con Nobir últimamente?» (26098) -> «¿El salteadorillo? Llevo varias semanas sin verlo» (21712) -> «Se supone que Nobir tenía que hablar contigo para intercambiar el cerebromotor...» (26097) -> a storm over the Altos de los Aullidos yesterday (21713) -> «Gracias por la información. Me voy en dirección a los Altos de los Aullidos» (26096) does 10020; with the automaton boxes (10028, the engine's bring objective: offered only with 17033 carried, and takes it) «Tengo los robots que envió Berbiquí» (26100) gives the Cerebromotor (17034): «¡Un cerebromotor, justo lo que pediste! Ten cuidado, es muy frágil» (21714) -> «Gracias. Hasta luego» (26099). Dofus pour les noobs («Autel du Nord»): «Demandez alors à Fidji Merline la bricoleuse si Nobir est venu la voir [...] il y a eu une tempête du côté de la route de Brâkmar», «Donnez les automates à Fidji afin qu'elle vous donner le cervomotor». Her other lines, kept now that she has a tree: «Una grieta en su caparazón» (309, objective 2731) «Pedir las llaves de Mulic Bere» (5657) -> she forgot to give them back (6387); «Plantas contra mediomuertos» (1951) «Pedir el material para Jauel Indio» (36496) -> 30305 -> «Tomar las cajas» (36495), only the text: its hand-out is that quest's to write (13660 still ticks on the greeting); and «Informarte sobre el oficio de manitas» (2775) -> 3152. INFERRED: 5657 doing 2731. 1951: «Pedir el material para Jauel Indio» (36496) and «Tomar las cajas» (36495), which hands the box (19485). Dofus pour les noobs («Plantes contre Trépamorts»). The hand-over objective 13665 asks for 5 boxes, so the take gives five."
     },
   {
       "npc": 2956,
@@ -55183,11 +55361,30 @@
             { "reply": 34507, "door": "key" },
             { "reply": 34510, "door": "keyring" },
             { "reply": 35037, "quest": 1915, "beforeObjective": 13174, "teleport": 184685313 },
-            { "reply": 35037, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185, "teleport": 184685313 }
+            { "reply": 35037, "quest": 1915, "afterObjective": 13184, "beforeObjective": 13185, "teleport": 184685313 },
+            { "reply": 36106, "next": 30046, "quest": 1952, "afterObjective": 13686, "beforeObjective": 13688, "completes": 13688, "params": [[30, 13688]] }
+          ]
+        },
+        {
+          "message": 30046,
+          "choices": [
+            { "reply": 36105, "next": 30047, "quest": 1952, "beforeObjective": 13690 }
+          ]
+        },
+        {
+          "message": 30047,
+          "choices": [
+            { "reply": 36104, "next": 30048, "quest": 1952, "beforeObjective": 13690 }
+          ]
+        },
+        {
+          "message": 30048,
+          "choices": [
+            { "reply": 36103, "quest": 1952, "gives": 19494, "criterion": "PO!19494", "beforeObjective": 13690 }
           ]
         }
       ],
-      "why": "The Endless Day guard at the gate of Ilyzaelle's Lookout [-73,-76]: give him the key (34507) or use the keyring (34510) to go in, as at every keeper's door. «Examen de paso» (1906): Dofus pour les noobs, «Direction l'entrée du donjon d'Ilyzaelle en [-73,-76!]. Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle» -- the king had promised the guard would let you by (28741). The map in front of her, «Herida de Nas Orazal», is 13047. «Es hora de morir» (1915): the guard's «Dire que vous avez l'appui du roi Beldarion» (35037) before Agonía is found (13174) and on the way back to the queen (13184). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir»)"
+      "why": "The Endless Day guard at the gate of Ilyzaelle's Lookout [-73,-76]: give him the key (34507) or use the keyring (34510) to go in, as at every keeper's door. «Examen de paso» (1906): Dofus pour les noobs, «Direction l'entrée du donjon d'Ilyzaelle en [-73,-76!]. Parlez au Gardien du Jour sans fin \"Dire que vous avez l'appui du roi Beldarion\". Vous êtes téléporté devant Ilyzaelle» -- the king had promised the guard would let you by (28741). The map in front of her, «Herida de Nas Orazal», is 13047. «Es hora de morir» (1915): the guard's «Dire que vous avez l'appui du roi Beldarion» (35037) before Agonía is found (13174) and on the way back to the queen (13184). (1915 «Es hora de morir», Dofus pour les noobs «Il est temps de mourir») 1952: «Darle el fetiche de Jauel Indio y explicarle sus expectativas» (36106) hands the fetish (13688), then he crystallises a fragment of white fire (30046-30048, replies 36105 / 36104 / 36103 hand the white fire pearl 19494). Dofus pour les noobs («Le héros de Plantes contre Trépamorts»). INFERRED: reply order (the guide gives the story, not the replies)."
     },
   {
       "npc": 4057,
@@ -58901,17 +59098,27 @@
       "npc": 62,
       "map": 0,
       "opening": 38,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 38,
           "choices": [
-            { "reply": 508, "next": 604 }
+            { "reply": 508, "next": 604 },
+            { "reply": 36320, "next": 30179, "quest": 1953, "afterObjective": 13708, "beforeObjective": 13709 }
           ]
         },
-        { "message": 604, "choices": [] }
+        {
+          "message": 604,
+          "choices": []
+        },
+        {
+          "message": 30179,
+          "choices": [
+            { "reply": 36319, "quest": 1953, "completes": 13709, "params": [[30, 13709]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 1953: negotiating the arms (13709). Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."
     },
   {
       "npc": 814,
@@ -59033,17 +59240,27 @@
       "npc": 81,
       "map": 0,
       "opening": 171,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
         {
           "message": 171,
           "choices": [
-            { "reply": 145, "next": 172 }
+            { "reply": 145, "next": 172 },
+            { "reply": 36318, "next": 30178, "quest": 1953, "afterObjective": 13707, "beforeObjective": 13708 }
           ]
         },
-        { "message": 172, "choices": [] }
+        {
+          "message": 172,
+          "choices": []
+        },
+        {
+          "message": 30178,
+          "choices": [
+            { "reply": 36317, "quest": 1953, "completes": 13708, "params": [[30, 13708]] }
+          ]
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. 1953: negotiating the posters (13708). Dofus pour les noobs («Battre le fer tant qu'il est chaud»)."
     },
   {
       "npc": 1578,
@@ -64808,10 +65025,80 @@
       "map": 0,
       "opening": 40787,
       "lines": [
-        { "message": 40787, "choices": [] }
+        {
+          "message": 40787,
+          "choices": [
+            { "reply": 53227, "next": 40865, "quest": 2154, "beforeObjective": 16536 },
+            { "reply": 53231, "next": 40871, "quest": 2154, "afterObjective": 16537, "beforeObjective": 16538 }
+          ]
+        },
+        {
+          "message": 40865,
+          "choices": [
+            { "reply": 53224, "next": 40866 }
+          ]
+        },
+        {
+          "message": 40866,
+          "choices": [
+            { "reply": 53225, "next": 40868 },
+            { "reply": 53230, "next": 40867 }
+          ]
+        },
+        {
+          "message": 40868,
+          "choices": [
+            { "reply": 53226, "next": 40867 }
+          ]
+        },
+        {
+          "message": 40867,
+          "choices": [
+            { "reply": 54056, "next": 41528 }
+          ]
+        },
+        {
+          "message": 41528,
+          "choices": [
+            { "reply": 54055, "next": 41529 }
+          ]
+        },
+        {
+          "message": 41529,
+          "choices": [
+            { "reply": 54054 }
+          ]
+        },
+        {
+          "message": 40871,
+          "choices": [
+            { "reply": 54058, "next": 41526 }
+          ]
+        },
+        {
+          "message": 41526,
+          "choices": [
+            { "reply": 54057, "next": 41527 }
+          ]
+        },
+        {
+          "message": 41527,
+          "choices": [
+            { "reply": 53228, "next": 40872 }
+          ]
+        },
+        {
+          "message": 40872,
+          "choices": [
+            { "reply": 53229, "next": 40873 }
+          ]
+        },
+        {
+          "message": 40873,
+          "choices": []
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "The guard of the Centella gate in Fuegodala [18,-30]: «Los firefux...» (40787), «¿Puedes informarme de la situación?» (53227) and the briefing 40865..40867/40868, 41528 (the rice paper for the lantern) and 41529 (where to find the rest) close 16536 (binding on 54054, which hands the paper); with the lantern carried 53231 lights it (40871, 41526, 41527, 40872, 40873) and ticks 16538 (client: «Fuegodala: ...»). Dofus pour les noobs («Le festival de la lanterne»). INFERRED: reply-to-line pairing follows the message order of the client texts."
     },
   {
       "npc": 5765,
@@ -65749,11 +66036,26 @@
       "npc": 1246,
       "map": 0,
       "opening": 7728,
+      "_source": "official server packet captures, 2026-11-17 to 11-21",
       "lines": [
-        { "message": 7728, "choices": [] }
+        {
+          "message": 7728,
+          "choices": [
+            { "reply": 8447, "startsQuest": 655, "params": [[34, 655]], "next": 8423, "criterion": "Qf=650&Sc=702", "beforeQuest": 655 },
+            { "reply": 8448, "quest": 655, "completes": 4235, "params": [[30, 4235]], "next": 8424, "criterion": "Qa=655&Qo>4224&Qo>4225&Qo>4226&Qo>4227&Qo>4228&Qo>4229&Qo>4230&Qo>4231&Qo>4232&Qo>4233&Qo>4234" },
+            { "reply": 7846 }
+          ]
+        },
+        {
+          "message": 8423,
+          "choices": []
+        },
+        {
+          "message": 8424,
+          "choices": []
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "As the official server says it, with no quest under way. «Frigost, una isla que no es como las demás» (655, Dofus pour les noobs «Frigost, une île pas comme les autres»): «¿Me das una guía turística?» (8447) starts it and she answers its step line 8423; the eleven map visits tick on entering them; once all are done the reply 8448 («¿Me das otra guía turística?», INFERRED as the reply that returns to her; the guide only says talk to her again) closes 4235 and she answers 8424."
     },
   {
       "npc": 1996,
@@ -66844,10 +67146,30 @@
       "map": 0,
       "opening": 30031,
       "lines": [
-        { "message": 30031, "choices": [] }
+        {
+          "message": 30031,
+          "choices": [
+            { "reply": 36087, "next": 30032, "quest": 1951, "beforeObjective": 13661, "completes": 13661, "params": [[30, 13661]] }
+          ]
+        },
+        {
+          "message": 30032,
+          "choices": [
+            { "reply": 36085, "next": 30034, "quest": 1951, "gives": 19486, "afterObjective": 13661, "beforeObjective": 13662, "completes": 13662, "params": [[30, 13662]], "givesCount": 5 },
+            { "reply": 36086, "next": 30033, "quest": 1951, "gives": 19486, "afterObjective": 13661, "beforeObjective": 13662, "completes": 13662, "params": [[30, 13662]], "givesCount": 5 },
+            { "reply": 36084 }
+          ]
+        },
+        {
+          "message": 30033,
+          "choices": []
+        },
+        {
+          "message": 30034,
+          "choices": []
+        }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "why": "Scott Pennar at [-25,21] (1951): «Pedir el material para Jauel Indio» (36087) and the chewing gum accepted «a regañadientes» (36085, DPLN) or with pleasure (36086) hand over his chest (19486). Dofus pour les noobs («Plantes contre Trépamorts»). INFERRED: reply order (the guide gives the story, not the replies). The hand-over objective 13666 asks for 5 chests, so the take gives five."
     },
   {
       "npc": 830,
@@ -66971,11 +67293,70 @@
       "npc": 3869,
       "map": 0,
       "opening": 27743,
-      "lines": [
-        { "message": 27743, "choices": [] }
+      "openings": [
+        { "criterion": "Qf=1949&Qa!1950&Qf!1950", "message": 29955 },
+        { "criterion": "Qa=1950&Qo>13633&Qo<13634", "message": 29958 }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "lines": [
+        {
+          "message": 27743,
+          "choices": [
+            { "reply": 36019, "next": 29969, "quest": 1950, "afterObjective": 13636, "beforeObjective": 13637, "completes": 13637, "params": [[30, 13637]] },
+            { "reply": 36077, "next": 30024, "quest": 1950, "afterObjective": 13657, "beforeObjective": 13658 }
+          ]
+        },
+        {
+          "message": 29955,
+          "choices": [
+            { "reply": 36003, "next": 29956, "criterion": "Qf=1949&PL>179&Qa!1950&Qf!1950", "beforeQuest": 1950 }
+          ]
+        },
+        {
+          "message": 29956,
+          "choices": [
+            { "reply": 36004, "next": 29957 }
+          ]
+        },
+        {
+          "message": 29957,
+          "choices": [
+            { "reply": 36018, "startsQuest": 1950, "params": [[34, 1950]] }
+          ]
+        },
+        {
+          "message": 29958,
+          "choices": [
+            { "reply": 36008, "next": 29959, "quest": 1950, "afterObjective": 13633, "beforeObjective": 13634 }
+          ]
+        },
+        {
+          "message": 29959,
+          "choices": [
+            { "reply": 36007, "next": 29960, "quest": 1950, "afterObjective": 13633, "beforeObjective": 13634 }
+          ]
+        },
+        {
+          "message": 29960,
+          "choices": [
+            { "reply": 36006, "quest": 1950, "completes": 13634, "params": [[30, 13634]] }
+          ]
+        },
+        {
+          "message": 29969,
+          "choices": []
+        },
+        {
+          "message": 30024,
+          "choices": [
+            { "reply": 36076, "next": 30025, "quest": 1950, "afterObjective": 13657, "beforeObjective": 13658, "completes": 13658, "params": [[30, 13658]] }
+          ]
+        },
+        {
+          "message": 30025,
+          "choices": []
+        }
+      ],
+      "why": "Tusok at [-21,25] (1950): the quest starts on «Ir al lugar» (36018) after 29955/29956/29957 (step line 29957); the report of the kills (13634), Guy's story (13637, 36019) and the end (36077/36076, 30024/30025). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
     },
   {
       "npc": 3867,
@@ -67034,11 +67415,29 @@
       "npc": 4277,
       "map": 0,
       "opening": 30036,
-      "lines": [
-        { "message": 30036, "choices": [] }
+      "openings": [
+        { "criterion": "Qa=1951&Qo>13677&Qo<13678", "message": 30039 },
+        { "criterion": "Qa=1951&Qo>13672&Qo<13678", "message": 30037 }
       ],
-      "why": "As the official server says it, with no quest under way.",
-      "_source": "official server packet captures, 2026-11-17 to 11-21"
+      "lines": [
+        {
+          "message": 30036,
+          "choices": [
+            { "reply": 36089, "next": 30037, "quest": 1951, "completesAll": [13668, 13669, 13670, 13671, 13672], "afterObjective": 13667, "beforeObjective": 13672, "completes": 13672, "params": [[30, 13672]] }
+          ]
+        },
+        {
+          "message": 30037,
+          "choices": []
+        },
+        {
+          "message": 30039,
+          "choices": [
+            { "reply": 36092, "quest": 1951, "gives": 19488, "afterObjective": 13677, "beforeObjective": 13678, "completes": 13678, "params": [[30, 13678]] }
+          ]
+        }
+      ],
+      "why": "Elanna Obrien at [-27,28] (1951): the materials and the diamond are handed over (36089), the sensor is collected once the repeaters are hidden (30039, 36092). Dofus pour les noobs («Plantes contre Trépamorts»). INFERRED: reply order (the guide gives the story, not the replies)."
     },
   {
       "npc": 383,
@@ -69035,6 +69434,8 @@
         { "quest": 737, "message": 9261 },
         { "quest": 738, "message": 9268 },
         { "quest": 739, "message": 9269 },
+        { "after": 737, "message": 9262, "criterion": "Qa!738&Qf!738" },
+        { "after": 738, "message": 9263, "criterion": "Qa!739&Qf!739" },
         { "after": 739, "message": 9266, "criterion": "Qa!740&Qf!740" },
         { "quest": 740, "message": 9270 },
         { "after": 742, "message": 9047 },
@@ -69219,7 +69620,7 @@
           ]
         }
       ],
-      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270). «El safari de las almas» 740 (Dofus pour les noobs («Le Safari des âmes»)): the last tier. The five full soul stones go by 9511 (partial); the four optional steps (the laska of each rare krokille, items 12560-12579, INFERRED order 3178-3197) by 10064, which takes the twenty. Lines 9270/9271/9572 INFERRED ids. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): with the register page (12323) «Ponerle delante de sus narices la página firmada de su puño y letra.» (32978) is 12325 and 27174 (he laughs: the page is a forgery), 32977 -> 27176 (he asks for it), 32976 -> 27177 (it looks like his signature), «¿Quién es el culpable?» (32975) is 12326 and 27178 sends the character to Madrestam. INFERRED order and tier of the replies (the three copies of the lines 27173..27188 are the same text)."
+      "why": "«Caza de cascasaurios» (742) and its four repeatable tiers (743-746, by level; Dofus pour les noobs («Chasse aux Krokilles»)): Nevark's warning (9036) and «Averiguar más cosas» (9166) lead to his offer (9037, the step's own line); «Asentir» (9167-9170, one per tier, INFERRED) starts 742 and shows the tier's task (9038-9044 even): «Ir a cazar cascasaurios» (9171-9174, INFERRED) starts the tier's hunt, which runs alongside 742 («Cette quête se lance en même temps que la quête répétable»). Back with the 30 tongues, «Darle las lenguas de cascasaurio» (9179/9180) hands them over (the engine's bring objective) and he seals the passport (9047); 742 ends on that same reply (objectives.json). «El safari de las almas» (737-740; Dofus pour les noobs («Le Safari des âmes»)): after the tongues, «Perdirle una actividad digna de un verdadero cazador» (9500, INFERRED id) leads to his safari (9260, 9267) and «Irte a cazar cascasaurios raros» (82804) starts 737 (9261: the young rare ones). The five full soul stones are handed over by «Darle las almas de los cascasaurios jóvenes especiales» (9508, partial, the engine's soul hand-over); 9262 and «Ir a cazar cascasaurios» (9175, INFERRED) start 738, and so on (9509/9176, 9510/9177, 9268-9270). «El safari de las almas» 740 (Dofus pour les noobs («Le Safari des âmes»)): the last tier. The five full soul stones go by 9511 (partial); the four optional steps (the laska of each rare krokille, items 12560-12579, INFERRED order 3178-3197) by 10064, which takes the twenty. Lines 9270/9271/9572 INFERRED ids. «A la rescousse des magypus» (1853, Dofus pour les noobs («A la rescousse des magypus»)): with the register page (12323) «Ponerle delante de sus narices la página firmada de su puño y letra.» (32978) is 12325 and 27174 (he laughs: the page is a forgery), 32977 -> 27176 (he asks for it), 32976 -> 27177 (it looks like his signature), «¿Quién es el culpable?» (32975) is 12326 and 27178 sends the character to Madrestam. INFERRED order and tier of the replies (the three copies of the lines 27173..27188 are the same text). Safari 737/738: the lines after a handed-over tier (9262, 9263) are also offered as the opening while the next tier is not started, as 9266 already is after 739, so a hunter who left the talk after the hand-over is not stuck (content_738a)."
     },
   {
       "npc": 1442,
@@ -86360,6 +86761,1450 @@
         }
       ],
       "why": "2083: Osamodas and the invocation. Dofus pour les noobs («Le temps des secrets»). Reply order INFERRED from the message and reply ids (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4285,
+      "map": 0,
+      "opening": 30155,
+      "openings": [
+        { "quest": 1953, "step": 2595, "message": 30157 }
+      ],
+      "lines": [
+        {
+          "message": 30155,
+          "choices": [
+            { "reply": 36291, "next": 30156, "beforeQuest": 1953, "criterion": "PL>179&Qa!1953&Qf!1953" }
+          ]
+        },
+        {
+          "message": 30156,
+          "choices": [
+            { "reply": 36290, "next": 30157, "beforeQuest": 1953 }
+          ]
+        },
+        {
+          "message": 30157,
+          "choices": [
+            { "reply": 36284, "beforeQuest": 1953, "startsQuest": 1953, "params": [[34, 1953]], "criterion": "PL>179&Qa!1953&Qf!1953" },
+            { "reply": 36288, "next": 30158, "beforeQuest": 1953, "criterion": "PL>179&Qa!1953&Qf!1953" },
+            { "reply": 36295, "next": 30159, "quest": 1953, "completesAll": [13696, 13697, 13698, 13699, 13700], "completes": 13700, "params": [[30, 13700]] },
+            { "reply": 36308, "next": 30170, "quest": 1953, "afterObjective": 13705, "beforeObjective": 13706, "completes": 13706, "params": [[30, 13706]] },
+            { "reply": 36324, "next": 30181, "quest": 1953, "afterObjective": 13710, "beforeObjective": 13711, "completes": 13711, "params": [[30, 13711]] }
+          ]
+        },
+        {
+          "message": 30158,
+          "choices": [
+            { "reply": 36285, "beforeQuest": 1953, "startsQuest": 1953, "params": [[34, 1953]], "criterion": "PL>179&Qa!1953&Qf!1953" },
+            { "reply": 36289, "beforeQuest": 1953 }
+          ]
+        },
+        {
+          "message": 30159,
+          "choices": [
+            { "reply": 36294, "next": 30160, "quest": 1953, "afterObjective": 13700, "beforeObjective": 13701 }
+          ]
+        },
+        {
+          "message": 30160,
+          "choices": [
+            { "reply": 36307, "next": 30161, "quest": 1953 }
+          ]
+        },
+        {
+          "message": 30161,
+          "choices": [
+            { "reply": 36292, "quest": 1953 }
+          ]
+        },
+        {
+          "message": 30170,
+          "choices": [
+            { "reply": 36306, "next": 30171, "quest": 1953 }
+          ]
+        },
+        {
+          "message": 30171,
+          "choices": []
+        },
+        {
+          "message": 30181,
+          "choices": [
+            { "reply": 36323, "quest": 1953 }
+          ]
+        }
+      ],
+      "why": "Berkle at [-26,23] (1953): the quest starts on «De acuerdo» (36284/36285), the five supplies are handed over (36295, step line 30157), the ore (36308) and the negotiation report (36324). The 100000 kamas offer (36286/36287) is not wired. Dofus pour les noobs («Battre le fer tant qu'il est chaud»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4286,
+      "map": 0,
+      "opening": 30165,
+      "lines": [
+        {
+          "message": 30165,
+          "choices": [
+            { "reply": 36303, "next": 30166, "quest": 1953, "afterObjective": 13701, "beforeObjective": 13702 },
+            { "reply": 36305, "next": 30169, "quest": 1953, "afterObjective": 13704, "beforeObjective": 13705 }
+          ]
+        },
+        {
+          "message": 30166,
+          "choices": [
+            { "reply": 36302, "next": 30167, "quest": 1953 }
+          ]
+        },
+        {
+          "message": 30167,
+          "choices": [
+            { "reply": 36301, "next": 30168, "quest": 1953 }
+          ]
+        },
+        {
+          "message": 30168,
+          "choices": [
+            { "reply": 36300, "quest": 1953, "completes": 13702, "params": [[30, 13702]] }
+          ]
+        },
+        {
+          "message": 30169,
+          "choices": [
+            { "reply": 36304, "quest": 1953, "completes": 13705, "params": [[30, 13705]] }
+          ]
+        }
+      ],
+      "why": "Komimoto Vorutereta at [-29,26] (1953, 13702 and 13705): the worry of Berkle, the ore lead, the dump. Dofus pour les noobs («Battre le fer tant qu'il est chaud»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 5679,
+      "map": 204998403,
+      "opening": 41420,
+      "openings": [
+        { "quest": 2153, "objective": 16428, "pending": 16429, "message": 41415 }
+      ],
+      "lines": [
+        {
+          "message": 41420,
+          "choices": [
+            { "reply": 53929, "next": 41419 }
+          ]
+        },
+        {
+          "message": 41419,
+          "choices": [
+            { "reply": 53933, "next": 41421 }
+          ]
+        },
+        {
+          "message": 41421,
+          "choices": [
+            { "reply": 53932, "next": 41422 }
+          ]
+        },
+        {
+          "message": 41422,
+          "choices": [
+            { "reply": 53931, "next": 41423 }
+          ]
+        },
+        {
+          "message": 41423,
+          "choices": [
+            { "reply": 53930, "quest": 2153, "beforeObjective": 16410, "completes": 16410, "params": [[30, 16410]] }
+          ]
+        },
+        {
+          "message": 41415,
+          "choices": [
+            { "reply": 53928, "next": 41416 }
+          ]
+        },
+        {
+          "message": 41416,
+          "choices": [
+            { "reply": 53927, "quest": 2153, "beforeObjective": 16429, "completes": 16429, "params": [[30, 16429]] }
+          ]
+        }
+      ],
+      "why": "Rice farmer zollo at [20,-26]. «La jetée des enfants perdus» (2153): «Preguntarle por su situación» (53929) -> 41419 -> 53933 -> 41421 -> 53932 -> 41422 -> 53931 -> 41423 -> 53930 closes 16410; with the young zollo freed 41415 -> 53928 -> 41416 -> 53927 «Dejarla reencontrarse con su hijo...» closes 16429 (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5617,
+      "map": 204997378,
+      "opening": 41424,
+      "openings": [
+        { "quest": 2153, "objective": 16412, "message": 41425 }
+      ],
+      "lines": [
+        {
+          "message": 41424,
+          "choices": [
+            { "reply": 53934, "quest": 2153, "beforeObjective": 16412 },
+            { "reply": 80914 }
+          ]
+        },
+        {
+          "message": 41425,
+          "choices": [
+            { "reply": 53938, "next": 41426 },
+            { "reply": 53935 }
+          ]
+        },
+        {
+          "message": 41426,
+          "choices": [
+            { "reply": 53937, "next": 41427 },
+            { "reply": 53935 }
+          ]
+        },
+        {
+          "message": 41427,
+          "choices": [
+            { "reply": 53936, "next": 41428, "quest": 2153, "beforeObjective": 16411, "completes": 16411, "params": [[30, 16411]] },
+            { "reply": 53935 }
+          ]
+        },
+        {
+          "message": 41428,
+          "choices": [
+            { "reply": 53935 }
+          ]
+        }
+      ],
+      "why": "Yuminh, the fisher at [18,-25]. 2153: 53934 «Atacar a los kuapas» starts the fight (npc_fights); 80914 «Esperar a que lleguen refuerzos» just closes. After it 41425: 53938 -> 41426 -> 53937 (examine the water) -> 41427 -> 53936 «preguntarle al pescador sobre el origen» closes 16411 -> 41428; 53935 says goodbye (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5681,
+      "map": 204998401,
+      "opening": 41464,
+      "lines": [
+        {
+          "message": 41464,
+          "choices": [
+            { "reply": 53979, "quest": 2153, "afterObjective": 16415, "beforeObjective": 16416 },
+            { "reply": 53977, "quest": 2153, "afterObjective": 16415, "beforeObjective": 16416 },
+            { "reply": 53978, "next": 41465 },
+            { "reply": 80916 }
+          ]
+        },
+        {
+          "message": 41465,
+          "choices": []
+        }
+      ],
+      "why": "Bounty hunter on [20,-24] around the isolated kuapa. 2153: «Atacar a los cazadores» / «Neutralizar a los cazadores» start the fight of 16416 (npc_fights); «Me gustaría hablar un poco con el kuapa» is answered by the second line; the wait reply closes (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5682,
+      "map": 204998401,
+      "opening": 41466,
+      "lines": [
+        {
+          "message": 41466,
+          "choices": [
+            { "reply": 53983, "quest": 2153, "afterObjective": 16415, "beforeObjective": 16416 },
+            { "reply": 53981, "quest": 2153, "afterObjective": 16415, "beforeObjective": 16416 },
+            { "reply": 53982, "next": 41467 },
+            { "reply": 80915 }
+          ]
+        },
+        {
+          "message": 41467,
+          "choices": []
+        }
+      ],
+      "why": "Bounty hunter on [20,-24] around the isolated kuapa. 2153: «Atacar a los cazadores» / «Neutralizar a los cazadores» start the fight of 16416 (npc_fights); «Me gustaría hablar un poco con el kuapa» is answered by the second line; the wait reply closes (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5618,
+      "map": 204998401,
+      "opening": 41435,
+      "openings": [
+        { "quest": 2153, "objective": 16417, "pending": 16418, "message": 41439 },
+        { "quest": 2153, "objective": 16418, "pending": 16419, "message": 41442 }
+      ],
+      "lines": [
+        {
+          "message": 41435,
+          "choices": [
+            { "reply": 53953, "next": 41436 },
+            { "reply": 53954 },
+            { "reply": 53947 },
+            { "reply": 53946 }
+          ]
+        },
+        {
+          "message": 41436,
+          "choices": [
+            { "reply": 53950, "next": 41437, "quest": 2153, "afterObjective": 16416, "beforeObjective": 16417 }
+          ]
+        },
+        {
+          "message": 41437,
+          "choices": [
+            { "reply": 53951, "next": 41438, "quest": 2153, "beforeObjective": 16417, "criterion": "PO=23211", "takes": 23211 }
+          ]
+        },
+        {
+          "message": 41438,
+          "choices": [
+            { "reply": 53958, "next": 41439, "quest": 2153, "beforeObjective": 16417 }
+          ]
+        },
+        {
+          "message": 41439,
+          "choices": [
+            { "reply": 53949, "next": 41440, "quest": 2153, "beforeObjective": 16417 },
+            { "reply": 53959, "next": 41442, "quest": 2153, "beforeObjective": 16418, "completes": 16418, "params": [[30, 16418]], "criterion": "PO=23097" }
+          ]
+        },
+        {
+          "message": 41440,
+          "choices": [
+            { "reply": 53948, "quest": 2153, "beforeObjective": 16417, "completes": 16417, "params": [[30, 16417]] }
+          ]
+        },
+        {
+          "message": 41442,
+          "choices": [
+            { "reply": 53952, "next": 41443, "quest": 2153, "beforeObjective": 16419 }
+          ]
+        },
+        {
+          "message": 41443,
+          "choices": [
+            { "reply": 53957, "next": 41444, "quest": 2153, "beforeObjective": 16419 }
+          ]
+        },
+        {
+          "message": 41444,
+          "choices": [
+            { "reply": 53956, "next": 41445, "quest": 2153, "beforeObjective": 16419 }
+          ]
+        },
+        {
+          "message": 41445,
+          "choices": [
+            { "reply": 53955, "quest": 2153, "beforeObjective": 16419, "completes": 16419, "params": [[30, 16419]], "teleport": 204999425 }
+          ]
+        }
+      ],
+      "why": "Kuatalo, the isolated kuapa on [20,-24]. 2153: flee (41435) -> bow (53953) -> 41436 -> introduce (53950) -> 41437 -> give him the enchanted kuapa water (53951, 23211 taken) -> 41438 -> 53958 -> 41439 (lonely, no cucumbers left) -> 53949 -> 41440 -> 53948 «Irte en busca de los pepinos silvestres» closes 16417. With the six wild cucumbers (23097) 53959 gives them (closes 16418) -> 41442 -> 53952 -> 41443 -> 53957 -> 41444 -> 53956 -> 41445 -> 53955 «Aceptar y marcharte con él» closes 16419 and takes the character to the stairs 204999425 (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5683,
+      "map": 204999425,
+      "opening": 41477,
+      "lines": [
+        {
+          "message": 41477,
+          "choices": [
+            { "reply": 53994, "next": 41479 },
+            { "reply": 53997, "next": 41480 }
+          ]
+        },
+        {
+          "message": 41479,
+          "choices": [
+            { "reply": 53992, "door": "key" },
+            { "reply": 53993 }
+          ]
+        },
+        {
+          "message": 41480,
+          "choices": [
+            { "reply": 53995, "door": "keyring" },
+            { "reply": 53996 }
+          ]
+        }
+      ],
+      "why": "Kyhuri, the keeper of the Water Lady's Valle [22,-24] (dungeon 123, key 7310): «Darle la llave» (53994) asks for the key (41479, yes 53992 / no 53993), «Utilizar el manojo de llaves» (53997) for the keyring (41480, yes 53995 / no 53996). The door is the engine's (DungeonDoor). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5618,
+      "map": 204999425,
+      "opening": 41446,
+      "openings": [
+        { "quest": 2153, "objective": 16420, "message": 41448 }
+      ],
+      "lines": [
+        {
+          "message": 41446,
+          "choices": [
+            { "reply": 53964 }
+          ]
+        },
+        {
+          "message": 41448,
+          "choices": [
+            { "reply": 53960, "quest": 2153, "beforeObjective": 16421, "door": "keyring" },
+            { "reply": 53964 }
+          ]
+        }
+      ],
+      "why": "Kuatalo at the Valle's stairs. 2153: while the pandawito is held (16420) 41446 «¡Hay que liberar al pandawa...!»; after the fight 41448 «¡Lo hemos conseguido!» and «Marcharte con Kuatalo al Valle de la Dama del Agua» (53960) goes in by the keyring like any dungeon door (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5621,
+      "map": 204999425,
+      "opening": 41473,
+      "openings": [
+        { "quest": 2153, "objective": 16420, "message": 41468 }
+      ],
+      "lines": [
+        {
+          "message": 41473,
+          "choices": [
+            { "reply": 53985, "quest": 2153, "beforeObjective": 16420 },
+            { "reply": 53986, "next": 41472 }
+          ]
+        },
+        {
+          "message": 41472,
+          "choices": []
+        },
+        {
+          "message": 41468,
+          "choices": [
+            { "reply": 53984 },
+            { "reply": 53986, "next": 41472 }
+          ]
+        }
+      ],
+      "why": "The pandawito at the Valle's stairs: 53985 «Intentar arrancar al niño de las garras de los kuapas» starts the fight of 16420 (npc_fights); once freed he greets (41468). Dofus pour les noobs («La jetée des enfants perdus»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5619,
+      "map": 208146434,
+      "opening": 41481,
+      "lines": [
+        {
+          "message": 41481,
+          "choices": [
+            { "reply": 54006, "next": 41482, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41482,
+          "choices": [
+            { "reply": 54005, "next": 41483, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41483,
+          "choices": [
+            { "reply": 54004, "next": 41484, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41484,
+          "choices": [
+            { "reply": 54003, "next": 41485, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41485,
+          "choices": [
+            { "reply": 54000, "next": 41486, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41486,
+          "choices": [
+            { "reply": 54001, "next": 41487, "quest": 2153, "beforeObjective": 16423 },
+            { "reply": 53999 }
+          ]
+        },
+        {
+          "message": 41487,
+          "choices": [
+            { "reply": 54002, "quest": 2153, "beforeObjective": 16423, "completes": 16423, "params": [[30, 16423]] },
+            { "reply": 53999 }
+          ]
+        }
+      ],
+      "why": "Nagate after the fight, in the room beside the boss' (208146434). 2153: 54006 -> 41482 -> 54005 -> 41483 -> 54004 -> 41484 -> 54003 -> 41485 -> 54000 -> 41486 -> 54001 -> 41487 -> 54002 «Comprobar con alivio que el pandawito por fin está con Kuatalo» closes 16423; 53999 «Irte del valle» is the dungeon exit (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5618,
+      "map": 208146434,
+      "opening": 41449,
+      "lines": [
+        {
+          "message": 41449,
+          "choices": [
+            { "reply": 53962, "next": 41450, "quest": 2153, "beforeObjective": 16425 },
+            { "reply": 53963 }
+          ]
+        },
+        {
+          "message": 41450,
+          "choices": [
+            { "reply": 53961, "next": 41451, "quest": 2153, "beforeObjective": 16425 }
+          ]
+        },
+        {
+          "message": 41451,
+          "choices": [
+            { "reply": 53965, "quest": 2153, "beforeObjective": 16425, "completes": 16425, "params": [[30, 16425]], "teleport": 204999681 }
+          ]
+        }
+      ],
+      "why": "Kuatalo after the boss. 2153: 41449 «¿De verdad quieres hablar con Akwanokima?» -> 53962 -> 41450 (the frog bridge) -> 53961 -> 41451 -> 53965 «Marcharte al puente con Kuatalo y el pandawito» closes 16425 and moves the character to the bridge [23,-22] (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5621,
+      "map": 208146434,
+      "opening": 41468,
+      "lines": [
+        {
+          "message": 41468,
+          "choices": [
+            { "reply": 53984 },
+            { "reply": 53986, "next": 41472 }
+          ]
+        },
+        {
+          "message": 41472,
+          "choices": []
+        }
+      ],
+      "why": "The freed pandawito beside Kuatalo. Dofus pour les noobs («La jetée des enfants perdus»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5618,
+      "map": 204999681,
+      "opening": 41453,
+      "openings": [
+        { "quest": 2153, "objective": 16425, "pending": 16426, "message": 41456 },
+        { "quest": 2153, "objective": 16426, "pending": 16427, "message": 41452 },
+        { "quest": 2153, "objective": 16427, "pending": 16428, "message": 41458 }
+      ],
+      "lines": [
+        {
+          "message": 41453,
+          "choices": [
+            { "reply": 53964 }
+          ]
+        },
+        {
+          "message": 41456,
+          "choices": [
+            { "reply": 53969, "next": 41457 },
+            { "reply": 53964 }
+          ]
+        },
+        {
+          "message": 41457,
+          "choices": [
+            { "reply": 53964 }
+          ]
+        },
+        {
+          "message": 41452,
+          "choices": [
+            { "reply": 53968, "next": 41454, "quest": 2153, "beforeObjective": 16427 }
+          ]
+        },
+        {
+          "message": 41454,
+          "choices": [
+            { "reply": 53967, "next": 41455, "quest": 2153, "beforeObjective": 16427 }
+          ]
+        },
+        {
+          "message": 41455,
+          "choices": [
+            { "reply": 53970, "next": 41458, "quest": 2153, "beforeObjective": 16427 }
+          ]
+        },
+        {
+          "message": 41458,
+          "choices": [
+            { "reply": 53971, "quest": 2153, "beforeObjective": 16427, "completes": 16427, "params": [[30, 16427]] },
+            { "reply": 53966, "quest": 2153, "afterObjective": 16427, "beforeObjective": 16428, "teleport": 207620110 }
+          ]
+        }
+      ],
+      "why": "Kuatalo at the frog bridge [23,-22]. 2153: before the wish 41456 «Dicen que esta es la cascada preferida de Akwanokima... Lanza unos kamas al agua» (53969 -> 41457); after it 41452 «Veo un zollo...» -> 53968 -> 41454 -> 53967 -> 41455 -> 53970 -> 41458 -> 53971 «Escuchar la llamada de la cascada» closes 16427 (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5623,
+      "map": 207620110,
+      "opening": 41489,
+      "openings": [
+        { "quest": 2153, "objective": 16428, "pending": 16429, "message": 41499 }
+      ],
+      "lines": [
+        {
+          "message": 41489,
+          "choices": [
+            { "reply": 61451, "next": 41490, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41490,
+          "choices": [
+            { "reply": 54010, "next": 41491, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41491,
+          "choices": [
+            { "reply": 54011, "next": 41492, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41492,
+          "choices": [
+            { "reply": 54012, "next": 41493, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41493,
+          "choices": [
+            { "reply": 54015, "next": 41494, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41494,
+          "choices": [
+            { "reply": 54014, "next": 41495, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41495,
+          "choices": [
+            { "reply": 54013, "next": 41496, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41496,
+          "choices": [
+            { "reply": 54020, "next": 41497, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41497,
+          "choices": [
+            { "reply": 54018, "next": 41498, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41498,
+          "choices": [
+            { "reply": 54017, "next": 41499, "quest": 2153, "beforeObjective": 16428 }
+          ]
+        },
+        {
+          "message": 41499,
+          "choices": [
+            { "reply": 54019, "quest": 2153, "beforeObjective": 16428, "completes": 16428, "params": [[30, 16428]] },
+            { "reply": 61447, "quest": 2153, "afterObjective": 16428, "beforeObjective": 16429, "teleport": 204998403 }
+          ]
+        }
+      ],
+      "why": "Akwanokima, the Water Spirit (207620110, the bridge's twin map). 2153: hello (61451) -> 41490 -> 54010 -> 41491 -> 54011 -> 41492 -> 54012 -> 41493 -> 54015 -> 41494 -> 54014 -> 41495 -> 54013 -> 41496 -> 54020 -> 41497 -> 54018 -> 41498 -> 54017 -> 41499 -> 54019 closes 16428; «Dejarte llevar por la magia de las aguas para volver por donde has venido» (61447) returns to the zollos' fields (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5620,
+      "map": 204998403,
+      "opening": 41500,
+      "lines": [
+        {
+          "message": 41500,
+          "choices": [
+            { "reply": 54021, "next": 41501 },
+            { "reply": 54022 }
+          ]
+        },
+        {
+          "message": 41501,
+          "choices": []
+        }
+      ],
+      "why": "The young zollo (Maltalo) in the fields [20,-26]: «Llevar a Kuatalo hacia una zolla que podría ser su madre» (54021) -> 41501; «Adiós, Maltalo...» (54022) closes. Dofus pour les noobs («La jetée des enfants perdus»). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5688,
+      "map": 204999681,
+      "opening": 41535,
+      "lines": [
+        {
+          "message": 41535,
+          "choices": [
+            { "reply": 54082, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153001, "marks": -2153001 },
+            { "reply": 54081, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153002, "marks": -2153002, "afterElement": -2153001 },
+            { "reply": 54079, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153003, "marks": -2153003, "afterElement": -2153002 },
+            { "reply": 54078, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153004, "marks": -2153004, "afterElement": -2153003 },
+            { "reply": 54082, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153005, "marks": -2153005, "afterElement": -2153004 },
+            { "reply": 54081, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153006, "marks": -2153006, "afterElement": -2153005 },
+            { "reply": 54079, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153007, "marks": -2153007, "afterElement": -2153006 },
+            { "reply": 54078, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153008, "marks": -2153008, "afterElement": -2153007 },
+            { "reply": 54083 }
+          ]
+        },
+        {
+          "message": 41536,
+          "choices": [
+            { "reply": 54082, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153001, "marks": -2153001 },
+            { "reply": 54081, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153002, "marks": -2153002, "afterElement": -2153001 },
+            { "reply": 54079, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153003, "marks": -2153003, "afterElement": -2153002 },
+            { "reply": 54078, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153004, "marks": -2153004, "afterElement": -2153003 },
+            { "reply": 54082, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153005, "marks": -2153005, "afterElement": -2153004 },
+            { "reply": 54081, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153006, "marks": -2153006, "afterElement": -2153005 },
+            { "reply": 54079, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153007, "marks": -2153007, "afterElement": -2153006 },
+            { "reply": 54078, "next": 41536, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153008, "marks": -2153008, "afterElement": -2153007 },
+            { "reply": 54083 }
+          ]
+        }
+      ],
+      "why": "A ranadina of the frog bridge (8 kamas). 2153: the offerings go in order 8, 4, 2, 1 kamas (5688, 5687, 5686, 5685); each «Lanzar un kama a la ranadina» costs one kama and sets a mark, the next throw needs the previous mark, the first ranadina needs none, and the 15th throw opens the wish. «Guardarte tu dinero» closes. The protector's punishment for attacking is not written (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5687,
+      "map": 204999681,
+      "opening": 41533,
+      "lines": [
+        {
+          "message": 41533,
+          "choices": [
+            { "reply": 54074, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153009, "marks": -2153009, "afterElement": -2153008 },
+            { "reply": 54072, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153010, "marks": -2153010, "afterElement": -2153009 },
+            { "reply": 54071, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153011, "marks": -2153011, "afterElement": -2153010 },
+            { "reply": 54070, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153012, "marks": -2153012, "afterElement": -2153011 },
+            { "reply": 54073 }
+          ]
+        },
+        {
+          "message": 41534,
+          "choices": [
+            { "reply": 54074, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153009, "marks": -2153009, "afterElement": -2153008 },
+            { "reply": 54072, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153010, "marks": -2153010, "afterElement": -2153009 },
+            { "reply": 54071, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153011, "marks": -2153011, "afterElement": -2153010 },
+            { "reply": 54070, "next": 41534, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153012, "marks": -2153012, "afterElement": -2153011 },
+            { "reply": 54073 }
+          ]
+        }
+      ],
+      "why": "A ranadina of the frog bridge (4 kamas). 2153: the offerings go in order 8, 4, 2, 1 kamas (5688, 5687, 5686, 5685); each «Lanzar un kama a la ranadina» costs one kama and sets a mark, the next throw needs the previous mark, the first ranadina needs none, and the 15th throw opens the wish. «Guardarte tu dinero» closes. The protector's punishment for attacking is not written (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5686,
+      "map": 204999681,
+      "opening": 41531,
+      "lines": [
+        {
+          "message": 41531,
+          "choices": [
+            { "reply": 54066, "next": 41532, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153013, "marks": -2153013, "afterElement": -2153012 },
+            { "reply": 54064, "next": 41532, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153014, "marks": -2153014, "afterElement": -2153013 },
+            { "reply": 54065 }
+          ]
+        },
+        {
+          "message": 41532,
+          "choices": [
+            { "reply": 54066, "next": 41532, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153013, "marks": -2153013, "afterElement": -2153012 },
+            { "reply": 54064, "next": 41532, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153014, "marks": -2153014, "afterElement": -2153013 },
+            { "reply": 54065 }
+          ]
+        }
+      ],
+      "why": "A ranadina of the frog bridge (2 kamas). 2153: the offerings go in order 8, 4, 2, 1 kamas (5688, 5687, 5686, 5685); each «Lanzar un kama a la ranadina» costs one kama and sets a mark, the next throw needs the previous mark, the first ranadina needs none, and the 15th throw opens the wish. «Guardarte tu dinero» closes. The protector's punishment for attacking is not written (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5685,
+      "map": 204999681,
+      "opening": 41530,
+      "lines": [
+        {
+          "message": 41530,
+          "choices": [
+            { "reply": 54059, "next": 41530, "quest": 2153, "afterObjective": 16425, "beforeObjective": 16426, "buyPrice": 1, "beforeElement": -2153015, "marks": -2153015, "afterElement": -2153014 },
+            { "reply": 54060 }
+          ]
+        }
+      ],
+      "why": "A ranadina of the frog bridge (1 kama). 2153: the offerings go in order 8, 4, 2, 1 kamas (5688, 5687, 5686, 5685); each «Lanzar un kama a la ranadina» costs one kama and sets a mark, the next throw needs the previous mark, the first ranadina needs none, and the 15th throw opens the wish. «Guardarte tu dinero» closes. The protector's punishment for attacking is not written (Dofus pour les noobs («La jetée des enfants perdus»)). INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 4267,
+      "map": 0,
+      "opening": 29971,
+      "lines": [
+        {
+          "message": 29971,
+          "choices": [
+            { "reply": 36022, "next": 29972, "quest": 1950, "afterObjective": 13637, "beforeObjective": 13638 },
+            { "reply": 36055, "next": 30006, "quest": 1950, "completesAll": [13647, 13648, 13649], "completes": 13649, "params": [[30, 13649]] }
+          ]
+        },
+        {
+          "message": 29972,
+          "choices": [
+            { "reply": 36021, "next": 29973, "quest": 1950, "afterObjective": 13637, "beforeObjective": 13638 }
+          ]
+        },
+        {
+          "message": 29973,
+          "choices": [
+            { "reply": 36020, "next": 29974, "quest": 1950, "gives": 19509, "completes": 13638, "params": [[30, 13638]] }
+          ]
+        },
+        {
+          "message": 29974,
+          "choices": []
+        },
+        {
+          "message": 30006,
+          "choices": [
+            { "reply": 36054, "quest": 1950 }
+          ]
+        }
+      ],
+      "why": "Manale at [-27,27] (1950): the plan against the three zobals, the whistle of Cesfran (19509, given on 36020) and the talismans shown (36055). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4268,
+      "map": 0,
+      "opening": 29975,
+      "lines": [
+        {
+          "message": 29975,
+          "choices": [
+            { "reply": 36025, "next": 29976, "quest": 1950, "afterObjective": 13638, "beforeObjective": 13639 }
+          ]
+        },
+        {
+          "message": 29976,
+          "choices": [
+            { "reply": 36024, "next": 29977, "quest": 1950, "afterObjective": 13638, "beforeObjective": 13639, "completes": 13639, "params": [[30, 13639]] }
+          ]
+        },
+        {
+          "message": 29977,
+          "choices": [
+            { "reply": 36023, "quest": 1950 }
+          ]
+        }
+      ],
+      "why": "Cesfran at [-29,23] (1950): the whistle is offered (13639) and then blown with the item (13640). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4272,
+      "map": 0,
+      "opening": 29978,
+      "lines": [
+        {
+          "message": 29978,
+          "choices": [
+            { "reply": 36029, "next": 29979, "quest": 1950, "afterObjective": 13640, "beforeObjective": 13641 }
+          ]
+        },
+        {
+          "message": 29979,
+          "choices": [
+            { "reply": 36028, "next": 29980, "quest": 1950, "afterObjective": 13640, "beforeObjective": 13641 }
+          ]
+        },
+        {
+          "message": 29980,
+          "choices": [
+            { "reply": 36027, "next": 29981, "quest": 1950, "gives": 19511, "afterObjective": 13640, "beforeObjective": 13641 }
+          ]
+        },
+        {
+          "message": 29981,
+          "choices": [
+            { "reply": 36026, "quest": 1950, "completes": 13641, "params": [[30, 13641]] }
+          ]
+        }
+      ],
+      "why": "Laly at [-29,23] (1950): caught by the trap; her talisman (19511) is taken on 36027. Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4269,
+      "map": 0,
+      "opening": 29985,
+      "lines": [
+        {
+          "message": 29985,
+          "choices": [
+            { "reply": 36033, "next": 29986, "quest": 1950, "afterObjective": 13641, "beforeObjective": 13642, "completes": 13642, "params": [[30, 13642]] }
+          ]
+        },
+        {
+          "message": 29986,
+          "choices": []
+        }
+      ],
+      "why": "Falena at [-32,23] (1950): the four smoked sausages (17205) are handed over on 36033 (13642). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4273,
+      "map": 0,
+      "opening": 29994,
+      "lines": [
+        {
+          "message": 29994,
+          "choices": [
+            { "reply": 36044, "next": 29995, "quest": 1950, "afterObjective": 13642, "beforeObjective": 13643 }
+          ]
+        },
+        {
+          "message": 29995,
+          "choices": [
+            { "reply": 36043, "next": 29996, "quest": 1950, "afterObjective": 13642, "beforeObjective": 13643 }
+          ]
+        },
+        {
+          "message": 29996,
+          "choices": [
+            { "reply": 36042, "next": 29997, "quest": 1950, "gives": 19512, "afterObjective": 13642, "beforeObjective": 13643 }
+          ]
+        },
+        {
+          "message": 29997,
+          "choices": [
+            { "reply": 36041, "quest": 1950, "completes": 13643, "params": [[30, 13643]] }
+          ]
+        }
+      ],
+      "why": "Bino at [-32,23] (1950): his talisman (19512) is taken on 36042. Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4270,
+      "map": 0,
+      "opening": 29998,
+      "lines": [
+        {
+          "message": 29998,
+          "choices": [
+            { "reply": 36046, "next": 29999, "quest": 1950, "afterObjective": 13643, "beforeObjective": 13644 }
+          ]
+        },
+        {
+          "message": 29999,
+          "choices": [
+            { "reply": 36045, "quest": 1950, "completes": 13644, "params": [[30, 13644]] }
+          ]
+        }
+      ],
+      "why": "Desolan at [-30,18] (1950): the situation and the repeater (13644). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4274,
+      "map": 0,
+      "opening": 30004,
+      "lines": [
+        {
+          "message": 30004,
+          "choices": [
+            { "reply": 36053, "next": 30005, "quest": 1950, "afterObjective": 13644, "beforeObjective": 13645, "completes": 13645, "params": [[30, 13645]] }
+          ]
+        },
+        {
+          "message": 30005,
+          "choices": [
+            { "reply": 36051, "quest": 1950, "afterObjective": 13645, "beforeObjective": 13646 },
+            { "reply": 36052, "quest": 1950 }
+          ]
+        }
+      ],
+      "why": "Ys at [-30,18] (1950): the talk (13645) and «Defender tu piel» (36051), a solo fight (13646). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4271,
+      "map": 182978569,
+      "opening": 29961,
+      "lines": [
+        {
+          "message": 29961,
+          "choices": [
+            { "reply": 36017, "next": 29962, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29962,
+          "choices": [
+            { "reply": 36016, "next": 29963, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29963,
+          "choices": [
+            { "reply": 36015, "next": 29964, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29964,
+          "choices": [
+            { "reply": 36012, "next": 29965, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29965,
+          "choices": [
+            { "reply": 36013, "next": 29966, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29966,
+          "choices": [
+            { "reply": 36014, "next": 29967, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29967,
+          "choices": [
+            { "reply": 36074, "next": 29968, "quest": 1950, "afterObjective": 13635, "beforeObjective": 13636 }
+          ]
+        },
+        {
+          "message": 29968,
+          "choices": []
+        }
+      ],
+      "why": "Guy Malva Visco hidden behind the rock at [-27,23] (1950): his story of the Uginaks' death (13636 is closed by the binding on 36074). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4271,
+      "map": 182978573,
+      "opening": 30007,
+      "lines": [
+        {
+          "message": 30007,
+          "choices": [
+            { "reply": 36057, "next": 30008, "quest": 1950, "afterObjective": 13649, "beforeObjective": 13650 }
+          ]
+        },
+        {
+          "message": 30008,
+          "choices": [
+            { "reply": 36056, "quest": 1950, "completes": 13650, "params": [[30, 13650]] }
+          ]
+        }
+      ],
+      "why": "Guy at [-27,27] (1950, 13650): the talismans' secret (30008). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4271,
+      "map": 182978568,
+      "opening": 30009,
+      "openings": [
+        { "criterion": "Qa=1950&Qo>13656&Qo<13657", "message": 30023 }
+      ],
+      "lines": [
+        {
+          "message": 30009,
+          "choices": [
+            { "reply": 36060, "next": 30011, "quest": 1950, "afterObjective": 13651, "beforeObjective": 13652 }
+          ]
+        },
+        {
+          "message": 30011,
+          "choices": [
+            { "reply": 36058, "next": 30010, "quest": 1950, "afterObjective": 13651, "beforeObjective": 13652 }
+          ]
+        },
+        {
+          "message": 30010,
+          "choices": [
+            { "reply": 36059, "next": 30012, "quest": 1950, "afterObjective": 13651, "beforeObjective": 13652 }
+          ]
+        },
+        {
+          "message": 30012,
+          "choices": [
+            { "reply": 36061, "quest": 1950, "passage": 4271001, "completes": 13652, "params": [[30, 13652]] }
+          ]
+        },
+        {
+          "message": 30023,
+          "choices": [
+            { "reply": 36010, "quest": 1950, "afterObjective": 13656, "beforeObjective": 13657, "completes": 13657, "params": [[30, 13657]] }
+          ]
+        }
+      ],
+      "why": "Guy at [-27,22] (1950): the three talismans open the secret passage (13652) and, after the fight, his farewell (13657). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4258,
+      "map": 184287240,
+      "opening": 30013,
+      "openings": [
+        { "criterion": "Qa=1950&Qo>13654&Qo<13655", "message": 30018 },
+        { "criterion": "Qa=1950&Qo>13655&Qo<13656", "message": 30021 }
+      ],
+      "lines": [
+        {
+          "message": 30013,
+          "choices": [
+            { "reply": 36066, "next": 30014, "quest": 1950, "afterObjective": 13653, "beforeObjective": 13654 }
+          ]
+        },
+        {
+          "message": 30014,
+          "choices": [
+            { "reply": 36064, "next": 30015, "quest": 1950, "afterObjective": 13653, "beforeObjective": 13654 }
+          ]
+        },
+        {
+          "message": 30015,
+          "choices": [
+            { "reply": 36063, "next": 30016, "quest": 1950, "afterObjective": 13653, "beforeObjective": 13654 }
+          ]
+        },
+        {
+          "message": 30016,
+          "choices": [
+            { "reply": 36065, "next": 30017, "quest": 1950, "afterObjective": 13653, "beforeObjective": 13654 }
+          ]
+        },
+        {
+          "message": 30017,
+          "choices": [
+            { "reply": 36062, "next": 30018, "quest": 1950, "afterObjective": 13653, "beforeObjective": 13654, "completes": 13654, "params": [[30, 13654]] }
+          ]
+        },
+        {
+          "message": 30018,
+          "choices": [
+            { "reply": 36067, "quest": 1950, "afterObjective": 13654, "beforeObjective": 13655 }
+          ]
+        },
+        {
+          "message": 30021,
+          "choices": [
+            { "reply": 36385, "next": 30022, "quest": 1950, "afterObjective": 13655, "beforeObjective": 13656 }
+          ]
+        },
+        {
+          "message": 30022,
+          "choices": [
+            { "reply": 36386, "quest": 1950, "passage": 4258001, "afterObjective": 13655, "beforeObjective": 13656, "completes": 13656, "params": [[30, 13656]] }
+          ]
+        }
+      ],
+      "why": "Triki Guest (Claude M'Se) in the secret room [-27,22] (1950): his plan (13654), the fight on 36067 (13655) and his ritual afterwards (13656). Dofus pour les noobs («Du feu de dieu»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4275,
+      "map": 0,
+      "opening": 30026,
+      "openings": [
+        { "criterion": "Qa=1951&Qo<13667", "message": 30204 },
+        { "criterion": "Qa=1951&Qo>13673&Qo<13679", "message": 30038 },
+        { "criterion": "Qa=1951&Qo>13666&Qo<13673", "message": 30035 },
+        { "criterion": "Qa=1951&Qo>13679&Qo<13683", "message": 30040 },
+        { "criterion": "Qa=1951&Qo>13683", "message": 30041 },
+        { "criterion": "Qf=1951&Qf!1952&Qa!1952", "message": 30043 },
+        { "criterion": "Qa=1952&Qo<13691", "message": 30045 },
+        { "criterion": "Qa=1952&Qo>13690&Qo<13692", "message": 30052 },
+        { "criterion": "Qa=1952&Qo>13691", "message": 30054 }
+      ],
+      "lines": [
+        {
+          "message": 30026,
+          "choices": [
+            { "reply": 36081, "next": 30027, "criterion": "PL>179&(Qf=1939|PO=19482)&Qa!1951&Qf!1951", "beforeQuest": 1951 }
+          ]
+        },
+        {
+          "message": 30027,
+          "choices": [
+            { "reply": 36080, "next": 30028 }
+          ]
+        },
+        {
+          "message": 30028,
+          "choices": [
+            { "reply": 36082, "next": 30029 }
+          ]
+        },
+        {
+          "message": 30029,
+          "choices": [
+            { "reply": 36101, "next": 30030 }
+          ]
+        },
+        {
+          "message": 30030,
+          "choices": [
+            { "reply": 36078, "next": 30204, "startsQuest": 1951, "params": [[34, 1951]] },
+            { "reply": 36079 }
+          ]
+        },
+        {
+          "message": 30204,
+          "choices": [
+            { "reply": 36088, "next": 30035, "quest": 1951, "completesAll": [13663, 13664, 13665, 13666, 13667], "gives": 19484, "alsoGives": [19483, 19485, 19486], "criterion": "Qo>13659&Qo>13660&Qo>13661&Qo>13662", "completes": 13667, "params": [[30, 13667]] }
+          ]
+        },
+        {
+          "message": 30035,
+          "choices": [
+            { "reply": 36091, "next": 30038, "quest": 1951, "afterObjective": 13672, "beforeObjective": 13673 }
+          ]
+        },
+        {
+          "message": 30038,
+          "choices": [
+            { "reply": 36090, "quest": 1951, "gives": 19487, "givesCount": 4, "afterObjective": 13672, "beforeObjective": 13673, "completes": 13673, "params": [[30, 13673]] },
+            { "reply": 36095, "next": 30040, "quest": 1951, "afterObjective": 13678, "beforeObjective": 13679, "completes": 13679, "params": [[30, 13679]] }
+          ]
+        },
+        {
+          "message": 30040,
+          "choices": [
+            { "reply": 36097, "next": 30049, "quest": 1951, "completesAll": [13680, 13681, 13682, 13683], "afterObjective": 13679, "beforeObjective": 13683, "completes": 13683, "params": [[30, 13683]] }
+          ]
+        },
+        {
+          "message": 30049,
+          "choices": [
+            { "reply": 36096, "quest": 1951 }
+          ]
+        },
+        {
+          "message": 30041,
+          "choices": [
+            { "reply": 36113, "next": 30050, "quest": 1951, "afterObjective": 13683, "beforeObjective": 13684 }
+          ]
+        },
+        {
+          "message": 30050,
+          "choices": [
+            { "reply": 36112, "next": 30051, "quest": 1951, "afterObjective": 13683, "beforeObjective": 13684, "completes": 13684, "params": [[30, 13684]] }
+          ]
+        },
+        {
+          "message": 30051,
+          "choices": []
+        },
+        {
+          "message": 30043,
+          "choices": [
+            { "reply": 36083, "next": 30042, "beforeQuest": 1952 }
+          ]
+        },
+        {
+          "message": 30042,
+          "choices": [
+            { "reply": 36102, "next": 30044, "beforeQuest": 1952 }
+          ]
+        },
+        {
+          "message": 30044,
+          "choices": [
+            { "reply": 36100, "next": 30045, "startsQuest": 1952, "params": [[34, 1952]], "gives": 19490, "alsoGives": [19493] }
+          ]
+        },
+        {
+          "message": 30045,
+          "choices": [
+            { "reply": 36099, "quest": 1952, "beforeObjective": 13689 },
+            { "reply": 36109, "quest": 1952, "completesAll": [13689, 13690], "afterObjective": 13688, "beforeObjective": 13691, "completes": 13690, "params": [[30, 13690]] }
+          ]
+        },
+        {
+          "message": 30052,
+          "choices": [
+            { "reply": 36108, "quest": 1952, "afterObjective": 13690, "beforeObjective": 13692 }
+          ]
+        },
+        {
+          "message": 30054,
+          "choices": [
+            { "reply": 36117, "next": 30055, "quest": 1952, "afterObjective": 13692, "beforeObjective": 13693 }
+          ]
+        },
+        {
+          "message": 30055,
+          "choices": [
+            { "reply": 36118, "next": 30056, "quest": 1952, "afterObjective": 13692, "beforeObjective": 13693, "completes": 13693, "params": [[30, 13693]] }
+          ]
+        },
+        {
+          "message": 30056,
+          "choices": []
+        }
+      ],
+      "why": "Jauel Indio (Hugues Lindien) at [-27,24] (1951): the story and the acceptance (36078, step line 30204), the hand-over of the materials (36088; he gives back one of each for Elanna, 30035), the repeaters (36091/36090, 30038), the sensor (36095), the souls (36097) and the result of the experiment (36113). Dofus pour les noobs («Plantes contre Trépamorts»). INFERRED: reply order (the guide gives the story, not the replies). 1952: after 1951 (30043 -> 36083 -> 30042 -> 36102 -> 30044 -> 36100 starts the quest and hands the talisman 19490 and the fetish 19493, 30045 the step line), the pearls (36109, 13689/13690), 30052 while Zombigne waits, then 30054 -> 36117 -> 30055 -> 36118 closes 13693. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»). INFERRED: reply order (the guide gives the story, not the replies)."
+    },
+    {
+      "npc": 4284,
+      "map": 0,
+      "opening": 30053,
+      "lines": [
+        {
+          "message": 30053,
+          "choices": [
+            { "reply": 36114, "quest": 1952, "afterObjective": 13691, "beforeObjective": 13692 },
+            { "reply": 36115, "quest": 1952, "afterObjective": 13691, "beforeObjective": 13692 }
+          ]
+        }
+      ],
+      "why": "Zombigne (4284) at [-27,34] (1952): «Conducir las plantas al combate» (36114) starts the fight (npc_fights), «Huir gritando» (36115) leaves. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»)."
+    },
+    {
+      "npc": 5642,
+      "map": 206045189,
+      "opening": 40874,
+      "openings": [
+        { "quest": 2154, "objective": 16541, "message": 40878 }
+      ],
+      "lines": [
+        {
+          "message": 40874,
+          "choices": [
+            { "reply": 53232, "next": 40875, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 },
+            { "reply": 53233, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 }
+          ]
+        },
+        {
+          "message": 40875,
+          "choices": [
+            { "reply": 53234, "next": 40877, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 }
+          ]
+        },
+        {
+          "message": 40877,
+          "choices": [
+            { "reply": 54087, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 },
+            { "reply": 54088, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 },
+            { "reply": 53233, "quest": 2154, "afterObjective": 16539, "beforeObjective": 16541 }
+          ]
+        },
+        {
+          "message": 40878,
+          "choices": [
+            { "reply": 53235, "next": 40876, "quest": 2154, "afterObjective": 16541 },
+            { "reply": 53238, "next": 40879, "quest": 2154, "afterObjective": 16541 },
+            { "reply": 53237, "quest": 2154, "afterObjective": 16541 }
+          ]
+        },
+        {
+          "message": 40876,
+          "choices": []
+        },
+        {
+          "message": 40879,
+          "choices": []
+        }
+      ],
+      "why": "Will-o'-wisps of the Fuegodala sanctuary, «El festival de la lanterne». Dofus pour les noobs («Le festival de la lanterne»): they mock the lantern, are provoked (53232), then fought (54087); once beaten they let the player pass. INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5641,
+      "map": 207619078,
+      "opening": 40880,
+      "lines": [
+        {
+          "message": 40880,
+          "choices": [
+            { "reply": 54502, "next": 41881, "quest": 2154, "afterObjective": 16541, "beforeObjective": 16542 },
+            { "reply": 53253, "next": 40890, "quest": 2154, "afterObjective": 16549, "beforeObjective": 16550 },
+            { "reply": 53289, "next": 40916, "quest": 2154, "afterObjective": 16558, "beforeObjective": 16559 },
+            { "reply": 53378, "next": 42506, "quest": 2154, "afterObjective": 16561, "beforeObjective": 16562 }
+          ]
+        },
+        {
+          "message": 41881,
+          "choices": [
+            { "reply": 54501, "next": 41882, "quest": 2154, "afterObjective": 16541, "beforeObjective": 16542 }
+          ]
+        },
+        {
+          "message": 41882,
+          "choices": [
+            { "reply": 54500, "next": 41883, "quest": 2154, "afterObjective": 16541, "beforeObjective": 16542 }
+          ]
+        },
+        {
+          "message": 41883,
+          "choices": [
+            { "reply": 54499, "next": 41884, "quest": 2154, "afterObjective": 16541 }
+          ]
+        },
+        {
+          "message": 41884,
+          "choices": [
+            { "reply": 54498, "quest": 2154, "afterObjective": 16541 }
+          ]
+        },
+        {
+          "message": 40890,
+          "choices": [
+            { "reply": 53252, "quest": 2154, "afterObjective": 16549, "beforeObjective": 16550 }
+          ]
+        },
+        {
+          "message": 40916,
+          "choices": [
+            { "reply": 53288, "quest": 2154, "afterObjective": 16558, "beforeObjective": 16559 }
+          ]
+        },
+        {
+          "message": 42506,
+          "choices": [
+            { "reply": 53377, "quest": 2154, "afterObjective": 16561, "beforeObjective": 16562, "completes": 16562, "params": [[30, 16562]] }
+          ]
+        }
+      ],
+      "why": "Ozulan in the Fuegodala temple, «El festival de la lanterne». Dofus pour les noobs («Le festival de la lanterne»): he receives the report of the wisps (54500), the wanchiaos, the mortar and the spirit encounter. INFERRED: reply-to-line pairing follows the message order of the client texts."
+    },
+    {
+      "npc": 5643,
+      "map": 207618054,
+      "opening": 40883,
+      "lines": [
+        {
+          "message": 40883,
+          "choices": [
+            { "reply": 53243, "next": 40884, "quest": 2154, "afterObjective": 16542, "beforeObjective": 16544 },
+            { "reply": 53245, "next": 40885, "quest": 2154, "afterObjective": 16542, "beforeObjective": 16544, "criterion": "PO=23166" },
+            { "reply": 53254, "quest": 2154, "afterObjective": 16551, "beforeObjective": 16552 },
+            { "reply": 53255, "quest": 2154, "afterObjective": 16551, "beforeObjective": 16552 },
+            { "reply": 53258, "next": 40892, "quest": 2154, "afterObjective": 16552, "beforeObjective": 16553 }
+          ]
+        },
+        {
+          "message": 40884,
+          "choices": [
+            { "reply": 53242, "quest": 2154, "afterObjective": 16542, "beforeObjective": 16544 }
+          ]
+        },
+        {
+          "message": 40885,
+          "choices": [
+            { "reply": 53244, "quest": 2154, "afterObjective": 16542, "completes": 16544, "params": [[30, 16544]] }
+          ]
+        },
+        {
+          "message": 40892,
+          "choices": [
+            { "reply": 53257, "next": 40893, "quest": 2154, "afterObjective": 16552, "beforeObjective": 16553 }
+          ]
+        },
+        {
+          "message": 40893,
+          "choices": [
+            { "reply": 53256, "next": 40894, "quest": 2154, "afterObjective": 16552, "completes": 16553, "params": [[30, 16553]] }
+          ]
+        },
+        {
+          "message": 40894,
+          "choices": []
+        }
+      ],
+      "why": "Pandako the paper maker, «El festival de la lanterne». Dofus pour les noobs («Le festival de la lanterne»): talismans (53243, 53245), the qilin defence (53254) and the road to the factory (53256). INFERRED: reply-to-line pairing follows the message order of the client texts."
     }
   ]
 }

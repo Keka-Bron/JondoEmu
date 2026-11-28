@@ -9584,6 +9584,138 @@
       "orientation": 1,
       "criterion": "Qa=2083&Qo>15060&Qo<15068",
       "why": "Agusto in the Clock, up to the talk that ends the journey into the past (Dofus pour les noobs («Le temps des secrets»)). Cell INFERRED."
-    }
+    },
+    {
+      "map": 204998401,
+      "npc": 5681,
+      "cell": 286,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16414&Qo<16417",
+      "why": "Anutrof bounty hunter around the isolated kuapa (16415-16416). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204998401,
+      "npc": 5682,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=2153&Qo>16414&Qo<16417",
+      "why": "Ocra bounty hunter beside the Anutrof (16415-16416). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204998401,
+      "npc": 5618,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16414&Qo<16419",
+      "why": "Kuatalo, the isolated kuapa (16415-16418). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999425,
+      "npc": 5618,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16418&Qo<16421",
+      "why": "Kuatalo waits at the stairs of the Valle (16419-16420). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999425,
+      "npc": 5621,
+      "cell": 315,
+      "orientation": 1,
+      "criterion": "Qa=2153&Qo>16418&Qo<16421",
+      "why": "The kidnapped pandawito at the stairs (16420). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 208146434,
+      "npc": 5618,
+      "cell": 286,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16422&Qo<16425",
+      "why": "Kuatalo in the room after the boss (16423-16424). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 208146434,
+      "npc": 5621,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16422&Qo<16425",
+      "why": "The freed pandawito beside Kuatalo (16423-16424). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5618,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16429",
+      "why": "Kuatalo at the frog bridge (16425-16428). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5621,
+      "cell": 314,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16429",
+      "why": "The pandawito at the bridge (16425-16428). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5688,
+      "cell": 230,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16427",
+      "why": "Ranadina of 8 kamas, the first of the bridge (16426). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5687,
+      "cell": 244,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16427",
+      "why": "Ranadina of 4 kamas (16426). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5686,
+      "cell": 258,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16427",
+      "why": "Ranadina of 2 kamas (16426). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 204999681,
+      "npc": 5685,
+      "cell": 272,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16424&Qo<16427",
+      "why": "Ranadina of 1 kama (16426). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+    {
+      "map": 207620110,
+      "npc": 5623,
+      "cell": 300,
+      "orientation": 3,
+      "criterion": "Qa=2153&Qo>16427&Qo<16429",
+      "why": "Akwanokima at her place (16428). «La jetée des enfants perdus» (2153), Dofus pour les noobs («La jetée des enfants perdus»). INFERRED cell: a free walkable cell of the map."
+    },
+  {"map": 182978573, "npc": 4267, "cell": 297, "orientation": 1, "criterion": "Qa=1950&Qo>13637&Qo<13651", "why": "Manale at [-27,27] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 184288258, "npc": 4268, "cell": 324, "orientation": 1, "criterion": "Qa=1950&Qo>13638&Qo<13642", "why": "Cesfran at [-29,23] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 184288258, "npc": 4272, "cell": 338, "orientation": 1, "criterion": "Qa=1950&Qo>13640&Qo<13642", "why": "Laly, caught by the whistle's trap at [-29,23] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 184289280, "npc": 4269, "cell": 296, "orientation": 1, "criterion": "Qa=1950&Qo>13641&Qo<13644", "why": "Falena at [-32,23] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 184289280, "npc": 4273, "cell": 310, "orientation": 1, "criterion": "Qa=1950&Qo>13642&Qo<13644", "why": "Bino at [-32,23] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182977028, "npc": 4270, "cell": 355, "orientation": 1, "criterion": "Qa=1950&Qo>13643&Qo<13646", "why": "Desolan at [-30,18] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182977028, "npc": 4274, "cell": 369, "orientation": 1, "criterion": "Qa=1950&Qo>13643&Qo<13647", "why": "Ys at [-30,18] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182978569, "npc": 4271, "cell": 297, "orientation": 1, "criterion": "Qa=1950&Qo>13635&Qo<13637", "why": "Guy Malva Visco hidden at [-27,23] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182978573, "npc": 4271, "cell": 268, "orientation": 1, "criterion": "Qa=1950&Qo>13649&Qo<13651", "why": "Guy at [-27,27] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182978568, "npc": 4271, "cell": 296, "orientation": 1, "criterion": "Qa=1950&Qo>13650&Qo<13653", "why": "Guy at [-27,22], before the passage (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182978568, "npc": 4271, "cell": 296, "orientation": 1, "criterion": "Qa=1950&Qo>13656&Qo<13658", "why": "Guy at [-27,22], after the fight (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 184287240, "npc": 4258, "cell": 296, "orientation": 1, "criterion": "Qa=1950&Qo>13652&Qo<13657", "why": "Triki Guest in the secret room [-27,22] (1950). Dofus pour les noobs («Du feu de dieu»). INFERRED cell."},
+  {"map": 182978573, "npc": 4267, "cell": 286, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 184288258, "npc": 4268, "cell": 371, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 184288258, "npc": 4272, "cell": 384, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 184289280, "npc": 4269, "cell": 328, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 184289280, "npc": 4273, "cell": 342, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 182977028, "npc": 4270, "cell": 371, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 182977028, "npc": 4274, "cell": 385, "remove": true, "why": "Not wanted: the derived placement stood the 1950 NPC on the map for everyone and before the quest; the gated row of the same quest stands instead."},
+  {"map": 182978570, "npc": 4284, "cell": 168, "orientation": 1, "criterion": "Qa=1952&Qo>13691&Qo<13693", "why": "Zombigne (4284) beside Jauel at [-27,34] (1952, 13692). INFERRED cell."}
   ]
 }
