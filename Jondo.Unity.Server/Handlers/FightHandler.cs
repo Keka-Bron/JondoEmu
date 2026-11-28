@@ -12921,8 +12921,8 @@ namespace Jondo.Unity.Server.Handlers
             // klutist of their own map, tick only the fight that lets one fall.
             // The binding names the roleplay map, not the arena the fight is played on.
             long dropMap = fight.RoleplayMapId != 0 ? fight.RoleplayMapId : session.State.MapId;
-            foreach (int item in loot.Keys)
-                await Managers.Quests.OnGatheredAsync(session, item, dropMap);
+            foreach (var (item, count) in loot)
+                await Managers.Quests.OnGatheredAsync(session, item, dropMap, count);
 
             // The koliseo pays ITS OWN, planned with the rest (PlanKoliseo): there are no monsters in
             // front to get experience, kamas or a loot table from, the koliseo pays for winning, and

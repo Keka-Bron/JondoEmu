@@ -1512,23 +1512,28 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>
         /// Something has been gathered, or has dropped in a fight, on a map: an objective bound to
         /// obtaining it there closes (the tutorial's five resources of the jobs room, the
-        /// P'Koutoulou of 1765).
+        /// P'Koutoulou of 1765). Each item obtained closes one objective of a quest: the ten
+        /// chained «Recupera 1 trozo de cofrefuerte» of 1501 each want their own piece, and the
+        /// next one is only revealed once the one before closes, so without the count a single
+        /// piece would close the whole chain.
         /// </summary>
-        public static async Task OnGatheredAsync(GameSession session, int itemId, long mapId)
+        public static async Task OnGatheredAsync(GameSession session, int itemId, long mapId, int count = 1)
         {
             using var context = SessionContext.Push(session);
             var log = Log;
-            if (log == null || _book == null) return;
+            if (log == null || _book == null || count <= 0) return;
             foreach (var run in new List<QuestRun>(log.Doing()))
             {
                 var step = _book.Step(run.StepId);
                 if (step == null) continue;
+                int left = count;
                 foreach (var objective in step.Objectives)
                 {
+                    if (left == 0) break;
                     var binding = Bindings.Of(objective.Id);
                     if (binding == null || binding.Kind != QuestBindingKind.Gather || binding.ItemId != itemId) continue;
                     if (binding.MapId != 0 && binding.MapId != mapId) continue;
-                    await CloseAsync(session, binding);
+                    if (await CloseAsync(session, binding)) left--;
                 }
             }
         }
