@@ -197,7 +197,7 @@ namespace Jondo.Unity.Launcher.Setup
             // 4. The mods, which may have changed with it, into the client.
             step = Step("mods");
             string client = state.Client.Length > 0 ? Path.GetDirectoryName(state.Client) ?? "" : "";
-            if (!OperatingSystem.IsWindows() || client.Length == 0 || !Directory.Exists(client)) step.Skip();
+            if (client.Length == 0 || !new ClientInstallation(state.Client).HasMelonLoader) step.Skip();
             else
             {
                 step.Start();
@@ -210,8 +210,9 @@ namespace Jondo.Unity.Launcher.Setup
                     foreach (string name in retiredMods) BundledClientMods.Remember(client, name);
                     BundledClientMods.SetAsideLegacyCopies(client, retiredMods);
                 }
-                int copied = MelonLoaderSetup.InstallMods(_layout.Root, client);
-                step.Finish(copied > 0 ? string.Join(", ", BundledClientMods.Discover(_layout.Root).Keys) : UI.SetupTexts.AlreadyThere(_lang));
+                int copied = await Guard(step, () => Task.Run(() => MelonLoaderSetup.InstallMods(_layout.Root, client), cancel));
+                var names = BundledClientMods.Discover(_layout.Root).Keys.Prepend(ClientModManifest.RequiredClientDll);
+                step.Finish(copied > 0 ? string.Join(", ", names) : UI.SetupTexts.AlreadyThere(_lang));
             }
 
             // 5. The staging folder goes.

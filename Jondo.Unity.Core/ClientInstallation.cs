@@ -21,6 +21,14 @@ public sealed record ClientInstallation(string Executable)
 
     public bool IsWindows => Executable.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
 
+    public bool HasMelonLoader => IsWindows
+        ? HasWindowsMelonLoader(Root)
+        : HasLinuxMods && File.Exists(Path.Combine(Root, "MelonLoader", "net6", "MelonLoader.dll"));
+
+    public static bool HasWindowsMelonLoader(string clientRoot)
+        => File.Exists(Path.Combine(clientRoot, "version.dll"))
+           && File.Exists(Path.Combine(clientRoot, "MelonLoader", "net6", "MelonLoader.dll"));
+
     /// <summary>MelonLoader's Linux loader, preloaded into the native client to load the mods.</summary>
     public const string LinuxMelonLoader = "MelonLoader.Bootstrap.so";
 

@@ -21,7 +21,7 @@ namespace Jondo.Unity.Launcher.Setup
     /// mods are loaded the client has nothing left to do here, and it is closed.
     /// </para>
     /// <para>
-    /// Only on Windows: the native Linux client is played without mods.
+    /// This installer configures MelonLoader on Windows.
     /// </para>
     /// </remarks>
     internal static class MelonLoaderSetup
@@ -33,8 +33,7 @@ namespace Jondo.Unity.Launcher.Setup
 
         /// <summary>Whether MelonLoader is in the client, and which version its files say.</summary>
         public static bool IsInstalled(string clientRoot)
-            => File.Exists(Path.Combine(clientRoot, "version.dll"))
-               && File.Exists(Path.Combine(clientRoot, "MelonLoader", "net6", "MelonLoader.dll"));
+            => ClientInstallation.HasWindowsMelonLoader(clientRoot);
 
         /// <summary>Whether the assemblies have been generated once already.</summary>
         public static bool IsGenerated(string clientRoot)
@@ -62,7 +61,7 @@ namespace Jondo.Unity.Launcher.Setup
         {
             string mods = Path.Combine(clientRoot, "Mods");
             Directory.CreateDirectory(mods);
-            int copied = 0;
+            int copied = BundledClientMods.InstallRequiredClientDll(emulatorRoot, clientRoot) ? 1 : 0;
             foreach ((string mod, string shipped) in BundledClientMods.Discover(emulatorRoot))
             {
                 string installed = Path.Combine(mods, mod);

@@ -140,10 +140,11 @@ Equivalent `ZAAP_PORT`, `ZAAP_HASH`, `ZAAP_GAME`, `ZAAP_RELEASE`, `ZAAP_INSTANCE
 and instance id even though all clients use the same local listeners.
 
 The process starts with the launcher screen's working dimensions, falling back to 1920×1080 when
-no screen is available. On Windows it retains Direct3D/MelonLoader options, installs the shipped
-JondoFix when MelonLoader is present, and waits briefly to maximize the client window. Linux uses
-the native client without those options or a mod loader; each launch has a unique `player.log`
-directory and shares the configured client preferences directory. Launching stops launcher music.
+no screen is available. Every launch requires MelonLoader and installs the release copy of
+`JondoFix.dll` into the client's `Mods/` directory. On Windows the launcher retains Direct3D
+options and waits briefly to maximize the client window. Native Linux launches preload
+MelonLoader and use a unique `player.log` directory and the configured client preferences
+directory. Launching stops launcher music.
 
 ---
 

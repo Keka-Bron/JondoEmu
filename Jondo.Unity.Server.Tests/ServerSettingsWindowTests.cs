@@ -85,7 +85,7 @@ public sealed class ServerSettingsWindowTests
         var settings = ServerSettings.Read("""
             {"LegacyToggle":false,"Fixture.Package":{"Delay":3,"Custom":["future value"]}}
             """);
-        Assert.Equal(["JondoFix.dll"], settings.ClientMods);
+        Assert.Empty(settings.ClientMods);
 
         var next = settings.Copy();
         next.ClientMods = [];

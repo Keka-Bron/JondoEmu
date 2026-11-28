@@ -18,11 +18,12 @@ internal sealed class ClientModCatalog
     {
         var packages = new Dictionary<string, Asset>(StringComparer.OrdinalIgnoreCase);
         foreach (Asset asset in packageAssets ?? [])
-            packages.TryAdd(asset.Name, asset);
+            if (!ClientModManifest.IsRequiredClientDll(asset.Name)) packages.TryAdd(asset.Name, asset);
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (string name in names)
         {
+            if (ClientModManifest.IsRequiredClientDll(name)) continue;
             if (!ClientModManifest.IsDllName(name) || !seen.Add(name))
             {
                 _orderError ??= $"Invalid or repeated client mod filename: {name}";

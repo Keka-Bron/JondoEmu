@@ -349,9 +349,7 @@ namespace Jondo.Unity.Launcher
                 }
 
                 var installation = new ClientInstallation(clientPath);
-                bool modded = installation.IsWindows
-                    ? MelonLoaderSetup.IsInstalled(installation.Root) : installation.HasLinuxMods;
-                var modPlan = ClientModSync.Prepare(UI.LauncherPreferences.ServerHost, modded, installation.IsWindows, approveMods);
+                var modPlan = ClientModSync.Prepare(UI.LauncherPreferences.ServerHost, installation.HasMelonLoader, approveMods);
 
                 // The game's language, which may be one the launcher has no texts for: the server
                 // keeps it for the Zaap's "language" setting and answers its own messages in the
@@ -398,20 +396,17 @@ namespace Jondo.Unity.Launcher
 
                     // The mods run wherever MelonLoader does: on Windows, in the Windows client
                     // through Wine, and in the native Linux client that carries it.
-                    if (modded && !modPlan.UsesManifest) InstallMod(clientPath);
+                    if (!modPlan.UsesManifest) InstallMod(clientPath);
                     if (installation.HasLinuxMods) installation.LinkDataFolderForMelonLoader();
 
                     var startInfo = ClientStartInfo(clientPath, area.Width, area.Height, instanceId,
                         hash, language, packFlags, UI.LauncherPreferences.ClientConfigDirectory, Paths.LogsDir);
                     ClientModSync.Activate(installation, modPlan, startInfo);
-                    if (modded)
-                    {
-                        // The shipped mods consume these.
-                        startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                        if (Roles.AlMenos(accountRole, Roles.Administrador))
-                            startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
-                        startInfo.Environment["JONDO_PLAYER_TOKEN"] = token ?? "";
-                    }
+                    // JondoFix and the optional client mods consume these.
+                    startInfo.Environment["JONDO_ACCOUNT_ROLE"] = accountRole.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    if (Roles.AlMenos(accountRole, Roles.Administrador))
+                        startInfo.Environment["JONDO_CONTROL_TOKEN"] = token ?? "";
+                    startInfo.Environment["JONDO_PLAYER_TOKEN"] = token ?? "";
 
                     var client = System.Diagnostics.Process.Start(startInfo);
 

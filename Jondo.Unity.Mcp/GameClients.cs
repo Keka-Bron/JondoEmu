@@ -48,7 +48,7 @@ public sealed class GameClients : IDisposable
 
         var installation = ClientInstallation.Find()
             ?? throw new McpException("No Dofus client found. Set JONDO_CLIENT_EXECUTABLE to its Dofus.exe.");
-        if (!Directory.Exists(Path.Combine(installation.Root, "MelonLoader")))
+        if (!installation.HasMelonLoader)
             throw new McpException($"The client at {installation.Root} has no MelonLoader: the mods, and the input port, would not load.");
         var launch = Emulator.Object(await _emulator.TestAsync("launch", new JsonObject { ["language"] = language }, slot, cancellationToken));
         string token = (string?)launch["token"] ?? "";
@@ -56,7 +56,7 @@ public sealed class GameClients : IDisposable
         var server = new UriBuilder(Uri.UriSchemeHttp, IPAddress.Loopback.ToString(), Contract.Puerto).Uri;
         string cache = Path.Combine(UserDirectories.Data, "Jondo", "client-mods");
         var modPlan = ClientModDeployment.Prepare(server, _emulator.Source, cache, "",
-            hasMelonLoader: true, requiresRedirectMod: true, approve: (_, _, _) => true);
+            hasMelonLoader: true, approve: (_, _, _) => true);
         string installed = modPlan.UsesManifest
             ? "Using the server's client mod manifest."
             : InstallMods(installation.Root);

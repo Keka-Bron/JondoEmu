@@ -22,7 +22,6 @@ DofusClient
 **/*.db-wal
 **/*.exe
 **/*.dll
-!mods/JondoFix.dll
 !Heroes/Heroes.dll
 !Cazacabezas/Cazacabezas.dll
 mods/*/**

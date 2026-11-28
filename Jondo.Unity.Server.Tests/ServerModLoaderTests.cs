@@ -64,7 +64,7 @@ public sealed class ServerModLoaderTests : IDisposable
             new TaskCompletionSource().Task, (mods, catalog) =>
             {
                 Assert.Empty(mods.ClientAssets);
-                Assert.Equal("JondoFix.dll", Assert.Single(catalog.CreateManifest().Mods).Name);
+                Assert.Empty(catalog.CreateManifest().Mods);
                 _messages.Add("ready");
                 return Task.CompletedTask;
             }, () => { }, _messages.Add);
@@ -138,7 +138,7 @@ public sealed class ServerModLoaderTests : IDisposable
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.True(response.Headers.CacheControl?.NoStore);
         var manifest = (await response.Content.ReadFromJsonAsync<ClientModManifest>())!;
-        Assert.Equal(["JondoFix.dll", "Shared.dll", "Standalone.dll", "Extra.dll"], manifest.Mods.Select(mod => mod.Name));
+        Assert.Equal(["Shared.dll", "Standalone.dll", "Extra.dll"], manifest.Mods.Select(mod => mod.Name));
 
         using var download = await Get(route + "/Shared.dll");
         Assert.Equal(HttpStatusCode.OK, download.StatusCode);
@@ -146,12 +146,11 @@ public sealed class ServerModLoaderTests : IDisposable
         Assert.Equal("application/octet-stream", download.Content.Headers.ContentType?.MediaType);
         byte[] bytes = await download.Content.ReadAsByteArrayAsync();
         Assert.Equal(new byte[] { 4, 5 }, bytes);
-        Assert.Equal(bytes.Length, manifest.Mods[1].Size);
-        Assert.Equal(Convert.ToHexStringLower(SHA256.HashData(bytes)), manifest.Mods[1].Sha256);
+        Assert.Equal(bytes.Length, manifest.Mods[0].Size);
+        Assert.Equal(Convert.ToHexStringLower(SHA256.HashData(bytes)), manifest.Mods[0].Sha256);
 
         using var fix = await Get(route + "/JondoFix.dll");
-        Assert.Equal(HttpStatusCode.OK, fix.StatusCode);
-        Assert.Equal(new byte[] { 1 }, await fix.Content.ReadAsByteArrayAsync());
+        Assert.Equal(HttpStatusCode.NotFound, fix.StatusCode);
         using var extra = await Get(route + "/Extra.dll");
         Assert.Equal(HttpStatusCode.OK, extra.StatusCode);
         Assert.Equal(new byte[] { 7 }, await extra.Content.ReadAsByteArrayAsync());

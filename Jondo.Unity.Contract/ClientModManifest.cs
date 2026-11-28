@@ -8,6 +8,7 @@ public sealed record ClientModManifest([property: JsonPropertyName("mods")] Clie
 {
     public const string Route = Contract.Prefijo + "mods";
     public const string BootstrapFileName = "JondoModLoader.dll";
+    public const string RequiredClientDll = "JondoFix.dll";
     public const string LaunchManifestEnvironmentVariable = "JONDO_CLIENT_MOD_MANIFEST";
     public const int MaxEntries = 128;
     public const int MaxDllBytes = 128 * 1024 * 1024;
@@ -19,7 +20,11 @@ public sealed record ClientModManifest([property: JsonPropertyName("mods")] Clie
 
     public static bool IsDllName(string? name) => name != null
         && !name.Equals(BootstrapFileName, StringComparison.OrdinalIgnoreCase)
+        && !IsRequiredClientDll(name)
         && SafeDllName.IsMatch(name);
+
+    public static bool IsRequiredClientDll(string? name)
+        => string.Equals(name, RequiredClientDll, StringComparison.OrdinalIgnoreCase);
 
     public static bool IsDllSize(long size) => size > 0 && size <= MaxDllBytes;
 }

@@ -101,7 +101,7 @@ namespace Jondo.Unity.Server
         public int SimulatedPlayersMax { get; set; } = 20;
 
         /// <summary>Client mods to serve, in their configured load order.</summary>
-        public string[] ClientMods { get; set; } = ["JondoFix.dll"];
+        public string[] ClientMods { get; set; } = [];
 
         /// <summary>Server mod filenames and package manifest IDs in startup order.</summary>
         public string[] ServerMods { get; set; } = ["heroes", "cazacabezas"];
@@ -170,7 +170,7 @@ namespace Jondo.Unity.Server
             var settings = doc.RootElement.Deserialize<ServerSettings>(Json) ?? new ServerSettings();
             if (doc.RootElement.ValueKind != JsonValueKind.Object) return settings;
 
-            settings.ClientMods ??= new ServerSettings().ClientMods;
+            settings.ClientMods = (settings.ClientMods ?? []).Where(name => !ClientModManifest.IsRequiredClientDll(name)).ToArray();
             settings.ServerMods ??= [];
             var extra = new Dictionary<string, JsonElement>(StringComparer.OrdinalIgnoreCase);
             foreach (var (key, value) in settings.ModSettings)

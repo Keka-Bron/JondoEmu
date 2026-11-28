@@ -26,8 +26,8 @@ local publish output.
   [Wine way](#mods-on-linux) only.
 
 The native client uses its normal Linux graphics/audio dependencies separately.
-The installer sets up no mod loader on Linux: JondoFix, Heroes, Cazacabezas and the
-admin windows need MelonLoader, which [Mods on Linux](#mods-on-linux) adds by hand.
+The launcher requires MelonLoader on Linux for JondoFix. Follow [Mods on Linux](#mods-on-linux)
+to install it manually.
 The separate chat server is unsupported for this Linux workflow and is not a
 launch/readiness prerequisite.
 
@@ -113,8 +113,9 @@ key together when moving a profile.
 ## Mods on Linux
 
 The mods run wherever MelonLoader does. The launcher picks the way from the client
-selected in Settings, and in both it installs the mods into the client's `Mods/` and hands
-them the account's role and tokens, as on Windows.
+selected in Settings. In both it installs the release copy of `JondoFix.dll` into the
+client's `Mods/`, uses the server manifest for optional DLLs when available, and supplies
+the account's role and tokens.
 
 ### Native client with MelonLoader
 

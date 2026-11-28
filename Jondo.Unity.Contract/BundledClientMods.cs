@@ -5,12 +5,11 @@ namespace Jondo.Unity.Launcher;
 /// <summary>Discovers the standalone client DLLs shipped in an installation or checkout.</summary>
 public static class BundledClientMods
 {
-    public const string RedirectDll = "JondoFix.dll";
     private const string ReceiptDirectory = ".jondo-managed";
     private const string ReceiptSuffix = ".receipt";
 
     // Launchers before manifest support installed these directly without receipts.
-    private static readonly string[] LegacyDllNames = [RedirectDll, "Cazacabezas.dll", "Heroes.dll"];
+    private static readonly string[] LegacyDllNames = ["Cazacabezas.dll", "Heroes.dll"];
 
     public static IReadOnlyDictionary<string, string> Discover(string root)
     {
@@ -25,9 +24,51 @@ public static class BundledClientMods
             }
         }
 
-        string checkoutRedirect = Path.Combine(root, "JondoFix", RedirectDll);
-        if (File.Exists(checkoutRedirect)) files.TryAdd(RedirectDll, checkoutRedirect);
         return files;
+    }
+
+    public static bool InstallRequiredClientDll(string root, string clientRoot)
+    {
+        const string name = ClientModManifest.RequiredClientDll;
+        string shipped = Path.Combine(root, "JondoFix", name);
+        if (!File.Exists(shipped)) shipped = Path.Combine(root, "mods", name); // Older release bundles.
+        if (!File.Exists(shipped))
+            throw new FileNotFoundException($"The required {name} is missing from this installation. Repair the launcher installation.", shipped);
+
+        string mods = Path.Combine(clientRoot, "Mods");
+        string installed = Path.Combine(mods, name);
+        bool changed = !File.Exists(installed) || !SameContent(installed, shipped);
+        if (changed)
+        {
+            Directory.CreateDirectory(mods);
+            InstallDll(shipped, installed);
+        }
+        Remember(clientRoot, name);
+        return changed;
+    }
+
+    internal static void InstallDll(string source, string installed)
+    {
+        string staged = installed + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            File.Copy(source, staged);
+            try
+            {
+                File.Move(staged, installed, overwrite: true);
+            }
+            catch (Exception ex) when ((ex is IOException or UnauthorizedAccessException) && File.Exists(installed))
+            {
+                string aside = installed + ".old";
+                File.Delete(aside);
+                File.Move(installed, aside);
+                File.Move(staged, installed, overwrite: true);
+            }
+        }
+        finally
+        {
+            File.Delete(staged);
+        }
     }
 
     public sealed record Update(string Name, string? Error);
@@ -73,7 +114,7 @@ public static class BundledClientMods
 
     public static void Remember(string clientRoot, string name)
     {
-        if (!ClientModManifest.IsDllName(name)) return;
+        if (!ClientModManifest.IsDllName(name) && !ClientModManifest.IsRequiredClientDll(name)) return;
         string receipts = Path.Combine(clientRoot, "Mods", ReceiptDirectory);
         Directory.CreateDirectory(receipts);
         using var receipt = new FileStream(Path.Combine(receipts, name + ReceiptSuffix), FileMode.OpenOrCreate,
@@ -87,7 +128,7 @@ public static class BundledClientMods
         foreach (string receipt in Directory.EnumerateFiles(receipts, "*" + ReceiptSuffix))
         {
             string name = Path.GetFileName(receipt)[..^ReceiptSuffix.Length];
-            if (ClientModManifest.IsDllName(name)) yield return name;
+            if (ClientModManifest.IsDllName(name) || ClientModManifest.IsRequiredClientDll(name)) yield return name;
         }
     }
 
@@ -97,6 +138,7 @@ public static class BundledClientMods
         if (!Directory.Exists(modsDirectory)) return;
         var managed = names.ToHashSet(StringComparer.OrdinalIgnoreCase);
         managed.UnionWith(LegacyDllNames);
+        managed.Remove(ClientModManifest.RequiredClientDll);
         foreach (string legacy in Directory.EnumerateFiles(modsDirectory))
         {
             if (!managed.Contains(Path.GetFileName(legacy))) continue;

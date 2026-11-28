@@ -36,9 +36,9 @@
     </Reference>
   </ItemGroup>
 
-  <!-- The server publishes the DLL from the emulator's mods folder. -->
-  <Target Name="GuardarMod" AfterTargets="Build">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)/../mods" OverwriteReadOnlyFiles="true" />
+  <!-- Stage the required client DLL for the launcher and release packaging. -->
+  <Target Name="StageClientDll" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="DesplegarMod" AfterTargets="Build"

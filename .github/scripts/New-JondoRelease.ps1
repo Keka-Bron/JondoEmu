@@ -63,10 +63,10 @@ foreach ($name in $Executables.Keys) {
 }
 
 $root = Resolve-Path (Join-Path $PSScriptRoot '../..')
-foreach ($path in 'mods/JondoFix.dll', 'JondoModLoader/JondoModLoader.dll') {
+foreach ($path in 'JondoFix/JondoFix.dll', 'JondoModLoader/JondoModLoader.dll') {
     $source = Join-Path $root $path
     if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
-        throw "Missing built client mod: $path. Run Build-ClientMods.ps1 before packaging."
+        throw "Missing built client DLL: $path. Run Build-ClientMods.ps1 before packaging."
     }
     $target = Join-Path $stage $path
     New-Item -ItemType Directory -Force (Split-Path -Parent $target) | Out-Null

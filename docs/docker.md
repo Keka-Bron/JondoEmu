@@ -9,7 +9,7 @@ before. Nothing changes unless you start the container.
 When building from a source checkout, first build the client DLLs with
 `./.github/scripts/Build-ClientMods.ps1 -DofusClientDir <client-folder>` using a
 Dofus 3.6.10.11 installation with MelonLoader and its generated assemblies.
-The Docker build copies the generated `mods/JondoFix.dll` into the image.
+The Docker build includes the client DLLs for the optional Heroes and Cazacabezas server packages.
 
 ```sh
 cp .env.example .env          # optional: bind address, tag, time zone
@@ -107,7 +107,7 @@ The image runs as the non-root `app` user and sets:
 
 Put standalone DLLs and unpacked packages in `mods/` on the Docker host and bind-mount
 it at `/app/mods`. This mount replaces the image's built-in `mods/` directory, which
-includes `JondoFix.dll` and the Heroes and Cazacabezas packages. Include those files
+includes the Heroes and Cazacabezas packages. Include those packages
 in the mounted folder to keep them available. Add this
 to a Compose override file next to `docker-compose.yml`.
 

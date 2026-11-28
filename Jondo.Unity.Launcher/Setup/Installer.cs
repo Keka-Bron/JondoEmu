@@ -275,8 +275,9 @@ namespace Jondo.Unity.Launcher.Setup
 
                 step = Step("mods");
                 step.Start();
-                int copied = MelonLoaderSetup.InstallMods(layout.Root, clientRoot);
-                step.Finish(string.Join(", ", BundledClientMods.Discover(layout.Root).Keys) + (copied > 0 ? "" : $" ({UI.SetupTexts.AlreadyThere(_lang)})"));
+                int copied = await Guard(step, () => Task.Run(() => MelonLoaderSetup.InstallMods(layout.Root, clientRoot), cancel));
+                var names = BundledClientMods.Discover(layout.Root).Keys.Prepend(ClientModManifest.RequiredClientDll);
+                step.Finish(string.Join(", ", names) + (copied > 0 ? "" : $" ({UI.SetupTexts.AlreadyThere(_lang)})"));
 
                 step = Step("generation");
                 if (state.Generated && MelonLoaderSetup.IsGenerated(clientRoot)) step.Skip(UI.SetupTexts.AlreadyThere(_lang));

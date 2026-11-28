@@ -12,12 +12,15 @@ public static class ClientModDeployment
     public sealed record Plan(string ManifestPath, bool UsesManifest, string NewApproval, IReadOnlyList<string> ManagedNames);
 
     public static Plan Prepare(Uri server, string bundleRoot, string cache, string trusted,
-        bool hasMelonLoader, bool requiresRedirectMod, Func<string, ClientModManifest, string, bool>? approve)
-        => Prepare(Http, server, bundleRoot, cache, trusted, hasMelonLoader, requiresRedirectMod, approve);
+        bool hasMelonLoader, Func<string, ClientModManifest, string, bool>? approve)
+        => Prepare(Http, server, bundleRoot, cache, trusted, hasMelonLoader, approve);
 
     public static Plan Prepare(HttpClient http, Uri server, string bundleRoot, string cache, string trusted,
-        bool hasMelonLoader, bool requiresRedirectMod, Func<string, ClientModManifest, string, bool>? approve)
+        bool hasMelonLoader, Func<string, ClientModManifest, string, bool>? approve)
     {
+        if (!hasMelonLoader)
+            throw new InvalidOperationException("Install MelonLoader to launch the Jondo client.");
+
         var manifestUri = new Uri(server, ClientModManifest.Route);
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         using var request = new HttpRequestMessage(HttpMethod.Get, manifestUri);
@@ -32,21 +35,18 @@ public static class ClientModDeployment
         ClientModManifest manifest = JsonSerializer.Deserialize<ClientModManifest>(json)
             ?? throw new InvalidDataException("The server returned an empty client mod manifest.");
         Validate(manifest);
-        if (requiresRedirectMod &&
-            !manifest.Mods.Any(mod => mod.Name.Equals(BundledClientMods.RedirectDll, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException("This server must include JondoFix.dll in its client mod list to support the Windows client.");
+
+        string fingerprint = Convert.ToHexStringLower(SHA256.HashData(json));
+        // Older manifests can still advertise JondoFix. Load only the release copy.
+        if (manifest.Mods.Any(mod => ClientModManifest.IsRequiredClientDll(mod.Name)))
+        {
+            manifest = new ClientModManifest(manifest.Mods.Where(mod => !ClientModManifest.IsRequiredClientDll(mod.Name)).ToArray());
+            json = JsonSerializer.SerializeToUtf8Bytes(manifest);
+        }
 
         var bundledMods = BundledClientMods.Discover(bundleRoot);
         string? BundledPath(ClientModEntry mod) => bundledMods.GetValueOrDefault(mod.Name);
         bool bundledOnly = manifest.Mods.All(mod => Matches(BundledPath(mod), mod));
-        if (!hasMelonLoader)
-        {
-            if (requiresRedirectMod || !bundledOnly)
-                throw new InvalidOperationException("This server requires client mods. Install MelonLoader to join it.");
-            return new Plan("", UsesManifest: false, "", []);
-        }
-
-        string fingerprint = Convert.ToHexStringLower(SHA256.HashData(json));
         bool approvalNeeded = (trusted.Length != 0 || !bundledOnly) &&
             !fingerprint.Equals(trusted, StringComparison.OrdinalIgnoreCase);
         if (approvalNeeded)
@@ -87,8 +87,9 @@ public static class ClientModDeployment
 
         string manifestDirectory = Path.Combine(cache, "manifests");
         Directory.CreateDirectory(manifestDirectory);
-        string path = Path.Combine(manifestDirectory, fingerprint + ".json");
-        if (Matches(path, json.Length, fingerprint)) return new Plan(path, UsesManifest: true, newApproval, managedNames);
+        string launchFingerprint = Convert.ToHexStringLower(SHA256.HashData(json));
+        string path = Path.Combine(manifestDirectory, launchFingerprint + ".json");
+        if (Matches(path, json.Length, launchFingerprint)) return new Plan(path, UsesManifest: true, newApproval, managedNames);
         string pending = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
@@ -111,7 +112,10 @@ public static class ClientModDeployment
             throw new InvalidDataException("The server returned an invalid client mod list.");
         foreach (ClientModEntry mod in manifest.Mods)
         {
-            if (mod == null || !ClientModManifest.IsDllName(mod.Name) ||
+            if (mod == null)
+                throw new InvalidDataException("The server returned an invalid client mod entry.");
+            if (ClientModManifest.IsRequiredClientDll(mod.Name)) continue;
+            if (!ClientModManifest.IsDllName(mod.Name) ||
                 !names.Add(mod.Name) || !ClientModManifest.IsDllSize(mod.Size) || mod.Sha256 is not { Length: 64 } ||
                 !mod.Sha256.All(Uri.IsHexDigit))
                 throw new InvalidDataException("The server returned an invalid client mod entry.");
@@ -122,6 +126,7 @@ public static class ClientModDeployment
         Func<string, string>? translatePath = null)
     {
         start.Environment.Remove(ClientModManifest.LaunchManifestEnvironmentVariable);
+        BundledClientMods.InstallRequiredClientDll(bundleRoot, clientRoot);
         if (!plan.UsesManifest) return;
         if (plan.ManifestPath.Length > 0)
         {
@@ -135,39 +140,13 @@ public static class ClientModDeployment
             Directory.CreateDirectory(plugins);
             string installed = Path.Combine(plugins, ClientModManifest.BootstrapFileName);
             if (!File.Exists(installed) || !BundledClientMods.SameContent(installed, bootstrap))
-            {
-                string staged = installed + "." + Guid.NewGuid().ToString("N") + ".tmp";
-                try
-                {
-                    File.Copy(bootstrap, staged);
-                    ReplaceBootstrap(staged, installed);
-                }
-                finally
-                {
-                    File.Delete(staged);
-                }
-            }
+                BundledClientMods.InstallDll(bootstrap, installed);
             start.Environment[ClientModManifest.LaunchManifestEnvironmentVariable] =
                 translatePath?.Invoke(plan.ManifestPath) ?? plan.ManifestPath;
         }
 
         // Older launchers and first-run setup placed these in MelonLoader's default scan folder.
         BundledClientMods.SetAsideLegacyCopies(clientRoot, plan.ManagedNames.Concat(BundledClientMods.ManagedNames(clientRoot)));
-    }
-
-    private static void ReplaceBootstrap(string staged, string installed)
-    {
-        try
-        {
-            File.Move(staged, installed, overwrite: true);
-        }
-        catch (Exception ex) when ((ex is IOException or UnauthorizedAccessException) && File.Exists(installed))
-        {
-            string aside = installed + ".old";
-            File.Delete(aside);
-            File.Move(installed, aside);
-            File.Move(staged, installed);
-        }
     }
 
     private static bool Matches(string? path, ClientModEntry mod) => Matches(path, mod.Size, mod.Sha256);

@@ -71,7 +71,7 @@ public sealed class ModsPageTests
             Assert.Equal(["other", "sample"], page.Editor!.Edited.ServerMods);
             Click(page, "Up.Server.sample");
             Assert.Equal(["sample", "other"], page.Editor.Edited.ServerMods);
-            Find<ToggleSwitch>(page, "Active.Client.JondoFix.dll").IsChecked = false;
+            Assert.DoesNotContain(page.GetLogicalDescendants(), control => control is ToggleSwitch { Name: "Active.Client.JondoFix.dll" });
             Find<ToggleSwitch>(page, "Active.Client.Extra.dll").IsChecked = true;
             Click(page, "Up.Client.Extra.dll");
 

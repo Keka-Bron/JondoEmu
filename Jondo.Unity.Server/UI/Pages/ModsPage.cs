@@ -65,7 +65,7 @@ internal sealed class ModsPage : UserControl, IServerPage
         _installed = _packages();
         _packagedAssets = _installed.Select(mod => mod.ClientAsset).OfType<string>().ToHashSet(Ids);
         var saved = _saved();
-        var looseFiles = _clientFiles();
+        var looseFiles = _clientFiles().Where(name => !ClientModManifest.IsRequiredClientDll(name)).ToArray();
         _serverFiles = _installed.Where(mod => mod.IsStandalone).Select(mod => mod.Id)
             .Concat(looseFiles.Intersect(saved.ServerMods, Ids)).ToHashSet(Ids);
         _standalone = looseFiles.Except(_packagedAssets, Ids).Except(_serverFiles, Ids).ToArray();
@@ -96,7 +96,7 @@ internal sealed class ModsPage : UserControl, IServerPage
         var next = _saved().Copy();
         next.CopyModsFrom(edited);
         // Installed packages own their client assets. Their order follows server startup.
-        next.ClientMods = next.ClientMods.Where(name => !_packagedAssets.Contains(name)).ToArray();
+        next.ClientMods = next.ClientMods.Where(name => !ClientModManifest.IsRequiredClientDll(name) && !_packagedAssets.Contains(name)).ToArray();
         Write(next);
     }
 
@@ -106,7 +106,8 @@ internal sealed class ModsPage : UserControl, IServerPage
         _rows.Children.Clear();
         var settings = Editor!.Edited;
         var serverOrder = settings.ServerMods.Where(id => !string.IsNullOrWhiteSpace(id)).Distinct(Ids).ToArray();
-        var clientOrder = settings.ClientMods.Where(id => !string.IsNullOrWhiteSpace(id) && !_packagedAssets.Contains(id))
+        var clientOrder = settings.ClientMods.Where(id => !string.IsNullOrWhiteSpace(id) &&
+                !ClientModManifest.IsRequiredClientDll(id) && !_packagedAssets.Contains(id))
             .Distinct(Ids).ToArray();
         var packages = _installed.ToDictionary(mod => mod.Id, Ids);
         var clientFiles = _standalone.ToHashSet(Ids);

@@ -117,7 +117,7 @@ table and skipped when serving the list, so a DLL can be restored without losing
 
 ```json
 {
-  "ClientMods": ["JondoFix.dll"],
+  "ClientMods": [],
   "ServerMods": ["Example.Audit.dll", "example.greeting"],
   "example.greeting": {
     "Enabled": true
@@ -143,10 +143,10 @@ the displayed fingerprint with the one supplied by the server operator. Choose
 **Trust and play** to approve that manifest for the server, or **Cancel** to stop
 the launch. A changed approved manifest requires approval again.
 
-Keep `JondoFix.dll` available and in the configured order to support the Windows
-client, including the Windows client running under Wine. It redirects the client
-to the emulator. The launcher sets aside managed legacy copies from the client's MelonLoader
-`Mods/` directory. To retire a loose DLL from an older installation, move it
+The launcher requires MelonLoader and installs `JondoFix.dll` from its GitHub release.
+The server's mod settings and manifests control optional client DLLs. The launcher
+sets aside managed copies of those optional DLLs from the client's MelonLoader
+`Mods/` directory when using a manifest. To retire a loose optional DLL from an older installation, move it
 out of the server's `mods/` folder and the client's MelonLoader `Mods/` folder.
 
 ### Server mods
