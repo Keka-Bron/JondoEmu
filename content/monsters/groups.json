@@ -992,6 +992,14 @@
    "orientation": 3,
    "members": [{"monster": 5768, "grade": 0}, {"monster": 5769, "grade": 0}],
    "why": "Time elementals of Amakna [3,1] (2064, Dofus pour les noobs: groups of 2-3 at five places). Their composition is INFERRED; the quest loot sits on their own drop tables."
+  },
+  {
+   "map": 131860993,
+   "group": -2499001,
+   "cell": 344,
+   "orientation": 3,
+   "members": [{"monster": 3686, "grade": 0}],
+   "why": "The Super Formidiablo (3686) in his lair at [2,-4] (1499, Dofus pour les noobs «Le phormidiable au corps»: «attaquez le Grand Phormidiable»). INFERRED cell and grade."
   }
   ]
 }

@@ -1918,11 +1918,13 @@ namespace Jondo.Unity.Server.Handlers
                 if (seller != null) await OpenShopAsync(stream, seller);
             }
 
+            bool gaveAfterClosing = false;
             if (completesAfterClosing != 0
                 && (closedByReply.Contains(completesAfterClosing)
                     || await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true)))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
+                gaveAfterClosing = true;
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
                 // the vault on «Respaldar a Becky y dirigirte hacia la puerta».
                 if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(elegidaAhora);
@@ -1943,7 +1945,9 @@ namespace Jondo.Unity.Server.Handlers
 
             if (reply != KamasMountainReply)
             {
-                Console.WriteLine($"[NPC] Reply {reply}: gives nothing.");
+                // Only when the closing objective above handed nothing over: Bizcana's follower
+                // (15287) is given there and the line would say otherwise.
+                if (!gaveAfterClosing) Console.WriteLine($"[NPC] Reply {reply}: gives nothing.");
                 return;
             }
 

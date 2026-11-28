@@ -641,6 +641,15 @@
       "npc": 5619,
       "replies": [53999],
       "why": "Valle de la Dama del Agua (dungeon 123): after Nagate (6256, room 208146432) the winners are in 208146434 where Nagate, Kuatalo and the pandawito stand. Her 'Irte del valle' (53999) leaves through the dungeon's own way out. INFERRED cell 300: a walkable cell of the map; Dofus pour les noobs («La jetée des enfants perdus»)."
-    }
+    },
+  {
+   "dungeon": 79,
+   "bossRoom": 130548736,
+   "room": 130549760,
+   "cell": 344,
+   "npc": 2352,
+   "replies": [21220],
+   "why": "Perfósil's gallery: after the boss the winners stand in the gallery's exit room (130549760, «Exit»), where Dian Perfosé (1500's 8437) offers the way up (17955, 21220). INFERRED cell."
+  }
   ]
 }

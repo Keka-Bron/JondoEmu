@@ -2378,6 +2378,27 @@
     { "npc": 2405, "map": 128976900, "reply": 21097,
       "monsters": [ { "monster": 3661, "grade": 2 } ] },
     { "npc": 2406, "map": 128977924, "reply": 21095,
-      "monsters": [ { "monster": 3659, "grade": 4 } ] }
+      "monsters": [ { "monster": 3659, "grade": 4 } ] },
+    { "npc": 2539, "map": 138152449, "reply": 21966,
+      "monsters": [ { "monster": 3815, "grade": 0 }, { "monster": 3816, "grade": 0 }, { "monster": 3817, "grade": 0 }, { "monster": 3818, "grade": 0 }, { "monster": 3820, "grade": 0 } ],
+      "why": "«Vence a la banda de canallas para interrogarles» (885328): the canalla band of the ambush plus a thief of the Thieves' Queen dungeon (Dofus pour les noobs («La chapelle noire»))." },
+    { "npc": 2539, "map": 138152449, "reply": 21963,
+      "monsters": [ { "monster": 3815, "grade": 0 }, { "monster": 3816, "grade": 0 }, { "monster": 3817, "grade": 0 }, { "monster": 3818, "grade": 0 }, { "monster": 3820, "grade": 0 } ],
+      "why": "«Vence a la banda de canallas para interrogarles» (885328): the canalla band of the ambush plus a thief of the Thieves' Queen dungeon (Dofus pour les noobs («La chapelle noire»))." },
+    { "npc": 2539, "map": 138152449, "reply": 21970,
+      "monsters": [ { "monster": 3815, "grade": 0 }, { "monster": 3816, "grade": 0 }, { "monster": 3817, "grade": 0 }, { "monster": 3818, "grade": 0 }, { "monster": 3820, "grade": 0 } ],
+      "why": "«Vence a la banda de canallas para interrogarles» (885328): the canalla band of the ambush plus a thief of the Thieves' Queen dungeon (Dofus pour les noobs («La chapelle noire»))." },
+    { "npc": 2539, "map": 138152449, "reply": 21967,
+      "monsters": [ { "monster": 3815, "grade": 0 }, { "monster": 3816, "grade": 0 }, { "monster": 3817, "grade": 0 }, { "monster": 3818, "grade": 0 }, { "monster": 3820, "grade": 0 } ],
+      "why": "«Vence a la banda de canallas para interrogarles» (885328): the canalla band of the ambush plus a thief of the Thieves' Queen dungeon (Dofus pour les noobs («La chapelle noire»))." },
+    { "npc": 2539, "map": 138152449, "reply": 21968,
+      "monsters": [ { "monster": 3815, "grade": 0 }, { "monster": 3816, "grade": 0 }, { "monster": 3817, "grade": 0 }, { "monster": 3818, "grade": 0 }, { "monster": 3820, "grade": 0 } ],
+      "why": "«Vence a la banda de canallas para interrogarles» (885328): the canalla band of the ambush plus a thief of the Thieves' Queen dungeon (Dofus pour les noobs («La chapelle noire»))." },
+    { "npc": 2416, "map": 128974850, "reply": 21049,
+      "monsters": [ { "monster": 3683, "grade": 4 } ] },
+    { "npc": 2417, "map": 128975876, "reply": 21052,
+      "monsters": [ { "monster": 3684, "grade": 2 }, { "monster": 3684, "grade": 3 }, { "monster": 3684, "grade": 4 } ] },
+    { "npc": 2418, "map": 128976898, "reply": 21062,
+      "monsters": [ { "monster": 3685, "grade": 0 }, { "monster": 3685, "grade": 1 }, { "monster": 3685, "grade": 2 }, { "monster": 3685, "grade": 3 }, { "monster": 3685, "grade": 4 } ] }
   ]
 }

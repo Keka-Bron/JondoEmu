@@ -9836,14 +9836,6 @@
       "why": "Cráneo cotilla, the curious skull, in the alley [8,3]. INFERRED cell on open floor; Dofus pour les noobs («Viande fraîche»)."
     },
     {
-      "map": 136185090,
-      "npc": 2462,
-      "cell": 370,
-      "orientation": 1,
-      "criterion": "Qa=1553",
-      "why": "Cráneo receloso [4,0] while «Carne fresca» is open: his only derived spawn is tied to quest 1556, so he stood nowhere for 1553 (Dofus pour les noobs, «Viande fraîche»: «posez des questions au Crâne Méfiant»). Same cell as the derived one."
-    },
-    {
       "map": 134218752,
       "npc": 2548,
       "cell": 304,
@@ -9883,11 +9875,19 @@
     },
     {
       "map": 136055044,
+      "npc": 2562,
+      "cell": 398,
+      "orientation": 1,
+      "criterion": "Qa=1555&Qo<8880",
+      "why": "Caducabuelo in his Sram costume (the walkthrough's Pepperime) on the dark summit until he is unmasked. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+    },
+    {
+      "map": 136055044,
       "npc": 2564,
       "cell": 398,
       "orientation": 1,
-      "criterion": "Qa=1555&Qo>8877&Qo<8882",
-      "why": "Caducabuelo, the disguised divinutrof (the walkthrough's Pepperime), on the dark summit while the quest looks for clues. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
+      "criterion": "Qa=1555&Qo>8880&Qo<8882",
+      "why": "Caducabuelo unmasked, the divinutrof (the walkthrough's Pepperime), on the dark summit until the hidden passage is found. INFERRED cell on open floor; Dofus pour les noobs («Comme un poison dans l'eau»)."
     },
     {
       "map": 137369604,
@@ -9920,6 +9920,153 @@
       "orientation": 1,
       "criterion": "Qa=1488&Qo>8370&Qo<8371",
       "why": "Old Digshot for «Crache Test» (1488) at the Gold Quarry; Dofus pour les noobs («Crache Test»). INFERRED cell."
+    },
+    {
+      "map": 131597312,
+      "npc": 2362,
+      "cell": 287,
+      "orientation": 1,
+      "why": "Rol Sterding's krosmoglob in the outpost camp [-1,-1] (1490: «dirigez vous en [-1,-1] à la rencontre du Krosmoglob de Rol», Dofus pour les noobs («La quatrième dimension»)). INFERRED cell, on the camp's interactive 485007 (cell 287)."
+    },
+    {
+      "map": 137365762,
+      "npc": 2536,
+      "cell": 328,
+      "orientation": 1,
+      "why": "Marie Jeannette [4,1], busy with an appointment. INFERRED cell on open floor; Dofus pour les noobs («La chapelle noire»)."
+    },
+    {
+      "map": 138152449,
+      "npc": 2538,
+      "cell": 342,
+      "orientation": 1,
+      "why": "Ben Dido (Baal Hans) in his house at [4,0]; he also gives «Presunto culpable» (1557). INFERRED cell on open floor; Dofus pour les noobs («La chapelle noire»)."
+    },
+    {
+      "map": 138152449,
+      "npc": 2539,
+      "cell": 357,
+      "orientation": 1,
+      "criterion": "Qa=1556&Qo>8888&Qo<8891",
+      "why": "The ambush leader waiting in Ben Dido's first room. INFERRED cell on open floor; Dofus pour les noobs («La chapelle noire»)."
+    },
+    {
+      "map": 136185090,
+      "npc": 2462,
+      "cell": 370,
+      "orientation": 1,
+      "why": "Cráneo receloso [4,0]: «Carne fresca» (1553) and the start of «La capilla negra» (1556); the derived row was tied to quest 1556 only. INFERRED cell on open floor; Dofus pour les noobs («La chapelle noire»)."
+    },
+    {
+      "map": 136185090,
+      "npc": 2538,
+      "cell": 384,
+      "orientation": 1,
+      "criterion": "Qa=1556&Qo<8886",
+      "why": "Ben Dido (Baal Hans) in the street of [4,0], who offers to hide the player. INFERRED cell on open floor; Dofus pour les noobs («La chapelle noire»)."
+    },
+    {
+      "map": 137369602,
+      "npc": 2537,
+      "cell": 244,
+      "orientation": 1,
+      "criterion": "Qa=1557&Qo>8977",
+      "why": "Trebor Sonderan in the prison cell, interrogating the player. INFERRED cell on open floor; Dofus pour les noobs («Présumé coupable»)."
+    },
+    {
+      "map": 137369602,
+      "npc": 2565,
+      "cell": 246,
+      "orientation": 1,
+      "criterion": "Qa=1557&Qo>8977&Qo<8979",
+      "why": "Franca Lucho in the cell, come to break the player out. INFERRED cell on open floor; Dofus pour les noobs («Présumé coupable»)."
+    },
+    {
+      "map": 134222848,
+      "npc": 2565,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1557&Qo>8978&Qo<8980",
+      "why": "Franca Lucho outside the prison, hurrying the player on. INFERRED cell on open floor; Dofus pour les noobs («Présumé coupable»)."
+    },
+    {
+      "map": 128974850,
+      "npc": 2416,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qa=1497&Qo<8420",
+      "why": "Lone poacher for «La meilleure défense, c'est l'attaque» (1497) at the Gold Quarry; Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»). INFERRED cell."
+    },
+    {
+      "map": 128975876,
+      "npc": 2417,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1497&Qo>8420&Qo<8421",
+      "why": "Poacher family for «La meilleure défense, c'est l'attaque» (1497) at the Gold Quarry; Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»). INFERRED cell."
+    },
+    {
+      "map": 128976898,
+      "npc": 2418,
+      "cell": 288,
+      "orientation": 1,
+      "criterion": "Qa=1497&Qo>8421&Qo<8422",
+      "why": "Poacher band for «La meilleure défense, c'est l'attaque» (1497) at the Gold Quarry; Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»). INFERRED cell."
+    },
+    {
+      "map": 128974852,
+      "npc": 2376,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8424",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8424 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 128974848,
+      "npc": 2376,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8425",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8425 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 128975872,
+      "npc": 2376,
+      "cell": 327,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8426",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8426 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 128976900,
+      "npc": 2376,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8427",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8427 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 128976896,
+      "npc": 2376,
+      "cell": 303,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8428",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8428 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 128977922,
+      "npc": 2376,
+      "cell": 325,
+      "orientation": 1,
+      "criterion": "Qa=1498&Qo<8429",
+      "why": "Perforatroza en celo for «Phorreurs dans la brume» (1498), objective 8429 (Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»)). INFERRED cell."
+    },
+    {
+      "map": 130549760,
+      "npc": 2352,
+      "cell": 312,
+      "orientation": 1,
+      "why": "Dian Perfosé in the gallery's exit room after Perfósil (1500: «Habla con Dian Perfosé dentro de la Galería de Perfósil»; DPLN «La pelle de la Phorrée»: «Une fois le donjon terminé, parlez à Dyane»). INFERRED cell."
     }
   ]
 }

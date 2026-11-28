@@ -11339,6 +11339,153 @@
    "afterObjectives": [8370],
    "gives": [{"item": 15291}],
    "why": "«Test the nugget chucker on an Old Digshot and note the results»: the creature's reply starts the fight, winning it ticks the test and the character keeps a test report (15291, three are handed over). INFERRED monster grade."
+  },
+  {
+   "objective": 8882,
+   "quest": 1555,
+   "kind": "enter",
+   "map": 137369604,
+   "overridesMap": true,
+   "why": "«Busca el pasaje escondido hacia el Oseorfanato» (885311): the sewer grille of the catacombs [8,5] (element 485502, the passage in interactives/teleports.json, open only to whoever has the objective) leads down to the Oseorfanato, so arriving there does it. Dofus pour les noobs («Comme un poison dans l'eau»): «Cliquez sur la grille des égouts pour ouvrir un passage secret». The objective names the catacombs (134223878), hence overridesMap."
+  },
+  {
+   "objective": 8373,
+   "quest": 1489,
+   "kind": "use",
+   "why": "«Activa el detector de baliza en la entrada del retiro de los eternos»: the detector (15283, its effect 30 is this objective, usable only on the retreat's entrance map by its criterion Pm)."
+  },
+  {
+   "objective": 8379,
+   "quest": 1489,
+   "kind": "beat",
+   "monsters": [3710, 3711],
+   "map": 129761282,
+   "elements": [{"map": 129761282, "element": 485082}, {"map": 129761282, "element": 485083}],
+   "spawns": {"monster": 3710, "count": 1, "with": [3711], "attacks": true},
+   "afterObjectives": [8378],
+   "why": "«Deshazte de los divinutrofs que la han tomado con Bizcana»: the barrel (Dofus pour les noobs: «Cliquez sur le tonneau dans lequel se cache l'agent»; which of the two barrels hides her is INFERRED, both accepted) brings out the Divinutrof bizco and the Divinutrof cegato (the «enutrofor bigleux» and «miro»), who attack."
+  },
+  {
+   "objective": 8381,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 131597312,
+   "afterObjectives": [8380],
+   "requires": [{"item": 15287, "count": 1}],
+   "spends": true,
+   "why": "«Escolta a Bizcana hasta el puesto avanzado de Anutropía»: the outpost [-1,-1], with Bizcana following (15287 taken back, she stays there), as 2435's rataplastada."
+  },
+  {
+   "objective": 8374,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 129764610,
+   "afterObjectives": [8373],
+   "why": "«Ve hasta la posición que indica el detector» / «Encuentra a la agente Bizcana»: the trail of maps from the retreat's entrance to the barrels (Dofus pour les noobs); it closes on stepping onto the map the objective carries. Added because type-0 map objectives are not closed by the engine on their own."
+  },
+  {
+   "objective": 8375,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 129763328,
+   "afterObjectives": [8374],
+   "why": "«Ve hasta la posición que indica el detector» / «Encuentra a la agente Bizcana»: the trail of maps from the retreat's entrance to the barrels (Dofus pour les noobs); it closes on stepping onto the map the objective carries. Added because type-0 map objectives are not closed by the engine on their own."
+  },
+  {
+   "objective": 8376,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 129762306,
+   "afterObjectives": [8375],
+   "why": "«Ve hasta la posición que indica el detector» / «Encuentra a la agente Bizcana»: the trail of maps from the retreat's entrance to the barrels (Dofus pour les noobs); it closes on stepping onto the map the objective carries. Added because type-0 map objectives are not closed by the engine on their own."
+  },
+  {
+   "objective": 8377,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 129761282,
+   "afterObjectives": [8376],
+   "why": "«Ve hasta la posición que indica el detector» / «Encuentra a la agente Bizcana»: the trail of maps from the retreat's entrance to the barrels (Dofus pour les noobs); it closes on stepping onto the map the objective carries. Added because type-0 map objectives are not closed by the engine on their own."
+  },
+  {
+   "objective": 8378,
+   "quest": 1489,
+   "kind": "enter",
+   "map": 129761282,
+   "afterObjectives": [8377],
+   "why": "«Ve hasta la posición que indica el detector» / «Encuentra a la agente Bizcana»: the trail of maps from the retreat's entrance to the barrels (Dofus pour les noobs); it closes on stepping onto the map the objective carries. Added because type-0 map objectives are not closed by the engine on their own."
+  },
+  {
+   "objective": 8382,
+   "quest": 1490,
+   "kind": "click",
+   "elements": [{"map": 128974850, "element": 485010}],
+   "requires": [{"item": 15284, "count": 1}],
+   "why": "«Utiliza el datalejo con un cristal de la cantera aurífera» (452793): the crystal 485010 of the Carrière Aurifère map 128974850 (interactive of the map, graphic crystal), clicked with the datalejo in the bag (Dofus pour les noobs («La quatrième dimension»))."
+  },
+  {
+   "objective": 8383,
+   "quest": 1490,
+   "kind": "click",
+   "elements": [{"map": 128975872, "element": 485011}],
+   "requires": [{"item": 15284, "count": 1}],
+   "why": "«Utiliza el datalejo con un cristal de la cantera aurífera» (452793): the crystal 485011 of the Carrière Aurifère map 128975872 (interactive of the map, graphic crystal), clicked with the datalejo in the bag (Dofus pour les noobs («La quatrième dimension»))."
+  },
+  {
+   "objective": 8384,
+   "quest": 1490,
+   "kind": "click",
+   "elements": [{"map": 128975876, "element": 485012}],
+   "requires": [{"item": 15284, "count": 1}],
+   "why": "«Utiliza el datalejo con un cristal de la cantera aurífera» (452793): the crystal 485012 of the Carrière Aurifère map 128975876 (interactive of the map, graphic crystal), clicked with the datalejo in the bag (Dofus pour les noobs («La quatrième dimension»))."
+  },
+  {
+   "objective": 8385,
+   "quest": 1490,
+   "kind": "click",
+   "elements": [{"map": 128976898, "element": 485013}],
+   "requires": [{"item": 15284, "count": 1}],
+   "why": "«Utiliza el datalejo con un cristal de la cantera aurífera» (452793): the crystal 485013 of the Carrière Aurifère map 128976898 (interactive of the map, graphic crystal), clicked with the datalejo in the bag (Dofus pour les noobs («La quatrième dimension»))."
+  },
+  {
+   "objective": 8386,
+   "quest": 1490,
+   "kind": "click",
+   "elements": [{"map": 128976896, "element": 485014}],
+   "requires": [{"item": 15284, "count": 1}],
+   "why": "«Utiliza el datalejo con un cristal de la cantera aurífera» (452793): the crystal 485014 of the Carrière Aurifère map 128976896 (interactive of the map, graphic crystal), clicked with the datalejo in the bag (Dofus pour les noobs («La quatrième dimension»))."
+  },
+  {
+   "objective": 8885,
+   "quest": 1556,
+   "kind": "reply",
+   "replies": [21949],
+   "why": "«Encuentra un lugar en el que esconderte» (885327): accepting Ben Dido's offer to hide (Dofus pour les noobs («La chapelle noire»))."
+  },
+  {
+   "objective": 8890,
+   "quest": 1556,
+   "kind": "beat",
+   "monster": 3815,
+   "map": 138152449,
+   "afterObjectives": [8889],
+   "why": "«Vence a la banda de canallas para interrogarles» (885328): ticks when the canalla band falls (Dofus pour les noobs («La chapelle noire»))."
+  },
+  {
+   "objective": 8976,
+   "quest": 1557,
+   "kind": "enter",
+   "map": 136054022,
+   "afterObjectives": [8975],
+   "overridesMap": true,
+   "why": "«Busca al investigador» (885352): Trebor Sonderan, the investigator, stands in the Hauts Tenebreux; the walkthrough's variable position ([7,0], [5,1] or [5,-1]) is reduced to his derived place [6,-2] (Dofus pour les noobs («Présumé coupable»))."
+  },
+  {
+   "objective": 8431,
+   "quest": 1499,
+   "kind": "enter",
+   "map": 131860993,
+   "why": "«Encuentra la madriguera del formidiablo»: the lair at [2,-4] behind the hole in the rock (DPLN «Le phormidiable au corps»: «Passez par le trou dans la roche puis attaquez le Grand Phormidiable»)."
   }
   ]
 }
