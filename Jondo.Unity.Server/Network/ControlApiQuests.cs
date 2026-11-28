@@ -433,5 +433,34 @@ namespace Jondo.Unity.Server.Network
             var run = log.Run(quest);
             return Bien(new { quest, op, run = run == null ? null : RunOf(log, run), lines = lines.Where(l => l.Contains("[Quest")).ToList() });
         }
+
+        /// <summary>
+        /// Achievements granted by id, {"ids": [..]}: earned as the game earns them (saved, the
+        /// client told, the map shown), so a quest line that asks for achievement points («Oa»)
+        /// can be played without earning a thousand of them first. Ids already held are skipped.
+        /// </summary>
+        private static Respuesta TestAchievement(string cuerpo)
+        {
+            var session = TestSessionOnline();
+            if (session == null) return Mal(404, "offline");
+            var log = session.State.Achievements;
+            if (log == null || Achievements.Book == null) return Mal(409, "achievements not loaded");
+
+            var ids = new List<int>();
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(cuerpo);
+                if (doc.RootElement.TryGetProperty("ids", out var list) && list.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    foreach (var one in list.EnumerateArray())
+                        if (one.TryGetInt32(out int id)) ids.Add(id);
+            }
+            catch (System.Text.Json.JsonException) { return Mal(400, "json"); }
+
+            var unknown = ids.Where(id => Achievements.Book.Of(id) == null).ToList();
+            if (unknown.Count > 0) return Mal(404, "achievements " + string.Join(",", unknown));
+            var granted = ids.Distinct().Where(id => !log.Has(id)).ToList();
+            var lines = RunInSession(session, _ => AchievementStateService.Live.AnnounceAsync(session, session, granted));
+            return Bien(new { granted, points = log.Points, lines = lines.Where(l => l.Contains("[Achievements]")).ToList() });
+        }
     }
 }

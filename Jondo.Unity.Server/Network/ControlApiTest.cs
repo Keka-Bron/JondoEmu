@@ -121,6 +121,7 @@ namespace Jondo.Unity.Server.Network
                 "give" => TestGive(cuerpo),
                 "quests" => TestQuests(),
                 "quest" => TestQuest(cuerpo),
+                "achievement" => TestAchievement(cuerpo),
                 "season" => TestSeason(cuerpo),
                 "events" => TestEvents(cuerpo),
                 "reload" => TestReload(),
