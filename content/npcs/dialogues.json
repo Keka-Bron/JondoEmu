@@ -90995,7 +90995,8 @@
           "choices": [
             { "reply": 20954, "next": 17498, "quest": 1501, "afterObjective": 8546, "beforeObjective": 8440, "completes": 8440, "params": [[30, 8440]], "gives": 15299, "givesCount": 10 }
           ]
-        }
+        },
+        { "message": 17498, "choices": [] }
       ],
       "why": "Mariscal Logy Stika at the outpost: «Tragamonedas» (1501): shown the ten pieces of strongbox and Kohmer's needs (20954, 17498) he recycles them, handing ten recycled pieces (15299; 8440). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. His Farma Stika lines (27072, 27073) belong to a later quest."
     }
