@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using Jondo.Unity.Launcher;
+using Jondo.Unity.Protocol;
 using Jondo.Unity.Server;
 using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Managers;
@@ -27,6 +29,32 @@ public sealed class HeroesControlTests
         "list", "connect", "disconnect", "portrait", "quests", "autopass",
         "loot", "sheet", "switch", "create", "name", "preview",
     ];
+
+    [Fact]
+    public async Task Command_alias_is_available_for_the_lifetime_of_an_enabled_package()
+    {
+        string packages = HeroesTestPackage.Directory;
+        Assert.DoesNotContain(".heroes", CommandHandler.Names);
+
+        using var disabled = ServerModLoader.LoadConfigured(packages,
+            ServerSettings.Read("""{"HeroMode":false,"ServerMods":["heroes"]}"""), _ => { });
+        Assert.DoesNotContain(".heroes", CommandHandler.Names);
+
+        using var enabled = ServerModLoader.Load(packages, ["heroes"], _ => { });
+        Assert.Contains(".heroes", CommandHandler.Names);
+        Assert.Equal(Roles.Administrador, CommandHandler.RequiredRole(".HEROES"));
+
+        await using var pipe = await ClientPipe.OpenAsync(Account, 0, Map, enterWorld: false);
+        using var session = SessionContext.Push(pipe.Session);
+        Assert.True(await CommandHandler.TryHandleAsync(pipe.ToClient, ".HEROES 8", accountId: Account));
+        Assert.Equal(ConnectionProtocol.BuildNotice(CommandTexts.Get(pipe.Session.State.Language, "command.denied", ".heroes")),
+            await pipe.Next(Op.Lqn));
+
+        enabled.Dispose();
+        Assert.DoesNotContain(".heroes", CommandHandler.Names);
+        Assert.Contains(".allycontrol", CommandHandler.Names);
+        Assert.False(await CommandHandler.TryHandleAsync(pipe.ToClient, ".heroes 8", accountId: Account));
+    }
 
     [Fact]
     public async Task Package_owns_the_authenticated_Heroes_HTTP_routes()

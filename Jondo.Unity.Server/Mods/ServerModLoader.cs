@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Jondo.Unity.Launcher;
+using Jondo.Unity.Server.Handlers;
 using Jondo.Unity.Server.Network;
 using Jondo.Unity.ServerMods;
 
@@ -401,6 +402,15 @@ internal sealed class ServerModLoader(Action<string> log, bool failFast,
                 if (_stopping) throw new InvalidOperationException("The server mod is stopping.");
                 controlRoutes.Add(path, handler);
                 _cleanup.Push(() => controlRoutes.Remove(path));
+            }
+        }
+
+        public void RegisterCommandAlias(string alias, string command)
+        {
+            lock (_cleanup)
+            {
+                if (_stopping) throw new InvalidOperationException("The server mod is stopping.");
+                _cleanup.Push(CommandHandler.RegisterAlias(alias, command));
             }
         }
 

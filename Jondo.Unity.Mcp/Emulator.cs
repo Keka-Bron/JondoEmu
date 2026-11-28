@@ -26,7 +26,7 @@ namespace Jondo.Unity.Mcp;
 /// The key is JONDO_TEST_KEY's when the tools are given one -- a server started by hand with the same
 /// key is then usable -- and one drawn for this run otherwise.
 /// </remarks>
-public sealed class Emulator : IDisposable
+public sealed class Emulator : IMcpTestClient, IDisposable
 {
     private const int MostOutputLines = 3000;
 

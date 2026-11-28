@@ -205,3 +205,10 @@ character (`409 world`). Disabling the package removes the routes (`404 ruta`) a
 - The spell book (the client's own) shows the master's spells, not the hero's.
 
 The core `.allycontrol` command opens a developer test fight in which an administrator controls allied JondoBots.
+When the Heroes server package is enabled, `.heroes` is an administrator-only alias for that command.
+
+The Heroes package includes `Heroes.Mcp.dll`, which provides `hero_list`, `hero_connect`,
+`hero_disconnect`, and `hero_switch`. Set `Mcp__ToolProviders__0` to the DLL's absolute path in
+the MCP host's environment and restart MCP. Enable the Heroes server package to serve these tools'
+authenticated routes. The three actions accept a character name or ID, and every tool accepts a
+test account slot.

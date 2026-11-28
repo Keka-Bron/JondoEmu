@@ -34,6 +34,9 @@ public interface IServerModHost
 
     /// <summary>Registers an exact control API path. The host resolves the account before calling the handler.</summary>
     void RegisterAuthenticatedControlRoute(string path, Func<AuthenticatedControlRequest, ServerModControlResponse> handler);
+
+    /// <summary>Registers a chat command alias for a built-in command, including its permissions, until the package stops.</summary>
+    void RegisterCommandAlias(string alias, string command);
 }
 
 public readonly record struct AuthenticatedControlRequest(long AccountId, string Method, string Body);

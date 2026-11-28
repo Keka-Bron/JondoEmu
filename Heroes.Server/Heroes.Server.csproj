@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Tests/**/*.cs" />
+    <Compile Remove="Mcp/**/*.cs;Tests/**/*.cs" />
     <InternalsVisibleTo Include="Jondo.Unity.Module.Tests" />
     <ProjectReference Include="..\Jondo.Unity.Contract\Jondo.Unity.Contract.csproj" Private="false" />
+    <ProjectReference Include="Mcp/Heroes.Mcp.csproj" ReferenceOutputAssembly="false"
+                      OutputItemType="McpProviderAssembly" Condition="'$(StageServerMod)' == 'true'" />
   </ItemGroup>
 
   <Target Name="StageServerMod" AfterTargets="Build" Condition="'$(StageServerMod)' == 'true'">
-    <Copy SourceFiles="$(TargetPath);$(MSBuildProjectDirectory)/manifest.json;$(MSBuildProjectDirectory)/../Heroes/Heroes.dll"
+    <Copy SourceFiles="$(TargetPath);$(MSBuildProjectDirectory)/manifest.json;$(MSBuildProjectDirectory)/../Heroes/Heroes.dll;@(McpProviderAssembly)"
           DestinationFolder="$(HeroesPackageDirectory)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

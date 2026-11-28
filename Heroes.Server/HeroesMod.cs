@@ -10,6 +10,7 @@ public sealed partial class HeroesMod : IServerMod
 
     public void Initialize(IServerModHost host)
     {
+        host.RegisterCommandAlias(".heroes", ".allycontrol");
         var world = host.GetService<ICharacterWorld>();
         var settings = host.Settings.Deserialize<HeroesSettings>() ?? new();
         var companions = host.GetService<ICompanionWorld>();

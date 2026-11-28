@@ -1,6 +1,7 @@
 using Jondo.Unity.Launcher;
 using System;
 using System.Linq;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
@@ -177,18 +178,37 @@ namespace Jondo.Unity.Server.Handlers
                 [".shutdown"] = Roles.Administrador,
             };
 
-        /// <summary>
-        /// The role a command asks for: its row in the table, or Administrator for one without --
-        /// the safe side to be wrong on.
-        /// </summary>
-        /// <summary>The commands that exist, for the staff console's help.</summary>
-        internal static System.Collections.Generic.IEnumerable<string> Names => Uso.Keys;
+        private static readonly ConcurrentDictionary<string, string> Aliases = new(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>Each command and the catalogue key of its usage text, for the tests.</summary>
+        /// <summary>The commands that exist, for the staff console's help.</summary>
+        internal static IEnumerable<string> Names => Uso.Keys.Concat(Aliases.Keys);
+
+        /// <summary>Each built-in command and the catalogue key of its usage text, for the tests.</summary>
         internal static IReadOnlyDictionary<string, string> UsageKeys => Uso;
 
+        /// <summary>The role a command asks for, defaulting to Administrator.</summary>
         internal static int RequiredRole(string command)
+            => BuiltInRequiredRole(ResolveAlias(command));
+
+        private static int BuiltInRequiredRole(string command)
             => HaceFalta.TryGetValue(command, out int role) ? role : Roles.Administrador;
+
+        internal static Action RegisterAlias(string alias, string command)
+        {
+            ArgumentNullException.ThrowIfNull(alias);
+            ArgumentNullException.ThrowIfNull(command);
+            if (!alias.StartsWith('.') || !LooksLikeCommand(alias))
+                throw new ArgumentException("An alias must be a dot followed by letters.", nameof(alias));
+            if (!Uso.ContainsKey(command))
+                throw new ArgumentException($"Unknown built-in command '{command}'.", nameof(command));
+            command = command.ToLowerInvariant();
+            if (Uso.ContainsKey(alias) || !Aliases.TryAdd(alias, command))
+                throw new InvalidOperationException($"Command '{alias}' is already registered.");
+            return () => Aliases.TryRemove(new KeyValuePair<string, string>(alias, command));
+        }
+
+        private static string ResolveAlias(string command)
+            => Aliases.TryGetValue(command, out string? target) ? target : command;
 
         /// <summary>The level at which the normal game ends; from there up it is Omega.</summary>
         private const int MaxNormalLevel = CharacteristicRules.MaxLevelWithStats;
@@ -207,8 +227,9 @@ namespace Jondo.Unity.Server.Handlers
         public static async Task<bool> TryHandleAsync(NetworkStream stream, string text,
                                                       int channel = 0, long accountId = 0)
         {
-            string? command = CommandOf(text);
-            if (command == null) return false;
+            string? entered = CommandOf(text);
+            if (entered == null) return false;
+            string command = ResolveAlias(entered);
 
             // In jail, no command of any kind -- an administrator's neither: see Managers.Jail.
             // Swallowed, not echoed, so it does not go out on the general channel either.
@@ -226,7 +247,7 @@ namespace Jondo.Unity.Server.Handlers
                 if (LooksLikeCommand(command))
                 {
                     await NotifyAsync(stream, T("command.unknown", command,
-                                              string.Join(", ", Uso.Keys)), channel, accountId);
+                                              string.Join(", ", Names)), channel, accountId);
                 }
                 return false;
             }
@@ -241,23 +262,23 @@ namespace Jondo.Unity.Server.Handlers
             // The account comes from this socket's session, not from anything the client sends.
             long quien = accountId > 0 ? accountId : Network.SessionContext.Current.AccountId;
             int rol = DatabaseManager.GetAccountRole(quien);
-            int haceFalta = RequiredRole(command);
+            int haceFalta = BuiltInRequiredRole(command);
 
             if (!Roles.AlMenos(rol, haceFalta))
             {
                 Console.WriteLine($"[Commands] Account {quien} ({Roles.Nombre(rol)}) tried " +
-                                  $"{command}, which is for {Roles.Nombre(haceFalta)}. Rejected.");
+                                  $"{entered}, which is for {Roles.Nombre(haceFalta)}. Rejected.");
                 ActivityJournal.Current.Write("command.denied", quien, GameState.CharacterId,
-                    new { command, role = rol, requiredRole = haceFalta });
-                await NotifyAsync(stream, T("command.denied", command), channel, accountId);
+                    new { command = entered, role = rol, requiredRole = haceFalta });
+                await NotifyAsync(stream, T("command.denied", entered), channel, accountId);
                 return true;   // swallowed: neither run nor published in the chat
             }
 
             string rest = RestOf(text);
-            Console.WriteLine($"[Commands] {command} {rest}".TrimEnd() +
+            Console.WriteLine($"[Commands] {entered} {rest}".TrimEnd() +
                               $"  (account {quien}, {Roles.Nombre(rol)})");
             ActivityJournal.Current.Write("command.requested", quien, GameState.CharacterId,
-                new { command, role = rol });
+                new { command = entered, role = rol });
 
             try
             {
@@ -288,10 +309,10 @@ namespace Jondo.Unity.Server.Handlers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Commands] {command} failed: {ex}");
+                Console.WriteLine($"[Commands] {entered} failed: {ex}");
                 ActivityJournal.Current.Write("command.failed", quien, GameState.CharacterId,
-                    new { command, error = ex.GetType().Name, message = ex.Message });
-                await NotifyAsync(stream, T("command.failed", command, ex.Message),
+                    new { command = entered, error = ex.GetType().Name, message = ex.Message });
+                await NotifyAsync(stream, T("command.failed", entered, ex.Message),
                                   channel, accountId);
             }
 

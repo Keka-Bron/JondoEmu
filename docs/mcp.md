@@ -110,6 +110,17 @@ run` writes its build output to stdout, which is the protocol's channel. For Ope
 | `JONDO_TEST_KEY` | drawn for each run | Set it to use a server started by hand with the same key |
 | `JONDO_CLIENT_EXECUTABLE` | as the launcher finds it | The client's `Dofus.exe` |
 
+## Loading optional tool providers
+
+Set `Mcp__ToolProviders__0` to the absolute path of a provider DLL in the MCP process's
+environment. Use consecutive indices for additional providers. MCP registers the tools in these
+assemblies at startup.
+
+A provider references `Jondo.Unity.Contract` and uses the host's version of `ModelContextProtocol`.
+Mark a tool class with `[McpServerToolType]` and its methods with `[McpServerTool]`. Methods can take
+an `IMcpTestClient` parameter to call keyed test routes or authenticated player routes for a test
+slot. Ship a provider's own dependencies with its `.deps.json` when it has private dependencies.
+
 ## A session
 
 ```text
