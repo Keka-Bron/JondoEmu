@@ -4,9 +4,12 @@ namespace Jondo.Unity.Launcher.Setup;
 
 internal static class ClientModSync
 {
-    internal static ClientModDeployment.Plan Prepare(string host, bool hasMelonLoader,
+    internal static ClientModDeployment.Plan? Prepare(string host, ClientInstallation client, bool enableNativeMods,
         Func<string, ClientModManifest, string, bool>? approve)
     {
+        bool hasMelonLoader = client.HasMelonLoader;
+        if (!client.IsWindows && (!enableNativeMods || !hasMelonLoader)) return null;
+
         var server = new UriBuilder(Uri.UriSchemeHttp, host, Contract.Puerto).Uri;
         string cache = Path.Combine(UserDirectories.Data, "Jondo", "client-mods");
         var plan = ClientModDeployment.Prepare(server, Paths.Root, cache, LauncherPreferences.TrustedModManifest(host),

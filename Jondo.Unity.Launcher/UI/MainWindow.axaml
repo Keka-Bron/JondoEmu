@@ -342,6 +342,7 @@
                       <StackPanel x:Name="NativeClientSettings" Spacing="8" IsVisible="False">
                         <Button x:Name="ConfigureClient" Classes="secondary" HorizontalAlignment="Left"
                                 Click="ConfigureNativeClient" />
+                        <CheckBox x:Name="NativeClientMods" Click="SaveNativeClientMods" />
                         <TextBlock x:Name="ClientConfigLabel" Classes="label" />
                         <TextBox x:Name="ClientConfigPath" Classes="field" LostFocus="SaveClientConfigPath" />
                       </StackPanel>

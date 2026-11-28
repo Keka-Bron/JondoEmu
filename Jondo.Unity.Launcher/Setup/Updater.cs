@@ -196,10 +196,12 @@ namespace Jondo.Unity.Launcher.Setup
 
             // 4. The mods, which may have changed with it, into the client.
             step = Step("mods");
-            string client = state.Client.Length > 0 ? Path.GetDirectoryName(state.Client) ?? "" : "";
-            if (client.Length == 0 || !new ClientInstallation(state.Client).HasMelonLoader) step.Skip();
+            var installation = state.Client.Length > 0 ? new ClientInstallation(state.Client) : null;
+            if (installation == null || !installation.HasMelonLoader ||
+                (!installation.IsWindows && !UI.LauncherPreferences.NativeClientModsEnabled)) step.Skip();
             else
             {
+                string client = installation.Root;
                 step.Start();
                 var retiredMods = plan.Remove.Select(path => path.Replace('\\', '/').Split('/'))
                     .Where(parts => parts.Length == 2 && parts[0].Equals("mods", StringComparison.OrdinalIgnoreCase)

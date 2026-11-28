@@ -60,6 +60,36 @@ public sealed class ClientModSyncTests : IDisposable
     }
 
     [Fact]
+    public void A_native_modded_launch_installs_the_bootstrap_and_passes_the_manifest_path()
+    {
+        string shippedFix = ReleaseFix();
+        string bundle = Path.Combine(_cache, "bundle");
+        string bootstrap = Path.Combine(Directory.CreateDirectory(Path.Combine(bundle, "JondoModLoader")).FullName,
+            ClientModManifest.BootstrapFileName);
+        File.WriteAllBytes(bootstrap, [1]);
+        var client = new ClientInstallation(Path.Combine(_cache, "client with spaces", "Dofus.x64"));
+        string managed = Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader", "net6")).FullName;
+        File.Copy(typeof(HttpStatusCode).Assembly.Location, Path.Combine(managed, "MelonLoader.dll"));
+        File.WriteAllText(Path.Combine(client.Root, ClientInstallation.LinuxMelonLoader), "");
+        ClientModEntry mod = Entry("Heroes.dll", [2]);
+        using var feed = new Feed(mod);
+        feed.Blobs.Add(mod.Name, [2]);
+        using var http = new HttpClient(feed);
+        var plan = ClientModDeployment.Prepare(http, Server, bundle, _cache, "", client.HasMelonLoader,
+            (_, _, _) => true);
+
+        var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 25, "hash", "fr", "",
+            Path.Combine(_cache, "config"), Path.Combine(_cache, "logs"), preloadNativeMods: true);
+        ClientModDeployment.Activate(client.Root, bundle, plan, start);
+
+        Assert.StartsWith("./" + ClientInstallation.LinuxMelonLoader, start.Environment["LD_PRELOAD"]);
+        Assert.Equal(plan.ManifestPath, start.Environment[ClientModManifest.LaunchManifestEnvironmentVariable]);
+        Assert.Equal(new[] { mod }, Read(plan).Mods);
+        Assert.True(BundledClientMods.SameContent(bootstrap, Path.Combine(client.Root, "Plugins", ClientModManifest.BootstrapFileName)));
+        Assert.True(BundledClientMods.SameContent(shippedFix, Path.Combine(client.Root, "Mods", ClientModManifest.RequiredClientDll)));
+    }
+
+    [Fact]
     public void A_corrupted_dll_cannot_publish_a_launch_plan_and_can_be_retried()
     {
         byte[] correct = [1, 2, 3];

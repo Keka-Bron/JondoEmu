@@ -143,7 +143,8 @@ the displayed fingerprint with the one supplied by the server operator. Choose
 **Trust and play** to approve that manifest for the server, or **Cancel** to stop
 the launch. A changed approved manifest requires approval again.
 
-The launcher requires MelonLoader and installs `JondoFix.dll` from its GitHub release.
+For a modded launch, the launcher uses MelonLoader and installs `JondoFix.dll` from
+its GitHub release. A configured native Linux client can also launch without client mods.
 The server's mod settings and manifests control optional client DLLs. The launcher
 sets aside managed copies of those optional DLLs from the client's MelonLoader
 `Mods/` directory when using a manifest. To retire a loose optional DLL from an older installation, move it

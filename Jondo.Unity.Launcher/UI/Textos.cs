@@ -68,6 +68,14 @@ namespace Jondo.Unity.Launcher.UI
             _ => "Configurar cliente para Jondo",
         };
 
+        public static string ModsClienteNativo(Language i) => i switch
+        {
+            Language.En => "Use MelonLoader with the native Linux client",
+            Language.Fr => "Utiliser MelonLoader avec le client Linux natif",
+            Language.Pt => "Usar MelonLoader com o cliente Linux nativo",
+            _ => "Usar MelonLoader con el cliente nativo de Linux",
+        };
+
         public static string DirectorioPreferenciasCliente(Language i) => i switch
         {
             Language.En => "Client preferences directory (XDG_CONFIG_HOME)",

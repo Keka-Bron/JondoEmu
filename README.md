@@ -113,7 +113,8 @@ Then it goes through each step with an animated progress bar, the step's name, i
 9. Prepare the world database
 10. Start the server, when it runs on this computer
 
-Steps 6 to 8 are Windows only: the native Linux client has no mod loader.
+Setup automates steps 6 to 8 on Windows. On Linux, the native client can launch after configuration.
+For client mods, see [Mods on Linux](docs/linux-desktop.md#mods-on-linux).
 
 When it is done the launcher opens on its sign-in screen with the server online. Sign in or **CREATE ACCOUNT**, tick one or several accounts of the team and press play. Up to eight Dofus clients can run at once.
 

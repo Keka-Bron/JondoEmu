@@ -113,6 +113,7 @@ namespace Jondo.Unity.Launcher.UI
             InitializeComponent();
             NativeClientSettings.IsVisible = OperatingSystem.IsLinux();
             ClientConfigPath.Text = LauncherPreferences.ClientConfigDirectory;
+            NativeClientMods.IsChecked = LauncherPreferences.NativeClientModsEnabled;
 
             // The flag and the name; the same template draws the closed box, so the chosen one
             // shows with its flag too. Both dropdowns, the launcher's and the game's, share it.
@@ -478,6 +479,7 @@ namespace Jondo.Unity.Launcher.UI
             ToolTip.SetTip(SelectorIdiomaJuego, Textos.PieIdiomaDelJuego(_idioma));
             PieCliente.Text = Textos.PieCliente(_idioma);
             ConfigureClient.Content = Textos.ConfigurarCliente(_idioma);
+            NativeClientMods.Content = Textos.ModsClienteNativo(_idioma);
             ClientConfigLabel.Text = Textos.DirectorioPreferenciasCliente(_idioma);
             PieCuentasGuardadas.Text = Textos.PieCuentasGuardadas(_idioma);
 
@@ -1010,6 +1012,9 @@ namespace Jondo.Unity.Launcher.UI
             }
             catch (Exception error) { Avisar(error.Message); }
         }
+
+        private void SaveNativeClientMods(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+            => LauncherPreferences.NativeClientModsEnabled = NativeClientMods.IsChecked == true;
 
         private void SaveClientConfigPath(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {

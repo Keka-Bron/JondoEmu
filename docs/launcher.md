@@ -140,11 +140,13 @@ Equivalent `ZAAP_PORT`, `ZAAP_HASH`, `ZAAP_GAME`, `ZAAP_RELEASE`, `ZAAP_INSTANCE
 and instance id even though all clients use the same local listeners.
 
 The process starts with the launcher screen's working dimensions, falling back to 1920×1080 when
-no screen is available. Every launch requires MelonLoader and installs the release copy of
-`JondoFix.dll` into the client's `Mods/` directory. On Windows the launcher retains Direct3D
-options and waits briefly to maximize the client window. Native Linux launches preload
-MelonLoader and use a unique `player.log` directory and the configured client preferences
-directory. Launching stops launcher music.
+no screen is available. `Dofus.exe` requires MelonLoader on Windows and under Wine. On native
+Linux, the launcher preloads MelonLoader when enabled in Settings and installed in the
+client folder. Modded launches install the release copy of `JondoFix.dll` into `Mods/` and
+use the server manifest for optional client DLLs. A native launch without MelonLoader uses the
+`ConfigUrl` patch and skips manifest sync. Native Linux launches use a unique `player.log`
+directory and the configured client preferences directory. On Windows the launcher retains
+Direct3D options and waits briefly to maximize the client window. Launching stops launcher music.
 
 ---
 

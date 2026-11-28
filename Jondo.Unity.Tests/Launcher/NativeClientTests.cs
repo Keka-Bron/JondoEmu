@@ -1,6 +1,7 @@
 using Jondo.Unity.Deobfuscator;
 using Jondo.Unity.Launcher;
 using Jondo.Unity.Launcher.Packs;
+using Jondo.Unity.Launcher.Setup;
 using Jondo.Unity.Reversing;
 using Xunit;
 
@@ -102,6 +103,36 @@ public sealed class NativeClientTests : IDisposable
         Assert.DoesNotContain("-logFile", start.ArgumentList);
     }
 
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, false)]
+    public void Native_launch_skips_mod_preparation_when_the_loader_is_missing_incomplete_or_disabled(
+        bool hasBootstrap, bool hasManagedLoader, bool enableMods)
+    {
+        var client = Client(version: LaunchVersion);
+        client.Configure();
+        client.ValidateNativeLaunch();
+        if (hasBootstrap) File.WriteAllText(Path.Combine(client.Root, ClientInstallation.LinuxMelonLoader), "");
+        if (hasBootstrap) Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader", "net6"));
+        if (hasManagedLoader) File.WriteAllText(Path.Combine(client.Root, "MelonLoader", "net6", "MelonLoader.dll"), "");
+
+        var plan = ClientModSync.Prepare("invalid host", client, enableMods,
+            (_, _, _) => throw new InvalidOperationException("Unexpected approval"));
+        Assert.Null(plan);
+
+        var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 24, "hash", "fr", "",
+            Path.Combine(_root, "config"), Path.Combine(_root, "logs"), preloadNativeMods: plan != null);
+        Assert.DoesNotContain(start.ArgumentList, arg => arg.Contains("melonloader"));
+        start.Environment.TryGetValue("LD_PRELOAD", out string? preload);
+        Assert.Equal(Environment.GetEnvironmentVariable("LD_PRELOAD"), preload);
+        Assert.False(start.Environment.ContainsKey(ClientModManifest.LaunchManifestEnvironmentVariable));
+        Assert.False(start.Environment.ContainsKey("JONDO_PLAYER_TOKEN"));
+        Assert.False(start.Environment.ContainsKey("JONDO_CONTROL_TOKEN"));
+        Assert.False(Directory.Exists(Path.Combine(client.Root, "Mods")));
+        Assert.False(Directory.Exists(Path.Combine(client.Root, "Plugins")));
+    }
+
     [Fact]
     public void The_native_client_with_melonloader_preloads_it_relative_to_its_folder()
     {
@@ -110,14 +141,17 @@ public sealed class NativeClientTests : IDisposable
         Assert.False(client.HasLinuxMods);
         File.WriteAllText(Path.Combine(client.Root, ClientInstallation.LinuxMelonLoader), "");
         Assert.False(client.HasLinuxMods);
-        Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader"));
-        Assert.True(client.HasLinuxMods);
+        string managed = Directory.CreateDirectory(Path.Combine(client.Root, "MelonLoader", "net6")).FullName;
+        Assert.False(client.HasMelonLoader);
+        File.WriteAllText(Path.Combine(managed, "MelonLoader.dll"), "");
+        Assert.True(client.HasMelonLoader);
 
         string? before = Environment.GetEnvironmentVariable("LD_PRELOAD");
         try
         {
             Environment.SetEnvironmentVariable("LD_PRELOAD", null);
-            var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 22, "hash", "fr", "", Path.Combine(_root, "config"), Path.Combine(_root, "logs"));
+            var start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 22, "hash", "fr", "",
+                Path.Combine(_root, "config"), Path.Combine(_root, "logs"), preloadNativeMods: client.HasMelonLoader);
             // The client's folder has a space in it ("jondo native client é …"): relative, from the working directory.
             Assert.Equal("./MelonLoader.Bootstrap.so", start.Environment["LD_PRELOAD"]);
             Assert.Equal(client.Root, start.WorkingDirectory);
@@ -127,7 +161,8 @@ public sealed class NativeClientTests : IDisposable
             Assert.False(start.Environment.ContainsKey("WAYLAND_DISPLAY"));
 
             Environment.SetEnvironmentVariable("LD_PRELOAD", "/usr/lib64/libother.so");
-            start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 23, "hash", "fr", "", Path.Combine(_root, "config"), Path.Combine(_root, "logs"));
+            start = LauncherService.ClientStartInfo(client.Executable, 1280, 720, 23, "hash", "fr", "",
+                Path.Combine(_root, "config"), Path.Combine(_root, "logs"), preloadNativeMods: client.HasMelonLoader);
             Assert.Equal("./MelonLoader.Bootstrap.so /usr/lib64/libother.so", start.Environment["LD_PRELOAD"]);
         }
         finally

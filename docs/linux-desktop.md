@@ -26,8 +26,8 @@ local publish output.
   [Wine way](#mods-on-linux) only.
 
 The native client uses its normal Linux graphics/audio dependencies separately.
-The launcher requires MelonLoader on Linux for JondoFix. Follow [Mods on Linux](#mods-on-linux)
-to install it manually.
+The native client can play after the configuration steps below. Install MelonLoader
+manually if you want JondoFix and client mods. See [Mods on Linux](#mods-on-linux).
 The separate chat server is unsupported for this Linux workflow and is not a
 launch/readiness prerequisite.
 
@@ -81,8 +81,8 @@ output outside the repository. That directory must contain `.jondo-root`.
    `$XDG_DATA_HOME/Jondo/client-config` (normally `~/.local/share/Jondo/client-config`).
    Point it to an existing configuration base to reuse your client preferences.
 4. Sign in, select accounts and launch them. Each process receives its own Jondo
-   instance ID/hash and `ZAAP_*` environment. Linux launches omit Direct3D and
-   MelonLoader arguments, and drop `WAYLAND_DISPLAY`: on a Wayland session the client's
+   instance ID/hash and `ZAAP_*` environment. Native launches omit Direct3D and
+   drop `WAYLAND_DISPLAY`: on a Wayland session the client's
    screen plugin would take its Wayland path, which cannot tell where the window is, and
    the client would stop on its loading screen (`DisplayConfiguration.GetDisplayInfo(-1)`).
    Unity draws through XWayland either way. Each launch gets a separate Unity `player.log` under
@@ -112,31 +112,30 @@ key together when moving a profile.
 
 ## Mods on Linux
 
-The mods run wherever MelonLoader does. The launcher picks the way from the client
-selected in Settings. In both it installs the release copy of `JondoFix.dll` into the
-client's `Mods/`, uses the server manifest for optional DLLs when available, and supplies
-the account's role and tokens.
+For a modded launch, the launcher installs the release copy of `JondoFix.dll` into
+the client's `Mods/` and uses the server manifest to load optional DLLs such as Heroes
+and Cazacabezas. It asks for approval when the server's DLLs differ from the bundled
+copies. The launcher passes account tokens to the mods only for bundled content.
 
 ### Native client with MelonLoader
 
-When `MelonLoader.Bootstrap.so` and `MelonLoader/` are beside `Dofus.x64`, the launcher
-preloads the loader (`LD_PRELOAD=./MelonLoader.Bootstrap.so`, relative to the client's
-folder because `LD_PRELOAD` splits on spaces) and links `Dofus.x64_Data` to `Dofus_Data`,
-the name Cpp2IL looks for on the first run.
-
-1. Unpack `MelonLoader.Linux.x64.zip` into the client's folder.
+1. Unpack `MelonLoader.Linux.x64.zip` into the client's folder. Server-provided
+   mods require MelonLoader 0.7.3 or newer.
 2. Put a .NET 6 runtime where MelonLoader looks for a portable one, `<client>/dotnet`
    (`dotnet-install.sh --runtime dotnet --channel 6.0 --install-dir "<client>/dotnet"`),
    unless one is installed system-wide.
-3. Start the client once from the launcher: MelonLoader generates its assemblies (two to
-   three minutes), then the mods load.
+3. Use an Il2CppInterop build with the ELF fix in
+   [BepInEx/Il2CppInterop#296](https://github.com/BepInEx/Il2CppInterop/pull/296).
+   The upstream report tested Dofus 3.6.10.11 with MelonLoader 0.7.4-ci.2673 and
+   replaced `MelonLoader/net6/Il2CppInterop.Runtime.dll` with a build from that PR.
+   Without the fix, the loader can crash in `GameAssembly.so` during startup.
+4. Leave **Use MelonLoader with the native Linux client** enabled in Settings
+   and launch the game. The launcher checks for `MelonLoader.Bootstrap.so` and
+   `MelonLoader/net6/MelonLoader.dll`, preloads the bootstrap from the client's folder,
+   and links `Dofus.x64_Data` to `Dofus_Data` for the first run of Cpp2IL.
 
-This needs an Il2CppInterop that resolves `MetadataCache::GetTypeInfoFromTypeDefinitionIndex`
-on ELF builds ([BepInEx/Il2CppInterop#296](https://github.com/BepInEx/Il2CppInterop/pull/296)).
-MelonLoader 0.7.3 and the 0.7.4 CI builds bundle one without it, and the client dies with
-`SIGSEGV` in `GameAssembly.so` right after `Class::Init signatures have been exhausted`;
-until a MelonLoader release carries the fix, `MelonLoader/net6/Il2CppInterop.Runtime.dll`
-has to be a build of that branch.
+Turn off **Use MelonLoader with the native Linux client** to start the configured
+client without client mods, including when an installed loader crashes.
 
 Keep the game's **Display Mode** on *Windowed*. In *Full screen* the native client's window
 stops receiving the mouse under KWin/XWayland (keys still work), mods or not; it is the

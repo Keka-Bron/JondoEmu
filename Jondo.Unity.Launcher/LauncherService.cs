@@ -329,7 +329,8 @@ namespace Jondo.Unity.Launcher
                         Message = UI.LauncherPreferences.Textos.ClientNotFound
                     };
                 }
-                if (OperatingSystem.IsLinux()) new ClientInstallation(clientPath).ValidateNativeLaunch();
+                var installation = new ClientInstallation(clientPath);
+                if (OperatingSystem.IsLinux()) installation.ValidateNativeLaunch();
 
                 // BEFORE anything, that the server is really answering.
                 //
@@ -348,8 +349,9 @@ namespace Jondo.Unity.Launcher
                     };
                 }
 
-                var installation = new ClientInstallation(clientPath);
-                var modPlan = ClientModSync.Prepare(UI.LauncherPreferences.ServerHost, installation.HasMelonLoader, approveMods);
+                var modPlan = ClientModSync.Prepare(UI.LauncherPreferences.ServerHost, installation,
+                    UI.LauncherPreferences.NativeClientModsEnabled, approveMods);
+                bool preloadNativeMods = modPlan != null && !installation.IsWindows;
 
                 // The game's language, which may be one the launcher has no texts for: the server
                 // keeps it for the Zaap's "language" setting and answers its own messages in the
@@ -394,15 +396,16 @@ namespace Jondo.Unity.Launcher
                                           "for this client version; starting without it.");
                     }
 
-                    // The mods run wherever MelonLoader does: on Windows, in the Windows client
-                    // through Wine, and in the native Linux client that carries it.
-                    if (!modPlan.UsesManifest) InstallMod(clientPath);
-                    if (installation.HasLinuxMods) installation.LinkDataFolderForMelonLoader();
-
                     var startInfo = ClientStartInfo(clientPath, area.Width, area.Height, instanceId,
-                        hash, language, packFlags, UI.LauncherPreferences.ClientConfigDirectory, Paths.LogsDir);
-                    ClientModSync.Activate(installation, modPlan, startInfo);
-                    SetClientAccountEnvironment(startInfo, modPlan, accountRole, token);
+                        hash, language, packFlags, UI.LauncherPreferences.ClientConfigDirectory, Paths.LogsDir,
+                        preloadNativeMods);
+                    if (modPlan != null)
+                    {
+                        if (!modPlan.UsesManifest) InstallMod(clientPath);
+                        if (preloadNativeMods) installation.LinkDataFolderForMelonLoader();
+                        ClientModSync.Activate(installation, modPlan, startInfo);
+                        SetClientAccountEnvironment(startInfo, modPlan, accountRole, token);
+                    }
 
                     var client = System.Diagnostics.Process.Start(startInfo);
 
@@ -456,7 +459,7 @@ namespace Jondo.Unity.Launcher
         /// <param name="packFlags">From <see cref="Packs.TexturePackService.LaunchFlags"/>; may be empty.</param>
         internal static System.Diagnostics.ProcessStartInfo ClientStartInfo(string executable, int width,
             int height, int instanceId, string hash, string language, string packFlags,
-            string configDirectory, string logRoot)
+            string configDirectory, string logRoot, bool preloadNativeMods = false)
         {
             var installation = new ClientInstallation(executable);
             var start = new System.Diagnostics.ProcessStartInfo(installation.Executable)
@@ -481,12 +484,12 @@ namespace Jondo.Unity.Launcher
             foreach (string argument in new[] { "-screen-fullscreen", "0", "-screen-width",
                 width.ToString(System.Globalization.CultureInfo.InvariantCulture), "-screen-height",
                 height.ToString(System.Globalization.CultureInfo.InvariantCulture) }) start.ArgumentList.Add(argument);
-            if (installation.IsWindows || installation.HasLinuxMods)
+            if (installation.IsWindows || preloadNativeMods)
             {
                 start.ArgumentList.Add("--melonloader.hideconsole");
                 start.ArgumentList.Add("--melonloader.disablestartscreen");
             }
-            if (installation.HasLinuxMods)
+            if (preloadNativeMods)
             {
                 // Linux has no version.dll to hijack: the loader is preloaded. Relative to the
                 // working directory, the client's folder, because LD_PRELOAD splits on spaces and

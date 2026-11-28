@@ -59,6 +59,12 @@ namespace Jondo.Unity.Launcher.UI
             set => Escribir("clientConfig", value);
         }
 
+        public static bool NativeClientModsEnabled
+        {
+            get => Leer().GetValueOrDefault("nativeClientMods", "1") == "1";
+            set => Escribir("nativeClientMods", value ? "1" : "0");
+        }
+
         private static Dictionary<string, string> Leer()
         {
             var valores = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
