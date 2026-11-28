@@ -275,6 +275,10 @@ namespace Jondo.Unity.Server.Managers
                     return arenaFight.HasValue ? Compare(arenaFight.Value ? 1 : 0, op, value) : Answer.Unknown;
                 case "OA":
                     return facts.State?.Achievements == null ? Answer.Unknown : Truth(facts.State.Achievements.Has((int)value), op);
+                // Oa is the achievement points, the score the player card shows: Viejunuco hears out
+                // «La grève de la fin» (1512) only from a character with 3000 of them.
+                case "Oa":
+                    return facts.State?.Achievements == null ? Answer.Unknown : Compare(facts.State.Achievements.Points, op, value);
                 // Ot asks whether the character owns this title, not whether it exists in the catalog.
                 case "Ot":
                     if (condition.Args.Count == 0 || !int.TryParse(condition.Args[0], out int titleId)

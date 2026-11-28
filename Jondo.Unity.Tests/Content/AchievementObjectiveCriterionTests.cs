@@ -108,5 +108,33 @@ namespace Jondo.Unity.Tests.Content
             Assert.False(Met("OO=11281", noCharacter));
             Assert.False(Met("OO!11281", noCharacter));
         }
+
+        [Fact]
+        public void Oa_compares_the_character_s_achievement_points()
+        {
+            if (!File.Exists(Paths.AchievementsJson) || !File.Exists(Paths.QuestsJson)
+                || !File.Exists(Paths.AchievementLinksJson)) return;
+
+            var session = GameSession.SinSocket();
+            var book = new AchievementCatalogue();
+            var log = new AchievementLog(book, new PlayerFacts());
+            session.State.Achievements = log;
+            using (SessionContext.Push(session))
+            {
+                var facts = new PlayerCriteria.Facts(session.State, null, null, 0, _ => 0);
+                Assert.True(Met("Oa<1", facts));
+                Assert.False(Met("Oa>0", facts));
+
+                int points = book.Of(8518)!.Points;
+                Assert.True(points > 0);
+                log.Restore(8518, true);
+                Assert.True(Met("Oa>" + (points - 1), facts));
+                Assert.False(Met("Oa>" + points, facts));
+                Assert.True(Met("Oa=" + points, facts));
+            }
+
+            var noCharacter = new PlayerCriteria.Facts(null, null, null, 0, _ => 0);
+            Assert.False(Met("Oa<1", noCharacter));
+        }
     }
 }
