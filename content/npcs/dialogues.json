@@ -89912,17 +89912,17 @@
         {
           "message": 18347,
           "choices": [
-            { "reply": 21974, "criterion": "Qf=1556&Qa!1557&Qf!1557", "startsQuest": 1557, "params": [[34, 1557]], "next": 18348 }
+            { "reply": 21974, "criterion": "Qf=1556&Qa!1557&Qf!1557", "startsQuest": 1557, "params": [[34, 1557]], "next": 18354 }
           ]
         },
         {
-          "message": 18348,
+          "message": 18354,
           "choices": [
-            { "reply": 21973 }
+            { "reply": 21982 }
           ]
         }
       ],
-      "why": "Ben Dido [4,0] in the street (Baal Hans): «Pssst, ven por aqui» (18329); «Aceptar la proposicion» (21949 = 8885) takes the player to his house (138152449: the client's world graph has no door from the street into it); «Rechazar» (21950) gets 18331. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La chapelle noire»). «Presunto culpable» (1557): the same offer in the street (21974 -> 18348 starts it; 21973 leaves). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»)."
+      "why": "Ben Dido [4,0] in the street (Baal Hans): «Pssst, ven por aqui» (18329); «Aceptar la proposicion» (21949 = 8885) takes the player to his house (138152449: the client's world graph has no door from the street into it); «Rechazar» (21950) gets 18331. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La chapelle noire»). «Presunto culpable» (1557): the same offer in the street (21974 -> 18348 starts it; 21973 leaves). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»). The handover of 1557 goes on to 18354, the line its first step declares (the same words as 18348)."
     },
     {
       "npc": 2565,
