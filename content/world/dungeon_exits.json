@@ -650,6 +650,15 @@
    "npc": 2352,
    "replies": [21220],
    "why": "Perfósil's gallery: after the boss the winners stand in the gallery's exit room (130549760, «Exit»), where Dian Perfosé (1500's 8437) offers the way up (17955, 21220). INFERRED cell."
+  },
+  {
+   "dungeon": 82,
+   "bossRoom": 136840192,
+   "room": 136841216,
+   "cell": 282,
+   "npc": 2445,
+   "replies": [21897],
+   "why": "Toxoliat's cave: after the boss the winners stand in the cave's exit room (136841216, the quest 1547 map of objectives 8853-8854), where Stark Sytruper (2445) offers the way out («Salir de la Cueva de Toxoliat.», 21897) and, for the quest, the gastric fluid (22309). Dofus pour les noobs («L'art me ment»). INFERRED cell: a walkable cell of the map."
   }
   ]
 }

@@ -10,6 +10,7 @@
     "Source: official server packet captures, 2026-11-17 to 11-21."
   ],
   "messages": [
+    {"map": 129762304, "element": 485092, "message": 0, "gives": [{"item": 15335, "count": 1}], "criterion": "Qa!1516&Qf!1516", "what": "Quest 1516 (DPLN, Laissé en plan): the plan on the ground of Retraite des Eternels [-9,-5] (element 485092, graphic 40477, cell 204) hands the Mapa antiguo de Anutropia (15335), whose effect 34 starts «El mapa de la verdad» when used. Not to a character on or past the quest."},
     {"map": 205260289, "element": 519617, "message": 0, "gives": [{"item": 23481, "count": 2}], "criterion": "Qo>16437&Qo<16440", "what": "Quest 2152 (DPLN, Au nom de l'Art): the big pebble column at the center of Tierradala [25,-25] hands 2 x Rock Dust (23481) while the balm is the objective in hand (16438). INFERRED element (graphic 66405, the central type -1 element)."},
     {
       "map": 190840834,

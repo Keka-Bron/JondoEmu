@@ -2120,6 +2120,11 @@
       "toMap": 128976898,
       "toCell": 101,
       "why": "The pit of the formidiablo's lair (gfx 45391, the same pit as the one of 131861250): the way back to the quarry [2,-4], beside the hole (cell 101, walkable). INFERRED, the guide says nothing about the way out."
+    },
+    { "map": 131862020, "element": 2430002, "npc": 2430, "cell": 384, "gfx": 0, "type": -1, "skill": 0, "toMap": 131863044, "toCell": 284, "why": "The llavoro guard's «Entrar en la sala de los rehenes.» (21370, 21367) leads into the fifth room (131863044), whose right and bottom borders lead back to the fourth. Landing: the cell the map's arrival gives (284). Dofus pour les noobs («Prise d'otages»)." },
+    {
+      "map": 135267843, "element": 485503, "cell": 106, "gfx": 2870, "type": -1, "skill": 184, "toMap": 138150401, "toCell": 497, "criterion": "Qa=1546&Qo>8829",
+      "why": "Quest 1546 (Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)): cliquez sur les ossements pour ouvrir le passage secret - the bones on [6,8] (element 485503, graphic 2870, no skill in the data; INFERRED as the bones) open the secret room of Merridiu once Serpentine has proposed the passages. Landing cell INFERRED beside the room own way out (cell 496)."
     }
   ]
 }

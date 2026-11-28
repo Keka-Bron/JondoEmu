@@ -10102,6 +10102,68 @@
     { "map": 134221826, "npc": 2578, "cell": 330, "orientation": 1, "why": "Straf, bouncer beside the Ring's skull door in [6,3] (Dofus pour les noobs («Un ring pour les gouverner tous»)). INFERRED cell on open floor beside the door (343)." },
     { "map": 134221826, "npc": 2579, "cell": 344, "orientation": 1, "why": "Halaryo, the other bouncer of the Ring in [6,3] (18969; Dofus pour les noobs («Un ring pour les gouverner tous»)). INFERRED cell on open floor beside the door (343)." },
     { "map": 135397891, "npc": 2509, "cell": 258, "orientation": 1, "criterion": "Qa=1544", "why": "Marshall Palegnor waits beside the blue-flame barrel of the catacombs [4,8] (Dofus pour les noobs («Épidémiologie»)). INFERRED cell on open floor beside the barrel (245)." },
-    { "map": 129762562, "npc": 2383, "cell": 290, "orientation": 3, "criterion": "Qa=1503&Qo>8457&Qo<8460", "why": "«El silencio es oro» (1503): the toolkit at [-9,-6] while it is asked for (8458, 8459). INFERRED cell: an open tile in the middle of the map." }
+    { "map": 129762562, "npc": 2383, "cell": 290, "orientation": 3, "criterion": "Qa=1503&Qo>8457&Qo<8460", "why": "«El silencio es oro» (1503): the toolkit at [-9,-6] while it is asked for (8458, 8459). INFERRED cell: an open tile in the middle of the map." },
+    {
+      "map": 135268869,
+      "npc": 2511,
+      "cell": 356,
+      "remove": true
+    },
+    {
+      "map": 129764354,
+      "npc": 2431,
+      "cell": 283,
+      "orientation": 1,
+      "criterion": "Qa=1511&Qo<8568",
+      "why": "The explosives expert at [-7,-4] (the guide: [-7,-4] or [-9,-5], he roams) while «Toma de rehenes» (1511) looks for him and until his fight is won (8568). INFERRED cell."
+    },
+    {
+      "map": 131863044,
+      "npc": 2429,
+      "cell": 355,
+      "orientation": 1,
+      "criterion": "Qa=1511&Qo>8570&Qo<8573",
+      "why": "Yiyo in the hostage room, from the moment the guard lets you in (8570) until he is beaten (8573) in «Toma de rehenes» (1511). INFERRED cell."
+    },
+    {
+      "map": 135267843,
+      "npc": 2516,
+      "cell": 187,
+      "orientation": 1,
+      "criterion": "Qa=1545&Qo>8823&Qo<8825|Qa=1546&Qo>8827&Qo<8829",
+      "why": "A child of the catacombs on [6,8], met while the character looks for food samples (1545) and again when searching the catacombs (1546; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)). INFERRED cell on open floor."
+    },
+    {
+      "map": 135267843,
+      "npc": 2517,
+      "cell": 201,
+      "orientation": 1,
+      "criterion": "Qa=1545&Qo>8823&Qo<8825|Qa=1546&Qo>8827&Qo<8829",
+      "why": "Second child of the catacombs on [6,8] (Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)). INFERRED cell on open floor."
+    },
+    {
+      "map": 135267843,
+      "npc": 2518,
+      "cell": 215,
+      "orientation": 1,
+      "criterion": "Qa=1545&Qo>8823&Qo<8825|Qa=1546&Qo>8827&Qo<8829",
+      "why": "Third child of the catacombs on [6,8] (Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)). INFERRED cell on open floor."
+    },
+    {
+      "map": 131863044,
+      "npc": 2427,
+      "cell": 370,
+      "orientation": 1,
+      "criterion": "Qf=1511",
+      "why": "Cerriyayo in the strikers' room [-8,-5] for «La huelga es el final» (1512). INFERRED cell."
+    },
+    {
+      "map": 137364480,
+      "npc": 2509,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1547",
+      "why": "Marshall Palegnor in the Sramvil outpost [0,18] beside Bikini and Ron Jerric (quest 1547 objective 8843, «Ve a ver a Marshall Palegnor»; Dofus pour les noobs («L'art me ment»)). INFERRED open cell next to the other patients; the quest's own map for him is 137364480."
+    }
   ]
 }

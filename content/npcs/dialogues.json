@@ -56406,7 +56406,9 @@
             { "reply": 21081, "next": 17599, "quest": 1505, "afterObjective": 8485, "beforeObjective": 8486, "completes": 8486, "showsNpc": 2389, "criterion": "PO=15310" },
             { "reply": 21084, "next": 17602, "quest": 1505, "afterObjective": 8488, "beforeObjective": 8489, "completes": 8489, "params": [[30, 8489]] },
             { "reply": 21094, "next": 17607, "quest": 1505, "afterObjective": 8491, "beforeObjective": 8492, "completes": 8492, "params": [[30, 8492]] },
-            { "reply": 21133, "next": 17628, "quest": 1506, "beforeObjective": 8493, "completes": 8493, "params": [[30, 8493]] }
+            { "reply": 21133, "next": 17628, "quest": 1506, "beforeObjective": 8493, "completes": 8493, "params": [[30, 8493]] },
+            { "reply": 21473, "next": 17908, "quest": 1516, "beforeObjective": 8592, "criterion": "PO=15335" },
+            { "reply": 21478, "next": 17916, "quest": 1516, "afterObjective": 8597, "beforeObjective": 8598, "completes": 8598, "params": [[30, 8598]] }
           ]
         },
         {
@@ -56428,9 +56430,41 @@
         {
           "message": 17628,
           "choices": []
+        },
+        {
+          "message": 17908,
+          "choices": [
+            { "reply": 21472, "next": 17909, "quest": 1516, "beforeObjective": 8592 }
+          ]
+        },
+        {
+          "message": 17909,
+          "choices": [
+            { "reply": 21471, "next": 17910, "quest": 1516, "beforeObjective": 8592 }
+          ]
+        },
+        {
+          "message": 17910,
+          "choices": [
+            { "reply": 21470, "next": 17911, "quest": 1516, "beforeObjective": 8592 }
+          ]
+        },
+        {
+          "message": 17911,
+          "choices": [
+            { "reply": 21469, "next": 17912, "completes": 8592, "params": [[30, 8592]], "quest": 1516 }
+          ]
+        },
+        {
+          "message": 17912,
+          "choices": []
+        },
+        {
+          "message": 17916,
+          "choices": []
         }
       ],
-      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586). «Tesorfanato» (1505): Mimicandy handed over and his fate asked (21081) is 8486, «Mimikmatti sera jeté aux ordures» (17599); asking to carry out the sentence yourself (21084) is 8489 (17602, «Conduis Mimikmatti jusqu'à la benne à ordures»); telling him it is done (21094) is 8492, the reward (17607) (Dofus pour les noobs, «Trésorphelinat»). «El maleficio del cofre» (1506): «Abordar el problema de los cofrefuertes» (21133) is 8493: only the Tesoráculo can say more (17628), «Ce dernier vous envoi donc rencontrer Kamalonnête afin que vous puissiez consulter le Trésoracle» (Dofus pour les noobs, «Malladie»)."
+      "why": "Riberico at the professor's camp [-1,-1] once he has been taken there («Cofrología», 1504): the Cofredía's envoy hopes to gain from the travellers' technomagic (17585), and tells of his brotherhood (21061, 17586). «Tesorfanato» (1505): Mimicandy handed over and his fate asked (21081) is 8486, «Mimikmatti sera jeté aux ordures» (17599); asking to carry out the sentence yourself (21084) is 8489 (17602, «Conduis Mimikmatti jusqu'à la benne à ordures»); telling him it is done (21094) is 8492, the reward (17607) (Dofus pour les noobs, «Trésorphelinat»). «El maleficio del cofre» (1506): «Abordar el problema de los cofrefuertes» (21133) is 8493: only the Tesoráculo can say more (17628), «Ce dernier vous envoi donc rencontrer Kamalonnête afin que vous puissiez consulter le Trésoracle» (Dofus pour les noobs, «Malladie»). Quest 1516: «Ensenarle el viejo mapa de Anutropia.» (21473, 17908), 21472 -> 17909, 21471 -> 17910, 21470 -> 17911, «Aceptar.» (21469, 17912, 8592) and «Ensenarle la caja de monedas de cofrefuerte.» (21478, 17916, 8598). The order of the five replies is read from the texts (INFERRED). Dofus pour les noobs «Laissé en plan»; message and reply ids are the client's (qdump 1516)"
     },
   {
       "npc": 2390,
@@ -56633,6 +56667,10 @@
       "map": 130287616,
       "opening": 17647,
       "openings": [
+        { "quest": 1513, "objective": 8589, "pending": 8590, "message": 17656 },
+        { "quest": 1513, "objective": 8588, "pending": 8589, "message": 17962 },
+        { "quest": 1513, "objective": 8587, "pending": 8588, "message": 17656 },
+        { "quest": 1513, "objective": 8590, "message": 17974 },
         { "quest": 1506, "objective": 8497, "message": 17656 }
       ],
       "lines": [
@@ -56681,7 +56719,9 @@
           "choices": [
             { "reply": 21168, "next": 17657, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498 },
             { "reply": 21167, "next": 17658, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498 },
-            { "reply": 21166, "next": 17659, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498, "completes": 8498, "params": [[30, 8498]] }
+            { "reply": 21166, "next": 17659, "quest": 1506, "afterObjective": 8497, "beforeObjective": 8498, "completes": 8498, "params": [[30, 8498]] },
+            { "reply": 21547, "next": 17961, "quest": 1513, "afterObjective": 8587, "beforeObjective": 8588 },
+            { "reply": 21549, "next": 17963, "quest": 1513, "afterObjective": 8589, "beforeObjective": 8590 }
           ]
         },
         {
@@ -56699,9 +56739,31 @@
         {
           "message": 17659,
           "choices": []
+        },
+        {
+          "message": 17961,
+          "choices": [
+            { "reply": 21546, "next": 17962, "quest": 1513, "afterObjective": 8587, "beforeObjective": 8588, "completes": 8588, "params": [[30, 8588]] }
+          ]
+        },
+        {
+          "message": 17962,
+          "choices": [
+            { "reply": 21548, "quest": 1513, "afterObjective": 8588, "beforeObjective": 8589 }
+          ]
+        },
+        {
+          "message": 17963,
+          "choices": [
+            { "reply": 21563, "next": 17974, "quest": 1513, "afterObjective": 8589, "beforeObjective": 8590, "completes": 8590, "params": [[30, 8590]] }
+          ]
+        },
+        {
+          "message": 17974,
+          "choices": []
         }
       ],
-      "why": "Malefíscof in the factory's way out (130287616), once its fight is won, for «El maleficio del cofre» (1506): «Une fois le donjon terminé, parlez à Malléfisk avant de sortir. Commencez par la flatter afin qu'elle s'intéresse à vous. Malléfisk vous apprend alors qu'elle endors les Koffrefors à distance afin de ne pas rouiller. Cependant lorsque vous lui demandez de réveiller ceux de Maximilio, celle-ci refuse. Le Krosmoglob du Professeur Maximilio apparait alors ... Reparlez alors à Malléfisk pour vous excuser. Finalement après plusieurs essais Malléfisk accepte» (Dofus pour les noobs, «Malladie»). She ignores you (17647); «Hablarle» (21162, 17648), «Elogiar la belleza de sus trazos» (21161, 17649), «Encomiar su magnificiencia» (21160, 17650, «extranjero de lengua bien suelta»), the narcolepsy (21159, 17651), why the professor's (21158, 17652) and «Exigirle que libere a los cofrefuertes» (21157, 17653, «Tú no puedes exigirme nada») is 8496, and the krosmoglob appears. Then she turns to you (17656): her bags (21168, 17657) and the narcolepsy again (21167, 17658) fail, and «Excusarte diciendo que solo eres una larva indigna de interés» (21169) lets you try again; «Alabar su grandeza y mentir sobre una solución para liberarla» (21166, 17659, «aprecio tu espíritu retorcido, por lo que voy a acceder a tu petición») is 8498. The replies run in that order in the client's own numbering, highest first."
+      "why": "Malefíscof in the factory's way out (130287616), once its fight is won, for «El maleficio del cofre» (1506): «Une fois le donjon terminé, parlez à Malléfisk avant de sortir. Commencez par la flatter afin qu'elle s'intéresse à vous. Malléfisk vous apprend alors qu'elle endors les Koffrefors à distance afin de ne pas rouiller. Cependant lorsque vous lui demandez de réveiller ceux de Maximilio, celle-ci refuse. Le Krosmoglob du Professeur Maximilio apparait alors ... Reparlez alors à Malléfisk pour vous excuser. Finalement après plusieurs essais Malléfisk accepte» (Dofus pour les noobs, «Malladie»). She ignores you (17647); «Hablarle» (21162, 17648), «Elogiar la belleza de sus trazos» (21161, 17649), «Encomiar su magnificiencia» (21160, 17650, «extranjero de lengua bien suelta»), the narcolepsy (21159, 17651), why the professor's (21158, 17652) and «Exigirle que libere a los cofrefuertes» (21157, 17653, «Tú no puedes exigirme nada») is 8496, and the krosmoglob appears. Then she turns to you (17656): her bags (21168, 17657) and the narcolepsy again (21167, 17658) fail, and «Excusarte diciendo que solo eres una larva indigna de interés» (21169) lets you try again; «Alabar su grandeza y mentir sobre una solución para liberarla» (21166, 17659, «aprecio tu espíritu retorcido, por lo que voy a acceder a tu petición») is 8498. The replies run in that order in the client's own numbering, highest first. Quest 1513: Malefiscof (130287616): «Relacionar la narcolepsia...» (21546, 17962, 8588), «Defenderte con uñas y dientes.» (21548) starts the soul fight (8589), «Elogiar su espíritu combativo.» (21547, 17963) and «Exigirle que te diga por qué lo ha hecho.» (21549, 17974, 8590). The line that follows each reply is read from the texts (17962 threatens the fight, 17963 gives her motives, 17974 closes); reply 21545 (second «Defenderte») has no own line and is not used. Dofus pour les noobs «Malle des profondeurs»; message and reply ids are the client's (qdump 1513) Quest 1513 order re-checked against Dofus pour les noobs «Malle des profondeurs» (talk to her and compliment, then tell her you know about the guards' narcolepsy and she fights you; after the fight talk to her again for her motives): greeting 17656, «Elogiar su espiritu combativo» 21547 -> 17961, «Relacionar la narcolepsia...» 21546 -> 17962, fight 21548; after it 21549 «Exigirle que te diga por que...» -> 17963 and 21563 «Insistir...» -> 17974. The message after each reply is INFERRED from the texts; reply 21545 stays unused."
     },
   {
       "npc": 2387,
@@ -56754,7 +56816,8 @@
             { "reply": 20997, "next": 17533 },
             { "reply": 21171, "next": 17661, "quest": 1507, "afterObjective": 8502, "showsNpc": 2402, "completes": 8503, "params": [[30, 8503]] },
             { "reply": 21020, "next": 17556, "criterion": "Qf=1507&Qa!1508&Qf!1508", "beforeQuest": 1508 },
-            { "reply": 21608, "next": 18006, "quest": 1508, "afterObjective": 8517, "beforeObjective": 8518 }
+            { "reply": 21608, "next": 18006, "quest": 1508, "afterObjective": 8517, "beforeObjective": 8518 },
+            { "reply": 21561, "next": 17972, "quest": 1513, "afterObjective": 8585, "beforeObjective": 8586, "completes": 8586, "params": [[30, 8586]] }
           ]
         },
         {
@@ -56792,9 +56855,13 @@
         {
           "message": 18007,
           "choices": []
+        },
+        {
+          "message": 17972,
+          "choices": []
         }
       ],
-      "why": "Graverg at the Cantera aurífera [3,-4], who gives «Las grandes galerías» (1507): «Parlez à Grabergue en [3,-4] pour savoir quel genre de travaux ils font dans le coin» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Se renseigner sur les travaux.» (20997, 17533), «Demander si tout se passe bien.» (20996, 17534: miners trapped by a rockfall) and «Accepter.» (20995). Back with the tamed perforatroces, «Donner les Phorreurs apprivoisés.» (21171) hands them over (8503, a bring objective: Graverg keeps the follower 15311, «ya están al pie del cañón», 17661) and Williamwadui comes up: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (17661: «Williamwadui, ¿has conseguido arreglártelas?»). 1508 «Un corazón de oro»: after 1507, «Me la ha dado Williamwadui como recompensa» (21020) shows him the jewel (17556); picking it up (21021) starts 1508 and he has no time (17971). Back after McRico's kamas, the same reply (21608 -> 18006 -> 21609 -> 18007) closes 8518 and he calls Williamwadui. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+      "why": "Graverg at the Cantera aurífera [3,-4], who gives «Las grandes galerías» (1507): «Parlez à Grabergue en [3,-4] pour savoir quel genre de travaux ils font dans le coin» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Se renseigner sur les travaux.» (20997, 17533), «Demander si tout se passe bien.» (20996, 17534: miners trapped by a rockfall) and «Accepter.» (20995). Back with the tamed perforatroces, «Donner les Phorreurs apprivoisés.» (21171) hands them over (8503, a bring objective: Graverg keeps the follower 15311, «ya están al pie del cañón», 17661) and Williamwadui comes up: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (17661: «Williamwadui, ¿has conseguido arreglártelas?»). 1508 «Un corazón de oro»: after 1507, «Me la ha dado Williamwadui como recompensa» (21020) shows him the jewel (17556); picking it up (21021) starts 1508 and he has no time (17971). Back after McRico's kamas, the same reply (21608 -> 18006 -> 21609 -> 18007) closes 8518 and he calls Williamwadui. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Quest 1513: «¿Qué quería la Hermandad de la Seguridad Interior?» (21561, 17972, 8586). Dofus pour les noobs «Malle des profondeurs»; message and reply ids are the client's (qdump 1513)"
     },
   {
       "npc": 2399,
@@ -57050,7 +57117,8 @@
         {
           "message": 17706,
           "choices": [
-            { "reply": 21213, "next": 17707, "quest": 1507, "afterObjectives": [8500, 8501], "beforeObjective": 8503 }
+            { "reply": 21213, "next": 17707, "quest": 1507, "afterObjectives": [8500, 8501], "beforeObjective": 8503 },
+            { "reply": 21542, "next": 17959, "quest": 1513, "beforeObjective": 8585, "completes": 8585, "params": [[30, 8585]] }
           ]
         },
         {
@@ -57076,9 +57144,13 @@
             { "reply": 21214, "buyPrice": 6000, "gives": 15311, "quest": 1507, "afterObjective": 8502, "beforeObjective": 8503, "criterion": "PO!15311" },
             { "reply": 21215, "quest": 1507, "afterObjective": 8502, "beforeObjective": 8503, "criterion": "PO!15311" }
           ]
+        },
+        {
+          "message": 17959,
+          "choices": []
         }
       ],
-      "why": "Yanocoche at [0,-5], for «Las grandes galerías» (1507, 8502), once Draifontein and Foolk are convinced (8500, 8501): «Allez maintenant auprès de Yanacoché en [0,-5] pour lui demander de vous prêter des phorreurs. Parlez lui donc du problème des mineurs à lui aussi ... Vous obtenez donc 3 phorreurs apprivoisés en personnages suiveurs» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Parler du problème des mineurs.» (21213, 17707), «Recentrer la discussion sur les mineurs en danger.» (21212, 17708), «Demander l'aide de ses Phorreurs» (21211, 17709): the follower 15311. Lost before Graverg has them, they cost what he warns: «Ya te lo había dicho: te costará 6000 kamas» (21216, 17711), «Pagar los 6000 kamas» (21214) or «Ir a buscar kamas» (21215)."
+      "why": "Yanocoche at [0,-5], for «Las grandes galerías» (1507, 8502), once Draifontein and Foolk are convinced (8500, 8501): «Allez maintenant auprès de Yanacoché en [0,-5] pour lui demander de vous prêter des phorreurs. Parlez lui donc du problème des mineurs à lui aussi ... Vous obtenez donc 3 phorreurs apprivoisés en personnages suiveurs» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Parler du problème des mineurs.» (21213, 17707), «Recentrer la discussion sur les mineurs en danger.» (21212, 17708), «Demander l'aide de ses Phorreurs» (21211, 17709): the follower 15311. Lost before Graverg has them, they cost what he warns: «Ya te lo había dicho: te costará 6000 kamas» (21216, 17711), «Pagar los 6000 kamas» (21214) or «Ir a buscar kamas» (21215). Quest 1513: «Intentar averiguar más cosas sobre los incidentes ocurridos en las profundidades.» (21542, 17959, 8585). Dofus pour les noobs «Malle des profondeurs»; message and reply ids are the client's (qdump 1513)"
     },
   {
       "npc": 2402,
@@ -57336,7 +57408,13 @@
             { "reply": 21324, "criterion": "Qf=1510", "passage": 2424001 },
             { "reply": 21324, "quest": 1510, "beforeObjective": 8563, "passage": 2424001 },
             { "reply": 21326, "next": 17792, "quest": 1510, "afterObjective": 8553, "beforeObjective": 8554, "takesAll": [15347, 15348, 15349], "completes": 8554, "params": [[30, 8554]] },
-            { "reply": 21356, "next": 17819, "quest": 1510, "afterObjective": 8563, "completes": 8564, "params": [[30, 8564]] }
+            { "reply": 21356, "next": 17819, "quest": 1510, "afterObjective": 8563, "completes": 8564, "params": [[30, 8564]] },
+            { "reply": 21360, "next": 17824, "afterObjective": 8565, "beforeObjective": 8566, "completes": 8566, "params": [[30, 8566]], "quest": 1511 },
+            { "reply": 21366, "next": 17827, "afterObjective": 8568, "beforeObjective": 8569, "completes": 8569, "params": [[30, 8569]], "quest": 1511 },
+            { "reply": 21406, "next": 17866, "quest": 1512, "afterObjective": 8580, "beforeObjective": 8581 },
+            { "reply": 21408, "next": 17870, "quest": 1512, "afterObjective": 8582, "beforeObjective": 8583, "completes": 8583, "params": [[30, 8583]] },
+            { "reply": 21544, "next": 17960, "quest": 1513, "afterObjective": 8586, "beforeObjective": 8587, "completes": 8587, "params": [[30, 8587]] },
+            { "reply": 21479, "next": 17917, "quest": 1516, "afterObjective": 8598, "beforeObjective": 8599, "completes": 8599, "params": [[30, 8599]] }
           ]
         },
         {
@@ -57372,9 +57450,39 @@
         {
           "message": 17819,
           "choices": []
+        },
+        {
+          "message": 17824,
+          "choices": []
+        },
+        {
+          "message": 17827,
+          "choices": []
+        },
+        {
+          "message": 17866,
+          "choices": [
+            { "reply": 21405, "next": 17867, "quest": 1512, "afterObjective": 8580, "beforeObjective": 8581, "completes": 8581, "params": [[30, 8581]] }
+          ]
+        },
+        {
+          "message": 17867,
+          "choices": []
+        },
+        {
+          "message": 17870,
+          "choices": []
+        },
+        {
+          "message": 17960,
+          "choices": []
+        },
+        {
+          "message": 17917,
+          "choices": []
         }
       ],
-      "why": "Anciago before the Cofredía's building at [-8,-5], who gives «Espionaje industrial» (1510): «Parlez à Ancestro en [-8,-5]» (Dofus pour les noobs, «Espionnage industriel»). «Informarte sobre los empleos disponibles en el sector.» (21321, 17789), «Sí.» (21320, 17790: his brother Riberico spoke of you; a spy in the Cofredía), «Aceptar jugar a los investigadores.» (21319) starts it, and he sends you in (17791, «Entrar en el edificio de la Cofredía.», 21322). His opening has «Accéder au bâtiment» and «Donner les indices» side by side in the guide's picture: «Entrar en el edificio de la Cofredía.» (21324) while the quest is in hand, and «Aquí tienes las pistas que he encontrado.» (21326) once the three clues are carried (8553), which he keeps (8554: «como las has metido de cualquier modo en tu bolso, se han mezclado todas. Sin embargo, me sorprende ver el polvo sulfurado», 17792); «Intentar averiguar cómo ha podido llegar ahí el polvo.» (21325, 17793: question the Cofredía's workers and the Comilones') and in again (21323). Once the guard is told (8563), «Explicar la situación.» (21356) is 8564: «Así que el topo es Yiyo» (17819). Once the spy is unmasked (1510 done), «Entrar en el edificio de la Cofredía.» (21324) stays open: for «Golpe en Anutropía» (1908) «Anciago probablemente pueda darte acceso al edificio» (Inés, 28981); «Allez donc en [-8,-5] pour rencontrer Pépénible et accéder au bâtiment de la Koffrérie. NOTE : Pour pouvoir enter dans ce bâtiment il faut avoir terminé la quête Espionnage Industriel» (Dofus pour les noobs, «Casse en Enutrosor»)."
+      "why": "Anciago before the Cofredía's building at [-8,-5], who gives «Espionaje industrial» (1510): «Parlez à Ancestro en [-8,-5]» (Dofus pour les noobs, «Espionnage industriel»). «Informarte sobre los empleos disponibles en el sector.» (21321, 17789), «Sí.» (21320, 17790: his brother Riberico spoke of you; a spy in the Cofredía), «Aceptar jugar a los investigadores.» (21319) starts it, and he sends you in (17791, «Entrar en el edificio de la Cofredía.», 21322). His opening has «Accéder au bâtiment» and «Donner les indices» side by side in the guide's picture: «Entrar en el edificio de la Cofredía.» (21324) while the quest is in hand, and «Aquí tienes las pistas que he encontrado.» (21326) once the three clues are carried (8553), which he keeps (8554: «como las has metido de cualquier modo en tu bolso, se han mezclado todas. Sin embargo, me sorprende ver el polvo sulfurado», 17792); «Intentar averiguar cómo ha podido llegar ahí el polvo.» (21325, 17793: question the Cofredía's workers and the Comilones') and in again (21323). Once the guard is told (8563), «Explicar la situación.» (21356) is 8564: «Así que el topo es Yiyo» (17819). Once the spy is unmasked (1510 done), «Entrar en el edificio de la Cofredía.» (21324) stays open: for «Golpe en Anutropía» (1908) «Anciago probablemente pueda darte acceso al edificio» (Inés, 28981); «Allez donc en [-8,-5] pour rencontrer Pépénible et accéder au bâtiment de la Koffrérie. NOTE : Pour pouvoir enter dans ce bâtiment il faut avoir terminé la quête Espionnage Industriel» (Dofus pour les noobs, «Casse en Enutrosor»). Quest 1512: «Comunicarle las reivindicaciones de los obreros.» (21406, 17866), «Explicarle que los trabajadores quieren garantías.» (21405, 17867, 8581); after Frinklan «Aceptar su condición.» (21408, 17870, 8583). Line 17868 (the tax condition) is not reachable: no client reply leads to it. Dofus pour les noobs «La grève de la fin»; message and reply ids are the client's (qdump 1512) Quest 1513: «Preguntarle si la Hermandad de la Seguridad Interior ha pasado a verle.» (21544, 17960, 8587). Dofus pour les noobs «Malle des profondeurs»; message and reply ids are the client's (qdump 1513) Quest 1516: «Darle la caja de monedas de cofrefuerte.» (21479, 17917, 8599). Dofus pour les noobs «Laissé en plan»; message and reply ids are the client's (qdump 1516)"
     },
   {
       "npc": 2425,
@@ -57485,8 +57593,14 @@
       "map": 131862020,
       "opening": 17816,
       "openings": [
+        { "quest": 1512, "message": 17975 },
+        { "quest": 1511, "objective": 8573, "message": 17844 },
+        { "quest": 1511, "objective": 8570, "pending": 8573, "message": 17975 },
+        { "quest": 1511, "message": 17828 },
         { "quest": 1510, "objective": 8561, "pending": 8562, "message": 17817 },
-        { "quest": 1510, "objective": 8562, "pending": 8564, "message": 17818 }
+        { "quest": 1510, "objective": 8562, "pending": 8564, "message": 17818 },
+        { "before": 1511, "criterion": "Qf=1510&PL>179", "message": 17820 },
+        { "after": 1511, "before": 1512, "criterion": "PL>179", "message": 17975 }
       ],
       "lines": [
         {
@@ -57507,6 +57621,43 @@
           "choices": [
             { "reply": 21355, "quest": 1510, "afterObjective": 8562, "beforeObjective": 8563, "passage": 2430001, "completes": 8563, "params": [[30, 8563]] },
             { "reply": 21355, "quest": 1510, "afterObjective": 8563, "passage": 2430001 }
+          ]
+        },
+        {
+          "message": 17820,
+          "choices": [
+            { "reply": 21357, "startsQuest": 1511, "params": [[34, 1511]] }
+          ]
+        },
+        {
+          "message": 17828,
+          "choices": [
+            { "reply": 21369, "next": 17829, "afterObjective": 8569, "beforeObjective": 8570, "completes": 8570, "params": [[30, 8570]], "quest": 1511 }
+          ]
+        },
+        {
+          "message": 17829,
+          "choices": [
+            { "reply": 21368, "next": 17830, "quest": 1511, "afterObjective": 8570, "beforeObjective": 8573 }
+          ]
+        },
+        {
+          "message": 17830,
+          "choices": [
+            { "reply": 21370, "quest": 1511, "afterObjective": 8570, "beforeObjective": 8573, "passage": 2430002 }
+          ]
+        },
+        {
+          "message": 17975,
+          "choices": [
+            { "reply": 21367, "quest": 1511, "afterObjective": 8570, "beforeObjective": 8573, "passage": 2430002 },
+            { "reply": 21564, "criterion": "Qf=1511&Qf!1512&PL>179", "passage": 2430002 }
+          ]
+        },
+        {
+          "message": 17844,
+          "choices": [
+            { "reply": 21357, "afterObjective": 8573, "beforeObjective": 8574, "completes": 8574, "params": [[30, 8574]], "quest": 1511 }
           ]
         }
       ],
@@ -70273,7 +70424,9 @@
             { "reply": 21680, "quest": 1540, "criterion": "Qo>8764&Qo<8765", "holds": 15489, "completes": 8765, "params": [[30, 8765]] },
             { "reply": 21697, "quest": 1541, "criterion": "Qo>8769&Qo<8770", "completes": 8770, "params": [[30, 8770]], "gives": 15491, "next": 18103 },
             { "reply": 21989, "quest": 1557, "criterion": "Qo=8975", "completes": 8975, "params": [[30, 8975]], "next": 18360 },
-            { "reply": 21778, "quest": 1544, "completes": 8812, "params": [[30, 8812]], "criterion": "Qa=1544&Qo>8811&Qo<8812", "next": 18174 }
+            { "reply": 21778, "quest": 1544, "completes": 8812, "params": [[30, 8812]], "criterion": "Qa=1544&Qo>8811&Qo<8812", "next": 18174 },
+            { "reply": 21870, "quest": 1546, "completes": 8839, "params": [[30, 8839]], "criterion": "Qa=1546&Qo>8838&Qo<8839", "next": 18255 },
+            { "reply": 21878, "quest": 1547, "completes": 8844, "params": [[30, 8844]], "criterion": "Qa=1547&Qo>8843&Qo<8844", "next": 18266 }
           ]
         },
         {
@@ -70357,9 +70510,17 @@
         {
           "message": 18174,
           "choices": []
+        },
+        {
+          "message": 18255,
+          "choices": []
+        },
+        {
+          "message": 18266,
+          "choices": []
         }
       ],
-      "why": "Sergeant Raskzac of the travellers' outpost in Sramvil, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Estoy en misión especial para Exploranciana» (22363) is 8723; he tells Mundy lives in the dark summit and offers an escort that is declined (22361, 18717). Reply order INFERRED. Other quests of the sergeant add their lines here. «Fanfouille» (1538; Dofus pour les noobs («Fanfouille»)): 21630 -> 18029 -> 21629 -> 18030 -> «Aceptar» (21628) starts it; 18031 is his impatient line while the agent's affair is unfinished; the report (21649 -> 18049, «De acuerdo» 21650 = 8718) sends the player to Sinedia. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Fanfouille»). «Las brigadas del abismo» (1539; Dofus pour les noobs («Les brigades de l'abîme»)): «¿Me das otra misión?» (21652) -> 18050 -> «Sigue contándome» (21651) starts it and ends on 18051. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Les brigades de l'abîme»). «Balance la sauce» (1540; Dofus pour les noobs («Balance la sauce»)): «¿Me das otra misión?» (21670) -> 18078 -> 21669 starts it (18079); handing the documents over (21680 = 8765). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Balance la sauce»). Fix 1540d: reply 21680 no longer takes the documents before completing (the objective stayed pending). «Los viajeros del canal» (1541; Dofus pour les noobs («La seinoise»)): «Explicarle el trato con la niña» (21697 = 8770) -> 18103, he gives the defective krosmoglob (15491). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Presunto culpable» (1557; Dofus pour les noobs («Présumé coupable»)): «Negociar la proteccion de la Orden...» (21989 = 8975, 18360): he will not protect a criminal. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): after the samples (18168: «¿Te envía la doctora Brennan?»), «¿Cuál es la situación urgente, sargento?» (21774 = 8807 -> 18169: the agent in trouble in the catacombs [4,8]) and, at the end, «Hacerle un informe» (21778 = 8812 -> 18174). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
+      "why": "Sergeant Raskzac of the travellers' outpost in Sramvil, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Estoy en misión especial para Exploranciana» (22363) is 8723; he tells Mundy lives in the dark summit and offers an escort that is declined (22361, 18717). Reply order INFERRED. Other quests of the sergeant add their lines here. «Fanfouille» (1538; Dofus pour les noobs («Fanfouille»)): 21630 -> 18029 -> 21629 -> 18030 -> «Aceptar» (21628) starts it; 18031 is his impatient line while the agent's affair is unfinished; the report (21649 -> 18049, «De acuerdo» 21650 = 8718) sends the player to Sinedia. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Fanfouille»). «Las brigadas del abismo» (1539; Dofus pour les noobs («Les brigades de l'abîme»)): «¿Me das otra misión?» (21652) -> 18050 -> «Sigue contándome» (21651) starts it and ends on 18051. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Les brigades de l'abîme»). «Balance la sauce» (1540; Dofus pour les noobs («Balance la sauce»)): «¿Me das otra misión?» (21670) -> 18078 -> 21669 starts it (18079); handing the documents over (21680 = 8765). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Balance la sauce»). Fix 1540d: reply 21680 no longer takes the documents before completing (the objective stayed pending). «Los viajeros del canal» (1541; Dofus pour les noobs («La seinoise»)): «Explicarle el trato con la niña» (21697 = 8770) -> 18103, he gives the defective krosmoglob (15491). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Presunto culpable» (1557; Dofus pour les noobs («Présumé coupable»)): «Negociar la proteccion de la Orden...» (21989 = 8975, 18360): he will not protect a criminal. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): after the samples (18168: «¿Te envía la doctora Brennan?»), «¿Cuál es la situación urgente, sargento?» (21774 = 8807 -> 18169: the agent in trouble in the catacombs [4,8]) and, at the end, «Hacerle un informe» (21778 = 8812 -> 18174). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»). «Sa majesté des Nécrotiques» (1546): «La entrega de armas ha tenido lugar» (21870 = 8839 -> 18255). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»). «L'art me ment» (1547): «Hablarle de la unidad de Marshall Palegnor y de la zona de cuarentena» (21878 = 8844 -> 18266). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
     },
   {
       "npc": 2454,
@@ -70830,7 +70991,8 @@
         {
           "message": 18711,
           "choices": [
-            { "reply": 22414, "quest": 1531, "criterion": "Qo<8738", "next": 18769 }
+            { "reply": 22414, "quest": 1531, "criterion": "Qo<8738", "next": 18769 },
+            { "reply": 22357, "quest": 1546, "completes": 8837, "params": [[30, 8837]], "criterion": "Qa=1546&Qo>8836&Qo<8837", "next": 18712 }
           ]
         },
         {
@@ -70838,9 +71000,13 @@
           "choices": [
             { "reply": 22413, "quest": 1531, "completes": 8738, "params": [[30, 8738]] }
           ]
+        },
+        {
+          "message": 18712,
+          "choices": []
         }
       ],
-      "why": "Rufiana [8,4]: decodes the message and accepts (22414, 18769; the leave reply 22413 = 8738). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»)."
+      "why": "Rufiana [8,4]: decodes the message and accepts (22414, 18769; the leave reply 22413 = 8738). Reply order INFERRED from the client's lines; Dofus pour les noobs («Messager clandestin»). «Sa majesté des Nécrotiques» (1546): «Explicar la situación de los niños en las catacombrías» (22357 = 8837 -> 18712). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
     },
   {
       "npc": 2541,
@@ -88633,11 +88799,16 @@
       "npc": 2434,
       "map": 0,
       "opening": 17913,
+      "openings": [
+        { "quest": 1516, "objective": 8595, "pending": 8596, "message": 17914 }
+      ],
       "lines": [
         {
           "message": 17913,
           "choices": [
-            { "reply": 21593, "next": 17994, "quest": 1514, "afterObjective": 8609, "beforeObjective": 8610 }
+            { "reply": 21593, "next": 17994, "quest": 1514, "afterObjective": 8609, "beforeObjective": 8610 },
+            { "reply": 21475, "next": 17914, "quest": 1516, "afterObjectives": [8593, 8594], "beforeObjective": 8595, "takesAll": [15337, 15338, 15339, 15340, 15341, 15342, 15343, 15344, 15345, 15346], "completes": 8595, "params": [[30, 8595]] },
+            { "reply": 21477, "next": 17915, "quest": 1516, "afterObjective": 8596, "beforeObjective": 8597, "gives": 15336, "completes": 8597, "params": [[30, 8597]] }
           ]
         },
         {
@@ -88649,9 +88820,19 @@
         {
           "message": 17995,
           "choices": []
+        },
+        {
+          "message": 17914,
+          "choices": [
+            { "reply": 21474, "quest": 1516, "afterObjective": 8595, "beforeObjective": 8596 }
+          ]
+        },
+        {
+          "message": 17915,
+          "choices": []
         }
       ],
-      "why": "Desalmago (1514, 8610): «Pedir un bol de sopa reconstituyente.» (21593, 17994) and «Beber la sopa.» (21592, 17995) after Wello's resources. Dofus pour les noobs («Coiffeur de génie»). The 1516 reply 21474 is not written yet (no content for that quest)."
+      "why": "Desalmago (1514, 8610): «Pedir un bol de sopa reconstituyente.» (21593, 17994) and «Beber la sopa.» (21592, 17995) after Wello's resources. Dofus pour les noobs («Coiffeur de génie»). The 1516 reply 21474 is not written yet (no content for that quest). Quest 1516: «Darle los recursos y explicarle tu mision.» (21475, 17914, 8595), «Impedir que Desalmago desaparezca con los recursos.» (21474) starts the solo fight (8596), «Exigirle que haga el trabajo convenido.» (21477, 17915, 8597) hands the Caja de monedas (15336). Reply 21476 («Reclamarle los recursos por la fuerza») is not used (INFERRED). Dofus pour les noobs «Laissé en plan»; message and reply ids are the client's (qdump 1516)"
     },
     {
       "npc": 2355,
@@ -89138,7 +89319,15 @@
             { "reply": 21762, "quest": 1542, "criterion": "Qa=1542&Qo>8781&Qo<8787&PO!15498", "next": 18155 },
             { "reply": 21768, "quest": 1543, "completes": 8796, "params": [[30, 8796]], "criterion": "Qa=1543&Qo>8795&Qo<8796", "next": 18164 },
             { "reply": 21771, "criterion": "PL>159&Qf=1539&Qf=1543&Qa!1544&Qf!1544", "next": 18165 },
-            { "reply": 21772, "quest": 1544, "completes": 8806, "params": [[30, 8806]], "criterion": "Qa=1544&Qo<8806&PO=15509&PO=15511&PO=15513&PO=15517&PO=15519&PO=15520&PO=15521&PO=15522", "completesAll": [8801, 8802, 8803, 8804, 8805, 8806], "next": 18167 }
+            { "reply": 21772, "quest": 1544, "completes": 8806, "params": [[30, 8806]], "criterion": "Qa=1544&Qo<8806&PO=15509&PO=15511&PO=15513&PO=15517&PO=15519&PO=15520&PO=15521&PO=15522", "completesAll": [8801, 8802, 8803, 8804, 8805, 8806], "next": 18167 },
+            { "reply": 21781, "criterion": "Qf=1544&Qa!1545&Qf!1545", "next": 18175 },
+            { "reply": 21788, "quest": 1545, "completes": 8821, "params": [[30, 8821]], "criterion": "Qa=1545&Qo>8820&Qo<8821&PO=15550", "next": 18180 },
+            { "reply": 21791, "criterion": "Qa=1545&Qo>8822&Qo<8823&PO=15552", "next": 18183 },
+            { "reply": 21790, "quest": 1545, "completes": 8823, "params": [[30, 8823]], "criterion": "Qa=1545&Qo>8822&Qo<8823&PO=15552", "next": 18184 },
+            { "reply": 21871, "quest": 1546, "completes": 8840, "params": [[30, 8840]], "criterion": "Qa=1546&Qo>8839&Qo<8840", "next": 18256 },
+            { "reply": 21873, "criterion": "PL>179&Qf=1546&Qa!1547&Qf!1547", "next": 18257 },
+            { "reply": 21882, "quest": 1547, "completes": 8846, "params": [[30, 8846]], "criterion": "Qa=1547&Qo>8845&Qo<8846", "next": 18270 },
+            { "reply": 21944, "quest": 1547, "completes": 8857, "params": [[30, 8857]], "criterion": "Qa=1547&Qo>8854&Qo<8857", "next": 18319 }
           ]
         },
         {
@@ -89198,9 +89387,51 @@
         {
           "message": 18167,
           "choices": []
+        },
+        {
+          "message": 18175,
+          "choices": [
+            { "reply": 21780, "next": 18176 }
+          ]
+        },
+        {
+          "message": 18176,
+          "choices": [
+            { "reply": 21779, "startsQuest": 1545, "params": [[34, 1545]] }
+          ]
+        },
+        {
+          "message": 18180,
+          "choices": []
+        },
+        {
+          "message": 18183,
+          "choices": []
+        },
+        {
+          "message": 18184,
+          "choices": []
+        },
+        {
+          "message": 18256,
+          "choices": []
+        },
+        {
+          "message": 18257,
+          "choices": [
+            { "reply": 21872, "startsQuest": 1547, "params": [[34, 1547]] }
+          ]
+        },
+        {
+          "message": 18270,
+          "choices": []
+        },
+        {
+          "message": 18319,
+          "choices": []
         }
       ],
-      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «Hablarle de tu evasión» (21760 = 8781, 18154: the milimaestro disguise 15498); «Necesito un nuevo disfraz» (21762 -> 18155 -> 21761: 4000 kamas). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»). «Un ring para gobernarlos a todos» (1543; Dofus pour les noobs («Un ring pour les gouverner tous»)): «Aquí tienes los resultados de la investigación» (21768 = 8796, 18164). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): «Estoy listo para ayudarte en una nueva misión» (21771 -> 18165), «¿Qué tengo que hacer yo?» (21770 -> 18166, the step line) and «Aceptar» (21769 starts it); «Aquí tienes las muestras» (21772 -> 18167) hands over the four healthy necrotic samples (8801-8804) and the four egg samples (8806). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
+      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «Hablarle de tu evasión» (21760 = 8781, 18154: the milimaestro disguise 15498); «Necesito un nuevo disfraz» (21762 -> 18155 -> 21761: 4000 kamas). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»). «Un ring para gobernarlos a todos» (1543; Dofus pour les noobs («Un ring pour les gouverner tous»)): «Aquí tienes los resultados de la investigación» (21768 = 8796, 18164). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): «Estoy listo para ayudarte en una nueva misión» (21771 -> 18165), «¿Qué tengo que hacer yo?» (21770 -> 18166, the step line) and «Aceptar» (21769 starts it); «Aquí tienes las muestras» (21772 -> 18167) hands over the four healthy necrotic samples (8801-8804) and the four egg samples (8806). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»). «Tique attaque» (1545; Dofus pour les noobs («Tique attaque»)): «¿Cómo va tu investigación?» (21781 -> 18175), «¿Cómo piensas conseguirlas?» (21780 -> 18176, the step line) and «Claro, estoy encantado...» (21779 starts it); «Aquí tienes la muestra» (21788 = 8821 -> 18180) hands over the aggressive necrotic sample 15550; «Hacerle preguntas sobre el paquete» (21791 -> 18183) and «Toma el paquete» (21790 = 8823 -> 18184) the parcel 15552. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Tique attaque»). «Sa majesté des Nécrotiques» (1546): «Hablarle de tus logros» (21871 = 8840 -> 18256). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»). «L'art me ment» (1547): «¿Sabes algo nuevo del asunto de los viajeros agredidos?» (21873 -> 18257, the step line) and «Aceptar» (21872) starts it; «Hablarle de la misión de la unidad de Marshall Palegnor» (21882 = 8846 -> 18270); «Toma el fluido gástrico de Toxoliat» (21944 = 8857 -> 18319). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
     },
     {
       "npc": 2503,
@@ -90959,7 +91190,10 @@
             { "reply": 20966, "next": 17508, "quest": 1502, "afterObjective": 8450, "beforeObjective": 8451, "completes": 8451, "params": [[30, 8451]] },
             { "reply": 20968, "next": 17509, "criterion": "PL>179&Qf=1502&Qa!1503&Qf!1503", "beforeQuest": 1503 },
             { "reply": 20994, "next": 17531, "quest": 1503, "afterObjective": 8464, "beforeObjective": 8465, "completes": 8465, "params": [[30, 8465]] },
-            { "reply": 20929 }
+            { "reply": 20929 },
+            { "reply": 21407, "next": 17869, "quest": 1512, "afterObjective": 8581, "beforeObjective": 8582, "completes": 8582, "params": [[30, 8582]] },
+            { "reply": 21541, "next": 17957, "criterion": "PL>179&Qf=1512&Qa!1513&Qf!1513", "beforeQuest": 1513 },
+            { "reply": 21550, "next": 17964, "quest": 1513, "afterObjective": 8590, "beforeObjective": 8591, "completes": 8591, "params": [[30, 8591]] }
           ]
         },
         {
@@ -91009,9 +91243,23 @@
         {
           "message": 17531,
           "choices": []
+        },
+        {
+          "message": 17869,
+          "choices": []
+        },
+        {
+          "message": 17957,
+          "choices": [
+            { "startsQuest": 1513, "params": [[34, 1513]], "reply": 21540 }
+          ]
+        },
+        {
+          "message": 17964,
+          "choices": []
         }
       ],
-      "why": "Sargento Frinklan of the travellers outpost: the giver of «Tragamonedas» (1501: 20948 -> 17489 -> 20947 -> 17490 -> 20946 -> 17491 -> 20945 starts; 20955 reports, 17499), «Perforestación» (1502: 20957 -> 17500 -> 20956; 20966 reports, 17508) and «El silencio es oro» (1503: 20968 -> 17509 -> 20967; 20994 reports, 17531). Gladis' errand (20928, 17476) keeps its line. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+      "why": "Sargento Frinklan of the travellers outpost: the giver of «Tragamonedas» (1501: 20948 -> 17489 -> 20947 -> 17490 -> 20946 -> 17491 -> 20945 starts; 20955 reports, 17499), «Perforestación» (1502: 20957 -> 17500 -> 20956; 20966 reports, 17508) and «El silencio es oro» (1503: 20968 -> 17509 -> 20967; 20994 reports, 17531). Gladis' errand (20928, 17476) keeps its line. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Quest 1512: «Hablar sobre la localización del terreno.» (21407, 17869, 8582). Dofus pour les noobs «La grève de la fin»; message and reply ids are the client's (qdump 1512) Quest 1513: «Hablar de los últimos rumores.» (21541, 17957, Aceptar 21540 starts it) and «Informarle acerca de los incidentes de Anutropía.» (21550, 17964, 8591). Dofus pour les noobs «Malle des profondeurs»; message and reply ids are the client's (qdump 1513)"
     },
     {
       "npc": 2377,
@@ -91140,6 +91388,9 @@
       "npc": 2509,
       "map": 0,
       "opening": 18170,
+      "openings": [
+        { "quest": 1547, "message": 18262 }
+      ],
       "lines": [
         {
           "message": 18170,
@@ -91150,9 +91401,26 @@
         {
           "message": 18171,
           "choices": []
+        },
+        {
+          "message": 18262,
+          "names": true,
+          "choices": [
+            { "reply": 21877, "quest": 1547, "completes": 8843, "params": [[30, 8843]], "criterion": "Qa=1547&Qo<8843", "next": 18263 }
+          ]
+        },
+        {
+          "message": 18263,
+          "choices": [
+            { "reply": 21876, "next": 18264 }
+          ]
+        },
+        {
+          "message": 18264,
+          "choices": []
         }
       ],
-      "why": "Marshall Palegnor in the catacombs [4,8] (18170): «Analizar el conjunto de la situación» (21775 = 8809 -> 18171: the experimental fuel to put in the flames). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
+      "why": "Marshall Palegnor in the catacombs [4,8] (18170): «Analizar el conjunto de la situación» (21775 = 8809 -> 18171: the experimental fuel to put in the flames). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»). «L'art me ment» (1547): opening 18262; «¿Tu estado ha mejorado?» (21877 = 8843 -> 18263) and «¿Quiénes son los otros miembros?» (21876 -> 18264). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
     },
     {
       "npc": 2510,
@@ -91296,6 +91564,588 @@
         }
       ],
       "why": "Bolsa de herramientas (Trousse à outils in Dofus pour les noobs «Le silence est d'or»), [-9,-6]: it will not follow (17530); «Darle una paliza a la bolsa de herramientas» (20993) starts the fight and «Ir en busca de ayuda» (21604) leaves. Dofus pour les noobs «Le silence est d'or»; the order of the replies is read from the client's message and reply ids."
+    },
+    {
+      "npc": 2511,
+      "map": 0,
+      "opening": 18177,
+      "lines": [
+        {
+          "message": 18177,
+          "choices": [
+            { "reply": 21784, "criterion": "Qa=1545&Qo<8820", "next": 18178 },
+            { "reply": 21782, "criterion": "Qa=1545&Qo>8819&Qo<8820&PO!15550" },
+            { "reply": 21786, "quest": 1545, "completes": 8820, "params": [[30, 8820]], "criterion": "Qa=1545&Qo>8819&Qo<8820&PO=15550", "next": 18179 },
+            { "reply": 21801, "quest": 1545, "completes": 8825, "params": [[30, 8825]], "criterion": "Qa=1545&Qo>8824&Qo<8825", "next": 18192 },
+            { "reply": 21806, "criterion": "Qf=1545&Qa!1546&Qf!1546", "next": 18195 },
+            { "reply": 21811, "quest": 1546, "completes": 8827, "params": [[30, 8827]], "criterion": "Qa=1546&Qo>8826&Qo<8827", "next": 18200 },
+            { "reply": 21834, "quest": 1546, "completes": 8829, "params": [[30, 8829]], "criterion": "Qa=1546&Qo>8828&Qo<8829", "next": 18220 },
+            { "reply": 21869, "quest": 1546, "completes": 8838, "params": [[30, 8838]], "criterion": "Qa=1546&Qo>8837&Qo<8838", "next": 18254 },
+            { "reply": 21883, "quest": 1547, "completes": 8847, "params": [[30, 8847]], "criterion": "Qa=1547&Qo>8846&Qo<8847", "next": 18271 }
+          ]
+        },
+        {
+          "message": 18178,
+          "choices": [
+            { "reply": 21785 },
+            { "reply": 21783 }
+          ]
+        },
+        {
+          "message": 18179,
+          "choices": []
+        },
+        {
+          "message": 18192,
+          "choices": []
+        },
+        {
+          "message": 18195,
+          "choices": [
+            { "reply": 21805, "startsQuest": 1546, "params": [[34, 1546]] }
+          ]
+        },
+        {
+          "message": 18200,
+          "choices": []
+        },
+        {
+          "message": 18220,
+          "choices": [
+            { "reply": 21839 }
+          ]
+        },
+        {
+          "message": 18254,
+          "choices": []
+        },
+        {
+          "message": 18271,
+          "choices": []
+        }
+      ],
+      "why": "Serpentine of the Pits n. 12 [7,9] (opening 18177): «Me envía Kathy Brennan» (21784 -> 18178: the necrotics around her), «Luchar contra los necróticos agresivos» (21785 alone, 21782 once the reinforcements were called with 21783), «Hablar de los necróticos» (21786 = 8820 -> 18179) after the fight, and «Hablarle de tu encuentro inesperado con unos niños» (21801 = 8825 -> 18192) at the end. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Tique attaque»). «Sa majesté des Nécrotiques» (1546): «¿Por qué eres tan agresiva?» (21806 -> 18195, the step line) and «Obedecer» (21805) starts it; «Resumirle la charla con Nosf» (21811 = 8827 -> 18200), «¿Por qué no cambias de cantinela?» (21834 = 8829 -> 18220: the small passages, «Tomar uno de los pasajes» 21839) and «Tranquila, todo volverá a su cauce» (21869 = 8838 -> 18254). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»). «L'art me ment» (1547): «Hablarle de las pruebas de armamento con precaución» (21883 = 8847 -> 18271). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2512,
+      "map": 0,
+      "opening": 18181,
+      "lines": [
+        {
+          "message": 18181,
+          "choices": [
+            { "reply": 21789, "quest": 1545, "completes": 8822, "params": [[30, 8822]], "criterion": "Qa=1545&Qo>8821&Qo<8822", "gives": 15552, "next": 18182 }
+          ]
+        },
+        {
+          "message": 18182,
+          "choices": []
+        }
+      ],
+      "why": "Amuza Ataga [7,4] (18181): «¿Está listo el pedido de Kathy Brennan?» (21789 = 8822 -> 18182) hands over the parcel 15552. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Tique attaque»)."
+    },
+    {
+      "npc": 2431,
+      "map": 129764354,
+      "opening": 17821,
+      "openings": [
+        { "quest": 1511, "objective": 8567, "pending": 8568, "message": 17826 }
+      ],
+      "lines": [
+        {
+          "message": 17821,
+          "choices": [
+            { "reply": 21359, "next": 17822, "quest": 1511, "beforeObjective": 8565 },
+            { "reply": 21362, "next": 17825, "afterObjective": 8566, "beforeObjective": 8567, "completes": 8567, "params": [[30, 8567]], "quest": 1511 }
+          ]
+        },
+        {
+          "message": 17822,
+          "choices": [
+            { "reply": 21358, "next": 17823, "quest": 1511, "beforeObjective": 8565, "completes": 8565, "params": [[30, 8565]] }
+          ]
+        },
+        {
+          "message": 17823,
+          "choices": []
+        },
+        {
+          "message": 17825,
+          "choices": [
+            { "reply": 21361, "quest": 1511, "afterObjective": 8567, "beforeObjective": 8568 },
+            { "reply": 21363, "quest": 1511, "afterObjective": 8567, "beforeObjective": 8568 }
+          ]
+        },
+        {
+          "message": 17826,
+          "choices": [
+            { "reply": 21364, "quest": 1511, "afterObjective": 8567, "beforeObjective": 8568 },
+            { "reply": 21365, "quest": 1511, "afterObjective": 8567, "beforeObjective": 8568 }
+          ]
+        }
+      ],
+      "why": "Buscador de oro clandestino (the explosives expert, Orpailleur clandestin in Dofus pour les noobs «Prise d'otages») at [-7,-4]: «¿Tú sabes de explosivos?» (21359, 17822), «Necesito que me ayudes en un edificio de Anutropía.» (21358, 17823: one million kamas, 8565), «Los divinutrofs aceptan tu oferta.» (21362, 17825, 8567), then «Luchar contra los divinutrofs.» (21361/21364, alone) or «Esperar a que lleguen refuerzos.» (21363/21365, the guide: the fight may be done in a group). Dofus pour les noobs «Prise d'otages»; the order of the replies is read from the client's message and reply ids"
+    },
+    {
+      "npc": 2429,
+      "map": 131863044,
+      "opening": 17841,
+      "lines": [
+        {
+          "message": 17841,
+          "choices": [
+            { "reply": 21388, "quest": 1511, "afterObjective": 8571, "beforeObjective": 8573, "completes": 8572, "params": [[30, 8572]] }
+          ]
+        }
+      ],
+      "why": "Yiyo in the hostage room (131863044): «Responder de la forma más básica posible: con violencia.» (21388) starts the fight alone («Attaquez alors René sans même négocier. Le combat s'effectuera seul !»). Dofus pour les noobs «Prise d'otages»; the order of the replies is read from the client's message and reply ids"
+    },
+    {
+      "npc": 2516,
+      "map": 0,
+      "opening": 18187,
+      "lines": [
+        {
+          "message": 18187,
+          "choices": [
+            { "reply": 21795 }
+          ]
+        }
+      ],
+      "why": "A child of the catacombs [6,8] (18187): «Tratar de atrapar a los niños» (21795) - he warns the others and the children run off through the passage. The reply ticks 1545 objective 8824 and 1546 objective 8828 (bindings). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2517,
+      "map": 0,
+      "opening": 18188,
+      "lines": [
+        {
+          "message": 18188,
+          "choices": [
+            { "reply": 21796 }
+          ]
+        }
+      ],
+      "why": "A child of the catacombs [6,8] (18188): «Tratar de atrapar a los niños» (21796) - he warns the others and the children run off through the passage. The reply ticks 1545 objective 8824 and 1546 objective 8828 (bindings). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2518,
+      "map": 0,
+      "opening": 18189,
+      "lines": [
+        {
+          "message": 18189,
+          "choices": [
+            { "reply": 21797 }
+          ]
+        }
+      ],
+      "why": "A child of the catacombs [6,8] (18189): «Tratar de atrapar a los niños» (21797) - he warns the others and the children run off through the passage. The reply ticks 1545 objective 8824 and 1546 objective 8828 (bindings). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2519,
+      "map": 0,
+      "opening": 18196,
+      "lines": [
+        {
+          "message": 18196,
+          "choices": [
+            { "reply": 21810, "next": 18197 }
+          ]
+        },
+        {
+          "message": 18197,
+          "choices": [
+            { "reply": 21809, "next": 18198 }
+          ]
+        },
+        {
+          "message": 18198,
+          "choices": [
+            { "reply": 21808, "next": 18199 }
+          ]
+        },
+        {
+          "message": 18199,
+          "choices": [
+            { "reply": 21807, "quest": 1546, "completes": 8826, "params": [[30, 8826]], "criterion": "Qa=1546&Qo<8826" }
+          ]
+        }
+      ],
+      "why": "Nosf on [6,8] (18196): «Hacerle preguntas sobre los necróticos» (21810), «Escuchar la información» (21809), «Escuchar la explicación» (21808) and «Irte rápidamente» (21807 = 8826), the falling population of necrotics. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2524,
+      "map": 0,
+      "opening": 18228,
+      "lines": [
+        {
+          "message": 18228,
+          "choices": [
+            { "reply": 21849, "quest": 1546, "completes": 8831, "params": [[30, 8831]], "criterion": "Qa=1546&Qo>8830&Qo<8831", "next": 18229 },
+            { "reply": 21852, "criterion": "Qa=1546&Qo>8831&Qo<8832" }
+          ]
+        },
+        {
+          "message": 18229,
+          "choices": [
+            { "reply": 21848, "next": 18230 }
+          ]
+        },
+        {
+          "message": 18230,
+          "choices": [
+            { "reply": 21847, "next": 18231 }
+          ]
+        },
+        {
+          "message": 18231,
+          "choices": [
+            { "reply": 21850 },
+            { "reply": 21851 }
+          ]
+        }
+      ],
+      "why": "Mérridiu in the secret room (18228): «¿Quién dirige a los niños?» (21849 = 8831), «Partirte de risa...» (21848), «¡A que te transformo en relleno de salchicha!» (21847), then «Cumplir con tu amenaza» (21850, alone) or «Esperar refuerzos» (21851) and, once they are called, «Cumplir con tu amenaza» (21852, a group may join). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2526,
+      "map": 0,
+      "opening": 18243,
+      "lines": [
+        {
+          "message": 18243,
+          "choices": [
+            { "reply": 21865, "quest": 1546, "completes": 8833, "params": [[30, 8833]], "criterion": "Qa=1546&Qo>8832&Qo<8833", "next": 18241 }
+          ]
+        },
+        {
+          "message": 18241,
+          "choices": []
+        }
+      ],
+      "why": "A freed child of the secret room (18243): the reply 21865 = 8833 -> 18241. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2527,
+      "map": 0,
+      "opening": 18245,
+      "lines": [
+        {
+          "message": 18245,
+          "choices": [
+            { "reply": 21866, "quest": 1546, "completes": 8834, "params": [[30, 8834]], "criterion": "Qa=1546&Qo>8833&Qo<8834", "next": 18247 }
+          ]
+        },
+        {
+          "message": 18247,
+          "choices": []
+        }
+      ],
+      "why": "A freed child of the secret room (18245): the reply 21866 = 8834 -> 18247. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2528,
+      "map": 0,
+      "opening": 18248,
+      "lines": [
+        {
+          "message": 18248,
+          "choices": [
+            { "reply": 21867, "quest": 1546, "completes": 8835, "params": [[30, 8835]], "criterion": "Qa=1546&Qo>8834&Qo<8835", "next": 18250 }
+          ]
+        },
+        {
+          "message": 18250,
+          "choices": []
+        }
+      ],
+      "why": "A freed child of the secret room (18248): the reply 21867 = 8835 -> 18250. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2529,
+      "map": 0,
+      "opening": 18252,
+      "lines": [
+        {
+          "message": 18252,
+          "choices": [
+            { "reply": 21868, "quest": 1546, "completes": 8836, "params": [[30, 8836]], "criterion": "Qa=1546&Qo>8835&Qo<8836", "next": 18253 }
+          ]
+        },
+        {
+          "message": 18253,
+          "choices": []
+        }
+      ],
+      "why": "A freed child of the secret room (18252): the reply 21868 = 8836 -> 18253. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»)."
+    },
+    {
+      "npc": 2432,
+      "map": 131863044,
+      "opening": 17845,
+      "lines": [
+        {
+          "message": 17845,
+          "choices": [
+            { "reply": 21394, "next": 17846, "criterion": "Qf=1511&Qa!1512&Qf!1512&PL>179" },
+            { "reply": 21416, "next": 17876, "afterObjective": 8583, "beforeObjective": 8584, "completes": 8584, "params": [[30, 8584]], "quest": 1512 }
+          ]
+        },
+        {
+          "message": 17846,
+          "choices": [
+            { "reply": 21393, "next": 17847, "startsQuest": 1512, "params": [[34, 1512]] }
+          ]
+        },
+        {
+          "message": 17847,
+          "choices": []
+        },
+        {
+          "message": 17876,
+          "choices": []
+        }
+      ],
+      "why": "Veteranciano in the strikers' room (131863044), giver of «La huelga es el final» (1512): «Escuchar sus reivindicaciones.» (21394, 17846), «Aceptar.» (21393, 17847); «Hacerle un resumen de tu conversación con Anciago.» (21416, 17876) ends it. Dofus pour les noobs «La grève de la fin»; the order of the replies is read from the client's message and reply ids"
+    },
+    {
+      "npc": 2433,
+      "map": 131863044,
+      "opening": 17848,
+      "lines": [
+        {
+          "message": 17848,
+          "choices": [
+            { "reply": 21396, "next": 17849, "quest": 1512, "beforeObjective": 8575, "completes": 8575, "params": [[30, 8575]] },
+            { "reply": 21397, "next": 17852, "quest": 1512, "afterObjective": 8575, "beforeObjective": 8576, "criterion": "Oa>2999", "completes": 8576, "params": [[30, 8576]] },
+            { "reply": 21395, "next": 17853, "quest": 1512, "afterObjective": 8575, "beforeObjective": 8576, "criterion": "Oa<3000" }
+          ]
+        },
+        {
+          "message": 17849,
+          "choices": []
+        },
+        {
+          "message": 17852,
+          "choices": []
+        },
+        {
+          "message": 17853,
+          "choices": []
+        }
+      ],
+      "why": "Viejunuco: «Escuchar sus reivindicaciones.» (21396, 17849, 8575). «Narrar tus logros.» (8576): 21397 with 3000 achievement points (Oa>2999) leads to 17852 and ticks it; 21395 with fewer (Oa<3000) leads to 17853, the refusal (client message and reply ids; Dofus pour les noobs «La grève de la fin»: 3000 points needed)."
+    },
+    {
+      "npc": 2428,
+      "map": 131863044,
+      "opening": 17854,
+      "lines": [
+        {
+          "message": 17854,
+          "choices": [
+            { "reply": 21399, "next": 17855, "quest": 1512, "afterObjective": 8576, "beforeObjective": 8577, "completes": 8577, "params": [[30, 8577]] },
+            { "reply": 21399, "next": 17855, "quest": 1512, "afterObjective": 8577, "beforeObjective": 8578 }
+          ]
+        },
+        {
+          "message": 17855,
+          "choices": [
+            { "reply": 21400, "next": 17858, "quest": 1512, "afterObjective": 8577, "beforeObjective": 8578, "criterion": "PK>199999", "completes": 8578, "params": [[30, 8578]] },
+            { "reply": 21398, "next": 17859, "quest": 1512, "afterObjective": 8577, "beforeObjective": 8578, "criterion": "PK<200000" }
+          ]
+        },
+        {
+          "message": 17858,
+          "choices": []
+        },
+        {
+          "message": 17859,
+          "choices": []
+        }
+      ],
+      "why": "Abureka (Vieurêka) in the strikers' room: «Escuchar sus reivindicaciones.» (21399, 17855, 8577), «Asegurarle que tú también sientes ese placer.» (21400 with 200,000 kamas carried, 17858, 8578; 21398 without, 17859). Dofus pour les noobs «La grève de la fin»; the order of the replies is read from the client's message and reply ids Resuming after the claims were heard: the same reply (21399) leads to 17855 again until the next objective is ticked."
+    },
+    {
+      "npc": 2427,
+      "map": 131863044,
+      "opening": 17860,
+      "lines": [
+        {
+          "message": 17860,
+          "choices": [
+            { "reply": 21401, "next": 17861, "quest": 1512, "afterObjective": 8578, "beforeObjective": 8579, "completes": 8579, "params": [[30, 8579]] },
+            { "reply": 21401, "next": 17861, "quest": 1512, "afterObjective": 8579, "beforeObjective": 8580 }
+          ]
+        },
+        {
+          "message": 17861,
+          "choices": [
+            { "reply": 21403, "next": 17864, "quest": 1512, "afterObjective": 8579, "beforeObjective": 8580, "criterion": "(Pj>1,199|Pj>2,199|Pj>11,199|Pj>13,199|Pj>15,199|Pj>16,199|Pj>24,199|Pj>26,199|Pj>27,199|Pj>28,199|Pj>36,199|Pj>41,199|Pj>44,199|Pj>48,199|Pj>60,199|Pj>62,199|Pj>63,199|Pj>64,199|Pj>65,199|Pj>74,199|Pj>75,199|Pj>78,199|Pj>79,199)", "completes": 8580, "params": [[30, 8580]] },
+            { "reply": 21402, "next": 17865, "quest": 1512, "afterObjective": 8579, "beforeObjective": 8580, "criterion": "Pj<1,200&Pj<2,200&Pj<11,200&Pj<13,200&Pj<15,200&Pj<16,200&Pj<24,200&Pj<26,200&Pj<27,200&Pj<28,200&Pj<36,200&Pj<41,200&Pj<44,200&Pj<48,200&Pj<60,200&Pj<62,200&Pj<63,200&Pj<64,200&Pj<65,200&Pj<74,200&Pj<75,200&Pj<78,200&Pj<79,200" }
+          ]
+        },
+        {
+          "message": 17864,
+          "choices": []
+        },
+        {
+          "message": 17865,
+          "choices": []
+        }
+      ],
+      "why": "Cerriyayo (Fripépé) in the strikers' room: «Escuchar sus reivindicaciones.» (21401, 17861, 8579), «Hablar de tu talento como trabajador.» (21403 with a job at level 200, 17864, 8580; 21402 otherwise, 17865). Dofus pour les noobs «La grève de la fin»; the order of the replies is read from the client's message and reply ids Resuming after the claims were heard: the same reply (21401) leads to 17861 again until the next objective is ticked."
+    },
+    {
+      "npc": 2530,
+      "map": 0,
+      "opening": 18258,
+      "lines": [
+        {
+          "message": 18258,
+          "choices": [
+            { "reply": 21874, "quest": 1547, "completes": 8841, "params": [[30, 8841]], "criterion": "Qa=1547&Qo<8841", "next": 18259 }
+          ]
+        },
+        {
+          "message": 18259,
+          "choices": []
+        }
+      ],
+      "why": "Bikini in the outpost (18258): «¿Cómo te pusiste enferma?» (21874 = 8841 -> 18259). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2531,
+      "map": 0,
+      "opening": 18260,
+      "lines": [
+        {
+          "message": 18260,
+          "choices": [
+            { "reply": 21875, "quest": 1547, "completes": 8842, "params": [[30, 8842]], "criterion": "Qa=1547&Qo<8842", "next": 18261 }
+          ]
+        },
+        {
+          "message": 18261,
+          "choices": []
+        }
+      ],
+      "why": "Ron Jerric in the outpost (18260): «¿Cómo has contraído la enfermedad?» (21875 = 8842 -> 18261). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2532,
+      "map": 137363456,
+      "opening": 18267,
+      "openings": [
+        { "quest": 1547, "objective": 8857, "pending": 8858, "message": 18320 }
+      ],
+      "lines": [
+        {
+          "message": 18267,
+          "names": true,
+          "choices": [
+            { "reply": 21881, "criterion": "Qa=1547&Qo>8844&Qo<8845", "next": 18268 }
+          ]
+        },
+        {
+          "message": 18268,
+          "choices": [
+            { "reply": 21880, "quest": 1547, "completes": 8845, "params": [[30, 8845]], "criterion": "Qa=1547&Qo>8844&Qo<8845", "next": 18269 }
+          ]
+        },
+        {
+          "message": 18269,
+          "choices": []
+        },
+        {
+          "message": 18320,
+          "choices": [
+            { "reply": 21946, "next": 18321 }
+          ]
+        },
+        {
+          "message": 18321,
+          "choices": [
+            { "reply": 21945, "quest": 1547, "completes": 8858, "params": [[30, 8858]], "criterion": "Qa=1547&Qo>8857&Qo<8858" }
+          ]
+        }
+      ],
+      "why": "The commander's Krosmoglob on the outpost [2,2]: «Hablarle de la unidad de Marshall Palegnor» (21881 -> 18268), «Hacerle preguntas sobre esta nueva arma» (21880 = 8845 -> 18269); after the cure (8857) it scolds (18320): «Tratar de justificarte» (21946 -> 18321) and «Balbucear unas excusas y un adiós» (21945 = 8858). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2533,
+      "map": 0,
+      "opening": 18308,
+      "openings": [
+        { "quest": 1547, "objective": 8849, "pending": 8850, "message": 18311 }
+      ],
+      "lines": [
+        {
+          "message": 18308,
+          "choices": [
+            { "reply": 21934, "quest": 1547, "completes": 8848, "params": [[30, 8848]], "criterion": "Qa=1547&Qo>8847&Qo<8848", "next": 18309 }
+          ]
+        },
+        {
+          "message": 18309,
+          "choices": [
+            { "reply": 21933, "next": 18310 },
+            { "reply": 21935 }
+          ]
+        },
+        {
+          "message": 18310,
+          "choices": [
+            { "reply": 21931 },
+            { "reply": 21932 }
+          ]
+        },
+        {
+          "message": 18311,
+          "choices": [
+            { "reply": 21936, "quest": 1547, "completes": 8850, "params": [[30, 8850]], "criterion": "Qa=1547&Qo>8849&Qo<8850", "next": 18312 }
+          ]
+        },
+        {
+          "message": 18312,
+          "choices": []
+        }
+      ],
+      "why": "Serpentine n. 110 [7,9]: «Hablarle de las pruebas de armamento de la unidad de Marshall Palegnor» (21934 = 8848 -> 18309), «Amenazarla...» (21933 -> 18310), «Darle una bofetada» (21931 solo / 21935 group: the fight), «Ir en busca de refuerzos» (21932); once beaten (18311) «¿Cómo se pueden curar...?» (21936 = 8850 -> 18312). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2555,
+      "map": 0,
+      "opening": 18703,
+      "lines": [
+        {
+          "message": 18703,
+          "choices": [
+            { "reply": 22349, "quest": 1547, "completes": 8851, "params": [[30, 8851]], "criterion": "Qa=1547&Qo>8850&Qo<8851", "next": 18704 }
+          ]
+        },
+        {
+          "message": 18704,
+          "choices": []
+        }
+      ],
+      "why": "Lucia Nuro in her poison shop [8,8]: «Me interesa el tarro de fluido gástrico de Toxoliat» (22349 = 8851 -> 18704): the jars are empty, go down yourself. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («L'art me ment»)."
+    },
+    {
+      "npc": 2445,
+      "map": 136841216,
+      "opening": 18285,
+      "lines": [
+        {
+          "message": 18285,
+          "choices": [
+            { "reply": 22309, "gives": 15553, "criterion": "Qa=1547&Qo>8853&Qo<8857&PO!15553" },
+            { "reply": 21897 }
+          ]
+        }
+      ],
+      "why": "Stark Sytruper in Toxoliat's cave after the boss (quest 1547 objective 8854, Dofus pour les noobs («L'art me ment»)): «¿Has conseguido que los necroticos no te devoren?» (18285); «¿Puedes darme fluido gastrico de Toxoliat antes de que me vaya?» (22309) hands over the fluid 15553 and completes 8854; «Salir de la Cueva de Toxoliat.» (21897) written in the tree because the engine adds the exit replies only to NPCs without one. Reply order INFERRED."
     }
   ]
 }

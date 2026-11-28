@@ -11975,6 +11975,76 @@
    "quest": 1503,
    "kind": "order",
    "afterObjectives": [8464]
+  },
+  {
+   "objective": 8819,
+   "quest": 1545,
+   "kind": "enter",
+   "map": 135268869,
+   "why": "«Únete al miembro de Hyrda en el punto de encuentro» (885357): reaching [7,9] (Dofus pour les noobs («Tique attaque»))."
+  },
+  {
+   "objective": 8568,
+   "quest": 1511,
+   "kind": "beat",
+   "monsters": [3710, 3711],
+   "map": 129764354,
+   "afterObjectives": [8567],
+   "why": "«Vence a los divinutrofs que quieren linchar al buscador de oro clandestino» (1150151): the fight of replies 21361/21363/21364/21365 against the divinutrofs. Dofus pour les noobs («Prise d'otages»)."
+  },
+  {
+   "objective": 8824,
+   "quest": 1545,
+   "kind": "reply",
+   "replies": [21795, 21796, 21797],
+   "afterObjectives": [8823],
+   "why": "«Toma muestras de comida en las catacombrías» (885359): on [6,8] the children carrying off remains are met and the character tries to catch one (21795-21797; Dofus pour les noobs («Tique attaque»))."
+  },
+  {
+   "objective": 8828,
+   "quest": 1546,
+   "kind": "reply",
+   "replies": [21795, 21796, 21797],
+   "afterObjectives": [8827],
+   "why": "«Explora las catacombrías» (885353): the children of the catacombs are met on [6,8] and the character tries to catch one (Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»))."
+  },
+  {
+   "objective": 8832,
+   "quest": 1546,
+   "kind": "beat",
+   "monster": 3790,
+   "map": 138150401,
+   "afterObjectives": [8831],
+   "why": "«Vence a Mérridiu» (885354): the fight against Mérridiu (3790) in the secret room (Dofus pour les noobs («Sa majesté des Nécrotiques» and «Tique attaque»))."
+  },
+  {
+   "objective": 8849,
+   "quest": 1547,
+   "kind": "beat",
+   "monster": 3792,
+   "map": 135268869,
+   "afterObjectives": [8848],
+   "why": "«Vence a la víbora de las fosas n.º 110 y a sus hombres de confianza» (885349): the fight on [7,9] (Dofus pour les noobs («L'art me ment»))."
+  },
+  {
+   "objective": 8593,
+   "quest": 1516,
+   "kind": "click",
+   "elements": [{"map": 129238528, "element": 485093, "item": 15337}, {"map": 129238019, "element": 485094, "item": 15338}, {"map": 129237506, "element": 485095, "item": 15339}, {"map": 128975872, "element": 485096, "item": 15340}, {"map": 128976900, "element": 485097, "item": 15341}],
+   "givesEach": true,
+   "gives": [{"item": 15337, "count": 1}, {"item": 15338, "count": 1}, {"item": 15339, "count": 1}, {"item": 15340, "count": 1}, {"item": 15341, "count": 1}],
+   "afterObjectives": [8592], "anyOrder": true,
+   "why": "«Recupera los trozos de cofrefuertes de la cantera aurifera y del crisol de los afortunados» (885077). Dofus pour les noobs «Laissé en plan» lists the five spots map by map: trozo de berserkofre antiguo [-2,-4]; trozo de cofrefuerte antiguo [-3,-1]; trozo de tesorero antiguo [-4,-2]; trozo de antesoro antiguo [1,-5]; trozo de Malefiscof antiguo [2,-3]. Which element is which is INFERRED: the five maps each carry one extra element 485093-485102 (graphics 453xx-454xx), in the guide's order; the quest's items 15337-15346 are the client's own. Done once all five are carried."
+  },
+  {
+   "objective": 8594,
+   "quest": 1516,
+   "kind": "click",
+   "elements": [{"map": 129236993, "element": 485098, "item": 15342}, {"map": 129238531, "element": 485099, "item": 15343}, {"map": 128975874, "element": 485100, "item": 15344}, {"map": 128976896, "element": 485101, "item": 15345}, {"map": 128974852, "element": 485102, "item": 15346}],
+   "givesEach": true,
+   "gives": [{"item": 15342, "count": 1}, {"item": 15343, "count": 1}, {"item": 15344, "count": 1}, {"item": 15345, "count": 1}, {"item": 15346, "count": 1}],
+   "afterObjectives": [8592], "anyOrder": true,
+   "why": "«Recupera las gemas encantadas de la cantera aurifera y del crisol de los afortunados» (885078). Dofus pour les noobs «Laissé en plan» lists the five spots map by map: Rubi encantado [-5,-3]; Granate encantado [-2,-1]; Topacio encantado [1,-4]; Zafiro encantado [2,-5]; Esmeralda encantada [0,-3]. Which element is which is INFERRED: the five maps each carry one extra element 485093-485102 (graphics 453xx-454xx), in the guide's order; the quest's items 15337-15346 are the client's own. Done once all five are carried."
   }
   ]
 }
