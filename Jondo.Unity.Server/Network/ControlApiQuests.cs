@@ -459,6 +459,8 @@ namespace Jondo.Unity.Server.Network
             var unknown = ids.Where(id => Achievements.Book.Of(id) == null).ToList();
             if (unknown.Count > 0) return Mal(404, "achievements " + string.Join(",", unknown));
             var granted = ids.Distinct().Where(id => !log.Has(id)).ToList();
+            // Into the live log first: the announcement only notes who earned what is already there.
+            foreach (int id in granted) log.Restore(id, claimed: false);
             var lines = RunInSession(session, _ => AchievementStateService.Live.AnnounceAsync(session, session, granted));
             return Bien(new { granted, points = log.Points, lines = lines.Where(l => l.Contains("[Achievements]")).ToList() });
         }
