@@ -10164,6 +10164,196 @@
       "orientation": 1,
       "criterion": "Qa=1547",
       "why": "Marshall Palegnor in the Sramvil outpost [0,18] beside Bikini and Ron Jerric (quest 1547 objective 8843, «Ve a ver a Marshall Palegnor»; Dofus pour les noobs («L'art me ment»)). INFERRED open cell next to the other patients; the quest's own map for him is 137364480."
+    },
+    {
+      "map": 136056068,
+      "npc": 2613,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Silverbwork on the dark heights [8,-1] (Dofus pour les noobs («Les sentiers de la perdition»)); cell from the derived spawn list (INFERRED)."
+    },
+    {
+      "map": 136056068,
+      "npc": 2618,
+      "cell": 301,
+      "orientation": 1,
+      "criterion": "Qa=1548&Qo>8994&Qo<8997",
+      "why": "The agent's krosmoglob on Silverbwork's map: «parlez au Krosmoglob de l'agent Tourloupe» (Dofus pour les noobs («Les sentiers de la perdition»)); cell INFERRED."
+    },
+    {
+      "map": 134220802,
+      "npc": 2492,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qa=1549&Qo>8999&Qo<9002",
+      "why": "Ratero Gris on [5,3] («Allez en [5,3] pour reparler au Râtelier Gris», Dofus pour les noobs («Les sentiers de la perdition», Le grand bazar)); cell INFERRED."
+    },
+    {
+      "map": 134220802,
+      "npc": 2618,
+      "cell": 345,
+      "orientation": 1,
+      "criterion": "Qa=1549&Qo>9001&Qo<9004",
+      "why": "The agent's krosmoglob on [5,3] («Toujours sur la même map, faites un rapport au Krosmoglob», Dofus pour les noobs («Les sentiers de la perdition», Le grand bazar)); cell INFERRED."
+    },
+    {
+      "map": 134221824,
+      "npc": 2618,
+      "cell": 285,
+      "orientation": 1,
+      "criterion": "Qa=1550&Qo>9012&Qo<9014",
+      "why": "The agent's krosmoglob in the bazaar [6,2] («Sur la même map, faites un résumé de la situation au Krosmoglob», Dofus pour les noobs («Le Bazar du Bizarre»)); cell INFERRED."
+    },
+    {
+      "map": 136054020,
+      "npc": 2467,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=1550&Qo>9013&Qo<9018",
+      "why": "Flecha Malva on [6,-1] («Allez en [6,-1] pour parler à Flèche Mauve», Dofus pour les noobs («Le Bazar du Bizarre»)); cell INFERRED."
+    },
+    {
+      "map": 136054020,
+      "npc": 2618,
+      "cell": 340,
+      "orientation": 1,
+      "criterion": "Qf=1550&Qa!1551&Qf!1551",
+      "why": "The agent's krosmoglob on [6,-1] («La quête se lance en [6,-1] auprès du Krosmoglob de l'agent Tourloupe», Dofus pour les noobs («Bouchées à la reine»)); cell INFERRED."
+    },
+    {
+      "map": 136054018,
+      "npc": 2490,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qa=1551&Qo>8986&Qo<9020",
+      "why": "Guard of the dark court on [6,0] («allez voir le Garde de la Cour Sombre en [6,0]», Dofus pour les noobs («Bouchées à la reine»)); cell INFERRED."
+    },
+    {
+      "map": 136055048,
+      "npc": 2467,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qa=1551&Qo>9020&Qo<9023",
+      "why": "Flecha Malva on [7,-3] («Redescendez en [7,-3] pour parler à Flèche Mauve», Dofus pour les noobs («Bouchées à la reine»)); cell INFERRED."
+    },
+    {
+      "map": 137365764,
+      "npc": 2467,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qa=1551&Qo>9022&Qo<9024",
+      "why": "Flecha Malva on [5,-1] («Retournez voir Flèche Mauve en [5,-1]», Dofus pour les noobs («Bouchées à la reine»)); cell INFERRED."
+    },
+    {
+      "map": 134222848,
+      "npc": 2460,
+      "cell": 313,
+      "orientation": 1,
+      "criterion": "Qa=1537",
+      "why": "Talking skull of «Memorias de ultratumba» (Dofus pour les noobs («Mémoires d'outre-tombe»)); INFERRED cell (walkable, checked by a goto)."
+    },
+    {
+      "map": 136055046,
+      "npc": 2458,
+      "cell": 296,
+      "orientation": 1,
+      "criterion": "Qa=1537",
+      "why": "Talking skull of «Memorias de ultratumba» (Dofus pour les noobs («Mémoires d'outre-tombe»)); INFERRED cell (walkable, checked by a goto)."
+    },
+    {
+      "map": 136056068,
+      "npc": 2459,
+      "cell": 314,
+      "orientation": 1,
+      "criterion": "Qa=1537",
+      "why": "Talking skull of «Memorias de ultratumba» (Dofus pour les noobs («Mémoires d'outre-tombe»)); INFERRED cell (walkable, checked by a goto)."
+    },
+    {
+      "map": 137363456,
+      "npc": 2362,
+      "cell": 342,
+      "orientation": 1,
+      "criterion": "Qa=1537&Qo>8864&Qo<8862",
+      "why": "Rol Sterding's krosmoglob in the travellers' outpost [2,2] (Dofus pour les noobs («Mémoires d'outre-tombe»)); INFERRED cell."
+    },
+    {
+      "map": 137365764,
+      "npc": 2622,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qf=1551&Qa!1552&Qf!1552",
+      "why": "Flecha Malva, wounded, on [5,-1] where the bomb blew («La quête se lance en [5,-1] à Flèche Mauve blessé», Dofus pour les noobs («La cour des miracles»)); cell INFERRED."
+    },
+    {
+      "map": 137365764,
+      "npc": 2622,
+      "cell": 312,
+      "orientation": 1,
+      "criterion": "Qa=1552&Qo<8988",
+      "why": "Same, while the quest is under way and the message not yet given."
+    },
+    {
+      "map": 137103360,
+      "npc": 2447,
+      "cell": 423,
+      "orientation": 1,
+      "why": "The Queen of Thieves in the room above the throne (Dofus pour les noobs («La cour des miracles»)); cell INFERRED."
+    },
+    {
+      "map": 137369606,
+      "npc": 2622,
+      "cell": 316,
+      "orientation": 1,
+      "criterion": "Qa=1552&Qo>9024&Qo<9027",
+      "why": "Flecha Malva, wounded, in the court of miracles («Flèche Mauve blessé à qui vous devrez parler pour lui proposer de toucher la statue», Dofus pour les noobs («La cour des miracles»)); cell INFERRED."
+    },
+    {
+      "map": 137369606,
+      "npc": 2467,
+      "cell": 318,
+      "orientation": 1,
+      "criterion": "Qa=1552&Qo>9027&Qo<9029",
+      "why": "Flecha Malva, healed, in the court of miracles (Dofus pour les noobs («La cour des miracles»)); cell INFERRED."
+    },
+    {
+      "map": 134224898,
+      "npc": 2572,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1559",
+      "why": "Filelo Mortademon in the bazaar [9,3] (Dofus pour les noobs («Courir après des ombres»)); INFERRED cell (walkable)."
+    },
+    {
+      "map": 136054018,
+      "npc": 2624,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1559&Qo>8913&Qo<8914",
+      "why": "Moria on the dark heights [6,0], seen after the shadow was reworked (Dofus pour les noobs («Courir après des ombres»)); INFERRED cell."
+    },
+    {
+      "map": 121637892,
+      "npc": 2625,
+      "cell": 329,
+      "orientation": 1,
+      "criterion": "Qa=1559&PO=15628&Qo<8920",
+      "why": "Shadow thief at his ritual, seen only in the obscuranti disguise 15628 («pnj apparait» after double-clicking the rock, Dofus pour les noobs («Courir après des ombres»)); INFERRED cell."
+    },
+    {
+      "map": 121637892,
+      "npc": 2575,
+      "cell": 343,
+      "orientation": 1,
+      "criterion": "Qf=1559",
+      "why": "Eylen in the obscure dimension [3,7], where «Sortir de l'ombre» starts (Dofus pour les noobs («Sortir de l'ombre»)); INFERRED cell."
+    },
+    {
+      "map": 134217728,
+      "npc": 2457,
+      "cell": 300,
+      "orientation": 1,
+      "criterion": "Qa=1537|Qa=1560",
+      "why": "The chatty skull of the Sramvil outpost: «Memorias de ultratumba» (1537) and where Chi Neska is (1560); INFERRED cell."
     }
   ]
 }

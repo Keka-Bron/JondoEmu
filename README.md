@@ -624,18 +624,18 @@ played through.
 | Sufokia | `████████░░` **77%** | 44/57 |
 | Class Temple | `██████████` **100%** | 39/39 |
 | Kingdom of Amakna | `█████████░` **89%** | 34/38 |
+| Srambad | `████████░░` **85%** | 28/33 |
 | Wanted Notices | `███░░░░░░░` **32%** | 26/82 |
+| Enurado | `███████░░░` **73%** | 24/33 |
 | Incarnam | `██████████` **100%** | 24/24 |
 | Wabbit Islands | `██████████` **100%** | 23/23 |
 | Cania | `█████████░` **88%** | 23/26 |
 | Vigilantes | `██████████` **100%** | 21/21 |
 | Krosmoz | `██████████` **100%** | 18/18 |
 | Pandala Island | `███░░░░░░░` **33%** | 18/55 |
-| Enurado | `█████░░░░░` **52%** | 17/33 |
 | Otomai Island | `██████████` **100%** | 14/14 |
 | Towers of the Brotherhood of the Forgotten | `████████░░` **78%** | 14/18 |
 | Bwork and Goblin Camps | `██████████` **100%** | 12/12 |
-| Srambad | `████░░░░░░` **36%** | 12/33 |
 | Kwismas | `█░░░░░░░░░` **13%** | 10/79 |
 | Moon Island | `██████████` **100%** | 10/10 |
 | Koalak Mountain | `██████████` **100%** | 7/7 |
@@ -648,7 +648,7 @@ played through.
 | Eliocalypse | `█░░░░░░░░░` **10%** | 3/30 |
 | Evil Forest | `████████░░` **75%** | 3/4 |
 | Osavora | `█░░░░░░░░░` **10%** | 2/21 |
-| **All quests** | **30.6%** | **604/1976** |
+| **All quests** | **31.7%** | **627/1976** |
 <!-- quest-status:end -->
 
 - ✅ Quests handed over by NPCs

@@ -335,6 +335,20 @@
    "monsters": [3693],
    "criterion": "Qa=1503&Qo>8457&Qo<8460",
    "why": "«El silencio es oro» (1503): the beaten toolkit leaves the quest item that is brought to Jana (8458, 8460)."
+  },
+  {
+   "item": 15616,
+   "percent": 100,
+   "monsters": [3819],
+   "criterion": "Qa=1548&Qo>8992&Qo<8994&PO!15616",
+   "why": "«Vence a Lanz Vanz y su escolta» (1137751): the dirty money bag (15616) comes off Lanz Vanz (Dofus pour les noobs («Les sentiers de la perdition»))."
+  },
+  {
+   "item": 15639,
+   "percent": 100,
+   "monsters": [3805],
+   "criterion": "Qa=1551&Qo>9021&Qo<9022&PO!15639",
+   "why": "Monster 3805 template drops the krosmoglob's signal (15639) while 9022 is current (criterion Qo=9022&PO!15639 in the client's data)."
   }
   ]
 }

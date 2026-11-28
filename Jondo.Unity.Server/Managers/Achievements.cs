@@ -854,7 +854,7 @@ namespace Jondo.Unity.Server.Managers
                 "lB" => BestLeague(),
                 AchievementCatalogue.CraftKey => Tally(AchievementCatalogue.CraftKey, 0),
                 Almanax.DayOperator => Almanax.Scalar(op),
-                _ => null,
+                _ => ItemCriteria.TotalBy(op, S),
             };
 
             public long? Count(string op, long key, string flag) => op switch

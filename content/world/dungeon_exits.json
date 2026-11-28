@@ -659,6 +659,15 @@
    "npc": 2445,
    "replies": [21897],
    "why": "Toxoliat's cave: after the boss the winners stand in the cave's exit room (136841216, the quest 1547 map of objectives 8853-8854), where Stark Sytruper (2445) offers the way out («Salir de la Cueva de Toxoliat.», 21897) and, for the quest, the gastric fluid (22309). Dofus pour les noobs («L'art me ment»). INFERRED cell: a walkable cell of the map."
+  },
+  {
+   "dungeon": 83,
+   "bossRoom": 137102336,
+   "room": 137103360,
+   "cell": 437,
+   "npc": 2447,
+   "replies": [21895],
+   "why": "The Dark Court Throne: after the Queen of Thieves the winners climb the steps to the room above the throne (137103360, quest «La corte de los milagros»: «montez les marches», Dofus pour les noobs («La cour des miracles»)), where she stands (2447) and «Salir del Trono de la Corte Tenebrosa» (21895) leaves. INFERRED cell."
   }
   ]
 }

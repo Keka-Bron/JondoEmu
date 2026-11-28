@@ -12045,6 +12045,185 @@
    "gives": [{"item": 15342, "count": 1}, {"item": 15343, "count": 1}, {"item": 15344, "count": 1}, {"item": 15345, "count": 1}, {"item": 15346, "count": 1}],
    "afterObjectives": [8592], "anyOrder": true,
    "why": "«Recupera las gemas encantadas de la cantera aurifera y del crisol de los afortunados» (885078). Dofus pour les noobs «Laissé en plan» lists the five spots map by map: Rubi encantado [-5,-3]; Granate encantado [-2,-1]; Topacio encantado [1,-4]; Zafiro encantado [2,-5]; Esmeralda encantada [0,-3]. Which element is which is INFERRED: the five maps each carry one extra element 485093-485102 (graphics 453xx-454xx), in the guide's order; the quest's items 15337-15346 are the client's own. Done once all five are carried."
+  },
+  {
+   "objective": 8993,
+   "quest": 1548,
+   "kind": "beat",
+   "monster": 3819,
+   "map": 134350082,
+   "afterObjectives": [8992],
+   "why": "«Vence a Lanz Vanz y su escolta» (1137751): ticks when Lanz Vanz's band falls (Dofus pour les noobs («Les sentiers de la perdition»))."
+  },
+  {
+   "objective": 8985,
+   "quest": 1549,
+   "kind": "enter",
+   "map": 134222850,
+   "why": "«Encuentra a Shae Temu» (885345): the free-text objective closes on stepping onto Shae Temu's shop map, where Fafred waits (Dofus pour les noobs («Les sentiers de la perdition», Le grand bazar))."
+  },
+  {
+   "objective": 8998,
+   "quest": 1549,
+   "kind": "enter",
+   "map": 134218754,
+   "afterObjectives": [8997],
+   "why": "«Encuentra a Simón Espartan» (885346): closes on stepping onto the map of his shop [3,3], where Ratero Gris waits (Dofus pour les noobs («Les sentiers de la perdition», Le grand bazar))."
+  },
+  {
+   "objective": 8986,
+   "quest": 1550,
+   "kind": "reply",
+   "replies": [22564, 22566],
+   "why": "«Interroga a los mercaderes del bazar» (885360): closes with the reply «Hacerle preguntas sobre los acontecimientos recientes» to Eli Ksir (22564) or, for Sram and Rogue, Madame Ardite (22566) (Dofus pour les noobs («Le Bazar du Bizarre»))."
+  },
+  {
+   "objective": 9014,
+   "quest": 1550,
+   "kind": "enter",
+   "map": 136054020,
+   "afterObjectives": [9013],
+   "why": "«Busca a Temorduk» (885361): closes on stepping onto [6,-1], where he is held (Dofus pour les noobs («Le Bazar du Bizarre»))."
+  },
+  {
+   "objective": 9019,
+   "quest": 1551,
+   "kind": "reply",
+   "replies": [22447],
+   "afterObjectives": [8987],
+   "why": "«Busca a los agentes desaparecidos en la cima tenebrosa»: the guard of the dark court [6,0], «Describirle a Kosple y Arty Ficiero» (Dofus pour les noobs («Bouchées à la reine»))."
+  },
+  {
+   "objective": 9020,
+   "quest": 1551,
+   "kind": "reply",
+   "replies": [22455],
+   "afterObjectives": [9019],
+   "why": "Same text: Chambella [8,-4], «Describirle a Kosple y Arty Ficiero» (Dofus pour les noobs («Bouchées à la reine»))."
+  },
+  {
+   "objective": 9022,
+   "quest": 1551,
+   "kind": "beat",
+   "monster": 3805,
+   "map": 136055048,
+   "afterObjectives": [9021],
+   "why": "«Destruye las bombas y ayuda a Flecha Malva»: the bomb fight on [7,-3]; 3805 drops the quest item (Dofus pour les noobs («Bouchées à la reine»))."
+  },
+  {
+   "objective": 8647,
+   "quest": 1535,
+   "kind": "enter",
+   "map": 134222852,
+   "requires": [{"item": 15532, "count": 1}],
+   "why": "«Prueba el aparato de camuflaje en la plaza mercante de Sramvil» (453345): the test closes on reaching the map with the generator (Dofus pour les noobs («Faux-semblants»), [6,-1]-type test spots; the character would look like a monster of the zone)."
+  },
+  {
+   "objective": 8813,
+   "quest": 1535,
+   "kind": "enter",
+   "map": 136054020,
+   "requires": [{"item": 15532, "count": 1}],
+   "why": "«Prueba el aparato de camuflaje en una terraza de la cima tenebrosa» (454083)."
+  },
+  {
+   "objective": 8814,
+   "quest": 1535,
+   "kind": "enter",
+   "map": 135267843,
+   "requires": [{"item": 15532, "count": 1}],
+   "why": "«Prueba el aparato de camuflaje en el corazon de las catacombrias» (454084)."
+  },
+  {
+   "objective": 8649,
+   "quest": 1537,
+   "kind": "reply",
+   "replies": [22528],
+   "why": "«Interroga a un cráneo parlante» (8649): done when the character notes the answer and leaves (22528)."
+  },
+  {
+   "objective": 8855,
+   "quest": 1537,
+   "kind": "reply",
+   "replies": [22531],
+   "why": "«Interroga a un cráneo parlante» (8855): done when the character notes the answer and leaves (22531)."
+  },
+  {
+   "objective": 8856,
+   "quest": 1537,
+   "kind": "reply",
+   "replies": [22537],
+   "why": "«Interroga a un cráneo parlante» (8856): done when the character notes the answer and leaves (22537)."
+  },
+  {
+   "objective": 8859,
+   "quest": 1537,
+   "kind": "reply",
+   "replies": [22534],
+   "why": "«Interroga a un cráneo parlante» (8859): done when the character notes the answer and leaves (22534)."
+  },
+  {
+   "objective": 8860,
+   "quest": 1537,
+   "kind": "talk",
+   "npc": 2489,
+   "map": 137371652,
+   "afterObjectives": [8649, 8855, 8856, 8859],
+   "why": "«Encuentra al amo de los cráneos parlantes» (454057) carries no map: meeting the necromancer closes it, after the four skulls (Dofus pour les noobs («Mémoires d'outre-tombe»))."
+  },
+  {
+   "objective": 8913,
+   "quest": 1559,
+   "kind": "reply",
+   "replies": [22047],
+   "why": "«Buscar información en el bazar» (885312): closed by the free-adjustment deal with the shadow-reworker (Dofus pour les noobs («Courir après des ombres»))."
+  },
+  {
+   "objective": 8914,
+   "quest": 1559,
+   "kind": "reply",
+   "replies": [22051],
+   "afterObjectives": [8913],
+   "why": "«Deambula por la cima tenebrosa» (885313): Moria's sky (22051) and the shadow vanishing (Dofus pour les noobs («Courir après des ombres»))."
+  },
+  {
+   "objective": 8918,
+   "quest": 1559,
+   "kind": "enter",
+   "map": 121637892,
+   "afterObjectives": [8917],
+   "why": "«Busca a los ladrones de sombras» (885315) carries no map: reaching the ritual map [3,7] in disguise closes it (Dofus pour les noobs («Courir après des ombres»))."
+  },
+  {
+   "objective": 8919,
+   "quest": 1559,
+   "kind": "reply",
+   "replies": [22055],
+   "why": "«Escucha a los ladrones de sombras» (885316): «Seguir escuchando el encantamiento»."
+  },
+  {
+   "objective": 8920,
+   "quest": 1559,
+   "kind": "reply",
+   "replies": [22054, 22056],
+   "afterObjectives": [8919],
+   "why": "«Interrumpe el ritual» (885317): «Interrumpir el ritual» in either line."
+  },
+  {
+   "objective": 8921,
+   "quest": 1560,
+   "kind": "reply",
+   "replies": [22263],
+   "why": "«Busca a Chi Neska en Sramvil» (885355): the skull tells where she meets (22263 -> 18625), Dofus pour les noobs («Sortir de l'ombre»)"
+  },
+  {
+   "objective": 8927,
+   "quest": 1560,
+   "kind": "beat",
+   "monster": 3820,
+   "map": 137367814,
+   "afterObjectives": [8926],
+   "why": "«Vence a los ladrones» (885356): the fight at Wendy's, closed by beating the burglar's gang (Dofus pour les noobs («Sortir de l'ombre»))."
   }
   ]
 }

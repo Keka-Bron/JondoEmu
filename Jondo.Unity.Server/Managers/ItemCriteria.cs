@@ -77,6 +77,28 @@ namespace Jondo.Unity.Server.Managers
         };
 
         /// <summary>
+        /// A characteristic as a criterion's capital letters ask it, the client's CharacteristicCriterion:
+        /// the whole of it, what the points, the scrolls, the equipment and the alterations give
+        /// together. «CS>149» opens one of Cilia's replies in quest 1561 to the strong only.
+        /// </summary>
+        internal static long? TotalBy(string op, SessionState state)
+        {
+            (int stat, int own) = op switch
+            {
+                "CA" => (Stat.Agility, state.TotalAgility),
+                "CC" => (Stat.Chance, state.TotalChance),
+                "CI" => (Stat.Intelligence, state.TotalIntelligence),
+                "CS" => (Stat.Strength, state.TotalStrength),
+                "CV" => (Stat.Vitality, state.TotalVitality),
+                "CW" => (Stat.Wisdom, state.TotalWisdom),
+                _ => (0, 0),
+            };
+            if (stat == 0) return null;
+            var worn = Equipment.BonusesOf(state.EquipmentItems.Values.Select(item => (item.Position, item)));
+            return own + worn.GetValueOrDefault(stat) + Alterations.Bonuses(state.CharacterId).GetValueOrDefault(stat);
+        }
+
+        /// <summary>
         /// Whether whoever is in session has a spell: a special one learnt, itself or its pair, or one
         /// of his class's at his level, either half of its pair.
         /// </summary>
@@ -118,7 +140,7 @@ namespace Jondo.Unity.Server.Managers
             public long? Scalar(string op)
             {
                 // Leniency leaves the term unanswered, which the reader lets through.
-                long? scrolled = ScrolledBy(op, S);
+                long? scrolled = ScrolledBy(op, S) ?? TotalBy(op, S);
                 if (scrolled != null) return _lenient == Lenient.Characteristics ? null : scrolled;
 
                 return op switch
