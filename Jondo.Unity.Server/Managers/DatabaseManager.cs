@@ -4786,6 +4786,45 @@ namespace Jondo.Unity.Server
         /// «Qa=385&amp;PO&lt;2269,10» -- and carry their criterion for the caller to answer for whoever
         /// would receive them (PlayerCriteria): a database reader does not know the player.
         /// </summary>
+        /// <summary>
+        /// A monster's «souls»: the item its captured soul turns into, besides the full stone, and
+        /// the criterion it is given under (MonsterTemplates.Data → souls[]). Of the 409 monsters
+        /// that have one, 103 carry a criterion -- the plants of «Plantas contra mediomuertos»
+        /// (1951): «Alma capturada: Girasol salvaje» (34209) under «Qa=1951&amp;Qo&gt;13679&amp;...».
+        /// An empty criterion comes back empty, for the caller to decide on.
+        /// </summary>
+        public static List<(int ObjectId, string Criterion)> GetMonsterSouls(int monsterId)
+        {
+            var souls = new List<(int, string)>();
+            try
+            {
+                using var connection = new SqliteConnection(WorldConnectionString);
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT Data FROM MonsterTemplates WHERE Id = $id;";
+                cmd.Parameters.AddWithValue("$id", monsterId);
+                string? json = cmd.ExecuteScalar() as string;
+                if (string.IsNullOrEmpty(json)) return souls;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (!doc.RootElement.TryGetProperty("souls", out var prop)) return souls;
+                if (prop.ValueKind == System.Text.Json.JsonValueKind.Object && prop.TryGetProperty("Array", out var inner)) prop = inner;
+                if (prop.ValueKind != System.Text.Json.JsonValueKind.Array) return souls;
+                foreach (var e in prop.EnumerateArray())
+                {
+                    if (!e.TryGetProperty("objectId", out var oid) || oid.GetInt32() <= 0) continue;
+                    string criterion = e.TryGetProperty("criterion", out var c) && c.ValueKind == System.Text.Json.JsonValueKind.String
+                        ? c.GetString() ?? "" : "";
+                    souls.Add((oid.GetInt32(), criterion));
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.LogDebug($"[DatabaseManager] Error reading the souls of monster {monsterId}: {ex.Message}");
+            }
+            return souls;
+        }
+
         public static List<MonsterDrop> GetMonsterDrops(int monsterId, int gradeIndex)
         {
             var drops = new List<MonsterDrop>();

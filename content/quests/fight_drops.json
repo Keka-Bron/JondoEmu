@@ -283,6 +283,15 @@
       "monsters": [5873],
       "criterion": "Qa=2078&Qo>14988&Qo<14991",
       "why": "2078: the captured energy ball fills the airtight box (21219) (DPLN: combat the ball and capture it). INFERRED to be the filled box 21219."
-    }
+    },
+  {
+   "item": 23211,
+   "percent": 100,
+   "monsters": [6278, 6279, 6280],
+   "criterion": "Qa=2153&PO!23211",
+   "why": "«La jetée des enfants perdus»: the enchanted kuapa water (23211) from the kuapas of the fisher's fight, later given to Kuatalo (Dofus pour les noobs («La jetée des enfants perdus»))."
+  },
+  {"item": 19513, "percent": 100, "monsters": [5186], "criterion": "Qa=1950&Qo>13645&Qo<13647&PO!19513", "why": "Ys's talisman (19513) falls on the first win of «Defender tu piel» (1950). Dofus pour les noobs («Du feu de dieu»)."},
+  {"item": 19484, "percent": 100, "monsters": [5102, 5103, 5104, 5105], "criterion": "Qa=1951&Qo<13663", "why": "«Plantas contra mediomuertos» (1951): the stone of the calcinados (19484), 100 % while it is asked for. Dofus pour les noobs («Plantes contre Trépamorts»)."}
   ]
 }
