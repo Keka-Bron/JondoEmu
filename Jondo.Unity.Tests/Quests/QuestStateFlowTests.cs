@@ -63,8 +63,9 @@ public sealed class QuestStateFlowTests
                 Assert.Equal(2249, followed.Quests[0].Details!.StepId);
                 Assert.False(followed.Quests[0].Details!.Objectives.Single(objective => objective.ObjectiveId == 9655).ObjectivePending);
                 Assert.True(followed.Quests[0].Details!.Objectives.Single(objective => objective.ObjectiveId == 9656).ObjectivePending);
-                // 9680 is done; 9685 and 9720 are reached. The later objectives wait for 9720.
-                Assert.Equal(new[] { 9680, 9685, 9720 }, journal.ActiveQuests[0].Details!.Objectives.Select(objective => objective.ObjectiveId));
+                // 9680 is done and 9685 is reached; the two fights side by side can both be won,
+                // and the return to the master waits for them.
+                Assert.Equal(new[] { 9680, 9685, 9720, 10121 }, journal.ActiveQuests[0].Details!.Objectives.Select(objective => objective.ObjectiveId));
             }
             Assert.All(codec.Frames, frame => Assert.Null(frame.Uid));
             Assert.Equal(0, codec.Decodes);

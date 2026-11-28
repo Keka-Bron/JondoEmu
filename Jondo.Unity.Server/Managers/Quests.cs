@@ -1889,14 +1889,42 @@ namespace Jondo.Unity.Server.Managers
             return shown.Any(o => !done.Contains(o)) ? shown : objectives.ToList();
         }
 
-        /// <summary>The same, using the reveal rule the dialogue and actions already use.</summary>
+        /// <summary>The same, for a quest of this character's journal.</summary>
         private static List<int> Shown(QuestLog log, QuestRun run, QuestStep step, IReadOnlyList<int> objectives)
+            => Shown(step, run, objectives, before => log.ObjectiveDone(before));
+
+        /// <summary>
+        /// The objectives of a journal step: the done ones, and the outstanding ones something can
+        /// close now.
+        /// </summary>
+        /// <remarks>
+        /// A talk, a bring or an element pressed closes only what <see cref="Revealed"/> lets through,
+        /// so the journal holds the rest back the same way: quest 894 listed all eleven
+        /// objectives of its step while only the first could be done. A fight or a pick-up is not held
+        /// to the step's order: monsters side by side are beaten in any order
+        /// (QuestWatcher.BehindOtherWork), and a gather or beat row only waits for its
+        /// afterObjectives. Those stay on screen while they can be won, or a step of three monsters
+        /// would list one and tick the other two out of nowhere. If nothing outstanding would be
+        /// left, the whole list goes out, as before.
+        /// </remarks>
+        internal static List<int> Shown(QuestStep step, QuestRun run, IReadOnlyList<int> objectives,
+                                        Func<int, bool> doneElsewhere)
         {
-            var byId = step.Objectives.ToDictionary(objective => objective.Id);
-            var shown = objectives
-                .Where(id => run.Done.Contains(id)
-                             || (byId.TryGetValue(id, out var objective) && Revealed(step, objective, run)))
-                .ToList();
+            bool Reached(int id)
+            {
+                var objective = step.Objectives.FirstOrDefault(o => o.Id == id);
+                if (objective == null) return false;
+                if (Revealed(step, objective, run)) return true;
+
+                var binding = Bindings.Of(id);
+                if (objective.MonsterId != 0 && binding?.Lost != true)
+                    return !Handlers.QuestWatcher.BehindOtherWork(step, objective, run);
+                return binding != null
+                       && (binding.Kind == QuestBindingKind.Gather || binding.Kind == QuestBindingKind.Beat)
+                       && binding.AfterObjectives.All(before => run.Done.Contains(before) || doneElsewhere(before));
+            }
+
+            var shown = objectives.Where(id => run.Done.Contains(id) || Reached(id)).ToList();
             return shown.Any(id => !run.Done.Contains(id)) ? shown : objectives.ToList();
         }
 
