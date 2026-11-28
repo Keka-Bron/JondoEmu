@@ -11213,14 +11213,6 @@
    "why": "«Descubre el escondite del botín de Queca Mela» (885344): click the grille to take her plush (15492; the only element of [3,3], INFERRED; Dofus pour les noobs («La seinoise»))."
   },
   {
-   "objective": 8868,
-   "quest": 1553,
-   "kind": "enter",
-   "map": 137367810,
-   "afterObjectives": [8867],
-   "why": "«Guarida del Carnicero» (452532): the objective names its map (Dofus pour les noobs («Viande fraîche»))."
-  },
-  {
    "objective": 8870,
    "quest": 1553,
    "kind": "beat",
