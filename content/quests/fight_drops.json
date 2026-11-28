@@ -314,6 +314,20 @@
    "monsters": [3732, 3733],
    "criterion": "Qa=1540&Qo>8761&Qo<8764&PO!15489",
    "why": "«Dale una paliza a Grant Nuja para recuperar los documentos» (885300): the documents (15489) are recovered from Grant Nuja's gang (Dofus pour les noobs («Balance la sauce»))."
+  },
+  {
+   "item": 15314,
+   "percent": 100,
+   "monsters": [3708],
+   "criterion": "Qa=1509&Qo>8521&Qo<8522&PO!15314",
+   "why": "«Maldita generosidad» (1509): the aggressive perfidotroz's eye, handed to Williamwadui (8523). Chance INFERRED."
+  },
+  {
+   "item": 15298,
+   "percent": 100,
+   "monsters": [3663, 3664, 3665, 3666],
+   "criterion": "Qa=1501&Qo>8436&Qo<8440",
+   "why": "«Tragamonedas» (1501): the strongboxes of the slot machine's map leave a piece of strongbox (15298) while the ten are asked for (8438, 8538-8546). Chance INFERRED."
   }
   ]
 }

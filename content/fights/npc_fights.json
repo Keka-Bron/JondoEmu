@@ -2399,6 +2399,25 @@
     { "npc": 2417, "map": 128975876, "reply": 21052,
       "monsters": [ { "monster": 3684, "grade": 2 }, { "monster": 3684, "grade": 3 }, { "monster": 3684, "grade": 4 } ] },
     { "npc": 2418, "map": 128976898, "reply": 21062,
-      "monsters": [ { "monster": 3685, "grade": 0 }, { "monster": 3685, "grade": 1 }, { "monster": 3685, "grade": 2 }, { "monster": 3685, "grade": 3 }, { "monster": 3685, "grade": 4 } ] }
+      "monsters": [ { "monster": 3685, "grade": 0 }, { "monster": 3685, "grade": 1 }, { "monster": 3685, "grade": 2 }, { "monster": 3685, "grade": 3 }, { "monster": 3685, "grade": 4 } ] },
+    { "npc": 2506, "map": 137367552, "reply": 21746,
+      "monsters": [ { "monster": 3776, "grade": 0 } ],
+      "why": "«Vence al sramurái» (8778): the fair duel against the sramurái con mala leleche (Dofus pour les noobs («Ça se katche»)): «Acepto el duelo»." },
+    { "npc": 2495, "map": 134219778, "reply": 22327,
+      "monsters": [ { "monster": 3779, "grade": 0 } ],
+      "why": "«Vence a El Rumo e interrógale» (885373): El Rumo's katch holds in the fishing map [4,3] (Dofus pour les noobs («Ça se katche»)); fought alone." },
+    { "npc": 2495, "map": 134219778, "reply": 22328,
+      "monsters": [ { "monster": 3779, "grade": 0 } ],
+      "why": "«Vence a El Rumo e interrógale» (885373): El Rumo's katch holds in the fishing map [4,3] (Dofus pour les noobs («Ça se katche»)); fought alone. «¡Ayuda!» calls the party in." },
+    { "npc": 2408, "map": 128975874, "reply": 21000,
+      "monsters": [ { "monster": 3707, "grade": 1 } ] },
+    { "npc": 2408, "map": 128975874, "reply": 21002,
+      "monsters": [ { "monster": 3707, "grade": 1 } ] },
+    { "npc": 2402, "map": 128977922, "reply": 21026,
+      "monsters": [ { "monster": 3708, "grade": 1 } ] },
+    { "npc": 2402, "map": 128977922, "reply": 21027,
+      "monsters": [ { "monster": 3708, "grade": 1 } ] },
+    { "npc": 2377, "map": 129236994, "reply": 20950,
+      "monsters": [ { "monster": 3664, "grade": 3 }, { "monster": 3665, "grade": 3 }, { "monster": 3666, "grade": 2 } ] }
   ]
 }

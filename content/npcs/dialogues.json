@@ -56727,7 +56727,9 @@
           "message": 17532,
           "choices": [
             { "reply": 20997, "next": 17533 },
-            { "reply": 21171, "next": 17661, "quest": 1507, "afterObjective": 8502, "showsNpc": 2402, "completes": 8503, "params": [[30, 8503]] }
+            { "reply": 21171, "next": 17661, "quest": 1507, "afterObjective": 8502, "showsNpc": 2402, "completes": 8503, "params": [[30, 8503]] },
+            { "reply": 21020, "next": 17556, "criterion": "Qf=1507&Qa!1508&Qf!1508", "beforeQuest": 1508 },
+            { "reply": 21608, "next": 18006, "quest": 1508, "afterObjective": 8517, "beforeObjective": 8518 }
           ]
         },
         {
@@ -56745,9 +56747,29 @@
         {
           "message": 17661,
           "choices": []
+        },
+        {
+          "message": 17556,
+          "choices": [
+            { "startsQuest": 1508, "params": [[34, 1508]], "reply": 21021, "next": 17971 }
+          ]
+        },
+        {
+          "message": 17971,
+          "choices": []
+        },
+        {
+          "message": 18006,
+          "choices": [
+            { "completes": 8518, "params": [[30, 8518]], "reply": 21609, "next": 18007, "quest": 1508, "afterObjective": 8517 }
+          ]
+        },
+        {
+          "message": 18007,
+          "choices": []
         }
       ],
-      "why": "Graverg at the Cantera aurífera [3,-4], who gives «Las grandes galerías» (1507): «Parlez à Grabergue en [3,-4] pour savoir quel genre de travaux ils font dans le coin» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Se renseigner sur les travaux.» (20997, 17533), «Demander si tout se passe bien.» (20996, 17534: miners trapped by a rockfall) and «Accepter.» (20995). Back with the tamed perforatroces, «Donner les Phorreurs apprivoisés.» (21171) hands them over (8503, a bring objective: Graverg keeps the follower 15311, «ya están al pie del cañón», 17661) and Williamwadui comes up: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (17661: «Williamwadui, ¿has conseguido arreglártelas?»)."
+      "why": "Graverg at the Cantera aurífera [3,-4], who gives «Las grandes galerías» (1507): «Parlez à Grabergue en [3,-4] pour savoir quel genre de travaux ils font dans le coin» (Dofus pour les noobs, «Les grandes galeries»), whose pictures go «Se renseigner sur les travaux.» (20997, 17533), «Demander si tout se passe bien.» (20996, 17534: miners trapped by a rockfall) and «Accepter.» (20995). Back with the tamed perforatroces, «Donner les Phorreurs apprivoisés.» (21171) hands them over (8503, a bring objective: Graverg keeps the follower 15311, «ya están al pie del cañón», 17661) and Williamwadui comes up: «En bas apparait alors Williamwadui qui a été sauvé grâce à vous» (17661: «Williamwadui, ¿has conseguido arreglártelas?»). 1508 «Un corazón de oro»: after 1507, «Me la ha dado Williamwadui como recompensa» (21020) shows him the jewel (17556); picking it up (21021) starts 1508 and he has no time (17971). Back after McRico's kamas, the same reply (21608 -> 18006 -> 21609 -> 18007) closes 8518 and he calls Williamwadui. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
     },
   {
       "npc": 2399,
@@ -57037,6 +57059,11 @@
       "npc": 2402,
       "map": 128977922,
       "opening": 17535,
+      "openings": [
+        { "after": 1508, "before": 1509, "message": 17558 },
+        { "quest": 1509, "objective": 8522, "pending": 8523, "message": 17712 },
+        { "quest": 1509, "objective": 8520, "message": 17560 }
+      ],
       "lines": [
         {
           "message": 17535,
@@ -57049,9 +57076,41 @@
           "choices": [
             { "reply": 20998, "quest": 1507, "afterObjective": 8503, "completes": 8504, "params": [[30, 8504]] }
           ]
+        },
+        {
+          "message": 17558,
+          "choices": [
+            { "reply": 21024, "next": 17559 }
+          ]
+        },
+        {
+          "message": 17559,
+          "choices": [
+            { "reply": 21025, "next": 17561 }
+          ]
+        },
+        {
+          "message": 17561,
+          "choices": [
+            { "reply": 21023, "next": 17560 }
+          ]
+        },
+        {
+          "message": 17560,
+          "choices": [
+            { "startsQuest": 1509, "params": [[34, 1509]], "reply": 21022, "criterion": "Qa!1509&Qf!1509" },
+            { "reply": 21026, "criterion": "Qa=1509&Qo>8521&Qo<8522" }
+          ]
+        },
+        {
+          "message": 17712,
+          "choices": [
+            { "reply": 21028, "criterion": "PO=15314", "quest": 1509, "afterObjective": 8522, "beforeObjective": 8523, "completes": 8523, "params": [[30, 8523]] },
+            { "reply": 21027, "criterion": "Qa=1509&Qo>8521&Qo<8522" }
+          ]
         }
       ],
-      "why": "Williamwadui beside Graverg at [3,-4], for «Las grandes galerías» (1507, 8504): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous. En guise de sa reconnaissance, il vous offre un précieux joyaux et la quête se termine» (Dofus pour les noobs, «Les grandes galeries»): «Demander si tout va bien.» (20999), «Sí, creo que te debo una ... acepta esta magnífica joya» (17536), «Agarra la joya.» (20998); the jewel (15318) is the step's reward."
+      "why": "Williamwadui beside Graverg at [3,-4], for «Las grandes galerías» (1507, 8504): «En bas apparait alors Williamwadui qui a été sauvé grâce à vous. En guise de sa reconnaissance, il vous offre un précieux joyaux et la quête se termine» (Dofus pour les noobs, «Les grandes galeries»): «Demander si tout va bien.» (20999), «Sí, creo que te debo una ... acepta esta magnífica joya» (17536), «Agarra la joya.» (20998); the jewel (15318) is the step's reward. 1509 «Maldita generosidad»: after 1508 he confesses (17558, 21024, 17559, 21025, 17561, 21023, 17560) and 21022 starts it; once the stone and the hiding place are found (8519, 8520) he sends the player against the aggressive perfidotroz (21026/21027, fight 8522); the eye (15314) is handed over (21028, 17712; 8523). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Fix: the engine's hand-over takes the item."
     },
   {
       "npc": 2853,
@@ -89033,7 +89092,9 @@
           "message": 18095,
           "choices": [
             { "reply": 21694, "criterion": "PL>109&Qa!1541&Qf!1541", "next": 18096 },
-            { "reply": 21696, "quest": 1541, "criterion": "Qo>8768&Qo<8769", "completes": 8769, "params": [[30, 8769]], "next": 18102 }
+            { "reply": 21696, "quest": 1541, "criterion": "Qo>8768&Qo<8769", "completes": 8769, "params": [[30, 8769]], "next": 18102 },
+            { "reply": 21760, "quest": 1542, "completes": 8781, "params": [[30, 8781]], "criterion": "Qo>8780&Qo<8781", "gives": 15498, "next": 18154 },
+            { "reply": 21762, "quest": 1542, "criterion": "Qa=1542&Qo>8781&Qo<8787&PO!15498", "next": 18155 }
           ]
         },
         {
@@ -89063,9 +89124,19 @@
         {
           "message": 18102,
           "choices": []
+        },
+        {
+          "message": 18154,
+          "choices": []
+        },
+        {
+          "message": 18155,
+          "choices": [
+            { "reply": 21761, "buyItem": 15498, "buyPrice": 4000 }
+          ]
         }
       ],
-      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written."
+      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «Hablarle de tu evasión» (21760 = 8781, 18154: the milimaestro disguise 15498); «Necesito un nuevo disfraz» (21762 -> 18155 -> 21761: 4000 kamas). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
     },
     {
       "npc": 2503,
@@ -89077,7 +89148,8 @@
           "choices": [
             { "reply": 21695, "quest": 1541, "criterion": "Qo<8768", "completes": 8768, "params": [[30, 8768]], "next": 18101 },
             { "reply": 21698, "quest": 1541, "criterion": "Qo>8770&Qo<8771", "holds": 15491, "completes": 8771, "params": [[30, 8771]], "next": 18104 },
-            { "reply": 21700, "quest": 1541, "criterion": "Qo>8773&Qo<8774", "holds": 15492, "next": 18105 }
+            { "reply": 21700, "quest": 1541, "criterion": "Qo>8773&Qo<8774", "holds": 15492, "next": 18105 },
+            { "reply": 22290, "criterion": "Qf=1541&Qa!1542&Qf!1542", "startsQuest": 1542, "params": [[34, 1542]], "next": 18138 }
           ]
         },
         {
@@ -89103,9 +89175,13 @@
         {
           "message": 18107,
           "choices": []
+        },
+        {
+          "message": 18138,
+          "choices": []
         }
       ],
-      "why": "Queca Mela (Bonnie Menteuse) [4,2]: the deal for a krosmoglob (21695 = 8768, 18101), the krosmoglob handed over and her cheat (21698 = 8771, 18104), the plush shown (21700 -> 18105 -> 21699 -> 18106) and what she saw (21701 = 8774, 18107). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written."
+      "why": "Queca Mela (Bonnie Menteuse) [4,2]: the deal for a krosmoglob (21695 = 8768, 18101), the krosmoglob handed over and her cheat (21698 = 8771, 18104), the plush shown (21700 -> 18105 -> 21699 -> 18106) and what she saw (21701 = 8774, 18107). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «¿Qué sabes sobre el caso que lleva Kathy Brennan?» (22290) starts it (18138: the bodies thrown in the canal, the tavern). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
     },
     {
       "npc": 2478,
@@ -90426,6 +90502,502 @@
         }
       ],
       "why": "Dofus pour les noobs («La meilleure défense, c'est l'attaque», «Phorreurs dans la brume», «Le phormidiable au corps», «La pelle de la Phorrée»): Dian Perfosé of the Perfósil gallery [-2,-3]. The opening is the client's own 17710. 21509 hands over the poachers' fangs (15295, 1497's 8423, one is taken); 1498 starts after it by 21508/21513 (two copies of the same lines, 17933-17935 / 17936-17938) and hands the sweat sprayer (15296); 21519 reports the sprayed perforatrozas (8430, 17939); 1499 starts by 21515 / 21521 (17940-17945), 21530 reports the Super Formidiablo (8433, 17947); 1500 starts by 21531 / 21525 (17948-17953). Reply order INFERRED from the message and reply ids. Entrance room (130547712): the guardian's own key reply 21222 «Darle la llave y entrar» goes in by the key (door: key), as the template did before the quest tree replaced it; the keyring does not open this dungeon (keyring 0)."
+    },
+    {
+      "npc": 2506,
+      "map": 0,
+      "opening": 18143,
+      "openings": [
+        { "quest": 1542, "objective": 8778, "pending": 8779, "message": 18146 }
+      ],
+      "lines": [
+        {
+          "message": 18143,
+          "choices": [
+            { "reply": 21749, "quest": 1542, "criterion": "Qa=1542&Qo<8778", "next": 18144 },
+            { "reply": 21752, "quest": 1542, "criterion": "Qo>8782&Qo<8783", "next": 18158 }
+          ]
+        },
+        {
+          "message": 18144,
+          "choices": [
+            { "reply": 21748, "quest": 1542, "criterion": "Qo>8776&Qo<8778", "completes": 8777, "params": [[30, 8777]], "next": 18145 }
+          ]
+        },
+        {
+          "message": 18145,
+          "choices": [
+            { "reply": 21746, "quest": 1542 },
+            { "reply": 21747, "quest": 1542 }
+          ]
+        },
+        {
+          "message": 18146,
+          "choices": [
+            { "reply": 21751, "quest": 1542, "completes": 8779, "params": [[30, 8779]], "teleport": 137368576 }
+          ]
+        },
+        {
+          "message": 18158,
+          "choices": [
+            { "reply": 21763, "quest": 1542, "completes": 8783, "params": [[30, 8783]], "next": 18159 }
+          ]
+        },
+        {
+          "message": 18159,
+          "choices": []
+        }
+      ],
+      "why": "Sramurái con mala leleche (tavern [5,2]): the bodies in the canal (21749 -> 18144), insisting (21748 = 8777 -> 18145), the fair duel (21746 starts the fight; 21747 refuses); after winning he cries foul (18146) and 21751 «Protestar» throws the player into the prison (8779); with the disguise: «Quiero saber todo lo que ocurrió...» (21752 -> 18158 -> 21763 = 8783 -> 18159). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
+    },
+    {
+      "npc": 2545,
+      "map": 0,
+      "opening": 18147,
+      "openings": [
+        { "quest": 1542, "objective": 8780, "pending": 8781, "message": 18150 }
+      ],
+      "lines": [
+        {
+          "message": 18147,
+          "choices": [
+            { "reply": 21755, "quest": 1542, "next": 18148 }
+          ]
+        },
+        {
+          "message": 18148,
+          "choices": [
+            { "reply": 21754, "quest": 1542, "next": 18149 }
+          ]
+        },
+        {
+          "message": 18149,
+          "choices": [
+            { "reply": 21753, "quest": 1542, "completes": 8780, "params": [[30, 8780]], "teleport": 137367552 }
+          ]
+        }
+      ],
+      "why": "Prisionero sobrio (prison): «¡Soy inocente!» (21755 -> 18148), the sramurái's story (21754 -> 18149: he saw the maligilantes throw the bodies and stole the cell key) and «Sí, quiero salir» (21753 = 8780): he opens the cell and the player goes back to the tavern. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
+    },
+    {
+      "npc": 2507,
+      "map": 0,
+      "opening": 18160,
+      "lines": [
+        {
+          "message": 18160,
+          "choices": [
+            { "reply": 21764, "quest": 1542, "completes": 8785, "params": [[30, 8785]], "criterion": "Qa=1542&Qo>8783&Qo<8785", "next": 18161 }
+          ]
+        },
+        {
+          "message": 18161,
+          "choices": []
+        }
+      ],
+      "why": "Lugarteniente Cormoran [4,3]: «Vengo a hablar de los cadáveres de los viajeros» (21764 = 8785, 18161: El Rumo arrives). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
+    },
+    {
+      "npc": 2495,
+      "map": 0,
+      "opening": 18684,
+      "openings": [
+        { "after": 1542, "before": 1543, "message": 18688 },
+        { "quest": 1542, "objective": 8786, "pending": 8787, "message": 18685 }
+      ],
+      "lines": [
+        {
+          "message": 18684,
+          "choices": [
+            { "reply": 22329, "quest": 1542, "completes": 8786, "params": [[30, 8786]], "criterion": "Qa=1542&Qo>8785&Qo<8786", "next": 18685 }
+          ]
+        },
+        {
+          "message": 18685,
+          "choices": [
+            { "reply": 22327, "quest": 1542 },
+            { "reply": 22328, "quest": 1542 }
+          ]
+        },
+        {
+          "message": 18688,
+          "choices": [
+            { "reply": 22334, "next": 18689 }
+          ]
+        },
+        {
+          "message": 18689,
+          "choices": [
+            { "reply": 22337, "startsQuest": 1543, "params": [[34, 1543]], "criterion": "Qf=1542&Qa!1543&Qf!1543", "next": 18690 },
+            { "reply": 22336, "next": 18691 }
+          ]
+        },
+        {
+          "message": 18690,
+          "choices": []
+        },
+        {
+          "message": 18691,
+          "choices": [
+            { "reply": 22335, "next": 18692 }
+          ]
+        },
+        {
+          "message": 18692,
+          "choices": []
+        }
+      ],
+      "why": "El Rumo [4,3]: «¿Tienes algo que ver con la muerte de los viajeros?» (22329 = 8786, 18685), «¡En guardia!»/«¡Ayuda!» (22327/22328 start the fight); after the fight he asks for his mawashi (18688, 22334 -> 18689) and the questioning goes on: «¿Qué sabes sobre la muerte de los viajeros?» (22337 -> 18690, starts «Un ring para gobernarlos a todos»), his stage name (22336 -> 18691 -> 22335 -> 18692). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
+    },
+    {
+      "npc": 2408,
+      "map": 128975874,
+      "opening": 17537,
+      "openings": [
+        { "quest": 1508, "objective": 8506, "message": 17540 }
+      ],
+      "lines": [
+        {
+          "message": 17537,
+          "choices": [
+            { "reply": 21001, "next": 17538, "criterion": "Qa=1508&Qo<8506" }
+          ]
+        },
+        {
+          "message": 17538,
+          "choices": [
+            { "reply": 21000 },
+            { "reply": 21002 }
+          ]
+        },
+        {
+          "message": 17540,
+          "choices": []
+        }
+      ],
+      "why": "«Un corazón de oro» (1508): Toponambo asks for coins and the player offers help (21001, 8505); the wounded formidiablo (3707) attacks at once (17538), fought with 21000 or 21002 (8506); afterwards he thanks and sends the player to Sivago (17540, 8507). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+    },
+    {
+      "npc": 2407,
+      "map": 128974852,
+      "opening": 17541,
+      "openings": [
+        { "quest": 1508, "objective": 8510, "pending": 8511, "message": 17544 },
+        { "quest": 1508, "objective": 8509, "message": 17544 },
+        { "quest": 1508, "objective": 8508, "pending": 8509, "message": 17542 }
+      ],
+      "lines": [
+        {
+          "message": 17541,
+          "choices": [
+            { "reply": 21006, "next": 17542, "criterion": "Qa=1508&Qo>8506" }
+          ]
+        },
+        {
+          "message": 17542,
+          "choices": [
+            { "reply": 21005, "next": 17543 }
+          ]
+        },
+        {
+          "message": 17543,
+          "choices": []
+        },
+        {
+          "message": 17544,
+          "choices": [
+            { "reply": 21007, "criterion": "Qa=1508&Qo>8509&Qo<8510", "gives": 15313 },
+            { "reply": 21007, "criterion": "Qa=1508&Qo>8510&Qo<8511&PO!15313", "gives": 15313 }
+          ]
+        }
+      ],
+      "why": "«Un corazón de oro» (1508): Sivago is spoken to on Toponambo's behalf (21006, 17542, 8508), orders the manure to be balled (21005, 17543); with it done he hands the herald's hot food (15313) (17544, 21007, 8510). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Fix: the greeting itself ticks 8508, so the 17542 line is the opening while 8509 is pending. Fix: 21007 hands the hot food (15313). Same hand-over again while 8511 is pending and the food is not carried."
+    },
+    {
+      "npc": 2356,
+      "map": 129236992,
+      "opening": 17780,
+      "lines": [
+        {
+          "message": 17780,
+          "choices": [
+            { "reply": 21575, "next": 17981, "quest": 1508, "afterObjective": 8510, "beforeObjective": 8511, "criterion": "PO=15313", "completes": 8511, "params": [[30, 8511]] },
+            { "reply": 21305 }
+          ]
+        },
+        {
+          "message": 17981,
+          "choices": []
+        }
+      ],
+      "why": "«Un corazón de oro» (1508): the herald is given Sivago's hot food (21575, 17981: «Ve a ver a Tanguy»; 8511). The audience replies of his own talk (21306-21310) are handled by no engine code, so only the exit stays. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Fix: the engine's hand-over of the bring objective takes the food."
+    },
+    {
+      "npc": 2409,
+      "map": 129238529,
+      "opening": 17545,
+      "lines": [
+        {
+          "message": 17545,
+          "choices": [
+            { "reply": 21015, "next": 17546, "criterion": "Qa=1508&Qo>8510&Qo<8512" }
+          ]
+        },
+        {
+          "message": 17546,
+          "choices": [
+            { "reply": 21014, "next": 17547 }
+          ]
+        },
+        {
+          "message": 17547,
+          "choices": [
+            { "reply": 21013, "next": 17548 },
+            { "reply": 21008, "next": 17552 }
+          ]
+        },
+        {
+          "message": 17548,
+          "choices": [
+            { "reply": 21012, "next": 17549 }
+          ]
+        },
+        {
+          "message": 17549,
+          "choices": [
+            { "reply": 21011, "next": 17550 },
+            { "reply": 21009, "next": 17552 }
+          ]
+        },
+        {
+          "message": 17550,
+          "choices": [
+            { "completes": 8512, "params": [[30, 8512]], "reply": 21010, "next": 17551, "quest": 1508, "afterObjective": 8511 }
+          ]
+        },
+        {
+          "message": 17551,
+          "choices": []
+        },
+        {
+          "message": 17552,
+          "choices": [
+            { "reply": 21014, "next": 17547 }
+          ]
+        }
+      ],
+      "why": "«Un corazón de oro» (1508): the improvised dance (17546..17551): follow the steps (21014, 21013, 21012, 21011, 21010; 8512); pushing him (21008/21009) gets 17552 and starts over. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+    },
+    {
+      "npc": 2410,
+      "map": 128975872,
+      "opening": 17553,
+      "openings": [
+        { "quest": 1508, "objective": 8516, "message": 17555 },
+        { "quest": 1509, "objective": 8524, "message": 17715 }
+      ],
+      "lines": [
+        {
+          "message": 17553,
+          "choices": [
+            { "reply": 21016, "next": 17554, "criterion": "Qa=1508&Qo>8512&Qo<8513" }
+          ]
+        },
+        {
+          "message": 17554,
+          "choices": [
+            { "completes": 8513, "params": [[30, 8513]], "reply": 21016, "quest": 1508, "afterObjective": 8512 }
+          ]
+        },
+        {
+          "message": 17555,
+          "choices": [
+            { "reply": 21019, "next": 17555, "quest": 1508, "afterObjective": 8516, "beforeObjective": 8517, "completes": 8517, "params": [[30, 8517]] },
+            { "reply": 21018 }
+          ]
+        },
+        {
+          "message": 17715,
+          "choices": [
+            { "reply": 21229, "next": 18014, "quest": 1509, "afterObjective": 8524, "beforeObjective": 8525, "criterion": "PO=15315", "completes": 8525, "params": [[30, 8525]] }
+          ]
+        },
+        {
+          "message": 18014,
+          "choices": [
+            { "reply": 21224, "next": 18015 },
+            { "reply": 21225, "next": 18016 },
+            { "reply": 21226, "next": 18017 },
+            { "reply": 21227, "next": 18018 }
+          ]
+        },
+        {
+          "message": 18015,
+          "choices": [
+            { "reply": 21228, "next": 17716 }
+          ]
+        },
+        {
+          "message": 18016,
+          "choices": [
+            { "reply": 21228, "next": 17716 }
+          ]
+        },
+        {
+          "message": 18017,
+          "choices": [
+            { "reply": 21228, "next": 17716 }
+          ]
+        },
+        {
+          "message": 18018,
+          "choices": [
+            { "reply": 21228, "next": 17716 }
+          ]
+        },
+        {
+          "message": 17716,
+          "choices": [
+            { "reply": 21236, "next": 17724 }
+          ]
+        },
+        {
+          "message": 17724,
+          "choices": [
+            { "reply": 21234, "next": 17725 }
+          ]
+        },
+        {
+          "message": 17725,
+          "choices": [
+            { "completes": 8526, "params": [[30, 8526]], "reply": 21235, "next": 17726, "quest": 1509, "afterObjective": 8525 }
+          ]
+        },
+        {
+          "message": 17726,
+          "choices": []
+        }
+      ],
+      "why": "«Un corazón de oro» (1508): McRico (17553) asks the player to count his kamas (21016, 17554; 8513); after the three clicks (8514-8516) he is told the number (21019, 17555; 8517). «Maldita generosidad» (1509): the golden waffle (15315) is shown (21229, 17715; 8525) and haggled over (21224-21228, 18014-18018, 17716), paid on credit (21236, 17724) and the jewel sold (21234, 17725, 21235; 8526). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. Fix: the engine's hand-over takes the item."
+    },
+    {
+      "npc": 2341,
+      "map": 131597312,
+      "opening": 17475,
+      "lines": [
+        {
+          "message": 17475,
+          "choices": [
+            { "reply": 20928, "next": 17476 },
+            { "reply": 20948, "next": 17489, "criterion": "PL>79&Qa!1501&Qf!1501", "beforeQuest": 1501 },
+            { "reply": 20955, "next": 17499, "quest": 1501, "afterObjective": 8441, "beforeObjective": 8442, "completes": 8442, "params": [[30, 8442]] },
+            { "reply": 20957, "next": 17500, "criterion": "PL>129&Qf=1501&Qa!1502&Qf!1502", "beforeQuest": 1502 },
+            { "reply": 20966, "next": 17508, "quest": 1502, "afterObjective": 8450, "beforeObjective": 8451, "completes": 8451, "params": [[30, 8451]] },
+            { "reply": 20968, "next": 17509, "criterion": "PL>179&Qf=1502&Qa!1503&Qf!1503", "beforeQuest": 1503 },
+            { "reply": 20994, "next": 17531, "quest": 1503, "afterObjective": 8464, "beforeObjective": 8465, "completes": 8465, "params": [[30, 8465]] },
+            { "reply": 20929 }
+          ]
+        },
+        {
+          "message": 17476,
+          "choices": [
+            { "reply": 20927 }
+          ]
+        },
+        {
+          "message": 17489,
+          "choices": [
+            { "reply": 20947, "next": 17490 }
+          ]
+        },
+        {
+          "message": 17490,
+          "choices": [
+            { "reply": 20946, "next": 17491 }
+          ]
+        },
+        {
+          "message": 17491,
+          "choices": [
+            { "startsQuest": 1501, "params": [[34, 1501]], "reply": 20945 }
+          ]
+        },
+        {
+          "message": 17499,
+          "choices": []
+        },
+        {
+          "message": 17508,
+          "choices": []
+        },
+        {
+          "message": 17500,
+          "choices": [
+            { "startsQuest": 1502, "params": [[34, 1502]], "reply": 20956 }
+          ]
+        },
+        {
+          "message": 17509,
+          "choices": [
+            { "startsQuest": 1503, "params": [[34, 1503]], "reply": 20967 }
+          ]
+        },
+        {
+          "message": 17531,
+          "choices": []
+        }
+      ],
+      "why": "Sargento Frinklan of the travellers outpost: the giver of «Tragamonedas» (1501: 20948 -> 17489 -> 20947 -> 17490 -> 20946 -> 17491 -> 20945 starts; 20955 reports, 17499), «Perforestación» (1502: 20957 -> 17500 -> 20956; 20966 reports, 17508) and «El silencio es oro» (1503: 20968 -> 17509 -> 20967; 20994 reports, 17531). Gladis' errand (20928, 17476) keeps its line. INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+    },
+    {
+      "npc": 2377,
+      "map": 129236994,
+      "opening": 17492,
+      "lines": [
+        {
+          "message": 17492,
+          "choices": [
+            { "reply": 20949, "next": 17493, "criterion": "Qa=1501&Qo<8436" },
+            { "reply": 20952, "next": 17495, "criterion": "Qa=1501&Qo>8436&Qo<8438" },
+            { "reply": 20953, "next": 17496, "quest": 1501, "afterObjective": 8440, "beforeObjective": 8441, "completes": 8441, "params": [[30, 8441]] }
+          ]
+        },
+        {
+          "message": 17493,
+          "choices": [
+            { "reply": 20951, "next": 17494 }
+          ]
+        },
+        {
+          "message": 17494,
+          "choices": [
+            { "reply": 20950 }
+          ]
+        },
+        {
+          "message": 17495,
+          "choices": []
+        },
+        {
+          "message": 17496,
+          "choices": []
+        }
+      ],
+      "why": "Agente Kohmer Sial testing the slot machine: «Tragamonedas» (1501): his mission (20949, 17493), the player explains theirs (20951, 17494) and defends him (20950, fight 8436); after it a scrap piece is asked about (20952, 17495) and the ten pieces of strongbox are recovered (8438, 8538-8546); the recycled ones from Logy are handed over (20953, 17496; 8441). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+    },
+    {
+      "npc": 2378,
+      "map": 131597312,
+      "opening": 17497,
+      "lines": [
+        {
+          "message": 17497,
+          "choices": [
+            { "reply": 20954, "next": 17498, "quest": 1501, "afterObjective": 8546, "beforeObjective": 8440, "completes": 8440, "params": [[30, 8440]], "gives": 15299, "givesCount": 10 }
+          ]
+        }
+      ],
+      "why": "Mariscal Logy Stika at the outpost: «Tragamonedas» (1501): shown the ten pieces of strongbox and Kohmer's needs (20954, 17498) he recycles them, handing ten recycled pieces (15299; 8440). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. His Farma Stika lines (27072, 27073) belong to a later quest."
     }
   ]
 }

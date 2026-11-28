@@ -10067,6 +10067,37 @@
       "cell": 312,
       "orientation": 1,
       "why": "Dian Perfosé in the gallery's exit room after Perfósil (1500: «Habla con Dian Perfosé dentro de la Galería de Perfósil»; DPLN «La pelle de la Phorrée»: «Une fois le donjon terminé, parlez à Dyane»). INFERRED cell."
+    },
+    {
+      "map": 134219778,
+      "npc": 2507,
+      "cell": 257,
+      "orientation": 1,
+      "criterion": "Qa=1542&Qo>8783",
+      "why": "Lugarteniente Cormoran fishing piranhabs on the fishing map [4,3] («Rendez-vous sur la map de pêche en [4,3]»; Dofus pour les noobs («Ça se katche»)). INFERRED cell on open floor."
+    },
+    {
+      "map": 134219778,
+      "npc": 2495,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qa=1542&Qo>8785",
+      "why": "El Rumo arrives at Cormoran's side on [4,3] (18161; Dofus pour les noobs («Ça se katche»)). INFERRED cell on open floor."
+    },
+    {
+      "map": 134219778,
+      "npc": 2495,
+      "cell": 272,
+      "orientation": 1,
+      "criterion": "Qf=1542&Qa!1543&Qf!1543",
+      "why": "El Rumo stays on [4,3] until «Un ring para gobernarlos a todos» is taken from him (22337; Dofus pour les noobs («Ça se katche»)). INFERRED cell."
+    },
+    {
+      "map": 136052994,
+      "npc": 2442,
+      "cell": 300,
+      "orientation": 1,
+      "why": "Collector Por (2442): shop trading items for 15206 (shops.json). Map and cell INFERRED: no source gives his position; placed on Srambad [5,0]."
     }
   ]
 }

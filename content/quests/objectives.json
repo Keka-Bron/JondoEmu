@@ -11486,6 +11486,298 @@
    "kind": "enter",
    "map": 131860993,
    "why": "«Encuentra la madriguera del formidiablo»: the lair at [2,-4] behind the hole in the rock (DPLN «Le phormidiable au corps»: «Passez par le trou dans la roche puis attaquez le Grand Phormidiable»)."
+  },
+  {
+   "objective": 8777,
+   "quest": 1542,
+   "kind": "reply",
+   "replies": [21748],
+   "why": "«Habla con los maligilantes» (885370): insisting to the sramurái (Dofus pour les noobs («Ça se katche»))."
+  },
+  {
+   "objective": 8782,
+   "quest": 1542,
+   "kind": "use",
+   "afterObjectives": [8781],
+   "why": "«Utiliza el disfraz de milimaestro» (885371): the disguise 15498, used (its effect 30 is this objective; Dofus pour les noobs («Ça se katche»))."
+  },
+  {
+   "objective": 8783,
+   "quest": 1542,
+   "kind": "reply",
+   "replies": [21763],
+   "afterObjectives": [8782],
+   "why": "«Escucha las conversaciones de los maligilantes» (885372): the disguised player hears the sramurái (Dofus pour les noobs («Ça se katche»))."
+  },
+  {
+   "objective": 8784,
+   "quest": 1542,
+   "kind": "enter",
+   "map": 134219778,
+   "afterObjectives": [8783],
+   "overridesMap": true,
+   "why": "«Descubre el mapa»: the fishing map [4,3] (Dofus pour les noobs («Ça se katche»)); the objective carries no map."
+  },
+  {
+   "objective": 8787,
+   "quest": 1542,
+   "kind": "beat",
+   "monster": 3779,
+   "map": 134219778,
+   "afterObjectives": [8786],
+   "why": "«Vence a El Rumo e interrógale» (885373): ticks when El Rumo falls (Dofus pour les noobs («Ça se katche»))."
+  },
+  {
+   "objective": 8505,
+   "quest": 1508,
+   "kind": "reply",
+   "replies": [21001],
+   "why": "«Busca alguien a quien ayudar en la cantera aurífera»: offering help to Toponambo (21001). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts."
+  },
+  {
+   "objective": 8507,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8506],
+   "why": "Toponambo's thanks come after the fight."
+  },
+  {
+   "objective": 8508,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8507],
+   "why": "Sivago is spoken to for Toponambo after his thanks."
+  },
+  {
+   "objective": 8509,
+   "quest": 1508,
+   "kind": "click",
+   "afterObjectives": [8508],
+   "elements": [{"map": 128974852, "element": 484974}, {"map": 128974852, "element": 484975}, {"map": 128975876, "element": 484976}, {"map": 128976898, "element": 484977}, {"map": 128976896, "element": 484978}, {"map": 128976896, "element": 484979}],
+   "why": "«Ocúpate de los excrementos en la cantera aurífera»: ball up the droppings lying around the quarry (17543, «hazlo tres veces»): the six «Utilizar» props of gfx 45655-45659 in the quarry. Any of them counts; the three repetitions are not counted."
+  },
+  {
+   "objective": 8510,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8509],
+   "why": "Sivago hands the food after the manure."
+  },
+  {
+   "objective": 8511,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8510]
+  },
+  {
+   "objective": 8512,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8511]
+  },
+  {
+   "objective": 8513,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8512]
+  },
+  {
+   "objective": 8514,
+   "quest": 1508,
+   "kind": "click",
+   "afterObjectives": [8513],
+   "elements": [{"map": 128975872, "element": 485115}],
+   "why": "«Cuenta los kamas»: one of the piles of kamas by McRico (gfx 45138). INFERRED element."
+  },
+  {
+   "objective": 8515,
+   "quest": 1508,
+   "kind": "click",
+   "afterObjectives": [8514],
+   "elements": [{"map": 128975872, "element": 485117}],
+   "why": "«Verifica la autenticidad de los kamas»: another pile (gfx 45138). INFERRED element."
+  },
+  {
+   "objective": 8516,
+   "quest": 1508,
+   "kind": "click",
+   "afterObjectives": [8515],
+   "elements": [{"map": 128975872, "element": 485114}],
+   "why": "«Devuelve los kamas a su sitio»: a third pile (gfx 45139). INFERRED element."
+  },
+  {
+   "objective": 8517,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8516]
+  },
+  {
+   "objective": 8518,
+   "quest": 1508,
+   "kind": "order",
+   "afterObjectives": [8517]
+  },
+  {
+   "objective": 8519,
+   "quest": 1509,
+   "kind": "click",
+   "elements": [{"map": 128976896, "element": 484979}],
+   "why": "«Encuentra una piedra más preciosa que las otras»: the gem prop (gfx 45659) of the quarry. INFERRED element."
+  },
+  {
+   "objective": 8520,
+   "quest": 1509,
+   "kind": "click",
+   "afterObjectives": [8519],
+   "elements": [{"map": 128977922, "element": 484981}],
+   "why": "«Encuentra un escondite para la piedra preciosa»: the prop (gfx 45467) at Graverg's map. INFERRED element."
+  },
+  {
+   "objective": 8521,
+   "quest": 1509,
+   "kind": "order",
+   "afterObjectives": [8520]
+  },
+  {
+   "objective": 8522,
+   "quest": 1509,
+   "kind": "beat",
+   "monster": 3708,
+   "map": 128977922,
+   "afterObjectives": [8521],
+   "why": "«Vence solo y desarmado a un perfidotroz agresivo»: the fight alone; «desarmado» is not enforced."
+  },
+  {
+   "objective": 8524,
+   "quest": 1509,
+   "kind": "click",
+   "afterObjectives": [8523],
+   "elements": [{"map": 128976900, "element": 485027}],
+   "gives": [{"item": 15315, "count": 1}],
+   "why": "«Fabrica un gofre de oro»: the oven prop at [2,-4] (type 57, skill 20). The data carries no recipe for the golden waffle (15315), so the click makes it. STAND-IN: ingredients unknown."
+  },
+  {
+   "objective": 8526,
+   "quest": 1509,
+   "kind": "order",
+   "afterObjectives": [8525]
+  },
+  {
+   "objective": 8776,
+   "quest": 1542,
+   "kind": "reply",
+   "replies": [21749],
+   "why": "Busca a los maligilantes implicados en la muerte de los viajeros (885369): the first question put to the sramurai in the tavern (Dofus pour les noobs, Ca se katche)."
+  },
+  {
+   "objective": 8436,
+   "quest": 1501,
+   "kind": "beat",
+   "monster": 3665,
+   "map": 129236994,
+   "why": "«Defiende al agente Kohmer Sial y vuelve a hablar con él»: the fight he asks for (20950) against the strongboxes; the talk afterwards is 20952."
+  },
+  {
+   "objective": 8438,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8436],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8538,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8438],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8539,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8538],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8540,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8539],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8541,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8540],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8542,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8541],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8543,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8542],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8544,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8543],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8545,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8544],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8546,
+   "quest": 1501,
+   "kind": "gather",
+   "item": 15298,
+   "map": 129236994,
+   "afterObjectives": [8545],
+   "why": "«Recupera 1 trozo de cofrefuerte»: a piece (15298) dropped by the strongboxes around the slot machine, one per objective, in order."
+  },
+  {
+   "objective": 8442,
+   "quest": 1501,
+   "kind": "order",
+   "afterObjectives": [8441]
+  },
+  {
+   "objective": 8441,
+   "quest": 1501,
+   "kind": "order",
+   "afterObjectives": [8440]
   }
   ]
 }
