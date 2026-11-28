@@ -11778,6 +11778,203 @@
    "quest": 1501,
    "kind": "order",
    "afterObjectives": [8440]
+  },
+  {
+   "objective": 8791,
+   "quest": 1543,
+   "kind": "reply",
+   "replies": [22338],
+   "why": "«Habla con los vigilantes del ring» (885362): the question to Straf (Dofus pour les noobs («Un ring pour les gouverner tous»))."
+  },
+  {
+   "objective": 8444,
+   "quest": 1502,
+   "kind": "beat",
+   "monster": 3658,
+   "map": 128976896,
+   "why": "«Defiende al agente Ruño y vuelve a hablar con él»: the fight his reply 20958 starts against the perforatroces (3658-3660, Galerie du Phossile); the talk afterwards is 20963."
+  },
+  {
+   "objective": 8446,
+   "quest": 1502,
+   "kind": "reply",
+   "replies": [20964],
+   "afterObjectives": [8445],
+   "requires": [{"item": 15301, "count": 1}, {"item": 15302, "count": 1}, {"item": 15303, "count": 1}, {"item": 15304, "count": 1}],
+   "spends": true,
+   "gives": [{"item": 15305, "count": 1}, {"item": 15319, "count": 1}, {"item": 15320, "count": 1}],
+   "why": "«Llévale las 4 mochilas de viajero al agente Ruño»: he takes the four bags (20964, 17506) and gives the three traps (15305 blinding, 15319 incendiary, 15320 poisoned) to put in the maps [1,-5], [2,-4] and [3,-5] (Dofus pour les noobs)."
+  },
+  {
+   "objective": 8447,
+   "quest": 1502,
+   "kind": "use",
+   "afterObjectives": [8446],
+   "why": "«Pon una trampa para perforatroz»: the trap 15305, used on its map (its criterion Pm and Qo; its effect 30 is this objective; Dofus pour les noobs)."
+  },
+  {
+   "objective": 8448,
+   "quest": 1502,
+   "kind": "use",
+   "afterObjectives": [8446],
+   "why": "«Pon una trampa para perforatroz»: the trap 15319, used on its map (its criterion Pm and Qo; its effect 30 is this objective; Dofus pour les noobs)."
+  },
+  {
+   "objective": 8449,
+   "quest": 1502,
+   "kind": "use",
+   "afterObjectives": [8446],
+   "why": "«Pon una trampa para perforatroz»: the trap 15320, used on its map (its criterion Pm and Qo; its effect 30 is this objective; Dofus pour les noobs)."
+  },
+  {
+   "objective": 8450,
+   "quest": 1502,
+   "kind": "order",
+   "afterObjectives": [8449]
+  },
+  {
+   "objective": 8451,
+   "quest": 1502,
+   "kind": "order",
+   "afterObjectives": [8450]
+  },
+  {
+   "objective": 8445,
+   "quest": 1502,
+   "kind": "click",
+   "afterObjectives": [8444],
+   "anyOrder": true,
+   "elements": [{"map": 128977922, "element": 484989, "item": 15301}, {"map": 128975876, "element": 484990, "item": 15302}, {"map": 128976898, "element": 484991, "item": 15303}, {"map": 128975872, "element": 484988, "item": 15304}],
+   "givesEach": true,
+   "gives": [{"item": 15301, "count": 1}, {"item": 15302, "count": 1}, {"item": 15303, "count": 1}, {"item": 15304, "count": 1}],
+   "why": "«Recupera 4 mochilas en la cantera aurífera» at [3,-4], [1,-3], [2,-4] and [1,-5] (Dofus pour les noobs): the prop (gfx 45166) of each of those maps, a traveller's bag each (15301-15304); done once the four are carried. INFERRED element and which bag is in which map."
+  },
+  {
+   "objective": 8805,
+   "quest": 1544,
+   "kind": "click",
+   "elements": [{"map": 135266817, "element": 485434, "item": 15519}, {"map": 135266821, "element": 485435, "item": 15520}, {"map": 135269891, "element": 485436, "item": 15521, "spawns": {"monster": 3782, "chance": 50, "attacks": true, "alone": true}}, {"map": 135269889, "element": 485437, "item": 15522, "spawns": {"monster": 3780, "chance": 50, "attacks": true, "alone": true}}],
+   "onlyGives": true,
+   "givesEach": true,
+   "gives": [{"item": 15519, "count": 1}, {"item": 15520, "count": 1}, {"item": 15521, "count": 1}, {"item": 15522, "count": 1}],
+   "anyOrder": true,
+   "why": "«Toma muestras de los huevos de necróticos» (885374): the four eggs of the catacombs, at [5,7] scoliopod, [5,9] éperfide, [8,8] lucrane, [8,7] puceronde (Dofus pour les noobs («Épidémiologie»)). Elements 485434-485437 (graphics 44845, 44844, 44860, 44857, no skill in the client data) are INFERRED as the eggs, the consecutive ids on exactly those four maps; the item of each (15519-15522) too. Sampling the lucrane egg [8,8] or the puceronde egg [8,7] may set a playful lucrane (3782) or puceronde (3780) on the player, fought alone («il se peut que vous vous fassiez agresser ... à combattre seul»); the other two eggs never do. The 50% chance is INFERRED: the walkthrough only says it may happen."
+  },
+  {
+   "objective": 8806,
+   "quest": 1544,
+   "kind": "order",
+   "afterObjectives": [8805],
+   "requires": [{"item": 15519, "count": 1}, {"item": 15520, "count": 1}, {"item": 15521, "count": 1}, {"item": 15522, "count": 1}],
+   "spends": true,
+   "why": "«Lleva las muestras de huevos de necróticos a Kathy Brennan» (885375): handed over with 21772, the four egg samples are taken (Dofus pour les noobs («Épidémiologie»))."
+  },
+  {
+   "objective": 8810,
+   "quest": 1544,
+   "kind": "click",
+   "elements": [{"map": 135397891, "element": 485433}],
+   "afterObjectives": [8809],
+   "why": "«Utiliza combustible para alejar a los necróticos» (885376): the blue-flame barrel beside Palegnor (element 485433, graphic 46528, cell 245; «Cliquez sur le baril à flamme bleue», Dofus pour les noobs («Épidémiologie»))."
+  },
+  {
+   "objective": 8801,
+   "quest": 1544,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Hand-over objective of the healthy sample8801. Marked anyOrder so the catalogue's order (hand-over objectives before the eggs) does not hide the egg objective: the samples are all handed over with the one line 21772 (Dofus pour les noobs, «Epidemiologie»)."
+  },
+  {
+   "objective": 8802,
+   "quest": 1544,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Hand-over objective of the healthy sample8802. Marked anyOrder so the catalogue's order (hand-over objectives before the eggs) does not hide the egg objective: the samples are all handed over with the one line 21772 (Dofus pour les noobs, «Epidemiologie»)."
+  },
+  {
+   "objective": 8803,
+   "quest": 1544,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Hand-over objective of the healthy sample8803. Marked anyOrder so the catalogue's order (hand-over objectives before the eggs) does not hide the egg objective: the samples are all handed over with the one line 21772 (Dofus pour les noobs, «Epidemiologie»)."
+  },
+  {
+   "objective": 8804,
+   "quest": 1544,
+   "kind": "order",
+   "anyOrder": true,
+   "why": "Hand-over objective of the healthy sample8804. Marked anyOrder so the catalogue's order (hand-over objectives before the eggs) does not hide the egg objective: the samples are all handed over with the one line 21772 (Dofus pour les noobs, «Epidemiologie»)."
+  },
+  {
+   "objective": 8453,
+   "quest": 1503,
+   "kind": "beat",
+   "monster": 3692,
+   "map": 129761280,
+   "why": "«Defiende a la agente Jana y vuelve a hablar con ella»: the fight her reply 20969 starts against the divinutrofs and their chief Aityuns (3692); the talk afterwards is 20974."
+  },
+  {
+   "objective": 8454,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8453]
+  },
+  {
+   "objective": 8455,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8454]
+  },
+  {
+   "objective": 8456,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8455]
+  },
+  {
+   "objective": 8457,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8456]
+  },
+  {
+   "objective": 8458,
+   "quest": 1503,
+   "kind": "gather",
+   "item": 15307,
+   "map": 129762562,
+   "afterObjectives": [8457],
+   "why": "«Recupera una bolsa de herramientas de divinutrof»: the toolkit's fight (8459) leaves its quest item (15307; the guide: «vous obtiendrez une Trousse à outils dans votre inventaire de quête»)."
+  },
+  {
+   "objective": 8461,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8460]
+  },
+  {
+   "objective": 8462,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8461]
+  },
+  {
+   "objective": 8463,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8462]
+  },
+  {
+   "objective": 8464,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8463]
+  },
+  {
+   "objective": 8465,
+   "quest": 1503,
+   "kind": "order",
+   "afterObjectives": [8464]
   }
   ]
 }

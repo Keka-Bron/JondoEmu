@@ -328,6 +328,13 @@
    "monsters": [3663, 3664, 3665, 3666],
    "criterion": "Qa=1501&Qo>8436&Qo<8440",
    "why": "«Tragamonedas» (1501): the strongboxes of the slot machine's map leave a piece of strongbox (15298) while the ten are asked for (8438, 8538-8546). Chance INFERRED."
+  },
+  {
+   "item": 15307,
+   "percent": 100,
+   "monsters": [3693],
+   "criterion": "Qa=1503&Qo>8457&Qo<8460",
+   "why": "«El silencio es oro» (1503): the beaten toolkit leaves the quest item that is brought to Jana (8458, 8460)."
   }
   ]
 }

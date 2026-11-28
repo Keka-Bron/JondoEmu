@@ -2418,6 +2418,14 @@
     { "npc": 2402, "map": 128977922, "reply": 21027,
       "monsters": [ { "monster": 3708, "grade": 1 } ] },
     { "npc": 2377, "map": 129236994, "reply": 20950,
-      "monsters": [ { "monster": 3664, "grade": 3 }, { "monster": 3665, "grade": 3 }, { "monster": 3666, "grade": 2 } ] }
+      "monsters": [ { "monster": 3664, "grade": 3 }, { "monster": 3665, "grade": 3 }, { "monster": 3666, "grade": 2 } ] },
+    { "npc": 2379, "map": 128976896, "reply": 20958,
+      "monsters": [ { "monster": 3658, "grade": 2 }, { "monster": 3659, "grade": 1 }, { "monster": 3660, "grade": 1 } ] },
+    { "npc": 2383, "map": 129762562, "reply": 20993,
+      "monsters": [ { "monster": 3693, "grade": 3 } ] },
+    { "npc": 2380, "map": 129761280, "reply": 20969,
+      "monsters": [ { "monster": 3692, "grade": 2 }, { "monster": 3654, "grade": 0 }, { "monster": 3655, "grade": 1 }, { "monster": 3653, "grade": 1 } ],
+      "alliesMustLive": true,
+      "allies": [ { "monster": 3691, "grade": 0 } ] }
   ]
 }

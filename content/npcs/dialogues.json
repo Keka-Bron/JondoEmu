@@ -43413,6 +43413,7 @@
         {
           "message": 18284,
           "choices": [
+            { "reply": 22344, "quest": 1543, "criterion": "Qa=1543&Qo>8794&Qo<8795", "next": 18696 },
             { "reply": 22119, "next": 18483, "quest": 1526, "afterObjective": 8689, "beforeObjective": 8690 },
             { "reply": 21896 }
           ]
@@ -43428,9 +43429,33 @@
           "choices": [
             { "reply": 22117, "gives": 15420, "quest": 1526, "completes": 8690, "params": [[30, 8690]] }
           ]
+        },
+        {
+          "message": 18696,
+          "choices": [
+            { "reply": 22343, "quest": 1543, "next": 18697 }
+          ]
+        },
+        {
+          "message": 18697,
+          "choices": [
+            { "reply": 22342, "quest": 1543, "next": 18698 }
+          ]
+        },
+        {
+          "message": 18698,
+          "choices": [
+            { "reply": 22341, "quest": 1543, "next": 18699 }
+          ]
+        },
+        {
+          "message": 18699,
+          "choices": [
+            { "reply": 22340, "quest": 1543, "completes": 8795, "params": [[30, 8795]] }
+          ]
         }
       ],
-      "why": "Captain Eskarlata after the ring, in his dressing room (18284: what a punch). For «El anillo de Tot» (Dofus pour les noobs: at the end of the dungeon, before leaving, ask him a reward for beating him; he gives the ring): «Una victoria tan sublime como la mía merece una buena recompensa» (22119, 18483), «Me gustaría tener un anillo de Tot» (22118, 18484: he bought one thinking it magic) and «Gracias. Adiós» (22117) gives the «Anillo de Tot» (15420) and is 8690. «Salir del Ring del Capitán Eskarlata» (21896) leaves the dungeon (content/world/dungeon_exits.json)."
+      "why": "Captain Eskarlata after the ring, in his dressing room (18284: what a punch). For «El anillo de Tot» (Dofus pour les noobs: at the end of the dungeon, before leaving, ask him a reward for beating him; he gives the ring): «Una victoria tan sublime como la mía merece una buena recompensa» (22119, 18483), «Me gustaría tener un anillo de Tot» (22118, 18484: he bought one thinking it magic) and «Gracias. Adiós» (22117) gives the «Anillo de Tot» (15420) and is 8690. «Salir del Ring del Capitán Eskarlata» (21896) leaves the dungeon (content/world/dungeon_exits.json). «Un ring para gobernarlos a todos» (1543; Dofus pour les noobs («Un ring pour les gouverner tous»)): after the ring, «Exijo que me des explicaciones...» (22344 -> 18696), 22343 -> 18697, 22342 -> 18698, 22341 -> 18699 and «No será necesario» (22340 = 8795): the two travellers died attacking his fighter. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»)."
     },
   {
       "npc": 2466,
@@ -70233,7 +70258,8 @@
       "map": 0,
       "opening": 18028,
       "openings": [
-        { "quest": 1538, "pending": 8717, "message": 18031 }
+        { "quest": 1538, "pending": 8717, "message": 18031 },
+        { "quest": 1544, "objective": 8806, "pending": 8807, "message": 18168 }
       ],
       "lines": [
         {
@@ -70246,7 +70272,8 @@
             { "reply": 21670, "criterion": "PL>179&Qf=1539&Qa!1540&Qf!1540", "next": 18078 },
             { "reply": 21680, "quest": 1540, "criterion": "Qo>8764&Qo<8765", "holds": 15489, "completes": 8765, "params": [[30, 8765]] },
             { "reply": 21697, "quest": 1541, "criterion": "Qo>8769&Qo<8770", "completes": 8770, "params": [[30, 8770]], "gives": 15491, "next": 18103 },
-            { "reply": 21989, "quest": 1557, "criterion": "Qo=8975", "completes": 8975, "params": [[30, 8975]], "next": 18360 }
+            { "reply": 21989, "quest": 1557, "criterion": "Qo=8975", "completes": 8975, "params": [[30, 8975]], "next": 18360 },
+            { "reply": 21778, "quest": 1544, "completes": 8812, "params": [[30, 8812]], "criterion": "Qa=1544&Qo>8811&Qo<8812", "next": 18174 }
           ]
         },
         {
@@ -70316,9 +70343,23 @@
         {
           "message": 18360,
           "choices": []
+        },
+        {
+          "message": 18168,
+          "choices": [
+            { "reply": 21774, "quest": 1544, "completes": 8807, "params": [[30, 8807]], "next": 18169 }
+          ]
+        },
+        {
+          "message": 18169,
+          "choices": []
+        },
+        {
+          "message": 18174,
+          "choices": []
         }
       ],
-      "why": "Sergeant Raskzac of the travellers' outpost in Sramvil, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Estoy en misión especial para Exploranciana» (22363) is 8723; he tells Mundy lives in the dark summit and offers an escort that is declined (22361, 18717). Reply order INFERRED. Other quests of the sergeant add their lines here. «Fanfouille» (1538; Dofus pour les noobs («Fanfouille»)): 21630 -> 18029 -> 21629 -> 18030 -> «Aceptar» (21628) starts it; 18031 is his impatient line while the agent's affair is unfinished; the report (21649 -> 18049, «De acuerdo» 21650 = 8718) sends the player to Sinedia. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Fanfouille»). «Las brigadas del abismo» (1539; Dofus pour les noobs («Les brigades de l'abîme»)): «¿Me das otra misión?» (21652) -> 18050 -> «Sigue contándome» (21651) starts it and ends on 18051. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Les brigades de l'abîme»). «Balance la sauce» (1540; Dofus pour les noobs («Balance la sauce»)): «¿Me das otra misión?» (21670) -> 18078 -> 21669 starts it (18079); handing the documents over (21680 = 8765). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Balance la sauce»). Fix 1540d: reply 21680 no longer takes the documents before completing (the objective stayed pending). «Los viajeros del canal» (1541; Dofus pour les noobs («La seinoise»)): «Explicarle el trato con la niña» (21697 = 8770) -> 18103, he gives the defective krosmoglob (15491). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Presunto culpable» (1557; Dofus pour les noobs («Présumé coupable»)): «Negociar la proteccion de la Orden...» (21989 = 8975, 18360): he will not protect a criminal. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»)."
+      "why": "Sergeant Raskzac of the travellers' outpost in Sramvil, for «La cité de l'indicible mal» (1530; Dofus pour les noobs («La cité de l'indicible mal»)): «Estoy en misión especial para Exploranciana» (22363) is 8723; he tells Mundy lives in the dark summit and offers an escort that is declined (22361, 18717). Reply order INFERRED. Other quests of the sergeant add their lines here. «Fanfouille» (1538; Dofus pour les noobs («Fanfouille»)): 21630 -> 18029 -> 21629 -> 18030 -> «Aceptar» (21628) starts it; 18031 is his impatient line while the agent's affair is unfinished; the report (21649 -> 18049, «De acuerdo» 21650 = 8718) sends the player to Sinedia. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Fanfouille»). «Las brigadas del abismo» (1539; Dofus pour les noobs («Les brigades de l'abîme»)): «¿Me das otra misión?» (21652) -> 18050 -> «Sigue contándome» (21651) starts it and ends on 18051. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Les brigades de l'abîme»). «Balance la sauce» (1540; Dofus pour les noobs («Balance la sauce»)): «¿Me das otra misión?» (21670) -> 18078 -> 21669 starts it (18079); handing the documents over (21680 = 8765). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Balance la sauce»). Fix 1540d: reply 21680 no longer takes the documents before completing (the objective stayed pending). «Los viajeros del canal» (1541; Dofus pour les noobs («La seinoise»)): «Explicarle el trato con la niña» (21697 = 8770) -> 18103, he gives the defective krosmoglob (15491). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Presunto culpable» (1557; Dofus pour les noobs («Présumé coupable»)): «Negociar la proteccion de la Orden...» (21989 = 8975, 18360): he will not protect a criminal. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Présumé coupable»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): after the samples (18168: «¿Te envía la doctora Brennan?»), «¿Cuál es la situación urgente, sargento?» (21774 = 8807 -> 18169: the agent in trouble in the catacombs [4,8]) and, at the end, «Hacerle un informe» (21778 = 8812 -> 18174). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
     },
   {
       "npc": 2454,
@@ -89094,7 +89135,10 @@
             { "reply": 21694, "criterion": "PL>109&Qa!1541&Qf!1541", "next": 18096 },
             { "reply": 21696, "quest": 1541, "criterion": "Qo>8768&Qo<8769", "completes": 8769, "params": [[30, 8769]], "next": 18102 },
             { "reply": 21760, "quest": 1542, "completes": 8781, "params": [[30, 8781]], "criterion": "Qo>8780&Qo<8781", "gives": 15498, "next": 18154 },
-            { "reply": 21762, "quest": 1542, "criterion": "Qa=1542&Qo>8781&Qo<8787&PO!15498", "next": 18155 }
+            { "reply": 21762, "quest": 1542, "criterion": "Qa=1542&Qo>8781&Qo<8787&PO!15498", "next": 18155 },
+            { "reply": 21768, "quest": 1543, "completes": 8796, "params": [[30, 8796]], "criterion": "Qa=1543&Qo>8795&Qo<8796", "next": 18164 },
+            { "reply": 21771, "criterion": "PL>159&Qf=1539&Qf=1543&Qa!1544&Qf!1544", "next": 18165 },
+            { "reply": 21772, "quest": 1544, "completes": 8806, "params": [[30, 8806]], "criterion": "Qa=1544&Qo<8806&PO=15509&PO=15511&PO=15513&PO=15517&PO=15519&PO=15520&PO=15521&PO=15522", "completesAll": [8801, 8802, 8803, 8804, 8805, 8806], "next": 18167 }
           ]
         },
         {
@@ -89134,9 +89178,29 @@
           "choices": [
             { "reply": 21761, "buyItem": 15498, "buyPrice": 4000 }
           ]
+        },
+        {
+          "message": 18164,
+          "choices": []
+        },
+        {
+          "message": 18165,
+          "choices": [
+            { "reply": 21770, "next": 18166 }
+          ]
+        },
+        {
+          "message": 18166,
+          "choices": [
+            { "reply": 21769, "startsQuest": 1544, "params": [[34, 1544]] }
+          ]
+        },
+        {
+          "message": 18167,
+          "choices": []
         }
       ],
-      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «Hablarle de tu evasión» (21760 = 8781, 18154: the milimaestro disguise 15498); «Necesito un nuevo disfraz» (21762 -> 18155 -> 21761: 4000 kamas). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»)."
+      "why": "Kathy Brennan [2,2]: «Quiero participar en tu apasionante aventura» (21694) .. 18099 «De acuerdo» (21690) starts «Los viajeros del canal»; «Explicarle el trato con la niña» (21696 = 8769, 18102). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («La seinoise»). Only the path of the non-Sram, non-Rogue classes (Myopic Skull) is written. «Ça se katche» (1542; Dofus pour les noobs («Ça se katche»)): «Hablarle de tu evasión» (21760 = 8781, 18154: the milimaestro disguise 15498); «Necesito un nuevo disfraz» (21762 -> 18155 -> 21761: 4000 kamas). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Ça se katche»). «Un ring para gobernarlos a todos» (1543; Dofus pour les noobs («Un ring pour les gouverner tous»)): «Aquí tienes los resultados de la investigación» (21768 = 8796, 18164). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»). «Épidémiologie» (1544; Dofus pour les noobs («Épidémiologie»)): «Estoy listo para ayudarte en una nueva misión» (21771 -> 18165), «¿Qué tengo que hacer yo?» (21770 -> 18166, the step line) and «Aceptar» (21769 starts it); «Aquí tienes las muestras» (21772 -> 18167) hands over the four healthy necrotic samples (8801-8804) and the four egg samples (8806). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
     },
     {
       "npc": 2503,
@@ -90999,6 +91063,239 @@
         { "message": 17498, "choices": [] }
       ],
       "why": "Mariscal Logy Stika at the outpost: «Tragamonedas» (1501): shown the ten pieces of strongbox and Kohmer's needs (20954, 17498) he recycles them, handing ten recycled pieces (15299; 8440). INFERRED wiring (no Dofus pour les noobs page for the quest): order of replies read from the NPC's message and reply ids and texts. His Farma Stika lines (27072, 27073) belong to a later quest."
+    },
+    {
+      "npc": 2578,
+      "map": 0,
+      "opening": 18693,
+      "lines": [
+        {
+          "message": 18693,
+          "choices": [
+            { "reply": 22338, "quest": 1543, "completes": 8791, "params": [[30, 8791]], "criterion": "Qa=1543&Qo<8791", "next": 18694 }
+          ]
+        },
+        {
+          "message": 18694,
+          "choices": []
+        }
+      ],
+      "why": "Straf, bouncer of the Ring in [6,3] (18693): «Hablarle de los altercados con dos viajeros» (22338 = 8791, 18694: ask for Captain Eskarlata through Tak Hillero). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»)."
+    },
+    {
+      "npc": 2444,
+      "map": 0,
+      "opening": 18286,
+      "lines": [
+        {
+          "message": 18286,
+          "choices": [
+            { "reply": 22339, "quest": 1543, "completes": 8792, "params": [[30, 8792]], "criterion": "Qa=1543&Qo>8791&Qo<8792", "next": 18695 }
+          ]
+        },
+        {
+          "message": 18695,
+          "choices": []
+        }
+      ],
+      "why": "Tak Hillero (Guy Cheutie in the French walkthrough) at the Ring door (18286): «Quiero ver al Capitán Eskarlata» (22339 = 8792, 18695: he fights today, wear the presinkach suit and climb into the ring). The key replies come from the dungeon door. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Un ring pour les gouverner tous»)."
+    },
+    {
+      "npc": 2379,
+      "map": 128976896,
+      "opening": 17501,
+      "lines": [
+        {
+          "message": 17501,
+          "choices": [
+            { "reply": 20959, "next": 17502, "criterion": "Qa=1502&Qo<8444" },
+            { "reply": 20963, "next": 17505, "criterion": "Qa=1502&Qo>8444&Qo<8445" },
+            { "reply": 20964, "next": 17506, "criterion": "Qa=1502&Qo>8444&Qo<8446" },
+            { "reply": 20965, "next": 17507, "quest": 1502, "criterion": "Qa=1502&Qo>8448&Qo<8450", "completes": 8450, "params": [[30, 8450]] }
+          ]
+        },
+        {
+          "message": 17502,
+          "choices": [
+            { "reply": 20973 },
+            { "reply": 20958 }
+          ]
+        },
+        {
+          "message": 17505,
+          "choices": []
+        },
+        {
+          "message": 17506,
+          "choices": []
+        },
+        {
+          "message": 17507,
+          "choices": []
+        }
+      ],
+      "why": "Agente Runo (Agent Sart in Dofus pour les noobs «Déphorrestation»), quarry [2,-5]: he tells his mission («Explicarle tu misión» 20959, 17502); «Esperar más refuerzos» (20973) lets the others join, «Defender al agente Ruño» (20958) starts the fight against the perforatroces; afterwards «¿Qué ha ocurrido?» (20963, 17505: the lost bags); «Aquí tienes las mochilas» (20964, 17506) hands the four bags over and the traps come back; «Ya he puesto las trampas» (20965, 17507) ends the errand. Dofus pour les noobs «Déphorrestation»; the order of the replies is read from the client's message and reply ids."
+    },
+    {
+      "npc": 2509,
+      "map": 0,
+      "opening": 18170,
+      "lines": [
+        {
+          "message": 18170,
+          "choices": [
+            { "reply": 21775, "quest": 1544, "completes": 8809, "params": [[30, 8809]], "criterion": "Qa=1544&Qo>8808&Qo<8809", "next": 18171 }
+          ]
+        },
+        {
+          "message": 18171,
+          "choices": []
+        }
+      ],
+      "why": "Marshall Palegnor in the catacombs [4,8] (18170): «Analizar el conjunto de la situación» (21775 = 8809 -> 18171: the experimental fuel to put in the flames). Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
+    },
+    {
+      "npc": 2510,
+      "map": 0,
+      "opening": 18172,
+      "lines": [
+        {
+          "message": 18172,
+          "choices": [
+            { "reply": 21777, "quest": 1544, "completes": 8811, "params": [[30, 8811]], "criterion": "Qa=1544&Qo>8810&Qo<8811", "next": 18173 }
+          ]
+        },
+        {
+          "message": 18173,
+          "choices": [
+            { "reply": 21776, "quest": 1544, "criterion": "Qa=1544&Qo>8811", "teleport": 137363456 }
+          ]
+        }
+      ],
+      "why": "Tim Trauma the eni, arrived once the fuel is in the flames (18172): «Marshall Palegnor» (21777 = 8811 -> 18173) and «Aprovechar la ocasión para volver al puesto avanzado» (21776) takes the player back to the outpost [2,2]. Reply-to-line order INFERRED from the client's lines and the walkthrough; Dofus pour les noobs («Épidémiologie»)."
+    },
+    {
+      "npc": 2380,
+      "map": 129761280,
+      "opening": 17510,
+      "lines": [
+        {
+          "message": 17510,
+          "choices": [
+            { "reply": 20971, "next": 17511, "criterion": "Qa=1503&Qo<8453" },
+            { "reply": 20974, "next": 17512, "criterion": "Qa=1503&Qo>8453&Qo<8454" },
+            { "reply": 20978, "next": 17515, "criterion": "Qa=1503&Qo>8454&Qo<8455", "completes": 8455, "params": [[30, 8455]], "quest": 1503 },
+            { "reply": 20980, "next": 17516, "criterion": "Qa=1503&Qo>8456&Qo<8457", "completes": 8457, "params": [[30, 8457]], "quest": 1503 },
+            { "reply": 20981, "next": 17518, "criterion": "Qa=1503&Qo>8458&Qo<8460", "completes": 8460, "params": [[30, 8460]], "quest": 1503 },
+            { "reply": 20982, "next": 17519, "criterion": "Qa=1503&Qo>8461&Qo<8462", "completes": 8462, "params": [[30, 8462]], "quest": 1503 },
+            { "reply": 20983, "next": 17520, "criterion": "Qa=1503&Qo>8463&Qo<8464", "completes": 8464, "params": [[30, 8464]], "quest": 1503 }
+          ]
+        },
+        {
+          "message": 17511,
+          "choices": [
+            { "reply": 20969 },
+            { "reply": 20970 }
+          ]
+        },
+        {
+          "message": 17512,
+          "choices": []
+        },
+        {
+          "message": 17515,
+          "choices": []
+        },
+        {
+          "message": 17516,
+          "choices": [
+            { "reply": 20979, "next": 17517 }
+          ]
+        },
+        {
+          "message": 17517,
+          "choices": []
+        },
+        {
+          "message": 17518,
+          "choices": []
+        },
+        {
+          "message": 17519,
+          "choices": []
+        },
+        {
+          "message": 17520,
+          "choices": []
+        }
+      ],
+      "why": "Agente Jana (Pruneaude in Dofus pour les noobs «Le silence est d'or»), Retreat of the Eternals [-10,-5]: her plan (20971, 17511), «Atacar a los divinutrofs» (20969) starts the fight to capture their chief and «Ir a buscar refuerzos» (20970) waits; after it (20974, 17512) the prisoner is left to the character; back from Aityuns (20978, 17515; 20980, 17516, then 20979, 17517 the toolkit); the toolkit shown (20981, 17518), the failure told (20982, 17519), and giving up (20983, 17520). Dofus pour les noobs «Le silence est d'or»; the order of the replies is read from the client's message and reply ids."
+    },
+    {
+      "npc": 2381,
+      "map": 129761280,
+      "opening": 17521,
+      "lines": [
+        {
+          "message": 17521,
+          "choices": [
+            { "reply": 20985, "next": 17522, "criterion": "Qa=1503&Qo>8453&Qo<8454" },
+            { "reply": 20987, "next": 17524, "criterion": "Qa=1503&Qo>8455&Qo<8456" },
+            { "reply": 20991, "next": 17528, "criterion": "Qa=1503&Qo>8460&Qo<8461", "completes": 8461, "params": [[30, 8461]], "quest": 1503 },
+            { "reply": 20992, "next": 17527, "criterion": "Qa=1503&Qo>8462&Qo<8463" }
+          ]
+        },
+        {
+          "message": 17522,
+          "choices": [
+            { "reply": 20984, "next": 17523, "completes": 8454, "params": [[30, 8454]], "quest": 1503 }
+          ]
+        },
+        {
+          "message": 17523,
+          "choices": []
+        },
+        {
+          "message": 17524,
+          "choices": [
+            { "reply": 20986, "next": 17525, "completes": 8456, "params": [[30, 8456]], "quest": 1503 }
+          ]
+        },
+        {
+          "message": 17525,
+          "choices": []
+        },
+        {
+          "message": 17528,
+          "choices": []
+        },
+        {
+          "message": 17527,
+          "choices": [
+            { "reply": 20990, "next": 17529, "completes": 8463, "params": [[30, 8463]], "quest": 1503 }
+          ]
+        },
+        {
+          "message": 17529,
+          "choices": []
+        }
+      ],
+      "why": "Aityuns (Aïethune in Dofus pour les noobs), tied up at [-10,-5]: asked about the divinutrof technology (20985, 17522) he warns the travellers off (20984, 17523); asked again (20987, 17524) he answers he is a prisoner for having attacked Jana (20986, 17525); threatened with the wrench (20991, 17528) and then with the pliers on his hair (20992, 17527; 20990 pretending, 17529). Dofus pour les noobs «Le silence est d'or»; the order of the replies is read from the client's message and reply ids."
+    },
+    {
+      "npc": 2383,
+      "map": 129762562,
+      "opening": 17530,
+      "lines": [
+        {
+          "message": 17530,
+          "choices": [
+            { "reply": 21604 },
+            { "reply": 20993 }
+          ]
+        }
+      ],
+      "why": "Bolsa de herramientas (Trousse à outils in Dofus pour les noobs «Le silence est d'or»), [-9,-6]: it will not follow (17530); «Darle una paliza a la bolsa de herramientas» (20993) starts the fight and «Ir en busca de ayuda» (21604) leaves. Dofus pour les noobs «Le silence est d'or»; the order of the replies is read from the client's message and reply ids."
     }
   ]
 }

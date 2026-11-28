@@ -10098,6 +10098,10 @@
       "cell": 300,
       "orientation": 1,
       "why": "Collector Por (2442): shop trading items for 15206 (shops.json). Map and cell INFERRED: no source gives his position; placed on Srambad [5,0]."
-    }
+    },
+    { "map": 134221826, "npc": 2578, "cell": 330, "orientation": 1, "why": "Straf, bouncer beside the Ring's skull door in [6,3] (Dofus pour les noobs («Un ring pour les gouverner tous»)). INFERRED cell on open floor beside the door (343)." },
+    { "map": 134221826, "npc": 2579, "cell": 344, "orientation": 1, "why": "Halaryo, the other bouncer of the Ring in [6,3] (18969; Dofus pour les noobs («Un ring pour les gouverner tous»)). INFERRED cell on open floor beside the door (343)." },
+    { "map": 135397891, "npc": 2509, "cell": 258, "orientation": 1, "criterion": "Qa=1544", "why": "Marshall Palegnor waits beside the blue-flame barrel of the catacombs [4,8] (Dofus pour les noobs («Épidémiologie»)). INFERRED cell on open floor beside the barrel (245)." },
+    { "map": 129762562, "npc": 2383, "cell": 290, "orientation": 3, "criterion": "Qa=1503&Qo>8457&Qo<8460", "why": "«El silencio es oro» (1503): the toolkit at [-9,-6] while it is asked for (8458, 8459). INFERRED cell: an open tile in the middle of the map." }
   ]
 }
