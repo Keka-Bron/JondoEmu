@@ -7,7 +7,7 @@
     <!-- Where the Dofus client is. It used to carry the absolute path of one specific machine,
          so here it finds itself and can be passed from outside:
 
-           dotnet build Cazacabezas -p:DofusClientDir="D:\whatever\Dofus"
+           dotnet build Headhunters -p:DofusClientDir="D:\whatever\Dofus"
 
          or with the DOFUS_CLIENT_DIR environment variable. If nothing is said the known
          names next to the repository are tried; the first is this project's. -->
@@ -37,6 +37,6 @@
           Condition="'$(SkipModDeploy)' != 'true' And Exists('$(DofusClientDir)\Mods')">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DofusClientDir)\Mods"
           OverwriteReadOnlyFiles="true" />
-    <Message Text="[Deploy] Cazacabezas.dll en $(DofusClientDir)\Mods." Importance="high" />
+    <Message Text="[Deploy] Headhunters.dll en $(DofusClientDir)\Mods." Importance="high" />
   </Target>
 </Project>

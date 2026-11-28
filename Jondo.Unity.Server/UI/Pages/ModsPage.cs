@@ -159,7 +159,8 @@ internal sealed class ModsPage : UserControl, IServerPage
         string[] order, string[] activeOrder, bool canEnable, string? focusName)
     {
         var grid = RowGrid();
-        string name = string.IsNullOrWhiteSpace(mod?.Name) ? id : mod.Name;
+        string name = ModSettingsDialog.Localize(mod?.Configuration?.Title, _language)
+                      ?? (string.IsNullOrWhiteSpace(mod?.Name) ? id : mod.Name);
         int index = Array.FindIndex(activeOrder, item => Ids.Equals(item, id));
         bool active = index >= 0;
         string rowId = (server ? "Server." : "Client.") + id;

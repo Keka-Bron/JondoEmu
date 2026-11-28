@@ -25,5 +25,5 @@ runs:
           JondoFix/JondoFix.dll
           JondoModLoader/JondoModLoader.dll
           Heroes/Heroes.dll
-          Cazacabezas/Cazacabezas.dll
+          Headhunters/Headhunters.dll
         if-no-files-found: error

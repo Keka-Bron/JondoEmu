@@ -16,6 +16,13 @@ internal sealed class ModSettingsDialog : Window
 {
     internal static bool HasFields(ServerModConfiguration schema) => EditableFields(schema).Any();
 
+    internal static string? Localize(LocalizedModText? text, Language language) => language switch
+    {
+        Language.En => text?.En ?? text?.Es,
+        Language.Fr => text?.Fr ?? text?.En ?? text?.Es,
+        _ => text?.Es ?? text?.En,
+    };
+
     internal ModSettingsDialog(Language language, string name, ServerModConfiguration schema, ServerSettings edited)
     {
         Title = name;
@@ -27,12 +34,7 @@ internal sealed class ModSettingsDialog : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ServerTheme.Window(this);
         string T(string key) => ServerSettingsTexts.Get(language, key);
-        string? Localized(LocalizedModText? text) => language switch
-        {
-            Language.En => text?.En ?? text?.Es,
-            Language.Fr => text?.Fr ?? text?.En ?? text?.Es,
-            _ => text?.Es ?? text?.En,
-        };
+        string? Localized(LocalizedModText? text) => Localize(text, language);
 
         var values = ServerModConfiguration.Resolve(edited, schema.Id, schema);
         var fields = new StackPanel { Spacing = 16, Margin = new Thickness(24, 20) };

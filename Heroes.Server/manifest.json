@@ -6,6 +6,11 @@
   "clientAsset": "Heroes.dll",
   "settings": {
     "name": "Heroes",
+    "title": {
+      "es": "Héroes",
+      "en": "Heroes",
+      "fr": "Héros"
+    },
     "fields": [
       {
         "key": "Enabled",

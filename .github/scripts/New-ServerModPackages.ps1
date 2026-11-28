@@ -12,7 +12,7 @@ $stage = [IO.Directory]::CreateTempSubdirectory('jondo-server-mods-')
 
 try {
     $modules = [ordered]@{
-        Cazacabezas = 'cazacabezas'
+        Headhunters = 'headhunters'
         Heroes = 'heroes'
     }
     foreach ($module in $modules.Keys) {
@@ -22,7 +22,7 @@ try {
         dotnet build $project --configuration $Configuration --nologo -m:1 -nr:false -p:StageServerMod=true "-p:${module}PackageDirectory=$package"
         if ($LASTEXITCODE -ne 0) { throw "Building $id failed." }
 
-        if ($BundledModsDirectory -and $id -in 'cazacabezas', 'heroes') {
+        if ($BundledModsDirectory -and $id -in 'headhunters', 'heroes') {
             Copy-Item -LiteralPath $package -Destination (Join-Path $BundledModsDirectory $id) -Recurse
         }
         if (-not $SkipArchives) {

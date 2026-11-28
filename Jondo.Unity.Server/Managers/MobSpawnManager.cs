@@ -389,6 +389,8 @@ namespace Jondo.Unity.Server.Managers
                 int uniques = 0;
                 int bajoTecho = 0;
                 int beasts = 0;
+                int questOnly = 0;
+                MonsterFlags.Preload(connection);
                 using (var reader = cmdMapMobs.ExecuteReader())
                 {
                     while (reader.Read())
@@ -447,6 +449,9 @@ namespace Jondo.Unity.Server.Managers
                                         else if (WantedPosters.Is(ids[i])) criminals++;
                                         continue;
                                     }
+                                    // Nor a quest's monster: the Shoon Mine's groups had its quest's
+                                    // level-140 creatures among its own miners.
+                                    if (QuestOnly(mapId, ids[i])) { questOnly++; continue; }
                                     if (_monsters.TryGetValue(ids[i], out var mData)) {
                                         // Same as above: the database stores grades the
                                         // client does not accept, and they have to be trimmed here too.
@@ -529,6 +534,8 @@ namespace Jondo.Unity.Server.Managers
                                   $"({100.0 * wanted / Math.Max(1, count):0.0}% of them), one per map and one per zone.");
                 if (beasts > 0)
                     Console.WriteLine($"[MobSpawnManager] {beasts} La Bête member(s) taken out of groups outside {LaBeteBasement}.");
+                if (questOnly > 0)
+                    Console.WriteLine($"[MobSpawnManager] {questOnly} quest monster(s) taken out of the wild groups.");
                 if (uniques > 0)
                 {
                     Console.WriteLine($"[MobSpawnManager] {uniques} unique monster(s) swapped for their ordinary version; " +
@@ -977,6 +984,22 @@ namespace Jondo.Unity.Server.Managers
             => monster != PunchingBag
                && !WantedPosters.Is(monster)
                && (monster != LaBete || mapId == LaBeteBasement);
+
+        /// <summary>
+        /// Whether a member of a group the database seeds on that map is a quest's monster that
+        /// does not belong there. The subarea rosters name the creatures a quest or an event brings
+        /// out (m_flags IsQuestMonster), and the generated groups took them in with the zone's own:
+        /// the Shoon Mine's groups held its quest's level-140 monsters, and the Katigger and the
+        /// Faded Stunted Rat stood in hundreds of maps. A quest gives its fights by its own spawns and
+        /// NPC fights. Kept: the dungeon rooms, whose rosters are their quests' rooms too; an
+        /// event's guests (<see cref="EventGuests"/>), which their event shows and hides; and La
+        /// Bête in its cellar.
+        /// </summary>
+        internal static bool QuestOnly(long mapId, int monster)
+            => MonsterFlags.IsQuest(monster)
+               && !DungeonManager.IsRoom(mapId)
+               && !EventGuests.IsGuest(monster)
+               && !(monster == LaBete && mapId == LaBeteBasement);
 
         /// <summary>
         /// The subarea roster entries that may stand in a generated group: only living templates

@@ -137,6 +137,29 @@ public sealed class ClientModSyncTests : IDisposable
         }
     }
 
+    [Fact]
+    public void Client_assets_of_bundled_server_packages_count_as_bundled()
+    {
+        const string name = "Heroes.dll";
+        const string token = "session-token";
+        string package = Directory.CreateDirectory(Path.Combine(_cache, "bundle", "mods", "heroes")).FullName;
+        File.WriteAllText(Path.Combine(package, "manifest.json"), """{"id":"heroes","clientAsset":"Heroes.dll"}""");
+        File.WriteAllBytes(Path.Combine(package, name), [7]);
+        File.WriteAllBytes(Path.Combine(package, "Heroes.Server.dll"), [8]);
+        using var feed = new Feed(Entry(name, [7]));
+        feed.Blobs.Add(name, [7]);
+        using var http = new HttpClient(feed);
+
+        var plan = Prepare(http, "", (_, _, _) => throw new InvalidOperationException("Unexpected approval"));
+        var start = new ProcessStartInfo();
+        start.Environment.Clear();
+        LauncherService.SetClientAccountEnvironment(start, plan, Roles.Jugador, token);
+
+        Assert.True(plan.BundledOnly);
+        Assert.Equal(token, start.Environment["JONDO_PLAYER_TOKEN"]);
+        Assert.Equal([name], BundledClientMods.Discover(Path.Combine(_cache, "bundle")).Keys);
+    }
+
     [Theory]
     [InlineData("Cazacabezas.dll")]
     [InlineData("heroes.DLL")]

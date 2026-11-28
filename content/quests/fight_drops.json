@@ -260,6 +260,60 @@
       "monsters": [2848],
       "criterion": "Qs=1150&Qo>3779&PO!11261",
       "why": "577: «vous droperez l'anneau automatiquement sur le combat de la dernière salle» (Dofus pour les noobs, Pêche en eaux gelées); the last room of the Mansot Royal dungeon is the Morsagüino Real (2848). The ring is Damar's alliance (11261), once he has told of it."
-    }
+    },
+    {
+      "item": 34132,
+      "percent": 100,
+      "monsters": [
+        2917
+      ],
+      "criterion": "PT=413&Qa=592&Qo<3932&PO!34132",
+      "why": "«Prefiere morir en el mar» (592): the soul of Guzmán Onelsako (monster 2917, souls criterion 'Qo=3829&PO!34132') falls from the fight when the soul stone caught it (Dofus pour les noobs («Prefiere morir en el mar»))."
+    },
+    {
+      "item": 21186,
+      "percent": 100,
+      "monsters": [5868],
+      "criterion": "Qa=2078&Qo>14982&PO!21186",
+      "why": "2078 (Amaknomalia): the village chief drops the Dofus vulbis (DPLN: «vous dropez le Dofus Vulbis»). No other source in the engine."
+    },
+    {
+      "item": 21219,
+      "percent": 100,
+      "monsters": [5873],
+      "criterion": "Qa=2078&Qo>14988&Qo<14991",
+      "why": "2078: the captured energy ball fills the airtight box (21219) (DPLN: combat the ball and capture it). INFERRED to be the filled box 21219."
+    },
+  {
+   "item": 23211,
+   "percent": 100,
+   "monsters": [6278, 6279, 6280],
+   "criterion": "Qa=2153&PO!23211",
+   "why": "«La jetée des enfants perdus»: the enchanted kuapa water (23211) from the kuapas of the fisher's fight, later given to Kuatalo (Dofus pour les noobs («La jetée des enfants perdus»))."
+  },
+  {"item": 19513, "percent": 100, "monsters": [5186], "criterion": "Qa=1950&Qo>13645&Qo<13647&PO!19513", "why": "Ys's talisman (19513) falls on the first win of «Defender tu piel» (1950). Dofus pour les noobs («Du feu de dieu»)."},
+  {"item": 19484, "percent": 100, "monsters": [5102, 5103, 5104, 5105], "criterion": "Qa=1951&Qo<13663", "why": "«Plantas contra mediomuertos» (1951): the stone of the calcinados (19484), 100 % while it is asked for. Dofus pour les noobs («Plantes contre Trépamorts»)."},
+  {"item": 19491, "percent": 100, "monsters": [4968, 4969, 4970, 4971, 4972], "criterion": "Qa=1952&Qo<13686&PO<19491,8", "why": "«El héroe de las plantas contra los mediomuertos» (1952): the ashes of quemaalmas (19491, dropMonsterIds of the item), 100 % while the talisman step is open. Dofus pour les noobs («Le héros de Plantes contre Trépamorts»)."},
+  {
+   "item": 23166,
+   "percent": 12,
+   "monsters": [6251, 6252, 6253, 6254],
+   "criterion": "Qa=2154&Qo=16544",
+   "why": "«Recupera los enigmas» (2154): the firefux (6251-6254) that stole the talismans leave the calligraphed enigmas (23166). Chance INFERRED. Dofus pour les noobs («Le festival de la lanterne»)"
+  },
+  {
+   "item": 15487,
+   "percent": 100,
+   "monsters": [3769],
+   "criterion": "Qa=1539&Qo>8735&Qo<8749&PO!15487",
+   "why": "«Vence al enjambre de escoliopendras y, luego, dale el krosmoglob a la agente Jen O. Pato» (453808): the doctor's signal (15487) is recovered from the swarm and handed over to Jen (Dofus pour les noobs («Les brigades de l'abîme»))."
+  },
+  {
+   "item": 15489,
+   "percent": 100,
+   "monsters": [3732, 3733],
+   "criterion": "Qa=1540&Qo>8761&Qo<8764&PO!15489",
+   "why": "«Dale una paliza a Grant Nuja para recuperar los documentos» (885300): the documents (15489) are recovered from Grant Nuja's gang (Dofus pour les noobs («Balance la sauce»))."
+  }
   ]
 }

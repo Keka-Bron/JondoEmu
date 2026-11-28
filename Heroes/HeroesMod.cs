@@ -32,7 +32,7 @@ namespace Heroes
     /// their bar and their turns come to it as a summon's do.
     /// </para>
     /// <para>
-    /// Opened and closed with Ctrl+Tab. Built from the client's own pieces, as Cazacabezas is.
+    /// Opened and closed with Ctrl+Tab. Built from the client's own pieces, as Headhunters is.
     /// </para>
     /// </remarks>
     public class HeroesMod : MelonMod
@@ -4608,7 +4608,7 @@ namespace Heroes
 
         /// <summary>
         /// A click on the window is not a click on the map: while the pointer is on it the game's
-        /// InputUtility says «over the interface» and reports no button, as Cazacabezas does.
+        /// InputUtility says «over the interface» and reports no button, as Headhunters does.
         /// </summary>
         private static void InstallInputGuard()
         {

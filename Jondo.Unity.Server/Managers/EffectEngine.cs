@@ -3594,6 +3594,19 @@ namespace Jondo.Unity.Server.Managers
                                                              && EnLaCasilla(combat, cell) == null, -1);
                         if (aDonde < 0) continue;
                     }
+                    // A straight line ('L') aimed at a taken cell runs on from it, away from the
+                    // caster, and he lands on its first free cell, over whatever is not ground.
+                    // The water bombombre (6234) of Nagate's valley: hit from next door, it is
+                    // pushed a cell back (16771), and when it could not move the one who hit it
+                    // casts 16745 at it, "4 on L63" -- he goes through the bombombre, and from
+                    // the edge of the waterfall onto her islet, as the guides have it. Aimed at
+                    // the bombombre's own cell, the teleport was refused and nobody ever crossed.
+                    else if (efecto.Forma == Jondo.Unity.World.Maps.Zone.Linea && EnLaCasilla(combat, aDonde) != null)
+                    {
+                        aDonde = CasillasDelEfecto(efecto, caster.CellId, aDonde)
+                            .FirstOrDefault(cell => cell != caster.CellId && LibreYPisable(combat, cell), -1);
+                        if (aDonde < 0) continue;
+                    }
                     // Handed to him by somebody else's spell and aimed at a fighter, he lands in
                     // that fighter's contact, on the free cell nearest him. The Kutulu larva's
                     // Vacilación del Universo (6752) has every enemy cast its grade 4 at her,
@@ -3944,6 +3957,7 @@ namespace Jondo.Unity.Server.Managers
                                 Sobre = aQuien ?? candidato, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
                                 HeldCaster = lanzaElHijo, HeldSpell = efecto.DiceNum,
                                 HeldGrade = Math.Max(1, efecto.DiceSide), HeldCell = aQueCasilla, HeldCritical = critical,
+                                HechizoOrigen = spell, NivelOrigen = grade,
                             });
                             continue;
                         }
@@ -4069,6 +4083,7 @@ namespace Jondo.Unity.Server.Managers
                                 Sobre = sobre, Caster = lanzaElHijo, Efecto = efecto, HeldChild = true,
                                 HeldCaster = lanzaElHijo, HeldSpell = hecho.HechizoEncadenado,
                                 HeldGrade = hecho.GradoEncadenado, HeldCell = casillaDelHijo, HeldCritical = critical,
+                                HechizoOrigen = spell, NivelOrigen = grade,
                             });
                             continue;
                         }

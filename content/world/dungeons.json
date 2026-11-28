@@ -1204,5 +1204,41 @@
       ]
     },
     "why": "A royal room of the Jellith Dimension (dungeon 24), reached from the Fifth Room's royals when the puddles open it: Dofus pour les noobs, «Gelaxième Dimension»: «parlez à n'importe laquelle d'entre elles pour accéder à la salle du boss»; «Pour affronter les 4 Gelées Royales en même temps, il faudra avoir une flaque de chaque couleur de Gelée». Its fight is the four royals together with jellies of the four colours; «Chaque Gelée Royale invoque une Gelée au tour 1». Its win leads to the Exit room (dungeon_exits.json), a defeat back to the dimension's way in. INFERRED: the jellies beside the royal."
+  },
+  "9014": {
+    "name": "The Rebel Spirit's Wreck",
+    "minLevel": 120,
+    "optimalLevel": 150,
+    "difficulty": 2,
+    "entrance": 54162771,
+    "exit": 54162771,
+    "rooms": [
+      59244544,
+      59245568
+    ],
+    "bosses": [
+      2918
+    ],
+    "keyring": 0,
+    "required": [],
+    "autoGroup": 0,
+    "alone": {
+      "59244544": [
+        2920,
+        2920,
+        2920,
+        2920,
+        2920,
+        2920
+      ],
+      "59245568": [
+        2918,
+        2921,
+        2921,
+        2921,
+        2921
+      ]
+    },
+    "why": "The rebel spirit's mini-dungeon of «Prefiere morir en el mar» (592): Dofus pour les noobs («Prefiere morir en el mar»): Guzmán turns the player into a pirate ghost; room 1 six Espirates, room 2 (boss) four cannonball spirits and the rebel spirit, 300 HP, rooted, 100% neutral resistance. Fought alone, all of them and nobody else."
   }
 }

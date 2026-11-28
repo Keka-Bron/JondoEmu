@@ -13,7 +13,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $client 'MelonLoader/net6/MelonLoade
     throw "Expected MelonLoader and generated Il2Cpp assemblies in $client."
 }
 
-foreach ($mod in 'JondoFix', 'JondoModLoader', 'Heroes', 'Cazacabezas') {
+foreach ($mod in 'JondoFix', 'JondoModLoader', 'Heroes', 'Headhunters') {
     $project = Join-Path $root "$mod/$mod.csproj"
     dotnet build $project --configuration $Configuration --nologo `
         "-p:DofusClientDir=$client" -p:SkipModDeploy=true

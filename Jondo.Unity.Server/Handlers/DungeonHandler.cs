@@ -381,8 +381,8 @@ namespace Jondo.Unity.Server.Handlers
             var admission = await CommitAdmissionAsync(stream, dungeon, dungeon.FirstRoom, itemUid,
                 masterKeyring: false, weigh: true, itemCell: cell);
             if (admission == null) return false;
-            if (admission.Followers is { Count: > 0 })
-                await admission.MoveAsync(dungeon.FirstRoom, cell);
+            if (admission.Followers is { Count: > 0 } && await admission.MoveAsync(dungeon.FirstRoom, cell) < 0)
+                return false;
 
             foreach (long who in admission.FollowerIds.Prepend(state.CharacterId))
             {

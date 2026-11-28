@@ -1158,7 +1158,7 @@
     {"map": 185862661, "element": 511500, "cell": 401, "gfx": 32289, "type": 0, "skill": 114, "toMap": 17048576, "toCell": 441, "why": "Measured on the official server: landed on 17048576 cell 441; Jondo's reverse-element-approx route led to 17048576 cell 235."},
     {"map": 183765006, "element": 511690, "cell": 269, "gfx": 61728, "type": 0, "skill": 114, "toMap": 183765000, "toCell": 497, "why": "Measured on the official server: landed on 183765000 cell 497; Jondo's reverse-element-approx route led to 183765000 cell 483."},
     {"map": 183765004, "element": 511688, "cell": 190, "gfx": 61729, "type": -1, "skill": 184, "toMap": 183765002, "toCell": 478, "why": "Measured on the official server: landed on 183765002 cell 478; Jondo had no route."},
-    {"map": 183763982, "element": 511751, "cell": 193, "gfx": 62311, "type": 0, "skill": 114, "toMap": 183763980, "toCell": 368, "why": "Measured on the official server: landed on 183763980 cell 368; Jondo's reverse-element-approx route led to 183763980 cell 353."},
+    {"map": 183763982, "element": 511751, "cell": 193, "gfx": 62311, "type": 0, "skill": 114, "toMap": 183763980, "toCell": 368, "insteadToMap": 204211202, "insteadToCell": 300, "insteadWhen": "Qa=2083&Qo>15060&Qo<15068", "why": "Measured on the official server: landed on 183763980 cell 368; Jondo's reverse-element-approx route led to 183763980 cell 353."},
     {"map": 183763980, "element": 511749, "cell": 178, "gfx": 62341, "type": 0, "skill": 114, "toMap": 183763978, "toCell": 184, "why": "Measured on the official server: landed on 183763978 cell 184; Jondo's reverse-element-approx route led to 183763978 cell 170."},
     {"map": 183763978, "element": 511750, "cell": 170, "gfx": 62341, "type": 0, "skill": 114, "toMap": 183763980, "toCell": 191, "why": "Measured on the official server: landed on 183763980 cell 191; Jondo's reverse-element-approx route led to 183763980 cell 178."},
     {"map": 183763978, "element": 511747, "cell": 222, "gfx": 62341, "type": 0, "skill": 114, "toMap": 183763976, "toCell": 366, "why": "Measured on the official server: landed on 183763976 cell 366; Jondo's reverse-element-approx route led to 183763976 cell 351."},
@@ -2039,6 +2039,87 @@
     {
       "map": 147324928, "element": 487857, "cell": 248, "gfx": 48784, "type": -1, "skill": 184, "toMap": 147326976, "toCell": 297, "criterion": "Qa=1608&Qo<9413",
       "why": "Quest 1608, the undersea cave: Dofus pour les noobs («Le disparu de Sufokia»): «Cliquez sur le point lumineux au mur pour ouvrir la porte et franchissez la» - the glowing point (graphic 48784, no skill in the data) opens the stone doors into the sanctuary where Vardo waits. Type -1 and skill 184 as the measured passages. INFERRED landing cell 297 (the cell the walk-in lands on, left of the sanctuary). The sanctuary declares no element and Vardo's last reply is the way out, so the door opens only while he still waits (1608 under way, 9413 not done)."
+    },
+    {
+      "map": 196216844,
+      "element": 517277,
+      "cell": 215,
+      "gfx": 38095,
+      "type": 0,
+      "skill": 114,
+      "toMap": 196217868,
+      "toCell": 438,
+      "why": "2078: the door of the chief's house in the anomaly village [-4,26] (DPLN: enter the house). Landing cell INFERRED."
+    },
+    {
+      "map": 196217868,
+      "element": 517274,
+      "cell": 438,
+      "gfx": 3518,
+      "type": -1,
+      "skill": 114,
+      "toMap": 196216844,
+      "toCell": 215,
+      "why": "2078: the house's way out onto the anomaly village. Landing cell INFERRED."
+    },
+    {
+      "map": 196216844,
+      "element": 517368,
+      "cell": 345,
+      "gfx": 301294,
+      "type": 0,
+      "skill": 114,
+      "toMap": 88212481,
+      "toCell": 282,
+      "criterion": "POE21186,1",
+      "why": "2078: the anomaly village's exit back to the zaap of the Scarafeuilles plain, open only with the Dofus vulbis worn (DPLN: equip the Dofus, leave the anomaly)."
+    },
+    {
+      "map": 171182082,
+      "element": 509437,
+      "cell": 319,
+      "gfx": 39767,
+      "type": 0,
+      "skill": 114,
+      "toMap": 171181313,
+      "toCell": 343,
+      "why": "2082 Explora el sueno: the light of the second dream room leads on to the polter room (the generated pairing sent it back to 171181058). Link INFERRED, Dofus pour les noobs («La Colère de Terrakurial»)."
+    },
+  {"map": 182978568, "element": 4271001, "npc": 4271, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 184287240, "toCell": 282},
+  {"map": 184287240, "element": 4258001, "npc": 4258, "cell": 296, "gfx": 0, "type": -1, "skill": 0, "toMap": 182978568, "toCell": 282},
+  {
+   "map": 134223878,
+   "element": 485502,
+   "cell": 235,
+   "gfx": 46638,
+   "type": -1,
+   "skill": 184,
+   "toMap": 137369604,
+   "toCell": 451,
+   "criterion": "Qa=1555&Qo>8881&Qo<8883",
+   "why": "«Busca el pasaje escondido hacia el Oseorfanato» (452533/885311): the element of the catacombs [8,5] opens the secret passage to the sewers' Oseorfanato (same grid position [8,5]); only for whoever has the objective open, as the walkthrough says every character must click it himself. The element is the round wall grille drawn at cell 235 (gfx 46638); the animated 485490 beside it at 248 showed no hover and sent no use when clicked. Landing cell INFERRED; Dofus pour les noobs («Comme un poison dans l'eau»)."
+  },
+    {
+      "map": 128976898,
+      "element": 484973,
+      "cell": 102,
+      "gfx": 45611,
+      "type": -1,
+      "skill": 114,
+      "toMap": 131860993,
+      "toCell": 312,
+      "why": "The hole in the rock of the Gold Quarry [2,-4] (gfx 45611, found on no other map): the way into the formidiablo's lair 131860993 («Passez par le trou dans la roche», Dofus pour les noobs «Le phormidiable au corps»; the lair's own bottom edge leads to this map). Landing cell INFERRED: the lair's central walkable cell."
+    },
+    {
+      "map": 131860993,
+      "element": 485121,
+      "cell": 303,
+      "gfx": 45391,
+      "type": -1,
+      "skill": 114,
+      "toMap": 128976898,
+      "toCell": 101,
+      "why": "The pit of the formidiablo's lair (gfx 45391, the same pit as the one of 131861250): the way back to the quarry [2,-4], beside the hole (cell 101, walkable). INFERRED, the guide says nothing about the way out."
     }
   ]
 }

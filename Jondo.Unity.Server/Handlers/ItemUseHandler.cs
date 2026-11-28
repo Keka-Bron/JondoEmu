@@ -109,7 +109,11 @@ namespace Jondo.Unity.Server.Handlers
             if (await ReadingItemHandler.TryReadAsync(session, item)) return;
 
             // A compass: a flag on the world map where its map reference is, and the compass stays.
-            if (await CompassItemHandler.TryUseAsync(stream, item)) return;
+            // One that is also a quest objective (effect 30) goes on to it below: the detector of
+            // «¿Dónde está Bizcana?» (15283) points the way and its use is objective 8373.
+            if (await CompassItemHandler.TryUseAsync(stream, item)
+                && !DatabaseManager.GetItemEffectsData(DatabaseManager.GetItemTemplatePossibleEffects(item.Template))
+                    .Any(e => e.EffectId == ReadingItemHandler.ObjectiveEffect && e.Value != 0)) return;
 
             // An item that starts a quest (effect 34, the quest in its value): the vibrating feather
             // of «Un gros cube, un p'ti cube» (555) is double-clicked to take the quest, and stays in

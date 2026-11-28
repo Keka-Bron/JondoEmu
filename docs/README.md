@@ -135,6 +135,11 @@ triggered rows armed on every fighter they name, the 30-odd triggers fired, stat
 telefrags and the T/W masks, life thresholds, revives, glyphs, and what is still missing.
 *Go there* before touching a boss, or when a monster does something its guide says it should not.
 
+**`guilds.md`**, **`alliances.md`**, **`dreams.md`**, **`admin-window.md`** — The full feature lists.
+What the README sums up in a few lines for guilds and their raids, alliances and conquests, the
+Infinite Dreams and the in-game admin window (F10), item by item.
+*Go there* to know whether a given part of those systems is done.
+
 **`item-commands.md`** — Administrator item creation commands.
 The exact syntax and behavior of `.item`, `.itemset` and `.receta`, including role checks, template,
 set and recipe data sources, maximum factory effects, stacking, persistence, inventory updates and
@@ -166,11 +171,11 @@ keeps a byte blob from posing as a structure, and the `.packets` command.
 how to use host services, register gameplay hooks and add a new extension point to the server.
 The [server mod contract](server-mod-contract.md) describes package discovery, settings
 and client DLL distribution. The [migration guide](server-mod-migration.md) covers how
-to install and test the optional Cazacabezas and Heroes packages.
+to install and test the optional Headhunters and Heroes packages.
 
 **`cities-war.md`** — Bonta against Brakmar, and the head hunters.
 Who may attack whom and where, how honour, grades and dishonour are settled, the hunt orders and
-their chapeuvepés, the Cazacabezas mod's routes, and how the JondoBots join the war.
+their chapeuvepés, the Headhunters mod's routes, and how the JondoBots join the war.
 *Go there* when tuning the honour numbers, or when an aggression pays what it should not.
 
 **`jondo-coin.md`** — The server's own currency.

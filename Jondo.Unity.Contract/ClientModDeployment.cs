@@ -26,7 +26,7 @@ public static class ClientModDeployment
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         using var request = new HttpRequestMessage(HttpMethod.Get, manifestUri);
         using var response = http.Send(request, HttpCompletionOption.ResponseHeadersRead, deadline.Token);
-        if (response.StatusCode == HttpStatusCode.NotFound && trusted.Length == 0)
+        if (response.StatusCode == HttpStatusCode.NotFound) // An older server: the release JondoFix only.
             return new Plan("", UsesManifest: false, "", [], BundledOnly: true);
         response.EnsureSuccessStatusCode();
 

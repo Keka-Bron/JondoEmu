@@ -1,4 +1,4 @@
-namespace Cazacabezas.Server;
+namespace Headhunters.Server;
 
 internal sealed record HuntSettings
 {

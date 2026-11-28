@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Cazacabezas.Server;
+namespace Headhunters.Server;
 
 internal static class HuntTexts
 {

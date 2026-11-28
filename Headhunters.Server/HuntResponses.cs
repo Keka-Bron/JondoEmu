@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Jondo.Unity.ServerMods;
 
-namespace Cazacabezas.Server;
+namespace Headhunters.Server;
 
 internal sealed class HuntResponses(IAlignmentWorld world, HeadHunts hunts)
 {

@@ -5,7 +5,7 @@
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <!-- Where the Dofus client is, as for Cazacabezas:
+    <!-- Where the Dofus client is, as for Headhunters:
 
            dotnet build Heroes -p:DofusClientDir="D:\whatever\Dofus"
 

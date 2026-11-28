@@ -25,6 +25,39 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>MonsterFlags.CanBePushed: pushes and pulls move the creature.</summary>
         public const long CanBePushed = 256;
 
+        /// <summary>
+        /// MonsterFlags.IsQuestMonster: a creature a quest or an event brings out, not one of its
+        /// zone's own. 2,839 of the 5,134 templates have it.
+        /// </summary>
+        public const long IsQuestMonster = 16;
+
+        /// <summary>
+        /// Reads every template's m_flags in one query, so a caller that asks about thousands of
+        /// them (the world's groups at boot) does not open the database once per template.
+        /// </summary>
+        public static void Preload(SqliteConnection connection)
+        {
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, json_extract(Data, '$.m_flags') FROM MonsterTemplates;";
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                    _flags[reader.GetInt32(0)] = reader.IsDBNull(1) ? 0 : reader.GetInt64(1);
+            }
+            catch (Exception)
+            {
+                // Of() still answers one template at a time.
+            }
+        }
+
+        /// <summary>Whether the template carries the quest monster bit. A template world.db does not have is not.</summary>
+        public static bool IsQuest(int templateId)
+        {
+            long flags = Of(templateId);
+            return flags >= 0 && (flags & IsQuestMonster) != 0;
+        }
+
         private static readonly ConcurrentDictionary<int, long> _flags = new();
 
         /// <summary>The template's m_flags, or -1 when the template is not in world.db.</summary>

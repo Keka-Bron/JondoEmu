@@ -6868,16 +6868,45 @@ namespace Jondo.Unity.Server.Handlers
         /// Kitsunebis their states.
         /// </summary>
         private static async Task AplicarLoDelInvocadoAsync(NetworkStream stream, FightInstance fight, Fighter caster,
-                                                            int hechizo, int grado, Fighter invocado, bool conducta = false)
+                                                            int hechizo, int grado, Fighter invocado, bool conducta = false,
+                                                            int desdeFila = 0, int hastaFila = int.MaxValue)
         {
             if (invocado == null || hechizo == 0 || !invocado.IsAlive) return;
             var filas = Managers.SpellEffects.De(hechizo, grado)
-                .Where(f => (f.TargetMask ?? "").Split(',').Any(t => t.Trim() == "U")
-                            && f.Disparadores().Any(d => string.Equals(d, Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)))
+                .Where((f, i) => i >= desdeFila && i < hastaFila
+                                 && (f.TargetMask ?? "").Split(',').Any(t => t.Trim() == "U")
+                                 && f.Disparadores().Any(d => string.Equals(d, Managers.EffectEngine.AlLanzar, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
             if (filas.Count == 0) return;
             await LanzarPorOrdenAsync(stream, fight, caster, hechizo, grado, invocado, invocado.CellId,
                                       Managers.EffectEngine.AlLanzar, filas, soloAlObjetivo: true, conducta: conducta);
+        }
+
+        /// <summary>
+        /// The child held back for a newborn that comes before some of the rows the spell writes
+        /// for it ("U"), and that child's row: those later rows wait until it is cast. The Kwapa's
+        /// 16741 casts 16747, which turns a water bombombre without state 1901 into the one that
+        /// takes a fighter to Nagate's islet, and only then gives the newborn its 1901. Done at
+        /// birth, the 1901 came first and no bombombre ever turned.
+        /// </summary>
+        private static (Managers.Outcome Hijo, int Fila) HijoRetenidoParaElNacido(List<Managers.Outcome> consecuencias,
+                                                                                 Managers.Outcome nacimiento)
+        {
+            var filas = Managers.SpellEffects.De(nacimiento.HechizoOrigen, nacimiento.NivelOrigen);
+            for (int i = consecuencias.IndexOf(nacimiento) + 1; i < consecuencias.Count; i++)
+            {
+                var hijo = consecuencias[i];
+                if (!hijo.HeldChild || hijo.HechizoOrigen != nacimiento.HechizoOrigen
+                    || hijo.NivelOrigen != nacimiento.NivelOrigen || hijo.Efecto == null) continue;
+                int fila = -1;
+                for (int f = 0; f < filas.Count && fila < 0; f++)
+                    if (ReferenceEquals(filas[f], hijo.Efecto)
+                        || filas[f].EffectId == hijo.Efecto.EffectId && filas[f].DiceNum == hijo.Efecto.DiceNum
+                           && filas[f].DiceSide == hijo.Efecto.DiceSide && filas[f].TargetMask == hijo.Efecto.TargetMask)
+                        fila = f;
+                if (fila >= 0) return (hijo, fila);
+            }
+            return (null, -1);
         }
 
         /// <summary>The Zombi state a fighter brought back carries: 74, which the dungeons' spells read.</summary>
@@ -8332,6 +8361,9 @@ namespace Jondo.Unity.Server.Handlers
             // again on X5-10) gives the second as the fallback of the first, not as a second one.
             var nacidos = new List<(int Hechizo, int Grado, int Plantilla, int Forma, int Tamano, int Minimo)>();
 
+            // A newborn's rows that wait for a child held back before them (HijoRetenidoParaElNacido).
+            var loQueEspera = new List<(Managers.Outcome Hijo, Fighter Invoca, int Hechizo, int Grado, Fighter Nuevo, int Desde)>();
+
             foreach (var c in consecuencias)
             {
                 // A child held back for the creatures summoned before it: cast now they are born.
@@ -8344,6 +8376,12 @@ namespace Jondo.Unity.Server.Handlers
                         await AplicarEfectosAsync(stream, fight, c.HeldCaster, c.HeldSpell, c.HeldGrade,
                                                   c.Sobre, Managers.EffectEngine.AlLanzar, c.HeldCell,
                                                   c.HeldCritical, conducta: conducta);
+                    }
+                    foreach (var espera in loQueEspera.Where(e => e.Hijo == c).ToList())
+                    {
+                        loQueEspera.Remove(espera);
+                        await AplicarLoDelInvocadoAsync(stream, fight, espera.Invoca, espera.Hechizo, espera.Grado,
+                                                        espera.Nuevo, conducta, desdeFila: espera.Desde);
                     }
                     continue;
                 }
@@ -8965,7 +9003,15 @@ namespace Jondo.Unity.Server.Handlers
                     if (nuevo != null) nacidos.Add((c.HechizoOrigen, c.NivelOrigen, c.Invoca, c.Efecto.Forma,
                                                     c.Efecto.Tamano, c.Efecto.TamanoMinimo));
                     if (nuevo != null) ChallengeWatcher.PuppetSummoned(fight, nuevo, invoca);
-                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo);
+                    // A behaviour's summon gets what it writes for it as that behaviour, for the whole
+                    // fight: Hyrkul's starting spell (9104) casts 9105 on his tomb, whose "when hit
+                    // in melee, die" waits on "D" with no duration of its own. Cast as a plain spell,
+                    // that hook was gone after round one, and the tomb (and his invulnerability) stayed.
+                    var (retenido, filaDelRetenido) = nuevo != null ? HijoRetenidoParaElNacido(consecuencias, c) : (null, -1);
+                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo, conducta,
+                                                    hastaFila: retenido != null ? filaDelRetenido : int.MaxValue);
+                    if (retenido != null)
+                        loQueEspera.Add((retenido, invoca, c.HechizoOrigen, c.NivelOrigen, nuevo, filaDelRetenido + 1));
                     if (nuevo != null) await RevisarLosRecuentosAsync(stream, fight);
                     // The summoner has summoned (CI), with the new one as what set it off -- the "u"
                     // of the rows it fires: Pacto Bestial sacrifices "sus invocaciones ... futuras".
@@ -8981,7 +9027,7 @@ namespace Jondo.Unity.Server.Handlers
                 {
                     var invoca = c.Caster ?? quienLanza;
                     await AnunciarElDobleAsync(stream, fight, invoca, c.Doble);
-                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, c.Doble);
+                    await AplicarLoDelInvocadoAsync(stream, fight, invoca, c.HechizoOrigen, c.NivelOrigen, c.Doble, conducta);
                     await RevisarLosRecuentosAsync(stream, fight);
                     Disparo(invoca, Managers.EffectEngine.AlInvocar, c.Doble);
                     continue;
@@ -11761,7 +11807,7 @@ namespace Jondo.Unity.Server.Handlers
                     SupportMasks = supportMasks,
                     UtilityAllyMasks = utilityAllyMasks,
                     UtilityOwnSideMasks = utilityOwnSideMasks,
-                    Summons = summons,
+                    Summons = summons || Managers.MonsterTactics.Spell.SummonsByRows(Managers.SpellEffects.De(spell, grade), 0),
                     NeedsFreeCell = limits.NeedFreeCell,
                     BlowsUpOnTimer = limits.EsperaInicial > 0
                                      && Managers.SpellEffects.De(spell, grade).Any(e => e.EffectId == Jondo.Unity.World.Combat.EffectSupport.Kill
@@ -13475,7 +13521,9 @@ namespace Jondo.Unity.Server.Handlers
             await EngancheAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
             await NonPlayingSummonsAnswerAsync(stream, fight, ending, Managers.EffectEngine.AlAcabarElTurno);
 
-            // And the turn-end glyphs under him (402).
+            // And the turn-end glyphs under him (402). His turn is over by then: what a glyph makes
+            // him cast is put outside it and lives through his next turn.
+            fight.CloseTheTurn();
             await TurnEndGlyphsAsync(stream, fight, ending);
 
             // A dimension dungeon's newcomer was invulnerable until this, its first turn, ended.

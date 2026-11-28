@@ -4,10 +4,10 @@ using System.Data.Common;
 using System.Globalization;
 using Jondo.Unity.ServerMods;
 
-namespace Cazacabezas.Server
+namespace Headhunters.Server
 {
     /// <summary>
-    /// The head hunters, the Cazacabezas (<c>HeadHunters</c>): the old game's
+    /// The head hunters, the Headhunters (<c>HeadHunters</c>): the old game's
     /// «traques» brought back for the cities' war. A hunter of one city takes an order on a
     /// player of the other, chosen from the board; whenever the prey is in the world -- and the
     /// hunter too -- a hunt opens for a while, the hunter hears where the prey was last seen, and

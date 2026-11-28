@@ -22,9 +22,37 @@ public static class BundledClientMods
                 string name = Path.GetFileName(path);
                 if (ClientModManifest.IsDllName(name)) files.TryAdd(name, path);
             }
+
+            // Release and Docker bundles ship the first-party mods as server packages,
+            // mods/<id>/manifest.json naming the client DLL beside it.
+            foreach (string package in Directory.EnumerateDirectories(directory).Order(StringComparer.Ordinal))
+            {
+                string? asset = PackageClientAsset(Path.Combine(package, "manifest.json"));
+                if (asset == null || !ClientModManifest.IsDllName(asset)) continue;
+                string path = Path.Combine(package, asset);
+                if (File.Exists(path)) files.TryAdd(asset, path);
+            }
         }
 
         return files;
+    }
+
+    private static string? PackageClientAsset(string manifest)
+    {
+        if (!File.Exists(manifest)) return null;
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllBytes(manifest));
+            return document.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                   document.RootElement.TryGetProperty("clientAsset", out var asset) &&
+                   asset.ValueKind == System.Text.Json.JsonValueKind.String
+                ? asset.GetString()
+                : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            return null;
+        }
     }
 
     public static bool InstallRequiredClientDll(string root, string clientRoot)

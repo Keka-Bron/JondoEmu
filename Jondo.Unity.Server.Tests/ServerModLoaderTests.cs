@@ -44,7 +44,7 @@ public sealed class ServerModLoaderTests : IDisposable
         Assert.DoesNotContain(AssemblyLoadContext.Default.Assemblies,
             assembly => assembly.GetName().Name is "Fixture.ServerMod" or "Fixture.ServerModDependency");
         Assert.DoesNotContain(typeof(ServerModLoader).Assembly.GetReferencedAssemblies(),
-            assembly => assembly.Name is "Fixture.ServerMod" or "Fixture.ServerModDependency" or "Cazacabezas" or "Cazacabezas.Server" or "Heroes" or "Heroes.Server");
+            assembly => assembly.Name is "Fixture.ServerMod" or "Fixture.ServerModDependency" or "Headhunters" or "Headhunters.Server" or "Heroes" or "Heroes.Server");
     }
 
     [Fact]
@@ -252,8 +252,8 @@ public sealed class ServerModLoaderTests : IDisposable
             }, () => _messages.Add("host stopped"), _messages.Add);
 
         Assert.Equal([
-            $"[Server mods] heroes: package not found in '{missingRoot}'; skipped.",
-            $"[Server mods] cazacabezas: package not found in '{missingRoot}'; skipped.",
+            $"[Server mods] heroes: package not found in '{missingRoot}'; skipped. Stage it with: dotnet build Heroes.Server -p:StageServerMod=true",
+            $"[Server mods] headhunters: package not found in '{missingRoot}'; skipped. Stage it with: dotnet build Headhunters.Server -p:StageServerMod=true",
             "ready",
             "host stopped"
         ], _messages);
@@ -307,13 +307,15 @@ public sealed class ServerModLoaderTests : IDisposable
             }, () => _messages.Add("host stopped"), _messages.Add);
 
         Assert.Contains("ready", _messages);
-        Assert.Equal("host stopped", _messages[^1]);
+        int hostStopped = _messages.IndexOf("host stopped");
+        Assert.True(hostStopped > _messages.IndexOf("ready"));
+        Assert.DoesNotContain(_messages.Take(hostStopped), message => message.EndsWith("fixture stopped"));
         Assert.Equal(!firstPresent, _messages.Any(message => message.Contains("fixture.first: package not found")));
         Assert.Equal(!secondPresent, _messages.Any(message => message.Contains("fixture.second: package not found")));
     }
 
     [Fact]
-    public async Task EnabledPackagesStartBeforeAdmissionAndStopOnceBeforeHostTeardown()
+    public async Task EnabledPackagesStartBeforeAdmissionAndStopOnceAfterHostTeardown()
     {
         InstallFixture("z-first");
         InstallFixture("a-second");
@@ -339,13 +341,13 @@ public sealed class ServerModLoaderTests : IDisposable
         await run.WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal([
+            "host stopped",
             "[Server mods] a-second (fixture.a-second): fixture stopped",
             "[Server mods] a-second (fixture.a-second): second resource released",
             "[Server mods] a-second (fixture.a-second): first resource released",
             "[Server mods] z-first (fixture.z-first): fixture stopped",
             "[Server mods] z-first (fixture.z-first): second resource released",
-            "[Server mods] z-first (fixture.z-first): first resource released",
-            "host stopped"
+            "[Server mods] z-first (fixture.z-first): first resource released"
         ], _messages.Skip(5));
     }
 
@@ -459,8 +461,8 @@ public sealed class ServerModLoaderTests : IDisposable
                 if (message.Contains("private dependency")) shutdown.TrySetResult();
             });
 
-        Assert.Equal("[Server mods] first (fixture.first): fixture stopped", _messages[2]);
-        Assert.Equal("host stopped", _messages[^1]);
+        Assert.Equal("host stopped", _messages[2]);
+        Assert.Equal("[Server mods] first (fixture.first): fixture stopped", _messages[3]);
     }
 
     [Fact]
@@ -475,17 +477,29 @@ public sealed class ServerModLoaderTests : IDisposable
         Assert.True(edited.DiffersFrom(running));
     }
 
+    [Fact]
+    public void LegacyHeadhuntersSettingsMoveToTheEnglishId()
+    {
+        var settings = ServerSettings.Read(
+            """{"ServerMods":["heroes","cazacabezas"],"ClientMods":["Cazacabezas.dll"],"Cazacabezas":{"Enabled":true}}""");
+
+        Assert.Equal(["heroes", "headhunters"], settings.ServerMods);
+        Assert.Equal(["Headhunters.dll"], settings.ClientMods);
+        Assert.True(settings.ModSettings["headhunters"].GetProperty("Enabled").GetBoolean());
+        Assert.False(settings.ModSettings.ContainsKey("cazacabezas"));
+    }
+
     [Theory]
-    [InlineData("""{}""", "heroes", "cazacabezas")]
-    [InlineData("""{"heroMode":true}""", "heroes", "cazacabezas")]
-    [InlineData("""{"heroMode":false}""", "cazacabezas")]
+    [InlineData("""{}""", "heroes", "headhunters")]
+    [InlineData("""{"heroMode":true}""", "heroes", "headhunters")]
+    [InlineData("""{"heroMode":false}""", "headhunters")]
     [InlineData("""{"HeroMode":true,"ServerMods":["fixture.first"]}""", "fixture.first", "heroes")]
     [InlineData("""{"HeroMode":true,"ServerMods":["HEROES"]}""", "HEROES")]
     [InlineData("""{"serverMods":[],"HeroMode":false}""")]
     [InlineData("""{"ServerMods":[]}""")]
     public void SettingsMigrateLegacyHeroModeAndRespectExplicitSelections(string json, params string[] expected)
     {
-        Assert.Equal(["heroes", "cazacabezas"], new ServerSettings().ServerMods);
+        Assert.Equal(["heroes", "headhunters"], new ServerSettings().ServerMods);
         var settings = ServerSettings.Read(json);
         Assert.Equal(expected, settings.ServerMods);
         settings.ServerMods = [];

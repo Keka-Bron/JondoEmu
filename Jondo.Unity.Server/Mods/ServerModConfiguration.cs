@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Jondo.Unity.Server.Mods;
 
 internal sealed record ServerModConfiguration(string Id, string? Name, string? ActivationSetting,
-    ServerModSetting[] Fields)
+    ServerModSetting[] Fields, LocalizedModText? Title = null)
 {
     private static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true };
 

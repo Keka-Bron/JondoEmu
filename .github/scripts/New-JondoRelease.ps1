@@ -79,7 +79,7 @@ if ($BundleServerMods) {
     New-Item -ItemType Directory -Force $mods | Out-Null
     & (Join-Path $PSScriptRoot 'New-ServerModPackages.ps1') -OutDir $OutDir `
         -BundledModsDirectory $mods -SkipArchives:($Platform -eq 'linux-x64')
-    foreach ($id in 'heroes', 'cazacabezas') {
+    foreach ($id in 'heroes', 'headhunters') {
         foreach ($file in Get-ChildItem -LiteralPath (Join-Path $mods $id) -File) {
             $assets["mods/$id/$($file.Name)"] = "server-mod-$Platform-$id-$($file.Name)"
         }

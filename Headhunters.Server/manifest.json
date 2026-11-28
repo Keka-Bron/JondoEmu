@@ -1,11 +1,16 @@
 {
-  "id": "cazacabezas",
+  "id": "headhunters",
   "version": "1.0.0",
   "serverApiVersion": 2,
-  "serverAssembly": "Cazacabezas.Server.dll",
-  "clientAsset": "Cazacabezas.dll",
+  "serverAssembly": "Headhunters.Server.dll",
+  "clientAsset": "Headhunters.dll",
   "settings": {
-    "name": "Cazacabezas",
+    "name": "Headhunters",
+    "title": {
+      "es": "Cazacabezas",
+      "en": "Headhunters",
+      "fr": "Chasseurs de têtes"
+    },
     "fields": [
       {
         "key": "Enabled",

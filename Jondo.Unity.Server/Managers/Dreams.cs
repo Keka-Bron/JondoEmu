@@ -181,10 +181,17 @@ namespace Jondo.Unity.Server.Managers
         /// lines only make sense so: the Wp=1..5 rune lines are the guide's runes palier by palier
         /// (minor and average in I and II, major and astounding in III, ...), and the "Wi&gt;3" of
         /// every rune line keeps them from the three Rêve intensities, the guide's no legends and
-        /// no astral runes there and the client's droplegend 0. Anything else in a criterion --
-        /// the quests' Qa and Qo, Wv, Sc -- is not answered, and those lines do not drop.
+        /// no astral runes there and the client's droplegend 0.
+        ///
+        /// The player's own letters -- the quests' Qa, Qo and PO, Sc -- go to <paramref name="player"/>,
+        /// the winner's resolver; without one they are not answered and those lines do not drop.
+        /// Wv is INFERRED to be whether the dream is a souvenir: every quest line of the table
+        /// (2080, 2138, 2424, 2498) asks "Wv=false", so false is a dream played for real, and a
+        /// souvenir pays nothing anyway.
         /// </remarks>
-        public static Dictionary<int, int> LootOf(int difficulty, int row, int lootBonus, Func<double> roll)
+        public static Dictionary<int, int> LootOf(int difficulty, int row, int lootBonus, Func<double> roll,
+                                                  Jondo.Unity.World.Content.Criterion.Resolver? player = null,
+                                                  bool souvenir = false)
         {
             var loot = new Dictionary<int, int>();
             void Add(int item, int count)
@@ -202,7 +209,7 @@ namespace Jondo.Unity.Server.Managers
                     Add(line.Item, ReflectionsFor(lootBonus));
                     continue;
                 }
-                if (!Jondo.Unity.World.Content.Criterion.Met(line.Criterion, c => AnswerOf(c, palier, difficulty)))
+                if (!Jondo.Unity.World.Content.Criterion.Met(line.Criterion, c => AnswerOf(c, palier, difficulty, souvenir, player)))
                     continue;
                 double chance = line.Scaled ? line.Percent * lootBonus / 100.0 : line.Percent;
                 if (roll() < Math.Min(100.0, chance)) Add(line.Item, 1);
@@ -223,15 +230,35 @@ namespace Jondo.Unity.Server.Managers
             return lines;
         }
 
-        /// <summary>The two letters of a dream's criteria this server answers: Wp, the palier, and Wi, the intensity.</summary>
+        /// <summary>
+        /// A dream's own letters -- Wp, the palier, Wi, the intensity, Wv, a souvenir -- and the
+        /// player's, which <paramref name="player"/> answers when there is one.
+        /// </summary>
         private static Jondo.Unity.World.Content.Answer AnswerOf(Jondo.Unity.World.Content.Condition condition,
-                                                                 int palier, int intensity)
+                                                                 int palier, int intensity, bool souvenir,
+                                                                 Jondo.Unity.World.Content.Criterion.Resolver? player)
             => condition.Code switch
             {
                 "Wp" => Jondo.Unity.World.Content.Criterion.Compare(condition.Operator, palier, condition.Value),
                 "Wi" => Jondo.Unity.World.Content.Criterion.Compare(condition.Operator, intensity, condition.Value),
+                "Wv" => SouvenirAnswer(condition, souvenir),
+                _ => player?.Invoke(condition) ?? Jondo.Unity.World.Content.Answer.Unknown,
+            };
+
+        /// <summary>"Wv=false" or "Wv=true", "!" for not: anything else is not answered.</summary>
+        private static Jondo.Unity.World.Content.Answer SouvenirAnswer(Jondo.Unity.World.Content.Condition condition,
+                                                                       bool souvenir)
+        {
+            if (condition.Args.Count != 1 || !bool.TryParse(condition.Args[0], out bool asked))
+                return Jondo.Unity.World.Content.Answer.Unknown;
+            bool equal = souvenir == asked;
+            return condition.Operator switch
+            {
+                '=' => equal ? Jondo.Unity.World.Content.Answer.True : Jondo.Unity.World.Content.Answer.False,
+                '!' => equal ? Jondo.Unity.World.Content.Answer.False : Jondo.Unity.World.Content.Answer.True,
                 _ => Jondo.Unity.World.Content.Answer.Unknown,
             };
+        }
 
         /// <summary>
         /// The dream points a dream starts with: the f11 of the izg at the entrance. Ten in the
@@ -591,6 +618,9 @@ namespace Jondo.Unity.Server.Managers
 
             /// <summary>Whether his power was taken: "quand vous utilisez son pouvoir, le Gobelin disparaît".</summary>
             public bool GoblinGone { get; set; }
+
+            /// <summary>The quest NPC shown here once the room was won -- a Cocobur dream (<see cref="CocoburDreamOf"/>) or Oyukipoca's prey (<see cref="OyukipocaPreyOf"/>) -- or 0.</summary>
+            public int Cocobur { get; set; }
 
             /// <summary>Whether the Rey Gob stands here: the dreams saved before the other goblins say it so.</summary>
             public bool HasReyGob
@@ -2131,6 +2161,112 @@ namespace Jondo.Unity.Server.Managers
         /// <summary>The four goblins.</summary>
         public static readonly int[] Goblins = { Bog, Gobledore, Gobserico, ReyGob };
 
+        // ═══════════════════════════════════════════════════════════════════
+        //  Cocobur's dreams
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Ebony's quest 2037, whose sword is woken in the dreams: twelve "sueños de Cocobur" to
+        /// find in the well, each an NPC of the client's (4657 to 4668, «perdido» to «despierto»)
+        /// whose one reply is to brandish the sword.
+        /// </summary>
+        public const int CocoburQuest = 2037;
+
+        /// <summary>
+        /// The first eleven dreams, by objective: the NPC that stands for it, the level the client's
+        /// texts ask for the first six (1147788 to 1147793: 130 to 180), and the band (palier) the
+        /// room must be in for the other five, whose texts ask for an intense dream -- difficulty 3
+        /// or more. The order of the NPCs is INFERRED from their ids, the objectives' order.
+        /// </summary>
+        public static readonly (int Objective, int Npc, int Level, int Palier)[] CocoburDreams =
+        {
+            (14613, 4657, 130, 0), (14614, 4658, 140, 0), (14615, 4659, 150, 0),
+            (14616, 4660, 160, 0), (14617, 4661, 170, 0), (14618, 4662, 180, 0),
+            (14619, 4663, 0, 1), (14620, 4664, 0, 2), (14621, 4665, 0, 3),
+            (14705, 4666, 0, 4), (14706, 4667, 0, 5),
+        };
+
+        /// <summary>
+        /// The twelfth: «Lucha contra la oleada de guardianes quiméricos de un sueño intenso
+        /// (dificultad 3 o superior)». Counted when the dream's end is won, since winning it takes
+        /// the player out of the dream (DreamHandler.AfterTheFight).
+        /// </summary>
+        public const int CocoburLastObjective = 14707;
+
+        /// <summary>The difficulty an intense dream starts at, for the last six.</summary>
+        public const int CocoburIntense = 3;
+
+        /// <summary>
+        /// The Cocobur dream a won room shows, by its NPC, or 0: the first of the eleven the
+        /// character still has to find, when his level, the dream's difficulty and the room's
+        /// band allow it, and the room's throw of the dream's dice says so.
+        /// </summary>
+        /// <remarks>
+        /// The odds are INFERRED, the client's texts only say to explore the well until one is
+        /// found: one won fight room in <see cref="CocoburOneIn"/>. None in a dream from a code
+        /// (a souvenir), at the fountain, favour or end.
+        /// </remarks>
+        public static int CocoburDreamOf(Sueno sueno, Sala sala, int level, Func<int, bool> pending)
+        {
+            if (sueno.FromSouvenir || sala.EsFinal || sala.EsFavor || sala.EsFuente || sala.Fila == 0) return 0;
+            if (sala.Miembros.Count == 0) return 0;
+
+            foreach (var dream in CocoburDreams)
+            {
+                if (!pending(dream.Objective)) continue;
+                if (level < dream.Level) return 0;
+                if (dream.Palier > 0
+                    && (sueno.Dificultad < CocoburIntense || PalierOf(sala.Fila) < dream.Palier)) return 0;
+                return DiceOf(sueno, "cocobur", sala.Id).Next(CocoburOneIn) == 0 ? dream.Npc : 0;
+            }
+            return 0;
+        }
+
+        public const int CocoburOneIn = 3;
+
+        /// <summary>Whether the last dream is the character's to find on winning this dream's end.</summary>
+        public static bool FindsLastCocobur(Sueno sueno, Func<int, bool> pending)
+            => !sueno.FromSouvenir && sueno.Dificultad >= CocoburIntense
+               && pending(CocoburLastObjective)
+               && !CocoburDreams.Any(d => pending(d.Objective));
+
+        /// <summary>The NPCs of the eleven dreams.</summary>
+        public static IEnumerable<int> CocoburNpcs => CocoburDreams.Select(d => d.Npc);
+
+        // ---------------------------------------------------------------------------------------
+        //  Oyukipoca's prey (Tylezia's quest 2080)
+        // ---------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// «Encuentra el espíritu de Oyukipoca en las paradojas de los Sueños Infinitos» (15011): once
+        /// Draconiros has the three drops (15008 to 15010) and gave his key, a won room of a Paradox
+        /// or Nightmare dream -- «Paradoxe I à IV ou Cauchemar I à III, pas en Rêve» (Dofus pour les
+        /// noobs, Cauchemar infini) -- shows the Proie d'Oyukipoca (NPC 4998), whose reply takes the
+        /// player to Oyukipoca's Nightmare. The odds are INFERRED as the Cocobur dreams': the guide
+        /// only says to go through the dream until it is met.
+        /// </summary>
+        public const int OyukipocaPrey = 4998;
+        public const int OyukipocaPreyObjective = 15011;
+        public const int OyukipocaKeyObjective = 15008;
+        public const int ParadoxI = 4;
+        public const int OyukipocaPreyOneIn = 3;
+
+        /// <summary>The prey a won room shows (<see cref="OyukipocaPrey"/>), or 0.</summary>
+        public static int OyukipocaPreyOf(Sueno sueno, Sala sala, Func<int, bool> pending, Func<int, bool> done)
+        {
+            if (sueno.FromSouvenir || sala.EsFinal || sala.EsFavor || sala.EsFuente || sala.Fila == 0) return 0;
+            if (sala.Miembros.Count == 0 || sueno.Dificultad < ParadoxI) return 0;
+            if (!pending(OyukipocaPreyObjective) || !done(OyukipocaKeyObjective)) return 0;
+            return DiceOf(sueno, "oyukipoca", sala.Id).Next(OyukipocaPreyOneIn) == 0 ? OyukipocaPrey : 0;
+        }
+
+        /// <summary>The objective an NPC a won room shows stands for: a Cocobur dream's or the prey's.</summary>
+        public static int ObjectiveOfRoomNpc(int npc)
+            => npc == OyukipocaPrey ? OyukipocaPreyObjective : CocoburDreams.FirstOrDefault(d => d.Npc == npc).Objective;
+
+        /// <summary>Every NPC a won room may show for a quest.</summary>
+        public static IEnumerable<int> RoomQuestNpcs => CocoburNpcs.Append(OyukipocaPrey);
+
         /// <summary>
         /// Gobserico's power, 4033 ClearDreamRoom: "ce Gobelin s'occupe du groupe de monstre
         /// présent dans la salle et vous pouvez avancer sans l'affronter". The room is won, its
@@ -2186,6 +2322,20 @@ namespace Jondo.Unity.Server.Managers
                 return CasillaDelReyGob;
             int near = MapManager.GetNearestWalkableCell(sala.MapaDeLaSala, CasillaDelReyGob);
             return near > 0 ? near : CasillaDelReyGob;
+        }
+
+        /// <summary>
+        /// Where a Cocobur dream stands: two rows below the goblins' cell, or the walkable cell
+        /// nearest it, off the doors and off the goblin. INFERRED: the client places no actor.
+        /// </summary>
+        public static int CocoburCell(Sala sala)
+        {
+            int wanted = CasillaDelReyGob + 28;
+            var taken = DoorsOf(sala.MapaDeLaSala).Select(d => d.Cell).ToHashSet();
+            if (sala.Goblin != 0) taken.Add(GoblinCell(sala));
+            if (MapManager.IsCellWalkable(sala.MapaDeLaSala, wanted) && !taken.Contains(wanted)) return wanted;
+            int near = MapManager.GetNearestWalkableCell(sala.MapaDeLaSala, wanted);
+            return near > 0 && !taken.Contains(near) ? near : wanted;
         }
 
         /// <summary>The Dream Favour's Rey Gob, and where he is placed.</summary>

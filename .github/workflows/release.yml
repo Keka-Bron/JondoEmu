@@ -165,7 +165,7 @@ jobs:
 
             Download the setup for your system to install the emulator and fetch the Dofus client. The platform ZIPs are ready to unpack for a manual installation.
 
-            The setup and platform ZIPs include Heroes and Cazacabezas. For a manual server-only installation or update, extract their `*-server-mod.zip` archives into `mods/` at the emulator root. The same mod archives work with the Windows and Linux servers.
+            The setup and platform ZIPs include Heroes and Headhunters. For a manual server-only installation or update, extract their `*-server-mod.zip` archives into `mods/` at the emulator root. The same mod archives work with the Windows and Linux servers.
 
           artifacts: release/*.zip,release/*.exe,release/*.json,release/client-mod-*.dll,release/server-mod-*.dll
           artifactErrorsFailBuild: true

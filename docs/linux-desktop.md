@@ -114,7 +114,7 @@ key together when moving a profile.
 
 For a modded launch, the launcher installs the release copy of `JondoFix.dll` into
 the client's `Mods/` and uses the server manifest to load optional DLLs such as Heroes
-and Cazacabezas. It asks for approval when the server's DLLs differ from the bundled
+and Headhunters. It asks for approval when the server's DLLs differ from the bundled
 copies. The launcher passes account tokens to the mods only for bundled content.
 
 ### Native client with MelonLoader

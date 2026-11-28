@@ -400,6 +400,7 @@ namespace Jondo.Unity.Server.Handlers
             if (sala.EsFavor) PlantFavorNpc(sala);
             else if (!sala.EsFuente && !sala.Hecha) PlantarElGrupo(sala);
             PlantGoblin(sala);
+            PlantCocobur(sueno, sala);
 
             int aterriza = await TeleportHandler.ToMapAsync(session, mapa, 0);
 
@@ -429,6 +430,71 @@ namespace Jondo.Unity.Server.Handlers
 
             Managers.Npcs.PonerDelSueno(sala.MapaDeLaSala, sala.Goblin,
                                         Dreams.GoblinCell(sala), Dreams.OrientacionDelReyGob);
+        }
+
+        /// <summary>
+        /// The Cocobur dream a room just won shows its dreamer (<see cref="Dreams.CocoburDreamOf"/>),
+        /// judged on his quest log, his level and the room.
+        /// </summary>
+        private static int CocoburFor(Dreams.Sueno sueno, Dreams.Sala sala)
+        {
+            var session = SessionRegistry.FindByCharacter(sueno.CharacterId);
+            if (session == null) return 0;
+            using var context = SessionContext.Push(session);
+            var resolver = PlayerCriteria.ResolverFor(sala.MapaDeLaSala);
+            Func<int, bool> pending = objective => Jondo.Unity.World.Content.Criterion.Met($"Qo={objective}", resolver);
+            int cocobur = Dreams.CocoburDreamOf(sueno, sala, session.State.CharacterLevel, pending);
+            if (cocobur != 0) return cocobur;
+            // Or Oyukipoca's prey, for whoever has Draconiros' key to follow it (quest 2080).
+            return Dreams.OyukipocaPreyOf(sueno, sala, pending,
+                                          objective => Jondo.Unity.World.Content.Criterion.Met($"Qo>{objective}", resolver));
+        }
+
+        /// <summary>Whether the dreamer has yet to brandish the sword before a Cocobur dream.</summary>
+        private static bool CocoburStillPending(Dreams.Sueno sueno, int npc)
+        {
+            var session = SessionRegistry.FindByCharacter(sueno.CharacterId);
+            if (session == null) return false;
+            int objective = Dreams.ObjectiveOfRoomNpc(npc);
+            if (objective == 0) return false;
+            using var context = SessionContext.Push(session);
+            return PlayerCriteria.Met($"Qo={objective}", session.MapId);
+        }
+
+        /// <summary>
+        /// Puts a won room's Cocobur dream on its map while the sword has yet to be brandished
+        /// before it -- the ones another dream left on this map taken off first: the room maps
+        /// are shared. An NPC like the goblins; its reply completes its objective.
+        /// </summary>
+        private static void PlantCocobur(Dreams.Sueno sueno, Dreams.Sala sala)
+        {
+            if (sala.MapaDeLaSala == 0) return;
+            foreach (int npc in Dreams.RoomQuestNpcs) Managers.Npcs.QuitarDelSueno(sala.MapaDeLaSala, npc);
+            if (sala.Cocobur == 0 || !sala.Hecha || !CocoburStillPending(sueno, sala.Cocobur)) return;
+
+            Managers.Npcs.PonerDelSueno(sala.MapaDeLaSala, sala.Cocobur,
+                                        Dreams.CocoburCell(sala), Dreams.OrientacionDelReyGob);
+        }
+
+        /// <summary>
+        /// The last Cocobur dream, found by winning an intense dream's end: the quest's objective
+        /// is counted for whoever fought it and had it to do, the dream's end taking them out.
+        /// </summary>
+        private static void FindLastCocobur(Dreams.Sueno sueno, IEnumerable<long> fought)
+        {
+            foreach (long who in fought)
+            {
+                var session = SessionRegistry.FindByCharacter(who);
+                if (session == null) continue;
+                bool finds;
+                using (SessionContext.Push(session))
+                {
+                    var resolver = PlayerCriteria.ResolverFor(session.MapId);
+                    finds = Dreams.FindsLastCocobur(sueno,
+                        objective => Jondo.Unity.World.Content.Criterion.Met($"Qo={objective}", resolver));
+                }
+                if (finds) _ = Quests.TickAsync(session, Dreams.CocoburQuest, Dreams.CocoburLastObjective);
+            }
         }
 
         // The client's dream actions a goblin's reply carries (its ActionId).
@@ -605,9 +671,12 @@ namespace Jondo.Unity.Server.Handlers
                 if (sala.Hecha) return true;
 
                 sala.Hecha = true;
+                sala.Cocobur = CocoburFor(sueno, sala);
                 Persist(sueno);
+                PlantCocobur(sueno, sala);
 
-                Console.WriteLine($"[Dreams] Room {sala.Id} cleared; {sueno.DreamPoints} dream points.");
+                Console.WriteLine($"[Dreams] Room {sala.Id} cleared; {sueno.DreamPoints} dream points." +
+                                  (sala.Cocobur != 0 ? $" quest NPC {sala.Cocobur} shows." : ""));
                 return true;
             }
 
@@ -1135,6 +1204,7 @@ namespace Jondo.Unity.Server.Handlers
                     // A trial won: «Vencer en el combate final de la prueba» (EJ) for whoever fought it.
                     if (DreamTrials.Of(sueno) is { Achievement: > 0 } trial)
                         foreach (long who in fought) CountTrialWon(who, trial.Achievement);
+                    FindLastCocobur(sueno, fought);
                     var (map, cell) = End(sueno);
                     return (map, cell, CommandTexts.Get(session.State.Language, "dream.completed", cleared, fragments), true, result);
                 }

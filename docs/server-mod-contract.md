@@ -26,6 +26,8 @@ Configured standalone DLLs in `mods/` keep their load order. A package DLL with 
 
 A standalone client DLL can still load when listed in `ClientMods` and no active package supplies that filename. When switching to a package, remove the old filename from `ClientMods` if the replacement uses a different filename or if disabling the package should stop serving the old DLL. For manifest-based launches, the launcher sets aside managed copies from the game's `Mods/` folder so the game loads the versions selected by the manifest.
 
+The launcher asks the player to approve any client DLL that does not match the copy bundled with the launcher, showing the manifest fingerprint. An approved DLL runs with the player's operating system account and can read the sessions the launcher has saved. While any such DLL is part of a launch, the launcher hands no session token to the client, so the client features that call the server for the player (the JondoFix monster group tooltip and colour palette, the Heroes and Headhunters client mods, the administrator control token) stay off for that launch. First-party mods bundled with the launcher, including those shipped as `mods/<id>/` packages, need no approval.
+
 ## Install and enable server mods
 
 When upgrading from an installation with a separate `server-mods/` folder, move its
@@ -51,6 +53,7 @@ An optional manifest `settings` object describes the package's settings for the 
 ```json
 {
   "name": "Example greeting",
+  "title": { "en": "Greetings", "es": "Saludos", "fr": "Salutations" },
   "activationSetting": "Enabled",
   "fields": [
     {
@@ -62,7 +65,7 @@ An optional manifest `settings` object describes the package's settings for the 
 }
 ```
 
-Add this object as the manifest's `settings` property. The host reads the settings object under the manifest ID in `config/server_settings.json` and passes the effective values to `host.Settings`. Fields can declare localized labels and hints, numeric bounds and steps, units, and a `legacyKey` to read a former flat setting if the package section is absent. An optional `activationSetting` names a Boolean field. A false value skips the installed package even when its ID is listed. An entry in `ServerMods` is required for activation.
+Add this object as the manifest's `settings` property. The Mods page shows the localized `title` in the desktop's language and falls back to `name`, then to the package ID. The host reads the settings object under the manifest ID in `config/server_settings.json` and passes the effective values to `host.Settings`. Fields can declare localized labels and hints, numeric bounds and steps, units, and a `legacyKey` to read a former flat setting if the package section is absent. An optional `activationSetting` names a Boolean field. A false value skips the installed package even when its ID is listed. An entry in `ServerMods` is required for activation.
 
 ## Gameplay integration
 
@@ -74,7 +77,7 @@ Target .NET 10 and reference `Jondo.Unity.Contract`. The server assembly must ex
 
 The server calls the optional `StartGameplay()` in initialization order after opening listeners and starting gameplay services. Use it to begin timers and other background work that needs those services. If this call fails, the server shuts down the failed mod and any initialized dependents in reverse order before continuing. With `FailOnServerModError` enabled, it shuts down all initialized mods and aborts startup.
 
-Use `host.RegisterCleanup(Action)` immediately after acquiring a resource so its cleanup runs even if a later step in initialization fails. On shutdown or startup rollback, the server calls `Shutdown()` on successfully initialized mods in reverse startup order, while their host services are still available. Each mod's registered callbacks run in reverse registration order after its shutdown hook. If initialization throws, the server runs that mod's registered callbacks immediately. The server logs shutdown and callback errors and continues cleanup.
+Use `host.RegisterCleanup(Action)` immediately after acquiring a resource so its cleanup runs even if a later step in initialization fails. On shutdown or startup rollback, the server calls `Shutdown()` on successfully initialized mods in reverse startup order, after the network listeners stop and while their host services are still available. Each mod's registered callbacks run in reverse registration order after its shutdown hook. If initialization throws, the server runs that mod's registered callbacks immediately. The server logs shutdown and callback errors and continues cleanup.
 
 The server supplies its own `Jondo.Unity.Contract` assembly, including in single-file builds. Leave the contract DLL out of distributed packages. Each package has its own assembly load context. Put private managed DLLs beside the server assembly, or include the assembly's `.deps.json` and its referenced files within the package. Mods run with the server process's permissions.
 

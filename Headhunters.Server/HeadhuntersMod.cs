@@ -3,9 +3,9 @@ using System.Text.Json.Nodes;
 using Jondo.Unity.ServerMods;
 using Jondo.Unity.Launcher;
 
-namespace Cazacabezas.Server;
+namespace Headhunters.Server;
 
-public sealed class CazacabezasMod : IServerMod
+public sealed class HeadhuntersMod : IServerMod
 {
     private static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(5);
     internal HeadHunts? Hunts { get; private set; }

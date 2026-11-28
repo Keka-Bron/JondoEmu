@@ -1,7 +1,7 @@
 # The cities' war and the head hunters
 
 Bonta against Brakmar in the field: aggressions, honour and its ten grades, dishonour, and the
-*Cazacabezas* — hunt orders on a player of the other city, paid in chapeuvepés.
+*Headhunters* — hunt orders on a player of the other city, paid in chapeuvepés.
 
 There are no captures of any of it. The rules come from the client itself (its texts, its alignment
 tab, its end-of-fight screen, the map flags), from Ankama's devlogs on the alignment rework, and from
@@ -50,9 +50,9 @@ ceiling, honour, delta) shows it on the grade's bar, and the client's info messa
 dishonour washed, 155 not this time. The sheet's honour block is
 `{ f1 honour, f2 status, f3 ceiling, f4 floor }`; a new grade redraws the wings.
 
-## The Cazacabezas
+## The Headhunters
 
-`Cazacabezas.Server/HeadHunts.cs` owns the rules, and `Cazacabezas.Server/CazacabezasMod.cs` handles the package's control routes. The bundled package loads by default and handles chapeuvepé trades. Set its `Enabled` gameplay setting to true to allow hunt orders. See the [Cazacabezas server package settings](server-mod-migration.md#cazacabezas).
+`Headhunters.Server/HeadHunts.cs` owns the rules, and `Headhunters.Server/HeadhuntersMod.cs` handles the package's control routes. The bundled package loads by default and handles chapeuvepé trades. Set its `Enabled` gameplay setting to true to allow hunt orders. See the [Headhunters server package settings](server-mod-migration.md#headhunters).
 
 **Taking an order.** From level 50, sworn, PvP on and no dishonour. The board lists the enemies within
 reach: the other city, PvP on, level 30 or more, from 20 levels below the hunter to 50 above, seen
@@ -91,7 +91,7 @@ scrolls 2, 3, 5 or 16 by size, Alicha 1 or 5, and the gems.
 
 ## The mod
 
-`Cazacabezas/` is a MelonLoader mod built like JondoFix's windows, out of the client's own pieces
+`Headhunters/` is a MelonLoader mod built like JondoFix's windows, out of the client's own pieces
 (`WindowFigma`, `DofusTabGroup`, `DofusLabel`). It opens with **F7** or the button it puts beside the
 honour bar of the alignment tab (`pb_honour`), and asks the control API on `8888` with the account's
 own session, which the launcher passes as `JONDO_PLAYER_TOKEN` to every client:

@@ -1,29 +1,29 @@
-# Cazacabezas and Heroes server-plugin migration
+# Headhunters and Heroes server-plugin migration
 
 Baseline for the audit is `00e8dfb4` (`modding api start`). The client and server code for each mod ships in its own package. Paths are repository-relative.
 
-The JondoEmu setup, platform ZIPs and Docker image bundle Heroes and Cazacabezas. For a
-server-only installation, extract `cazacabezas-server-mod.zip` and `heroes-server-mod.zip`
+The JondoEmu setup, platform ZIPs and Docker image bundle Heroes and Headhunters. For a
+server-only installation, extract `headhunters-server-mod.zip` and `heroes-server-mod.zip`
 from the matching release into `mods/` before restarting. See [server mod installation](server-mod-contract.md#install-and-enable-server-mods).
 
 ## Shared settings, distribution and authentication
 
-- `Jondo.Unity.Server/ServerSettings.cs` loads `config/server_settings.json` once for the running process. The Mods page discovers standalone DLLs, installed packages, and package settings from manifests. Edits apply after restart. Set `ServerMods` to the DLL filenames and package IDs in startup order. The default list is `["heroes", "cazacabezas"]`. A legacy `HeroMode: false` omits Heroes from the default list. A legacy `HeroMode: true` adds Heroes to the list and the next settings save records that selection. With no legacy flag, an explicit list controls which packages load.
-- Installed package manifests declare the legacy flat JSON fields to import when their nested settings object is absent or null. The Heroes aliases are `HeroMode`, `HeroesMax` and `HeroSwitchReloadsMap`. The Cazacabezas aliases are `HeadHunters`, `HeadHuntWindowMinutes` and `HeadHuntRestMinutes`. Editing a package setting in the desktop UI saves its values in the package section. `Heroes.Enabled` gates a listed Heroes package. `Cazacabezas.Enabled` controls hunt orders, and the loaded package supports chapeuvepé trades with either value.
+- `Jondo.Unity.Server/ServerSettings.cs` loads `config/server_settings.json` once for the running process. The Mods page discovers standalone DLLs, installed packages, and package settings from manifests. Edits apply after restart. Set `ServerMods` to the DLL filenames and package IDs in startup order. The default list is `["heroes", "headhunters"]`. A legacy `HeroMode: false` omits Heroes from the default list. A legacy `HeroMode: true` adds Heroes to the list and the next settings save records that selection. With no legacy flag, an explicit list controls which packages load.
+- Installed package manifests declare the legacy flat JSON fields to import when their nested settings object is absent or null. The Heroes aliases are `HeroMode`, `HeroesMax` and `HeroSwitchReloadsMap`. The Headhunters aliases are `HeadHunters`, `HeadHuntWindowMinutes` and `HeadHuntRestMinutes`. Editing a package setting in the desktop UI saves its values in the package section. `Heroes.Enabled` gates a listed Heroes package. `Headhunters.Enabled` controls hunt orders, and the loaded package supports chapeuvepé trades with either value.
 - The client projects target `net6.0` and reference MelonLoader and game IL2CPP assemblies. CI and release builds generate these references from Dofus 3.6.10.11 on Windows. For a local build, run `./.github/scripts/Build-ClientMods.ps1 -DofusClientDir <client-folder>` with MelonLoader and its generated assemblies already installed. Each server package's `StageServerMod` build target stages its manifest, server assembly and built client DLL together. The GitHub release supplies `JondoFix/JondoFix.dll` and `JondoModLoader/JondoModLoader.dll`.
 - `Jondo.Unity.Core/Paths.cs` (`ModsDirectory`) resolves `<root>/mods`. `ServerSettings.ClientMods` defaults to an empty array and ignores legacy `JondoFix.dll` entries. A loaded package supplies its declared optional DLL even when the order omits it. An existing explicit `ClientMods` entry can still serve the same-named loose DLL from `mods/` when its package is absent. `Jondo.Unity.Server/Network/ClientModCatalog.cs` (`ListAvailable`, `CreateManifest`, `OpenDownload`) discovers DLLs, emits configured available entries in order with name, byte size and SHA-256, skips missing files, excludes links, rejects invalid/duplicate names and enforces contract limits. The server exposes `GET /api/mods` and `GET /api/mods/{name}`. Downloads require an exact configured name. `Jondo.Unity.Contract/ClientModManifest.cs` caps manifests at 128 entries and each DLL at 128 MiB. An empty order serves an empty manifest when no loaded packages supply client assets.
 - The launcher requires MelonLoader for `Dofus.exe`, including under Wine, and for loading client mods in `Dofus.x64`. A configured native Linux client can launch without client mods. Modded launches and MCP test clients copy JondoFix from the release into the client's `Mods/` and ignore JondoFix entries from older servers. `Jondo.Unity.Contract/ClientModDeployment.cs` verifies the optional DLLs and caches them by SHA-256. The launcher stores explicit approvals per host. MCP trusts the manifest of the local server that accepted its test key. `JondoModLoader/ServerModsPlugin.cs` verifies the cached files and loads them in order. A 404 from a server without a saved approval falls back to bundled loose optional DLLs.
-- `Cazacabezas/CazacabezasMod.cs` (`CazacabezasMod`, F7) and `Heroes/HeroesMod.cs` (`HeroesMod`, Ctrl+Tab and Tab switching) POST JSON to `http://127.0.0.1:8888/api/`. Both read `JONDO_PLAYER_TOKEN` with `JONDO_CONTROL_TOKEN` as fallback. Active gameplay routes below go through `ControlApi.Responder` → `ConSesion`, which resolves the body’s `token` via `Jondo.Unity.Server/Network/ClientLaunchRegistry.cs` (`ResolveToken`, registry then DB `LauncherToken` and `GameToken`). Invalid tokens receive `401 sesion`. These gameplay routes accept the same requests regardless of HTTP verb. `ControlApi.InTheWorld` finds the authenticated account’s in-world character with an active selection.
+- `Headhunters/HeadhuntersMod.cs` (`HeadhuntersMod`, F7) and `Heroes/HeroesMod.cs` (`HeroesMod`, Ctrl+Tab and Tab switching) POST JSON to `http://127.0.0.1:8888/api/`. Both read `JONDO_PLAYER_TOKEN` with `JONDO_CONTROL_TOKEN` as fallback. Active gameplay routes below go through `ControlApi.Responder` → `ConSesion`, which resolves the body’s `token` via `Jondo.Unity.Server/Network/ClientLaunchRegistry.cs` (`ResolveToken`, registry then DB `LauncherToken` and `GameToken`). Invalid tokens receive `401 sesion`. These gameplay routes accept the same requests regardless of HTTP verb. `ControlApi.InTheWorld` finds the authenticated account’s in-world character with an active selection.
 
-## Cazacabezas
+## Headhunters
 
 - **Settings** — `HuntSettings.Enabled=false`, `HuntWindowMinutes=15`, `RestMinutes=30`. Legacy aliases `HeadHunters`, `HeadHuntWindowMinutes`, `HeadHuntRestMinutes`. `HeadHunts.Window` and `Rest` enforce minima of 1 and 0 minutes respectively.
-- **Client work** — `CazacabezasMod.OnUpdate` polls status every 2 seconds with its window or an active hunt, otherwise every 6 seconds, with error backoff. It adds an alignment-tab button and displays the hunt tracker. `OnInitializeMelon` leaves the UI idle without a player token.
-- **Routes** — `Cazacabezas.Server/CazacabezasMod.cs` registers and owns `/api/headhunts/{status,board,take,abandon}`. The host authenticates each request before invoking the plugin. All four routes require the authenticated account's in-world character or return `409 world`. `take` reads the target character ID from `target`. With the package absent from `ServerMods`, all four paths return `404 ruta`.
-- **Package and host.** `Cazacabezas.Server/HeadHunts.cs` owns eligibility, targets, holds, streaks, orders, currency, and payouts. `HuntResponses.cs` projects the status and board JSON, and `HuntTexts.cs` contains localized notices. The module registers generic hooks for activity admission, currency, settlement and simulated targets. The host supplies world lookups, character lifecycle, ordinary alignment and PvP changes, and other game services through the shared contract.
-- **Development setup** — Run `dotnet build Cazacabezas.Server/Cazacabezas.Server.csproj -p:StageServerMod=true` to stage the manifest, server DLL and existing client DLL in `mods/cazacabezas/`. Pass `-p:CazacabezasPackageDirectory=<path>` to stage elsewhere. Add `"cazacabezas"` to `ServerMods` in `config/server_settings.json` and restart. `Cazacabezas.Enabled` controls hunt rules. The manifest’s `clientAsset` supplies `Cazacabezas.dll` to the catalog. An entry in `ClientMods` places it in the configured order, and the catalog appends it when that entry is omitted. The test project stages the same three files in its own fixture.
-- **Legacy client DLL** — The package asset takes precedence over an identically named standalone DLL in `mods/`. After package removal, the server can still advertise and serve a standalone `mods/Cazacabezas.dll` if an existing explicit `ClientMods` order includes it. For a full uninstall, remove the package ID from `ServerMods`, move the package out of `mods/`, and remove any legacy loose DLL from the server's `mods/` and from the client's MelonLoader `Mods/` directory. Restart to apply these changes.
-- **Storage and clock** — The package lazily loads/creates the existing tables through the host's SQLite connection to `DatabaseManager.WorldConnectionString` (`bases/world.db` by default). `HeadHunters` is keyed by `CharacterId` with `Chapeuvepes`, `Kills`, `Survivals`, `Failures`, `Streak`, `LockedUntilMs`. `HeadHuntOrders` is keyed by `Hunter` with `Target`, `TakenMs`, `OpenUntilMs`, `RestUntilMs`. Both participants are character IDs and timestamps use Unix milliseconds. Reload clears open state and keeps the later of the saved open/rest deadlines. `CazacabezasMod` owns the non-overlapping five-second tick. It starts when the host signals that gameplay services are online and waits for any running tick on shutdown. An unloaded package schedules no work. The tick honors `Cazacabezas.Enabled`. With the package loaded, that setting keeps its existing behavior for routes, persisted balances, and character cleanup.
+- **Client work** — `HeadhuntersMod.OnUpdate` polls status every 2 seconds with its window or an active hunt, otherwise every 6 seconds, with error backoff. It adds an alignment-tab button and displays the hunt tracker. `OnInitializeMelon` leaves the UI idle without a player token.
+- **Routes** — `Headhunters.Server/HeadhuntersMod.cs` registers and owns `/api/headhunts/{status,board,take,abandon}`. The host authenticates each request before invoking the plugin. All four routes require the authenticated account's in-world character or return `409 world`. `take` reads the target character ID from `target`. With the package absent from `ServerMods`, all four paths return `404 ruta`.
+- **Package and host.** `Headhunters.Server/HeadHunts.cs` owns eligibility, targets, holds, streaks, orders, currency, and payouts. `HuntResponses.cs` projects the status and board JSON, and `HuntTexts.cs` contains localized notices. The module registers generic hooks for activity admission, currency, settlement and simulated targets. The host supplies world lookups, character lifecycle, ordinary alignment and PvP changes, and other game services through the shared contract.
+- **Development setup** — Run `dotnet build Headhunters.Server/Headhunters.Server.csproj -p:StageServerMod=true` to stage the manifest, server DLL and existing client DLL in `mods/headhunters/`. Pass `-p:HeadhuntersPackageDirectory=<path>` to stage elsewhere. Add `"headhunters"` to `ServerMods` in `config/server_settings.json` and restart. `Headhunters.Enabled` controls hunt rules. The manifest’s `clientAsset` supplies `Headhunters.dll` to the catalog. An entry in `ClientMods` places it in the configured order, and the catalog appends it when that entry is omitted. The test project stages the same three files in its own fixture.
+- **Legacy client DLL** — The package asset takes precedence over an identically named standalone DLL in `mods/`. After package removal, the server can still advertise and serve a standalone `mods/Headhunters.dll` if an existing explicit `ClientMods` order includes it. For a full uninstall, remove the package ID from `ServerMods`, move the package out of `mods/`, and remove any legacy loose DLL from the server's `mods/` and from the client's MelonLoader `Mods/` directory. Restart to apply these changes.
+- **Storage and clock** — The package lazily loads/creates the existing tables through the host's SQLite connection to `DatabaseManager.WorldConnectionString` (`bases/world.db` by default). `HeadHunters` is keyed by `CharacterId` with `Chapeuvepes`, `Kills`, `Survivals`, `Failures`, `Streak`, `LockedUntilMs`. `HeadHuntOrders` is keyed by `Hunter` with `Target`, `TakenMs`, `OpenUntilMs`, `RestUntilMs`. Both participants are character IDs and timestamps use Unix milliseconds. Reload clears open state and keeps the later of the saved open/rest deadlines. `HeadhuntersMod` owns the non-overlapping five-second tick. It starts when the host signals that gameplay services are online and waits for any running tick on shutdown. An unloaded package schedules no work. The tick honors `Headhunters.Enabled`. With the package loaded, that setting keeps its existing behavior for routes, persisted balances, and character cleanup.
 
 | Gameplay operation | Hook and ordering |
 | --- | --- |
@@ -71,15 +71,15 @@ The Windows .NET 10 framework-dependent build ran through the normal `--headless
 | `ServerMods` | Authenticated gameplay routes | Package client assets |
 | --- | --- | --- |
 | `[]` | None | None |
-| `["cazacabezas"]` | `/api/headhunts/*` | `Cazacabezas.dll` |
+| `["headhunters"]` | `/api/headhunts/*` | `Headhunters.dll` |
 | `["heroes"]` | `/api/heroes/*` | `Heroes.dll` |
-| `["cazacabezas", "heroes"]` | Both route sets | Both DLLs in startup order |
+| `["headhunters", "heroes"]` | Both route sets | Both DLLs in startup order |
 
-All 16 mod paths returned `401 sesion` with an invalid token when their package was loaded and `404 ruta` when it was absent. Authenticated Heroes list and Cazacabezas status requests worked against the same live game session in the combined run. The in-process package matrix also checked that shutdown removed both route sets. The standalone host build, evaluated MSBuild project items and assembly metadata were checked for dependencies and embedded resources from either server plugin.
+All 16 mod paths returned `401 sesion` with an invalid token when their package was loaded and `404 ruta` when it was absent. Authenticated Heroes list and Headhunters status requests worked against the same live game session in the combined run. The in-process package matrix also checked that shutdown removed both route sets. The standalone host build, evaluated MSBuild project items and assembly metadata were checked for dependencies and embedded resources from either server plugin.
 
-## Cazacabezas package verification
+## Headhunters package verification
 
-The earlier Cazacabezas settlement smoke test used the built server's normal `--headless` entry point and a fresh installation. Direct checks against the running process covered the activation log, catalog name/size/SHA-256, download bytes, all four authenticated hunt routes, restart persistence, and removal. The package served the existing 42,496-byte DLL with SHA-256 `75438a80015c75280d4766a979e7dfc8f85bb0f8d29457bbc0a18906f3291801`.
+The earlier Headhunters settlement smoke test used the built server's normal `--headless` entry point and a fresh installation. Direct checks against the running process covered the activation log, catalog name/size/SHA-256, download bytes, all four authenticated hunt routes, restart persistence, and removal. Before the package took its English name, it served the existing 42,496-byte `Cazacabezas.dll` with SHA-256 `75438a80015c75280d4766a979e7dfc8f85bb0f8d29457bbc0a18906f3291801`.
 
 The existing `/api/test` harness supplied two headless clients for the live gameplay checks. Both connected through the game sockets. The hunt clock opened the order, the hunter sent the ordinary aggression frame, and the prey surrendered through its own socket. The production fight settlement removed the order and paid four chapeuvepés. A second open order survived a graceful process restart as a resting order, alongside the balance and kill count. With the package removed, all four routes returned `404 ruta` and an expired order stayed untouched through two five-second tick intervals. The configured standalone DLL still served in that run. Moving it out of `mods/` and restarting with the same `ClientMods` list produced an empty catalog and a `404` download.
 
@@ -88,10 +88,10 @@ The existing `/api/test` harness supplied two headless clients for the live game
 Run in PowerShell 7 from the repo root with the .NET 10 SDK and Python 3. Use an unused set of server ports (8888, 15881, 5555, 5556 and 6337) and a Windows session that can open loopback `HttpListener` endpoints. The setup uses the shipped world archive and a fresh auth database.
 
 ```powershell
-$stage = (New-Item -ItemType Directory (Join-Path (Resolve-Path .) "host-artifacts/cazacabezas-$([guid]::NewGuid().ToString('N'))") -Force).FullName
+$stage = (New-Item -ItemType Directory (Join-Path (Resolve-Path .) "host-artifacts/headhunters-$([guid]::NewGuid().ToString('N'))") -Force).FullName
 dotnet build Jondo.Unity.Server/Jondo.Unity.Server.csproj -m:1 -nr:false
 if ($LASTEXITCODE) { throw 'Server build failed' }
-dotnet build Cazacabezas.Server/Cazacabezas.Server.csproj -m:1 -nr:false -p:StageServerMod=true "-p:CazacabezasPackageDirectory=$stage/mods/cazacabezas"
+dotnet build Headhunters.Server/Headhunters.Server.csproj -m:1 -nr:false -p:StageServerMod=true "-p:HeadhuntersPackageDirectory=$stage/mods/headhunters"
 if ($LASTEXITCODE) { throw 'Package build failed' }
 Copy-Item .jondo-root $stage
 Copy-Item datos,content -Destination $stage -Recurse
@@ -100,10 +100,10 @@ $server = (Resolve-Path 'Jondo.Unity.Server/bin/Debug/net10.0/win-x64/Jondo Serv
 $env:JONDO_EMULATOR_ROOT = $stage
 $env:JONDO_PUBLIC_BIND = '0'
 $env:JONDO_TEST_KEY = [guid]::NewGuid().ToString('N')
-$dll = 'Cazacabezas.dll'
+$dll = 'Headhunters.dll'
 
 function Start-Run($label, $packages, $clientMods) {
-    @{ ServerMods = $packages; ClientMods = $clientMods; Cazacabezas = @{ Enabled = $true } } |
+    @{ ServerMods = $packages; ClientMods = $clientMods; Headhunters = @{ Enabled = $true } } |
         ConvertTo-Json -Depth 4 | Set-Content "$stage/config/server_settings.json"
     $script:serverLog = "$stage/$label.log"
     $script:process = Start-Process dotnet -ArgumentList ('"{0}" --headless' -f $server) -WorkingDirectory $stage `
@@ -113,7 +113,7 @@ function Start-Run($label, $packages, $clientMods) {
         if ($process.HasExited -or (Get-Date) -gt $deadline) { throw "Server startup failed. See $serverLog" }
         Start-Sleep -Milliseconds 250
     }
-    Select-String -SimpleMatch '[Server mods] cazacabezas (cazacabezas) initialized' $serverLog
+    Select-String -SimpleMatch '[Server mods] headhunters (headhunters) initialized' $serverLog
 }
 function Stop-Run {
     $signal = [Threading.EventWaitHandle]::OpenExisting('Local\JondoEmuServidor.Stop')
@@ -136,9 +136,9 @@ function Check-Catalog {
     $catalog = (Invoke-RestMethod 'http://127.0.0.1:8888/api/mods').mods
     $download = "$stage/download.dll"
     Invoke-WebRequest "http://127.0.0.1:8888/api/mods/$dll" -OutFile $download
-    $hash = (Get-FileHash "Cazacabezas/$dll").Hash.ToLowerInvariant()
+    $hash = (Get-FileHash "Headhunters/$dll").Hash.ToLowerInvariant()
     if ($catalog.Count -ne 1 -or $catalog[0].name -cne $dll -or $catalog[0].sha256 -cne $hash -or
-        $catalog[0].size -ne (Get-Item "Cazacabezas/$dll").Length -or (Get-FileHash $download).Hash.ToLowerInvariant() -cne $hash) {
+        $catalog[0].size -ne (Get-Item "Headhunters/$dll").Length -or (Get-FileHash $download).Hash.ToLowerInvariant() -cne $hash) {
         throw 'Catalog or download mismatch'
     }
 }
@@ -155,7 +155,7 @@ function Wait-HuntOpen {
 Start with the package alone, walk through the authenticated operations, and have the prey surrender. The status after surrender should show `kills: 1`, `chapeuvepes` equal to the quoted bounty, and `order: null`.
 
 ```powershell
-Start-Run installed @('cazacabezas') @($dll)
+Start-Run installed @('headhunters') @($dll)
 Check-Catalog
 $hunter = (Probe create 0 @{ name = 'Cazador-Smoke'; breed = 8; level = 100 }).id
 $prey = (Probe create 1 @{ name = 'Presa-Smoke'; breed = 8; level = 110 }).id
@@ -200,7 +200,7 @@ Stop-Run
 On restart, check that the same token resolves from the auth database. After reconnecting the hunter, expect the saved kill and balance, the same target, `open: false`, and a positive `restSeconds`. Use the other slot to check abandoning an order and its subsequent `409 locked` response.
 
 ```powershell
-Start-Run restarted @('cazacabezas') @()
+Start-Run restarted @('headhunters') @()
 Check-Catalog
 Hunt status @{} 409
 Probe headless
@@ -221,8 +221,8 @@ Stop-Run
 Remove the package and age the test order so an active hunt clock would delete it even with both players offline. With the legacy DLL present, expect the same download bytes, `404 ruta` on the gameplay routes and identical SQLite rows before and after waiting. After moving the legacy DLL out of `mods/`, expect an empty manifest and a `404` download as well.
 
 ```powershell
-Move-Item "$stage/mods/cazacabezas" "$stage/uninstalled-cazacabezas"
-Copy-Item "Cazacabezas/$dll" "$stage/mods/$dll"
+Move-Item "$stage/mods/headhunters" "$stage/uninstalled-headhunters"
+Copy-Item "Headhunters/$dll" "$stage/mods/$dll"
 $db = "$stage/bases/world.db"
 @'
 import sqlite3, sys, time
@@ -252,10 +252,10 @@ Stop-Run
 All six `HeadHuntTests` also passed in the in-process harness. Those tests use fixture sessions and the cities-war callback to cover holds, timeout, win and loss payouts, currency trades, legacy SQLite rows, and disposal. To repeat, use a scratch data root containing `.jondo-root`, `datos/`, `content/`, and `bases/world.db` extracted from `datos/world.zip`. Point `JONDO_EMULATOR_ROOT` at that root and reuse the compiled test assembly.
 
 ```powershell
-dotnet test Cazacabezas.Server/Tests/Cazacabezas.Server.Tests.csproj --filter FullyQualifiedName~HeadHuntTests
+dotnet test Headhunters.Server/Tests/Headhunters.Server.Tests.csproj --filter FullyQualifiedName~HeadHuntTests
 ```
 
-**Remaining manual check** — Launch a supported Dofus client through the launcher against the packaged installation. Confirm MelonLoader loads the downloaded DLL, F7 and the alignment-tab button open the hunt panel, and the tracker follows a live order through settlement. Repeat against the fully removed installation with any old client-local `Mods/Cazacabezas.dll` moved aside. This smoke test used a framework-dependent build. Published single-file and Docker smoke tests were outside the scope of this historical run.
+**Remaining manual check** — Launch a supported Dofus client through the launcher against the packaged installation. Confirm MelonLoader loads the downloaded DLL, F7 and the alignment-tab button open the hunt panel, and the tracker follows a live order through settlement. Repeat against the fully removed installation with any old client-local `Mods/Headhunters.dll` moved aside. This smoke test used a framework-dependent build. Published single-file and Docker smoke tests were outside the scope of this historical run.
 
 ## Test entry points
 
@@ -266,7 +266,7 @@ the .NET 10 SDK. Gameplay fixtures use a test data root with the world database 
 ```sh
 dotnet test Jondo.Unity.Tests/Jondo.Unity.Tests.csproj
 dotnet test Jondo.Unity.Server.Tests/Jondo.Unity.Server.Tests.csproj
-dotnet test Cazacabezas.Server/Tests/Cazacabezas.Server.Tests.csproj
+dotnet test Headhunters.Server/Tests/Headhunters.Server.Tests.csproj
 dotnet test Heroes.Server/Tests/Heroes.Server.Tests.csproj
 ```
 

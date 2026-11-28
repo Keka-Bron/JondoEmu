@@ -1713,6 +1713,12 @@ namespace Jondo.Unity.Server.Handlers
                         elegidaAhora.Takes.ToString(System.Globalization.CultureInfo.InvariantCulture))));
             }
 
+            // A reply that swears the character to a city: Amayiro's ten swords. The item handover
+            // above has already happened, and the switch writes the same alignment row as Chantal's
+            // oath, with the sheet and rank updates.
+            if (elegidaAhora != null && elegidaAhora.Swears != 0)
+                await AlignmentHandler.SwearAsync(stream, elegidaAhora.Swears);
+
             // A reply that does a conversation objective: before the next line when it goes on,
             // after the window closes when it ends it -- «He neutralizado a la rata.» is kld, then
             // lqn 56 and ied 1633 in the capture.
@@ -1923,11 +1929,13 @@ namespace Jondo.Unity.Server.Handlers
                 if (seller != null) await OpenShopAsync(stream, seller);
             }
 
+            bool gaveAfterClosing = false;
             if (completesAfterClosing != 0
                 && (closedByReply.Contains(completesAfterClosing)
                     || await CompleteQuestFromReplyAsync(session, questNpcId, elegidaAhora!, completesAfterClosing, giveFromReply: true)))
             {
                 await GiveFromReplyAsync(stream, elegidaAhora);
+                gaveAfterClosing = true;
                 // Whoever comes in once it is said and the window is shut: Selim Llenneb back in
                 // the vault on «Respaldar a Becky y dirigirte hacia la puerta».
                 if (elegidaAhora.ShowsNpc != 0) await ComeInAsync(elegidaAhora);
@@ -1948,7 +1956,9 @@ namespace Jondo.Unity.Server.Handlers
 
             if (reply != KamasMountainReply)
             {
-                Console.WriteLine($"[NPC] Reply {reply}: gives nothing.");
+                // Only when the closing objective above handed nothing over: Bizcana's follower
+                // (15287) is given there and the line would say otherwise.
+                if (!gaveAfterClosing) Console.WriteLine($"[NPC] Reply {reply}: gives nothing.");
                 return;
             }
 

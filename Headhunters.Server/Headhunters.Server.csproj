@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <Target Name="StageServerMod" AfterTargets="Build" Condition="'$(StageServerMod)' == 'true'">
-    <Copy SourceFiles="$(TargetPath);$(MSBuildProjectDirectory)/manifest.json;$(MSBuildProjectDirectory)/../Cazacabezas/Cazacabezas.dll"
-          DestinationFolder="$(CazacabezasPackageDirectory)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetPath);$(MSBuildProjectDirectory)/manifest.json;$(MSBuildProjectDirectory)/../Headhunters/Headhunters.dll"
+          DestinationFolder="$(HeadhuntersPackageDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
   <PropertyGroup>
-    <CazacabezasPackageDirectory Condition="'$(CazacabezasPackageDirectory)' == ''">$(MSBuildProjectDirectory)/../mods/cazacabezas</CazacabezasPackageDirectory>
+    <HeadhuntersPackageDirectory Condition="'$(HeadhuntersPackageDirectory)' == ''">$(MSBuildProjectDirectory)/../mods/headhunters</HeadhuntersPackageDirectory>
   </PropertyGroup>
 </Project>

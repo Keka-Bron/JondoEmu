@@ -23,7 +23,7 @@ DofusClient
 **/*.exe
 **/*.dll
 !Heroes/Heroes.dll
-!Cazacabezas/Cazacabezas.dll
+!Headhunters/Headhunters.dll
 mods/*/**
 *.csv
 *.pcap

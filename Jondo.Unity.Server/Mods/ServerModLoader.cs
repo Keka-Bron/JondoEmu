@@ -211,6 +211,14 @@ internal sealed class ServerModLoader(Action<string> log, bool failFast,
         return installed.ToLookup(entry => entry.Id, entry => entry.Mod, StringComparer.OrdinalIgnoreCase);
     }
 
+    // A plain dev build does not stage the first-party packages; say how to get them.
+    private static string StagingHint(string id) => id.ToLowerInvariant() switch
+    {
+        "heroes" => " Stage it with: dotnet build Heroes.Server -p:StageServerMod=true",
+        "headhunters" => " Stage it with: dotnet build Headhunters.Server -p:StageServerMod=true",
+        _ => "",
+    };
+
     private bool StartMod(string directory, ILookup<string, InstalledMod> installedMods,
         string id, ServerSettings settings, Func<string, IServerMod>? createMod, Func<string, bool> startDependency)
     {
@@ -222,7 +230,7 @@ internal sealed class ServerModLoader(Action<string> log, bool failFast,
             var matches = installedMods[id].ToArray();
             if (matches.Length == 0)
             {
-                log($"[Server mods] {id}: package not found in '{directory}'; skipped.");
+                log($"[Server mods] {id}: package not found in '{directory}'; skipped.{StagingHint(id)}");
                 return false;
             }
             if (matches.Length > 1)

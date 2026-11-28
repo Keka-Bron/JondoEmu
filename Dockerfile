@@ -41,7 +41,7 @@ RUN if [ "$SKIP_TESTS" != "true" ]; then \
         --artifacts-path /artifacts --nologo
 
 RUN dotnet build Heroes.Server/Heroes.Server.csproj -c Release -p:StageServerMod=true --nologo \
- && dotnet build Cazacabezas.Server/Cazacabezas.Server.csproj -c Release -p:StageServerMod=true --nologo
+ && dotnet build Headhunters.Server/Headhunters.Server.csproj -c Release -p:StageServerMod=true --nologo
 
 # ─── Runtime ──────────────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime

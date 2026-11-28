@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Jondo.Unity.Tests/ModuleTests.props" />
+  <PropertyGroup>
+    <ModuleId>headhunters</ModuleId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Headhunters.Server.csproj" OutputItemType="ModuleAssembly" />
+    <ModuleClientAsset Include="../../Headhunters/Headhunters.dll" />
+  </ItemGroup>
+</Project>

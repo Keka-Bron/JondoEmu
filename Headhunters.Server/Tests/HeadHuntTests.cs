@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Cazacabezas.Server;
+using Headhunters.Server;
 using Jondo.Unity.Protocol;
 using Jondo.Unity.Protocol.Game;
 using Jondo.Unity.Protocol.Game.Wire;
@@ -28,7 +28,7 @@ namespace Jondo.Unity.Tests.World
     public class HeadHuntsCollection { }
 
     /// <summary>
-    /// The Cazacabezas end to end, with sessions in the world: the board, the order, the hunt that
+    /// The Headhunters end to end, with sessions in the world: the board, the order, the hunt that
     /// opens when both are in, the prey's wings held out, and the head paid -- or the prey paid.
     /// </summary>
     [Collection("HeadHunts")]
@@ -39,7 +39,7 @@ namespace Jondo.Unity.Tests.World
         private static string Packages => Path.Combine(AppContext.BaseDirectory, "ServerModFixtures");
 
         private static ServerSettings HuntEnabled() => ServerSettings.Read("""
-            {"ServerMods":["cazacabezas"],"cazacabezas":{"Enabled":true}}
+            {"ServerMods":["headhunters"],"headhunters":{"Enabled":true}}
             """);
 
         private static HeadHunts OpenStorage()
@@ -68,7 +68,7 @@ namespace Jondo.Unity.Tests.World
 
         private static async Task WithHunt(Func<HeadHunts, long, long, ClientPipe, ClientPipe, Task> test, string tag)
         {
-            var mod = new CazacabezasMod();
+            var mod = new HeadhuntersMod();
             using var loaded = ServerModLoader.LoadConfigured(Packages, HuntEnabled(), Console.WriteLine, _ => mod);
             var hunts = mod.Hunts!;
             long hunter = Create(HunterAccount, "Cazador-" + tag, 100);
@@ -365,8 +365,8 @@ namespace Jondo.Unity.Tests.World
         [InlineData(true, true)]
         public async Task The_chapeuvepe_trade_is_offered_only_with_its_currency(bool modLoaded, bool hasQuestLog)
         {
-            var settings = ServerSettings.Read(modLoaded ? """{"ServerMods":["cazacabezas"]}""" : """{"ServerMods":[]}""");
-            using var mods = ServerModLoader.LoadConfigured(Packages, settings, Console.WriteLine, _ => new CazacabezasMod());
+            var settings = ServerSettings.Read(modLoaded ? """{"ServerMods":["headhunters"]}""" : """{"ServerMods":[]}""");
+            using var mods = ServerModLoader.LoadConfigured(Packages, settings, Console.WriteLine, _ => new HeadhuntersMod());
             await using var pipe = await ClientPipe.OpenAsync(8_980_000_003, 8_980_000_098, Map);
             var state = pipe.Session.State;
             if (hasQuestLog)
@@ -402,7 +402,7 @@ namespace Jondo.Unity.Tests.World
         public void A_chapeuvepe_trade_needs_the_chapeuvepes_even_when_hunts_are_off(string json)
         {
             const long someone = 8_980_000_099;
-            var mod = new CazacabezasMod();
+            var mod = new HeadhuntersMod();
             using var loaded = ServerModLoader.LoadConfigured(Packages, ServerSettings.Read(json), Console.WriteLine, _ => mod);
             var hunts = Assert.IsType<HeadHunts>(mod.Hunts);
             Assert.False(hunts.On);

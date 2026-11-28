@@ -41,6 +41,8 @@ namespace Jondo.Unity.Server
             try
             {
                 _headless = UI.ServerLaunch.Headless(args);
+                // A last stop when the process ends another way (a closed console window, a kill).
+                AppDomain.CurrentDomain.ProcessExit += (_, _) => StopServices();
                 Console.CancelKeyPress += (_, e) =>
                 {
                     e.Cancel = true;
@@ -276,15 +278,18 @@ namespace Jondo.Unity.Server
             Action<ImmutableDictionary<string, ServerModStartupIssue>>? publishIssues = null)
         {
             if (shutdown.IsCompleted) return;
+            Mods.ServerModLoader? mods = null;
             try
             {
-                using var mods = Mods.ServerModLoader.LoadConfigured(modsDirectory, settings, log, publishIssues: publishIssues);
+                mods = Mods.ServerModLoader.LoadConfigured(modsDirectory, settings, log, publishIssues: publishIssues);
                 if (!shutdown.IsCompleted)
                     await serve(mods, new ClientModCatalog(modsDirectory, settings.ClientMods, mods.ClientAssets));
             }
             finally
             {
-                stopServices();
+                // The network goes first, so no handler reaches a mod that has already stopped.
+                try { stopServices(); }
+                finally { mods?.Dispose(); }
             }
         }
 
@@ -459,8 +464,11 @@ namespace Jondo.Unity.Server
             _shutdown.TrySetResult();
         }
 
+        private static int _servicesStopped;
+
         private static void StopServices()
         {
+            if (Interlocked.Exchange(ref _servicesStopped, 1) != 0) return;
             Console.WriteLine("[+] Stopping services...");
             try { Bots.SimulatedPlayers.Stop(); } catch { }
             try { HaapiServer.Stop(); } catch { }

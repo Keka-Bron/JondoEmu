@@ -419,6 +419,20 @@ namespace Jondo.Unity.World.Fights
         public void CloseTheStart() => LastBuffOfTheStart = _ultimoEmbrujo;
 
         /// <summary>
+        /// Whoever is playing has ended his turn although the turn has not changed yet: what the
+        /// turn-end glyph under him makes him cast (793) is put outside his turn, so a one-turn
+        /// state it gives him lasts through his next turn, as the Riveteuse's glyph needs (124 at
+        /// one turn end, then 125 at the next one on it).
+        /// </summary>
+        public void CloseTheTurn()
+        {
+            if (CurrentFighter == null) return;
+            CurrentFighter.UltimoEmbrujoDeSuTurno = _ultimoEmbrujo;
+            _turnClosed = true;
+        }
+        private bool _turnClosed;
+
+        /// <summary>
         /// The number the last buff had got when this turn began: the later ones were put at its
         /// start or in it, the earlier ones in the turns before.
         /// </summary>
@@ -1804,7 +1818,9 @@ namespace Jondo.Unity.World.Fights
             StartsNewRound = false;
 
             // Whoever was playing ends his turn: the rows he puts from now on are put outside it.
-            if (CurrentFighter != null) CurrentFighter.UltimoEmbrujoDeSuTurno = _ultimoEmbrujo;
+            // If the turn was already closed before its turn-end glyphs, those rows stay outside it.
+            if (CurrentFighter != null && !_turnClosed) CurrentFighter.UltimoEmbrujoDeSuTurno = _ultimoEmbrujo;
+            _turnClosed = false;
             LastBuffBeforeThisTurn = _ultimoEmbrujo;
 
             // This is where the turn really changes, so this is where the counters are emptied. Before,

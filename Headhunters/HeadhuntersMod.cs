@@ -13,10 +13,10 @@ using Il2CppInterop.Runtime;
 using MelonLoader;
 using UnityEngine.UIElements;
 
-[assembly: MelonInfo(typeof(Cazacabezas.CazacabezasMod), "Cazacabezas", "1.0.0", "Jondo")]
+[assembly: MelonInfo(typeof(Headhunters.HeadhuntersMod), "Headhunters", "1.0.0", "Jondo")]
 [assembly: MelonGame("Ankama", "Dofus")]
 
-namespace Cazacabezas
+namespace Headhunters
 {
     /// <summary>
     /// The head hunters' window on the client: the hunter's record, his order and the board of prey
@@ -34,7 +34,7 @@ namespace Cazacabezas
     /// tabs, its labels.
     /// </para>
     /// </remarks>
-    public class CazacabezasMod : MelonMod
+    public class HeadhuntersMod : MelonMod
     {
         private const string Api = "http://127.0.0.1:8888/api/";
         private static readonly HttpClient _http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
@@ -62,8 +62,8 @@ namespace Cazacabezas
             _token = (Environment.GetEnvironmentVariable("JONDO_PLAYER_TOKEN")
                       ?? Environment.GetEnvironmentVariable("JONDO_CONTROL_TOKEN") ?? "").Trim();
             LoggerInstance.Msg(_token.Length > 0
-                ? "[Cazacabezas] Ready: F7 or the alignment tab's button opens the head hunters."
-                : "[Cazacabezas] No session token from the launcher: the head hunters stay asleep.");
+                ? "[Headhunters] Ready: F7 or the alignment tab's button opens the head hunters."
+                : "[Headhunters] No session token from the launcher: the head hunters stay asleep.");
         }
 
         public override void OnUpdate()
@@ -72,7 +72,7 @@ namespace Cazacabezas
             while (_toUnity.TryDequeue(out var action))
             {
                 try { action(); }
-                catch (Exception ex) { MelonLogger.Warning($"[Cazacabezas] {ex.Message}"); }
+                catch (Exception ex) { MelonLogger.Warning($"[Headhunters] {ex.Message}"); }
             }
 
             float now = UnityEngine.Time.unscaledTime;
@@ -257,7 +257,7 @@ namespace Cazacabezas
                 InstallInputGuard();
                 var window = new WindowFigma(true, T("title"), "", true);
                 window.showCloseButton = true;
-                window.name = "JondoCazacabezas";
+                window.name = "JondoHeadhunters";
                 window.style.position = new StyleEnum<Position>(Position.Absolute);
                 window.style.width = new StyleLength(780f);
                 window.style.height = new StyleLength(560f);
@@ -289,7 +289,7 @@ namespace Cazacabezas
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning($"[Cazacabezas] The window could not be opened: {ex}");
+                MelonLogger.Warning($"[Headhunters] The window could not be opened: {ex}");
                 Close();
             }
         }
@@ -482,7 +482,7 @@ namespace Cazacabezas
                 if (layer == null) return;
                 // A row across the top of the screen, its box in the middle: the clicks go through.
                 _tracker = new VisualElement();
-                _tracker.name = "JondoCazacabezasTracker";
+                _tracker.name = "JondoHeadhuntersTracker";
                 _tracker.pickingMode = PickingMode.Ignore;
                 _tracker.style.position = new StyleEnum<Position>(Position.Absolute);
                 _tracker.style.top = new StyleLength(12f);
@@ -525,9 +525,9 @@ namespace Cazacabezas
                 var bar = root == null ? null : UQueryExtensions.Q(root, "pb_honour", (string)null);
                 if (bar == null || bar.parent == null || bar.panel == null) continue;
                 var place = bar.parent;
-                if (UQueryExtensions.Q(place, "JondoCazacabezasButton", (string)null) != null) return;
+                if (UQueryExtensions.Q(place, "JondoHeadhuntersButton", (string)null) != null) return;
                 var button = Button(Do(Open), T("button"), true);
-                button.name = "JondoCazacabezasButton";
+                button.name = "JondoHeadhuntersButton";
                 button.style.marginTop = new StyleLength(8f);
                 button.style.alignSelf = new StyleEnum<Align>(Align.FlexStart);
                 place.Add(button);
@@ -594,7 +594,7 @@ namespace Cazacabezas
             => DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(new Action(() =>
             {
                 try { action(); }
-                catch (Exception ex) { MelonLogger.Warning($"[Cazacabezas] {ex.Message}"); }
+                catch (Exception ex) { MelonLogger.Warning($"[Headhunters] {ex.Message}"); }
             }));
 
         private static bool F7Pressed()
@@ -686,9 +686,9 @@ namespace Cazacabezas
         {
             if (_guardInstalled) return;
             _guardInstalled = true;
-            var harmony = new HarmonyLib.Harmony("jondo.cazacabezas.input");
-            var overUi = new HarmonyLib.HarmonyMethod(typeof(CazacabezasMod).GetMethod(nameof(SayOverUi)));
-            var noButton = new HarmonyLib.HarmonyMethod(typeof(CazacabezasMod).GetMethod(nameof(SayNoButton)));
+            var harmony = new HarmonyLib.Harmony("jondo.headhunters.input");
+            var overUi = new HarmonyLib.HarmonyMethod(typeof(HeadhuntersMod).GetMethod(nameof(SayOverUi)));
+            var noButton = new HarmonyLib.HarmonyMethod(typeof(HeadhuntersMod).GetMethod(nameof(SayNoButton)));
             var type = typeof(Il2CppAnkama.Utilities.InputUtility);
             void Patch(string name, HarmonyLib.HarmonyMethod postfix)
             {
@@ -699,7 +699,7 @@ namespace Cazacabezas
                 }
                 catch (Exception ex)
                 {
-                    MelonLogger.Warning($"[Cazacabezas] InputUtility.{name} not guarded: {ex.Message}");
+                    MelonLogger.Warning($"[Headhunters] InputUtility.{name} not guarded: {ex.Message}");
                 }
             }
             Patch("get_isPointerOverUI", overUi);

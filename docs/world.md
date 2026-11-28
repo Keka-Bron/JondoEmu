@@ -376,7 +376,7 @@ map; the zaapi list now sends nothing, which is what the real server does.
 
 ## 2.7 Houses
 
-**1,437 doors on 553 maps**, every one of them enterable and every one of them ownerless.
+**1,652 doors on 605 maps**, every one of them enterable and every one of them ownerless.
 
 ### What the client knows, and what it does not
 

@@ -104,7 +104,7 @@ namespace Jondo.Unity.Server
         public string[] ClientMods { get; set; } = [];
 
         /// <summary>Server mod filenames and package manifest IDs in startup order.</summary>
-        public string[] ServerMods { get; set; } = ["heroes", "cazacabezas"];
+        public string[] ServerMods { get; set; } = ["heroes", "headhunters"];
 
         /// <summary>Abort server startup when mod discovery, loading, or startup throws.</summary>
         public bool FailOnServerModError { get; set; }
@@ -176,13 +176,14 @@ namespace Jondo.Unity.Server
             foreach (var (key, value) in settings.ModSettings)
                 extra[key] = value;
             settings.ModSettings = extra;
+            RenameLegacyHeadhunters(settings, extra);
 
             bool hasSelection = doc.RootElement.EnumerateObject()
                 .Any(property => property.Name.Equals("ServerMods", StringComparison.OrdinalIgnoreCase));
             if (extra.TryGetValue("HeroMode", out var heroMode))
             {
                 if (heroMode.ValueKind == JsonValueKind.False && !hasSelection)
-                    settings.ServerMods = ["cazacabezas"];
+                    settings.ServerMods = ["headhunters"];
                 else if (heroMode.ValueKind == JsonValueKind.True)
                 {
                     if (!settings.ServerMods.Contains("heroes", StringComparer.OrdinalIgnoreCase))
@@ -192,6 +193,22 @@ namespace Jondo.Unity.Server
                 }
             }
             return settings;
+        }
+
+        // The head hunters' package once had a Spanish id, DLL and settings section; old settings files keep them.
+        private const string LegacyHeadhuntersId = "cazacabezas";
+        private const string LegacyHeadhuntersDll = "Cazacabezas.dll";
+
+        private static void RenameLegacyHeadhunters(ServerSettings settings, Dictionary<string, JsonElement> extra)
+        {
+            settings.ServerMods = settings.ServerMods
+                .Select(id => id.Equals(LegacyHeadhuntersId, StringComparison.OrdinalIgnoreCase) ? "headhunters" : id)
+                .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+            settings.ClientMods = settings.ClientMods
+                .Select(name => name.Equals(LegacyHeadhuntersDll, StringComparison.OrdinalIgnoreCase) ? "Headhunters.dll" : name)
+                .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+            if (extra.Remove(LegacyHeadhuntersId, out var section))
+                extra.TryAdd("headhunters", section);
         }
 
         /// <summary>Writes these settings to the file, for the next start.</summary>
