@@ -1,4 +1,4 @@
-using Jondo.Unity.Launcher;
+﻿using Jondo.Unity.Launcher;
 using System;
 using System.Linq;
 using System.Collections.Concurrent;

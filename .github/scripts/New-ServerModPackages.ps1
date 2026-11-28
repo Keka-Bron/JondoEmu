@@ -15,9 +15,6 @@ try {
         Cazacabezas = 'cazacabezas'
         Heroes = 'heroes'
     }
-    if (-not $SkipArchives -and (Test-Path -LiteralPath (Join-Path $root 'HeroProgressionSync.Server/HeroProgressionSync.Server.csproj') -PathType Leaf)) {
-        $modules['HeroProgressionSync'] = 'hero-progression-sync'
-    }
     foreach ($module in $modules.Keys) {
         $id = $modules[$module]
         $project = Join-Path $root "$module.Server/$module.Server.csproj"
